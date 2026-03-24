@@ -1,0 +1,19 @@
+[package]
+edition = "2021"
+name = "ts-gen-wasm-bindgen-tests"
+publish = false
+version = "0.0.0"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+doctest = false
+test = false
+
+[build-dependencies]
+ts-gen = { workspace = true }
+
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+js-sys = { workspace = true }
+wasm-bindgen = { workspace = true }
+wasm-bindgen-futures = { workspace = true }
+wasm-bindgen-test = { workspace = true }

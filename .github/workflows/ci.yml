@@ -1,0 +1,67 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  rustfmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@stable
+      with:
+        components: rustfmt
+    - run: cargo fmt --all -- --check
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@stable
+      with:
+        components: clippy
+    - run: >
+        cargo clippy --no-deps --all-features
+        --exclude ts-gen-wasm-bindgen-tests
+        --exclude cloudflare-worker-example
+        -- -D warnings
+
+  test:
+    name: Test (unit + snapshot)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@stable
+    - run: cargo test -p ts-gen
+
+  test_wasm_bindgen:
+    name: Test (wasm-bindgen integration)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: wasm32-unknown-unknown
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    - run: npm install --prefix crates/wasm-bindgen-tests
+    - run: cargo test -p ts-gen-wasm-bindgen-tests --target wasm32-unknown-unknown
+      env:
+        NODE_PATH: ${{ github.workspace }}/crates/wasm-bindgen-tests/node_modules

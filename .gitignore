@@ -1,0 +1,5 @@
+/target
+crates/wasm-bindgen-tests/node_modules
+examples/cloudflare-worker/node_modules
+examples/cloudflare-worker/.wrangler
+examples/cloudflare-worker/build
