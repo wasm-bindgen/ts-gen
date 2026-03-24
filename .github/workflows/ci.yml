@@ -36,11 +36,7 @@ jobs:
     - uses: dtolnay/rust-toolchain@stable
       with:
         components: clippy
-    - run: >
-        cargo clippy --no-deps --all-features
-        --exclude ts-gen-wasm-bindgen-tests
-        --exclude cloudflare-worker-example
-        -- -D warnings
+    - run: cargo clippy --no-deps --workspace --all-features --exclude ts-gen-wasm-bindgen-tests -- -D warnings
 
   test:
     name: Test (unit + snapshot)
