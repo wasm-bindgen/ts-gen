@@ -2,25 +2,6 @@
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
-#[doc = r" Extension trait for awaiting `js_sys::Promise<T>`."]
-#[doc = r""]
-#[doc = r" Since `IntoFuture` can't be implemented for `js_sys::Promise` from"]
-#[doc = r" generated code (orphan rule), use `.into_future().await` instead:"]
-#[doc = r" ```ignore"]
-#[doc = r" use bindings::PromiseExt;"]
-#[doc = r" let data: ArrayBuffer = promise.into_future().await?;"]
-#[doc = r" ```"]
-#[allow(dead_code)]
-pub trait PromiseExt {
-    type Output;
-    fn into_future(self) -> wasm_bindgen_futures::JsFuture<Self::Output>;
-}
-impl<T: 'static + wasm_bindgen::convert::FromWasmAbi> PromiseExt for js_sys::Promise<T> {
-    type Output = T;
-    fn into_future(self) -> wasm_bindgen_futures::JsFuture<T> {
-        wasm_bindgen_futures::JsFuture::from(self)
-    }
-}
 #[allow(dead_code)]
 use JsValue as AbortSignal;
 #[allow(dead_code)]
@@ -198,10 +179,8 @@ extern "C" {
     pub type DefaultProcessor;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(config: &Object) -> Result<DefaultProcessor, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn process(this: &DefaultProcessor, input: &str) -> Promise<JsString>;
-    #[wasm_bindgen(method, catch, js_name = "process")]
-    pub fn try_process(this: &DefaultProcessor, input: &str) -> Result<Promise<JsString>, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn process(this: &DefaultProcessor, input: &str) -> Result<String, JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn name(this: &DefaultProcessor) -> String;
 }
@@ -537,25 +516,17 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Cache;
-    #[wasm_bindgen(method)]
-    pub fn get(this: &Cache, key: &str) -> Promise<JsOption<Map<JsString, Array<JsString>>>>;
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get(
+    #[wasm_bindgen(method, catch)]
+    pub async fn get(
         this: &Cache,
         key: &str,
-    ) -> Result<Promise<JsOption<Map<JsString, Array<JsString>>>>, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn set(
-        this: &Cache,
-        key: &str,
-        value: &Map<JsString, Array<JsString>>,
-    ) -> Promise<Undefined>;
-    #[wasm_bindgen(method, catch, js_name = "set")]
-    pub fn try_set(
+    ) -> Result<Option<Map<JsString, Array<JsString>>>, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn set(
         this: &Cache,
         key: &str,
         value: &Map<JsString, Array<JsString>>,
-    ) -> Result<Promise<Undefined>, JsValue>;
+    ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -766,13 +737,8 @@ pub mod my_module {
     use wasm_bindgen::prelude::*;
     #[wasm_bindgen(module = "my-module")]
     extern "C" {
-        #[wasm_bindgen(js_name = "doWork")]
-        pub fn do_work(input: &str) -> Promise<JsString>;
-    }
-    #[wasm_bindgen(module = "my-module")]
-    extern "C" {
         #[wasm_bindgen(catch, js_name = "doWork")]
-        pub fn try_do_work(input: &str) -> Result<Promise<JsString>, JsValue>;
+        pub async fn do_work(input: &str) -> Result<String, JsValue>;
     }
     #[wasm_bindgen(module = "my-module")]
     extern "C" {

@@ -27,7 +27,7 @@ jobs:
       with:
         components: rustfmt
     - uses: extractions/setup-just@v2
-    - run: just fmt
+    - run: just fmt-check
 
   clippy:
     name: Clippy

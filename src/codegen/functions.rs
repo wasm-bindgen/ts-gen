@@ -115,6 +115,12 @@ fn generate_expanded_free_function(
         quote! { -> #ret_ty }
     };
 
+    let async_kw = if sig.is_async {
+        quote! { async }
+    } else {
+        quote! {}
+    };
+
     let wb_extern_attr = match ctx {
         ModuleContext::Module(m) => quote! { #[wasm_bindgen(module = #m)] },
         ModuleContext::Global => quote! { #[wasm_bindgen] },
@@ -125,7 +131,7 @@ fn generate_expanded_free_function(
         extern "C" {
             #doc
             #wb_attr
-            pub fn #rust_ident(#params) #ret;
+            pub #async_kw fn #rust_ident(#params) #ret;
         }
     }
 }

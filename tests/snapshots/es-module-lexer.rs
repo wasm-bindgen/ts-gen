@@ -2,25 +2,6 @@
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
-#[doc = r" Extension trait for awaiting `js_sys::Promise<T>`."]
-#[doc = r""]
-#[doc = r" Since `IntoFuture` can't be implemented for `js_sys::Promise` from"]
-#[doc = r" generated code (orphan rule), use `.into_future().await` instead:"]
-#[doc = r" ```ignore"]
-#[doc = r" use bindings::PromiseExt;"]
-#[doc = r" let data: ArrayBuffer = promise.into_future().await?;"]
-#[doc = r" ```"]
-#[allow(dead_code)]
-pub trait PromiseExt {
-    type Output;
-    fn into_future(self) -> wasm_bindgen_futures::JsFuture<Self::Output>;
-}
-impl<T: 'static + wasm_bindgen::convert::FromWasmAbi> PromiseExt for js_sys::Promise<T> {
-    type Output = T;
-    fn into_future(self) -> wasm_bindgen_futures::JsFuture<T> {
-        wasm_bindgen_futures::JsFuture::from(self)
-    }
-}
 #[allow(dead_code)]
 use JsValue as Error;
 pub mod es_module_lexer {
