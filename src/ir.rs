@@ -423,6 +423,12 @@ pub struct StaticMethodMember {
 
 pub struct TypeRegistry {
     pub types: HashMap<String, TypeInfo>,
+    /// Local-name → public export name for `export { local as exported }` forms
+    /// (the source-less rename pattern, e.g. `export { _EmailMessage as EmailMessage }`).
+    ///
+    /// Phase 2 consults this to give renamed declarations their public-facing
+    /// type name and to suppress redundant alias emission.
+    pub export_renames: HashMap<String, String>,
 }
 
 #[derive(Clone, Debug)]

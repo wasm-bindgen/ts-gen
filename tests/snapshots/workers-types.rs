@@ -111,8 +111,6 @@ use JsValue as Value;
 use JsValue as W;
 #[allow(dead_code)]
 use JsValue as WorkflowStepEvent;
-#[allow(dead_code)]
-use JsValue as _EmailMessage;
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(thread_local_v2)]
@@ -32877,28 +32875,7 @@ impl EmailSendResultBuilder {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type EmailMessage;
-    #[doc = " Envelope From attribute of the email message."]
-    #[wasm_bindgen(method, getter)]
-    pub fn from(this: &EmailMessage) -> String;
-    #[doc = " Envelope To attribute of the email message."]
-    #[wasm_bindgen(method, getter)]
-    pub fn to(this: &EmailMessage) -> String;
-}
-impl EmailMessage {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        #[allow(unused_unsafe)]
-        unsafe {
-            JsValue::from(js_sys::Object::new()).unchecked_into()
-        }
-    }
-}
-#[wasm_bindgen]
-extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = EmailMessage , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ForwardableEmailMessage;
     #[doc = " Stream of the email message content."]
@@ -33003,7 +32980,7 @@ extern "C" {
     #[wasm_bindgen(method)]
     pub fn reply(
         this: &ForwardableEmailMessage,
-        message: &_EmailMessage,
+        message: &EmailMessage,
     ) -> Promise<EmailSendResult>;
     #[doc = " Reply to the sender of this email message with a new EmailMessage object."]
     #[doc = " "]
@@ -33017,7 +32994,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "reply")]
     pub fn try_reply(
         this: &ForwardableEmailMessage,
-        message: &_EmailMessage,
+        message: &EmailMessage,
     ) -> Result<Promise<EmailSendResult>, JsValue>;
 }
 #[allow(dead_code)]
@@ -33090,11 +33067,11 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SendEmail;
     #[wasm_bindgen(method)]
-    pub fn send(this: &SendEmail, message: &_EmailMessage) -> Promise<EmailSendResult>;
+    pub fn send(this: &SendEmail, message: &EmailMessage) -> Promise<EmailSendResult>;
     #[wasm_bindgen(method, catch, js_name = "send")]
     pub fn try_send(
         this: &SendEmail,
-        message: &_EmailMessage,
+        message: &EmailMessage,
     ) -> Result<Promise<EmailSendResult>, JsValue>;
     #[wasm_bindgen(method, js_name = "send")]
     pub fn send_with_builder(this: &SendEmail, builder: &Object) -> Promise<EmailSendResult>;
@@ -39483,8 +39460,19 @@ pub mod email {
     use wasm_bindgen::prelude::*;
     #[wasm_bindgen(module = "cloudflare:email")]
     extern "C" {
-        #[wasm_bindgen(thread_local_v2, js_name = "_EmailMessage")]
-        pub static email_message: Object;
+        # [wasm_bindgen (extends = Object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type EmailMessage;
+        #[wasm_bindgen(constructor, catch)]
+        pub fn new(from: &str, to: &str, raw: &ReadableStream) -> Result<EmailMessage, JsValue>;
+        #[wasm_bindgen(constructor, catch, js_name = "EmailMessage")]
+        pub fn new_with_str(from: &str, to: &str, raw: &str) -> Result<EmailMessage, JsValue>;
+        #[doc = " Envelope From attribute of the email message."]
+        #[wasm_bindgen(method, getter)]
+        pub fn from(this: &EmailMessage) -> String;
+        #[doc = " Envelope To attribute of the email message."]
+        #[wasm_bindgen(method, getter)]
+        pub fn to(this: &EmailMessage) -> String;
     }
 }
 pub mod node {

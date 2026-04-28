@@ -8,7 +8,7 @@ use oxc_ast::ast;
 
 use crate::ir;
 use crate::parse::docs::DocComments;
-use crate::parse::merge::{extract_var_members, var_declarator_name};
+use crate::parse::merge::{extract_var_members, is_class_constructor_var, var_declarator_name};
 use crate::parse::scope::{ScopeArena, ScopeId};
 use crate::parse::types::{convert_ts_type, convert_type_params};
 use crate::util::diagnostics::DiagnosticCollector;
@@ -158,6 +158,23 @@ impl<'a> PopulateCtx<'a> {
                     let exported_name = spec.exported.name().to_string();
                     let local = spec.local.name().to_string();
                     if exported_name == local && export.source.is_none() {
+                        continue;
+                    }
+                    // If `local` was promoted from a constructor-shaped variable to a
+                    // class published under `exported_name` (recorded in phase 1's
+                    // `export_renames`), the class itself already carries the public
+                    // name — emitting an alias here would be self-referential.
+                    if export.source.is_none()
+                        && self
+                            .registry
+                            .export_renames
+                            .get(&local)
+                            .is_some_and(|renamed| renamed == &exported_name)
+                        && matches!(
+                            self.registry.types.get(&local).map(|info| &info.kind),
+                            Some(ir::RegisteredKind::Variable)
+                        )
+                    {
                         continue;
                     }
                     let from_module = export.source.as_ref().map(|s| s.value.to_string());
@@ -371,13 +388,22 @@ impl<'a> PopulateCtx<'a> {
         let doc = self.lookup_doc(dcx.export_span_start, var_decl.span.start);
         for declarator in &var_decl.declarations {
             if let Some(name) = var_declarator_name(declarator) {
-                if self
+                let merged_with_iface = self
                     .registry
                     .types
                     .get(&name)
                     .map(|info| info.kind == ir::RegisteredKind::MergedClassLike)
-                    .unwrap_or(false)
-                {
+                    .unwrap_or(false);
+
+                // Promote `let X: { new(...): T }` to a class when either:
+                //   (a) it merged with an interface (script `var + interface` pattern), or
+                //   (b) it lives in a module context and has constructor shape — the
+                //       `declare module "cloudflare:email" { let _X: { new(...): T }; }`
+                //       pattern, where the class is exported (often via rename).
+                let is_module_ctor_var = matches!(dcx.module_context, ir::ModuleContext::Module(_))
+                    && is_class_constructor_var(declarator);
+
+                if merged_with_iface || is_module_ctor_var {
                     if let Some(type_ann) = &declarator.type_annotation {
                         if let ast::TSType::TSTypeLiteral(lit) = &type_ann.type_annotation {
                             let (ctor, static_members) =
@@ -389,10 +415,20 @@ impl<'a> PopulateCtx<'a> {
                             }
                             members.extend(static_members);
 
+                            // Resolve the public-facing class name. For module-scoped
+                            // constructor vars, prefer the export rename (the JS name
+                            // consumers see) when one was recorded in phase 1.
+                            let public_name = self
+                                .registry
+                                .export_renames
+                                .get(&name)
+                                .cloned()
+                                .unwrap_or_else(|| name.clone());
+
                             declarations.push(dcx.decl(
                                 ir::TypeKind::Class(ir::ClassDecl {
-                                    name: name.clone(),
-                                    js_name: name,
+                                    name: public_name.clone(),
+                                    js_name: public_name,
                                     type_params: vec![],
                                     extends: None,
                                     implements: vec![],
