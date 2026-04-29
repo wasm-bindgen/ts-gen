@@ -618,20 +618,21 @@ fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
         let init_calls = &plan.init_calls;
         let arg_idents = &plan.arg_idents;
 
-        // Compose the doc block. Literal bullets come first (they
-        // describe the discriminants baked into this variant), then a
-        // `# Provided fields` heading and the bullets for the
-        // caller-supplied fields. Both sections are skipped when their
-        // bullet list is empty.
+        // Compose the doc block. `# Inlined fields` lists the literal
+        // discriminants baked into the function name (no parameter on
+        // the call). `# Parameters` lists the caller-supplied fields
+        // that show up in the actual signature. Either section is
+        // skipped when its bullet list is empty.
         let mut doc_text = String::new();
         if !plan.literal_doc_bullets.is_empty() {
+            doc_text.push_str("# Inlined fields\n\n");
             doc_text.push_str(&plan.literal_doc_bullets.join("\n"));
         }
         if !plan.provided_doc_bullets.is_empty() {
             if !doc_text.is_empty() {
                 doc_text.push_str("\n\n");
             }
-            doc_text.push_str("# Provided fields\n\n");
+            doc_text.push_str("# Parameters\n\n");
             doc_text.push_str(&plan.provided_doc_bullets.join("\n"));
         }
         let doc_attr = if doc_text.is_empty() {

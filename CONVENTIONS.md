@@ -283,18 +283,22 @@ SendEmailBuilder::new_with_email_address_and_array(from: &EmailAddress, to: &Arr
 Every `new*` and `builder*` variant ships with a doc block listing
 exactly what it does:
 
-* Each baked-in literal renders as a bullet
-  `` `field_name: literal_value` `` followed by the field's JSDoc (if
-  any).
-* Caller-provided fields land under a `# Provided fields` heading,
-  one bullet per parameter, again pulling from the field's JSDoc.
+* `# Inlined fields` — bullets `` `field_name: literal_value` `` for
+  each literal discriminant baked into the function name (these don't
+  appear as parameters).
+* `# Parameters` — bullets `` `field_name` `` for each caller-supplied
+  field, in signature order.
+
+Both sections pull the field's JSDoc into the bullet when present.
 
 For example:
 
 ```rust
+/// # Inlined fields
+///
 /// * `disposition: "inline"`: One of "inline" (default) or "attachment"
 ///
-/// # Provided fields
+/// # Parameters
 ///
 /// * `content`: A file attachment for an email message
 /// * `filename`: ...
