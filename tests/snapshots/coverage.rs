@@ -1,11 +1,11 @@
+#[allow(dead_code)]
+use ::web_sys::AbortSignal;
+#[allow(dead_code)]
+use ::web_sys::Headers;
 #[allow(unused_imports)]
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
-#[allow(dead_code)]
-use JsValue as AbortSignal;
-#[allow(dead_code)]
-use JsValue as Headers;
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -23,43 +23,27 @@ extern "C" {
     pub fn set_length(this: &NumberIndexed, val: f64);
 }
 impl NumberIndexed {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        #[allow(unused_imports)]
-        use wasm_bindgen::JsCast;
-        JsCast::unchecked_into(js_sys::Object::new())
+    #[doc = " # Provided fields"]
+    #[doc = " "]
+    #[doc = " * `length`"]
+    pub fn new(length: f64) -> NumberIndexed {
+        Self::builder(length).build()
     }
-    pub fn builder() -> NumberIndexedBuilder {
-        NumberIndexedBuilder {
-            inner: Self::new(),
-            required: 1u64,
-        }
+    #[doc = " # Provided fields"]
+    #[doc = " "]
+    #[doc = " * `length`"]
+    pub fn builder(length: f64) -> NumberIndexedBuilder {
+        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_length(length);
+        NumberIndexedBuilder { inner }
     }
 }
 pub struct NumberIndexedBuilder {
     inner: NumberIndexed,
-    required: u64,
 }
-#[allow(unused_mut)]
 impl NumberIndexedBuilder {
-    pub fn length(mut self, val: f64) -> Self {
-        self.inner.set_length(val);
-        self.required &= 18446744073709551614u64;
-        self
-    }
-    pub fn build(self) -> Result<NumberIndexed, JsValue> {
-        if self.required != 0 {
-            let mut missing = Vec::new();
-            if self.required & 1u64 != 0 {
-                missing.push("missing required property `length`");
-            }
-            return Err(JsValue::from_str(&format!(
-                "{}: {}",
-                stringify!(NumberIndexed),
-                missing.join(", ")
-            )));
-        }
-        Ok(self.inner)
+    pub fn build(self) -> NumberIndexed {
+        self.inner
     }
 }
 #[wasm_bindgen]
@@ -73,43 +57,27 @@ extern "C" {
     pub fn set_name(this: &MixedWithIndex, val: &str);
 }
 impl MixedWithIndex {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        #[allow(unused_imports)]
-        use wasm_bindgen::JsCast;
-        JsCast::unchecked_into(js_sys::Object::new())
+    #[doc = " # Provided fields"]
+    #[doc = " "]
+    #[doc = " * `name`"]
+    pub fn new(name: &str) -> MixedWithIndex {
+        Self::builder(name).build()
     }
-    pub fn builder() -> MixedWithIndexBuilder {
-        MixedWithIndexBuilder {
-            inner: Self::new(),
-            required: 1u64,
-        }
+    #[doc = " # Provided fields"]
+    #[doc = " "]
+    #[doc = " * `name`"]
+    pub fn builder(name: &str) -> MixedWithIndexBuilder {
+        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_name(name);
+        MixedWithIndexBuilder { inner }
     }
 }
 pub struct MixedWithIndexBuilder {
     inner: MixedWithIndex,
-    required: u64,
 }
-#[allow(unused_mut)]
 impl MixedWithIndexBuilder {
-    pub fn name(mut self, val: &str) -> Self {
-        self.inner.set_name(val);
-        self.required &= 18446744073709551614u64;
-        self
-    }
-    pub fn build(self) -> Result<MixedWithIndex, JsValue> {
-        if self.required != 0 {
-            let mut missing = Vec::new();
-            if self.required & 1u64 != 0 {
-                missing.push("missing required property `name`");
-            }
-            return Err(JsValue::from_str(&format!(
-                "{}: {}",
-                stringify!(MixedWithIndex),
-                missing.join(", ")
-            )));
-        }
-        Ok(self.inner)
+    pub fn build(self) -> MixedWithIndex {
+        self.inner
     }
 }
 #[wasm_bindgen]
@@ -123,43 +91,27 @@ extern "C" {
     pub fn set_name(this: &HasName, val: &str);
 }
 impl HasName {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        #[allow(unused_imports)]
-        use wasm_bindgen::JsCast;
-        JsCast::unchecked_into(js_sys::Object::new())
+    #[doc = " # Provided fields"]
+    #[doc = " "]
+    #[doc = " * `name`"]
+    pub fn new(name: &str) -> HasName {
+        Self::builder(name).build()
     }
-    pub fn builder() -> HasNameBuilder {
-        HasNameBuilder {
-            inner: Self::new(),
-            required: 1u64,
-        }
+    #[doc = " # Provided fields"]
+    #[doc = " "]
+    #[doc = " * `name`"]
+    pub fn builder(name: &str) -> HasNameBuilder {
+        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_name(name);
+        HasNameBuilder { inner }
     }
 }
 pub struct HasNameBuilder {
     inner: HasName,
-    required: u64,
 }
-#[allow(unused_mut)]
 impl HasNameBuilder {
-    pub fn name(mut self, val: &str) -> Self {
-        self.inner.set_name(val);
-        self.required &= 18446744073709551614u64;
-        self
-    }
-    pub fn build(self) -> Result<HasName, JsValue> {
-        if self.required != 0 {
-            let mut missing = Vec::new();
-            if self.required & 1u64 != 0 {
-                missing.push("missing required property `name`");
-            }
-            return Err(JsValue::from_str(&format!(
-                "{}: {}",
-                stringify!(HasName),
-                missing.join(", ")
-            )));
-        }
-        Ok(self.inner)
+    pub fn build(self) -> HasName {
+        self.inner
     }
 }
 #[wasm_bindgen]
@@ -173,43 +125,27 @@ extern "C" {
     pub fn set_age(this: &HasAge, val: f64);
 }
 impl HasAge {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        #[allow(unused_imports)]
-        use wasm_bindgen::JsCast;
-        JsCast::unchecked_into(js_sys::Object::new())
+    #[doc = " # Provided fields"]
+    #[doc = " "]
+    #[doc = " * `age`"]
+    pub fn new(age: f64) -> HasAge {
+        Self::builder(age).build()
     }
-    pub fn builder() -> HasAgeBuilder {
-        HasAgeBuilder {
-            inner: Self::new(),
-            required: 1u64,
-        }
+    #[doc = " # Provided fields"]
+    #[doc = " "]
+    #[doc = " * `age`"]
+    pub fn builder(age: f64) -> HasAgeBuilder {
+        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_age(age);
+        HasAgeBuilder { inner }
     }
 }
 pub struct HasAgeBuilder {
     inner: HasAge,
-    required: u64,
 }
-#[allow(unused_mut)]
 impl HasAgeBuilder {
-    pub fn age(mut self, val: f64) -> Self {
-        self.inner.set_age(val);
-        self.required &= 18446744073709551614u64;
-        self
-    }
-    pub fn build(self) -> Result<HasAge, JsValue> {
-        if self.required != 0 {
-            let mut missing = Vec::new();
-            if self.required & 1u64 != 0 {
-                missing.push("missing required property `age`");
-            }
-            return Err(JsValue::from_str(&format!(
-                "{}: {}",
-                stringify!(HasAge),
-                missing.join(", ")
-            )));
-        }
-        Ok(self.inner)
+    pub fn build(self) -> HasAge {
+        self.inner
     }
 }
 #[allow(dead_code)]
@@ -309,55 +245,34 @@ extern "C" {
     pub fn set_parent(this: &TreeNode, val: &TreeNode);
 }
 impl TreeNode {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        #[allow(unused_imports)]
-        use wasm_bindgen::JsCast;
-        JsCast::unchecked_into(js_sys::Object::new())
+    #[doc = " # Provided fields"]
+    #[doc = " "]
+    #[doc = " * `value`"]
+    #[doc = " * `children`"]
+    pub fn new(value: &str, children: &Array<TreeNode>) -> TreeNode {
+        Self::builder(value, children).build()
     }
-    pub fn builder() -> TreeNodeBuilder {
-        TreeNodeBuilder {
-            inner: Self::new(),
-            required: 3u64,
-        }
+    #[doc = " # Provided fields"]
+    #[doc = " "]
+    #[doc = " * `value`"]
+    #[doc = " * `children`"]
+    pub fn builder(value: &str, children: &Array<TreeNode>) -> TreeNodeBuilder {
+        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_value(value);
+        inner.set_children(children);
+        TreeNodeBuilder { inner }
     }
 }
 pub struct TreeNodeBuilder {
     inner: TreeNode,
-    required: u64,
 }
-#[allow(unused_mut)]
 impl TreeNodeBuilder {
-    pub fn value(mut self, val: &str) -> Self {
-        self.inner.set_value(val);
-        self.required &= 18446744073709551614u64;
-        self
-    }
-    pub fn children(mut self, val: &Array<TreeNode>) -> Self {
-        self.inner.set_children(val);
-        self.required &= 18446744073709551613u64;
-        self
-    }
-    pub fn parent(mut self, val: &TreeNode) -> Self {
+    pub fn parent(self, val: &TreeNode) -> Self {
         self.inner.set_parent(val);
         self
     }
-    pub fn build(self) -> Result<TreeNode, JsValue> {
-        if self.required != 0 {
-            let mut missing = Vec::new();
-            if self.required & 1u64 != 0 {
-                missing.push("missing required property `value`");
-            }
-            if self.required & 2u64 != 0 {
-                missing.push("missing required property `children`");
-            }
-            return Err(JsValue::from_str(&format!(
-                "{}: {}",
-                stringify!(TreeNode),
-                missing.join(", ")
-            )));
-        }
-        Ok(self.inner)
+    pub fn build(self) -> TreeNode {
+        self.inner
     }
 }
 #[wasm_bindgen]
@@ -377,56 +292,30 @@ extern "C" {
     pub fn set_next_with_null(this: &LinkedList, val: &Null);
 }
 impl LinkedList {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        #[allow(unused_imports)]
-        use wasm_bindgen::JsCast;
-        JsCast::unchecked_into(js_sys::Object::new())
+    #[doc = " # Provided fields"]
+    #[doc = " "]
+    #[doc = " * `data`"]
+    #[doc = " * `next`"]
+    pub fn new(data: &JsValue, next: Option<&LinkedList>) -> LinkedList {
+        Self::builder(data, next).build()
     }
-    pub fn builder() -> LinkedListBuilder {
-        LinkedListBuilder {
-            inner: Self::new(),
-            required: 3u64,
-        }
+    #[doc = " # Provided fields"]
+    #[doc = " "]
+    #[doc = " * `data`"]
+    #[doc = " * `next`"]
+    pub fn builder(data: &JsValue, next: Option<&LinkedList>) -> LinkedListBuilder {
+        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_data(data);
+        inner.set_next(next);
+        LinkedListBuilder { inner }
     }
 }
 pub struct LinkedListBuilder {
     inner: LinkedList,
-    required: u64,
 }
-#[allow(unused_mut)]
 impl LinkedListBuilder {
-    pub fn data(mut self, val: &JsValue) -> Self {
-        self.inner.set_data(val);
-        self.required &= 18446744073709551614u64;
-        self
-    }
-    pub fn next(mut self, val: &LinkedList) -> Self {
-        self.inner.set_next(val);
-        self.required &= 18446744073709551613u64;
-        self
-    }
-    pub fn next_with_null(mut self, val: &Null) -> Self {
-        self.inner.set_next_with_null(val);
-        self.required &= 18446744073709551613u64;
-        self
-    }
-    pub fn build(self) -> Result<LinkedList, JsValue> {
-        if self.required != 0 {
-            let mut missing = Vec::new();
-            if self.required & 1u64 != 0 {
-                missing.push("missing required property `data`");
-            }
-            if self.required & 2u64 != 0 {
-                missing.push("missing required property `next`");
-            }
-            return Err(JsValue::from_str(&format!(
-                "{}: {}",
-                stringify!(LinkedList),
-                missing.join(", ")
-            )));
-        }
-        Ok(self.inner)
+    pub fn build(self) -> LinkedList {
+        self.inner
     }
 }
 #[wasm_bindgen]
@@ -483,43 +372,27 @@ extern "C" {
     pub fn set_id(this: &MultiExtend, val: &str);
 }
 impl MultiExtend {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        #[allow(unused_imports)]
-        use wasm_bindgen::JsCast;
-        JsCast::unchecked_into(js_sys::Object::new())
+    #[doc = " # Provided fields"]
+    #[doc = " "]
+    #[doc = " * `id`"]
+    pub fn new(id: &str) -> MultiExtend {
+        Self::builder(id).build()
     }
-    pub fn builder() -> MultiExtendBuilder {
-        MultiExtendBuilder {
-            inner: Self::new(),
-            required: 1u64,
-        }
+    #[doc = " # Provided fields"]
+    #[doc = " "]
+    #[doc = " * `id`"]
+    pub fn builder(id: &str) -> MultiExtendBuilder {
+        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_id(id);
+        MultiExtendBuilder { inner }
     }
 }
 pub struct MultiExtendBuilder {
     inner: MultiExtend,
-    required: u64,
 }
-#[allow(unused_mut)]
 impl MultiExtendBuilder {
-    pub fn id(mut self, val: &str) -> Self {
-        self.inner.set_id(val);
-        self.required &= 18446744073709551614u64;
-        self
-    }
-    pub fn build(self) -> Result<MultiExtend, JsValue> {
-        if self.required != 0 {
-            let mut missing = Vec::new();
-            if self.required & 1u64 != 0 {
-                missing.push("missing required property `id`");
-            }
-            return Err(JsValue::from_str(&format!(
-                "{}: {}",
-                stringify!(MultiExtend),
-                missing.join(", ")
-            )));
-        }
-        Ok(self.inner)
+    pub fn build(self) -> MultiExtend {
+        self.inner
     }
 }
 #[wasm_bindgen]
@@ -657,50 +530,48 @@ extern "C" {
     pub fn set_signal(this: &FetchOptions, val: &AbortSignal);
 }
 impl FetchOptions {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        #[allow(unused_imports)]
-        use wasm_bindgen::JsCast;
-        JsCast::unchecked_into(js_sys::Object::new())
+    pub fn new() -> FetchOptions {
+        Self::builder().build()
     }
     pub fn builder() -> FetchOptionsBuilder {
-        FetchOptionsBuilder { inner: Self::new() }
+        FetchOptionsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
     }
 }
 pub struct FetchOptionsBuilder {
     inner: FetchOptions,
 }
-#[allow(unused_mut)]
 impl FetchOptionsBuilder {
-    pub fn method(mut self, val: &str) -> Self {
+    pub fn method(self, val: &str) -> Self {
         self.inner.set_method(val);
         self
     }
-    pub fn headers(mut self, val: &Headers) -> Self {
+    pub fn headers(self, val: &Headers) -> Self {
         self.inner.set_headers(val);
         self
     }
-    pub fn headers_with_record(mut self, val: &Object<JsString>) -> Self {
+    pub fn headers_with_record(self, val: &Object<JsString>) -> Self {
         self.inner.set_headers_with_record(val);
         self
     }
-    pub fn body(mut self, val: &str) -> Self {
+    pub fn body(self, val: &str) -> Self {
         self.inner.set_body(val);
         self
     }
-    pub fn body_with_array_buffer(mut self, val: &ArrayBuffer) -> Self {
+    pub fn body_with_array_buffer(self, val: &ArrayBuffer) -> Self {
         self.inner.set_body_with_array_buffer(val);
         self
     }
-    pub fn body_with_null(mut self, val: &Null) -> Self {
+    pub fn body_with_null(self, val: &Null) -> Self {
         self.inner.set_body_with_null(val);
         self
     }
-    pub fn redirect(mut self, val: &str) -> Self {
+    pub fn redirect(self, val: &str) -> Self {
         self.inner.set_redirect(val);
         self
     }
-    pub fn signal(mut self, val: &AbortSignal) -> Self {
+    pub fn signal(self, val: &AbortSignal) -> Self {
         self.inner.set_signal(val);
         self
     }
@@ -719,22 +590,20 @@ extern "C" {
     pub fn set_verbose(this: &SimpleConfig, val: bool);
 }
 impl SimpleConfig {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        #[allow(unused_imports)]
-        use wasm_bindgen::JsCast;
-        JsCast::unchecked_into(js_sys::Object::new())
+    pub fn new() -> SimpleConfig {
+        Self::builder().build()
     }
     pub fn builder() -> SimpleConfigBuilder {
-        SimpleConfigBuilder { inner: Self::new() }
+        SimpleConfigBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
     }
 }
 pub struct SimpleConfigBuilder {
     inner: SimpleConfig,
 }
-#[allow(unused_mut)]
 impl SimpleConfigBuilder {
-    pub fn verbose(mut self, val: bool) -> Self {
+    pub fn verbose(self, val: bool) -> Self {
         self.inner.set_verbose(val);
         self
     }
@@ -765,34 +634,32 @@ extern "C" {
     pub fn set_data(this: &NotificationOptions, val: &JsValue);
 }
 impl NotificationOptions {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        #[allow(unused_imports)]
-        use wasm_bindgen::JsCast;
-        JsCast::unchecked_into(js_sys::Object::new())
+    pub fn new() -> NotificationOptions {
+        Self::builder().build()
     }
     pub fn builder() -> NotificationOptionsBuilder {
-        NotificationOptionsBuilder { inner: Self::new() }
+        NotificationOptionsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
     }
 }
 pub struct NotificationOptionsBuilder {
     inner: NotificationOptions,
 }
-#[allow(unused_mut)]
 impl NotificationOptionsBuilder {
-    pub fn body(mut self, val: &str) -> Self {
+    pub fn body(self, val: &str) -> Self {
         self.inner.set_body(val);
         self
     }
-    pub fn icon(mut self, val: &str) -> Self {
+    pub fn icon(self, val: &str) -> Self {
         self.inner.set_icon(val);
         self
     }
-    pub fn tag(mut self, val: &str) -> Self {
+    pub fn tag(self, val: &str) -> Self {
         self.inner.set_tag(val);
         self
     }
-    pub fn data(mut self, val: &JsValue) -> Self {
+    pub fn data(self, val: &JsValue) -> Self {
         self.inner.set_data(val);
         self
     }
@@ -851,47 +718,31 @@ pub mod my_module {
         pub fn set_data(this: &WorkResult, val: &str);
     }
     impl WorkResult {
-        #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
-            #[allow(unused_imports)]
-            use wasm_bindgen::JsCast;
-            JsCast::unchecked_into(js_sys::Object::new())
+        #[doc = " # Provided fields"]
+        #[doc = " "]
+        #[doc = " * `success`"]
+        pub fn new(success: bool) -> WorkResult {
+            Self::builder(success).build()
         }
-        pub fn builder() -> WorkResultBuilder {
-            WorkResultBuilder {
-                inner: Self::new(),
-                required: 1u64,
-            }
+        #[doc = " # Provided fields"]
+        #[doc = " "]
+        #[doc = " * `success`"]
+        pub fn builder(success: bool) -> WorkResultBuilder {
+            let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+            inner.set_success(success);
+            WorkResultBuilder { inner }
         }
     }
     pub struct WorkResultBuilder {
         inner: WorkResult,
-        required: u64,
     }
-    #[allow(unused_mut)]
     impl WorkResultBuilder {
-        pub fn success(mut self, val: bool) -> Self {
-            self.inner.set_success(val);
-            self.required &= 18446744073709551614u64;
-            self
-        }
-        pub fn data(mut self, val: &str) -> Self {
+        pub fn data(self, val: &str) -> Self {
             self.inner.set_data(val);
             self
         }
-        pub fn build(self) -> Result<WorkResult, JsValue> {
-            if self.required != 0 {
-                let mut missing = Vec::new();
-                if self.required & 1u64 != 0 {
-                    missing.push("missing required property `success`");
-                }
-                return Err(JsValue::from_str(&format!(
-                    "{}: {}",
-                    stringify!(WorkResult),
-                    missing.join(", ")
-                )));
-            }
-            Ok(self.inner)
+        pub fn build(self) -> WorkResult {
+            self.inner
         }
     }
 }

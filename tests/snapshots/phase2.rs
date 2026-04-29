@@ -1,15 +1,15 @@
+#[allow(dead_code)]
+use ::web_sys::Blob;
+#[allow(dead_code)]
+use ::web_sys::ReadableStream;
+#[allow(dead_code)]
+use ::web_sys::Request;
+#[allow(dead_code)]
+use ::web_sys::Response;
 #[allow(unused_imports)]
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
-#[allow(dead_code)]
-use JsValue as Blob;
-#[allow(dead_code)]
-use JsValue as ReadableStream;
-#[allow(dead_code)]
-use JsValue as Request;
-#[allow(dead_code)]
-use JsValue as Response;
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]

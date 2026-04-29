@@ -52,6 +52,15 @@ pub struct GlobalContext {
     pub external_map: ExternalMap,
     /// Pending imports that need to be resolved during import resolution.
     pub pending_imports: Vec<PendingImport>,
+    /// `TypeId`s synthesised by `populate_builtin_scope` for global
+    /// intrinsics (`Error`, `Promise`, …) and web-platform types
+    /// (`ReadableStream`, `Headers`, …). Codegen short-circuits these
+    /// to bare-ident emission — they're either covered by `use js_sys::*`
+    /// or expected to come from a `--external` mapping at the top of the
+    /// generated file. Treating them as "local" would mark them for
+    /// emission; treating them as "unresolved" would alias them to
+    /// `JsValue` even though `js_sys` already provides them.
+    pub builtin_type_ids: std::collections::HashSet<TypeId>,
     types: Vec<TypeDeclaration>,
     modules: Vec<ParsedModule>,
     /// Map from module specifier to ModuleId for fast lookup.
@@ -65,6 +74,7 @@ impl GlobalContext {
             diagnostics: DiagnosticCollector::new(),
             external_map: ExternalMap::new(),
             pending_imports: Vec::new(),
+            builtin_type_ids: std::collections::HashSet::new(),
             types: Vec::new(),
             modules: Vec::new(),
             module_index: std::collections::HashMap::new(),

@@ -2,6 +2,8 @@
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
+#[allow(dead_code)]
+use JsValue as EventEmitter;
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(i32)]
@@ -79,7 +81,7 @@ pub mod node_js {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = EventEmitter , extends = Object)]
+    # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Stream;
     #[wasm_bindgen(method)]
@@ -150,26 +152,24 @@ pub mod intl {
         pub fn set_sensitivity(this: &CollatorOptions, val: &str);
     }
     impl CollatorOptions {
-        #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
-            #[allow(unused_imports)]
-            use wasm_bindgen::JsCast;
-            JsCast::unchecked_into(js_sys::Object::new())
+        pub fn new() -> CollatorOptions {
+            Self::builder().build()
         }
         pub fn builder() -> CollatorOptionsBuilder {
-            CollatorOptionsBuilder { inner: Self::new() }
+            CollatorOptionsBuilder {
+                inner: JsCast::unchecked_into(js_sys::Object::new()),
+            }
         }
     }
     pub struct CollatorOptionsBuilder {
         inner: CollatorOptions,
     }
-    #[allow(unused_mut)]
     impl CollatorOptionsBuilder {
-        pub fn usage(mut self, val: &str) -> Self {
+        pub fn usage(self, val: &str) -> Self {
             self.inner.set_usage(val);
             self
         }
-        pub fn sensitivity(mut self, val: &str) -> Self {
+        pub fn sensitivity(self, val: &str) -> Self {
             self.inner.set_sensitivity(val);
             self
         }

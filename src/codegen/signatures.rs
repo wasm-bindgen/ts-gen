@@ -317,6 +317,12 @@ pub fn build_signatures(
 /// suffixes by stripping a shared base prefix. We compute against a
 /// non-empty placeholder base because `compute_rust_names` was originally
 /// designed to produce full names.
+/// Public alias of [`compute_suffixes`] for callers in sibling modules
+/// that build their own concrete signature lists.
+pub fn compute_suffixes_pub(expansions: &[Vec<ConcreteParam>]) -> Vec<String> {
+    compute_suffixes(expansions)
+}
+
 fn compute_suffixes(expansions: &[Vec<ConcreteParam>]) -> Vec<String> {
     // Use a placeholder base — `BASE` is just a prefix that won't appear in
     // any param name, so we can safely strip it back off.
@@ -703,6 +709,7 @@ pub fn generate_concrete_params(
     params: &[ConcreteParam],
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
+    from_module: &crate::ir::ModuleContext,
 ) -> TokenStream {
     let items: Vec<_> = params
         .iter()
@@ -711,7 +718,13 @@ pub fn generate_concrete_params(
             let ty = if p.variadic {
                 quote! { &[JsValue] }
             } else {
-                typemap::to_syn_type(&p.type_ref, TypePosition::ARGUMENT, cgctx, scope)
+                typemap::to_syn_type(
+                    &p.type_ref,
+                    TypePosition::ARGUMENT,
+                    cgctx,
+                    scope,
+                    from_module,
+                )
             };
             quote! { #name: #ty }
         })

@@ -31,6 +31,19 @@ struct Cli {
     #[arg(short = 'e', long = "external", num_args = 1..)]
     external: Vec<String>,
 
+    /// Disable the built-in web platform → `web_sys` defaults.
+    ///
+    /// By default ts-gen treats names like `Blob`, `Headers`,
+    /// `ReadableStream`, `Event`, … as their `::web_sys::*` equivalents
+    /// so the generated code compiles against the standard web platform
+    /// types out of the box. Pass this flag for environments that don't
+    /// link against `web_sys` (custom runtimes, node-only outputs) or
+    /// when you want to provide every mapping explicitly via
+    /// `--external`. Explicit `--external` mappings always override the
+    /// defaults regardless of this flag.
+    #[arg(long = "no-web-sys")]
+    no_web_sys: bool,
+
     /// Print the parsed IR for debugging.
     #[arg(short, long)]
     verbose: bool,
@@ -49,6 +62,10 @@ fn main() -> Result<()> {
 
     // Parse
     let (module, mut gctx) = ts_gen::parse::parse_dts_files(&input_files, cli.lib_name.as_deref())?;
+
+    if cli.no_web_sys {
+        gctx.external_map.clear_defaults();
+    }
 
     // Apply external type mappings
     for mapping in &cli.external {

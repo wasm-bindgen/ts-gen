@@ -1,21 +1,21 @@
+#[allow(dead_code)]
+use ::web_sys::AbortSignal;
+#[allow(dead_code)]
+use ::web_sys::Blob;
+#[allow(dead_code)]
+use ::web_sys::FormData;
+#[allow(dead_code)]
+use ::web_sys::ReadableStream;
+#[allow(dead_code)]
+use ::web_sys::UrlSearchParams as URLSearchParams;
 #[allow(unused_imports)]
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
 #[allow(dead_code)]
-use JsValue as AbortSignal;
-#[allow(dead_code)]
-use JsValue as Blob;
-#[allow(dead_code)]
 use JsValue as E;
 #[allow(dead_code)]
-use JsValue as FormData;
-#[allow(dead_code)]
 use JsValue as IterableIterator;
-#[allow(dead_code)]
-use JsValue as ReadableStream;
-#[allow(dead_code)]
-use JsValue as URLSearchParams;
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -159,70 +159,68 @@ extern "C" {
     pub fn set_signal(this: &RequestInit, val: &AbortSignal);
 }
 impl RequestInit {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        #[allow(unused_imports)]
-        use wasm_bindgen::JsCast;
-        JsCast::unchecked_into(js_sys::Object::new())
+    pub fn new() -> RequestInit {
+        Self::builder().build()
     }
     pub fn builder() -> RequestInitBuilder {
-        RequestInitBuilder { inner: Self::new() }
+        RequestInitBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
     }
 }
 pub struct RequestInitBuilder {
     inner: RequestInit,
 }
-#[allow(unused_mut)]
 impl RequestInitBuilder {
-    pub fn method(mut self, val: &str) -> Self {
+    pub fn method(self, val: &str) -> Self {
         self.inner.set_method(val);
         self
     }
-    pub fn headers(mut self, val: &Headers) -> Self {
+    pub fn headers(self, val: &Headers) -> Self {
         self.inner.set_headers(val);
         self
     }
-    pub fn headers_with_record(mut self, val: &Object<JsString>) -> Self {
+    pub fn headers_with_record(self, val: &Object<JsString>) -> Self {
         self.inner.set_headers_with_record(val);
         self
     }
-    pub fn headers_with_array(mut self, val: &Array<ArrayTuple<(JsString, JsString)>>) -> Self {
+    pub fn headers_with_array(self, val: &Array<ArrayTuple<(JsString, JsString)>>) -> Self {
         self.inner.set_headers_with_array(val);
         self
     }
-    pub fn body(mut self, val: &ReadableStream) -> Self {
+    pub fn body(self, val: &ReadableStream) -> Self {
         self.inner.set_body(val);
         self
     }
-    pub fn body_with_str(mut self, val: &str) -> Self {
+    pub fn body_with_str(self, val: &str) -> Self {
         self.inner.set_body_with_str(val);
         self
     }
-    pub fn body_with_array_buffer(mut self, val: &ArrayBuffer) -> Self {
+    pub fn body_with_array_buffer(self, val: &ArrayBuffer) -> Self {
         self.inner.set_body_with_array_buffer(val);
         self
     }
-    pub fn body_with_blob(mut self, val: &Blob) -> Self {
+    pub fn body_with_blob(self, val: &Blob) -> Self {
         self.inner.set_body_with_blob(val);
         self
     }
-    pub fn body_with_url_search_params(mut self, val: &URLSearchParams) -> Self {
+    pub fn body_with_url_search_params(self, val: &URLSearchParams) -> Self {
         self.inner.set_body_with_url_search_params(val);
         self
     }
-    pub fn body_with_form_data(mut self, val: &FormData) -> Self {
+    pub fn body_with_form_data(self, val: &FormData) -> Self {
         self.inner.set_body_with_form_data(val);
         self
     }
-    pub fn body_with_null(mut self, val: &Null) -> Self {
+    pub fn body_with_null(self, val: &Null) -> Self {
         self.inner.set_body_with_null(val);
         self
     }
-    pub fn redirect(mut self, val: &str) -> Self {
+    pub fn redirect(self, val: &str) -> Self {
         self.inner.set_redirect(val);
         self
     }
-    pub fn signal(mut self, val: &AbortSignal) -> Self {
+    pub fn signal(self, val: &AbortSignal) -> Self {
         self.inner.set_signal(val);
         self
     }
@@ -350,38 +348,36 @@ extern "C" {
     );
 }
 impl ResponseInit {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        #[allow(unused_imports)]
-        use wasm_bindgen::JsCast;
-        JsCast::unchecked_into(js_sys::Object::new())
+    pub fn new() -> ResponseInit {
+        Self::builder().build()
     }
     pub fn builder() -> ResponseInitBuilder {
-        ResponseInitBuilder { inner: Self::new() }
+        ResponseInitBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
     }
 }
 pub struct ResponseInitBuilder {
     inner: ResponseInit,
 }
-#[allow(unused_mut)]
 impl ResponseInitBuilder {
-    pub fn status(mut self, val: f64) -> Self {
+    pub fn status(self, val: f64) -> Self {
         self.inner.set_status(val);
         self
     }
-    pub fn status_text(mut self, val: &str) -> Self {
+    pub fn status_text(self, val: &str) -> Self {
         self.inner.set_status_text(val);
         self
     }
-    pub fn headers(mut self, val: &Headers) -> Self {
+    pub fn headers(self, val: &Headers) -> Self {
         self.inner.set_headers(val);
         self
     }
-    pub fn headers_with_record(mut self, val: &Object<JsString>) -> Self {
+    pub fn headers_with_record(self, val: &Object<JsString>) -> Self {
         self.inner.set_headers_with_record(val);
         self
     }
-    pub fn headers_with_array(mut self, val: &Array<ArrayTuple<(JsString, JsString)>>) -> Self {
+    pub fn headers_with_array(self, val: &Array<ArrayTuple<(JsString, JsString)>>) -> Self {
         self.inner.set_headers_with_array(val);
         self
     }

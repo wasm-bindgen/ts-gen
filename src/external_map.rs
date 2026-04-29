@@ -25,18 +25,70 @@ pub struct RustPath {
 /// Maps TypeScript module specifiers and type names to Rust paths.
 #[derive(Clone, Debug, Default)]
 pub struct ExternalMap {
-    /// Explicit type mappings: `"Blob" → "::web_sys::Blob"`
+    /// Explicit type mappings from `--external`: `"Blob" → "::web_sys::Blob"`
     type_map: HashMap<String, String>,
     /// Module mappings: `"node:buffer" → "node_buffer_sys"`
     module_map: HashMap<String, String>,
     /// Wildcard module mappings: `"node:" → "node_sys"`
     /// Stored as (prefix, rust_crate) pairs.
     wildcard_map: Vec<(String, String)>,
+    /// Built-in defaults (web platform types → `::web_sys::...`). Checked
+    /// last, so any user-supplied mapping (explicit or module-based)
+    /// wins. Populated by `new()`; cleared in test contexts where bare
+    /// behaviour is needed.
+    default_type_map: HashMap<String, String>,
 }
+
+/// Default mappings for the web platform types declared in the TS lib.
+/// Anything in this list resolves to its `web_sys::` equivalent unless the
+/// user provides an explicit `--external` override (which wins via
+/// `add_mapping` overwriting the entry).
+pub const WEB_SYS_DEFAULTS: &[(&str, &str)] = &[
+    ("AbortController", "::web_sys::AbortController"),
+    ("AbortSignal", "::web_sys::AbortSignal"),
+    ("Blob", "::web_sys::Blob"),
+    ("Crypto", "::web_sys::Crypto"),
+    ("CryptoKey", "::web_sys::CryptoKey"),
+    ("Event", "::web_sys::Event"),
+    ("EventTarget", "::web_sys::EventTarget"),
+    ("File", "::web_sys::File"),
+    ("FormData", "::web_sys::FormData"),
+    ("Headers", "::web_sys::Headers"),
+    ("ReadableStream", "::web_sys::ReadableStream"),
+    ("Request", "::web_sys::Request"),
+    ("Response", "::web_sys::Response"),
+    ("SubtleCrypto", "::web_sys::SubtleCrypto"),
+    ("TextDecoder", "::web_sys::TextDecoder"),
+    ("TextEncoder", "::web_sys::TextEncoder"),
+    ("TransformStream", "::web_sys::TransformStream"),
+    ("URL", "::web_sys::Url"),
+    ("URLSearchParams", "::web_sys::UrlSearchParams"),
+    ("WebSocket", "::web_sys::WebSocket"),
+    ("Worker", "::web_sys::Worker"),
+    ("WritableStream", "::web_sys::WritableStream"),
+];
 
 impl ExternalMap {
     pub fn new() -> Self {
+        let mut map = Self::default();
+        for &(name, path) in WEB_SYS_DEFAULTS {
+            map.default_type_map
+                .insert(name.to_string(), path.to_string());
+        }
+        map
+    }
+
+    /// Construct a map with no defaults — for tests that need to verify
+    /// the user-added precedence in isolation.
+    pub fn empty_for_test() -> Self {
         Self::default()
+    }
+
+    /// Drop the built-in web platform defaults. Used by the
+    /// `--no-web-sys` CLI flag for environments that don't link
+    /// `web_sys` (Node-only runtimes, custom JS hosts, …).
+    pub fn clear_defaults(&mut self) {
+        self.default_type_map.clear();
     }
 
     /// Parse a CLI external mapping string.
@@ -84,7 +136,7 @@ impl ExternalMap {
     ///
     /// Returns `None` if no mapping exists (caller should fall back to JsValue).
     pub fn resolve(&self, type_name: &str, from_module: &str) -> Option<RustPath> {
-        // 1. Explicit type map (highest priority)
+        // 1. User-supplied explicit type map (highest priority)
         if let Some(rust_path) = self.type_map.get(type_name) {
             return Some(RustPath {
                 path: rust_path.clone(),
@@ -115,14 +167,22 @@ impl ExternalMap {
             }
         }
 
-        None
+        // 4. Built-in default (web_sys) — last resort.
+        self.default_type_map
+            .get(type_name)
+            .map(|rust_path| RustPath {
+                path: rust_path.clone(),
+            })
     }
 
     /// Resolve a type name without a known module (explicit type map only).
     pub fn resolve_type(&self, type_name: &str) -> Option<RustPath> {
-        self.type_map.get(type_name).map(|rust_path| RustPath {
-            path: rust_path.clone(),
-        })
+        self.type_map
+            .get(type_name)
+            .or_else(|| self.default_type_map.get(type_name))
+            .map(|rust_path| RustPath {
+                path: rust_path.clone(),
+            })
     }
 
     /// Check if any mappings have been configured.
@@ -199,6 +259,51 @@ mod tests {
             map.resolve("Server", "node:http").unwrap().path,
             "node_sys::http::Server"
         );
+    }
+
+    #[test]
+    fn test_web_sys_default_resolves_known_types() {
+        let map = ExternalMap::new();
+        assert_eq!(
+            map.resolve("Blob", "irrelevant").unwrap().path,
+            "::web_sys::Blob"
+        );
+        assert_eq!(
+            map.resolve_type("Headers").unwrap().path,
+            "::web_sys::Headers"
+        );
+        assert!(map.resolve_type("NotABuiltin").is_none());
+    }
+
+    #[test]
+    fn test_user_explicit_overrides_default() {
+        let mut map = ExternalMap::new();
+        map.add_mapping("Blob=my_crate::CustomBlob");
+        assert_eq!(
+            map.resolve("Blob", "any").unwrap().path,
+            "my_crate::CustomBlob"
+        );
+    }
+
+    #[test]
+    fn test_user_module_map_overrides_default() {
+        // A user mapping `node:buffer=node_buffer_sys` should win over
+        // the web_sys default for `Blob`, since the user clearly meant
+        // to source `Blob` from `node:buffer`.
+        let mut map = ExternalMap::new();
+        map.add_mapping("node:buffer=node_buffer_sys");
+        assert_eq!(
+            map.resolve("Blob", "node:buffer").unwrap().path,
+            "node_buffer_sys::Blob"
+        );
+    }
+
+    #[test]
+    fn test_clear_defaults_disables_web_sys() {
+        let mut map = ExternalMap::new();
+        map.clear_defaults();
+        assert!(map.resolve("Blob", "any").is_none());
+        assert!(map.resolve_type("Headers").is_none());
     }
 
     #[test]

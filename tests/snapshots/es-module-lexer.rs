@@ -2,8 +2,6 @@
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
-#[allow(dead_code)]
-use JsValue as Error;
 pub mod es_module_lexer {
     use super::*;
     use js_sys::*;
@@ -236,7 +234,7 @@ pub mod es_module_lexer {
     }
     #[wasm_bindgen(module = "es-module-lexer")]
     extern "C" {
-        # [wasm_bindgen (extends = Object)]
+        # [wasm_bindgen (extends = Error , extends = Object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type ParseError;
         #[wasm_bindgen(method, getter)]
@@ -245,43 +243,27 @@ pub mod es_module_lexer {
         pub fn set_idx(this: &ParseError, val: f64);
     }
     impl ParseError {
-        #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
-            #[allow(unused_imports)]
-            use wasm_bindgen::JsCast;
-            JsCast::unchecked_into(js_sys::Object::new())
+        #[doc = " # Provided fields"]
+        #[doc = " "]
+        #[doc = " * `idx`"]
+        pub fn new(idx: f64) -> ParseError {
+            Self::builder(idx).build()
         }
-        pub fn builder() -> ParseErrorBuilder {
-            ParseErrorBuilder {
-                inner: Self::new(),
-                required: 1u64,
-            }
+        #[doc = " # Provided fields"]
+        #[doc = " "]
+        #[doc = " * `idx`"]
+        pub fn builder(idx: f64) -> ParseErrorBuilder {
+            let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+            inner.set_idx(idx);
+            ParseErrorBuilder { inner }
         }
     }
     pub struct ParseErrorBuilder {
         inner: ParseError,
-        required: u64,
     }
-    #[allow(unused_mut)]
     impl ParseErrorBuilder {
-        pub fn idx(mut self, val: f64) -> Self {
-            self.inner.set_idx(val);
-            self.required &= 18446744073709551614u64;
-            self
-        }
-        pub fn build(self) -> Result<ParseError, JsValue> {
-            if self.required != 0 {
-                let mut missing = Vec::new();
-                if self.required & 1u64 != 0 {
-                    missing.push("missing required property `idx`");
-                }
-                return Err(JsValue::from_str(&format!(
-                    "{}: {}",
-                    stringify!(ParseError),
-                    missing.join(", ")
-                )));
-            }
-            Ok(self.inner)
+        pub fn build(self) -> ParseError {
+            self.inner
         }
     }
     #[wasm_bindgen(module = "es-module-lexer")]

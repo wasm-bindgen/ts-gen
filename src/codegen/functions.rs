@@ -80,13 +80,14 @@ fn generate_expanded_free_function(
     scope: ScopeId,
 ) -> TokenStream {
     let rust_ident = super::typemap::make_ident(&sig.rust_name);
-    let params = generate_concrete_params(&sig.params, cgctx, scope);
+    let params = generate_concrete_params(&sig.params, cgctx, scope, ctx);
     let ret_ty = to_return_type(
         &sig.return_type,
         sig.catch,
         sig.error_type.as_ref(),
         cgctx,
         scope,
+        ctx,
     );
     let doc = super::doc_tokens(&sig.doc);
     let has_variadic = sig.params.last().is_some_and(|p| p.variadic);
@@ -152,7 +153,7 @@ pub fn generate_variable(
     scope: ScopeId,
 ) -> TokenStream {
     let rust_ident = super::typemap::make_ident(&decl.name);
-    let ty = to_syn_type(&decl.type_ref, TypePosition::RETURN, cgctx, scope);
+    let ty = to_syn_type(&decl.type_ref, TypePosition::RETURN, cgctx, scope, ctx);
     let doc = super::doc_tokens(doc);
 
     let mut wb_parts: Vec<TokenStream> = vec![quote! { thread_local_v2 }];

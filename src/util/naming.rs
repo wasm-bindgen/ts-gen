@@ -2,6 +2,21 @@
 
 use convert_case::{Case, Casing};
 
+/// Convert a TS module specifier (`"cloudflare:email"`, `"node:url"`,
+/// `"some/sub/path"`) into the snake_case Rust identifier we use to
+/// wrap that module's declarations in `pub mod <ident> { ... }`.
+///
+/// Strips any protocol prefix (everything before the last `:`), then
+/// replaces `/` with `_` and `*` with `star`, and snake-cases the result.
+/// Codegen and qualification both go through here so they stay in sync.
+pub fn module_specifier_to_ident(specifier: &str) -> String {
+    let short = specifier
+        .rsplit_once(':')
+        .map(|(_, rest)| rest)
+        .unwrap_or(specifier);
+    to_snake_case(&short.replace('/', "_").replace('*', "star"))
+}
+
 /// Convert a JS identifier to a Rust snake_case name (for functions, methods, variables).
 ///
 /// Does NOT escape Rust keywords — that's handled by `make_ident` at the
