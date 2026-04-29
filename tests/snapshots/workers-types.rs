@@ -27435,13 +27435,13 @@ extern "C" {
     pub async fn run_with_object_and_options(
         this: &AiGateway,
         data: &Object,
-        options: &Object,
+        options: &AiGatewayOptions,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "run")]
     pub async fn run_with_array_and_options(
         this: &AiGateway,
         data: &Array<Object>,
-        options: &Object,
+        options: &AiGatewayOptions,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getUrl")]
     pub async fn get_url(this: &AiGateway) -> Result<String, JsValue>;
@@ -27452,6 +27452,48 @@ extern "C" {
     ) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getUrl")]
     pub async fn get_url_with_str(this: &AiGateway, provider: &str) -> Result<String, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiGatewayOptions;
+    #[wasm_bindgen(method, getter)]
+    pub fn gateway(this: &AiGatewayOptions) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_gateway(this: &AiGatewayOptions, val: &JsValue);
+    #[wasm_bindgen(method, getter, js_name = "extraHeaders")]
+    pub fn extra_headers(this: &AiGatewayOptions) -> Option<Object>;
+    #[wasm_bindgen(method, setter, js_name = "extraHeaders")]
+    pub fn set_extra_headers(this: &AiGatewayOptions, val: &Object);
+}
+impl AiGatewayOptions {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiGatewayOptionsBuilder {
+        AiGatewayOptionsBuilder { inner: Self::new() }
+    }
+}
+pub struct AiGatewayOptionsBuilder {
+    inner: AiGatewayOptions,
+}
+#[allow(unused_mut)]
+impl AiGatewayOptionsBuilder {
+    pub fn gateway(mut self, val: &JsValue) -> Self {
+        self.inner.set_gateway(val);
+        self
+    }
+    pub fn extra_headers(mut self, val: &Object) -> Self {
+        self.inner.set_extra_headers(val);
+        self
+    }
+    pub fn build(self) -> AiGatewayOptions {
+        self.inner
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -31039,12 +31081,101 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn raw(
         this: &D1PreparedStatement,
-        options: &Object,
+        options: &D1PreparedStatementOptions,
     ) -> Result<ArrayTuple<(Array<JsString>, Array)>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "raw")]
     pub async fn raw_1(
         this: &D1PreparedStatement,
     ) -> Result<ArrayTuple<(Array<JsString>, Array)>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "raw")]
+    pub async fn raw_with_d_1_prepared_statement_options_2(
+        this: &D1PreparedStatement,
+        options: &D1PreparedStatementOptions2,
+    ) -> Result<ArrayTuple<(Array<JsString>, Array)>, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type D1PreparedStatementOptions;
+    #[wasm_bindgen(method, getter, js_name = "columnNames")]
+    pub fn column_names(this: &D1PreparedStatementOptions) -> bool;
+    #[wasm_bindgen(method, setter, js_name = "columnNames")]
+    pub fn set_column_names(this: &D1PreparedStatementOptions, val: bool);
+}
+impl D1PreparedStatementOptions {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> D1PreparedStatementOptionsBuilder {
+        D1PreparedStatementOptionsBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct D1PreparedStatementOptionsBuilder {
+    inner: D1PreparedStatementOptions,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl D1PreparedStatementOptionsBuilder {
+    pub fn column_names(mut self, val: bool) -> Self {
+        self.inner.set_column_names(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn build(self) -> Result<D1PreparedStatementOptions, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `columnNames`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(D1PreparedStatementOptions),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type D1PreparedStatementOptions2;
+    #[wasm_bindgen(method, getter, js_name = "columnNames")]
+    pub fn column_names(this: &D1PreparedStatementOptions2) -> Option<bool>;
+    #[wasm_bindgen(method, setter, js_name = "columnNames")]
+    pub fn set_column_names(this: &D1PreparedStatementOptions2, val: bool);
+}
+impl D1PreparedStatementOptions2 {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> D1PreparedStatementOptions2Builder {
+        D1PreparedStatementOptions2Builder { inner: Self::new() }
+    }
+}
+pub struct D1PreparedStatementOptions2Builder {
+    inner: D1PreparedStatementOptions2,
+}
+#[allow(unused_mut)]
+impl D1PreparedStatementOptions2Builder {
+    pub fn column_names(mut self, val: bool) -> Self {
+        self.inner.set_column_names(val);
+        self
+    }
+    pub fn build(self) -> D1PreparedStatementOptions2 {
+        self.inner
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -31281,8 +31412,170 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "send")]
     pub async fn send_with_builder(
         this: &SendEmail,
-        builder: &Object,
+        builder: &SendEmailBuilder,
     ) -> Result<EmailSendResult, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type SendEmailBuilder;
+    #[wasm_bindgen(method, getter)]
+    pub fn from(this: &SendEmailBuilder) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_from(this: &SendEmailBuilder, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "from")]
+    pub fn set_from_with_email_address(this: &SendEmailBuilder, val: &EmailAddress);
+    #[wasm_bindgen(method, getter)]
+    pub fn to(this: &SendEmailBuilder) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_to(this: &SendEmailBuilder, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "to")]
+    pub fn set_to_with_array(this: &SendEmailBuilder, val: &Array<JsString>);
+    #[wasm_bindgen(method, getter)]
+    pub fn subject(this: &SendEmailBuilder) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_subject(this: &SendEmailBuilder, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "replyTo")]
+    pub fn reply_to(this: &SendEmailBuilder) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter, js_name = "replyTo")]
+    pub fn set_reply_to(this: &SendEmailBuilder, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "replyTo")]
+    pub fn set_reply_to_with_email_address(this: &SendEmailBuilder, val: &EmailAddress);
+    #[wasm_bindgen(method, getter)]
+    pub fn cc(this: &SendEmailBuilder) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_cc(this: &SendEmailBuilder, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "cc")]
+    pub fn set_cc_with_array(this: &SendEmailBuilder, val: &Array<JsString>);
+    #[wasm_bindgen(method, getter)]
+    pub fn bcc(this: &SendEmailBuilder) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_bcc(this: &SendEmailBuilder, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "bcc")]
+    pub fn set_bcc_with_array(this: &SendEmailBuilder, val: &Array<JsString>);
+    #[wasm_bindgen(method, getter)]
+    pub fn headers(this: &SendEmailBuilder) -> Option<Object<JsString>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_headers(this: &SendEmailBuilder, val: &Object<JsString>);
+    #[wasm_bindgen(method, getter)]
+    pub fn text(this: &SendEmailBuilder) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_text(this: &SendEmailBuilder, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn html(this: &SendEmailBuilder) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_html(this: &SendEmailBuilder, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn attachments(this: &SendEmailBuilder) -> Option<Array>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_attachments(this: &SendEmailBuilder, val: &Array<Object>);
+}
+impl SendEmailBuilder {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> SendEmailBuilderBuilder {
+        SendEmailBuilderBuilder {
+            inner: Self::new(),
+            required: 7u64,
+        }
+    }
+}
+pub struct SendEmailBuilderBuilder {
+    inner: SendEmailBuilder,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl SendEmailBuilderBuilder {
+    pub fn from(mut self, val: &str) -> Self {
+        self.inner.set_from(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn from_with_email_address(mut self, val: &EmailAddress) -> Self {
+        self.inner.set_from_with_email_address(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn to(mut self, val: &str) -> Self {
+        self.inner.set_to(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn to_with_array(mut self, val: &Array<JsString>) -> Self {
+        self.inner.set_to_with_array(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn subject(mut self, val: &str) -> Self {
+        self.inner.set_subject(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn reply_to(mut self, val: &str) -> Self {
+        self.inner.set_reply_to(val);
+        self
+    }
+    pub fn reply_to_with_email_address(mut self, val: &EmailAddress) -> Self {
+        self.inner.set_reply_to_with_email_address(val);
+        self
+    }
+    pub fn cc(mut self, val: &str) -> Self {
+        self.inner.set_cc(val);
+        self
+    }
+    pub fn cc_with_array(mut self, val: &Array<JsString>) -> Self {
+        self.inner.set_cc_with_array(val);
+        self
+    }
+    pub fn bcc(mut self, val: &str) -> Self {
+        self.inner.set_bcc(val);
+        self
+    }
+    pub fn bcc_with_array(mut self, val: &Array<JsString>) -> Self {
+        self.inner.set_bcc_with_array(val);
+        self
+    }
+    pub fn headers(mut self, val: &Object<JsString>) -> Self {
+        self.inner.set_headers(val);
+        self
+    }
+    pub fn text(mut self, val: &str) -> Self {
+        self.inner.set_text(val);
+        self
+    }
+    pub fn html(mut self, val: &str) -> Self {
+        self.inner.set_html(val);
+        self
+    }
+    pub fn attachments(mut self, val: &Array<Object>) -> Self {
+        self.inner.set_attachments(val);
+        self
+    }
+    pub fn build(self) -> Result<SendEmailBuilder, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `from`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `to`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `subject`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(SendEmailBuilder),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -32957,8 +33250,72 @@ pub mod cloudflare_workers_module {
         pub async fn wait_for_event(
             this: &WorkflowStep,
             name: &str,
-            options: &Object,
+            options: &WorkflowStepOptions,
         ) -> Result<WorkflowStepEvent, JsValue>;
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , js_namespace = "CloudflareWorkersModule")]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type WorkflowStepOptions;
+        #[wasm_bindgen(method, getter)]
+        pub fn r#type(this: &WorkflowStepOptions) -> String;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_type(this: &WorkflowStepOptions, val: &str);
+        #[wasm_bindgen(method, getter)]
+        pub fn timeout(this: &WorkflowStepOptions) -> Option<JsValue>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_timeout(this: &WorkflowStepOptions, val: &JsValue);
+        #[wasm_bindgen(method, setter, js_name = "timeout")]
+        pub fn set_timeout_with_f64(this: &WorkflowStepOptions, val: f64);
+    }
+    impl WorkflowStepOptions {
+        #[allow(clippy::new_without_default)]
+        pub fn new() -> Self {
+            #[allow(unused_imports)]
+            use wasm_bindgen::JsCast;
+            JsCast::unchecked_into(js_sys::Object::new())
+        }
+        pub fn builder() -> WorkflowStepOptionsBuilder {
+            WorkflowStepOptionsBuilder {
+                inner: Self::new(),
+                required: 1u64,
+            }
+        }
+    }
+    pub struct WorkflowStepOptionsBuilder {
+        inner: WorkflowStepOptions,
+        required: u64,
+    }
+    #[allow(unused_mut)]
+    impl WorkflowStepOptionsBuilder {
+        pub fn r#type(mut self, val: &str) -> Self {
+            self.inner.set_type(val);
+            self.required &= 18446744073709551614u64;
+            self
+        }
+        pub fn timeout(mut self, val: &JsValue) -> Self {
+            self.inner.set_timeout(val);
+            self
+        }
+        pub fn timeout_with_f64(mut self, val: f64) -> Self {
+            self.inner.set_timeout_with_f64(val);
+            self
+        }
+        pub fn build(self) -> Result<WorkflowStepOptions, JsValue> {
+            if self.required != 0 {
+                let mut missing = Vec::new();
+                if self.required & 1u64 != 0 {
+                    missing.push("missing required property `type`");
+                }
+                return Err(JsValue::from_str(&format!(
+                    "{}: {}",
+                    stringify!(WorkflowStepOptions),
+                    missing.join(", ")
+                )));
+            }
+            Ok(self.inner)
+        }
     }
     #[wasm_bindgen]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -36475,7 +36832,11 @@ extern "C" {
     #[doc = " "]
     #[doc = " * If the Worker script does not exist in this dispatch namespace, an error will be thrown."]
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_args(this: &DispatchNamespace, name: &str, args: &Object) -> JsValue;
+    pub fn get_with_args(
+        this: &DispatchNamespace,
+        name: &str,
+        args: &DispatchNamespaceArgs,
+    ) -> JsValue;
     #[doc = " ## Arguments"]
     #[doc = " "]
     #[doc = " * `name` - Name of the Worker script."]
@@ -36493,7 +36854,7 @@ extern "C" {
     pub fn try_get_with_args(
         this: &DispatchNamespace,
         name: &str,
-        args: &Object,
+        args: &DispatchNamespaceArgs,
     ) -> Result<JsValue, JsValue>;
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -36512,7 +36873,7 @@ extern "C" {
     pub fn get_with_args_and_options(
         this: &DispatchNamespace,
         name: &str,
-        args: &Object,
+        args: &DispatchNamespaceArgs,
         options: &DynamicDispatchOptions,
     ) -> JsValue;
     #[doc = " ## Arguments"]
@@ -36532,9 +36893,15 @@ extern "C" {
     pub fn try_get_with_args_and_options(
         this: &DispatchNamespace,
         name: &str,
-        args: &Object,
+        args: &DispatchNamespaceArgs,
         options: &DynamicDispatchOptions,
     ) -> Result<JsValue, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type DispatchNamespaceArgs;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -36753,7 +37120,72 @@ extern "C" {
     pub async fn status(this: &WorkflowInstance) -> Result<Object, JsValue>;
     #[doc = " Send an event to this instance."]
     #[wasm_bindgen(method, catch, js_name = "sendEvent")]
-    pub async fn send_event(this: &WorkflowInstance, arg0: &Object) -> Result<(), JsValue>;
+    pub async fn send_event(
+        this: &WorkflowInstance,
+        arg0: &WorkflowInstanceSendEvent,
+    ) -> Result<(), JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type WorkflowInstanceSendEvent;
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &WorkflowInstanceSendEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &WorkflowInstanceSendEvent, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn payload(this: &WorkflowInstanceSendEvent) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_payload(this: &WorkflowInstanceSendEvent, val: &JsValue);
+}
+impl WorkflowInstanceSendEvent {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> WorkflowInstanceSendEventBuilder {
+        WorkflowInstanceSendEventBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct WorkflowInstanceSendEventBuilder {
+    inner: WorkflowInstanceSendEvent,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl WorkflowInstanceSendEventBuilder {
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn payload(mut self, val: &JsValue) -> Self {
+        self.inner.set_payload(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn build(self) -> Result<WorkflowInstanceSendEvent, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `payload`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(WorkflowInstanceSendEvent),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
 }
 pub mod star {
     use super::*;

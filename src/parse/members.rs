@@ -6,10 +6,13 @@ use std::collections::HashSet;
 
 use crate::ir::*;
 use crate::parse::docs::{DocComments, JsDocInfo};
+use crate::parse::first_pass::converters::interface_from_signatures;
 use crate::parse::types::{
-    convert_formal_params, convert_ts_type, convert_ts_type_scoped, convert_type_params,
+    binding_pattern_name, convert_formal_params, convert_ts_type, convert_ts_type_scoped,
+    convert_type_params,
 };
 use crate::util::diagnostics::DiagnosticCollector;
+use crate::util::naming::{to_pascal_case, to_snake_case};
 
 /// Split the result of [`DocComments::info_for_span`] into a `(doc, info)`
 /// pair, defaulting to empty info when no JSDoc is attached.
@@ -20,23 +23,149 @@ fn split_info(opt: Option<(String, JsDocInfo)>) -> (Option<String>, JsDocInfo) {
     }
 }
 
+/// Like `convert_formal_params`, but additionally hoists any directly-
+/// inline `TSTypeLiteral` parameter types into named `InterfaceDecl`s
+/// using the existing interface-building pipeline (`interface_from_signatures`).
+///
+/// The synthesized name is `<Parent><Member>` PascalCased, deduped
+/// against `used_type_names` with a numeric suffix on collision. The
+/// resulting `InterfaceDecl`s are returned alongside the params for the
+/// caller to append to its declarations sink.
+///
+/// Anonymous types nested inside generics, unions, etc. (rather than
+/// flat at the top of the parameter type) are not hoisted — those still
+/// erase to `Object` per the existing `convert_ts_type` semantics. Real-
+/// world `.d.ts` patterns put the literal at the top level (e.g.
+/// `send(builder: { ... })`); deeper hoisting is a follow-up.
+pub(crate) fn convert_formal_params_with_synthesis(
+    params: &FormalParameters<'_>,
+    parent_name: &str,
+    member_name: &str,
+    used_type_names: &mut HashSet<String>,
+    docs: &DocComments<'_>,
+    diag: &mut DiagnosticCollector,
+) -> (Vec<Param>, Vec<InterfaceDecl>) {
+    let mut result_params = Vec::new();
+    let mut synthesized = Vec::new();
+
+    for (i, param) in params.items.iter().enumerate() {
+        // Capture the original (un-snake_cased) parameter name first so we
+        // can use it as the synthesized type's name segment. The Rust
+        // param name still goes through snake_case below.
+        let raw_param_name = binding_pattern_name(&param.pattern);
+        let name = raw_param_name
+            .as_deref()
+            .map(to_snake_case)
+            .unwrap_or_else(|| format!("arg{i}"));
+
+        let type_ref = match param.type_annotation.as_ref() {
+            Some(ann) => match &ann.type_annotation {
+                // The shape we hoist: a directly-inline object literal in
+                // parameter position. This is the `send(builder: { ... })`
+                // pattern; everything else falls through to the regular
+                // `convert_ts_type` path.
+                TSType::TSTypeLiteral(literal) => {
+                    // Prefer the parameter's own name as the discriminating
+                    // segment (`SendEmail.send(builder: {...})` →
+                    // `SendEmailBuilder` reads better than
+                    // `SendEmailSend`). Fall back to the member name when
+                    // the parameter has no usable identifier (destructured
+                    // patterns, anonymous callable args).
+                    let segment = raw_param_name.as_deref().unwrap_or(member_name);
+                    let synth_name = unique_type_name(parent_name, segment, used_type_names);
+                    used_type_names.insert(synth_name.clone());
+                    // Recurse: methods inside the hoisted interface might
+                    // themselves carry anonymous parameter types. They land
+                    // in `synthesized` alongside the parent so the caller
+                    // gets the full transitive set.
+                    let iface = interface_from_signatures(
+                        synth_name.clone(),
+                        Vec::new(),
+                        Vec::new(),
+                        &literal.members,
+                        used_type_names,
+                        &mut synthesized,
+                        docs,
+                        diag,
+                    );
+                    synthesized.push(iface);
+                    TypeRef::Named(synth_name)
+                }
+                other => convert_ts_type(other, diag),
+            },
+            None => TypeRef::Any,
+        };
+
+        let optional = param.optional;
+        result_params.push(Param {
+            name,
+            type_ref,
+            optional,
+            variadic: false,
+        });
+    }
+
+    if let Some(rest) = &params.rest {
+        let name = binding_pattern_name(&rest.rest.argument).unwrap_or_else(|| "rest".to_string());
+        let type_ref = rest
+            .type_annotation
+            .as_ref()
+            .map(|ann| convert_ts_type(&ann.type_annotation, diag))
+            .unwrap_or(TypeRef::Array(Box::new(TypeRef::Any)));
+        result_params.push(Param {
+            name,
+            type_ref,
+            optional: false,
+            variadic: true,
+        });
+    }
+
+    (result_params, synthesized)
+}
+
+/// Compute a unique synthesized type name for an anonymous interface
+/// hoisted from `<Parent>.<member>(...)`. Falls back to numeric suffixes
+/// on collision (`Foo`, `Foo2`, `Foo3`, …).
+fn unique_type_name(parent: &str, member: &str, used: &HashSet<String>) -> String {
+    let base = format!("{}{}", parent, to_pascal_case(member));
+    if !used.contains(&base) {
+        return base;
+    }
+    for i in 2.. {
+        let candidate = format!("{base}{i}");
+        if !used.contains(&candidate) {
+            return candidate;
+        }
+    }
+    unreachable!("HashSet exhaustion is impossible in practice");
+}
+
 /// Convert a `TSSignature` (interface body member) to our IR `Member`(s).
 ///
-/// Returns zero or more members. Plain properties produce both a getter and
-/// setter; explicit `get`/`set` accessors produce one each.
+/// `parent` is the surrounding type's Rust name when one is available
+/// — passed down so that anonymous parameter types inside method
+/// signatures can be hoisted into named interfaces (see
+/// [`convert_formal_params_with_synthesis`]). `synth` is the sink those
+/// hoisted interfaces are appended to. Pass `None` / a throwaway sink
+/// when you don't have parent context (no synthesis happens).
 pub fn convert_ts_signature(
     sig: &TSSignature<'_>,
+    parent: Option<&str>,
+    used_type_names: &mut HashSet<String>,
+    synth: &mut Vec<InterfaceDecl>,
     docs: &DocComments<'_>,
     diag: &mut DiagnosticCollector,
 ) -> Vec<Member> {
     match sig {
         TSSignature::TSPropertySignature(prop) => convert_property_signature(prop, docs, diag),
-        TSSignature::TSMethodSignature(method) => convert_method_signature(method, docs, diag),
+        TSSignature::TSMethodSignature(method) => {
+            convert_method_signature(method, parent, used_type_names, synth, docs, diag)
+        }
         TSSignature::TSIndexSignature(idx) => {
             convert_index_signature(idx, diag).into_iter().collect()
         }
         TSSignature::TSConstructSignatureDeclaration(ctor) => {
-            convert_construct_signature(ctor, docs, diag)
+            convert_construct_signature(ctor, parent, used_type_names, synth, docs, diag)
                 .into_iter()
                 .collect()
         }
@@ -49,15 +178,19 @@ pub fn convert_ts_signature(
 
 /// Convert a `ClassElement` (class body member) to our IR `Member`(s).
 ///
-/// Returns zero or more members. Plain properties produce both a getter and
-/// setter; explicit `get`/`set` accessors produce one each.
+/// See [`convert_ts_signature`] for the meaning of `parent` / `synth`.
 pub fn convert_class_element(
     elem: &ClassElement<'_>,
+    parent: Option<&str>,
+    used_type_names: &mut HashSet<String>,
+    synth: &mut Vec<InterfaceDecl>,
     docs: &DocComments<'_>,
     diag: &mut DiagnosticCollector,
 ) -> Vec<Member> {
     match elem {
-        ClassElement::MethodDefinition(method) => convert_class_method(method, docs, diag),
+        ClassElement::MethodDefinition(method) => {
+            convert_class_method(method, parent, used_type_names, synth, docs, diag)
+        }
         ClassElement::PropertyDefinition(prop) => convert_class_property(prop, docs, diag),
         ClassElement::AccessorProperty(acc) => convert_accessor_property(acc, docs, diag),
         ClassElement::TSIndexSignature(idx) => {
@@ -106,6 +239,9 @@ fn convert_property_signature(
 
 fn convert_method_signature(
     method: &TSMethodSignature<'_>,
+    parent: Option<&str>,
+    used_type_names: &mut HashSet<String>,
+    synth: &mut Vec<InterfaceDecl>,
     docs: &DocComments<'_>,
     diag: &mut DiagnosticCollector,
 ) -> Vec<Member> {
@@ -125,7 +261,25 @@ fn convert_method_signature(
         .map(|tp| tp.params.iter().map(|p| p.name.name.as_str()).collect())
         .unwrap_or_default();
 
-    let params = convert_formal_params(&method.params, diag);
+    // Hoist anonymous `{ ... }` parameter types into named interfaces when
+    // we know the surrounding parent name. Without `parent` we can't
+    // generate a sensible name, so fall back to the regular path that
+    // erases inline objects to `Object`.
+    let params = match parent {
+        Some(p) => {
+            let (params, more_synth) = convert_formal_params_with_synthesis(
+                &method.params,
+                p,
+                &js_name,
+                used_type_names,
+                docs,
+                diag,
+            );
+            synth.extend(more_synth);
+            params
+        }
+        None => convert_formal_params(&method.params, diag),
+    };
     let return_type = method
         .return_type
         .as_ref()
@@ -186,10 +340,30 @@ fn convert_index_signature(
 
 fn convert_construct_signature(
     ctor: &TSConstructSignatureDeclaration<'_>,
+    parent: Option<&str>,
+    used_type_names: &mut HashSet<String>,
+    synth: &mut Vec<InterfaceDecl>,
     docs: &DocComments<'_>,
     diag: &mut DiagnosticCollector,
 ) -> Option<Member> {
-    let params = convert_formal_params(&ctor.params, diag);
+    // Constructors hoist anonymous parameter types under `<Parent>Constructor`
+    // when a parent is known — matches the convention of using a method-like
+    // name segment for the synthesized type.
+    let params = match parent {
+        Some(p) => {
+            let (params, more_synth) = convert_formal_params_with_synthesis(
+                &ctor.params,
+                p,
+                "Constructor",
+                used_type_names,
+                docs,
+                diag,
+            );
+            synth.extend(more_synth);
+            params
+        }
+        None => convert_formal_params(&ctor.params, diag),
+    };
     let (doc, info) = split_info(docs.info_for_span(ctor.span.start));
     Some(Member::Constructor(ConstructorMember {
         params,
@@ -202,6 +376,9 @@ fn convert_construct_signature(
 
 fn convert_class_method(
     method: &MethodDefinition<'_>,
+    parent: Option<&str>,
+    used_type_names: &mut HashSet<String>,
+    synth: &mut Vec<InterfaceDecl>,
     docs: &DocComments<'_>,
     diag: &mut DiagnosticCollector,
 ) -> Vec<Member> {
@@ -221,7 +398,28 @@ fn convert_class_method(
         .map(|tp| tp.params.iter().map(|p| p.name.name.as_str()).collect())
         .unwrap_or_default();
 
-    let params = convert_formal_params(&func.params, diag);
+    let params = match parent {
+        Some(p) => {
+            // Constructors use a special "Constructor" segment so the
+            // synthesized type reads `<Parent>Constructor*` rather than
+            // `<Parent>` alone (which would clash with the parent itself).
+            let member_name = match method.kind {
+                MethodDefinitionKind::Constructor => "Constructor".to_string(),
+                _ => js_name.clone(),
+            };
+            let (params, more_synth) = convert_formal_params_with_synthesis(
+                &func.params,
+                p,
+                &member_name,
+                used_type_names,
+                docs,
+                diag,
+            );
+            synth.extend(more_synth);
+            params
+        }
+        None => convert_formal_params(&func.params, diag),
+    };
     let return_type = func
         .return_type
         .as_ref()
