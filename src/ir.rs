@@ -279,6 +279,12 @@ pub struct FunctionDecl {
     pub params: Vec<Param>,
     pub return_type: TypeRef,
     pub overloads: Vec<FunctionOverload>,
+    /// Error type captured from `@throws {T}` JSDoc tags, in the same
+    /// representation as any other type — single name as `TypeRef::Named`,
+    /// multiple as `TypeRef::Union(...)`. Codegen runs it through the
+    /// regular type-rendering pipeline, so subtyping LUB rules (see
+    /// `lub_types`) apply uniformly with normal unions.
+    pub throws: Option<TypeRef>,
 }
 
 #[derive(Clone, Debug)]
@@ -363,6 +369,8 @@ pub struct MethodMember {
     pub return_type: TypeRef,
     pub optional: bool,
     pub doc: Option<String>,
+    /// Error type from `@throws {T}` — see `FunctionDecl::throws`.
+    pub throws: Option<TypeRef>,
 }
 
 #[derive(Clone, Debug)]
@@ -370,6 +378,8 @@ pub struct MethodMember {
 pub struct ConstructorMember {
     pub params: Vec<Param>,
     pub doc: Option<String>,
+    /// Error type from `@throws {T}` — see `FunctionDecl::throws`.
+    pub throws: Option<TypeRef>,
 }
 
 #[derive(Clone, Debug)]
@@ -413,6 +423,8 @@ pub struct StaticMethodMember {
     pub params: Vec<Param>,
     pub return_type: TypeRef,
     pub doc: Option<String>,
+    /// Error type from `@throws {T}` — see `FunctionDecl::throws`.
+    pub throws: Option<TypeRef>,
 }
 
 // ─── Type Registry (First Pass) ──────────────────────────────────────

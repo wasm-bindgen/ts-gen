@@ -56,8 +56,15 @@ pub fn extract_var_members(
         match member {
             TSSignature::TSConstructSignatureDeclaration(ctor) => {
                 let params = convert_formal_params(&ctor.params, diag);
-                let doc = docs.for_span(ctor.span.start);
-                constructor = Some(ConstructorMember { params, doc });
+                let (doc, info) = match docs.info_for_span(ctor.span.start) {
+                    Some((d, i)) => (Some(d), i),
+                    None => (None, crate::parse::docs::JsDocInfo::default()),
+                };
+                constructor = Some(ConstructorMember {
+                    params,
+                    doc,
+                    throws: info.throws_typeref(),
+                });
             }
             TSSignature::TSPropertySignature(prop) => {
                 let js_name = match property_key_name(&prop.key) {
@@ -91,7 +98,10 @@ pub fn extract_var_members(
                     Some(name) => name,
                     None => continue,
                 };
-                let doc = docs.for_span(method.span.start);
+                let (doc, info) = match docs.info_for_span(method.span.start) {
+                    Some((d, i)) => (Some(d), i),
+                    None => (None, crate::parse::docs::JsDocInfo::default()),
+                };
                 let name = to_snake_case(&js_name);
                 let type_params = convert_type_params(method.type_parameters.as_ref(), diag);
                 let params = convert_formal_params(&method.params, diag);
@@ -107,6 +117,7 @@ pub fn extract_var_members(
                     params,
                     return_type,
                     doc,
+                    throws: info.throws_typeref(),
                 }));
             }
             TSSignature::TSCallSignatureDeclaration(_) => {

@@ -26,8 +26,8 @@ use proc_macro2::TokenStream;
 use quote::quote;
 
 use crate::codegen::signatures::{
-    dedupe_name, expand_signatures, generate_concrete_params, is_void_return, ExpandedSignature,
-    SignatureKind,
+    build_signatures, dedupe_name, generate_concrete_params, is_void_return, CallableSpec,
+    FunctionSignature, SignatureKind,
 };
 use crate::codegen::typemap::{to_return_type, to_syn_type, CodegenContext, TypePosition};
 use crate::ir::{
@@ -118,6 +118,19 @@ impl<'a> ClassConfig<'a> {
             cgctx,
             scope,
         }
+    }
+
+    /// Rust name to use everywhere the class identifier appears in generated
+    /// code (`pub type X`, `this: &X`, `static_method_of = X`, …).
+    ///
+    /// When the declared name collides with a `js_sys` reserved identifier,
+    /// `CodegenContext::resolve_collisions` chose a suffixed alternative
+    /// (`Global` → `Global_`); this method threads that through. Falls back
+    /// to the original `rust_name` when no rename was registered.
+    fn effective_rust_name(&self) -> String {
+        self.cgctx
+            .and_then(|ctx| ctx.renamed_locals.get(&self.rust_name).cloned())
+            .unwrap_or_else(|| self.rust_name.clone())
     }
 }
 
@@ -210,7 +223,7 @@ pub fn generate_dictionary_extern(
 /// }
 /// ```
 fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
-    let rust_type = super::typemap::make_ident(&config.rust_name);
+    let rust_type = super::typemap::make_ident(&config.effective_rust_name());
     let builder_name = super::typemap::make_ident(&format!("{}Builder", config.rust_name));
 
     // If any getter lacks a corresponding setter the type has readonly
@@ -292,12 +305,17 @@ fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
         };
 
         let mut setter_used = HashSet::new();
-        let setter_sigs = expand_signatures(
-            &g.js_name,
-            &[&[setter_param]],
-            &crate::ir::TypeRef::Void,
-            SignatureKind::Setter,
-            &None,
+        let setter_overloads = [&[setter_param][..]];
+        let void = crate::ir::TypeRef::Void;
+        let setter_sigs = build_signatures(
+            &CallableSpec {
+                js_name: &g.js_name,
+                kind: SignatureKind::Setter,
+                overloads: &setter_overloads,
+                return_type: &void,
+                error_type: None,
+                doc: &None,
+            },
             &mut setter_used,
             config.cgctx,
             config.scope,
@@ -479,12 +497,22 @@ fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                     .map(|c| c.params.as_slice())
                     .collect();
                 let doc = constructor_overloads.first().and_then(|c| c.doc.clone());
-                let sigs = expand_signatures(
-                    &config.js_name,
-                    &overloads,
-                    &TypeRef::Named(config.rust_name.clone()),
-                    SignatureKind::Constructor,
-                    &doc,
+                // Use the first overload's `@throws` (if any) as the error
+                // type for the constructor — TS overloads conventionally
+                // share semantics, and the first one carries the doc.
+                let throws = constructor_overloads
+                    .first()
+                    .and_then(|c| c.throws.as_ref());
+                let return_type = TypeRef::Named(config.rust_name.clone());
+                let sigs = build_signatures(
+                    &CallableSpec {
+                        js_name: &config.js_name,
+                        kind: SignatureKind::Constructor,
+                        overloads: &overloads,
+                        return_type: &return_type,
+                        error_type: throws,
+                        doc: &doc,
+                    },
                     &mut used_names,
                     config.cgctx,
                     config.scope,
@@ -503,12 +531,16 @@ fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 let overloads: Vec<&[Param]> = group.iter().map(|m| m.params.as_slice()).collect();
                 let doc = group.first().and_then(|m| m.doc.clone());
                 let return_type = &group[0].return_type;
-                let sigs = expand_signatures(
-                    &m.js_name,
-                    &overloads,
-                    return_type,
-                    SignatureKind::Method,
-                    &doc,
+                let throws = group.first().and_then(|m| m.throws.as_ref());
+                let sigs = build_signatures(
+                    &CallableSpec {
+                        js_name: &m.js_name,
+                        kind: SignatureKind::Method,
+                        overloads: &overloads,
+                        return_type,
+                        error_type: throws,
+                        doc: &doc,
+                    },
                     &mut used_names,
                     config.cgctx,
                     config.scope,
@@ -527,12 +559,16 @@ fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 let overloads: Vec<&[Param]> = group.iter().map(|m| m.params.as_slice()).collect();
                 let doc = group.first().and_then(|m| m.doc.clone());
                 let return_type = &group[0].return_type;
-                let sigs = expand_signatures(
-                    &m.js_name,
-                    &overloads,
-                    return_type,
-                    SignatureKind::StaticMethod,
-                    &doc,
+                let throws = group.first().and_then(|m| m.throws.as_ref());
+                let sigs = build_signatures(
+                    &CallableSpec {
+                        js_name: &m.js_name,
+                        kind: SignatureKind::StaticMethod,
+                        overloads: &overloads,
+                        return_type,
+                        error_type: throws,
+                        doc: &doc,
+                    },
                     &mut used_names,
                     config.cgctx,
                     config.scope,
@@ -566,11 +602,24 @@ fn generate_extern_block(config: &ClassConfig) -> TokenStream {
         None => quote! { #[wasm_bindgen] },
     };
 
+    // Re-export the type under its original (un-suffixed) name when collision
+    // resolution renamed it. The suffixed name (`Foo_`) is purely an internal
+    // disambiguator against the `use js_sys::*` glob inside the surrounding
+    // module — it must never leak into the public Rust path consumers see.
+    let public_alias = if config.effective_rust_name() != config.rust_name {
+        let public = super::typemap::make_ident(&config.rust_name);
+        let internal = super::typemap::make_ident(&config.effective_rust_name());
+        quote! { pub use #internal as #public; }
+    } else {
+        quote! {}
+    };
+
     quote! {
         #wb_extern_attr
         extern "C" {
             #(#items)*
         }
+        #public_alias
     }
 }
 
@@ -582,7 +631,16 @@ fn generate_extern_block(config: &ClassConfig) -> TokenStream {
 /// pub type FooBar;
 /// ```
 fn generate_type_decl(config: &ClassConfig) -> TokenStream {
-    let rust_ident = super::typemap::make_ident(&config.rust_name);
+    // If the bare class name collided with a `js_sys` reserved name (e.g.
+    // `Global`, `Function`), `CodegenContext::resolve_collisions` chose a
+    // suffixed Rust name (`Global_`). The type decl needs to use that
+    // renamed identifier so references through `to_syn_type` line up.
+    // The original JS-side name still goes through `js_name = "..."` below.
+    let rust_name = config
+        .cgctx
+        .and_then(|ctx| ctx.renamed_locals.get(&config.rust_name).cloned())
+        .unwrap_or_else(|| config.rust_name.clone());
+    let rust_ident = super::typemap::make_ident(&rust_name);
     let js_name = &config.js_name;
 
     // Build wasm_bindgen attribute parts
@@ -611,8 +669,10 @@ fn generate_type_decl(config: &ClassConfig) -> TokenStream {
         wb_parts.push(quote! { extends = Object });
     }
 
-    // Only emit js_name if it differs from the Rust name
-    if config.js_name != config.rust_name {
+    // Emit `js_name` whenever the JS-side class name differs from the Rust
+    // ident we'll use — that's true after a collision rename even if the
+    // `config.rust_name` (pre-rename) matched `js_name`.
+    if rust_name != *js_name {
         wb_parts.push(quote! { js_name = #js_name });
     }
 
@@ -634,18 +694,21 @@ fn generate_type_decl(config: &ClassConfig) -> TokenStream {
     }
 }
 
-/// Generate a constructor binding from an expanded signature.
-fn generate_expanded_constructor(config: &ClassConfig, sig: &ExpandedSignature) -> TokenStream {
+/// Generate a constructor binding from a resolved signature.
+fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) -> TokenStream {
     let rust_ident = super::typemap::make_ident(&sig.rust_name);
-    let rust_type = super::typemap::make_ident(&config.rust_name);
     let params = generate_concrete_params(&sig.params, config.cgctx, config.scope);
     let doc = super::doc_tokens(&sig.doc);
 
-    let ret = if sig.catch {
-        quote! { Result<#rust_type, JsValue> }
-    } else {
-        quote! { #rust_type }
-    };
+    // Constructors always return the constructed type, wrapped in Result
+    // when `catch` (which is always-true here per `SignatureKind::Constructor`).
+    let ret = to_return_type(
+        &sig.return_type,
+        sig.catch,
+        sig.error_type.as_ref(),
+        config.cgctx,
+        config.scope,
+    );
 
     let mut wb_parts = vec![quote! { constructor }];
     if sig.catch {
@@ -666,9 +729,9 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &ExpandedSignature) 
 }
 
 /// Generate an instance method binding from an expanded signature.
-fn generate_expanded_method(config: &ClassConfig, sig: &ExpandedSignature) -> TokenStream {
+fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> TokenStream {
     let rust_ident = super::typemap::make_ident(&sig.rust_name);
-    let this_type = super::typemap::make_ident(&config.rust_name);
+    let this_type = super::typemap::make_ident(&config.effective_rust_name());
     let params = generate_concrete_params(&sig.params, config.cgctx, config.scope);
     let doc = super::doc_tokens(&sig.doc);
     let has_variadic = sig.params.last().is_some_and(|p| p.variadic);
@@ -686,7 +749,13 @@ fn generate_expanded_method(config: &ClassConfig, sig: &ExpandedSignature) -> To
         wb_parts.push(quote! { js_name = #js_name });
     }
 
-    let ret_ty = to_return_type(&sig.return_type, sig.catch, config.cgctx, config.scope);
+    let ret_ty = to_return_type(
+        &sig.return_type,
+        sig.catch,
+        sig.error_type.as_ref(),
+        config.cgctx,
+        config.scope,
+    );
     let ret = if is_void_return(&sig.return_type) && !sig.catch {
         quote! {}
     } else {
@@ -707,9 +776,9 @@ fn generate_expanded_method(config: &ClassConfig, sig: &ExpandedSignature) -> To
 }
 
 /// Generate a static method binding from an expanded signature.
-fn generate_expanded_static_method(config: &ClassConfig, sig: &ExpandedSignature) -> TokenStream {
+fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature) -> TokenStream {
     let rust_ident = super::typemap::make_ident(&sig.rust_name);
-    let class_ident = super::typemap::make_ident(&config.rust_name);
+    let class_ident = super::typemap::make_ident(&config.effective_rust_name());
     let params = generate_concrete_params(&sig.params, config.cgctx, config.scope);
     let doc = super::doc_tokens(&sig.doc);
     let has_variadic = sig.params.last().is_some_and(|p| p.variadic);
@@ -726,7 +795,13 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &ExpandedSignature
         wb_parts.push(quote! { js_name = #js_name });
     }
 
-    let ret_ty = to_return_type(&sig.return_type, sig.catch, config.cgctx, config.scope);
+    let ret_ty = to_return_type(
+        &sig.return_type,
+        sig.catch,
+        sig.error_type.as_ref(),
+        config.cgctx,
+        config.scope,
+    );
     let ret = if is_void_return(&sig.return_type) && !sig.catch {
         quote! {}
     } else {
@@ -752,7 +827,7 @@ fn generate_getter(
     getter: &GetterMember,
     used_names: &mut HashSet<String>,
 ) -> TokenStream {
-    let this_type = super::typemap::make_ident(&config.rust_name);
+    let this_type = super::typemap::make_ident(&config.effective_rust_name());
     let doc = super::doc_tokens(&getter.doc);
 
     let candidate = to_snake_case(&getter.js_name);
@@ -796,7 +871,7 @@ fn generate_setter(
     setter: &SetterMember,
     used_names: &mut HashSet<String>,
 ) -> Vec<TokenStream> {
-    let this_type = super::typemap::make_ident(&config.rust_name);
+    let this_type = super::typemap::make_ident(&config.effective_rust_name());
     let doc = setter.doc.clone();
 
     // Treat the setter as a single-param method and expand through signatures
@@ -807,12 +882,17 @@ fn generate_setter(
         variadic: false,
     };
 
-    let sigs = expand_signatures(
-        &setter.js_name,
-        &[&[param]],
-        &crate::ir::TypeRef::Void,
-        SignatureKind::Setter,
-        &doc,
+    let overloads = [&[param][..]];
+    let void = crate::ir::TypeRef::Void;
+    let sigs = build_signatures(
+        &CallableSpec {
+            js_name: &setter.js_name,
+            kind: SignatureKind::Setter,
+            overloads: &overloads,
+            return_type: &void,
+            error_type: None,
+            doc: &doc,
+        },
         used_names,
         config.cgctx,
         config.scope,
@@ -845,7 +925,7 @@ fn generate_static_getter(
     getter: &StaticGetterMember,
     used_names: &mut HashSet<String>,
 ) -> TokenStream {
-    let class_ident = super::typemap::make_ident(&config.rust_name);
+    let class_ident = super::typemap::make_ident(&config.effective_rust_name());
     let doc = super::doc_tokens(&getter.doc);
 
     let candidate = to_snake_case(&getter.js_name);
@@ -881,7 +961,7 @@ fn generate_static_setter(
     setter: &StaticSetterMember,
     used_names: &mut HashSet<String>,
 ) -> Vec<TokenStream> {
-    let class_ident = super::typemap::make_ident(&config.rust_name);
+    let class_ident = super::typemap::make_ident(&config.effective_rust_name());
     let doc = setter.doc.clone();
 
     let param = crate::ir::Param {
@@ -891,12 +971,17 @@ fn generate_static_setter(
         variadic: false,
     };
 
-    let sigs = expand_signatures(
-        &setter.js_name,
-        &[&[param]],
-        &crate::ir::TypeRef::Void,
-        SignatureKind::StaticSetter,
-        &doc,
+    let overloads = [&[param][..]];
+    let void = crate::ir::TypeRef::Void;
+    let sigs = build_signatures(
+        &CallableSpec {
+            js_name: &setter.js_name,
+            kind: SignatureKind::StaticSetter,
+            overloads: &overloads,
+            return_type: &void,
+            error_type: None,
+            doc: &doc,
+        },
         used_names,
         config.cgctx,
         config.scope,

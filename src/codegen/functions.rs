@@ -4,7 +4,8 @@ use proc_macro2::TokenStream;
 use quote::quote;
 
 use crate::codegen::signatures::{
-    expand_signatures, generate_concrete_params, is_void_return, ExpandedSignature, SignatureKind,
+    build_signatures, generate_concrete_params, is_void_return, CallableSpec, FunctionSignature,
+    SignatureKind,
 };
 use crate::codegen::typemap::{to_return_type, to_syn_type, CodegenContext, TypePosition};
 use crate::parse::scope::ScopeId;
@@ -14,7 +15,8 @@ use crate::ir::{FunctionDecl, ModuleContext, VariableDecl};
 
 /// Generate wasm_bindgen extern blocks for a free function.
 ///
-/// Expands optional params into multiple overloads, and generates `try_` variants.
+/// Resolves overloads + try_/async/catch via [`build_signatures`], then
+/// emits one extern block per resulting [`FunctionSignature`].
 pub fn generate_function(
     decl: &FunctionDecl,
     ctx: &ModuleContext,
@@ -22,24 +24,7 @@ pub fn generate_function(
     doc: &Option<String>,
     scope: ScopeId,
 ) -> TokenStream {
-    let mut used_names = HashSet::new();
-    let sigs = expand_signatures(
-        &decl.js_name,
-        &[decl.params.as_slice()],
-        &decl.return_type,
-        SignatureKind::Function,
-        doc,
-        &mut used_names,
-        cgctx,
-        scope,
-    );
-
-    let items: Vec<TokenStream> = sigs
-        .iter()
-        .map(|sig| generate_expanded_free_function(sig, ctx, cgctx, None, scope))
-        .collect();
-
-    quote! { #(#items)* }
+    emit_function(decl, ctx, cgctx, doc, None, scope)
 }
 
 /// Generate wasm_bindgen extern blocks for a free function inside a namespace.
@@ -51,13 +36,28 @@ pub fn generate_function_with_js_namespace(
     doc: &Option<String>,
     scope: ScopeId,
 ) -> TokenStream {
+    emit_function(decl, ctx, cgctx, doc, Some(js_namespace), scope)
+}
+
+fn emit_function(
+    decl: &FunctionDecl,
+    ctx: &ModuleContext,
+    cgctx: Option<&CodegenContext<'_>>,
+    doc: &Option<String>,
+    js_namespace: Option<&str>,
+    scope: ScopeId,
+) -> TokenStream {
     let mut used_names = HashSet::new();
-    let sigs = expand_signatures(
-        &decl.js_name,
-        &[decl.params.as_slice()],
-        &decl.return_type,
-        SignatureKind::Function,
-        doc,
+    let overloads = [decl.params.as_slice()];
+    let sigs = build_signatures(
+        &CallableSpec {
+            js_name: &decl.js_name,
+            kind: SignatureKind::Function,
+            overloads: &[overloads[0]],
+            return_type: &decl.return_type,
+            error_type: decl.throws.as_ref(),
+            doc,
+        },
         &mut used_names,
         cgctx,
         scope,
@@ -65,15 +65,15 @@ pub fn generate_function_with_js_namespace(
 
     let items: Vec<TokenStream> = sigs
         .iter()
-        .map(|sig| generate_expanded_free_function(sig, ctx, cgctx, Some(js_namespace), scope))
+        .map(|sig| generate_expanded_free_function(sig, ctx, cgctx, js_namespace, scope))
         .collect();
 
     quote! { #(#items)* }
 }
 
-/// Generate a single extern block for one expanded free function signature.
+/// Generate a single extern block for one resolved free function signature.
 fn generate_expanded_free_function(
-    sig: &ExpandedSignature,
+    sig: &FunctionSignature,
     ctx: &ModuleContext,
     cgctx: Option<&CodegenContext<'_>>,
     js_namespace: Option<&str>,
@@ -81,7 +81,13 @@ fn generate_expanded_free_function(
 ) -> TokenStream {
     let rust_ident = super::typemap::make_ident(&sig.rust_name);
     let params = generate_concrete_params(&sig.params, cgctx, scope);
-    let ret_ty = to_return_type(&sig.return_type, sig.catch, cgctx, scope);
+    let ret_ty = to_return_type(
+        &sig.return_type,
+        sig.catch,
+        sig.error_type.as_ref(),
+        cgctx,
+        scope,
+    );
     let doc = super::doc_tokens(&sig.doc);
     let has_variadic = sig.params.last().is_some_and(|p| p.variadic);
 

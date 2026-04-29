@@ -1,37 +1,30 @@
 //! Signature expansion: expand TypeScript overloads (with optional/variadic/union
-//! params) into multiple concrete Rust signatures with computed names.
+//! params) into multiple concrete Rust parameter lists, each tagged with a
+//! disambiguating name suffix.
 //!
-//! This implements the core overload expansion algorithm, following the same
-//! pattern as wasm-bindgen's webidl codegen (`util.rs:create_imports`).
+//! This module is focused exclusively on the **parameter axis** — what
+//! variants does a single JS callable produce based on its overloads, optionals,
+//! and union-typed params? Decisions about `catch` / `try_` / `async fn` /
+//! return types belong in the per-callable emitters (constructors, methods,
+//! free functions, static methods) — those are the parts that vary by what
+//! kind of callable we're emitting and what the source IR member tells us
+//! about errors and async-ness.
 //!
-//! # Overview
-//!
-//! TypeScript overloads describe multiple ways to call the same runtime function.
-//! They are semantically equivalent to unions spread across declarations.
-//! `expand_signatures` takes ALL overloads of a single JS function and produces
-//! the complete set of Rust bindings for it.
-//!
-//! The algorithm has three phases:
+//! # Algorithm
 //!
 //! 1. **Per-overload expansion**: For each overload, generate optional truncation
 //!    variants and cartesian-product union type alternatives.
 //! 2. **Cross-overload dedup**: Remove expanded signatures with identical concrete
 //!    param lists (e.g. two overloads both truncate to `(callback)`).
-//! 3. **Naming**: Compute `_with_`/`_and_` suffixes across all surviving signatures
-//!    as one cohort, then assign final unique names via the shared `used_names` set.
+//! 3. **Suffix**: Compute `_with_X` / `_with_X_and_Y` suffixes across all surviving
+//!    signatures as one cohort.
 //!
 //! # Expansion Rules
 //!
 //! Given `f(a, b?, c?)`:
-//! - `f(a)` — base signature
-//! - `f_with_b(a, b)` — first optional included
-//! - `f_with_b_and_c(a, b, c)` — all params included
-//!
-//! # Catch Rules
-//!
-//! - **Constructors**: always `catch` (JS constructors can always throw)
-//! - **Methods/Functions**: no `catch` by default; a `try_` prefixed variant
-//!   is generated with `catch` for each expanded signature
+//! - `f(a)`         — base signature, suffix `""`
+//! - `f(a, b)`      — first optional included, suffix `"_with_b"`
+//! - `f(a, b, c)`   — all params included, suffix `"_with_b_and_c"`
 //!
 //! # Variadic
 //!
@@ -39,6 +32,13 @@
 //! Variadic params participate in `_with_`/`_and_` suffix computation — if a
 //! signature differs from its siblings only by having a trailing variadic param,
 //! the param name is used as a suffix (e.g. `_with_args`).
+//!
+//! # `try_` and `async` are not handled here
+//!
+//! The decision to emit `name` + `try_name` (sync, fallible companion) or just a
+//! single `async fn name() -> Result<T, E>` (Promise-returning methods) is per-
+//! callable and depends on return-type analysis. See `emit_callable_variants`
+//! in the parent `codegen` module for that layer.
 
 use std::collections::HashSet;
 
@@ -50,7 +50,14 @@ use crate::ir::{Param, TypeRef};
 use crate::parse::scope::ScopeId;
 use crate::util::naming::to_snake_case;
 
-/// What kind of callable we're expanding.
+/// What kind of callable an emitter is producing — drives default-naming
+/// (`new`, `set_x`, snake-case, …) and which `wasm_bindgen` attributes to
+/// stamp on the binding. Setters and constructors don't generate `try_`
+/// companions or `async fn` forms.
+///
+/// `expand_signatures` itself is kind-agnostic: it only does parameter-axis
+/// work. This enum is the contract between [`base_rust_name`] and the
+/// per-callable emitters in `classes.rs` / `functions.rs`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum SignatureKind {
     Constructor,
@@ -59,6 +66,35 @@ pub enum SignatureKind {
     Function,
     Setter,
     StaticSetter,
+}
+
+impl SignatureKind {
+    /// Whether this kind can produce a `try_<name>` fallible companion.
+    pub fn allows_try_variant(self) -> bool {
+        !matches!(self, Self::Constructor | Self::Setter | Self::StaticSetter)
+    }
+
+    /// Whether this kind can collapse a `Promise<T>` return into `async fn`.
+    pub fn allows_async(self) -> bool {
+        !matches!(self, Self::Constructor | Self::Setter | Self::StaticSetter)
+    }
+
+    /// Whether the binding always requires `catch` (constructors do).
+    pub fn always_catches(self) -> bool {
+        matches!(self, Self::Constructor)
+    }
+}
+
+/// Compute the default Rust name for a callable's primary variant before
+/// any `_with_X` suffix is appended.
+pub fn base_rust_name(js_name: &str, kind: SignatureKind) -> String {
+    match kind {
+        SignatureKind::Constructor => "new".to_string(),
+        SignatureKind::Setter | SignatureKind::StaticSetter => {
+            format!("set_{}", to_snake_case(js_name))
+        }
+        _ => to_snake_case(js_name),
+    }
 }
 
 /// A single concrete parameter in an expanded signature.
@@ -70,29 +106,49 @@ pub struct ConcreteParam {
     pub variadic: bool,
 }
 
-/// A single expanded, ready-to-codegen signature.
+/// One concrete parameter-list variant produced by overload expansion,
+/// paired with a suffix that disambiguates it from its siblings in Rust.
+///
+/// The caller adds the suffix to a base name of its choosing (`new`,
+/// `set_X`, `to_snake_case(js_name)`, `try_<name>`, etc.) and dedups
+/// against the surrounding extern block's used-name set.
 #[derive(Clone, Debug)]
 pub struct ExpandedSignature {
-    /// Rust function name — unique within the extern block.
-    pub rust_name: String,
-    /// JS function name (the real name on the JS side)
-    pub js_name: String,
-    /// Concrete params (no optional flags — those have been resolved by truncation)
+    /// `_with_X` / `_with_X_and_Y` suffix — empty for the primary
+    /// (most-truncated) variant when only one signature survives, or when
+    /// the variant is the shortest in its cohort.
+    pub name_suffix: String,
+    /// Concrete params (no optional flags — those have been resolved by
+    /// truncation; no union types — those have been cartesian-expanded).
     pub params: Vec<ConcreteParam>,
-    /// Whether to apply `catch` (wrap return in `Result<T, JsValue>`)
+}
+
+/// A fully-resolved emitter input: an [`ExpandedSignature`] augmented with
+/// the per-emit decisions (final Rust name, `catch`, `async`, return type,
+/// doc, error type) that the per-callable layer made.
+///
+/// This is what concrete emitters (`generate_method`, etc.) consume. Build
+/// via [`build_signatures`].
+#[derive(Clone, Debug)]
+pub struct FunctionSignature {
+    /// Final Rust function name — already deduped against the extern block's
+    /// used-names set.
+    pub rust_name: String,
+    /// JS function name, copied from the source for `js_name = "..."`.
+    pub js_name: String,
+    pub params: Vec<ConcreteParam>,
+    /// Wrap return in `Result<T, ErrTy>`.
     pub catch: bool,
-    /// Return type. For `is_async` signatures this is the *unwrapped* `T` from
-    /// the original `Promise<T>` — wasm-bindgen's async fn lowering rewraps it
-    /// as a Promise on the JS side automatically.
-    pub return_type: TypeRef,
-    /// Doc comment (only on the primary/shortest signature)
-    pub doc: Option<String>,
-    /// What kind of callable this is
-    pub kind: SignatureKind,
-    /// Emit as `async fn`. Set when the original return type was `Promise<T>`
-    /// and `kind` permits async (i.e. not a constructor/setter). The
-    /// `return_type` field carries the unwrapped `T`.
+    /// Emit as `async fn`. The `return_type` here carries the *unwrapped*
+    /// `T` — wasm-bindgen rewraps it as `Promise<T>` in the JS shim.
     pub is_async: bool,
+    /// Return type (already Promise-unwrapped when `is_async`).
+    pub return_type: TypeRef,
+    /// Custom error type for the `Result` wrapper. `None` falls back to
+    /// `JsValue` in [`to_return_type`].
+    pub error_type: Option<TypeRef>,
+    /// Doc comment — copied to every signature in the cohort.
+    pub doc: Option<String>,
 }
 
 /// Assign a unique name within the extern block.
@@ -117,43 +173,24 @@ pub fn dedupe_name(candidate: &str, used_names: &mut HashSet<String>) -> String 
     }
 }
 
-/// Expand all overloads of a single JS function into concrete Rust signatures.
+/// Expand all overloads of a single JS callable into concrete Rust parameter
+/// variants, each tagged with a disambiguating suffix.
 ///
-/// Takes ALL overloads (param lists) sharing the same `js_name` and produces
-/// the complete set of bindings. The algorithm:
+/// 1. **Per-overload expansion**: optional truncation + union cartesian product.
+/// 2. **Cross-overload dedup**: drop expansions with identical concrete params.
+/// 3. **Suffix**: assign `_with_X` / `_with_X_and_Y` suffixes across the cohort.
 ///
-/// 1. For each overload: generate optional truncation variants, then expand
-///    union types via cartesian product.
-/// 2. Dedup: remove expanded signatures with identical concrete param lists
-///    across overloads.
-/// 3. Name: compute `_with_`/`_and_` suffixes across all surviving signatures,
-///    then assign final unique names via the shared `used_names` set.
-/// 4. Generate `try_` variants (non-constructors only).
-#[allow(clippy::too_many_arguments)]
+/// The caller is responsible for choosing a base name, applying the suffix,
+/// and deduping the final names against the surrounding extern block.
 pub fn expand_signatures(
-    js_name: &str,
     overloads: &[&[Param]],
-    return_type: &TypeRef,
-    kind: SignatureKind,
-    doc: &Option<String>,
-    used_names: &mut HashSet<String>,
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) -> Vec<ExpandedSignature> {
-    let base_rust_name = match kind {
-        SignatureKind::Constructor => "new".to_string(),
-        SignatureKind::Setter | SignatureKind::StaticSetter => {
-            format!("set_{}", to_snake_case(js_name))
-        }
-        _ => to_snake_case(js_name),
-    };
-
     // Phase 1: Per-overload expansion — optional truncation + union cartesian product.
     let mut all_sigs: Vec<Vec<ConcreteParam>> = Vec::new();
-
     for params in overloads {
-        let expanded = expand_single_overload(params, cgctx, scope);
-        all_sigs.extend(expanded);
+        all_sigs.extend(expand_single_overload(params, cgctx, scope));
     }
 
     // Phase 2: Cross-overload dedup — remove identical expanded signatures.
@@ -166,77 +203,133 @@ pub fn expand_signatures(
         }
     }
 
-    // Phase 3: Naming — compute candidate names, then assign final unique names.
-    let candidate_names = compute_rust_names(&base_rust_name, &deduped);
-    let is_constructor = kind == SignatureKind::Constructor;
+    // Phase 3: Suffix — compute `_with_X` disambiguators across the cohort.
+    compute_suffixes(&deduped)
+        .into_iter()
+        .zip(deduped)
+        .map(|(name_suffix, params)| ExpandedSignature {
+            name_suffix,
+            params,
+        })
+        .collect()
+}
 
-    // Promise-returning methods/functions/static-methods collapse into a single
-    // async signature instead of the usual `name` + `try_name` pair. The async
-    // form is fallible (`-> Result<T, JsValue>`) and `.await`-able, which is
-    // strictly more useful than a sync `-> Promise<T>` plus a `try_` variant.
-    // Constructors and setters never become async — they don't return promises.
-    let async_eligible = !matches!(
-        kind,
-        SignatureKind::Constructor | SignatureKind::Setter | SignatureKind::StaticSetter
-    );
-    let (async_unwrapped_ret, is_async) = match return_type {
-        TypeRef::Promise(inner) if async_eligible => (inner.as_ref().clone(), true),
-        _ => (return_type.clone(), false),
+/// Per-callable input describing a JS callable that needs to be emitted as
+/// one or more wasm-bindgen extern signatures. Pairs with [`build_signatures`].
+///
+/// All decisions about `try_` companions, `async fn` collapse, and `catch`
+/// fall out of the kind + return type + error type once these inputs are
+/// available.
+#[derive(Clone, Debug)]
+pub struct CallableSpec<'a> {
+    pub js_name: &'a str,
+    pub kind: SignatureKind,
+    /// All overloads sharing this `js_name` — typically one element, but TS
+    /// allows multiple overloaded declarations.
+    pub overloads: &'a [&'a [Param]],
+    pub return_type: &'a TypeRef,
+    /// Optional error type from `@throws` — `None` means use the default
+    /// `JsValue` for any catching variant.
+    pub error_type: Option<&'a TypeRef>,
+    /// Doc comment to attach to the primary signature only.
+    pub doc: &'a Option<String>,
+}
+
+/// Resolve a [`CallableSpec`] into the full set of [`FunctionSignature`]s
+/// that should be emitted in the surrounding extern block.
+///
+/// Decisions made here:
+///
+/// * **Promise → async**: when [`SignatureKind::allows_async`] and the return
+///   type is `Promise<T>`, collapse to a single `async fn` with `catch: true`,
+///   carrying the unwrapped `T` as `return_type`. No `try_` companion is
+///   emitted in this case (`async + catch` is already the fallible form).
+/// * **`try_` companion**: for sync, non-setter, non-constructor callables,
+///   each primary `name` gets a fallible `try_name` sibling.
+/// * **Constructor catches always**: per JS semantics; the primary signature
+///   is `catch: true` and there's no `try_` variant.
+/// * **Naming**: each surviving expansion gets `base + suffix` deduped against
+///   `used_names`; `try_` variants prepend `try_` and dedup again.
+pub fn build_signatures(
+    spec: &CallableSpec<'_>,
+    used_names: &mut HashSet<String>,
+    cgctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> Vec<FunctionSignature> {
+    let base = base_rust_name(spec.js_name, spec.kind);
+    let expansions = expand_signatures(spec.overloads, cgctx, scope);
+
+    // Promise unwrap is per-callable, not per-overload — every expansion of a
+    // given JS callable shares the same return type.
+    let (is_async, return_type) = match (spec.return_type, spec.kind.allows_async()) {
+        (TypeRef::Promise(inner), true) => (true, inner.as_ref().clone()),
+        (other, _) => (false, other.clone()),
     };
 
-    let mut result = Vec::new();
+    let allow_try = !is_async && spec.kind.allows_try_variant();
+    let mut out = Vec::with_capacity(expansions.len() * if allow_try { 2 } else { 1 });
 
-    for (candidate, concrete_params) in candidate_names.into_iter().zip(deduped) {
-        let rust_name = dedupe_name(&candidate, used_names);
+    for exp in expansions {
+        let primary_candidate = format!("{base}{}", exp.name_suffix);
+        let primary_name = dedupe_name(&primary_candidate, used_names);
 
-        if is_async {
-            // Single async + catch signature; no `try_` companion.
-            result.push(ExpandedSignature {
-                rust_name,
-                js_name: js_name.to_string(),
-                params: concrete_params,
-                catch: true,
-                return_type: async_unwrapped_ret.clone(),
-                doc: doc.clone(),
-                kind,
-                is_async: true,
-            });
-            continue;
-        }
-
-        result.push(ExpandedSignature {
-            rust_name: rust_name.clone(),
-            js_name: js_name.to_string(),
-            params: concrete_params.clone(),
-            catch: is_constructor,
+        // Primary variant: catches if async (the catch encodes async failure)
+        // or if the kind always catches (constructors).
+        let primary_catches = is_async || spec.kind.always_catches();
+        out.push(FunctionSignature {
+            rust_name: primary_name.clone(),
+            js_name: spec.js_name.to_string(),
+            params: exp.params.clone(),
+            catch: primary_catches,
+            is_async,
             return_type: return_type.clone(),
-            doc: doc.clone(),
-            kind,
-            is_async: false,
+            error_type: if primary_catches {
+                spec.error_type.cloned()
+            } else {
+                None
+            },
+            doc: spec.doc.clone(),
         });
 
-        // try_ variant (not for constructors or setters)
-        let emit_try = !matches!(
-            kind,
-            SignatureKind::Constructor | SignatureKind::Setter | SignatureKind::StaticSetter
-        );
-        if emit_try {
-            let try_candidate = format!("try_{rust_name}");
-            let try_name = dedupe_name(&try_candidate, used_names);
-            result.push(ExpandedSignature {
+        if allow_try {
+            let try_name = dedupe_name(&format!("try_{primary_name}"), used_names);
+            out.push(FunctionSignature {
                 rust_name: try_name,
-                js_name: js_name.to_string(),
-                params: concrete_params,
+                js_name: spec.js_name.to_string(),
+                params: exp.params,
                 catch: true,
-                return_type: return_type.clone(),
-                doc: doc.clone(),
-                kind,
                 is_async: false,
+                return_type: return_type.clone(),
+                error_type: spec.error_type.cloned(),
+                doc: spec.doc.clone(),
             });
         }
     }
 
-    result
+    out
+}
+
+/// Compute `_with_X` / `_with_X_and_Y` suffixes across a cohort of expanded
+/// signatures. Returns one suffix string per input. The shortest-arity
+/// variant (or the only one if there's a single signature) gets `""`.
+///
+/// Wraps the existing [`compute_rust_names`] helper, then extracts the
+/// suffixes by stripping a shared base prefix. We compute against a
+/// non-empty placeholder base because `compute_rust_names` was originally
+/// designed to produce full names.
+fn compute_suffixes(expansions: &[Vec<ConcreteParam>]) -> Vec<String> {
+    // Use a placeholder base — `BASE` is just a prefix that won't appear in
+    // any param name, so we can safely strip it back off.
+    const BASE: &str = "BASE";
+    compute_rust_names(BASE, expansions)
+        .into_iter()
+        .map(|name| {
+            // `compute_rust_names` returns either `BASE` (primary, no suffix)
+            // or `BASE_with_X[_and_Y]` (variant). Strip the base; what's
+            // left including the leading `_` is the suffix.
+            name.strip_prefix(BASE).unwrap_or(&name).to_string()
+        })
+        .collect()
 }
 
 /// Check if two expanded concrete param lists are identical.
@@ -650,7 +743,8 @@ mod tests {
         (gctx, scope)
     }
 
-    /// Shorthand: expand a single overload.
+    /// Shorthand: build signatures for a single overload through the full
+    /// per-callable pipeline (`build_signatures`).
     fn expand(
         js: &str,
         params: &[Param],
@@ -658,13 +752,25 @@ mod tests {
         kind: SignatureKind,
         doc: &Option<String>,
         used: &mut HashSet<String>,
-    ) -> Vec<ExpandedSignature> {
+    ) -> Vec<FunctionSignature> {
         let (gctx, scope) = test_ctx();
         let cgctx = CodegenContext::empty(&gctx, scope);
-        expand_signatures(js, &[params], ret, kind, doc, used, Some(&cgctx), scope)
+        build_signatures(
+            &CallableSpec {
+                js_name: js,
+                kind,
+                overloads: &[params],
+                return_type: ret,
+                error_type: None,
+                doc,
+            },
+            used,
+            Some(&cgctx),
+            scope,
+        )
     }
 
-    /// Shorthand: expand multiple overloads.
+    /// Shorthand: build signatures for multiple overloads.
     fn expand_overloads(
         js: &str,
         overloads: &[&[Param]],
@@ -672,10 +778,22 @@ mod tests {
         kind: SignatureKind,
         doc: &Option<String>,
         used: &mut HashSet<String>,
-    ) -> Vec<ExpandedSignature> {
+    ) -> Vec<FunctionSignature> {
         let (gctx, scope) = test_ctx();
         let cgctx = CodegenContext::empty(&gctx, scope);
-        expand_signatures(js, overloads, ret, kind, doc, used, Some(&cgctx), scope)
+        build_signatures(
+            &CallableSpec {
+                js_name: js,
+                kind,
+                overloads,
+                return_type: ret,
+                error_type: None,
+                doc,
+            },
+            used,
+            Some(&cgctx),
+            scope,
+        )
     }
 
     fn param(name: &str) -> Param {

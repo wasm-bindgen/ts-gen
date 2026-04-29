@@ -114,6 +114,7 @@ fn register_type(
             params: vec![],
             return_type: ir::TypeRef::Any,
             overloads: vec![],
+            throws: None,
         }),
         ir::RegisteredKind::Variable => ir::TypeKind::Variable(ir::VariableDecl {
             name: name_str.clone(),

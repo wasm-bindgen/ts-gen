@@ -683,6 +683,7 @@ mod tests {
             return_type: TypeRef::Void,
             optional: false,
             doc: None,
+            throws: None,
         })
     }
 

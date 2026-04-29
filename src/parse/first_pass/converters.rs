@@ -99,6 +99,7 @@ pub fn convert_interface_decl(
 
 pub fn convert_function_decl(
     func: &ast::Function<'_>,
+    throws: Option<ir::TypeRef>,
     diag: &mut DiagnosticCollector,
 ) -> Option<ir::FunctionDecl> {
     let name = func.id.as_ref()?.name.to_string();
@@ -128,6 +129,7 @@ pub fn convert_function_decl(
         params,
         return_type,
         overloads: vec![],
+        throws,
     })
 }
 

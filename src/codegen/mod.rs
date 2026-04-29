@@ -7,6 +7,7 @@ pub mod classes;
 pub mod enums;
 pub mod functions;
 pub mod signatures;
+pub mod subtyping;
 pub mod typemap;
 
 use proc_macro2::TokenStream;
