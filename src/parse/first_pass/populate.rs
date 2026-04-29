@@ -209,11 +209,17 @@ impl<'a> PopulateCtx<'a> {
                     }
                 }
                 ast::ExportDefaultDeclarationKind::FunctionDeclaration(func) => {
-                    let doc = self
+                    // Look up structured info on either the export span or the
+                    // function span (JSDoc may be attached to either).
+                    let info = self
                         .docs
-                        .for_span(export.span.start)
-                        .or_else(|| self.docs.for_span(func.span.start));
-                    if let Some(decl) = convert_function_decl(func, self.diag) {
+                        .info_for_span(export.span.start)
+                        .or_else(|| self.docs.info_for_span(func.span.start));
+                    let (doc, throws) = match info {
+                        Some((d, i)) => (Some(d), i.throws_typeref()),
+                        None => (None, None),
+                    };
+                    if let Some(decl) = convert_function_decl(func, throws, self.diag) {
                         declarations.push(ir::TypeDeclaration {
                             kind: ir::TypeKind::Function(decl),
                             module_context: ctx.clone(),
@@ -373,8 +379,8 @@ impl<'a> PopulateCtx<'a> {
         dcx: &DeclCtx<'_>,
         declarations: &mut Vec<ir::TypeDeclaration>,
     ) {
-        let doc = self.lookup_doc(dcx.export_span_start, func.span.start);
-        if let Some(d) = convert_function_decl(func, self.diag) {
+        let (doc, throws) = self.lookup_callable_doc(dcx.export_span_start, func.span.start);
+        if let Some(d) = convert_function_decl(func, throws, self.diag) {
             declarations.push(dcx.decl(ir::TypeKind::Function(d), doc));
         }
     }
@@ -458,6 +464,9 @@ impl<'a> PopulateCtx<'a> {
                             params: sig.params,
                             return_type: *sig.return_type,
                             overloads: vec![],
+                            // Variable-as-function form (`var foo: () => T`) doesn't
+                            // typically carry @throws JSDoc; leave empty.
+                            throws: None,
                         }),
                         doc.clone(),
                     ));
@@ -574,6 +583,26 @@ impl<'a> PopulateCtx<'a> {
         export_span_start
             .and_then(|s| self.docs.for_span(s))
             .or_else(|| self.docs.for_span(inner_span_start))
+    }
+
+    /// Same fallback behavior as [`lookup_doc`], but also returns the
+    /// `@throws` type (already lifted into a `TypeRef`) from the same
+    /// JSDoc block. Used by callable declarations that need both the
+    /// rendered doc and structured throws info.
+    ///
+    /// [`lookup_doc`]: Self::lookup_doc
+    fn lookup_callable_doc(
+        &self,
+        export_span_start: Option<u32>,
+        inner_span_start: u32,
+    ) -> (Option<String>, Option<ir::TypeRef>) {
+        let info = export_span_start
+            .and_then(|s| self.docs.info_for_span(s))
+            .or_else(|| self.docs.info_for_span(inner_span_start));
+        match info {
+            Some((doc, info)) => (Some(doc), info.throws_typeref()),
+            None => (None, None),
+        }
     }
 
     /// Look up the child scope that Phase 1 created for a namespace.

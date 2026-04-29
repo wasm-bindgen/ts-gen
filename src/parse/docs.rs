@@ -7,6 +7,53 @@
 
 use oxc_ast::ast::Comment;
 
+/// Structured JSDoc data extracted alongside the rendered doc comment.
+///
+/// Currently carries `@throws` types for callable members; `for_span` keeps
+/// returning a bare `Option<String>` so non-callable callers don't have to
+/// touch this struct.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct JsDocInfo {
+    /// Type names mentioned across all `@throws {T}` lines, deduped while
+    /// preserving source order. Each entry is the raw identifier as written
+    /// in the JSDoc (e.g. `"TypeError"`, `"ImagesError"`).
+    ///
+    /// Use [`Self::throws_typeref`] to convert into the standard `TypeRef`
+    /// representation that the rest of the pipeline understands.
+    ///
+    /// Recognized forms:
+    /// * `@throws {TypeError} when foo` — single type
+    /// * `@throws {TypeError | RangeError} when bar` — union
+    /// * `@throws {@link ImagesError} if upload fails` — JSDoc link form
+    ///
+    /// Pure-prose `@throws Sentence describing condition.` entries with no
+    /// `{T}` annotation are silently ignored.
+    pub throws: Vec<String>,
+}
+
+impl JsDocInfo {
+    /// Lift the `@throws` name list into a `TypeRef`:
+    ///
+    /// * Empty → `None`
+    /// * Single name → `TypeRef::Named(...)`
+    /// * Multiple → `TypeRef::Union(...)` of named entries
+    ///
+    /// The returned `TypeRef` is just a regular type from the pipeline's
+    /// perspective — codegen's union-LUB rules apply uniformly to it.
+    pub fn throws_typeref(&self) -> Option<crate::ir::TypeRef> {
+        match self.throws.len() {
+            0 => None,
+            1 => Some(crate::ir::TypeRef::Named(self.throws[0].clone())),
+            _ => Some(crate::ir::TypeRef::Union(
+                self.throws
+                    .iter()
+                    .map(|n| crate::ir::TypeRef::Named(n.clone()))
+                    .collect(),
+            )),
+        }
+    }
+}
+
 /// Provides JSDoc lookup by span position.
 pub struct DocComments<'a> {
     comments: &'a [Comment],
@@ -23,6 +70,15 @@ impl<'a> DocComments<'a> {
     /// Returns the cleaned doc text (leading `*` and whitespace stripped per line),
     /// or `None` if no JSDoc is attached.
     pub fn for_span(&self, span_start: u32) -> Option<String> {
+        self.info_for_span(span_start).map(|(doc, _)| doc)
+    }
+
+    /// Like [`for_span`] but also returns structured JSDoc info (e.g. `@throws`
+    /// types). Callable converters that build `MethodMember` / `FunctionDecl`
+    /// / `ConstructorMember` use this to capture throws annotations.
+    ///
+    /// [`for_span`]: Self::for_span
+    pub fn info_for_span(&self, span_start: u32) -> Option<(String, JsDocInfo)> {
         // Find the last JSDoc comment attached to this position.
         // (There could be multiple leading comments; we want the JSDoc one closest to the node.)
         let jsdoc = self
@@ -34,7 +90,7 @@ impl<'a> DocComments<'a> {
         let content_span = jsdoc.content_span();
         let raw = &self.source[content_span.start as usize..content_span.end as usize];
 
-        Some(clean_jsdoc(raw))
+        Some(clean_jsdoc_with_info(raw))
     }
 }
 
@@ -45,7 +101,14 @@ impl<'a> DocComments<'a> {
 /// - Converts `@returns desc` → `# Returns` section
 /// - Converts `@example` blocks into fenced ` ```js ` code blocks
 /// - Removes empty leading/trailing lines
+#[cfg(test)]
 fn clean_jsdoc(raw: &str) -> String {
+    clean_jsdoc_with_info(raw).0
+}
+
+/// Like [`clean_jsdoc`] but also collects structured JSDoc info from the
+/// content (currently `@throws` type names).
+fn clean_jsdoc_with_info(raw: &str) -> (String, JsDocInfo) {
     let lines: Vec<&str> = raw.lines().collect();
     let mut cleaned: Vec<&str> = Vec::new();
 
@@ -75,13 +138,16 @@ fn clean_jsdoc(raw: &str) -> String {
 
 /// Convert JSDoc tags in cleaned lines to Rust doc conventions.
 ///
-/// Collects description lines, `@param` entries, `@returns`, and `@example` blocks,
-/// then re-emits them in idiomatic Rust doc order.
-fn convert_jsdoc_tags(lines: &[&str]) -> String {
+/// Collects description lines, `@param` entries, `@returns`, `@throws`, and
+/// `@example` blocks, then re-emits them in idiomatic Rust doc order. Returns
+/// the rendered doc plus structured info pulled from `@throws`.
+fn convert_jsdoc_tags(lines: &[&str]) -> (String, JsDocInfo) {
     let mut description: Vec<String> = Vec::new();
     let mut params: Vec<String> = Vec::new();
     let mut returns: Option<String> = None;
+    let mut throws_lines: Vec<String> = Vec::new();
     let mut examples: Vec<Vec<String>> = Vec::new();
+    let mut info = JsDocInfo::default();
 
     let mut i = 0;
     while i < lines.len() {
@@ -95,6 +161,16 @@ fn convert_jsdoc_tags(lines: &[&str]) -> String {
             .or_else(|| line.strip_prefix("@return "))
         {
             returns = Some(rest.to_string());
+        } else if let Some(rest) = line.strip_prefix("@throws ") {
+            // Capture both the structured type info (for `info.throws`) and a
+            // human-readable line for the Errors section in the rendered doc.
+            let (types, prose) = parse_throws_tag(rest);
+            for ty in types {
+                if !info.throws.contains(&ty) {
+                    info.throws.push(ty);
+                }
+            }
+            throws_lines.push(prose);
         } else if line == "@example" {
             // Collect all lines until the next tag or end
             let mut code_lines = Vec::new();
@@ -153,6 +229,19 @@ fn convert_jsdoc_tags(lines: &[&str]) -> String {
         out.push(ret.clone());
     }
 
+    // Errors section — surfaces `@throws` lines so the rendered doc still
+    // captures them even though the structured info is what drives codegen.
+    if !throws_lines.is_empty() {
+        if !out.is_empty() && !out.last().is_none_or(|l| l.is_empty()) {
+            out.push(String::new());
+        }
+        out.push("## Errors".to_string());
+        out.push(String::new());
+        for line in &throws_lines {
+            out.push(format!("* {line}"));
+        }
+    }
+
     // Examples
     for example in &examples {
         if !out.is_empty() && !out.last().is_none_or(|l| l.is_empty()) {
@@ -172,7 +261,80 @@ fn convert_jsdoc_tags(lines: &[&str]) -> String {
         out.pop();
     }
 
-    out.join("\n")
+    (out.join("\n"), info)
+}
+
+/// Parse the contents of an `@throws` tag.
+///
+/// Returns `(type_names, prose)` where:
+/// * `type_names` is the list of identifiers found between `{...}` (preserving
+///   source order). Empty if the tag is pure prose with no braced type.
+/// * `prose` is a short human-readable line for the rendered Errors section.
+///
+/// Per the JSDoc spec, structured types live inside curly braces:
+///
+/// * `{TypeError} when foo` — single type
+/// * `{TypeError | RangeError} when bar` — union
+/// * `{@link ImagesError} if upload fails` — JSDoc link form (linked
+///   identifier is taken as the type)
+/// * `If the X does not exist, an error will be thrown.` — pure prose, no type
+///
+/// Primitive type names (`string`/`number`/etc.) inside `{...}` are *not*
+/// added to `type_names` — they'd widen the LUB to `JsValue` anyway and
+/// aren't resolvable to a Rust error type.
+fn parse_throws_tag(rest: &str) -> (Vec<String>, String) {
+    let trimmed = rest.trim();
+
+    if let Some(stripped) = trimmed.strip_prefix('{') {
+        if let Some(end) = stripped.find('}') {
+            let inner = stripped[..end].trim();
+            let after = stripped[end + 1..].trim();
+
+            // Handle `{@link Foo}` — keep just the linked name.
+            let inner = inner.strip_prefix("@link ").map(str::trim).unwrap_or(inner);
+
+            let names: Vec<String> = inner
+                .split('|')
+                .map(str::trim)
+                .filter(|s| !s.is_empty() && !is_primitive_type_name(s))
+                .map(String::from)
+                .collect();
+
+            // Build a prose line for the rendered Errors section. Use the
+            // raw inner text (with `{@link X}` collapsed to `X`) so unions
+            // and link forms read naturally.
+            let prose = if after.is_empty() {
+                format!("`{inner}`")
+            } else {
+                format!("`{inner}` — {after}")
+            };
+            return (names, prose);
+        }
+    }
+
+    // No braces, or unmatched `{`: treat as pure prose with no structured type.
+    (Vec::new(), trimmed.to_string())
+}
+
+/// Names of TypeScript primitive types that should not be promoted to a
+/// throws "type" — they widen the LUB to `JsValue` anyway and aren't
+/// resolvable to a Rust error type.
+fn is_primitive_type_name(s: &str) -> bool {
+    matches!(
+        s,
+        "string"
+            | "number"
+            | "bigint"
+            | "boolean"
+            | "undefined"
+            | "null"
+            | "void"
+            | "any"
+            | "unknown"
+            | "object"
+            | "symbol"
+            | "never"
+    )
 }
 
 /// Format a `@param` rest string into a Rust-style argument list item.
@@ -291,5 +453,83 @@ mod tests {
             clean_jsdoc(raw),
             "Desc.\n\n## Returns\n\nresult\n\n## Example\n\n```js\ncode();\n```"
         );
+    }
+
+    fn parse(raw: &str) -> (String, JsDocInfo) {
+        clean_jsdoc_with_info(raw)
+    }
+
+    #[test]
+    fn test_throws_single_braced_type() {
+        let raw = "\n * Does X.\n * @throws {TypeError} when foo is bad\n ";
+        let (doc, info) = parse(raw);
+        assert_eq!(info.throws, vec!["TypeError"]);
+        // The Errors section appears in the rendered doc with the raw type
+        // and prose preserved.
+        assert!(doc.contains("## Errors"));
+        assert!(doc.contains("`TypeError` — when foo is bad"));
+    }
+
+    #[test]
+    fn test_throws_union() {
+        let raw = "\n * @throws {TypeError | RangeError} on bad input\n ";
+        let (_doc, info) = parse(raw);
+        assert_eq!(info.throws, vec!["TypeError", "RangeError"]);
+    }
+
+    #[test]
+    fn test_throws_link_form() {
+        let raw = "\n * @throws {@link ImagesError} if upload fails\n ";
+        let (doc, info) = parse(raw);
+        assert_eq!(info.throws, vec!["ImagesError"]);
+        // The rendered doc uses the linked name without the `@link` marker.
+        assert!(doc.contains("`ImagesError` — if upload fails"));
+    }
+
+    #[test]
+    fn test_throws_multiple_lines_dedup_preserves_order() {
+        // Multiple `@throws` lines accumulate into the same union, with
+        // duplicates collapsed but order preserved across lines.
+        let raw = "
+                 * @throws {NotFoundError} if not found
+                 * @throws {BadRequestError} if invalid
+                 * @throws {NotFoundError} again
+                 ";
+        let (_doc, info) = parse(raw);
+        assert_eq!(info.throws, vec!["NotFoundError", "BadRequestError"]);
+    }
+
+    #[test]
+    fn test_throws_pure_prose_has_no_types() {
+        let raw = "\n * @throws If the resource does not exist, an error is thrown.\n ";
+        let (doc, info) = parse(raw);
+        assert!(info.throws.is_empty());
+        // Prose still surfaces in the rendered Errors section.
+        assert!(doc.contains("## Errors"));
+        assert!(doc.contains("If the resource does not exist"));
+    }
+
+    #[test]
+    fn test_throws_primitives_filtered() {
+        // Primitive types in the union don't make it into `info.throws`
+        // since they aren't useful as a Rust error type.
+        let raw = "\n * @throws {TypeError | string} bad input\n ";
+        let (_doc, info) = parse(raw);
+        assert_eq!(info.throws, vec!["TypeError"]);
+    }
+
+    #[test]
+    fn test_throws_unmatched_brace_falls_back_to_prose() {
+        // If `}` is missing we don't attempt structured parsing.
+        let raw = "\n * @throws {TypeError if oops\n ";
+        let (_doc, info) = parse(raw);
+        assert!(info.throws.is_empty());
+    }
+
+    #[test]
+    fn test_no_throws_yields_empty_info() {
+        let raw = "\n * Just a description.\n ";
+        let (_doc, info) = parse(raw);
+        assert!(info.throws.is_empty());
     }
 }

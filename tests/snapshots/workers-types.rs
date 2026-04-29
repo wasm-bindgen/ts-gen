@@ -615,25 +615,26 @@ pub mod web_assembly {
     }
     #[wasm_bindgen]
     extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "WebAssembly")]
+        # [wasm_bindgen (extends = Object , js_name = "Global" , js_namespace = "WebAssembly")]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type Global;
+        pub type Global_;
         #[wasm_bindgen(constructor, catch)]
-        pub fn new(descriptor: &GlobalDescriptor) -> Result<Global, JsValue>;
+        pub fn new(descriptor: &GlobalDescriptor) -> Result<Global_, JsValue>;
         #[wasm_bindgen(constructor, catch, js_name = "Global")]
         pub fn new_with_value(
             descriptor: &GlobalDescriptor,
             value: &JsValue,
-        ) -> Result<Global, JsValue>;
+        ) -> Result<Global_, JsValue>;
         #[wasm_bindgen(method, getter)]
-        pub fn value(this: &Global) -> JsValue;
+        pub fn value(this: &Global_) -> JsValue;
         #[wasm_bindgen(method, setter)]
-        pub fn set_value(this: &Global, val: &JsValue);
+        pub fn set_value(this: &Global_, val: &JsValue);
         #[wasm_bindgen(method, js_name = "valueOf")]
-        pub fn value_of(this: &Global) -> JsValue;
+        pub fn value_of(this: &Global_) -> JsValue;
         #[wasm_bindgen(method, catch, js_name = "valueOf")]
-        pub fn try_value_of(this: &Global) -> Result<JsValue, JsValue>;
+        pub fn try_value_of(this: &Global_) -> Result<JsValue, JsValue>;
     }
+    pub use Global_ as Global;
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "WebAssembly")]
@@ -9647,15 +9648,15 @@ extern "C" {
         this: &R2Bucket,
         key: &str,
         options: &JsValue,
-    ) -> Result<Option<JsValue>, JsValue>;
+    ) -> Result<Option<R2Object>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_1(this: &R2Bucket, key: &str) -> Result<Option<JsValue>, JsValue>;
+    pub async fn get_1(this: &R2Bucket, key: &str) -> Result<Option<R2Object>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_r_2_get_options(
         this: &R2Bucket,
         key: &str,
         options: &R2GetOptions,
-    ) -> Result<Option<JsValue>, JsValue>;
+    ) -> Result<Option<R2Object>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn put(
         this: &R2Bucket,
@@ -31765,7 +31766,6 @@ extern "C" {
         image_id: &str,
     ) -> Result<Option<ReadableStream>, JsValue>;
     #[doc = " Upload a new hosted image"]
-    #[doc = " @throws {@link ImagesError} if upload fails"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -31775,13 +31775,16 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " Metadata for the uploaded image"]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `ImagesError` — if upload fails"]
     #[wasm_bindgen(method, catch)]
     pub async fn upload(
         this: &HostedImagesBinding,
         image: &ReadableStream,
-    ) -> Result<ImageMetadata, JsValue>;
+    ) -> Result<ImageMetadata, ImagesError>;
     #[doc = " Upload a new hosted image"]
-    #[doc = " @throws {@link ImagesError} if upload fails"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -31791,13 +31794,16 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " Metadata for the uploaded image"]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `ImagesError` — if upload fails"]
     #[wasm_bindgen(method, catch, js_name = "upload")]
     pub async fn upload_with_array_buffer(
         this: &HostedImagesBinding,
         image: &ArrayBuffer,
-    ) -> Result<ImageMetadata, JsValue>;
+    ) -> Result<ImageMetadata, ImagesError>;
     #[doc = " Upload a new hosted image"]
-    #[doc = " @throws {@link ImagesError} if upload fails"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -31807,14 +31813,17 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " Metadata for the uploaded image"]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `ImagesError` — if upload fails"]
     #[wasm_bindgen(method, catch, js_name = "upload")]
     pub async fn upload_with_js_value_and_options(
         this: &HostedImagesBinding,
         image: &ReadableStream,
         options: &ImageUploadOptions,
-    ) -> Result<ImageMetadata, JsValue>;
+    ) -> Result<ImageMetadata, ImagesError>;
     #[doc = " Upload a new hosted image"]
-    #[doc = " @throws {@link ImagesError} if upload fails"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -31824,14 +31833,17 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " Metadata for the uploaded image"]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `ImagesError` — if upload fails"]
     #[wasm_bindgen(method, catch, js_name = "upload")]
     pub async fn upload_with_array_buffer_and_options(
         this: &HostedImagesBinding,
         image: &ArrayBuffer,
         options: &ImageUploadOptions,
-    ) -> Result<ImageMetadata, JsValue>;
+    ) -> Result<ImageMetadata, ImagesError>;
     #[doc = " Update hosted image metadata"]
-    #[doc = " @throws {@link ImagesError} if update fails"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -31841,12 +31853,16 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " Updated image metadata"]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `ImagesError` — if update fails"]
     #[wasm_bindgen(method, catch)]
     pub async fn update(
         this: &HostedImagesBinding,
         image_id: &str,
         options: &ImageUpdateOptions,
-    ) -> Result<ImageMetadata, JsValue>;
+    ) -> Result<ImageMetadata, ImagesError>;
     #[doc = " Delete a hosted image"]
     #[doc = " "]
     #[doc = " ## Arguments"]
@@ -31859,7 +31875,6 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn delete(this: &HostedImagesBinding, image_id: &str) -> Result<bool, JsValue>;
     #[doc = " List hosted images with pagination"]
-    #[doc = " @throws {@link ImagesError} if list fails"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -31868,10 +31883,13 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " List of images with pagination info"]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `ImagesError` — if list fails"]
     #[wasm_bindgen(method, catch)]
-    pub async fn list(this: &HostedImagesBinding) -> Result<ImageList, JsValue>;
+    pub async fn list(this: &HostedImagesBinding) -> Result<ImageList, ImagesError>;
     #[doc = " List hosted images with pagination"]
-    #[doc = " @throws {@link ImagesError} if list fails"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -31880,11 +31898,15 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " List of images with pagination info"]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `ImagesError` — if list fails"]
     #[wasm_bindgen(method, catch, js_name = "list")]
     pub async fn list_with_options(
         this: &HostedImagesBinding,
         options: &ImageListOptions,
-    ) -> Result<ImageList, JsValue>;
+    ) -> Result<ImageList, ImagesError>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -31892,25 +31914,34 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImagesBinding;
     #[doc = " Get image metadata (type, width and height)"]
-    #[doc = " @throws {@link ImagesError} with code 9412 if input is not an image"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
     #[doc = " * `stream` - The image bytes"]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `ImagesError` — with code 9412 if input is not an image"]
     #[wasm_bindgen(method, catch)]
-    pub async fn info(this: &ImagesBinding, stream: &ReadableStream) -> Result<JsValue, JsValue>;
+    pub async fn info(
+        this: &ImagesBinding,
+        stream: &ReadableStream,
+    ) -> Result<JsValue, ImagesError>;
     #[doc = " Get image metadata (type, width and height)"]
-    #[doc = " @throws {@link ImagesError} with code 9412 if input is not an image"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
     #[doc = " * `stream` - The image bytes"]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `ImagesError` — with code 9412 if input is not an image"]
     #[wasm_bindgen(method, catch, js_name = "info")]
     pub async fn info_with_options(
         this: &ImagesBinding,
         stream: &ReadableStream,
         options: &Object,
-    ) -> Result<JsValue, JsValue>;
+    ) -> Result<JsValue, ImagesError>;
     #[doc = " Begin applying a series of transformations to an image"]
     #[doc = " "]
     #[doc = " ## Arguments"]
@@ -33080,11 +33111,6 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "video")]
     pub fn try_video(this: &StreamBinding, id: &str) -> Result<StreamVideoHandle, JsValue>;
     #[doc = " Uploads a new video from a File."]
-    #[doc = " @throws {BadRequestError} if the upload parameter is invalid"]
-    #[doc = " @throws {QuotaReachedError} if the account storage capacity is exceeded"]
-    #[doc = " @throws {MaxFileSizeError} if the file size is too large"]
-    #[doc = " @throws {RateLimitedError} if the server received too many requests"]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -33093,14 +33119,17 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " The uploaded video details."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `BadRequestError` — if the upload parameter is invalid"]
+    #[doc = " * `QuotaReachedError` — if the account storage capacity is exceeded"]
+    #[doc = " * `MaxFileSizeError` — if the file size is too large"]
+    #[doc = " * `RateLimitedError` — if the server received too many requests"]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn upload(this: &StreamBinding, file: &File) -> Result<StreamVideo, JsValue>;
+    pub async fn upload(this: &StreamBinding, file: &File) -> Result<StreamVideo, StreamError>;
     #[doc = " Uploads a new video from a File."]
-    #[doc = " @throws {BadRequestError} if the upload parameter is invalid"]
-    #[doc = " @throws {QuotaReachedError} if the account storage capacity is exceeded"]
-    #[doc = " @throws {MaxFileSizeError} if the file size is too large"]
-    #[doc = " @throws {RateLimitedError} if the server received too many requests"]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -33109,14 +33138,20 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " The uploaded video details."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `BadRequestError` — if the upload parameter is invalid"]
+    #[doc = " * `QuotaReachedError` — if the account storage capacity is exceeded"]
+    #[doc = " * `MaxFileSizeError` — if the file size is too large"]
+    #[doc = " * `RateLimitedError` — if the server received too many requests"]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch, js_name = "upload")]
-    pub async fn upload_with_url(this: &StreamBinding, url: &str) -> Result<StreamVideo, JsValue>;
+    pub async fn upload_with_url(
+        this: &StreamBinding,
+        url: &str,
+    ) -> Result<StreamVideo, StreamError>;
     #[doc = " Uploads a new video from a File."]
-    #[doc = " @throws {BadRequestError} if the upload parameter is invalid"]
-    #[doc = " @throws {QuotaReachedError} if the account storage capacity is exceeded"]
-    #[doc = " @throws {MaxFileSizeError} if the file size is too large"]
-    #[doc = " @throws {RateLimitedError} if the server received too many requests"]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -33125,16 +33160,21 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " The uploaded video details."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `BadRequestError` — if the upload parameter is invalid"]
+    #[doc = " * `QuotaReachedError` — if the account storage capacity is exceeded"]
+    #[doc = " * `MaxFileSizeError` — if the file size is too large"]
+    #[doc = " * `RateLimitedError` — if the server received too many requests"]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch, js_name = "upload")]
     pub async fn upload_with_url_and_params(
         this: &StreamBinding,
         url: &str,
         params: &Object,
-    ) -> Result<StreamVideo, JsValue>;
+    ) -> Result<StreamVideo, StreamError>;
     #[doc = " Creates a direct upload that allows video uploads without an API key."]
-    #[doc = " @throws {BadRequestError} if the parameters are invalid"]
-    #[doc = " @throws {RateLimitedError} if the server received too many requests"]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -33143,11 +33183,17 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " The direct upload details."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `BadRequestError` — if the parameters are invalid"]
+    #[doc = " * `RateLimitedError` — if the server received too many requests"]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch, js_name = "createDirectUpload")]
     pub async fn create_direct_upload(
         this: &StreamBinding,
         params: &Object,
-    ) -> Result<Object, JsValue>;
+    ) -> Result<Object, StreamError>;
     #[wasm_bindgen(method, getter)]
     pub fn videos(this: &StreamBinding) -> StreamVideos;
     #[wasm_bindgen(method, setter)]
@@ -33168,18 +33214,18 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_id(this: &StreamVideoHandle, val: &str);
     #[doc = " Get a full videos details"]
-    #[doc = " @throws {NotFoundError} if the video is not found"]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " The full video details."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `NotFoundError` — if the video is not found"]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn details(this: &StreamVideoHandle) -> Result<StreamVideo, JsValue>;
+    pub async fn details(this: &StreamVideoHandle) -> Result<StreamVideo, StreamError>;
     #[doc = " Update details for a single video."]
-    #[doc = " @throws {NotFoundError} if the video is not found"]
-    #[doc = " @throws {BadRequestError} if the parameters are invalid"]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -33188,25 +33234,40 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " The updated video details."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `NotFoundError` — if the video is not found"]
+    #[doc = " * `BadRequestError` — if the parameters are invalid"]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn update(this: &StreamVideoHandle, params: &Object) -> Result<StreamVideo, JsValue>;
+    pub async fn update(
+        this: &StreamVideoHandle,
+        params: &Object,
+    ) -> Result<StreamVideo, StreamError>;
     #[doc = " Deletes a video and its copies from Cloudflare Stream."]
-    #[doc = " @throws {NotFoundError} if the video is not found"]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " A promise that resolves when deletion completes."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `NotFoundError` — if the video is not found"]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn delete(this: &StreamVideoHandle) -> Result<(), JsValue>;
+    pub async fn delete(this: &StreamVideoHandle) -> Result<(), StreamError>;
     #[doc = " Creates a signed URL token for a video."]
-    #[doc = " @throws {InternalError} if the signing key cannot be retrieved or the token cannot be signed"]
     #[doc = " "]
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " The signed token that was created."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `InternalError` — if the signing key cannot be retrieved or the token cannot be signed"]
     #[wasm_bindgen(method, catch, js_name = "generateToken")]
-    pub async fn generate_token(this: &StreamVideoHandle) -> Result<String, JsValue>;
+    pub async fn generate_token(this: &StreamVideoHandle) -> Result<String, InternalError>;
     #[wasm_bindgen(method, getter)]
     pub fn downloads(this: &StreamVideoHandle) -> StreamScopedDownloads;
     #[wasm_bindgen(method, setter)]
@@ -33700,10 +33761,6 @@ extern "C" {
     pub type StreamScopedCaptions;
     #[doc = " Uploads the caption or subtitle file to the endpoint for a specific BCP47 language."]
     #[doc = " One caption or subtitle file per language is allowed."]
-    #[doc = " @throws {NotFoundError} if the video is not found"]
-    #[doc = " @throws {BadRequestError} if the language or file is invalid"]
-    #[doc = " @throws {MaxFileSizeError} if the file size is too large"]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -33713,20 +33770,20 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " The created caption entry."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `NotFoundError` — if the video is not found"]
+    #[doc = " * `BadRequestError` — if the language or file is invalid"]
+    #[doc = " * `MaxFileSizeError` — if the file size is too large"]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
     pub async fn upload(
         this: &StreamScopedCaptions,
         language: &str,
         file: &File,
-    ) -> Result<Object, JsValue>;
+    ) -> Result<Object, StreamError>;
     #[doc = " Generate captions or subtitles for the provided language via AI."]
-    #[doc = " @throws {NotFoundError} if the video is not found"]
-    #[doc = " @throws {BadRequestError} if the language is invalid"]
-    #[doc = " @throws {StreamError} if a generated caption already exists"]
-    #[doc = " @throws {StreamError} if the video duration is too long"]
-    #[doc = " @throws {StreamError} if the video is missing audio"]
-    #[doc = " @throws {StreamError} if the requested language is not supported"]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -33735,12 +33792,23 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " The generated caption entry."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `NotFoundError` — if the video is not found"]
+    #[doc = " * `BadRequestError` — if the language is invalid"]
+    #[doc = " * `StreamError` — if a generated caption already exists"]
+    #[doc = " * `StreamError` — if the video duration is too long"]
+    #[doc = " * `StreamError` — if the video is missing audio"]
+    #[doc = " * `StreamError` — if the requested language is not supported"]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn generate(this: &StreamScopedCaptions, language: &str) -> Result<Object, JsValue>;
+    pub async fn generate(
+        this: &StreamScopedCaptions,
+        language: &str,
+    ) -> Result<Object, StreamError>;
     #[doc = " Lists the captions or subtitles."]
     #[doc = " Use the language parameter to filter by a specific language."]
-    #[doc = " @throws {NotFoundError} if the video or caption is not found"]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -33749,12 +33817,15 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " The list of captions or subtitles."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `NotFoundError` — if the video or caption is not found"]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn list(this: &StreamScopedCaptions) -> Result<Array<Object>, JsValue>;
+    pub async fn list(this: &StreamScopedCaptions) -> Result<Array<Object>, StreamError>;
     #[doc = " Lists the captions or subtitles."]
     #[doc = " Use the language parameter to filter by a specific language."]
-    #[doc = " @throws {NotFoundError} if the video or caption is not found"]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -33763,14 +33834,17 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " The list of captions or subtitles."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `NotFoundError` — if the video or caption is not found"]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch, js_name = "list")]
     pub async fn list_with_language(
         this: &StreamScopedCaptions,
         language: &str,
-    ) -> Result<Array<Object>, JsValue>;
+    ) -> Result<Array<Object>, StreamError>;
     #[doc = " Removes the captions or subtitles from a video."]
-    #[doc = " @throws {NotFoundError} if the video or caption is not found"]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -33779,8 +33853,13 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " A promise that resolves when deletion completes."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `NotFoundError` — if the video or caption is not found"]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn delete(this: &StreamScopedCaptions, language: &str) -> Result<(), JsValue>;
+    pub async fn delete(this: &StreamScopedCaptions, language: &str) -> Result<(), StreamError>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -33789,11 +33868,6 @@ extern "C" {
     pub type StreamScopedDownloads;
     #[doc = " Generates a download for a video when a video is ready to view. Available"]
     #[doc = " types are `default` and `audio`. Defaults to `default` when omitted."]
-    #[doc = " @throws {NotFoundError} if the video is not found"]
-    #[doc = " @throws {BadRequestError} if the download type is invalid"]
-    #[doc = " @throws {StreamError} if the video duration is too long to generate a download"]
-    #[doc = " @throws {StreamError} if the video is not ready to stream"]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -33802,15 +33876,18 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " The current downloads for the video."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `NotFoundError` — if the video is not found"]
+    #[doc = " * `BadRequestError` — if the download type is invalid"]
+    #[doc = " * `StreamError` — if the video duration is too long to generate a download"]
+    #[doc = " * `StreamError` — if the video is not ready to stream"]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn generate(this: &StreamScopedDownloads) -> Result<Object, JsValue>;
+    pub async fn generate(this: &StreamScopedDownloads) -> Result<Object, StreamError>;
     #[doc = " Generates a download for a video when a video is ready to view. Available"]
     #[doc = " types are `default` and `audio`. Defaults to `default` when omitted."]
-    #[doc = " @throws {NotFoundError} if the video is not found"]
-    #[doc = " @throws {BadRequestError} if the download type is invalid"]
-    #[doc = " @throws {StreamError} if the video duration is too long to generate a download"]
-    #[doc = " @throws {StreamError} if the video is not ready to stream"]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -33819,24 +33896,33 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " The current downloads for the video."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `NotFoundError` — if the video is not found"]
+    #[doc = " * `BadRequestError` — if the download type is invalid"]
+    #[doc = " * `StreamError` — if the video duration is too long to generate a download"]
+    #[doc = " * `StreamError` — if the video is not ready to stream"]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch, js_name = "generate")]
     pub async fn generate_with_download_type(
         this: &StreamScopedDownloads,
         download_type: &StreamDownloadType,
-    ) -> Result<Object, JsValue>;
+    ) -> Result<Object, StreamError>;
     #[doc = " Lists the downloads created for a video."]
-    #[doc = " @throws {NotFoundError} if the video or downloads are not found"]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " The current downloads for the video."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `NotFoundError` — if the video or downloads are not found"]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn get(this: &StreamScopedDownloads) -> Result<Object, JsValue>;
+    pub async fn get(this: &StreamScopedDownloads) -> Result<Object, StreamError>;
     #[doc = " Delete the downloads for a video. Available types are `default` and `audio`."]
     #[doc = " Defaults to `default` when omitted."]
-    #[doc = " @throws {NotFoundError} if the video or downloads are not found"]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -33845,12 +33931,15 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " A promise that resolves when deletion completes."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `NotFoundError` — if the video or downloads are not found"]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn delete(this: &StreamScopedDownloads) -> Result<(), JsValue>;
+    pub async fn delete(this: &StreamScopedDownloads) -> Result<(), StreamError>;
     #[doc = " Delete the downloads for a video. Available types are `default` and `audio`."]
     #[doc = " Defaults to `default` when omitted."]
-    #[doc = " @throws {NotFoundError} if the video or downloads are not found"]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -33859,11 +33948,16 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " A promise that resolves when deletion completes."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `NotFoundError` — if the video or downloads are not found"]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch, js_name = "delete")]
     pub async fn delete_with_download_type(
         this: &StreamScopedDownloads,
         download_type: &StreamDownloadType,
-    ) -> Result<(), JsValue>;
+    ) -> Result<(), StreamError>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -33871,26 +33965,32 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamVideos;
     #[doc = " Lists all videos in a users account."]
-    #[doc = " @throws {BadRequestError} if the parameters are invalid"]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " The list of videos."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `BadRequestError` — if the parameters are invalid"]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn list(this: &StreamVideos) -> Result<Array<StreamVideo>, JsValue>;
+    pub async fn list(this: &StreamVideos) -> Result<Array<StreamVideo>, StreamError>;
     #[doc = " Lists all videos in a users account."]
-    #[doc = " @throws {BadRequestError} if the parameters are invalid"]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " The list of videos."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `BadRequestError` — if the parameters are invalid"]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch, js_name = "list")]
     pub async fn list_with_params(
         this: &StreamVideos,
         params: &Object,
-    ) -> Result<Array<StreamVideo>, JsValue>;
+    ) -> Result<Array<StreamVideo>, StreamError>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -33898,11 +33998,6 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamWatermarks;
     #[doc = " Generate a new watermark profile"]
-    #[doc = " @throws {BadRequestError} if the parameters are invalid"]
-    #[doc = " @throws {InvalidURLError} if the URL is invalid"]
-    #[doc = " @throws {MaxFileSizeError} if the file size is too large"]
-    #[doc = " @throws {TooManyWatermarksError} if the number of allowed watermarks is reached"]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -33912,18 +34007,21 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " The created watermark profile."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `BadRequestError` — if the parameters are invalid"]
+    #[doc = " * `InvalidURLError` — if the URL is invalid"]
+    #[doc = " * `MaxFileSizeError` — if the file size is too large"]
+    #[doc = " * `TooManyWatermarksError` — if the number of allowed watermarks is reached"]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
     pub async fn generate(
         this: &StreamWatermarks,
         file: &File,
         params: &Object,
-    ) -> Result<Object, JsValue>;
+    ) -> Result<Object, StreamError>;
     #[doc = " Generate a new watermark profile"]
-    #[doc = " @throws {BadRequestError} if the parameters are invalid"]
-    #[doc = " @throws {InvalidURLError} if the URL is invalid"]
-    #[doc = " @throws {MaxFileSizeError} if the file size is too large"]
-    #[doc = " @throws {TooManyWatermarksError} if the number of allowed watermarks is reached"]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -33933,23 +34031,32 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " The created watermark profile."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `BadRequestError` — if the parameters are invalid"]
+    #[doc = " * `InvalidURLError` — if the URL is invalid"]
+    #[doc = " * `MaxFileSizeError` — if the file size is too large"]
+    #[doc = " * `TooManyWatermarksError` — if the number of allowed watermarks is reached"]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch, js_name = "generate")]
     pub async fn generate_with_url(
         this: &StreamWatermarks,
         url: &str,
         params: &Object,
-    ) -> Result<Object, JsValue>;
+    ) -> Result<Object, StreamError>;
     #[doc = " Lists all watermark profiles for an account."]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " The list of watermark profiles."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn list(this: &StreamWatermarks) -> Result<Array<Object>, JsValue>;
+    pub async fn list(this: &StreamWatermarks) -> Result<Array<Object>, InternalError>;
     #[doc = " Retrieves details for a single watermark profile."]
-    #[doc = " @throws {NotFoundError} if the watermark is not found"]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -33958,11 +34065,14 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " The watermark profile details."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `NotFoundError` — if the watermark is not found"]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn get(this: &StreamWatermarks, watermark_id: &str) -> Result<Object, JsValue>;
+    pub async fn get(this: &StreamWatermarks, watermark_id: &str) -> Result<Object, StreamError>;
     #[doc = " Deletes a watermark profile."]
-    #[doc = " @throws {NotFoundError} if the watermark is not found"]
-    #[doc = " @throws {InternalError} if an unexpected error occurs"]
     #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
@@ -33971,8 +34081,13 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " A promise that resolves when deletion completes."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * `NotFoundError` — if the watermark is not found"]
+    #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn delete(this: &StreamWatermarks, watermark_id: &str) -> Result<(), JsValue>;
+    pub async fn delete(this: &StreamWatermarks, watermark_id: &str) -> Result<(), StreamError>;
 }
 #[allow(dead_code)]
 pub type StreamUpdateVideoParams = Object;
@@ -36316,8 +36431,6 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DispatchNamespace;
-    #[doc = " @throws If the Worker script does not exist in this dispatch namespace, an error will be thrown."]
-    #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
     #[doc = " * `name` - Name of the Worker script."]
@@ -36327,10 +36440,12 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " A Fetcher object that allows you to send requests to the Worker script."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * If the Worker script does not exist in this dispatch namespace, an error will be thrown."]
     #[wasm_bindgen(method)]
     pub fn get(this: &DispatchNamespace, name: &str) -> JsValue;
-    #[doc = " @throws If the Worker script does not exist in this dispatch namespace, an error will be thrown."]
-    #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
     #[doc = " * `name` - Name of the Worker script."]
@@ -36340,10 +36455,12 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " A Fetcher object that allows you to send requests to the Worker script."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * If the Worker script does not exist in this dispatch namespace, an error will be thrown."]
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn try_get(this: &DispatchNamespace, name: &str) -> Result<JsValue, JsValue>;
-    #[doc = " @throws If the Worker script does not exist in this dispatch namespace, an error will be thrown."]
-    #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
     #[doc = " * `name` - Name of the Worker script."]
@@ -36353,10 +36470,12 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " A Fetcher object that allows you to send requests to the Worker script."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * If the Worker script does not exist in this dispatch namespace, an error will be thrown."]
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_with_args(this: &DispatchNamespace, name: &str, args: &Object) -> JsValue;
-    #[doc = " @throws If the Worker script does not exist in this dispatch namespace, an error will be thrown."]
-    #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
     #[doc = " * `name` - Name of the Worker script."]
@@ -36366,14 +36485,16 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " A Fetcher object that allows you to send requests to the Worker script."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * If the Worker script does not exist in this dispatch namespace, an error will be thrown."]
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn try_get_with_args(
         this: &DispatchNamespace,
         name: &str,
         args: &Object,
     ) -> Result<JsValue, JsValue>;
-    #[doc = " @throws If the Worker script does not exist in this dispatch namespace, an error will be thrown."]
-    #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
     #[doc = " * `name` - Name of the Worker script."]
@@ -36383,6 +36504,10 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " A Fetcher object that allows you to send requests to the Worker script."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * If the Worker script does not exist in this dispatch namespace, an error will be thrown."]
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_with_args_and_options(
         this: &DispatchNamespace,
@@ -36390,8 +36515,6 @@ extern "C" {
         args: &Object,
         options: &DynamicDispatchOptions,
     ) -> JsValue;
-    #[doc = " @throws If the Worker script does not exist in this dispatch namespace, an error will be thrown."]
-    #[doc = " "]
     #[doc = " ## Arguments"]
     #[doc = " "]
     #[doc = " * `name` - Name of the Worker script."]
@@ -36401,6 +36524,10 @@ extern "C" {
     #[doc = " ## Returns"]
     #[doc = " "]
     #[doc = " A Fetcher object that allows you to send requests to the Worker script."]
+    #[doc = " "]
+    #[doc = " ## Errors"]
+    #[doc = " "]
+    #[doc = " * If the Worker script does not exist in this dispatch namespace, an error will be thrown."]
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn try_get_with_args_and_options(
         this: &DispatchNamespace,

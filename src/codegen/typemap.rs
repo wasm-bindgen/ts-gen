@@ -433,7 +433,18 @@ pub fn to_syn_type(
                 quote! { Option<#inner_ty> }
             }
         }
-        TypeRef::Union(_) => maybe_ref(quote! { JsValue }, borrow),
+        TypeRef::Union(members) => {
+            // Try the subtyping LUB: if every union member is a named type
+            // and they share a common ancestor more specific than `Object`,
+            // emit that ancestor instead of erasing to `JsValue`. Falls back
+            // to `JsValue` for non-named members or when only `Object` is
+            // common (which is no better than `JsValue` in practice).
+            if let Some(lub) = union_lub(members, ctx, scope) {
+                let lub_ty = to_syn_type(&TypeRef::Named(lub), pos, ctx, scope);
+                return lub_ty;
+            }
+            maybe_ref(quote! { JsValue }, borrow)
+        }
         TypeRef::Intersection(_) => maybe_ref(quote! { JsValue }, borrow),
         TypeRef::Tuple(elems) => {
             let base = if elems.is_empty() {
@@ -658,17 +669,52 @@ pub(crate) fn make_ident(name: &str) -> syn::Ident {
     }
 }
 
+/// Try to compute a subtyping LUB across the members of a union. Returns
+/// `Some(name)` only when every member is a `TypeRef::Named` *and* the
+/// resulting LUB is more specific than `Object` (a `Object` LUB is no
+/// better than the default `JsValue` erasure, so we treat it as no LUB).
+fn union_lub(
+    members: &[TypeRef],
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> Option<String> {
+    let cgctx = ctx?;
+    let names: Vec<&str> = members
+        .iter()
+        .map(|m| match m {
+            TypeRef::Named(n) => Some(n.as_str()),
+            _ => None,
+        })
+        .collect::<Option<Vec<_>>>()?;
+
+    let lub = crate::codegen::subtyping::lub_types(&names, cgctx, scope)?;
+    if lub == "Object" {
+        return None;
+    }
+    Some(lub)
+}
+
 /// Map an IR `TypeRef` to the type used in a wasm_bindgen return position,
-/// wrapping in `Result<T, JsValue>` when `catch` is true.
+/// wrapping in `Result<T, ErrTy>` when `catch` is true.
+///
+/// `error_ty`, when supplied, replaces the default `JsValue` error type —
+/// callers pass the simplified throws union here. Resolution goes through
+/// the same `to_syn_type` path as any other type, so e.g. `js_sys::TypeError`
+/// vs an external mapping is handled uniformly.
 pub fn to_return_type(
     ty: &TypeRef,
     catch: bool,
+    error_ty: Option<&TypeRef>,
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) -> TokenStream {
     let inner = to_syn_type(ty, TypePosition::RETURN, ctx, scope);
     if catch {
-        quote! { Result<#inner, JsValue> }
+        let err = match error_ty {
+            Some(ty) => to_syn_type(ty, TypePosition::RETURN, ctx, scope),
+            None => quote! { JsValue },
+        };
+        quote! { Result<#inner, #err> }
     } else {
         inner
     }
@@ -874,7 +920,7 @@ mod tests {
     #[test]
     fn test_return_with_catch() {
         let ty = TypeRef::Promise(Box::new(TypeRef::Void));
-        let result = to_return_type(&ty, true, None, ScopeId(0)).to_string();
+        let result = to_return_type(&ty, true, None, None, ScopeId(0)).to_string();
         assert_eq!(result, "Result < Promise < Undefined > , JsValue >");
     }
 

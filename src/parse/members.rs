@@ -5,11 +5,20 @@ use oxc_ast::ast::*;
 use std::collections::HashSet;
 
 use crate::ir::*;
-use crate::parse::docs::DocComments;
+use crate::parse::docs::{DocComments, JsDocInfo};
 use crate::parse::types::{
     convert_formal_params, convert_ts_type, convert_ts_type_scoped, convert_type_params,
 };
 use crate::util::diagnostics::DiagnosticCollector;
+
+/// Split the result of [`DocComments::info_for_span`] into a `(doc, info)`
+/// pair, defaulting to empty info when no JSDoc is attached.
+fn split_info(opt: Option<(String, JsDocInfo)>) -> (Option<String>, JsDocInfo) {
+    match opt {
+        Some((doc, info)) => (Some(doc), info),
+        None => (None, JsDocInfo::default()),
+    }
+}
 
 /// Convert a `TSSignature` (interface body member) to our IR `Member`(s).
 ///
@@ -104,7 +113,7 @@ fn convert_method_signature(
         Some(n) => n,
         None => return vec![],
     };
-    let doc = docs.for_span(method.span.start);
+    let (doc, info) = split_info(docs.info_for_span(method.span.start));
 
     let type_params = convert_type_params(method.type_parameters.as_ref(), diag);
 
@@ -150,6 +159,7 @@ fn convert_method_signature(
             return_type,
             optional: method.optional,
             doc,
+            throws: info.throws_typeref(),
         })],
     }
 }
@@ -180,8 +190,12 @@ fn convert_construct_signature(
     diag: &mut DiagnosticCollector,
 ) -> Option<Member> {
     let params = convert_formal_params(&ctor.params, diag);
-    let doc = docs.for_span(ctor.span.start);
-    Some(Member::Constructor(ConstructorMember { params, doc }))
+    let (doc, info) = split_info(docs.info_for_span(ctor.span.start));
+    Some(Member::Constructor(ConstructorMember {
+        params,
+        doc,
+        throws: info.throws_typeref(),
+    }))
 }
 
 // ─── Class member conversions ────────────────────────────────────────
@@ -195,7 +209,7 @@ fn convert_class_method(
         Some(n) => n,
         None => return vec![],
     };
-    let doc = docs.for_span(method.span.start);
+    let (doc, info) = split_info(docs.info_for_span(method.span.start));
 
     let func = &method.value;
     let type_params = convert_type_params(func.type_parameters.as_ref(), diag);
@@ -218,7 +232,11 @@ fn convert_class_method(
 
     match method.kind {
         MethodDefinitionKind::Constructor => {
-            vec![Member::Constructor(ConstructorMember { params, doc })]
+            vec![Member::Constructor(ConstructorMember {
+                params,
+                doc,
+                throws: info.throws_typeref(),
+            })]
         }
         MethodDefinitionKind::Get => {
             if is_static {
@@ -265,6 +283,7 @@ fn convert_class_method(
                     params,
                     return_type,
                     doc,
+                    throws: info.throws_typeref(),
                 })]
             } else {
                 vec![Member::Method(MethodMember {
@@ -275,6 +294,7 @@ fn convert_class_method(
                     return_type,
                     optional: method.optional,
                     doc,
+                    throws: info.throws_typeref(),
                 })]
             }
         }
