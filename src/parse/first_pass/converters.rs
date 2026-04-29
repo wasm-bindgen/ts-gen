@@ -16,6 +16,8 @@ use crate::util::naming::to_snake_case;
 pub fn convert_class_decl(
     class: &ast::Class<'_>,
     ctx: &ir::ModuleContext,
+    used_type_names: &mut std::collections::HashSet<String>,
+    synth: &mut Vec<ir::InterfaceDecl>,
     docs: &DocComments<'_>,
     diag: &mut DiagnosticCollector,
 ) -> Option<ir::ClassDecl> {
@@ -47,7 +49,9 @@ pub fn convert_class_decl(
         .body
         .body
         .iter()
-        .flat_map(|elem| convert_class_element(elem, docs, diag))
+        .flat_map(|elem| {
+            convert_class_element(elem, Some(&name), used_type_names, synth, docs, diag)
+        })
         .collect();
 
     Some(ir::ClassDecl {
@@ -64,29 +68,65 @@ pub fn convert_class_decl(
 
 pub fn convert_interface_decl(
     iface: &ast::TSInterfaceDeclaration<'_>,
+    used_type_names: &mut std::collections::HashSet<String>,
+    synth: &mut Vec<ir::InterfaceDecl>,
     docs: &DocComments<'_>,
     diag: &mut DiagnosticCollector,
 ) -> ir::InterfaceDecl {
     let name = iface.id.name.to_string();
-    let js_name = name.clone();
-
     let type_params = convert_type_params(iface.type_parameters.as_ref(), diag);
-
     let extends: Vec<ir::TypeRef> = iface
         .extends
         .iter()
         .map(|ext| convert_ts_type_from_heritage(&ext.expression, diag))
         .collect();
+    interface_from_signatures(
+        name,
+        type_params,
+        extends,
+        &iface.body.body,
+        used_type_names,
+        synth,
+        docs,
+        diag,
+    )
+}
 
-    let members: Vec<ir::Member> = iface
-        .body
-        .body
+/// Build an `InterfaceDecl` from raw inputs — the same pipeline that
+/// `convert_interface_decl` runs on a real `TSInterfaceDeclaration`,
+/// factored so that synthesized anonymous interfaces (lifted from
+/// `{ ... }` parameter types) take the identical path.
+///
+/// `used_type_names` and `synth` thread through to anonymous-interface
+/// hoisting inside member methods — when this interface's own methods
+/// have inline `{ ... }` parameter types, those get hoisted recursively
+/// using this interface's name as the parent.
+///
+/// This is the single point of truth for "given a name and a list of
+/// signature members, produce an interface IR node." Member conversion
+/// goes through `convert_ts_signature` (the same function real
+/// declarations use), classification goes through `classify_interface`,
+/// nothing diverges.
+#[allow(clippy::too_many_arguments)]
+pub fn interface_from_signatures(
+    name: String,
+    type_params: Vec<ir::TypeParam>,
+    extends: Vec<ir::TypeRef>,
+    signatures: &[ast::TSSignature<'_>],
+    used_type_names: &mut std::collections::HashSet<String>,
+    synth: &mut Vec<ir::InterfaceDecl>,
+    docs: &DocComments<'_>,
+    diag: &mut DiagnosticCollector,
+) -> ir::InterfaceDecl {
+    let js_name = name.clone();
+    let parent = name.clone();
+    let members: Vec<ir::Member> = signatures
         .iter()
-        .flat_map(|sig| convert_ts_signature(sig, docs, diag))
+        .flat_map(|sig| {
+            convert_ts_signature(sig, Some(&parent), used_type_names, synth, docs, diag)
+        })
         .collect();
-
     let classification = classify_interface(&members);
-
     ir::InterfaceDecl {
         name,
         js_name,

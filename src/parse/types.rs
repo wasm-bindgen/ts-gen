@@ -394,7 +394,7 @@ pub fn convert_formal_params(
 
 /// Extract a name from a binding pattern (only handles simple identifier patterns).
 /// In oxc 0.118, BindingPattern is an enum directly.
-fn binding_pattern_name(pattern: &BindingPattern<'_>) -> Option<String> {
+pub(crate) fn binding_pattern_name(pattern: &BindingPattern<'_>) -> Option<String> {
     match pattern {
         BindingPattern::BindingIdentifier(ident) => Some(ident.name.to_string()),
         _ => None,

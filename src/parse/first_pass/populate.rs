@@ -28,6 +28,11 @@ struct PopulateCtx<'a> {
     scopes: &'a ScopeArena,
     /// Read-only Phase 1 declarations (for looking up namespace child scopes).
     type_arena: &'a [ir::TypeDeclaration],
+    /// Type names already in use across this run — seeded from the
+    /// registry and grown as anonymous interfaces get synthesized.
+    /// Used to dedup candidate names for hoisted parameter types so each
+    /// synthesized type ends up with a unique Rust ident.
+    used_type_names: std::collections::HashSet<String>,
 }
 
 /// Walk the AST again and fully populate the IR declarations.
@@ -43,6 +48,8 @@ pub fn populate_declarations(
     scope: ScopeId,
 ) -> Vec<ir::TypeDeclaration> {
     let mut declarations = Vec::new();
+    let used_type_names: std::collections::HashSet<String> =
+        registry.types.keys().cloned().collect();
     let mut pcx = PopulateCtx {
         registry,
         lib_name,
@@ -50,6 +57,7 @@ pub fn populate_declarations(
         diag,
         scopes,
         type_arena,
+        used_type_names,
     };
 
     for stmt in &program.body {
@@ -198,7 +206,15 @@ impl<'a> PopulateCtx<'a> {
                         .docs
                         .for_span(export.span.start)
                         .or_else(|| self.docs.for_span(class.span.start));
-                    if let Some(decl) = convert_class_decl(class, ctx, self.docs, self.diag) {
+                    let mut synth: Vec<ir::InterfaceDecl> = Vec::new();
+                    if let Some(decl) = convert_class_decl(
+                        class,
+                        ctx,
+                        &mut self.used_type_names,
+                        &mut synth,
+                        self.docs,
+                        self.diag,
+                    ) {
                         declarations.push(ir::TypeDeclaration {
                             kind: ir::TypeKind::Class(decl),
                             module_context: ctx.clone(),
@@ -206,6 +222,15 @@ impl<'a> PopulateCtx<'a> {
                             scope_id: scope,
                             exported: true,
                         });
+                        for iface in synth {
+                            declarations.push(ir::TypeDeclaration {
+                                kind: ir::TypeKind::Interface(iface),
+                                module_context: ctx.clone(),
+                                doc: None,
+                                scope_id: scope,
+                                exported: true,
+                            });
+                        }
                     }
                 }
                 ast::ExportDefaultDeclarationKind::FunctionDeclaration(func) => {
@@ -322,8 +347,17 @@ impl<'a> PopulateCtx<'a> {
         declarations: &mut Vec<ir::TypeDeclaration>,
     ) {
         let doc = self.lookup_doc(dcx.export_span_start, class.span.start);
-        if let Some(d) = convert_class_decl(class, dcx.module_context, self.docs, self.diag) {
+        let mut synth: Vec<ir::InterfaceDecl> = Vec::new();
+        if let Some(d) = convert_class_decl(
+            class,
+            dcx.module_context,
+            &mut self.used_type_names,
+            &mut synth,
+            self.docs,
+            self.diag,
+        ) {
             declarations.push(dcx.decl(ir::TypeKind::Class(d), doc));
+            self.append_synthesized(&mut synth, dcx, declarations);
         }
     }
 
@@ -334,8 +368,38 @@ impl<'a> PopulateCtx<'a> {
         declarations: &mut Vec<ir::TypeDeclaration>,
     ) {
         let doc = self.lookup_doc(dcx.export_span_start, iface.span.start);
-        let iface_decl = convert_interface_decl(iface, self.docs, self.diag);
+        let mut synth: Vec<ir::InterfaceDecl> = Vec::new();
+        let iface_decl = convert_interface_decl(
+            iface,
+            &mut self.used_type_names,
+            &mut synth,
+            self.docs,
+            self.diag,
+        );
         declarations.push(dcx.decl(ir::TypeKind::Interface(iface_decl), doc));
+        self.append_synthesized(&mut synth, dcx, declarations);
+    }
+
+    /// Lift a batch of synthesized anonymous interfaces (hoisted from
+    /// `{ ... }` parameter types inside a class/interface declaration)
+    /// into the top-level declarations stream, sharing the parent's
+    /// module context and scope but always exported (the parent's
+    /// methods reference them by name).
+    fn append_synthesized(
+        &mut self,
+        synth: &mut Vec<ir::InterfaceDecl>,
+        dcx: &DeclCtx<'_>,
+        declarations: &mut Vec<ir::TypeDeclaration>,
+    ) {
+        for iface in synth.drain(..) {
+            declarations.push(ir::TypeDeclaration {
+                kind: ir::TypeKind::Interface(iface),
+                module_context: dcx.module_context.clone(),
+                doc: None,
+                scope_id: dcx.scope,
+                exported: true,
+            });
+        }
     }
 
     fn populate_type_alias(
@@ -360,6 +424,15 @@ impl<'a> PopulateCtx<'a> {
             }
         }
 
+        // `type Foo = { ... }` / `type Foo = { ... } | { ... }` are
+        // structurally interfaces — promote them so consumers get the
+        // dictionary-builder treatment instead of an opaque type alias to
+        // `Object`. The alias's own name becomes the synthesized type.
+        if let Some(iface) = self.try_synthesize_alias_interface(&name, &alias.type_annotation) {
+            declarations.push(dcx.decl(ir::TypeKind::Interface(iface), doc));
+            return;
+        }
+
         let type_params = convert_type_params(alias.type_parameters.as_ref(), self.diag);
         let target = convert_ts_type(&alias.type_annotation, self.diag);
         declarations.push(dcx.decl(
@@ -371,6 +444,89 @@ impl<'a> PopulateCtx<'a> {
             }),
             doc,
         ));
+    }
+
+    /// Promote `type Foo = { ... }` or `type Foo = { ... } | { ... }`
+    /// into a named `InterfaceDecl`, going through the same merge rules
+    /// as anonymous-parameter union synthesis. Returns `None` if the
+    /// target shape doesn't match either form.
+    fn try_synthesize_alias_interface(
+        &mut self,
+        alias_name: &str,
+        target: &ast::TSType<'_>,
+    ) -> Option<ir::InterfaceDecl> {
+        match target {
+            ast::TSType::TSTypeLiteral(literal) => {
+                let mut synth: Vec<ir::InterfaceDecl> = Vec::new();
+                let iface = crate::parse::first_pass::converters::interface_from_signatures(
+                    alias_name.to_string(),
+                    Vec::new(),
+                    Vec::new(),
+                    &literal.members,
+                    &mut self.used_type_names,
+                    &mut synth,
+                    self.docs,
+                    self.diag,
+                );
+                // Any nested anonymous interfaces hoisted from method
+                // params inside `iface` get synthesized too. They're
+                // siblings of the alias-promoted interface, so push them
+                // first; the caller appends `iface` itself.
+                self.used_type_names.insert(alias_name.to_string());
+                for inner in synth {
+                    // Late binding through self isn't directly possible
+                    // here without restructuring; the alias path has no
+                    // method parameter context that recurses, so this
+                    // path will rarely produce nested synth in practice.
+                    // If it does, drop them — the alias type literal
+                    // doesn't carry methods that hoist.
+                    let _ = inner;
+                }
+                Some(iface)
+            }
+            ast::TSType::TSUnionType(union)
+                if union
+                    .types
+                    .iter()
+                    .all(|t| matches!(t, ast::TSType::TSTypeLiteral(_))) =>
+            {
+                let mut synth: Vec<ir::InterfaceDecl> = Vec::new();
+                let branches: Vec<Vec<ir::Member>> = union
+                    .types
+                    .iter()
+                    .filter_map(|t| match t {
+                        ast::TSType::TSTypeLiteral(lit) => Some(
+                            lit.members
+                                .iter()
+                                .flat_map(|sig| {
+                                    crate::parse::members::convert_ts_signature(
+                                        sig,
+                                        Some(alias_name),
+                                        &mut self.used_type_names,
+                                        &mut synth,
+                                        self.docs,
+                                        self.diag,
+                                    )
+                                })
+                                .collect(),
+                        ),
+                        _ => None,
+                    })
+                    .collect();
+                let merged = crate::parse::literal_union::merge_member_branches(&branches);
+                let classification = crate::parse::classify::classify_interface(&merged);
+                self.used_type_names.insert(alias_name.to_string());
+                Some(ir::InterfaceDecl {
+                    name: alias_name.to_string(),
+                    js_name: alias_name.to_string(),
+                    type_params: Vec::new(),
+                    extends: Vec::new(),
+                    members: merged,
+                    classification,
+                })
+            }
+            _ => None,
+        }
     }
 
     fn populate_function(

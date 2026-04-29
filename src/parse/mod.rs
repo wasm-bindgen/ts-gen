@@ -3,6 +3,7 @@
 pub mod classify;
 pub mod docs;
 pub mod first_pass;
+pub mod literal_union;
 pub mod members;
 pub mod merge;
 pub mod resolve;
