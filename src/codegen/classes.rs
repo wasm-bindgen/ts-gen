@@ -55,6 +55,10 @@ struct ClassConfig<'a> {
     is_abstract: bool,
     /// Members to generate.
     members: Vec<Member>,
+    /// Type parameters declared on the type itself (rendered as
+    /// `<T: JsGeneric, …>` on the `pub type` decl and propagated to
+    /// every `this: &Type<T, …>` reference inside the extern block).
+    type_params: Vec<crate::ir::TypeParam>,
     /// Codegen context for type resolution.
     cgctx: Option<&'a CodegenContext<'a>>,
     /// Scope for type reference resolution.
@@ -85,6 +89,7 @@ impl<'a> ClassConfig<'a> {
             js_namespace: None,
             is_abstract: decl.is_abstract,
             members: decl.members.clone(),
+            type_params: decl.type_params.clone(),
             cgctx,
             scope,
         }
@@ -117,9 +122,39 @@ impl<'a> ClassConfig<'a> {
             js_namespace: None,
             is_abstract: false,
             members: decl.members.clone(),
+            type_params: decl.type_params.clone(),
             cgctx,
             scope,
         }
+    }
+
+    /// Tokens for the type-level generic declaration (`<T: JsGeneric, …>`)
+    /// or empty when the type has no parameters.
+    fn type_generics_decl(&self) -> TokenStream {
+        if self.type_params.is_empty() {
+            return quote! {};
+        }
+        let idents = self
+            .type_params
+            .iter()
+            .map(|tp| super::typemap::make_ident(&tp.name))
+            .collect::<Vec<_>>();
+        quote! { <#(#idents: ::wasm_bindgen::JsGeneric),*> }
+    }
+
+    /// Tokens for the type's generic-argument list (`<T, …>`) used in
+    /// `this: &Type<T, …>` references inside the extern block. Empty
+    /// when there are no parameters.
+    fn type_generics_args(&self) -> TokenStream {
+        if self.type_params.is_empty() {
+            return quote! {};
+        }
+        let idents = self
+            .type_params
+            .iter()
+            .map(|tp| super::typemap::make_ident(&tp.name))
+            .collect::<Vec<_>>();
+        quote! { <#(#idents),*> }
     }
 
     /// Rust name to use everywhere the class identifier appears in generated
@@ -976,10 +1011,12 @@ fn generate_type_decl(config: &ClassConfig) -> TokenStream {
         quote! { #[wasm_bindgen(#(#wb_parts),*)] }
     };
 
+    let generics_decl = config.type_generics_decl();
+
     quote! {
         #wb_attr
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type #rust_ident;
+        pub type #rust_ident #generics_decl;
     }
 }
 
@@ -1071,11 +1108,45 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
         quote! {}
     };
 
+    // wasm-bindgen requires every type parameter mentioned in a method
+    // signature to be redeclared on the method, even when the same name
+    // is already on the parent type — see `js_sys::Array::for_each<T:
+    // JsGeneric>` for the canonical pattern.
+    let method_generics = generic_params_for_method(config, sig);
+    let this_generics = config.type_generics_args();
+
     quote! {
         #doc
         #[wasm_bindgen(#(#wb_parts),*)]
-        pub #async_kw fn #rust_ident(this: &#this_type, #params) #ret;
+        pub #async_kw fn #rust_ident #method_generics (this: &#this_type #this_generics, #params) #ret;
     }
+}
+
+/// Generic declaration for a method, covering both type-level parameters
+/// referenced in `this: &Foo<T, …>` and any method-only parameters
+/// mentioned in arguments or the return type. wasm-bindgen requires the
+/// redeclaration even for type-level params.
+fn generic_params_for_method(config: &ClassConfig, sig: &FunctionSignature) -> TokenStream {
+    // Type-level params come first, in declaration order, so that
+    // `<T: JsGeneric, U: JsGeneric>` aligns with the type's parameter
+    // list when `this: &Foo<T, U>` is referenced.
+    let mut names: Vec<String> = config
+        .type_params
+        .iter()
+        .map(|tp| tp.name.clone())
+        .collect();
+    for p in &sig.params {
+        super::signatures::collect_type_params(&p.type_ref, &mut names);
+    }
+    super::signatures::collect_type_params(&sig.return_type, &mut names);
+    if names.is_empty() {
+        return quote! {};
+    }
+    let idents = names
+        .iter()
+        .map(|n| super::typemap::make_ident(n))
+        .collect::<Vec<_>>();
+    quote! { <#(#idents: ::wasm_bindgen::JsGeneric),*> }
 }
 
 /// Generate a static method binding from an expanded signature.
@@ -1124,10 +1195,12 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
         quote! {}
     };
 
+    let generics = generic_params_for_method(config, sig);
+
     quote! {
         #doc
         #[wasm_bindgen(#(#wb_parts),*)]
-        pub #async_kw fn #rust_ident(#params) #ret;
+        pub #async_kw fn #rust_ident #generics (#params) #ret;
     }
 }
 

@@ -147,6 +147,11 @@ pub struct CodegenContext<'a> {
 
     /// Local types that collide with js_sys reserved names — maps original name → renamed name.
     pub renamed_locals: HashMap<String, String>,
+    /// How many type parameters each *locally emitted* type accepts.
+    /// Used by `GenericInstantiation` codegen to decide whether to keep
+    /// the generic argument list (`Foo<T>`) or strip it (when the target
+    /// is a non-generic external like `web_sys::ReadableStream`).
+    pub local_type_param_counts: HashMap<String, usize>,
     /// Builtin (root) scope id.
     pub root_scope: ScopeId,
     /// Per-file scopes (children of root, contain imports + local types).
@@ -165,6 +170,7 @@ impl<'a> CodegenContext<'a> {
             local_types: HashMap::new(),
             local_type_ids: HashSet::new(),
             renamed_locals: HashMap::new(),
+            local_type_param_counts: HashMap::new(),
             root_scope: module.builtin_scope,
             file_scopes: module.file_scopes.clone(),
             external_uses: RefCell::new(HashMap::new()),
@@ -185,6 +191,7 @@ impl<'a> CodegenContext<'a> {
             local_types: HashMap::new(),
             local_type_ids: HashSet::new(),
             renamed_locals: HashMap::new(),
+            local_type_param_counts: HashMap::new(),
             root_scope,
             file_scopes: vec![],
             external_uses: RefCell::new(HashMap::new()),
@@ -312,10 +319,14 @@ impl<'a> CodegenContext<'a> {
             ir::TypeKind::Class(c) => {
                 self.local_types.insert(c.name.clone(), mctx.clone());
                 self.local_type_ids.insert(type_id);
+                self.local_type_param_counts
+                    .insert(c.name.clone(), c.type_params.len());
             }
             ir::TypeKind::Interface(i) => {
                 self.local_types.insert(i.name.clone(), mctx.clone());
                 self.local_type_ids.insert(type_id);
+                self.local_type_param_counts
+                    .insert(i.name.clone(), i.type_params.len());
             }
             ir::TypeKind::StringEnum(e) => {
                 self.local_types.insert(e.name.clone(), mctx.clone());
@@ -325,9 +336,12 @@ impl<'a> CodegenContext<'a> {
                 self.local_types.insert(e.name.clone(), mctx.clone());
                 self.local_type_ids.insert(type_id);
             }
-            ir::TypeKind::TypeAlias(_) => {
-                // Type aliases are resolved through the scope during codegen.
-                // No special collection needed.
+            ir::TypeKind::TypeAlias(a) => {
+                // Type aliases are resolved through the scope during codegen,
+                // but record their arity so `GenericInstantiation` codegen
+                // can preserve generic args on alias references.
+                self.local_type_param_counts
+                    .insert(a.name.clone(), a.type_params.len());
             }
             ir::TypeKind::Namespace(ns) => {
                 // Namespaces don't have an Id-of-themselves to chase here —
@@ -478,6 +492,27 @@ pub fn to_syn_type(
             generic_container(quote! { Promise }, inner, pos, ctx, scope, from_module),
             borrow,
         ),
+        TypeRef::Iterator(inner) => maybe_ref(
+            generic_container(quote! { Iterator }, inner, pos, ctx, scope, from_module),
+            borrow,
+        ),
+        TypeRef::AsyncIterator(inner) => maybe_ref(
+            generic_container(
+                quote! { AsyncIterator },
+                inner,
+                pos,
+                ctx,
+                scope,
+                from_module,
+            ),
+            borrow,
+        ),
+        // Un-hoisted `Iterable` / `AsyncIterable` (e.g. nested inside a
+        // union) erase to `JsValue` — codegen has no way to express the
+        // `[Symbol.iterator]` protocol without a synthesized wrapper.
+        // The `parse::members` synthesis pass rewrites top-level
+        // occurrences to `Named(...)` before reaching codegen.
+        TypeRef::Iterable(_) | TypeRef::AsyncIterable(_) => maybe_ref(quote! { JsValue }, borrow),
         TypeRef::Array(inner) => maybe_ref(
             generic_container(quote! { Array }, inner, pos, ctx, scope, from_module),
             borrow,
@@ -591,15 +626,34 @@ pub fn to_syn_type(
             }
             maybe_ref(named_type_to_rust(name, ctx, from_module), borrow)
         }
-        TypeRef::GenericInstantiation(name, _args) => {
-            // TODO (Phase 3): preserve generic type arguments once wasm_bindgen
-            // generic support is wired through. For now, emit just the base type.
-            if let Some(c) = ctx {
-                c.warn(format!(
-                    "generic type arguments on `{name}<...>` are not yet emitted, using bare `{name}`"
-                ));
+        TypeRef::TypeParam(name) => {
+            // Generic type parameters lower to a bare Rust identifier; the
+            // surrounding method/type carries the `<T: JsGeneric>` bound.
+            let ident = make_ident(name);
+            maybe_ref(quote! { #ident }, borrow)
+        }
+        TypeRef::GenericInstantiation(name, args) => {
+            let base = named_type_to_rust(name, ctx, from_module);
+            // Only preserve generic arguments when the target type
+            // actually accepts them. External non-generic types (e.g.
+            // `web_sys::ReadableStream`, the worker crate's `Context`)
+            // would emit `Type<Arg>` and fail to compile, so erase the
+            // arguments to the bare base type when no arity is known
+            // or when the recorded arity is zero.
+            let accepts_generics = ctx
+                .and_then(|c| c.local_type_param_counts.get(name))
+                .copied()
+                .unwrap_or(0)
+                > 0;
+            if !accepts_generics {
+                return maybe_ref(base, borrow);
             }
-            maybe_ref(named_type_to_rust(name, ctx, from_module), borrow)
+            let inner_pos = pos.to_inner();
+            let arg_tokens: Vec<TokenStream> = args
+                .iter()
+                .map(|a| to_syn_type(a, inner_pos, ctx, scope, from_module))
+                .collect();
+            maybe_ref(quote! { #base<#(#arg_tokens),*> }, borrow)
         }
 
         // === Special ===

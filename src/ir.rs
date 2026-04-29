@@ -69,6 +69,22 @@ pub enum TypeRef {
     Record(Box<TypeRef>, Box<TypeRef>),
     Map(Box<TypeRef>, Box<TypeRef>),
     Set(Box<TypeRef>),
+    /// `Iterator<T>` / `IterableIterator<T>` — already-iterator objects.
+    /// Maps to `js_sys::Iterator<T>` directly; the inner `T` erases the
+    /// same way `Promise<T>` does.
+    Iterator(Box<TypeRef>),
+    /// `AsyncIterator<T>` / `AsyncIterableIterator<T>` — already-iterator
+    /// objects on the async side. Maps to `js_sys::AsyncIterator<T>`.
+    AsyncIterator(Box<TypeRef>),
+    /// `Iterable<T>` — an object exposing `[Symbol.iterator](): Iterator<T>`.
+    /// Distinct from `Iterator<T>` (the iterator object itself).
+    /// Synthesis hooks in `parse::members` may rewrite top-level
+    /// occurrences to a hoisted `TypeRef::Named(<synth>)` wrapper before
+    /// codegen runs; codegen falls back to erasing remaining nested
+    /// occurrences to `JsValue`.
+    Iterable(Box<TypeRef>),
+    /// `AsyncIterable<T>` — analogous to `Iterable<T>` for async.
+    AsyncIterable(Box<TypeRef>),
 
     // === Structural Types ===
     Nullable(Box<TypeRef>),
@@ -87,6 +103,11 @@ pub enum TypeRef {
     Named(String),
     /// Generic instantiation: `Named<T1, T2, ...>`
     GenericInstantiation(String, Vec<TypeRef>),
+    /// In-scope generic type parameter (e.g. `T` inside `put<T>(value: T)`).
+    /// Lowered to a bare Rust identifier in codegen; methods that mention
+    /// a `TypeParam` carry a `<T: JsGeneric>` declaration so wasm-bindgen
+    /// can monomorphise per call site.
+    TypeParam(String),
 
     // === Special ===
     Date,
