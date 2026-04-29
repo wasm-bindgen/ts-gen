@@ -23,14 +23,14 @@ extern "C" {
     pub fn set_length(this: &NumberIndexed, val: f64);
 }
 impl NumberIndexed {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `length`"]
     pub fn new(length: f64) -> NumberIndexed {
         Self::builder(length).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `length`"]
     pub fn builder(length: f64) -> NumberIndexedBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -57,14 +57,14 @@ extern "C" {
     pub fn set_name(this: &MixedWithIndex, val: &str);
 }
 impl MixedWithIndex {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn new(name: &str) -> MixedWithIndex {
         Self::builder(name).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn builder(name: &str) -> MixedWithIndexBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -91,14 +91,14 @@ extern "C" {
     pub fn set_name(this: &HasName, val: &str);
 }
 impl HasName {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn new(name: &str) -> HasName {
         Self::builder(name).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn builder(name: &str) -> HasNameBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -125,14 +125,14 @@ extern "C" {
     pub fn set_age(this: &HasAge, val: f64);
 }
 impl HasAge {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `age`"]
     pub fn new(age: f64) -> HasAge {
         Self::builder(age).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `age`"]
     pub fn builder(age: f64) -> HasAgeBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -245,15 +245,15 @@ extern "C" {
     pub fn set_parent(this: &TreeNode, val: &TreeNode);
 }
 impl TreeNode {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `value`"]
     #[doc = " * `children`"]
     pub fn new(value: &str, children: &Array<TreeNode>) -> TreeNode {
         Self::builder(value, children).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `value`"]
     #[doc = " * `children`"]
     pub fn builder(value: &str, children: &Array<TreeNode>) -> TreeNodeBuilder {
@@ -292,15 +292,15 @@ extern "C" {
     pub fn set_next_with_null(this: &LinkedList, val: &Null);
 }
 impl LinkedList {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `data`"]
     #[doc = " * `next`"]
     pub fn new(data: &JsValue, next: Option<&LinkedList>) -> LinkedList {
         Self::builder(data, next).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `data`"]
     #[doc = " * `next`"]
     pub fn builder(data: &JsValue, next: Option<&LinkedList>) -> LinkedListBuilder {
@@ -372,14 +372,14 @@ extern "C" {
     pub fn set_id(this: &MultiExtend, val: &str);
 }
 impl MultiExtend {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     pub fn new(id: &str) -> MultiExtend {
         Self::builder(id).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     pub fn builder(id: &str) -> MultiExtendBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -718,14 +718,14 @@ pub mod my_module {
         pub fn set_data(this: &WorkResult, val: &str);
     }
     impl WorkResult {
-        #[doc = " # Provided fields"]
-        #[doc = " "]
+        #[doc = " # Parameters"]
+        #[doc = ""]
         #[doc = " * `success`"]
         pub fn new(success: bool) -> WorkResult {
             Self::builder(success).build()
         }
-        #[doc = " # Provided fields"]
-        #[doc = " "]
+        #[doc = " # Parameters"]
+        #[doc = ""]
         #[doc = " * `success`"]
         pub fn builder(success: bool) -> WorkResultBuilder {
             let inner: Self = JsCast::unchecked_into(js_sys::Object::new());

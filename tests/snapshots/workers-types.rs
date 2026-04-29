@@ -109,18 +109,18 @@ extern "C" {
     #[wasm_bindgen(constructor, catch, js_name = "DOMException")]
     pub fn new_with_message_and_name(message: &str, name: &str) -> Result<DOMException, JsValue>;
     #[doc = " The **`message`** read-only property of the a message or description associated with the given error name."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMException/message)"]
     #[wasm_bindgen(method, getter)]
     pub fn message(this: &DOMException) -> String;
     #[doc = " The **`name`** read-only property of the one of the strings associated with an error name."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMException/name)"]
     #[wasm_bindgen(method, getter)]
     pub fn name(this: &DOMException) -> String;
     #[doc = " The **`code`** read-only property of the DOMException interface returns one of the legacy error code constants, or `0` if none match."]
     #[doc = " @deprecated"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/DOMException/code)"]
     #[wasm_bindgen(method, getter)]
     pub fn code(this: &DOMException) -> f64;
@@ -206,8 +206,8 @@ extern "C" {
     pub fn set_rejectionhandled(this: &WorkerGlobalScopeEventMap, val: &PromiseRejectionEvent);
 }
 impl WorkerGlobalScopeEventMap {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `fetch`"]
     #[doc = " * `scheduled`"]
     #[doc = " * `queue`"]
@@ -229,8 +229,8 @@ impl WorkerGlobalScopeEventMap {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `fetch`"]
     #[doc = " * `scheduled`"]
     #[doc = " * `queue`"]
@@ -288,92 +288,92 @@ extern "C" {
         data: &[JsValue],
     ) -> Result<(), JsValue>;
     #[doc = " The **`console.clear()`** static method clears the console if possible."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/clear_static)"]
     #[wasm_bindgen(method)]
     pub fn clear(this: &Console);
     #[doc = " The **`console.clear()`** static method clears the console if possible."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/clear_static)"]
     #[wasm_bindgen(method, catch, js_name = "clear")]
     pub fn try_clear(this: &Console) -> Result<(), JsValue>;
     #[doc = " The **`console.count()`** static method logs the number of times that this particular call to `count()` has been called."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/count_static)"]
     #[wasm_bindgen(method)]
     pub fn count(this: &Console);
     #[doc = " The **`console.count()`** static method logs the number of times that this particular call to `count()` has been called."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/count_static)"]
     #[wasm_bindgen(method, catch, js_name = "count")]
     pub fn try_count(this: &Console) -> Result<(), JsValue>;
     #[doc = " The **`console.count()`** static method logs the number of times that this particular call to `count()` has been called."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/count_static)"]
     #[wasm_bindgen(method, js_name = "count")]
     pub fn count_with_label(this: &Console, label: &str);
     #[doc = " The **`console.count()`** static method logs the number of times that this particular call to `count()` has been called."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/count_static)"]
     #[wasm_bindgen(method, catch, js_name = "count")]
     pub fn try_count_with_label(this: &Console, label: &str) -> Result<(), JsValue>;
     #[doc = " The **`console.countReset()`** static method resets counter used with console/count_static."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/countReset_static)"]
     #[wasm_bindgen(method, js_name = "countReset")]
     pub fn count_reset(this: &Console);
     #[doc = " The **`console.countReset()`** static method resets counter used with console/count_static."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/countReset_static)"]
     #[wasm_bindgen(method, catch, js_name = "countReset")]
     pub fn try_count_reset(this: &Console) -> Result<(), JsValue>;
     #[doc = " The **`console.countReset()`** static method resets counter used with console/count_static."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/countReset_static)"]
     #[wasm_bindgen(method, js_name = "countReset")]
     pub fn count_reset_with_label(this: &Console, label: &str);
     #[doc = " The **`console.countReset()`** static method resets counter used with console/count_static."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/countReset_static)"]
     #[wasm_bindgen(method, catch, js_name = "countReset")]
     pub fn try_count_reset_with_label(this: &Console, label: &str) -> Result<(), JsValue>;
     #[doc = " The **`console.debug()`** static method outputs a message to the console at the 'debug' log level."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/debug_static)"]
     #[wasm_bindgen(method, variadic)]
     pub fn debug(this: &Console, data: &[JsValue]);
     #[doc = " The **`console.debug()`** static method outputs a message to the console at the 'debug' log level."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/debug_static)"]
     #[wasm_bindgen(method, variadic, catch, js_name = "debug")]
     pub fn try_debug(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " The **`console.dir()`** static method displays a list of the properties of the specified JavaScript object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/dir_static)"]
     #[wasm_bindgen(method)]
     pub fn dir(this: &Console);
     #[doc = " The **`console.dir()`** static method displays a list of the properties of the specified JavaScript object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/dir_static)"]
     #[wasm_bindgen(method, catch, js_name = "dir")]
     pub fn try_dir(this: &Console) -> Result<(), JsValue>;
     #[doc = " The **`console.dir()`** static method displays a list of the properties of the specified JavaScript object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/dir_static)"]
     #[wasm_bindgen(method, js_name = "dir")]
     pub fn dir_with_item(this: &Console, item: &JsValue);
     #[doc = " The **`console.dir()`** static method displays a list of the properties of the specified JavaScript object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/dir_static)"]
     #[wasm_bindgen(method, catch, js_name = "dir")]
     pub fn try_dir_with_item(this: &Console, item: &JsValue) -> Result<(), JsValue>;
     #[doc = " The **`console.dir()`** static method displays a list of the properties of the specified JavaScript object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/dir_static)"]
     #[wasm_bindgen(method, js_name = "dir")]
     pub fn dir_with_item_and_options(this: &Console, item: &JsValue, options: &JsValue);
     #[doc = " The **`console.dir()`** static method displays a list of the properties of the specified JavaScript object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/dir_static)"]
     #[wasm_bindgen(method, catch, js_name = "dir")]
     pub fn try_dir_with_item_and_options(
@@ -382,92 +382,92 @@ extern "C" {
         options: &JsValue,
     ) -> Result<(), JsValue>;
     #[doc = " The **`console.dirxml()`** static method displays an interactive tree of the descendant elements of the specified XML/HTML element."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/dirxml_static)"]
     #[wasm_bindgen(method, variadic)]
     pub fn dirxml(this: &Console, data: &[JsValue]);
     #[doc = " The **`console.dirxml()`** static method displays an interactive tree of the descendant elements of the specified XML/HTML element."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/dirxml_static)"]
     #[wasm_bindgen(method, variadic, catch, js_name = "dirxml")]
     pub fn try_dirxml(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " The **`console.error()`** static method outputs a message to the console at the 'error' log level."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/error_static)"]
     #[wasm_bindgen(method, variadic)]
     pub fn error(this: &Console, data: &[JsValue]);
     #[doc = " The **`console.error()`** static method outputs a message to the console at the 'error' log level."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/error_static)"]
     #[wasm_bindgen(method, variadic, catch, js_name = "error")]
     pub fn try_error(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " The **`console.group()`** static method creates a new inline group in the Web console log, causing any subsequent console messages to be indented by an additional level, until console/groupEnd_static is called."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/group_static)"]
     #[wasm_bindgen(method, variadic)]
     pub fn group(this: &Console, data: &[JsValue]);
     #[doc = " The **`console.group()`** static method creates a new inline group in the Web console log, causing any subsequent console messages to be indented by an additional level, until console/groupEnd_static is called."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/group_static)"]
     #[wasm_bindgen(method, variadic, catch, js_name = "group")]
     pub fn try_group(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " The **`console.groupCollapsed()`** static method creates a new inline group in the console."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/groupCollapsed_static)"]
     #[wasm_bindgen(method, variadic, js_name = "groupCollapsed")]
     pub fn group_collapsed(this: &Console, data: &[JsValue]);
     #[doc = " The **`console.groupCollapsed()`** static method creates a new inline group in the console."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/groupCollapsed_static)"]
     #[wasm_bindgen(method, variadic, catch, js_name = "groupCollapsed")]
     pub fn try_group_collapsed(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " The **`console.groupEnd()`** static method exits the current inline group in the console."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/groupEnd_static)"]
     #[wasm_bindgen(method, js_name = "groupEnd")]
     pub fn group_end(this: &Console);
     #[doc = " The **`console.groupEnd()`** static method exits the current inline group in the console."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/groupEnd_static)"]
     #[wasm_bindgen(method, catch, js_name = "groupEnd")]
     pub fn try_group_end(this: &Console) -> Result<(), JsValue>;
     #[doc = " The **`console.info()`** static method outputs a message to the console at the 'info' log level."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/info_static)"]
     #[wasm_bindgen(method, variadic)]
     pub fn info(this: &Console, data: &[JsValue]);
     #[doc = " The **`console.info()`** static method outputs a message to the console at the 'info' log level."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/info_static)"]
     #[wasm_bindgen(method, variadic, catch, js_name = "info")]
     pub fn try_info(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " The **`console.log()`** static method outputs a message to the console."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/log_static)"]
     #[wasm_bindgen(method, variadic)]
     pub fn log(this: &Console, data: &[JsValue]);
     #[doc = " The **`console.log()`** static method outputs a message to the console."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/log_static)"]
     #[wasm_bindgen(method, variadic, catch, js_name = "log")]
     pub fn try_log(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " The **`console.table()`** static method displays tabular data as a table."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/table_static)"]
     #[wasm_bindgen(method)]
     pub fn table(this: &Console);
     #[doc = " The **`console.table()`** static method displays tabular data as a table."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/table_static)"]
     #[wasm_bindgen(method, catch, js_name = "table")]
     pub fn try_table(this: &Console) -> Result<(), JsValue>;
     #[doc = " The **`console.table()`** static method displays tabular data as a table."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/table_static)"]
     #[wasm_bindgen(method, js_name = "table")]
     pub fn table_with_tabular_data(this: &Console, tabular_data: &JsValue);
     #[doc = " The **`console.table()`** static method displays tabular data as a table."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/table_static)"]
     #[wasm_bindgen(method, catch, js_name = "table")]
     pub fn try_table_with_tabular_data(
@@ -475,7 +475,7 @@ extern "C" {
         tabular_data: &JsValue,
     ) -> Result<(), JsValue>;
     #[doc = " The **`console.table()`** static method displays tabular data as a table."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/table_static)"]
     #[wasm_bindgen(method, js_name = "table")]
     pub fn table_with_tabular_data_and_properties(
@@ -484,7 +484,7 @@ extern "C" {
         properties: &Array<JsString>,
     );
     #[doc = " The **`console.table()`** static method displays tabular data as a table."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/table_static)"]
     #[wasm_bindgen(method, catch, js_name = "table")]
     pub fn try_table_with_tabular_data_and_properties(
@@ -493,62 +493,62 @@ extern "C" {
         properties: &Array<JsString>,
     ) -> Result<(), JsValue>;
     #[doc = " The **`console.time()`** static method starts a timer you can use to track how long an operation takes."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/time_static)"]
     #[wasm_bindgen(method)]
     pub fn time(this: &Console);
     #[doc = " The **`console.time()`** static method starts a timer you can use to track how long an operation takes."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/time_static)"]
     #[wasm_bindgen(method, catch, js_name = "time")]
     pub fn try_time(this: &Console) -> Result<(), JsValue>;
     #[doc = " The **`console.time()`** static method starts a timer you can use to track how long an operation takes."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/time_static)"]
     #[wasm_bindgen(method, js_name = "time")]
     pub fn time_with_label(this: &Console, label: &str);
     #[doc = " The **`console.time()`** static method starts a timer you can use to track how long an operation takes."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/time_static)"]
     #[wasm_bindgen(method, catch, js_name = "time")]
     pub fn try_time_with_label(this: &Console, label: &str) -> Result<(), JsValue>;
     #[doc = " The **`console.timeEnd()`** static method stops a timer that was previously started by calling console/time_static."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/timeEnd_static)"]
     #[wasm_bindgen(method, js_name = "timeEnd")]
     pub fn time_end(this: &Console);
     #[doc = " The **`console.timeEnd()`** static method stops a timer that was previously started by calling console/time_static."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/timeEnd_static)"]
     #[wasm_bindgen(method, catch, js_name = "timeEnd")]
     pub fn try_time_end(this: &Console) -> Result<(), JsValue>;
     #[doc = " The **`console.timeEnd()`** static method stops a timer that was previously started by calling console/time_static."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/timeEnd_static)"]
     #[wasm_bindgen(method, js_name = "timeEnd")]
     pub fn time_end_with_label(this: &Console, label: &str);
     #[doc = " The **`console.timeEnd()`** static method stops a timer that was previously started by calling console/time_static."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/timeEnd_static)"]
     #[wasm_bindgen(method, catch, js_name = "timeEnd")]
     pub fn try_time_end_with_label(this: &Console, label: &str) -> Result<(), JsValue>;
     #[doc = " The **`console.timeLog()`** static method logs the current value of a timer that was previously started by calling console/time_static."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/timeLog_static)"]
     #[wasm_bindgen(method, variadic, js_name = "timeLog")]
     pub fn time_log(this: &Console, data: &[JsValue]);
     #[doc = " The **`console.timeLog()`** static method logs the current value of a timer that was previously started by calling console/time_static."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/timeLog_static)"]
     #[wasm_bindgen(method, variadic, catch, js_name = "timeLog")]
     pub fn try_time_log(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " The **`console.timeLog()`** static method logs the current value of a timer that was previously started by calling console/time_static."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/timeLog_static)"]
     #[wasm_bindgen(method, variadic, js_name = "timeLog")]
     pub fn time_log_with_label(this: &Console, label: &str, data: &[JsValue]);
     #[doc = " The **`console.timeLog()`** static method logs the current value of a timer that was previously started by calling console/time_static."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/timeLog_static)"]
     #[wasm_bindgen(method, variadic, catch, js_name = "timeLog")]
     pub fn try_time_log_with_label(
@@ -565,22 +565,22 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "timeStamp")]
     pub fn try_time_stamp_with_label(this: &Console, label: &str) -> Result<(), JsValue>;
     #[doc = " The **`console.trace()`** static method outputs a stack trace to the console."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/trace_static)"]
     #[wasm_bindgen(method, variadic)]
     pub fn trace(this: &Console, data: &[JsValue]);
     #[doc = " The **`console.trace()`** static method outputs a stack trace to the console."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/trace_static)"]
     #[wasm_bindgen(method, variadic, catch, js_name = "trace")]
     pub fn try_trace(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " The **`console.warn()`** static method outputs a warning message to the console at the 'warning' log level."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/warn_static)"]
     #[wasm_bindgen(method, variadic)]
     pub fn warn(this: &Console, data: &[JsValue]);
     #[doc = " The **`console.warn()`** static method outputs a warning message to the console at the 'warning' log level."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/warn_static)"]
     #[wasm_bindgen(method, variadic, catch, js_name = "warn")]
     pub fn try_warn(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
@@ -649,14 +649,14 @@ pub mod web_assembly {
         pub fn set_mutable(this: &GlobalDescriptor, val: bool);
     }
     impl GlobalDescriptor {
-        #[doc = " # Provided fields"]
-        #[doc = " "]
+        #[doc = " # Parameters"]
+        #[doc = ""]
         #[doc = " * `value`"]
         pub fn new(value: &ValueType) -> GlobalDescriptor {
             Self::builder(value).build()
         }
-        #[doc = " # Provided fields"]
-        #[doc = " "]
+        #[doc = " # Parameters"]
+        #[doc = ""]
         #[doc = " * `value`"]
         pub fn builder(value: &ValueType) -> GlobalDescriptorBuilder {
             let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -729,14 +729,14 @@ pub mod web_assembly {
         pub fn set_shared(this: &MemoryDescriptor, val: bool);
     }
     impl MemoryDescriptor {
-        #[doc = " # Provided fields"]
-        #[doc = " "]
+        #[doc = " # Parameters"]
+        #[doc = ""]
         #[doc = " * `initial`"]
         pub fn new(initial: f64) -> MemoryDescriptor {
             Self::builder(initial).build()
         }
-        #[doc = " # Provided fields"]
-        #[doc = " "]
+        #[doc = " # Parameters"]
+        #[doc = ""]
         #[doc = " * `initial`"]
         pub fn builder(initial: f64) -> MemoryDescriptorBuilder {
             let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -801,15 +801,15 @@ pub mod web_assembly {
         pub fn set_name(this: &ModuleExportDescriptor, val: &str);
     }
     impl ModuleExportDescriptor {
-        #[doc = " # Provided fields"]
-        #[doc = " "]
+        #[doc = " # Parameters"]
+        #[doc = ""]
         #[doc = " * `kind`"]
         #[doc = " * `name`"]
         pub fn new(kind: &ImportExportKind, name: &str) -> ModuleExportDescriptor {
             Self::builder(kind, name).build()
         }
-        #[doc = " # Provided fields"]
-        #[doc = " "]
+        #[doc = " # Parameters"]
+        #[doc = ""]
         #[doc = " * `kind`"]
         #[doc = " * `name`"]
         pub fn builder(kind: &ImportExportKind, name: &str) -> ModuleExportDescriptorBuilder {
@@ -846,16 +846,16 @@ pub mod web_assembly {
         pub fn set_name(this: &ModuleImportDescriptor, val: &str);
     }
     impl ModuleImportDescriptor {
-        #[doc = " # Provided fields"]
-        #[doc = " "]
+        #[doc = " # Parameters"]
+        #[doc = ""]
         #[doc = " * `kind`"]
         #[doc = " * `module`"]
         #[doc = " * `name`"]
         pub fn new(kind: &ImportExportKind, module: &str, name: &str) -> ModuleImportDescriptor {
             Self::builder(kind, module, name).build()
         }
-        #[doc = " # Provided fields"]
-        #[doc = " "]
+        #[doc = " # Parameters"]
+        #[doc = ""]
         #[doc = " * `kind`"]
         #[doc = " * `module`"]
         #[doc = " * `name`"]
@@ -927,15 +927,15 @@ pub mod web_assembly {
         pub fn set_maximum(this: &TableDescriptor, val: f64);
     }
     impl TableDescriptor {
-        #[doc = " # Provided fields"]
-        #[doc = " "]
+        #[doc = " # Parameters"]
+        #[doc = ""]
         #[doc = " * `element`"]
         #[doc = " * `initial`"]
         pub fn new(element: &TableKind, initial: f64) -> TableDescriptor {
             Self::builder(element, initial).build()
         }
-        #[doc = " # Provided fields"]
-        #[doc = " "]
+        #[doc = " # Parameters"]
+        #[doc = ""]
         #[doc = " * `element`"]
         #[doc = " * `initial`"]
         pub fn builder(element: &TableKind, initial: f64) -> TableDescriptorBuilder {
@@ -1602,7 +1602,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[doc = " The **`dispatchEvent()`** method of the EventTarget sends an Event to the object, (synchronously) invoking the affected event listeners in the appropriate order."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/dispatchEvent)"]
     #[wasm_bindgen(js_name = "dispatchEvent")]
     pub fn dispatch_event(event: &JsValue) -> bool;
@@ -1610,7 +1610,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[doc = " The **`dispatchEvent()`** method of the EventTarget sends an Event to the object, (synchronously) invoking the affected event listeners in the appropriate order."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/dispatchEvent)"]
     #[wasm_bindgen(catch, js_name = "dispatchEvent")]
     pub fn try_dispatch_event(event: &JsValue) -> Result<bool, JsValue>;
@@ -1831,7 +1831,7 @@ extern "C" {
     #[doc = " The Workers runtime implements the full surface of this API, but with some differences in"]
     #[doc = " the [supported algorithms](https://developers.cloudflare.com/workers/runtime-apis/web-crypto/#supported-algorithms)"]
     #[doc = " compared to those implemented in most browsers."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/web-crypto/)"]
     #[wasm_bindgen(thread_local_v2)]
     pub static crypto: Crypto;
@@ -1839,7 +1839,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[doc = " The Cache API allows fine grained control of reading and writing from the Cloudflare global network cache."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/cache/)"]
     #[wasm_bindgen(thread_local_v2)]
     pub static caches: CacheStorage;
@@ -1853,7 +1853,7 @@ extern "C" {
 extern "C" {
     #[doc = " The Workers runtime supports a subset of the Performance API, used to measure timing and performance,"]
     #[doc = " as well as timing of subrequests and other operations."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/performance/)"]
     #[wasm_bindgen(thread_local_v2)]
     pub static performance: Performance;
@@ -3224,116 +3224,116 @@ extern "C" {
     #[wasm_bindgen(constructor, catch, js_name = "Event")]
     pub fn new_with_init(r#type: &str, init: &EventInit) -> Result<Event, JsValue>;
     #[doc = " The **`type`** read-only property of the Event interface returns a string containing the event's type."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/type)"]
     #[wasm_bindgen(method, getter)]
     pub fn r#type(this: &Event) -> String;
     #[doc = " The **`eventPhase`** read-only property of the being evaluated."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/eventPhase)"]
     #[wasm_bindgen(method, getter, js_name = "eventPhase")]
     pub fn event_phase(this: &Event) -> f64;
     #[doc = " The read-only **`composed`** property of the or not the event will propagate across the shadow DOM boundary into the standard DOM."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/composed)"]
     #[wasm_bindgen(method, getter)]
     pub fn composed(this: &Event) -> bool;
     #[doc = " The **`bubbles`** read-only property of the Event interface indicates whether the event bubbles up through the DOM tree or not."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/bubbles)"]
     #[wasm_bindgen(method, getter)]
     pub fn bubbles(this: &Event) -> bool;
     #[doc = " The **`cancelable`** read-only property of the Event interface indicates whether the event can be canceled, and therefore prevented as if the event never happened."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/cancelable)"]
     #[wasm_bindgen(method, getter)]
     pub fn cancelable(this: &Event) -> bool;
     #[doc = " The **`defaultPrevented`** read-only property of the Event interface returns a boolean value indicating whether or not the call to Event.preventDefault() canceled the event."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/defaultPrevented)"]
     #[wasm_bindgen(method, getter, js_name = "defaultPrevented")]
     pub fn default_prevented(this: &Event) -> bool;
     #[doc = " The Event property **`returnValue`** indicates whether the default action for this event has been prevented or not."]
     #[doc = " @deprecated"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/returnValue)"]
     #[wasm_bindgen(method, getter, js_name = "returnValue")]
     pub fn return_value(this: &Event) -> bool;
     #[doc = " The **`currentTarget`** read-only property of the Event interface identifies the element to which the event handler has been attached."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/currentTarget)"]
     #[wasm_bindgen(method, getter, js_name = "currentTarget")]
     pub fn current_target(this: &Event) -> Option<EventTarget>;
     #[doc = " The read-only **`target`** property of the dispatched."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/target)"]
     #[wasm_bindgen(method, getter)]
     pub fn target(this: &Event) -> Option<EventTarget>;
     #[doc = " The deprecated **`Event.srcElement`** is an alias for the Event.target property."]
     #[doc = " @deprecated"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/srcElement)"]
     #[wasm_bindgen(method, getter, js_name = "srcElement")]
     pub fn src_element(this: &Event) -> Option<EventTarget>;
     #[doc = " The **`timeStamp`** read-only property of the Event interface returns the time (in milliseconds) at which the event was created."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/timeStamp)"]
     #[wasm_bindgen(method, getter, js_name = "timeStamp")]
     pub fn time_stamp(this: &Event) -> f64;
     #[doc = " The **`isTrusted`** read-only property of the when the event was generated by the user agent (including via user actions and programmatic methods such as HTMLElement.focus()), and `false` when the event was dispatched via The only exception is the `click` event, which initializes the `isTrusted` property to `false` in user agents."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/isTrusted)"]
     #[wasm_bindgen(method, getter, js_name = "isTrusted")]
     pub fn is_trusted(this: &Event) -> bool;
     #[doc = " The **`cancelBubble`** property of the Event interface is deprecated."]
     #[doc = " @deprecated"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/cancelBubble)"]
     #[wasm_bindgen(method, getter, js_name = "cancelBubble")]
     pub fn cancel_bubble(this: &Event) -> bool;
     #[doc = " The **`cancelBubble`** property of the Event interface is deprecated."]
     #[doc = " @deprecated"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/cancelBubble)"]
     #[wasm_bindgen(method, setter, js_name = "cancelBubble")]
     pub fn set_cancel_bubble(this: &Event, val: bool);
     #[doc = " The **`stopImmediatePropagation()`** method of the If several listeners are attached to the same element for the same event type, they are called in the order in which they were added."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/stopImmediatePropagation)"]
     #[wasm_bindgen(method, js_name = "stopImmediatePropagation")]
     pub fn stop_immediate_propagation(this: &Event);
     #[doc = " The **`stopImmediatePropagation()`** method of the If several listeners are attached to the same element for the same event type, they are called in the order in which they were added."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/stopImmediatePropagation)"]
     #[wasm_bindgen(method, catch, js_name = "stopImmediatePropagation")]
     pub fn try_stop_immediate_propagation(this: &Event) -> Result<(), JsValue>;
     #[doc = " The **`preventDefault()`** method of the Event interface tells the user agent that if the event does not get explicitly handled, its default action should not be taken as it normally would be."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/preventDefault)"]
     #[wasm_bindgen(method, js_name = "preventDefault")]
     pub fn prevent_default(this: &Event);
     #[doc = " The **`preventDefault()`** method of the Event interface tells the user agent that if the event does not get explicitly handled, its default action should not be taken as it normally would be."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/preventDefault)"]
     #[wasm_bindgen(method, catch, js_name = "preventDefault")]
     pub fn try_prevent_default(this: &Event) -> Result<(), JsValue>;
     #[doc = " The **`stopPropagation()`** method of the Event interface prevents further propagation of the current event in the capturing and bubbling phases."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/stopPropagation)"]
     #[wasm_bindgen(method, js_name = "stopPropagation")]
     pub fn stop_propagation(this: &Event);
     #[doc = " The **`stopPropagation()`** method of the Event interface prevents further propagation of the current event in the capturing and bubbling phases."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/stopPropagation)"]
     #[wasm_bindgen(method, catch, js_name = "stopPropagation")]
     pub fn try_stop_propagation(this: &Event) -> Result<(), JsValue>;
     #[doc = " The **`composedPath()`** method of the Event interface returns the event's path which is an array of the objects on which listeners will be invoked."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/composedPath)"]
     #[wasm_bindgen(method, js_name = "composedPath")]
     pub fn composed_path(this: &Event) -> Array<EventTarget>;
     #[doc = " The **`composedPath()`** method of the Event interface returns the event's path which is an array of the objects on which listeners will be invoked."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/composedPath)"]
     #[wasm_bindgen(method, catch, js_name = "composedPath")]
     pub fn try_composed_path(this: &Event) -> Result<Array<EventTarget>, JsValue>;
@@ -3416,7 +3416,7 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<EventTarget, JsValue>;
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, js_name = "addEventListener")]
     pub fn add_event_listener(
@@ -3425,7 +3425,7 @@ extern "C" {
         handler: &EventListenerOrEventListenerObject,
     );
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
     pub fn try_add_event_listener(
@@ -3434,7 +3434,7 @@ extern "C" {
         handler: &EventListenerOrEventListenerObject,
     ) -> Result<(), JsValue>;
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, js_name = "addEventListener")]
     pub fn add_event_listener_with_event_target_add_event_listener_options(
@@ -3444,7 +3444,7 @@ extern "C" {
         options: &EventTargetAddEventListenerOptions,
     );
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
     pub fn try_add_event_listener_with_event_target_add_event_listener_options(
@@ -3454,7 +3454,7 @@ extern "C" {
         options: &EventTargetAddEventListenerOptions,
     ) -> Result<(), JsValue>;
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, js_name = "addEventListener")]
     pub fn add_event_listener_with_bool(
@@ -3464,7 +3464,7 @@ extern "C" {
         options: bool,
     );
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
     pub fn try_add_event_listener_with_bool(
@@ -3474,7 +3474,7 @@ extern "C" {
         options: bool,
     ) -> Result<(), JsValue>;
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, js_name = "removeEventListener")]
     pub fn remove_event_listener(
@@ -3483,7 +3483,7 @@ extern "C" {
         handler: &EventListenerOrEventListenerObject,
     );
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
     pub fn try_remove_event_listener(
@@ -3492,7 +3492,7 @@ extern "C" {
         handler: &EventListenerOrEventListenerObject,
     ) -> Result<(), JsValue>;
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, js_name = "removeEventListener")]
     pub fn remove_event_listener_with_event_target_event_listener_options(
@@ -3502,7 +3502,7 @@ extern "C" {
         options: &EventTargetEventListenerOptions,
     );
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
     pub fn try_remove_event_listener_with_event_target_event_listener_options(
@@ -3512,7 +3512,7 @@ extern "C" {
         options: &EventTargetEventListenerOptions,
     ) -> Result<(), JsValue>;
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, js_name = "removeEventListener")]
     pub fn remove_event_listener_with_bool(
@@ -3522,7 +3522,7 @@ extern "C" {
         options: bool,
     );
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
     pub fn try_remove_event_listener_with_bool(
@@ -3532,12 +3532,12 @@ extern "C" {
         options: bool,
     ) -> Result<(), JsValue>;
     #[doc = " The **`dispatchEvent()`** method of the EventTarget sends an Event to the object, (synchronously) invoking the affected event listeners in the appropriate order."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/dispatchEvent)"]
     #[wasm_bindgen(method, js_name = "dispatchEvent")]
     pub fn dispatch_event(this: &EventTarget, event: &JsValue) -> bool;
     #[doc = " The **`dispatchEvent()`** method of the EventTarget sends an Event to the object, (synchronously) invoking the affected event listeners in the appropriate order."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/dispatchEvent)"]
     #[wasm_bindgen(method, catch, js_name = "dispatchEvent")]
     pub fn try_dispatch_event(this: &EventTarget, event: &JsValue) -> Result<bool, JsValue>;
@@ -3646,16 +3646,16 @@ extern "C" {
     );
 }
 impl EventTargetHandlerObject {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `handle_event`"]
     pub fn new(
         handle_event: &Function<fn(Event) -> JsOption<JsValue>>,
     ) -> EventTargetHandlerObject {
         Self::builder(handle_event).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `handle_event`"]
     pub fn builder(
         handle_event: &Function<fn(Event) -> JsOption<JsValue>>,
@@ -3681,27 +3681,27 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<AbortController, JsValue>;
     #[doc = " The **`signal`** read-only property of the AbortController interface returns an AbortSignal object instance, which can be used to communicate with/abort an asynchronous operation as desired."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortController/signal)"]
     #[wasm_bindgen(method, getter)]
     pub fn signal(this: &AbortController) -> AbortSignal;
     #[doc = " The **`abort()`** method of the AbortController interface aborts an asynchronous operation before it has completed."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortController/abort)"]
     #[wasm_bindgen(method)]
     pub fn abort(this: &AbortController);
     #[doc = " The **`abort()`** method of the AbortController interface aborts an asynchronous operation before it has completed."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortController/abort)"]
     #[wasm_bindgen(method, catch, js_name = "abort")]
     pub fn try_abort(this: &AbortController) -> Result<(), JsValue>;
     #[doc = " The **`abort()`** method of the AbortController interface aborts an asynchronous operation before it has completed."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortController/abort)"]
     #[wasm_bindgen(method, js_name = "abort")]
     pub fn abort_with_reason(this: &AbortController, reason: &JsValue);
     #[doc = " The **`abort()`** method of the AbortController interface aborts an asynchronous operation before it has completed."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortController/abort)"]
     #[wasm_bindgen(method, catch, js_name = "abort")]
     pub fn try_abort_with_reason(this: &AbortController, reason: &JsValue) -> Result<(), JsValue>;
@@ -3712,52 +3712,52 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AbortSignal;
     #[doc = " The **`AbortSignal.abort()`** static method returns an AbortSignal that is already set as aborted (and which does not trigger an AbortSignal/abort_event event)."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/abort_static)"]
     # [wasm_bindgen (static_method_of = AbortSignal)]
     pub fn abort() -> AbortSignal;
     #[doc = " The **`AbortSignal.abort()`** static method returns an AbortSignal that is already set as aborted (and which does not trigger an AbortSignal/abort_event event)."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/abort_static)"]
     # [wasm_bindgen (static_method_of = AbortSignal , catch , js_name = "abort")]
     pub fn try_abort() -> Result<AbortSignal, JsValue>;
     #[doc = " The **`AbortSignal.abort()`** static method returns an AbortSignal that is already set as aborted (and which does not trigger an AbortSignal/abort_event event)."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/abort_static)"]
     # [wasm_bindgen (static_method_of = AbortSignal , js_name = "abort")]
     pub fn abort_with_reason(reason: &JsValue) -> AbortSignal;
     #[doc = " The **`AbortSignal.abort()`** static method returns an AbortSignal that is already set as aborted (and which does not trigger an AbortSignal/abort_event event)."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/abort_static)"]
     # [wasm_bindgen (static_method_of = AbortSignal , catch , js_name = "abort")]
     pub fn try_abort_with_reason(reason: &JsValue) -> Result<AbortSignal, JsValue>;
     #[doc = " The **`AbortSignal.timeout()`** static method returns an AbortSignal that will automatically abort after a specified time."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/timeout_static)"]
     # [wasm_bindgen (static_method_of = AbortSignal)]
     pub fn timeout(delay: f64) -> AbortSignal;
     #[doc = " The **`AbortSignal.timeout()`** static method returns an AbortSignal that will automatically abort after a specified time."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/timeout_static)"]
     # [wasm_bindgen (static_method_of = AbortSignal , catch , js_name = "timeout")]
     pub fn try_timeout(delay: f64) -> Result<AbortSignal, JsValue>;
     #[doc = " The **`AbortSignal.any()`** static method takes an iterable of abort signals and returns an AbortSignal."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/any_static)"]
     # [wasm_bindgen (static_method_of = AbortSignal)]
     pub fn any(signals: &Array<AbortSignal>) -> AbortSignal;
     #[doc = " The **`AbortSignal.any()`** static method takes an iterable of abort signals and returns an AbortSignal."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/any_static)"]
     # [wasm_bindgen (static_method_of = AbortSignal , catch , js_name = "any")]
     pub fn try_any(signals: &Array<AbortSignal>) -> Result<AbortSignal, JsValue>;
     #[doc = " The **`aborted`** read-only property returns a value that indicates whether the asynchronous operations the signal is communicating with are aborted (`true`) or not (`false`)."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/aborted)"]
     #[wasm_bindgen(method, getter)]
     pub fn aborted(this: &AbortSignal) -> bool;
     #[doc = " The **`reason`** read-only property returns a JavaScript value that indicates the abort reason."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/reason)"]
     #[wasm_bindgen(method, getter)]
     pub fn reason(this: &AbortSignal) -> JsValue;
@@ -3768,12 +3768,12 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "onabort")]
     pub fn set_onabort_with_null(this: &AbortSignal, val: &Null);
     #[doc = " The **`throwIfAborted()`** method throws the signal's abort AbortSignal.reason if the signal has been aborted; otherwise it does nothing."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/throwIfAborted)"]
     #[wasm_bindgen(method, js_name = "throwIfAborted")]
     pub fn throw_if_aborted(this: &AbortSignal);
     #[doc = " The **`throwIfAborted()`** method throws the signal's abort AbortSignal.reason if the signal has been aborted; otherwise it does nothing."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/throwIfAborted)"]
     #[wasm_bindgen(method, catch, js_name = "throwIfAborted")]
     pub fn try_throw_if_aborted(this: &AbortSignal) -> Result<(), JsValue>;
@@ -3830,12 +3830,12 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ExtendableEvent;
     #[doc = " The **`ExtendableEvent.waitUntil()`** method tells the event dispatcher that work is ongoing."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ExtendableEvent/waitUntil)"]
     #[wasm_bindgen(method, js_name = "waitUntil")]
     pub fn wait_until(this: &ExtendableEvent, promise: &Promise);
     #[doc = " The **`ExtendableEvent.waitUntil()`** method tells the event dispatcher that work is ongoing."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ExtendableEvent/waitUntil)"]
     #[wasm_bindgen(method, catch, js_name = "waitUntil")]
     pub fn try_wait_until(this: &ExtendableEvent, promise: &Promise) -> Result<(), JsValue>;
@@ -3853,7 +3853,7 @@ extern "C" {
         init: &CustomEventCustomEventInit,
     ) -> Result<CustomEvent, JsValue>;
     #[doc = " The read-only **`detail`** property of the CustomEvent interface returns any data passed when initializing the event."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/CustomEvent/detail)"]
     #[wasm_bindgen(method, getter)]
     pub fn detail(this: &CustomEvent) -> T;
@@ -3950,48 +3950,48 @@ extern "C" {
         options: &BlobOptions,
     ) -> Result<Blob, JsValue>;
     #[doc = " The **`size`** read-only property of the Blob interface returns the size of the Blob or File in bytes."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/size)"]
     #[wasm_bindgen(method, getter)]
     pub fn size(this: &Blob) -> f64;
     #[doc = " The **`type`** read-only property of the Blob interface returns the MIME type of the file."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/type)"]
     #[wasm_bindgen(method, getter)]
     pub fn r#type(this: &Blob) -> String;
     #[doc = " The **`slice()`** method of the Blob interface creates and returns a new `Blob` object which contains data from a subset of the blob on which it's called."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/slice)"]
     #[wasm_bindgen(method)]
     pub fn slice(this: &Blob) -> Blob;
     #[doc = " The **`slice()`** method of the Blob interface creates and returns a new `Blob` object which contains data from a subset of the blob on which it's called."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/slice)"]
     #[wasm_bindgen(method, catch, js_name = "slice")]
     pub fn try_slice(this: &Blob) -> Result<Blob, JsValue>;
     #[doc = " The **`slice()`** method of the Blob interface creates and returns a new `Blob` object which contains data from a subset of the blob on which it's called."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/slice)"]
     #[wasm_bindgen(method, js_name = "slice")]
     pub fn slice_with_start(this: &Blob, start: f64) -> Blob;
     #[doc = " The **`slice()`** method of the Blob interface creates and returns a new `Blob` object which contains data from a subset of the blob on which it's called."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/slice)"]
     #[wasm_bindgen(method, catch, js_name = "slice")]
     pub fn try_slice_with_start(this: &Blob, start: f64) -> Result<Blob, JsValue>;
     #[doc = " The **`slice()`** method of the Blob interface creates and returns a new `Blob` object which contains data from a subset of the blob on which it's called."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/slice)"]
     #[wasm_bindgen(method, js_name = "slice")]
     pub fn slice_with_start_and_end(this: &Blob, start: f64, end: f64) -> Blob;
     #[doc = " The **`slice()`** method of the Blob interface creates and returns a new `Blob` object which contains data from a subset of the blob on which it's called."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/slice)"]
     #[wasm_bindgen(method, catch, js_name = "slice")]
     pub fn try_slice_with_start_and_end(this: &Blob, start: f64, end: f64)
         -> Result<Blob, JsValue>;
     #[doc = " The **`slice()`** method of the Blob interface creates and returns a new `Blob` object which contains data from a subset of the blob on which it's called."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/slice)"]
     #[wasm_bindgen(method, js_name = "slice")]
     pub fn slice_with_start_and_end_and_type(
@@ -4001,7 +4001,7 @@ extern "C" {
         r#type: &str,
     ) -> Blob;
     #[doc = " The **`slice()`** method of the Blob interface creates and returns a new `Blob` object which contains data from a subset of the blob on which it's called."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/slice)"]
     #[wasm_bindgen(method, catch, js_name = "slice")]
     pub fn try_slice_with_start_and_end_and_type(
@@ -4011,27 +4011,27 @@ extern "C" {
         r#type: &str,
     ) -> Result<Blob, JsValue>;
     #[doc = " The **`arrayBuffer()`** method of the Blob interface returns a Promise that resolves with the contents of the blob as binary data contained in an ArrayBuffer."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/arrayBuffer)"]
     #[wasm_bindgen(method, catch, js_name = "arrayBuffer")]
     pub async fn array_buffer(this: &Blob) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`bytes()`** method of the Blob interface returns a Promise that resolves with a Uint8Array containing the contents of the blob as an array of bytes."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/bytes)"]
     #[wasm_bindgen(method, catch)]
     pub async fn bytes(this: &Blob) -> Result<Uint8Array, JsValue>;
     #[doc = " The **`text()`** method of the string containing the contents of the blob, interpreted as UTF-8."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/text)"]
     #[wasm_bindgen(method, catch)]
     pub async fn text(this: &Blob) -> Result<String, JsValue>;
     #[doc = " The **`stream()`** method of the Blob interface returns a ReadableStream which upon reading returns the data contained within the `Blob`."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/stream)"]
     #[wasm_bindgen(method)]
     pub fn stream(this: &Blob) -> ReadableStream;
     #[doc = " The **`stream()`** method of the Blob interface returns a ReadableStream which upon reading returns the data contained within the `Blob`."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/stream)"]
     #[wasm_bindgen(method, catch, js_name = "stream")]
     pub fn try_stream(this: &Blob) -> Result<ReadableStream, JsValue>;
@@ -4114,12 +4114,12 @@ extern "C" {
         options: &FileOptions,
     ) -> Result<File, JsValue>;
     #[doc = " The **`name`** read-only property of the File interface returns the name of the file represented by a File object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/File/name)"]
     #[wasm_bindgen(method, getter)]
     pub fn name(this: &File) -> String;
     #[doc = " The **`lastModified`** read-only property of the File interface provides the last modified date of the file as the number of milliseconds since the Unix epoch (January 1, 1970 at midnight)."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/File/lastModified)"]
     #[wasm_bindgen(method, getter, js_name = "lastModified")]
     pub fn last_modified(this: &File) -> f64;
@@ -4170,7 +4170,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CacheStorage;
     #[doc = " The **`open()`** method of the the Cache object matching the `cacheName`."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/CacheStorage/open)"]
     #[wasm_bindgen(method, catch)]
     pub async fn open(this: &CacheStorage, cache_name: &str) -> Result<Cache, JsValue>;
@@ -4284,29 +4284,29 @@ extern "C" {
     pub type Crypto;
     #[doc = " The **`Crypto.subtle`** read-only property returns a cryptographic operations."]
     #[doc = " Available only in secure contexts."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Crypto/subtle)"]
     #[wasm_bindgen(method, getter)]
     pub fn subtle(this: &Crypto) -> SubtleCrypto;
     #[doc = " The **`Crypto.getRandomValues()`** method lets you get cryptographically strong random values."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Crypto/getRandomValues)"]
     #[wasm_bindgen(method, js_name = "getRandomValues")]
     pub fn get_random_values(this: &Crypto, buffer: &T) -> JsValue;
     #[doc = " The **`Crypto.getRandomValues()`** method lets you get cryptographically strong random values."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Crypto/getRandomValues)"]
     #[wasm_bindgen(method, catch, js_name = "getRandomValues")]
     pub fn try_get_random_values(this: &Crypto, buffer: &T) -> Result<JsValue, JsValue>;
     #[doc = " The **`randomUUID()`** method of the Crypto interface is used to generate a v4 UUID using a cryptographically secure random number generator."]
     #[doc = " Available only in secure contexts."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Crypto/randomUUID)"]
     #[wasm_bindgen(method, js_name = "randomUUID")]
     pub fn random_uuid(this: &Crypto) -> String;
     #[doc = " The **`randomUUID()`** method of the Crypto interface is used to generate a v4 UUID using a cryptographically secure random number generator."]
     #[doc = " Available only in secure contexts."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Crypto/randomUUID)"]
     #[wasm_bindgen(method, catch, js_name = "randomUUID")]
     pub fn try_random_uuid(this: &Crypto) -> Result<String, JsValue>;
@@ -4321,7 +4321,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SubtleCrypto;
     #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
     #[wasm_bindgen(method, catch)]
     pub async fn encrypt(
@@ -4331,7 +4331,7 @@ extern "C" {
         plain_text: &ArrayBuffer,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
     #[wasm_bindgen(method, catch, js_name = "encrypt")]
     pub async fn encrypt_with_subtle_crypto_encrypt_algorithm_and_array_buffer(
@@ -4341,7 +4341,7 @@ extern "C" {
         plain_text: &ArrayBuffer,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
     #[wasm_bindgen(method, catch, js_name = "encrypt")]
     pub async fn encrypt_with_str_and_js_value(
@@ -4351,7 +4351,7 @@ extern "C" {
         plain_text: &Object,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
     #[wasm_bindgen(method, catch, js_name = "encrypt")]
     pub async fn encrypt_with_subtle_crypto_encrypt_algorithm_and_js_value(
@@ -4361,7 +4361,7 @@ extern "C" {
         plain_text: &Object,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
     #[wasm_bindgen(method, catch)]
     pub async fn decrypt(
@@ -4371,7 +4371,7 @@ extern "C" {
         cipher_text: &ArrayBuffer,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
     #[wasm_bindgen(method, catch, js_name = "decrypt")]
     pub async fn decrypt_with_subtle_crypto_encrypt_algorithm_and_array_buffer(
@@ -4381,7 +4381,7 @@ extern "C" {
         cipher_text: &ArrayBuffer,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
     #[wasm_bindgen(method, catch, js_name = "decrypt")]
     pub async fn decrypt_with_str_and_js_value(
@@ -4391,7 +4391,7 @@ extern "C" {
         cipher_text: &Object,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
     #[wasm_bindgen(method, catch, js_name = "decrypt")]
     pub async fn decrypt_with_subtle_crypto_encrypt_algorithm_and_js_value(
@@ -4401,7 +4401,7 @@ extern "C" {
         cipher_text: &Object,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
     #[wasm_bindgen(method, catch)]
     pub async fn sign(
@@ -4411,7 +4411,7 @@ extern "C" {
         data: &ArrayBuffer,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
     #[wasm_bindgen(method, catch, js_name = "sign")]
     pub async fn sign_with_subtle_crypto_sign_algorithm_and_array_buffer(
@@ -4421,7 +4421,7 @@ extern "C" {
         data: &ArrayBuffer,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
     #[wasm_bindgen(method, catch, js_name = "sign")]
     pub async fn sign_with_str_and_js_value(
@@ -4431,7 +4431,7 @@ extern "C" {
         data: &Object,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
     #[wasm_bindgen(method, catch, js_name = "sign")]
     pub async fn sign_with_subtle_crypto_sign_algorithm_and_js_value(
@@ -4441,7 +4441,7 @@ extern "C" {
         data: &Object,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
     #[wasm_bindgen(method, catch)]
     pub async fn verify(
@@ -4452,7 +4452,7 @@ extern "C" {
         data: &ArrayBuffer,
     ) -> Result<bool, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
     #[wasm_bindgen(method, catch, js_name = "verify")]
     pub async fn verify_with_subtle_crypto_sign_algorithm_and_array_buffer_and_array_buffer(
@@ -4463,7 +4463,7 @@ extern "C" {
         data: &ArrayBuffer,
     ) -> Result<bool, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
     #[wasm_bindgen(method, catch, js_name = "verify")]
     pub async fn verify_with_str_and_js_value_and_array_buffer(
@@ -4474,7 +4474,7 @@ extern "C" {
         data: &ArrayBuffer,
     ) -> Result<bool, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
     #[wasm_bindgen(method, catch, js_name = "verify")]
     pub async fn verify_with_subtle_crypto_sign_algorithm_and_js_value_and_array_buffer(
@@ -4485,7 +4485,7 @@ extern "C" {
         data: &ArrayBuffer,
     ) -> Result<bool, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
     #[wasm_bindgen(method, catch, js_name = "verify")]
     pub async fn verify_with_str_and_array_buffer_and_js_value(
@@ -4496,7 +4496,7 @@ extern "C" {
         data: &Object,
     ) -> Result<bool, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
     #[wasm_bindgen(method, catch, js_name = "verify")]
     pub async fn verify_with_subtle_crypto_sign_algorithm_and_array_buffer_and_js_value(
@@ -4507,7 +4507,7 @@ extern "C" {
         data: &Object,
     ) -> Result<bool, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
     #[wasm_bindgen(method, catch, js_name = "verify")]
     pub async fn verify_with_str_and_js_value_and_js_value(
@@ -4518,7 +4518,7 @@ extern "C" {
         data: &Object,
     ) -> Result<bool, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
     #[wasm_bindgen(method, catch, js_name = "verify")]
     pub async fn verify_with_subtle_crypto_sign_algorithm_and_js_value_and_js_value(
@@ -4529,7 +4529,7 @@ extern "C" {
         data: &Object,
     ) -> Result<bool, JsValue>;
     #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
     #[wasm_bindgen(method, catch)]
     pub async fn digest(
@@ -4538,7 +4538,7 @@ extern "C" {
         data: &ArrayBuffer,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
     #[wasm_bindgen(method, catch, js_name = "digest")]
     pub async fn digest_with_subtle_crypto_hash_algorithm_and_array_buffer(
@@ -4547,7 +4547,7 @@ extern "C" {
         data: &ArrayBuffer,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
     #[wasm_bindgen(method, catch, js_name = "digest")]
     pub async fn digest_with_str_and_js_value(
@@ -4556,7 +4556,7 @@ extern "C" {
         data: &Object,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
     #[wasm_bindgen(method, catch, js_name = "digest")]
     pub async fn digest_with_subtle_crypto_hash_algorithm_and_js_value(
@@ -4565,7 +4565,7 @@ extern "C" {
         data: &Object,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`generateKey()`** method of the SubtleCrypto interface is used to generate a new key (for symmetric algorithms) or key pair (for public-key algorithms)."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey)"]
     #[wasm_bindgen(method, catch, js_name = "generateKey")]
     pub async fn generate_key(
@@ -4575,7 +4575,7 @@ extern "C" {
         key_usages: &Array<JsString>,
     ) -> Result<JsValue, JsValue>;
     #[doc = " The **`generateKey()`** method of the SubtleCrypto interface is used to generate a new key (for symmetric algorithms) or key pair (for public-key algorithms)."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey)"]
     #[wasm_bindgen(method, catch, js_name = "generateKey")]
     pub async fn generate_key_with_subtle_crypto_generate_key_algorithm(
@@ -4585,7 +4585,7 @@ extern "C" {
         key_usages: &Array<JsString>,
     ) -> Result<JsValue, JsValue>;
     #[doc = " The **`deriveKey()`** method of the SubtleCrypto interface can be used to derive a secret key from a master key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
     #[wasm_bindgen(method, catch, js_name = "deriveKey")]
     pub async fn derive_key(
@@ -4597,7 +4597,7 @@ extern "C" {
         key_usages: &Array<JsString>,
     ) -> Result<CryptoKey, JsValue>;
     #[doc = " The **`deriveKey()`** method of the SubtleCrypto interface can be used to derive a secret key from a master key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
     #[wasm_bindgen(method, catch, js_name = "deriveKey")]
     pub async fn derive_key_with_subtle_crypto_derive_key_algorithm_and_str(
@@ -4609,7 +4609,7 @@ extern "C" {
         key_usages: &Array<JsString>,
     ) -> Result<CryptoKey, JsValue>;
     #[doc = " The **`deriveKey()`** method of the SubtleCrypto interface can be used to derive a secret key from a master key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
     #[wasm_bindgen(method, catch, js_name = "deriveKey")]
     pub async fn derive_key_with_str_and_subtle_crypto_import_key_algorithm(
@@ -4621,7 +4621,7 @@ extern "C" {
         key_usages: &Array<JsString>,
     ) -> Result<CryptoKey, JsValue>;
     #[doc = " The **`deriveKey()`** method of the SubtleCrypto interface can be used to derive a secret key from a master key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
     #[wasm_bindgen(method, catch, js_name = "deriveKey")]
     pub async fn derive_key_with_subtle_crypto_derive_key_algorithm_and_subtle_crypto_import_key_algorithm(
@@ -4633,7 +4633,7 @@ extern "C" {
         key_usages: &Array<JsString>,
     ) -> Result<CryptoKey, JsValue>;
     #[doc = " The **`deriveBits()`** method of the key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
     #[wasm_bindgen(method, catch, js_name = "deriveBits")]
     pub async fn derive_bits(
@@ -4642,7 +4642,7 @@ extern "C" {
         base_key: &CryptoKey,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`deriveBits()`** method of the key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
     #[wasm_bindgen(method, catch, js_name = "deriveBits")]
     pub async fn derive_bits_with_subtle_crypto_derive_key_algorithm(
@@ -4651,7 +4651,7 @@ extern "C" {
         base_key: &CryptoKey,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`deriveBits()`** method of the key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
     #[wasm_bindgen(method, catch, js_name = "deriveBits")]
     pub async fn derive_bits_with_str_and_f64(
@@ -4661,7 +4661,7 @@ extern "C" {
         length: f64,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`deriveBits()`** method of the key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
     #[wasm_bindgen(method, catch, js_name = "deriveBits")]
     pub async fn derive_bits_with_subtle_crypto_derive_key_algorithm_and_f64(
@@ -4671,7 +4671,7 @@ extern "C" {
         length: f64,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`deriveBits()`** method of the key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
     #[wasm_bindgen(method, catch, js_name = "deriveBits")]
     pub async fn derive_bits_with_str_and_null(
@@ -4681,7 +4681,7 @@ extern "C" {
         length: &Null,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`deriveBits()`** method of the key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
     #[wasm_bindgen(method, catch, js_name = "deriveBits")]
     pub async fn derive_bits_with_subtle_crypto_derive_key_algorithm_and_null(
@@ -4691,7 +4691,7 @@ extern "C" {
         length: &Null,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, catch, js_name = "importKey")]
     pub async fn import_key(
@@ -4703,7 +4703,7 @@ extern "C" {
         key_usages: &Array<JsString>,
     ) -> Result<CryptoKey, JsValue>;
     #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, catch, js_name = "importKey")]
     pub async fn import_key_with_js_value_and_str(
@@ -4715,7 +4715,7 @@ extern "C" {
         key_usages: &Array<JsString>,
     ) -> Result<CryptoKey, JsValue>;
     #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, catch, js_name = "importKey")]
     pub async fn import_key_with_json_web_key_and_str(
@@ -4727,7 +4727,7 @@ extern "C" {
         key_usages: &Array<JsString>,
     ) -> Result<CryptoKey, JsValue>;
     #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, catch, js_name = "importKey")]
     pub async fn import_key_with_array_buffer_and_subtle_crypto_import_key_algorithm(
@@ -4739,7 +4739,7 @@ extern "C" {
         key_usages: &Array<JsString>,
     ) -> Result<CryptoKey, JsValue>;
     #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, catch, js_name = "importKey")]
     pub async fn import_key_with_js_value_and_subtle_crypto_import_key_algorithm(
@@ -4751,7 +4751,7 @@ extern "C" {
         key_usages: &Array<JsString>,
     ) -> Result<CryptoKey, JsValue>;
     #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
     #[wasm_bindgen(method, catch, js_name = "importKey")]
     pub async fn import_key_with_json_web_key_and_subtle_crypto_import_key_algorithm(
@@ -4763,7 +4763,7 @@ extern "C" {
         key_usages: &Array<JsString>,
     ) -> Result<CryptoKey, JsValue>;
     #[doc = " The **`exportKey()`** method of the SubtleCrypto interface exports a key: that is, it takes as input a CryptoKey object and gives you the key in an external, portable format."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/exportKey)"]
     #[wasm_bindgen(method, catch, js_name = "exportKey")]
     pub async fn export_key(
@@ -4772,7 +4772,7 @@ extern "C" {
         key: &CryptoKey,
     ) -> Result<JsValue, JsValue>;
     #[doc = " The **`wrapKey()`** method of the SubtleCrypto interface 'wraps' a key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/wrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "wrapKey")]
     pub async fn wrap_key(
@@ -4783,7 +4783,7 @@ extern "C" {
         wrap_algorithm: &str,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`wrapKey()`** method of the SubtleCrypto interface 'wraps' a key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/wrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "wrapKey")]
     pub async fn wrap_key_with_subtle_crypto_encrypt_algorithm(
@@ -4794,7 +4794,7 @@ extern "C" {
         wrap_algorithm: &SubtleCryptoEncryptAlgorithm,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
     pub async fn unwrap_key(
@@ -4808,7 +4808,7 @@ extern "C" {
         key_usages: &Array<JsString>,
     ) -> Result<CryptoKey, JsValue>;
     #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
     pub async fn unwrap_key_with_js_value_and_str_and_str(
@@ -4822,7 +4822,7 @@ extern "C" {
         key_usages: &Array<JsString>,
     ) -> Result<CryptoKey, JsValue>;
     #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
     pub async fn unwrap_key_with_array_buffer_and_subtle_crypto_encrypt_algorithm_and_str(
@@ -4836,7 +4836,7 @@ extern "C" {
         key_usages: &Array<JsString>,
     ) -> Result<CryptoKey, JsValue>;
     #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
     pub async fn unwrap_key_with_js_value_and_subtle_crypto_encrypt_algorithm_and_str(
@@ -4850,7 +4850,7 @@ extern "C" {
         key_usages: &Array<JsString>,
     ) -> Result<CryptoKey, JsValue>;
     #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
     pub async fn unwrap_key_with_array_buffer_and_str_and_subtle_crypto_import_key_algorithm(
@@ -4864,7 +4864,7 @@ extern "C" {
         key_usages: &Array<JsString>,
     ) -> Result<CryptoKey, JsValue>;
     #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
     pub async fn unwrap_key_with_js_value_and_str_and_subtle_crypto_import_key_algorithm(
@@ -4878,7 +4878,7 @@ extern "C" {
         key_usages: &Array<JsString>,
     ) -> Result<CryptoKey, JsValue>;
     #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
     pub async fn unwrap_key_with_array_buffer_and_subtle_crypto_encrypt_algorithm_and_subtle_crypto_import_key_algorithm(
@@ -4892,7 +4892,7 @@ extern "C" {
         key_usages: &Array<JsString>,
     ) -> Result<CryptoKey, JsValue>;
     #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
     #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
     pub async fn unwrap_key_with_js_value_and_subtle_crypto_encrypt_algorithm_and_subtle_crypto_import_key_algorithm(
@@ -4956,22 +4956,22 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CryptoKey;
     #[doc = " The read-only **`type`** property of the CryptoKey interface indicates which kind of key is represented by the object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/CryptoKey/type)"]
     #[wasm_bindgen(method, getter)]
     pub fn r#type(this: &CryptoKey) -> String;
     #[doc = " The read-only **`extractable`** property of the CryptoKey interface indicates whether or not the key may be extracted using `SubtleCrypto.exportKey()` or `SubtleCrypto.wrapKey()`."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/CryptoKey/extractable)"]
     #[wasm_bindgen(method, getter)]
     pub fn extractable(this: &CryptoKey) -> bool;
     #[doc = " The read-only **`algorithm`** property of the CryptoKey interface returns an object describing the algorithm for which this key can be used, and any associated extra parameters."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/CryptoKey/algorithm)"]
     #[wasm_bindgen(method, getter)]
     pub fn algorithm(this: &CryptoKey) -> JsValue;
     #[doc = " The read-only **`usages`** property of the CryptoKey interface indicates what can be done with the key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/CryptoKey/usages)"]
     #[wasm_bindgen(method, getter)]
     pub fn usages(this: &CryptoKey) -> Array<JsString>;
@@ -4991,15 +4991,15 @@ extern "C" {
     pub fn set_private_key(this: &CryptoKeyPair, val: &CryptoKey);
 }
 impl CryptoKeyPair {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `public_key`"]
     #[doc = " * `private_key`"]
     pub fn new(public_key: &CryptoKey, private_key: &CryptoKey) -> CryptoKeyPair {
         Self::builder(public_key, private_key).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `public_key`"]
     #[doc = " * `private_key`"]
     pub fn builder(public_key: &CryptoKey, private_key: &CryptoKey) -> CryptoKeyPairBuilder {
@@ -5096,14 +5096,14 @@ extern "C" {
     pub fn set_k(this: &JsonWebKey, val: &str);
 }
 impl JsonWebKey {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `kty`"]
     pub fn new(kty: &str) -> JsonWebKey {
         Self::builder(kty).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `kty`"]
     pub fn builder(kty: &str) -> JsonWebKeyBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -5275,14 +5275,14 @@ extern "C" {
     pub fn set_info_with_js_value(this: &SubtleCryptoDeriveKeyAlgorithm, val: &Object);
 }
 impl SubtleCryptoDeriveKeyAlgorithm {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn new(name: &str) -> SubtleCryptoDeriveKeyAlgorithm {
         Self::builder(name).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn builder(name: &str) -> SubtleCryptoDeriveKeyAlgorithmBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -5373,14 +5373,14 @@ extern "C" {
     pub fn set_label_with_js_value(this: &SubtleCryptoEncryptAlgorithm, val: &Object);
 }
 impl SubtleCryptoEncryptAlgorithm {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn new(name: &str) -> SubtleCryptoEncryptAlgorithm {
         Self::builder(name).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn builder(name: &str) -> SubtleCryptoEncryptAlgorithmBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -5474,14 +5474,14 @@ extern "C" {
     pub fn set_named_curve(this: &SubtleCryptoGenerateKeyAlgorithm, val: &str);
 }
 impl SubtleCryptoGenerateKeyAlgorithm {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn new(name: &str) -> SubtleCryptoGenerateKeyAlgorithm {
         Self::builder(name).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn builder(name: &str) -> SubtleCryptoGenerateKeyAlgorithmBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -5536,14 +5536,14 @@ extern "C" {
     pub fn set_name(this: &SubtleCryptoHashAlgorithm, val: &str);
 }
 impl SubtleCryptoHashAlgorithm {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn new(name: &str) -> SubtleCryptoHashAlgorithm {
         Self::builder(name).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn builder(name: &str) -> SubtleCryptoHashAlgorithmBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -5591,14 +5591,14 @@ extern "C" {
     pub fn set_compressed(this: &SubtleCryptoImportKeyAlgorithm, val: bool);
 }
 impl SubtleCryptoImportKeyAlgorithm {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn new(name: &str) -> SubtleCryptoImportKeyAlgorithm {
         Self::builder(name).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn builder(name: &str) -> SubtleCryptoImportKeyAlgorithmBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -5662,14 +5662,14 @@ extern "C" {
     pub fn set_salt_length(this: &SubtleCryptoSignAlgorithm, val: f64);
 }
 impl SubtleCryptoSignAlgorithm {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn new(name: &str) -> SubtleCryptoSignAlgorithm {
         Self::builder(name).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn builder(name: &str) -> SubtleCryptoSignAlgorithmBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -5712,14 +5712,14 @@ extern "C" {
     pub fn set_name(this: &CryptoKeyKeyAlgorithm, val: &str);
 }
 impl CryptoKeyKeyAlgorithm {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn new(name: &str) -> CryptoKeyKeyAlgorithm {
         Self::builder(name).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn builder(name: &str) -> CryptoKeyKeyAlgorithmBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -5750,15 +5750,15 @@ extern "C" {
     pub fn set_length(this: &CryptoKeyAesKeyAlgorithm, val: f64);
 }
 impl CryptoKeyAesKeyAlgorithm {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `length`"]
     pub fn new(name: &str, length: f64) -> CryptoKeyAesKeyAlgorithm {
         Self::builder(name, length).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `length`"]
     pub fn builder(name: &str, length: f64) -> CryptoKeyAesKeyAlgorithmBuilder {
@@ -5795,16 +5795,16 @@ extern "C" {
     pub fn set_length(this: &CryptoKeyHmacKeyAlgorithm, val: f64);
 }
 impl CryptoKeyHmacKeyAlgorithm {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `hash`"]
     #[doc = " * `length`"]
     pub fn new(name: &str, hash: &CryptoKeyKeyAlgorithm, length: f64) -> CryptoKeyHmacKeyAlgorithm {
         Self::builder(name, hash, length).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `hash`"]
     #[doc = " * `length`"]
@@ -5853,8 +5853,8 @@ extern "C" {
     pub fn set_hash(this: &CryptoKeyRsaKeyAlgorithm, val: &CryptoKeyKeyAlgorithm);
 }
 impl CryptoKeyRsaKeyAlgorithm {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `modulus_length`"]
     #[doc = " * `public_exponent`"]
@@ -5865,8 +5865,8 @@ impl CryptoKeyRsaKeyAlgorithm {
     ) -> CryptoKeyRsaKeyAlgorithm {
         Self::builder(name, modulus_length, public_exponent).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `modulus_length`"]
     #[doc = " * `public_exponent`"]
@@ -5877,8 +5877,8 @@ impl CryptoKeyRsaKeyAlgorithm {
     ) -> CryptoKeyRsaKeyAlgorithm {
         Self::builder_with_js_value(name, modulus_length, public_exponent).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `modulus_length`"]
     #[doc = " * `public_exponent`"]
@@ -5893,8 +5893,8 @@ impl CryptoKeyRsaKeyAlgorithm {
         inner.set_public_exponent(public_exponent);
         CryptoKeyRsaKeyAlgorithmBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `modulus_length`"]
     #[doc = " * `public_exponent`"]
@@ -5937,15 +5937,15 @@ extern "C" {
     pub fn set_named_curve(this: &CryptoKeyEllipticKeyAlgorithm, val: &str);
 }
 impl CryptoKeyEllipticKeyAlgorithm {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `named_curve`"]
     pub fn new(name: &str, named_curve: &str) -> CryptoKeyEllipticKeyAlgorithm {
         Self::builder(name, named_curve).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `named_curve`"]
     pub fn builder(name: &str, named_curve: &str) -> CryptoKeyEllipticKeyAlgorithmBuilder {
@@ -5986,14 +5986,14 @@ extern "C" {
     pub fn set_length(this: &CryptoKeyArbitraryKeyAlgorithm, val: f64);
 }
 impl CryptoKeyArbitraryKeyAlgorithm {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn new(name: &str) -> CryptoKeyArbitraryKeyAlgorithm {
         Self::builder(name).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn builder(name: &str) -> CryptoKeyArbitraryKeyAlgorithmBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -6052,22 +6052,22 @@ extern "C" {
         options: &TextDecoderConstructorOptions,
     ) -> Result<TextDecoder, JsValue>;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
     #[wasm_bindgen(method)]
     pub fn decode(this: &TextDecoder) -> String;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
     #[wasm_bindgen(method, catch, js_name = "decode")]
     pub fn try_decode(this: &TextDecoder) -> Result<String, JsValue>;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
     #[wasm_bindgen(method, js_name = "decode")]
     pub fn decode_with_array_buffer(this: &TextDecoder, input: &ArrayBuffer) -> String;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
     #[wasm_bindgen(method, catch, js_name = "decode")]
     pub fn try_decode_with_array_buffer(
@@ -6075,17 +6075,17 @@ extern "C" {
         input: &ArrayBuffer,
     ) -> Result<String, JsValue>;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
     #[wasm_bindgen(method, js_name = "decode")]
     pub fn decode_with_js_value(this: &TextDecoder, input: &Object) -> String;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
     #[wasm_bindgen(method, catch, js_name = "decode")]
     pub fn try_decode_with_js_value(this: &TextDecoder, input: &Object) -> Result<String, JsValue>;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
     #[wasm_bindgen(method, js_name = "decode")]
     pub fn decode_with_array_buffer_and_options(
@@ -6094,7 +6094,7 @@ extern "C" {
         options: &TextDecoderDecodeOptions,
     ) -> String;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
     #[wasm_bindgen(method, catch, js_name = "decode")]
     pub fn try_decode_with_array_buffer_and_options(
@@ -6103,7 +6103,7 @@ extern "C" {
         options: &TextDecoderDecodeOptions,
     ) -> Result<String, JsValue>;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
     #[wasm_bindgen(method, js_name = "decode")]
     pub fn decode_with_js_value_and_options(
@@ -6112,7 +6112,7 @@ extern "C" {
         options: &TextDecoderDecodeOptions,
     ) -> String;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
     #[wasm_bindgen(method, catch, js_name = "decode")]
     pub fn try_decode_with_js_value_and_options(
@@ -6135,27 +6135,27 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<TextEncoder, JsValue>;
     #[doc = " The **`TextEncoder.encode()`** method takes a string as input, and returns a Global_Objects/Uint8Array containing the text given in parameters encoded with the specific method for that TextEncoder object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextEncoder/encode)"]
     #[wasm_bindgen(method)]
     pub fn encode(this: &TextEncoder) -> Uint8Array;
     #[doc = " The **`TextEncoder.encode()`** method takes a string as input, and returns a Global_Objects/Uint8Array containing the text given in parameters encoded with the specific method for that TextEncoder object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextEncoder/encode)"]
     #[wasm_bindgen(method, catch, js_name = "encode")]
     pub fn try_encode(this: &TextEncoder) -> Result<Uint8Array, JsValue>;
     #[doc = " The **`TextEncoder.encode()`** method takes a string as input, and returns a Global_Objects/Uint8Array containing the text given in parameters encoded with the specific method for that TextEncoder object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextEncoder/encode)"]
     #[wasm_bindgen(method, js_name = "encode")]
     pub fn encode_with_input(this: &TextEncoder, input: &str) -> Uint8Array;
     #[doc = " The **`TextEncoder.encode()`** method takes a string as input, and returns a Global_Objects/Uint8Array containing the text given in parameters encoded with the specific method for that TextEncoder object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextEncoder/encode)"]
     #[wasm_bindgen(method, catch, js_name = "encode")]
     pub fn try_encode_with_input(this: &TextEncoder, input: &str) -> Result<Uint8Array, JsValue>;
     #[doc = " The **`TextEncoder.encodeInto()`** method takes a string to encode and a destination Uint8Array to put resulting UTF-8 encoded text into, and returns a dictionary object indicating the progress of the encoding."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextEncoder/encodeInto)"]
     #[wasm_bindgen(method, js_name = "encodeInto")]
     pub fn encode_into(
@@ -6164,7 +6164,7 @@ extern "C" {
         buffer: &Uint8Array,
     ) -> TextEncoderEncodeIntoResult;
     #[doc = " The **`TextEncoder.encodeInto()`** method takes a string to encode and a destination Uint8Array to put resulting UTF-8 encoded text into, and returns a dictionary object indicating the progress of the encoding."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextEncoder/encodeInto)"]
     #[wasm_bindgen(method, catch, js_name = "encodeInto")]
     pub fn try_encode_into(
@@ -6190,15 +6190,15 @@ extern "C" {
     pub fn set_ignore_bom(this: &TextDecoderConstructorOptions, val: bool);
 }
 impl TextDecoderConstructorOptions {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `fatal`"]
     #[doc = " * `ignore_bom`"]
     pub fn new(fatal: bool, ignore_bom: bool) -> TextDecoderConstructorOptions {
         Self::builder(fatal, ignore_bom).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `fatal`"]
     #[doc = " * `ignore_bom`"]
     pub fn builder(fatal: bool, ignore_bom: bool) -> TextDecoderConstructorOptionsBuilder {
@@ -6227,14 +6227,14 @@ extern "C" {
     pub fn set_stream(this: &TextDecoderDecodeOptions, val: bool);
 }
 impl TextDecoderDecodeOptions {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `stream`"]
     pub fn new(stream: bool) -> TextDecoderDecodeOptions {
         Self::builder(stream).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `stream`"]
     pub fn builder(stream: bool) -> TextDecoderDecodeOptionsBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -6265,15 +6265,15 @@ extern "C" {
     pub fn set_written(this: &TextEncoderEncodeIntoResult, val: f64);
 }
 impl TextEncoderEncodeIntoResult {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `read`"]
     #[doc = " * `written`"]
     pub fn new(read: f64, written: f64) -> TextEncoderEncodeIntoResult {
         Self::builder(read, written).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `read`"]
     #[doc = " * `written`"]
     pub fn builder(read: f64, written: f64) -> TextEncoderEncodeIntoResultBuilder {
@@ -6304,27 +6304,27 @@ extern "C" {
         init: &ErrorEventErrorEventInit,
     ) -> Result<ErrorEvent, JsValue>;
     #[doc = " The **`filename`** read-only property of the ErrorEvent interface returns a string containing the name of the script file in which the error occurred."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ErrorEvent/filename)"]
     #[wasm_bindgen(method, getter)]
     pub fn filename(this: &ErrorEvent) -> String;
     #[doc = " The **`message`** read-only property of the ErrorEvent interface returns a string containing a human-readable error message describing the problem."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ErrorEvent/message)"]
     #[wasm_bindgen(method, getter)]
     pub fn message(this: &ErrorEvent) -> String;
     #[doc = " The **`lineno`** read-only property of the ErrorEvent interface returns an integer containing the line number of the script file on which the error occurred."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ErrorEvent/lineno)"]
     #[wasm_bindgen(method, getter)]
     pub fn lineno(this: &ErrorEvent) -> f64;
     #[doc = " The **`colno`** read-only property of the ErrorEvent interface returns an integer containing the column number of the script file on which the error occurred."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ErrorEvent/colno)"]
     #[wasm_bindgen(method, getter)]
     pub fn colno(this: &ErrorEvent) -> f64;
     #[doc = " The **`error`** read-only property of the ErrorEvent interface returns a JavaScript value, such as an Error or DOMException, representing the error associated with this event."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ErrorEvent/error)"]
     #[wasm_bindgen(method, getter)]
     pub fn error(this: &ErrorEvent) -> JsValue;
@@ -6401,27 +6401,27 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new(r#type: &str, initializer: &MessageEventInit) -> Result<MessageEvent, JsValue>;
     #[doc = " The **`data`** read-only property of the The data sent by the message emitter; this can be any data type, depending on what originated this event."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessageEvent/data)"]
     #[wasm_bindgen(method, getter)]
     pub fn data(this: &MessageEvent) -> JsValue;
     #[doc = " The **`origin`** read-only property of the origin of the message emitter."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessageEvent/origin)"]
     #[wasm_bindgen(method, getter)]
     pub fn origin(this: &MessageEvent) -> Option<String>;
     #[doc = " The **`lastEventId`** read-only property of the unique ID for the event."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessageEvent/lastEventId)"]
     #[wasm_bindgen(method, getter, js_name = "lastEventId")]
     pub fn last_event_id(this: &MessageEvent) -> String;
     #[doc = " The **`source`** read-only property of the a WindowProxy, MessagePort, or a `MessageEventSource` (which can be a WindowProxy, message emitter."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessageEvent/source)"]
     #[wasm_bindgen(method, getter)]
     pub fn source(this: &MessageEvent) -> Option<MessagePort>;
     #[doc = " The **`ports`** read-only property of the containing all MessagePort objects sent with the message, in order."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessageEvent/ports)"]
     #[wasm_bindgen(method, getter)]
     pub fn ports(this: &MessageEvent) -> Array<MessagePort>;
@@ -6439,28 +6439,28 @@ extern "C" {
     pub fn set_data_with_str(this: &MessageEventInit, val: &str);
 }
 impl MessageEventInit {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `data`"]
     pub fn new(data: &ArrayBuffer) -> MessageEventInit {
         Self::builder(data).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `data`"]
     pub fn new_with_str(data: &str) -> MessageEventInit {
         Self::builder_with_str(data).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `data`"]
     pub fn builder(data: &ArrayBuffer) -> MessageEventInitBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_data(data);
         MessageEventInitBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `data`"]
     pub fn builder_with_str(data: &str) -> MessageEventInitBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -6482,12 +6482,12 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type PromiseRejectionEvent;
     #[doc = " The PromiseRejectionEvent interface's **`promise`** read-only property indicates the JavaScript rejected."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/PromiseRejectionEvent/promise)"]
     #[wasm_bindgen(method, getter)]
     pub fn promise(this: &PromiseRejectionEvent) -> Promise;
     #[doc = " The PromiseRejectionEvent **`reason`** read-only property is any JavaScript value or Object which provides the reason passed into Promise.reject()."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/PromiseRejectionEvent/reason)"]
     #[wasm_bindgen(method, getter)]
     pub fn reason(this: &PromiseRejectionEvent) -> JsValue;
@@ -6500,32 +6500,32 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<FormData, JsValue>;
     #[doc = " The **`append()`** method of the FormData interface appends a new value onto an existing key inside a `FormData` object, or adds the key if it does not already exist."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/append)"]
     #[wasm_bindgen(method)]
     pub fn append(this: &FormData, name: &str, value: &str);
     #[doc = " The **`append()`** method of the FormData interface appends a new value onto an existing key inside a `FormData` object, or adds the key if it does not already exist."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/append)"]
     #[wasm_bindgen(method, catch, js_name = "append")]
     pub fn try_append(this: &FormData, name: &str, value: &str) -> Result<(), JsValue>;
     #[doc = " The **`append()`** method of the FormData interface appends a new value onto an existing key inside a `FormData` object, or adds the key if it does not already exist."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/append)"]
     #[wasm_bindgen(method, js_name = "append")]
     pub fn append_with_blob(this: &FormData, name: &str, value: &Blob);
     #[doc = " The **`append()`** method of the FormData interface appends a new value onto an existing key inside a `FormData` object, or adds the key if it does not already exist."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/append)"]
     #[wasm_bindgen(method, catch, js_name = "append")]
     pub fn try_append_with_blob(this: &FormData, name: &str, value: &Blob) -> Result<(), JsValue>;
     #[doc = " The **`append()`** method of the FormData interface appends a new value onto an existing key inside a `FormData` object, or adds the key if it does not already exist."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/append)"]
     #[wasm_bindgen(method, js_name = "append")]
     pub fn append_with_blob_and_filename(this: &FormData, name: &str, value: &Blob, filename: &str);
     #[doc = " The **`append()`** method of the FormData interface appends a new value onto an existing key inside a `FormData` object, or adds the key if it does not already exist."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/append)"]
     #[wasm_bindgen(method, catch, js_name = "append")]
     pub fn try_append_with_blob_and_filename(
@@ -6535,72 +6535,72 @@ extern "C" {
         filename: &str,
     ) -> Result<(), JsValue>;
     #[doc = " The **`delete()`** method of the FormData interface deletes a key and its value(s) from a `FormData` object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/delete)"]
     #[wasm_bindgen(method)]
     pub fn delete(this: &FormData, name: &str);
     #[doc = " The **`delete()`** method of the FormData interface deletes a key and its value(s) from a `FormData` object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/delete)"]
     #[wasm_bindgen(method, catch, js_name = "delete")]
     pub fn try_delete(this: &FormData, name: &str) -> Result<(), JsValue>;
     #[doc = " The **`get()`** method of the FormData interface returns the first value associated with a given key from within a `FormData` object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/get)"]
     #[wasm_bindgen(method)]
     pub fn get(this: &FormData, name: &str) -> Option<JsValue>;
     #[doc = " The **`get()`** method of the FormData interface returns the first value associated with a given key from within a `FormData` object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/get)"]
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn try_get(this: &FormData, name: &str) -> Result<Option<JsValue>, JsValue>;
     #[doc = " The **`getAll()`** method of the FormData interface returns all the values associated with a given key from within a `FormData` object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/getAll)"]
     #[wasm_bindgen(method, js_name = "getAll")]
     pub fn get_all(this: &FormData, name: &str) -> Array;
     #[doc = " The **`getAll()`** method of the FormData interface returns all the values associated with a given key from within a `FormData` object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/getAll)"]
     #[wasm_bindgen(method, catch, js_name = "getAll")]
     pub fn try_get_all(this: &FormData, name: &str) -> Result<Array, JsValue>;
     #[doc = " The **`has()`** method of the FormData interface returns whether a `FormData` object contains a certain key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/has)"]
     #[wasm_bindgen(method)]
     pub fn has(this: &FormData, name: &str) -> bool;
     #[doc = " The **`has()`** method of the FormData interface returns whether a `FormData` object contains a certain key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/has)"]
     #[wasm_bindgen(method, catch, js_name = "has")]
     pub fn try_has(this: &FormData, name: &str) -> Result<bool, JsValue>;
     #[doc = " The **`set()`** method of the FormData interface sets a new value for an existing key inside a `FormData` object, or adds the key/value if it does not already exist."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/set)"]
     #[wasm_bindgen(method)]
     pub fn set(this: &FormData, name: &str, value: &str);
     #[doc = " The **`set()`** method of the FormData interface sets a new value for an existing key inside a `FormData` object, or adds the key/value if it does not already exist."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/set)"]
     #[wasm_bindgen(method, catch, js_name = "set")]
     pub fn try_set(this: &FormData, name: &str, value: &str) -> Result<(), JsValue>;
     #[doc = " The **`set()`** method of the FormData interface sets a new value for an existing key inside a `FormData` object, or adds the key/value if it does not already exist."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/set)"]
     #[wasm_bindgen(method, js_name = "set")]
     pub fn set_with_blob(this: &FormData, name: &str, value: &Blob);
     #[doc = " The **`set()`** method of the FormData interface sets a new value for an existing key inside a `FormData` object, or adds the key/value if it does not already exist."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/set)"]
     #[wasm_bindgen(method, catch, js_name = "set")]
     pub fn try_set_with_blob(this: &FormData, name: &str, value: &Blob) -> Result<(), JsValue>;
     #[doc = " The **`set()`** method of the FormData interface sets a new value for an existing key inside a `FormData` object, or adds the key/value if it does not already exist."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/set)"]
     #[wasm_bindgen(method, js_name = "set")]
     pub fn set_with_blob_and_filename(this: &FormData, name: &str, value: &Blob, filename: &str);
     #[doc = " The **`set()`** method of the FormData interface sets a new value for an existing key inside a `FormData` object, or adds the key/value if it does not already exist."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/set)"]
     #[wasm_bindgen(method, catch, js_name = "set")]
     pub fn try_set_with_blob_and_filename(
@@ -7546,27 +7546,27 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type FetchEvent;
     #[doc = " The **`request`** read-only property of the the event handler."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FetchEvent/request)"]
     #[wasm_bindgen(method, getter)]
     pub fn request(this: &FetchEvent) -> Request;
     #[doc = " The **`respondWith()`** method of allows you to provide a promise for a Response yourself."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FetchEvent/respondWith)"]
     #[wasm_bindgen(method, js_name = "respondWith")]
     pub fn respond_with(this: &FetchEvent, promise: &Response);
     #[doc = " The **`respondWith()`** method of allows you to provide a promise for a Response yourself."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FetchEvent/respondWith)"]
     #[wasm_bindgen(method, catch, js_name = "respondWith")]
     pub fn try_respond_with(this: &FetchEvent, promise: &Response) -> Result<(), JsValue>;
     #[doc = " The **`respondWith()`** method of allows you to provide a promise for a Response yourself."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FetchEvent/respondWith)"]
     #[wasm_bindgen(method, js_name = "respondWith")]
     pub fn respond_with_with_promise(this: &FetchEvent, promise: &Promise<Response>);
     #[doc = " The **`respondWith()`** method of allows you to provide a promise for a Response yourself."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FetchEvent/respondWith)"]
     #[wasm_bindgen(method, catch, js_name = "respondWith")]
     pub fn try_respond_with_with_promise(
@@ -7594,12 +7594,12 @@ extern "C" {
     #[wasm_bindgen(constructor, catch, js_name = "Headers")]
     pub fn new_with_record(init: &Object<JsString>) -> Result<Headers, JsValue>;
     #[doc = " The **`get()`** method of the Headers interface returns a byte string of all the values of a header within a `Headers` object with a given name."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/get)"]
     #[wasm_bindgen(method)]
     pub fn get(this: &Headers, name: &str) -> Option<String>;
     #[doc = " The **`get()`** method of the Headers interface returns a byte string of all the values of a header within a `Headers` object with a given name."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/get)"]
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn try_get(this: &Headers, name: &str) -> Result<Option<String>, JsValue>;
@@ -7608,52 +7608,52 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "getAll")]
     pub fn try_get_all(this: &Headers, name: &str) -> Result<Array<JsString>, JsValue>;
     #[doc = " The **`getSetCookie()`** method of the Headers interface returns an array containing the values of all Set-Cookie headers associated with a response."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/getSetCookie)"]
     #[wasm_bindgen(method, js_name = "getSetCookie")]
     pub fn get_set_cookie(this: &Headers) -> Array<JsString>;
     #[doc = " The **`getSetCookie()`** method of the Headers interface returns an array containing the values of all Set-Cookie headers associated with a response."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/getSetCookie)"]
     #[wasm_bindgen(method, catch, js_name = "getSetCookie")]
     pub fn try_get_set_cookie(this: &Headers) -> Result<Array<JsString>, JsValue>;
     #[doc = " The **`has()`** method of the Headers interface returns a boolean stating whether a `Headers` object contains a certain header."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/has)"]
     #[wasm_bindgen(method)]
     pub fn has(this: &Headers, name: &str) -> bool;
     #[doc = " The **`has()`** method of the Headers interface returns a boolean stating whether a `Headers` object contains a certain header."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/has)"]
     #[wasm_bindgen(method, catch, js_name = "has")]
     pub fn try_has(this: &Headers, name: &str) -> Result<bool, JsValue>;
     #[doc = " The **`set()`** method of the Headers interface sets a new value for an existing header inside a `Headers` object, or adds the header if it does not already exist."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/set)"]
     #[wasm_bindgen(method)]
     pub fn set(this: &Headers, name: &str, value: &str);
     #[doc = " The **`set()`** method of the Headers interface sets a new value for an existing header inside a `Headers` object, or adds the header if it does not already exist."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/set)"]
     #[wasm_bindgen(method, catch, js_name = "set")]
     pub fn try_set(this: &Headers, name: &str, value: &str) -> Result<(), JsValue>;
     #[doc = " The **`append()`** method of the Headers interface appends a new value onto an existing header inside a `Headers` object, or adds the header if it does not already exist."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/append)"]
     #[wasm_bindgen(method)]
     pub fn append(this: &Headers, name: &str, value: &str);
     #[doc = " The **`append()`** method of the Headers interface appends a new value onto an existing header inside a `Headers` object, or adds the header if it does not already exist."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/append)"]
     #[wasm_bindgen(method, catch, js_name = "append")]
     pub fn try_append(this: &Headers, name: &str, value: &str) -> Result<(), JsValue>;
     #[doc = " The **`delete()`** method of the Headers interface deletes a header from the current `Headers` object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/delete)"]
     #[wasm_bindgen(method)]
     pub fn delete(this: &Headers, name: &str);
     #[doc = " The **`delete()`** method of the Headers interface deletes a header from the current `Headers` object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Headers/delete)"]
     #[wasm_bindgen(method, catch, js_name = "delete")]
     pub fn try_delete(this: &Headers, name: &str) -> Result<(), JsValue>;
@@ -7815,52 +7815,52 @@ extern "C" {
         maybe_init: &Response,
     ) -> Result<Response, JsValue>;
     #[doc = " The **`clone()`** method of the Response interface creates a clone of a response object, identical in every way, but stored in a different variable."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/clone)"]
     #[wasm_bindgen(method)]
     pub fn clone(this: &Response) -> Response;
     #[doc = " The **`clone()`** method of the Response interface creates a clone of a response object, identical in every way, but stored in a different variable."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/clone)"]
     #[wasm_bindgen(method, catch, js_name = "clone")]
     pub fn try_clone(this: &Response) -> Result<Response, JsValue>;
     #[doc = " The **`status`** read-only property of the Response interface contains the HTTP status codes of the response."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/status)"]
     #[wasm_bindgen(method, getter)]
     pub fn status(this: &Response) -> f64;
     #[wasm_bindgen(method, setter)]
     pub fn set_status(this: &Response, val: f64);
     #[doc = " The **`statusText`** read-only property of the Response interface contains the status message corresponding to the HTTP status code in Response.status."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/statusText)"]
     #[wasm_bindgen(method, getter, js_name = "statusText")]
     pub fn status_text(this: &Response) -> String;
     #[wasm_bindgen(method, setter, js_name = "statusText")]
     pub fn set_status_text(this: &Response, val: &str);
     #[doc = " The **`headers`** read-only property of the with the response."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/headers)"]
     #[wasm_bindgen(method, getter)]
     pub fn headers(this: &Response) -> Headers;
     #[wasm_bindgen(method, setter)]
     pub fn set_headers(this: &Response, val: &Headers);
     #[doc = " The **`ok`** read-only property of the Response interface contains a Boolean stating whether the response was successful (status in the range 200-299) or not."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/ok)"]
     #[wasm_bindgen(method, getter)]
     pub fn ok(this: &Response) -> bool;
     #[wasm_bindgen(method, setter)]
     pub fn set_ok(this: &Response, val: bool);
     #[doc = " The **`redirected`** read-only property of the Response interface indicates whether or not the response is the result of a request you made which was redirected."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/redirected)"]
     #[wasm_bindgen(method, getter)]
     pub fn redirected(this: &Response) -> bool;
     #[wasm_bindgen(method, setter)]
     pub fn set_redirected(this: &Response, val: bool);
     #[doc = " The **`url`** read-only property of the Response interface contains the URL of the response."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/url)"]
     #[wasm_bindgen(method, getter)]
     pub fn url(this: &Response) -> String;
@@ -7879,7 +7879,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "cf")]
     pub fn set_cf_with_null(this: &Response, val: &Null);
     #[doc = " The **`type`** read-only property of the Response interface contains the type of the response."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/type)"]
     #[wasm_bindgen(method, getter)]
     pub fn r#type(this: &Response) -> JsValue;
@@ -8003,38 +8003,38 @@ extern "C" {
     #[wasm_bindgen(constructor, catch, js_name = "Request")]
     pub fn new_with_url_and_init(input: &URL, init: &RequestInit) -> Result<Request, JsValue>;
     #[doc = " The **`clone()`** method of the Request interface creates a copy of the current `Request` object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/clone)"]
     #[wasm_bindgen(method)]
     pub fn clone(this: &Request) -> Request;
     #[doc = " The **`clone()`** method of the Request interface creates a copy of the current `Request` object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/clone)"]
     #[wasm_bindgen(method, catch, js_name = "clone")]
     pub fn try_clone(this: &Request) -> Result<Request, JsValue>;
     #[doc = " The **`method`** read-only property of the `POST`, etc.) A String indicating the method of the request."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/method)"]
     #[wasm_bindgen(method, getter)]
     pub fn method(this: &Request) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_method(this: &Request, val: &str);
     #[doc = " The **`url`** read-only property of the Request interface contains the URL of the request."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/url)"]
     #[wasm_bindgen(method, getter)]
     pub fn url(this: &Request) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_url(this: &Request, val: &str);
     #[doc = " The **`headers`** read-only property of the with the request."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/headers)"]
     #[wasm_bindgen(method, getter)]
     pub fn headers(this: &Request) -> Headers;
     #[wasm_bindgen(method, setter)]
     pub fn set_headers(this: &Request, val: &Headers);
     #[doc = " The **`redirect`** read-only property of the Request interface contains the mode for how redirects are handled."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/redirect)"]
     #[wasm_bindgen(method, getter)]
     pub fn redirect(this: &Request) -> String;
@@ -8047,7 +8047,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "fetcher")]
     pub fn set_fetcher_with_null(this: &Request, val: &Null);
     #[doc = " The read-only **`signal`** property of the Request interface returns the AbortSignal associated with the request."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/signal)"]
     #[wasm_bindgen(method, getter)]
     pub fn signal(this: &Request) -> AbortSignal;
@@ -8058,21 +8058,21 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_cf(this: &Request, val: &Cf);
     #[doc = " The **`integrity`** read-only property of the Request interface contains the subresource integrity value of the request."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/integrity)"]
     #[wasm_bindgen(method, getter)]
     pub fn integrity(this: &Request) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_integrity(this: &Request, val: &str);
     #[doc = " The **`keepalive`** read-only property of the Request interface contains the request's `keepalive` setting (`true` or `false`), which indicates whether the browser will keep the associated request alive if the page that initiated it is unloaded before the request is complete."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/keepalive)"]
     #[wasm_bindgen(method, getter)]
     pub fn keepalive(this: &Request) -> bool;
     #[wasm_bindgen(method, setter)]
     pub fn set_keepalive(this: &Request, val: bool);
     #[doc = " The **`cache`** read-only property of the Request interface contains the cache mode of the request."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/cache)"]
     #[wasm_bindgen(method, getter)]
     pub fn cache(this: &Request) -> Option<JsValue>;
@@ -8298,14 +8298,14 @@ extern "C" {
     pub fn set_metadata(this: &KVNamespaceListKey, val: &Metadata);
 }
 impl KVNamespaceListKey {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn new(name: &Key) -> KVNamespaceListKey {
         Self::builder(name).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn builder(name: &Key) -> KVNamespaceListKeyBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -8356,10 +8356,12 @@ extern "C" {
     pub fn set_list_complete_with_js_value(this: &KVNamespaceListResult, val: bool);
 }
 impl KVNamespaceListResult {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `list_complete: false`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cache_status`"]
     #[doc = " * `keys`"]
     pub fn new_false(
@@ -8368,10 +8370,12 @@ impl KVNamespaceListResult {
     ) -> KVNamespaceListResult {
         Self::builder_false(cache_status, keys).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `list_complete: true`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cache_status`"]
     #[doc = " * `keys`"]
     pub fn new_true(
@@ -8380,10 +8384,12 @@ impl KVNamespaceListResult {
     ) -> KVNamespaceListResult {
         Self::builder_true(cache_status, keys).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `list_complete: false`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cache_status`"]
     #[doc = " * `keys`"]
     pub fn builder_false(
@@ -8396,10 +8402,12 @@ impl KVNamespaceListResult {
         inner.set_list_complete(false);
         KVNamespaceListResultBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `list_complete: true`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cache_status`"]
     #[doc = " * `keys`"]
     pub fn builder_true(
@@ -8748,14 +8756,14 @@ extern "C" {
     pub fn set_cache_ttl(this: &KVNamespaceGetOptions, val: f64);
 }
 impl KVNamespaceGetOptions {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `type`"]
     pub fn new(r#type: &Type) -> KVNamespaceGetOptions {
         Self::builder(r#type).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `type`"]
     pub fn builder(r#type: &Type) -> KVNamespaceGetOptionsBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -8854,8 +8862,8 @@ extern "C" {
     pub fn set_cache_status_with_null(this: &KVNamespaceGetWithMetadataResult, val: &Null);
 }
 impl KVNamespaceGetWithMetadataResult {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `value`"]
     #[doc = " * `metadata`"]
     #[doc = " * `cache_status`"]
@@ -8866,8 +8874,8 @@ impl KVNamespaceGetWithMetadataResult {
     ) -> KVNamespaceGetWithMetadataResult {
         Self::builder(value, metadata, cache_status).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `value`"]
     #[doc = " * `metadata`"]
     #[doc = " * `cache_status`"]
@@ -9016,14 +9024,14 @@ extern "C" {
     pub fn set_delay_seconds(this: &MessageSendRequest, val: f64);
 }
 impl MessageSendRequest {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `body`"]
     pub fn new(body: &Body) -> MessageSendRequest {
         Self::builder(body).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `body`"]
     pub fn builder(body: &Body) -> MessageSendRequestBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -9534,15 +9542,15 @@ extern "C" {
     pub fn set_etag(this: &R2UploadedPart, val: &str);
 }
 impl R2UploadedPart {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `part_number`"]
     #[doc = " * `etag`"]
     pub fn new(part_number: f64, etag: &str) -> R2UploadedPart {
         Self::builder(part_number, etag).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `part_number`"]
     #[doc = " * `etag`"]
     pub fn builder(part_number: f64, etag: &str) -> R2UploadedPartBuilder {
@@ -10439,10 +10447,14 @@ extern "C" {
     );
 }
 impl UnderlyingByteSource {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"bytes\"`"]
     pub fn new_bytes() -> UnderlyingByteSource {
         Self::builder_bytes().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"bytes\"`"]
     pub fn builder_bytes() -> UnderlyingByteSourceBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -10700,19 +10712,19 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "preventCancel")]
     pub fn set_prevent_cancel(this: &StreamPipeOptions, val: bool);
     #[doc = " Pipes this readable stream to a given writable stream destination. The way in which the piping process behaves under various error conditions can be customized with a number of passed options. It returns a promise that fulfills when the piping process completes successfully, or rejects if any errors were encountered."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Piping a stream will lock it for the duration of the pipe, preventing any other consumer from acquiring a reader."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Errors and closures of the source and destination streams propagate as follows:"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " An error in this source readable stream will abort destination, unless preventAbort is truthy. The returned promise will be rejected with the source's error, or with any error that occurs during aborting the destination."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " An error in destination will cancel this source readable stream, unless preventCancel is truthy. The returned promise will be rejected with the destination's error, or with any error that occurs during canceling the source."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " When this source readable stream closes, destination will be closed, unless preventClose is truthy. The returned promise will be fulfilled once this process completes, unless an error is encountered while closing the destination, in which case it will be rejected with that error."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " If destination starts out closed or closing, this source readable stream will be canceled, unless preventCancel is true. The returned promise will be rejected with an error indicating piping to a closed stream failed, or with any error that occurs during canceling the source."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The signal option can be set to an AbortSignal to allow aborting an ongoing pipe operation via the corresponding AbortController. In this case, this source readable stream will be canceled, and destination aborted, unless the respective options preventCancel or preventAbort are set."]
     #[wasm_bindgen(method, getter, js_name = "preventClose")]
     pub fn prevent_close(this: &StreamPipeOptions) -> Option<bool>;
@@ -10776,20 +10788,28 @@ extern "C" {
     pub fn set_value_with_undefined(this: &ReadableStreamReadResult, val: &Undefined);
 }
 impl ReadableStreamReadResult {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `done: false`"]
     pub fn new_false() -> ReadableStreamReadResult {
         Self::builder_false().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `done: true`"]
     pub fn new_true() -> ReadableStreamReadResult {
         Self::builder_true().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `done: false`"]
     pub fn builder_false() -> ReadableStreamReadResultBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_done(false);
         ReadableStreamReadResultBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `done: true`"]
     pub fn builder_true() -> ReadableStreamReadResultBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -10830,23 +10850,23 @@ extern "C" {
         strategy: &QueuingStrategy,
     ) -> Result<ReadableStream, JsValue>;
     #[doc = " The **`locked`** read-only property of the ReadableStream interface returns whether or not the readable stream is locked to a reader."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/locked)"]
     #[wasm_bindgen(method, getter)]
     pub fn locked(this: &ReadableStream) -> bool;
     #[doc = " The **`cancel()`** method of the ReadableStream interface returns a Promise that resolves when the stream is canceled."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/cancel)"]
     #[wasm_bindgen(method, catch)]
     pub async fn cancel(this: &ReadableStream) -> Result<(), JsValue>;
     #[doc = " The **`cancel()`** method of the ReadableStream interface returns a Promise that resolves when the stream is canceled."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/cancel)"]
     #[wasm_bindgen(method, catch, js_name = "cancel")]
     pub async fn cancel_with_reason(this: &ReadableStream, reason: &JsValue)
         -> Result<(), JsValue>;
     #[doc = " The **`getReader()`** method of the ReadableStream interface creates a reader and locks the stream to it."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/getReader)"]
     #[wasm_bindgen(method, js_name = "getReader")]
     pub fn get_reader(
@@ -10854,7 +10874,7 @@ extern "C" {
         options: &ReadableStreamGetReaderOptions,
     ) -> ReadableStreamBYOBReader;
     #[doc = " The **`getReader()`** method of the ReadableStream interface creates a reader and locks the stream to it."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/getReader)"]
     #[wasm_bindgen(method, catch, js_name = "getReader")]
     pub fn try_get_reader(
@@ -10862,12 +10882,12 @@ extern "C" {
         options: &ReadableStreamGetReaderOptions,
     ) -> Result<ReadableStreamBYOBReader, JsValue>;
     #[doc = " The **`pipeThrough()`** method of the ReadableStream interface provides a chainable way of piping the current stream through a transform stream or any other writable/readable pair."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/pipeThrough)"]
     #[wasm_bindgen(method, js_name = "pipeThrough")]
     pub fn pipe_through(this: &ReadableStream, transform: &ReadableWritablePair) -> ReadableStream;
     #[doc = " The **`pipeThrough()`** method of the ReadableStream interface provides a chainable way of piping the current stream through a transform stream or any other writable/readable pair."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/pipeThrough)"]
     #[wasm_bindgen(method, catch, js_name = "pipeThrough")]
     pub fn try_pipe_through(
@@ -10875,7 +10895,7 @@ extern "C" {
         transform: &ReadableWritablePair,
     ) -> Result<ReadableStream, JsValue>;
     #[doc = " The **`pipeThrough()`** method of the ReadableStream interface provides a chainable way of piping the current stream through a transform stream or any other writable/readable pair."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/pipeThrough)"]
     #[wasm_bindgen(method, js_name = "pipeThrough")]
     pub fn pipe_through_with_options(
@@ -10884,7 +10904,7 @@ extern "C" {
         options: &StreamPipeOptions,
     ) -> ReadableStream;
     #[doc = " The **`pipeThrough()`** method of the ReadableStream interface provides a chainable way of piping the current stream through a transform stream or any other writable/readable pair."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/pipeThrough)"]
     #[wasm_bindgen(method, catch, js_name = "pipeThrough")]
     pub fn try_pipe_through_with_options(
@@ -10893,7 +10913,7 @@ extern "C" {
         options: &StreamPipeOptions,
     ) -> Result<ReadableStream, JsValue>;
     #[doc = " The **`pipeTo()`** method of the ReadableStream interface pipes the current `ReadableStream` to a given WritableStream and returns a Promise that fulfills when the piping process completes successfully, or rejects if any errors were encountered."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/pipeTo)"]
     #[wasm_bindgen(method, catch, js_name = "pipeTo")]
     pub async fn pipe_to(
@@ -10901,7 +10921,7 @@ extern "C" {
         destination: &WritableStream,
     ) -> Result<(), JsValue>;
     #[doc = " The **`pipeTo()`** method of the ReadableStream interface pipes the current `ReadableStream` to a given WritableStream and returns a Promise that fulfills when the piping process completes successfully, or rejects if any errors were encountered."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/pipeTo)"]
     #[wasm_bindgen(method, catch, js_name = "pipeTo")]
     pub async fn pipe_to_with_options(
@@ -10910,12 +10930,12 @@ extern "C" {
         options: &StreamPipeOptions,
     ) -> Result<(), JsValue>;
     #[doc = " The **`tee()`** method of the two-element array containing the two resulting branches as new ReadableStream instances."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/tee)"]
     #[wasm_bindgen(method)]
     pub fn tee(this: &ReadableStream) -> ArrayTuple<(ReadableStream, ReadableStream)>;
     #[doc = " The **`tee()`** method of the two-element array containing the two resulting branches as new ReadableStream instances."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/tee)"]
     #[wasm_bindgen(method, catch, js_name = "tee")]
     pub fn try_tee(
@@ -10953,19 +10973,19 @@ extern "C" {
         reason: &JsValue,
     ) -> Result<(), JsValue>;
     #[doc = " The **`read()`** method of the ReadableStreamDefaultReader interface returns a Promise providing access to the next chunk in the stream's internal queue."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultReader/read)"]
     #[wasm_bindgen(method, catch)]
     pub async fn read(
         this: &ReadableStreamDefaultReader,
     ) -> Result<ReadableStreamReadResult, JsValue>;
     #[doc = " The **`releaseLock()`** method of the ReadableStreamDefaultReader interface releases the reader's lock on the stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultReader/releaseLock)"]
     #[wasm_bindgen(method, js_name = "releaseLock")]
     pub fn release_lock(this: &ReadableStreamDefaultReader);
     #[doc = " The **`releaseLock()`** method of the ReadableStreamDefaultReader interface releases the reader's lock on the stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultReader/releaseLock)"]
     #[wasm_bindgen(method, catch, js_name = "releaseLock")]
     pub fn try_release_lock(this: &ReadableStreamDefaultReader) -> Result<(), JsValue>;
@@ -10987,7 +11007,7 @@ extern "C" {
         reason: &JsValue,
     ) -> Result<(), JsValue>;
     #[doc = " The **`read()`** method of the ReadableStreamBYOBReader interface is used to read data into a view on a user-supplied buffer from an associated readable byte stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBReader/read)"]
     #[wasm_bindgen(method, catch)]
     pub async fn read(
@@ -10995,12 +11015,12 @@ extern "C" {
         view: &T,
     ) -> Result<ReadableStreamReadResult, JsValue>;
     #[doc = " The **`releaseLock()`** method of the ReadableStreamBYOBReader interface releases the reader's lock on the stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBReader/releaseLock)"]
     #[wasm_bindgen(method, js_name = "releaseLock")]
     pub fn release_lock(this: &ReadableStreamBYOBReader);
     #[doc = " The **`releaseLock()`** method of the ReadableStreamBYOBReader interface releases the reader's lock on the stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBReader/releaseLock)"]
     #[wasm_bindgen(method, catch, js_name = "releaseLock")]
     pub fn try_release_lock(this: &ReadableStreamBYOBReader) -> Result<(), JsValue>;
@@ -11049,7 +11069,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ReadableStreamGetReaderOptions;
     #[doc = " Creates a ReadableStreamBYOBReader and locks the stream to the new reader."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " This call behaves the same way as the no-argument variant, except that it only works on readable byte streams, i.e. streams which were constructed specifically with the ability to handle \"bring your own buffer\" reading. The returned BYOB reader provides the ability to directly read individual chunks from the stream via its read() method, into developer-supplied buffers, allowing more precise control over allocation."]
     #[wasm_bindgen(method, getter)]
     pub fn mode(this: &ReadableStreamGetReaderOptions) -> String;
@@ -11057,14 +11077,18 @@ extern "C" {
     pub fn set_mode(this: &ReadableStreamGetReaderOptions, val: &str);
 }
 impl ReadableStreamGetReaderOptions {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `mode: \"byob\"`: Creates a ReadableStreamBYOBReader and locks the stream to the new reader."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " This call behaves the same way as the no-argument variant, except that it only works on readable byte streams, i.e. streams which were constructed specifically with the ability to handle \"bring your own buffer\" reading. The returned BYOB reader provides the ability to directly read individual chunks from the stream via its read() method, into developer-supplied buffers, allowing more precise control over allocation."]
     pub fn new_byob() -> ReadableStreamGetReaderOptions {
         Self::builder_byob().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `mode: \"byob\"`: Creates a ReadableStreamBYOBReader and locks the stream to the new reader."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " This call behaves the same way as the no-argument variant, except that it only works on readable byte streams, i.e. streams which were constructed specifically with the ability to handle \"bring your own buffer\" reading. The returned BYOB reader provides the ability to directly read individual chunks from the stream via its read() method, into developer-supplied buffers, allowing more precise control over allocation."]
     pub fn builder_byob() -> ReadableStreamGetReaderOptionsBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -11086,28 +11110,28 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ReadableStreamBYOBRequest;
     #[doc = " The **`view`** getter property of the ReadableStreamBYOBRequest interface returns the current view."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBRequest/view)"]
     #[wasm_bindgen(method, getter)]
     pub fn view(this: &ReadableStreamBYOBRequest) -> Option<Uint8Array>;
     #[doc = " The **`respond()`** method of the ReadableStreamBYOBRequest interface is used to signal to the associated readable byte stream that the specified number of bytes were written into the ReadableStreamBYOBRequest.view."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBRequest/respond)"]
     #[wasm_bindgen(method)]
     pub fn respond(this: &ReadableStreamBYOBRequest, bytes_written: f64);
     #[doc = " The **`respond()`** method of the ReadableStreamBYOBRequest interface is used to signal to the associated readable byte stream that the specified number of bytes were written into the ReadableStreamBYOBRequest.view."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBRequest/respond)"]
     #[wasm_bindgen(method, catch, js_name = "respond")]
     pub fn try_respond(this: &ReadableStreamBYOBRequest, bytes_written: f64)
         -> Result<(), JsValue>;
     #[doc = " The **`respondWithNewView()`** method of the ReadableStreamBYOBRequest interface specifies a new view that the consumer of the associated readable byte stream should write to instead of ReadableStreamBYOBRequest.view."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBRequest/respondWithNewView)"]
     #[wasm_bindgen(method, js_name = "respondWithNewView")]
     pub fn respond_with_new_view(this: &ReadableStreamBYOBRequest, view: &ArrayBuffer);
     #[doc = " The **`respondWithNewView()`** method of the ReadableStreamBYOBRequest interface specifies a new view that the consumer of the associated readable byte stream should write to instead of ReadableStreamBYOBRequest.view."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBRequest/respondWithNewView)"]
     #[wasm_bindgen(method, catch, js_name = "respondWithNewView")]
     pub fn try_respond_with_new_view(
@@ -11115,12 +11139,12 @@ extern "C" {
         view: &ArrayBuffer,
     ) -> Result<(), JsValue>;
     #[doc = " The **`respondWithNewView()`** method of the ReadableStreamBYOBRequest interface specifies a new view that the consumer of the associated readable byte stream should write to instead of ReadableStreamBYOBRequest.view."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBRequest/respondWithNewView)"]
     #[wasm_bindgen(method, js_name = "respondWithNewView")]
     pub fn respond_with_new_view_with_js_value(this: &ReadableStreamBYOBRequest, view: &Object);
     #[doc = " The **`respondWithNewView()`** method of the ReadableStreamBYOBRequest interface specifies a new view that the consumer of the associated readable byte stream should write to instead of ReadableStreamBYOBRequest.view."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBRequest/respondWithNewView)"]
     #[wasm_bindgen(method, catch, js_name = "respondWithNewView")]
     pub fn try_respond_with_new_view_with_js_value(
@@ -11136,37 +11160,37 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ReadableStreamDefaultController;
     #[doc = " The **`desiredSize`** read-only property of the required to fill the stream's internal queue."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController/desiredSize)"]
     #[wasm_bindgen(method, getter, js_name = "desiredSize")]
     pub fn desired_size(this: &ReadableStreamDefaultController) -> Option<f64>;
     #[doc = " The **`close()`** method of the ReadableStreamDefaultController interface closes the associated stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController/close)"]
     #[wasm_bindgen(method)]
     pub fn close(this: &ReadableStreamDefaultController);
     #[doc = " The **`close()`** method of the ReadableStreamDefaultController interface closes the associated stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController/close)"]
     #[wasm_bindgen(method, catch, js_name = "close")]
     pub fn try_close(this: &ReadableStreamDefaultController) -> Result<(), JsValue>;
     #[doc = " The **`enqueue()`** method of the ```js-nolint enqueue(chunk) ``` - `chunk` - : The chunk to enqueue."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController/enqueue)"]
     #[wasm_bindgen(method)]
     pub fn enqueue(this: &ReadableStreamDefaultController);
     #[doc = " The **`enqueue()`** method of the ```js-nolint enqueue(chunk) ``` - `chunk` - : The chunk to enqueue."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController/enqueue)"]
     #[wasm_bindgen(method, catch, js_name = "enqueue")]
     pub fn try_enqueue(this: &ReadableStreamDefaultController) -> Result<(), JsValue>;
     #[doc = " The **`enqueue()`** method of the ```js-nolint enqueue(chunk) ``` - `chunk` - : The chunk to enqueue."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController/enqueue)"]
     #[wasm_bindgen(method, js_name = "enqueue")]
     pub fn enqueue_with_chunk(this: &ReadableStreamDefaultController, chunk: &R);
     #[doc = " The **`enqueue()`** method of the ```js-nolint enqueue(chunk) ``` - `chunk` - : The chunk to enqueue."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController/enqueue)"]
     #[wasm_bindgen(method, catch, js_name = "enqueue")]
     pub fn try_enqueue_with_chunk(
@@ -11174,12 +11198,12 @@ extern "C" {
         chunk: &R,
     ) -> Result<(), JsValue>;
     #[doc = " The **`error()`** method of the with the associated stream to error."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController/error)"]
     #[wasm_bindgen(method)]
     pub fn error(this: &ReadableStreamDefaultController, reason: &JsValue);
     #[doc = " The **`error()`** method of the with the associated stream to error."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController/error)"]
     #[wasm_bindgen(method, catch, js_name = "error")]
     pub fn try_error(
@@ -11193,32 +11217,32 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ReadableByteStreamController;
     #[doc = " The **`byobRequest`** read-only property of the ReadableByteStreamController interface returns the current BYOB request, or `null` if there are no pending requests."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/byobRequest)"]
     #[wasm_bindgen(method, getter, js_name = "byobRequest")]
     pub fn byob_request(this: &ReadableByteStreamController) -> Option<ReadableStreamBYOBRequest>;
     #[doc = " The **`desiredSize`** read-only property of the ReadableByteStreamController interface returns the number of bytes required to fill the stream's internal queue to its 'desired size'."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/desiredSize)"]
     #[wasm_bindgen(method, getter, js_name = "desiredSize")]
     pub fn desired_size(this: &ReadableByteStreamController) -> Option<f64>;
     #[doc = " The **`close()`** method of the ReadableByteStreamController interface closes the associated stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/close)"]
     #[wasm_bindgen(method)]
     pub fn close(this: &ReadableByteStreamController);
     #[doc = " The **`close()`** method of the ReadableByteStreamController interface closes the associated stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/close)"]
     #[wasm_bindgen(method, catch, js_name = "close")]
     pub fn try_close(this: &ReadableByteStreamController) -> Result<(), JsValue>;
     #[doc = " The **`enqueue()`** method of the ReadableByteStreamController interface enqueues a given chunk on the associated readable byte stream (the chunk is copied into the stream's internal queues)."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/enqueue)"]
     #[wasm_bindgen(method)]
     pub fn enqueue(this: &ReadableByteStreamController, chunk: &ArrayBuffer);
     #[doc = " The **`enqueue()`** method of the ReadableByteStreamController interface enqueues a given chunk on the associated readable byte stream (the chunk is copied into the stream's internal queues)."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/enqueue)"]
     #[wasm_bindgen(method, catch, js_name = "enqueue")]
     pub fn try_enqueue(
@@ -11226,12 +11250,12 @@ extern "C" {
         chunk: &ArrayBuffer,
     ) -> Result<(), JsValue>;
     #[doc = " The **`enqueue()`** method of the ReadableByteStreamController interface enqueues a given chunk on the associated readable byte stream (the chunk is copied into the stream's internal queues)."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/enqueue)"]
     #[wasm_bindgen(method, js_name = "enqueue")]
     pub fn enqueue_with_js_value(this: &ReadableByteStreamController, chunk: &Object);
     #[doc = " The **`enqueue()`** method of the ReadableByteStreamController interface enqueues a given chunk on the associated readable byte stream (the chunk is copied into the stream's internal queues)."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/enqueue)"]
     #[wasm_bindgen(method, catch, js_name = "enqueue")]
     pub fn try_enqueue_with_js_value(
@@ -11239,12 +11263,12 @@ extern "C" {
         chunk: &Object,
     ) -> Result<(), JsValue>;
     #[doc = " The **`error()`** method of the ReadableByteStreamController interface causes any future interactions with the associated stream to error with the specified reason."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/error)"]
     #[wasm_bindgen(method)]
     pub fn error(this: &ReadableByteStreamController, reason: &JsValue);
     #[doc = " The **`error()`** method of the ReadableByteStreamController interface causes any future interactions with the associated stream to error with the specified reason."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/error)"]
     #[wasm_bindgen(method, catch, js_name = "error")]
     pub fn try_error(this: &ReadableByteStreamController, reason: &JsValue) -> Result<(), JsValue>;
@@ -11255,27 +11279,27 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WritableStreamDefaultController;
     #[doc = " The read-only **`signal`** property of the WritableStreamDefaultController interface returns the AbortSignal associated with the controller."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultController/signal)"]
     #[wasm_bindgen(method, getter)]
     pub fn signal(this: &WritableStreamDefaultController) -> AbortSignal;
     #[doc = " The **`error()`** method of the with the associated stream to error."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultController/error)"]
     #[wasm_bindgen(method)]
     pub fn error(this: &WritableStreamDefaultController);
     #[doc = " The **`error()`** method of the with the associated stream to error."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultController/error)"]
     #[wasm_bindgen(method, catch, js_name = "error")]
     pub fn try_error(this: &WritableStreamDefaultController) -> Result<(), JsValue>;
     #[doc = " The **`error()`** method of the with the associated stream to error."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultController/error)"]
     #[wasm_bindgen(method, js_name = "error")]
     pub fn error_with_reason(this: &WritableStreamDefaultController, reason: &JsValue);
     #[doc = " The **`error()`** method of the with the associated stream to error."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultController/error)"]
     #[wasm_bindgen(method, catch, js_name = "error")]
     pub fn try_error_with_reason(
@@ -11289,27 +11313,27 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TransformStreamDefaultController;
     #[doc = " The **`desiredSize`** read-only property of the TransformStreamDefaultController interface returns the desired size to fill the queue of the associated ReadableStream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/desiredSize)"]
     #[wasm_bindgen(method, getter, js_name = "desiredSize")]
     pub fn desired_size(this: &TransformStreamDefaultController) -> Option<f64>;
     #[doc = " The **`enqueue()`** method of the TransformStreamDefaultController interface enqueues the given chunk in the readable side of the stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/enqueue)"]
     #[wasm_bindgen(method)]
     pub fn enqueue(this: &TransformStreamDefaultController);
     #[doc = " The **`enqueue()`** method of the TransformStreamDefaultController interface enqueues the given chunk in the readable side of the stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/enqueue)"]
     #[wasm_bindgen(method, catch, js_name = "enqueue")]
     pub fn try_enqueue(this: &TransformStreamDefaultController) -> Result<(), JsValue>;
     #[doc = " The **`enqueue()`** method of the TransformStreamDefaultController interface enqueues the given chunk in the readable side of the stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/enqueue)"]
     #[wasm_bindgen(method, js_name = "enqueue")]
     pub fn enqueue_with_chunk(this: &TransformStreamDefaultController, chunk: &O);
     #[doc = " The **`enqueue()`** method of the TransformStreamDefaultController interface enqueues the given chunk in the readable side of the stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/enqueue)"]
     #[wasm_bindgen(method, catch, js_name = "enqueue")]
     pub fn try_enqueue_with_chunk(
@@ -11317,12 +11341,12 @@ extern "C" {
         chunk: &O,
     ) -> Result<(), JsValue>;
     #[doc = " The **`error()`** method of the TransformStreamDefaultController interface errors both sides of the stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/error)"]
     #[wasm_bindgen(method)]
     pub fn error(this: &TransformStreamDefaultController, reason: &JsValue);
     #[doc = " The **`error()`** method of the TransformStreamDefaultController interface errors both sides of the stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/error)"]
     #[wasm_bindgen(method, catch, js_name = "error")]
     pub fn try_error(
@@ -11330,12 +11354,12 @@ extern "C" {
         reason: &JsValue,
     ) -> Result<(), JsValue>;
     #[doc = " The **`terminate()`** method of the TransformStreamDefaultController interface closes the readable side and errors the writable side of the stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/terminate)"]
     #[wasm_bindgen(method)]
     pub fn terminate(this: &TransformStreamDefaultController);
     #[doc = " The **`terminate()`** method of the TransformStreamDefaultController interface closes the readable side and errors the writable side of the stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/terminate)"]
     #[wasm_bindgen(method, catch, js_name = "terminate")]
     pub fn try_terminate(this: &TransformStreamDefaultController) -> Result<(), JsValue>;
@@ -11350,7 +11374,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_readable(this: &ReadableWritablePair, val: &ReadableStream);
     #[doc = " Provides a convenient, chainable way of piping this readable stream through a transform stream (or any other { writable, readable } pair). It simply pipes the stream into the writable side of the supplied pair, and returns the readable side for further use."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Piping a stream will lock it for the duration of the pipe, preventing any other consumer from acquiring a reader."]
     #[wasm_bindgen(method, getter)]
     pub fn writable(this: &ReadableWritablePair) -> WritableStream;
@@ -11358,20 +11382,20 @@ extern "C" {
     pub fn set_writable(this: &ReadableWritablePair, val: &WritableStream);
 }
 impl ReadableWritablePair {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `readable`"]
     #[doc = " * `writable`: Provides a convenient, chainable way of piping this readable stream through a transform stream (or any other { writable, readable } pair). It simply pipes the stream into the writable side of the supplied pair, and returns the readable side for further use."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Piping a stream will lock it for the duration of the pipe, preventing any other consumer from acquiring a reader."]
     pub fn new(readable: &ReadableStream, writable: &WritableStream) -> ReadableWritablePair {
         Self::builder(readable, writable).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `readable`"]
     #[doc = " * `writable`: Provides a convenient, chainable way of piping this readable stream through a transform stream (or any other { writable, readable } pair). It simply pipes the stream into the writable side of the supplied pair, and returns the readable side for further use."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Piping a stream will lock it for the duration of the pipe, preventing any other consumer from acquiring a reader."]
     pub fn builder(
         readable: &ReadableStream,
@@ -11408,32 +11432,32 @@ extern "C" {
         queuing_strategy: &QueuingStrategy,
     ) -> Result<WritableStream, JsValue>;
     #[doc = " The **`locked`** read-only property of the WritableStream interface returns a boolean indicating whether the `WritableStream` is locked to a writer."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/locked)"]
     #[wasm_bindgen(method, getter)]
     pub fn locked(this: &WritableStream) -> bool;
     #[doc = " The **`abort()`** method of the WritableStream interface aborts the stream, signaling that the producer can no longer successfully write to the stream and it is to be immediately moved to an error state, with any queued writes discarded."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/abort)"]
     #[wasm_bindgen(method, catch)]
     pub async fn abort(this: &WritableStream) -> Result<(), JsValue>;
     #[doc = " The **`abort()`** method of the WritableStream interface aborts the stream, signaling that the producer can no longer successfully write to the stream and it is to be immediately moved to an error state, with any queued writes discarded."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/abort)"]
     #[wasm_bindgen(method, catch, js_name = "abort")]
     pub async fn abort_with_reason(this: &WritableStream, reason: &JsValue) -> Result<(), JsValue>;
     #[doc = " The **`close()`** method of the WritableStream interface closes the associated stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/close)"]
     #[wasm_bindgen(method, catch)]
     pub async fn close(this: &WritableStream) -> Result<(), JsValue>;
     #[doc = " The **`getWriter()`** method of the WritableStream interface returns a new instance of WritableStreamDefaultWriter and locks the stream to that instance."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/getWriter)"]
     #[wasm_bindgen(method, js_name = "getWriter")]
     pub fn get_writer(this: &WritableStream) -> WritableStreamDefaultWriter;
     #[doc = " The **`getWriter()`** method of the WritableStream interface returns a new instance of WritableStreamDefaultWriter and locks the stream to that instance."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/getWriter)"]
     #[wasm_bindgen(method, catch, js_name = "getWriter")]
     pub fn try_get_writer(this: &WritableStream) -> Result<WritableStreamDefaultWriter, JsValue>;
@@ -11446,27 +11470,27 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new(stream: &WritableStream) -> Result<WritableStreamDefaultWriter, JsValue>;
     #[doc = " The **`closed`** read-only property of the the stream errors or the writer's lock is released."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/closed)"]
     #[wasm_bindgen(method, getter)]
     pub fn closed(this: &WritableStreamDefaultWriter) -> Promise<Undefined>;
     #[doc = " The **`ready`** read-only property of the that resolves when the desired size of the stream's internal queue transitions from non-positive to positive, signaling that it is no longer applying backpressure."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/ready)"]
     #[wasm_bindgen(method, getter)]
     pub fn ready(this: &WritableStreamDefaultWriter) -> Promise<Undefined>;
     #[doc = " The **`desiredSize`** read-only property of the to fill the stream's internal queue."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/desiredSize)"]
     #[wasm_bindgen(method, getter, js_name = "desiredSize")]
     pub fn desired_size(this: &WritableStreamDefaultWriter) -> Option<f64>;
     #[doc = " The **`abort()`** method of the the producer can no longer successfully write to the stream and it is to be immediately moved to an error state, with any queued writes discarded."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/abort)"]
     #[wasm_bindgen(method, catch)]
     pub async fn abort(this: &WritableStreamDefaultWriter) -> Result<(), JsValue>;
     #[doc = " The **`abort()`** method of the the producer can no longer successfully write to the stream and it is to be immediately moved to an error state, with any queued writes discarded."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/abort)"]
     #[wasm_bindgen(method, catch, js_name = "abort")]
     pub async fn abort_with_reason(
@@ -11474,17 +11498,17 @@ extern "C" {
         reason: &JsValue,
     ) -> Result<(), JsValue>;
     #[doc = " The **`close()`** method of the stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/close)"]
     #[wasm_bindgen(method, catch)]
     pub async fn close(this: &WritableStreamDefaultWriter) -> Result<(), JsValue>;
     #[doc = " The **`write()`** method of the operation."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/write)"]
     #[wasm_bindgen(method, catch)]
     pub async fn write(this: &WritableStreamDefaultWriter) -> Result<(), JsValue>;
     #[doc = " The **`write()`** method of the operation."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/write)"]
     #[wasm_bindgen(method, catch, js_name = "write")]
     pub async fn write_with_chunk(
@@ -11492,12 +11516,12 @@ extern "C" {
         chunk: &W,
     ) -> Result<(), JsValue>;
     #[doc = " The **`releaseLock()`** method of the corresponding stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/releaseLock)"]
     #[wasm_bindgen(method, js_name = "releaseLock")]
     pub fn release_lock(this: &WritableStreamDefaultWriter);
     #[doc = " The **`releaseLock()`** method of the corresponding stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/releaseLock)"]
     #[wasm_bindgen(method, catch, js_name = "releaseLock")]
     pub fn try_release_lock(this: &WritableStreamDefaultWriter) -> Result<(), JsValue>;
@@ -11523,12 +11547,12 @@ extern "C" {
         readable_strategy: &QueuingStrategy,
     ) -> Result<TransformStream, JsValue>;
     #[doc = " The **`readable`** read-only property of the TransformStream interface returns the ReadableStream instance controlled by this `TransformStream`."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStream/readable)"]
     #[wasm_bindgen(method, getter)]
     pub fn readable(this: &TransformStream) -> ReadableStream;
     #[doc = " The **`writable`** read-only property of the TransformStream interface returns the WritableStream instance controlled by this `TransformStream`."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStream/writable)"]
     #[wasm_bindgen(method, getter)]
     pub fn writable(this: &TransformStream) -> WritableStream;
@@ -11741,7 +11765,7 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new(init: &QueuingStrategyInit) -> Result<ByteLengthQueuingStrategy, JsValue>;
     #[doc = " The read-only **`ByteLengthQueuingStrategy.highWaterMark`** property returns the total number of bytes that can be contained in the internal queue before backpressure is applied."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ByteLengthQueuingStrategy/highWaterMark)"]
     #[wasm_bindgen(method, getter, js_name = "highWaterMark")]
     pub fn high_water_mark(this: &ByteLengthQueuingStrategy) -> f64;
@@ -11756,7 +11780,7 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new(init: &QueuingStrategyInit) -> Result<CountQueuingStrategy, JsValue>;
     #[doc = " The read-only **`CountQueuingStrategy.highWaterMark`** property returns the total number of chunks that can be contained in the internal queue before backpressure is applied."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/CountQueuingStrategy/highWaterMark)"]
     #[wasm_bindgen(method, getter, js_name = "highWaterMark")]
     pub fn high_water_mark(this: &CountQueuingStrategy) -> f64;
@@ -11769,7 +11793,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type QueuingStrategyInit;
     #[doc = " Creates a new ByteLengthQueuingStrategy with the provided high water mark."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Note that the provided high water mark will not be validated ahead of time. Instead, if it is negative, NaN, or not a number, the resulting ByteLengthQueuingStrategy will cause the corresponding stream constructor to throw."]
     #[wasm_bindgen(method, getter, js_name = "highWaterMark")]
     pub fn high_water_mark(this: &QueuingStrategyInit) -> f64;
@@ -11777,18 +11801,18 @@ extern "C" {
     pub fn set_high_water_mark(this: &QueuingStrategyInit, val: f64);
 }
 impl QueuingStrategyInit {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `high_water_mark`: Creates a new ByteLengthQueuingStrategy with the provided high water mark."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Note that the provided high water mark will not be validated ahead of time. Instead, if it is negative, NaN, or not a number, the resulting ByteLengthQueuingStrategy will cause the corresponding stream constructor to throw."]
     pub fn new(high_water_mark: f64) -> QueuingStrategyInit {
         Self::builder(high_water_mark).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `high_water_mark`: Creates a new ByteLengthQueuingStrategy with the provided high water mark."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Note that the provided high water mark will not be validated ahead of time. Instead, if it is negative, NaN, or not a number, the resulting ByteLengthQueuingStrategy will cause the corresponding stream constructor to throw."]
     pub fn builder(high_water_mark: f64) -> QueuingStrategyInitBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -12285,122 +12309,122 @@ extern "C" {
     #[wasm_bindgen(constructor, catch, js_name = "URL")]
     pub fn new_with_url_and_url(url: &URL, base: &URL) -> Result<URL, JsValue>;
     #[doc = " The **`origin`** read-only property of the URL interface returns a string containing the Unicode serialization of the origin of the represented URL."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/origin)"]
     #[wasm_bindgen(method, getter)]
     pub fn origin(this: &URL) -> String;
     #[doc = " The **`href`** property of the URL interface is a string containing the whole URL."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/href)"]
     #[wasm_bindgen(method, getter)]
     pub fn href(this: &URL) -> String;
     #[doc = " The **`href`** property of the URL interface is a string containing the whole URL."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/href)"]
     #[wasm_bindgen(method, setter)]
     pub fn set_href(this: &URL, val: &str);
     #[doc = " The **`protocol`** property of the URL interface is a string containing the protocol or scheme of the URL, including the final `':'`."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/protocol)"]
     #[wasm_bindgen(method, getter)]
     pub fn protocol(this: &URL) -> String;
     #[doc = " The **`protocol`** property of the URL interface is a string containing the protocol or scheme of the URL, including the final `':'`."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/protocol)"]
     #[wasm_bindgen(method, setter)]
     pub fn set_protocol(this: &URL, val: &str);
     #[doc = " The **`username`** property of the URL interface is a string containing the username component of the URL."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/username)"]
     #[wasm_bindgen(method, getter)]
     pub fn username(this: &URL) -> String;
     #[doc = " The **`username`** property of the URL interface is a string containing the username component of the URL."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/username)"]
     #[wasm_bindgen(method, setter)]
     pub fn set_username(this: &URL, val: &str);
     #[doc = " The **`password`** property of the URL interface is a string containing the password component of the URL."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/password)"]
     #[wasm_bindgen(method, getter)]
     pub fn password(this: &URL) -> String;
     #[doc = " The **`password`** property of the URL interface is a string containing the password component of the URL."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/password)"]
     #[wasm_bindgen(method, setter)]
     pub fn set_password(this: &URL, val: &str);
     #[doc = " The **`host`** property of the URL interface is a string containing the host, which is the URL.hostname, and then, if the port of the URL is nonempty, a `':'`, followed by the URL.port of the URL."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/host)"]
     #[wasm_bindgen(method, getter)]
     pub fn host(this: &URL) -> String;
     #[doc = " The **`host`** property of the URL interface is a string containing the host, which is the URL.hostname, and then, if the port of the URL is nonempty, a `':'`, followed by the URL.port of the URL."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/host)"]
     #[wasm_bindgen(method, setter)]
     pub fn set_host(this: &URL, val: &str);
     #[doc = " The **`hostname`** property of the URL interface is a string containing either the domain name or IP address of the URL."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/hostname)"]
     #[wasm_bindgen(method, getter)]
     pub fn hostname(this: &URL) -> String;
     #[doc = " The **`hostname`** property of the URL interface is a string containing either the domain name or IP address of the URL."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/hostname)"]
     #[wasm_bindgen(method, setter)]
     pub fn set_hostname(this: &URL, val: &str);
     #[doc = " The **`port`** property of the URL interface is a string containing the port number of the URL."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/port)"]
     #[wasm_bindgen(method, getter)]
     pub fn port(this: &URL) -> String;
     #[doc = " The **`port`** property of the URL interface is a string containing the port number of the URL."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/port)"]
     #[wasm_bindgen(method, setter)]
     pub fn set_port(this: &URL, val: &str);
     #[doc = " The **`pathname`** property of the URL interface represents a location in a hierarchical structure."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/pathname)"]
     #[wasm_bindgen(method, getter)]
     pub fn pathname(this: &URL) -> String;
     #[doc = " The **`pathname`** property of the URL interface represents a location in a hierarchical structure."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/pathname)"]
     #[wasm_bindgen(method, setter)]
     pub fn set_pathname(this: &URL, val: &str);
     #[doc = " The **`search`** property of the URL interface is a search string, also called a _query string_, that is a string containing a `'?'` followed by the parameters of the URL."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/search)"]
     #[wasm_bindgen(method, getter)]
     pub fn search(this: &URL) -> String;
     #[doc = " The **`search`** property of the URL interface is a search string, also called a _query string_, that is a string containing a `'?'` followed by the parameters of the URL."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/search)"]
     #[wasm_bindgen(method, setter)]
     pub fn set_search(this: &URL, val: &str);
     #[doc = " The **`hash`** property of the URL interface is a string containing a `'#'` followed by the fragment identifier of the URL."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/hash)"]
     #[wasm_bindgen(method, getter)]
     pub fn hash(this: &URL) -> String;
     #[doc = " The **`hash`** property of the URL interface is a string containing a `'#'` followed by the fragment identifier of the URL."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/hash)"]
     #[wasm_bindgen(method, setter)]
     pub fn set_hash(this: &URL, val: &str);
     #[doc = " The **`searchParams`** read-only property of the access to the [MISSING: httpmethod('GET')] decoded query arguments contained in the URL."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/searchParams)"]
     #[wasm_bindgen(method, getter, js_name = "searchParams")]
     pub fn search_params(this: &URL) -> URLSearchParams;
     #[doc = " The **`toJSON()`** method of the URL interface returns a string containing a serialized version of the URL, although in practice it seems to have the same effect as ```js-nolint toJSON() ``` None."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/toJSON)"]
     #[wasm_bindgen(method, js_name = "toJSON")]
     pub fn to_json(this: &URL) -> String;
     #[doc = " The **`toJSON()`** method of the URL interface returns a string containing a serialized version of the URL, although in practice it seems to have the same effect as ```js-nolint toJSON() ``` None."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/toJSON)"]
     #[wasm_bindgen(method, catch, js_name = "toJSON")]
     pub fn try_to_json(this: &URL) -> Result<String, JsValue>;
@@ -12409,72 +12433,72 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "toString")]
     pub fn try_to_string(this: &URL) -> Result<String, JsValue>;
     #[doc = " The **`URL.canParse()`** static method of the URL interface returns a boolean indicating whether or not an absolute URL, or a relative URL combined with a base URL, are parsable and valid."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/canParse_static)"]
     # [wasm_bindgen (static_method_of = URL , js_name = "canParse")]
     pub fn can_parse(url: &str) -> bool;
     #[doc = " The **`URL.canParse()`** static method of the URL interface returns a boolean indicating whether or not an absolute URL, or a relative URL combined with a base URL, are parsable and valid."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/canParse_static)"]
     # [wasm_bindgen (static_method_of = URL , catch , js_name = "canParse")]
     pub fn try_can_parse(url: &str) -> Result<bool, JsValue>;
     #[doc = " The **`URL.canParse()`** static method of the URL interface returns a boolean indicating whether or not an absolute URL, or a relative URL combined with a base URL, are parsable and valid."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/canParse_static)"]
     # [wasm_bindgen (static_method_of = URL , js_name = "canParse")]
     pub fn can_parse_with_base(url: &str, base: &str) -> bool;
     #[doc = " The **`URL.canParse()`** static method of the URL interface returns a boolean indicating whether or not an absolute URL, or a relative URL combined with a base URL, are parsable and valid."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/canParse_static)"]
     # [wasm_bindgen (static_method_of = URL , catch , js_name = "canParse")]
     pub fn try_can_parse_with_base(url: &str, base: &str) -> Result<bool, JsValue>;
     #[doc = " The **`URL.parse()`** static method of the URL interface returns a newly created URL object representing the URL defined by the parameters."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/parse_static)"]
     # [wasm_bindgen (static_method_of = URL)]
     pub fn parse(url: &str) -> Option<URL>;
     #[doc = " The **`URL.parse()`** static method of the URL interface returns a newly created URL object representing the URL defined by the parameters."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/parse_static)"]
     # [wasm_bindgen (static_method_of = URL , catch , js_name = "parse")]
     pub fn try_parse(url: &str) -> Result<Option<URL>, JsValue>;
     #[doc = " The **`URL.parse()`** static method of the URL interface returns a newly created URL object representing the URL defined by the parameters."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/parse_static)"]
     # [wasm_bindgen (static_method_of = URL , js_name = "parse")]
     pub fn parse_with_base(url: &str, base: &str) -> Option<URL>;
     #[doc = " The **`URL.parse()`** static method of the URL interface returns a newly created URL object representing the URL defined by the parameters."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/parse_static)"]
     # [wasm_bindgen (static_method_of = URL , catch , js_name = "parse")]
     pub fn try_parse_with_base(url: &str, base: &str) -> Result<Option<URL>, JsValue>;
     #[doc = " The **`createObjectURL()`** static method of the URL interface creates a string containing a URL representing the object given in the parameter."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/createObjectURL_static)"]
     # [wasm_bindgen (static_method_of = URL , js_name = "createObjectURL")]
     pub fn create_object_url(object: &File) -> String;
     #[doc = " The **`createObjectURL()`** static method of the URL interface creates a string containing a URL representing the object given in the parameter."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/createObjectURL_static)"]
     # [wasm_bindgen (static_method_of = URL , catch , js_name = "createObjectURL")]
     pub fn try_create_object_url(object: &File) -> Result<String, JsValue>;
     #[doc = " The **`createObjectURL()`** static method of the URL interface creates a string containing a URL representing the object given in the parameter."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/createObjectURL_static)"]
     # [wasm_bindgen (static_method_of = URL , js_name = "createObjectURL")]
     pub fn create_object_url_with_blob(object: &Blob) -> String;
     #[doc = " The **`createObjectURL()`** static method of the URL interface creates a string containing a URL representing the object given in the parameter."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/createObjectURL_static)"]
     # [wasm_bindgen (static_method_of = URL , catch , js_name = "createObjectURL")]
     pub fn try_create_object_url_with_blob(object: &Blob) -> Result<String, JsValue>;
     #[doc = " The **`revokeObjectURL()`** static method of the URL interface releases an existing object URL which was previously created by calling Call this method when you've finished using an object URL to let the browser know not to keep the reference to the file any longer."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/revokeObjectURL_static)"]
     # [wasm_bindgen (static_method_of = URL , js_name = "revokeObjectURL")]
     pub fn revoke_object_url(object_url: &str);
     #[doc = " The **`revokeObjectURL()`** static method of the URL interface releases an existing object URL which was previously created by calling Call this method when you've finished using an object URL to let the browser know not to keep the reference to the file any longer."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL/revokeObjectURL_static)"]
     # [wasm_bindgen (static_method_of = URL , catch , js_name = "revokeObjectURL")]
     pub fn try_revoke_object_url(object_url: &str) -> Result<(), JsValue>;
@@ -12493,37 +12517,37 @@ extern "C" {
     #[wasm_bindgen(constructor, catch, js_name = "URLSearchParams")]
     pub fn new_with_str(init: &str) -> Result<URLSearchParams, JsValue>;
     #[doc = " The **`size`** read-only property of the URLSearchParams interface indicates the total number of search parameter entries."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/size)"]
     #[wasm_bindgen(method, getter)]
     pub fn size(this: &URLSearchParams) -> f64;
     #[doc = " The **`append()`** method of the URLSearchParams interface appends a specified key/value pair as a new search parameter."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/append)"]
     #[wasm_bindgen(method)]
     pub fn append(this: &URLSearchParams, name: &str, value: &str);
     #[doc = " The **`append()`** method of the URLSearchParams interface appends a specified key/value pair as a new search parameter."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/append)"]
     #[wasm_bindgen(method, catch, js_name = "append")]
     pub fn try_append(this: &URLSearchParams, name: &str, value: &str) -> Result<(), JsValue>;
     #[doc = " The **`delete()`** method of the URLSearchParams interface deletes specified parameters and their associated value(s) from the list of all search parameters."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/delete)"]
     #[wasm_bindgen(method)]
     pub fn delete(this: &URLSearchParams, name: &str);
     #[doc = " The **`delete()`** method of the URLSearchParams interface deletes specified parameters and their associated value(s) from the list of all search parameters."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/delete)"]
     #[wasm_bindgen(method, catch, js_name = "delete")]
     pub fn try_delete(this: &URLSearchParams, name: &str) -> Result<(), JsValue>;
     #[doc = " The **`delete()`** method of the URLSearchParams interface deletes specified parameters and their associated value(s) from the list of all search parameters."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/delete)"]
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_with_value(this: &URLSearchParams, name: &str, value: &str);
     #[doc = " The **`delete()`** method of the URLSearchParams interface deletes specified parameters and their associated value(s) from the list of all search parameters."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/delete)"]
     #[wasm_bindgen(method, catch, js_name = "delete")]
     pub fn try_delete_with_value(
@@ -12532,42 +12556,42 @@ extern "C" {
         value: &str,
     ) -> Result<(), JsValue>;
     #[doc = " The **`get()`** method of the URLSearchParams interface returns the first value associated to the given search parameter."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/get)"]
     #[wasm_bindgen(method)]
     pub fn get(this: &URLSearchParams, name: &str) -> Option<String>;
     #[doc = " The **`get()`** method of the URLSearchParams interface returns the first value associated to the given search parameter."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/get)"]
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn try_get(this: &URLSearchParams, name: &str) -> Result<Option<String>, JsValue>;
     #[doc = " The **`getAll()`** method of the URLSearchParams interface returns all the values associated with a given search parameter as an array."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/getAll)"]
     #[wasm_bindgen(method, js_name = "getAll")]
     pub fn get_all(this: &URLSearchParams, name: &str) -> Array<JsString>;
     #[doc = " The **`getAll()`** method of the URLSearchParams interface returns all the values associated with a given search parameter as an array."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/getAll)"]
     #[wasm_bindgen(method, catch, js_name = "getAll")]
     pub fn try_get_all(this: &URLSearchParams, name: &str) -> Result<Array<JsString>, JsValue>;
     #[doc = " The **`has()`** method of the URLSearchParams interface returns a boolean value that indicates whether the specified parameter is in the search parameters."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/has)"]
     #[wasm_bindgen(method)]
     pub fn has(this: &URLSearchParams, name: &str) -> bool;
     #[doc = " The **`has()`** method of the URLSearchParams interface returns a boolean value that indicates whether the specified parameter is in the search parameters."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/has)"]
     #[wasm_bindgen(method, catch, js_name = "has")]
     pub fn try_has(this: &URLSearchParams, name: &str) -> Result<bool, JsValue>;
     #[doc = " The **`has()`** method of the URLSearchParams interface returns a boolean value that indicates whether the specified parameter is in the search parameters."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/has)"]
     #[wasm_bindgen(method, js_name = "has")]
     pub fn has_with_value(this: &URLSearchParams, name: &str, value: &str) -> bool;
     #[doc = " The **`has()`** method of the URLSearchParams interface returns a boolean value that indicates whether the specified parameter is in the search parameters."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/has)"]
     #[wasm_bindgen(method, catch, js_name = "has")]
     pub fn try_has_with_value(
@@ -12576,22 +12600,22 @@ extern "C" {
         value: &str,
     ) -> Result<bool, JsValue>;
     #[doc = " The **`set()`** method of the URLSearchParams interface sets the value associated with a given search parameter to the given value."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/set)"]
     #[wasm_bindgen(method)]
     pub fn set(this: &URLSearchParams, name: &str, value: &str);
     #[doc = " The **`set()`** method of the URLSearchParams interface sets the value associated with a given search parameter to the given value."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/set)"]
     #[wasm_bindgen(method, catch, js_name = "set")]
     pub fn try_set(this: &URLSearchParams, name: &str, value: &str) -> Result<(), JsValue>;
     #[doc = " The **`URLSearchParams.sort()`** method sorts all key/value pairs contained in this object in place and returns `undefined`."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/sort)"]
     #[wasm_bindgen(method)]
     pub fn sort(this: &URLSearchParams);
     #[doc = " The **`URLSearchParams.sort()`** method sorts all key/value pairs contained in this object in place and returns `undefined`."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/URLSearchParams/sort)"]
     #[wasm_bindgen(method, catch, js_name = "sort")]
     pub fn try_sort(this: &URLSearchParams) -> Result<(), JsValue>;
@@ -12896,15 +12920,15 @@ extern "C" {
     pub fn set_groups(this: &URLPatternComponentResult, val: &Object<JsString>);
 }
 impl URLPatternComponentResult {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `input`"]
     #[doc = " * `groups`"]
     pub fn new(input: &str, groups: &Object<JsString>) -> URLPatternComponentResult {
         Self::builder(input, groups).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `input`"]
     #[doc = " * `groups`"]
     pub fn builder(input: &str, groups: &Object<JsString>) -> URLPatternComponentResultBuilder {
@@ -12967,8 +12991,8 @@ extern "C" {
     pub fn set_hash(this: &URLPatternResult, val: &URLPatternComponentResult);
 }
 impl URLPatternResult {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `inputs`"]
     #[doc = " * `protocol`"]
     #[doc = " * `username`"]
@@ -12994,8 +13018,8 @@ impl URLPatternResult {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `inputs`"]
     #[doc = " * `protocol`"]
     #[doc = " * `username`"]
@@ -13082,17 +13106,17 @@ extern "C" {
         initializer: &CloseEventInit,
     ) -> Result<CloseEvent, JsValue>;
     #[doc = " The **`code`** read-only property of the CloseEvent interface returns a WebSocket connection close code indicating the reason the connection was closed."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/CloseEvent/code)"]
     #[wasm_bindgen(method, getter)]
     pub fn code(this: &CloseEvent) -> f64;
     #[doc = " The **`reason`** read-only property of the CloseEvent interface returns the WebSocket connection close reason the server gave for closing the connection; that is, a concise human-readable prose explanation for the closure."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/CloseEvent/reason)"]
     #[wasm_bindgen(method, getter)]
     pub fn reason(this: &CloseEvent) -> String;
     #[doc = " The **`wasClean`** read-only property of the CloseEvent interface returns `true` if the connection closed cleanly."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/CloseEvent/wasClean)"]
     #[wasm_bindgen(method, getter, js_name = "wasClean")]
     pub fn was_clean(this: &CloseEvent) -> bool;
@@ -13168,8 +13192,8 @@ extern "C" {
     pub fn set_error(this: &WebSocketEventMap, val: &ErrorEvent);
 }
 impl WebSocketEventMap {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `close`"]
     #[doc = " * `message`"]
     #[doc = " * `open`"]
@@ -13182,8 +13206,8 @@ impl WebSocketEventMap {
     ) -> WebSocketEventMap {
         Self::builder(close, message, open, error).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `close`"]
     #[doc = " * `message`"]
     #[doc = " * `open`"]
@@ -13249,62 +13273,62 @@ extern "C" {
         options: &WebSocketAcceptOptions,
     ) -> Result<(), JsValue>;
     #[doc = " The **`WebSocket.send()`** method enqueues the specified data to be transmitted to the server over the WebSocket connection, increasing the value of `bufferedAmount` by the number of bytes needed to contain the data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/send)"]
     #[wasm_bindgen(method)]
     pub fn send(this: &WebSocket, message: &ArrayBuffer);
     #[doc = " The **`WebSocket.send()`** method enqueues the specified data to be transmitted to the server over the WebSocket connection, increasing the value of `bufferedAmount` by the number of bytes needed to contain the data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/send)"]
     #[wasm_bindgen(method, catch, js_name = "send")]
     pub fn try_send(this: &WebSocket, message: &ArrayBuffer) -> Result<(), JsValue>;
     #[doc = " The **`WebSocket.send()`** method enqueues the specified data to be transmitted to the server over the WebSocket connection, increasing the value of `bufferedAmount` by the number of bytes needed to contain the data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/send)"]
     #[wasm_bindgen(method, js_name = "send")]
     pub fn send_with_js_value(this: &WebSocket, message: &Object);
     #[doc = " The **`WebSocket.send()`** method enqueues the specified data to be transmitted to the server over the WebSocket connection, increasing the value of `bufferedAmount` by the number of bytes needed to contain the data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/send)"]
     #[wasm_bindgen(method, catch, js_name = "send")]
     pub fn try_send_with_js_value(this: &WebSocket, message: &Object) -> Result<(), JsValue>;
     #[doc = " The **`WebSocket.send()`** method enqueues the specified data to be transmitted to the server over the WebSocket connection, increasing the value of `bufferedAmount` by the number of bytes needed to contain the data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/send)"]
     #[wasm_bindgen(method, js_name = "send")]
     pub fn send_with_str(this: &WebSocket, message: &str);
     #[doc = " The **`WebSocket.send()`** method enqueues the specified data to be transmitted to the server over the WebSocket connection, increasing the value of `bufferedAmount` by the number of bytes needed to contain the data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/send)"]
     #[wasm_bindgen(method, catch, js_name = "send")]
     pub fn try_send_with_str(this: &WebSocket, message: &str) -> Result<(), JsValue>;
     #[doc = " The **`WebSocket.close()`** method closes the already `CLOSED`, this method does nothing."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/close)"]
     #[wasm_bindgen(method)]
     pub fn close(this: &WebSocket);
     #[doc = " The **`WebSocket.close()`** method closes the already `CLOSED`, this method does nothing."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/close)"]
     #[wasm_bindgen(method, catch, js_name = "close")]
     pub fn try_close(this: &WebSocket) -> Result<(), JsValue>;
     #[doc = " The **`WebSocket.close()`** method closes the already `CLOSED`, this method does nothing."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/close)"]
     #[wasm_bindgen(method, js_name = "close")]
     pub fn close_with_code(this: &WebSocket, code: f64);
     #[doc = " The **`WebSocket.close()`** method closes the already `CLOSED`, this method does nothing."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/close)"]
     #[wasm_bindgen(method, catch, js_name = "close")]
     pub fn try_close_with_code(this: &WebSocket, code: f64) -> Result<(), JsValue>;
     #[doc = " The **`WebSocket.close()`** method closes the already `CLOSED`, this method does nothing."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/close)"]
     #[wasm_bindgen(method, js_name = "close")]
     pub fn close_with_code_and_reason(this: &WebSocket, code: f64, reason: &str);
     #[doc = " The **`WebSocket.close()`** method closes the already `CLOSED`, this method does nothing."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/close)"]
     #[wasm_bindgen(method, catch, js_name = "close")]
     pub fn try_close_with_code_and_reason(
@@ -13321,14 +13345,14 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "deserializeAttachment")]
     pub fn try_deserialize_attachment(this: &WebSocket) -> Result<Option<JsValue>, JsValue>;
     #[doc = " The **`WebSocket.readyState`** read-only property returns the current state of the WebSocket connection."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/readyState)"]
     #[wasm_bindgen(method, getter, js_name = "readyState")]
     pub fn ready_state(this: &WebSocket) -> f64;
     #[wasm_bindgen(method, setter, js_name = "readyState")]
     pub fn set_ready_state(this: &WebSocket, val: f64);
     #[doc = " The **`WebSocket.url`** read-only property returns the absolute URL of the WebSocket as resolved by the constructor."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/url)"]
     #[wasm_bindgen(method, getter)]
     pub fn url(this: &WebSocket) -> Option<String>;
@@ -13337,7 +13361,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "url")]
     pub fn set_url_with_null(this: &WebSocket, val: &Null);
     #[doc = " The **`WebSocket.protocol`** read-only property returns the name of the sub-protocol the server selected; this will be one of the strings specified in the `protocols` parameter when creating the WebSocket object, or the empty string if no connection is established."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/protocol)"]
     #[wasm_bindgen(method, getter)]
     pub fn protocol(this: &WebSocket) -> Option<String>;
@@ -13346,7 +13370,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "protocol")]
     pub fn set_protocol_with_null(this: &WebSocket, val: &Null);
     #[doc = " The **`WebSocket.extensions`** read-only property returns the extensions selected by the server."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/extensions)"]
     #[wasm_bindgen(method, getter)]
     pub fn extensions(this: &WebSocket) -> Option<String>;
@@ -13355,7 +13379,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "extensions")]
     pub fn set_extensions_with_null(this: &WebSocket, val: &Null);
     #[doc = " The **`WebSocket.binaryType`** property controls the type of binary data being received over the WebSocket connection."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/binaryType)"]
     #[wasm_bindgen(method, getter, js_name = "binaryType")]
     pub fn binary_type(this: &WebSocket) -> JsValue;
@@ -13520,14 +13544,14 @@ extern "C" {
     pub fn set_high_water_mark_with_big_int(this: &SocketOptions, val: &BigInt);
 }
 impl SocketOptions {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `allow_half_open`"]
     pub fn new(allow_half_open: bool) -> SocketOptions {
         Self::builder(allow_half_open).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `allow_half_open`"]
     pub fn builder(allow_half_open: bool) -> SocketOptionsBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -13570,15 +13594,15 @@ extern "C" {
     pub fn set_port(this: &SocketAddress, val: f64);
 }
 impl SocketAddress {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `hostname`"]
     #[doc = " * `port`"]
     pub fn new(hostname: &str, port: f64) -> SocketAddress {
         Self::builder(hostname, port).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `hostname`"]
     #[doc = " * `port`"]
     pub fn builder(hostname: &str, port: f64) -> SocketAddressBuilder {
@@ -13681,27 +13705,27 @@ extern "C" {
         init: &EventSourceEventSourceInit,
     ) -> Result<EventSource, JsValue>;
     #[doc = " The **`close()`** method of the EventSource interface closes the connection, if one is made, and sets the ```js-nolint close() ``` None."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventSource/close)"]
     #[wasm_bindgen(method)]
     pub fn close(this: &EventSource);
     #[doc = " The **`close()`** method of the EventSource interface closes the connection, if one is made, and sets the ```js-nolint close() ``` None."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventSource/close)"]
     #[wasm_bindgen(method, catch, js_name = "close")]
     pub fn try_close(this: &EventSource) -> Result<(), JsValue>;
     #[doc = " The **`url`** read-only property of the URL of the source."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventSource/url)"]
     #[wasm_bindgen(method, getter)]
     pub fn url(this: &EventSource) -> String;
     #[doc = " The **`withCredentials`** read-only property of the the `EventSource` object was instantiated with CORS credentials set."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventSource/withCredentials)"]
     #[wasm_bindgen(method, getter, js_name = "withCredentials")]
     pub fn with_credentials(this: &EventSource) -> bool;
     #[doc = " The **`readyState`** read-only property of the connection."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventSource/readyState)"]
     #[wasm_bindgen(method, getter, js_name = "readyState")]
     pub fn ready_state(this: &EventSource) -> f64;
@@ -13850,14 +13874,14 @@ extern "C" {
     pub fn set_hard_timeout_with_big_int(this: &ContainerStartupOptions, val: &BigInt);
 }
 impl ContainerStartupOptions {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `enable_internet`"]
     pub fn new(enable_internet: bool) -> ContainerStartupOptions {
         Self::builder(enable_internet).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `enable_internet`"]
     pub fn builder(enable_internet: bool) -> ContainerStartupOptionsBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -13895,32 +13919,32 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MessagePort;
     #[doc = " The **`postMessage()`** method of the transfers ownership of objects to other browsing contexts."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessagePort/postMessage)"]
     #[wasm_bindgen(method, js_name = "postMessage")]
     pub fn post_message(this: &MessagePort);
     #[doc = " The **`postMessage()`** method of the transfers ownership of objects to other browsing contexts."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessagePort/postMessage)"]
     #[wasm_bindgen(method, catch, js_name = "postMessage")]
     pub fn try_post_message(this: &MessagePort) -> Result<(), JsValue>;
     #[doc = " The **`postMessage()`** method of the transfers ownership of objects to other browsing contexts."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessagePort/postMessage)"]
     #[wasm_bindgen(method, js_name = "postMessage")]
     pub fn post_message_with_data(this: &MessagePort, data: &JsValue);
     #[doc = " The **`postMessage()`** method of the transfers ownership of objects to other browsing contexts."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessagePort/postMessage)"]
     #[wasm_bindgen(method, catch, js_name = "postMessage")]
     pub fn try_post_message_with_data(this: &MessagePort, data: &JsValue) -> Result<(), JsValue>;
     #[doc = " The **`postMessage()`** method of the transfers ownership of objects to other browsing contexts."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessagePort/postMessage)"]
     #[wasm_bindgen(method, js_name = "postMessage")]
     pub fn post_message_with_data_and_array(this: &MessagePort, data: &JsValue, options: &Array);
     #[doc = " The **`postMessage()`** method of the transfers ownership of objects to other browsing contexts."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessagePort/postMessage)"]
     #[wasm_bindgen(method, catch, js_name = "postMessage")]
     pub fn try_post_message_with_data_and_array(
@@ -13929,7 +13953,7 @@ extern "C" {
         options: &Array,
     ) -> Result<(), JsValue>;
     #[doc = " The **`postMessage()`** method of the transfers ownership of objects to other browsing contexts."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessagePort/postMessage)"]
     #[wasm_bindgen(method, js_name = "postMessage")]
     pub fn post_message_with_data_and_message_port_post_message_options(
@@ -13938,7 +13962,7 @@ extern "C" {
         options: &MessagePortPostMessageOptions,
     );
     #[doc = " The **`postMessage()`** method of the transfers ownership of objects to other browsing contexts."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessagePort/postMessage)"]
     #[wasm_bindgen(method, catch, js_name = "postMessage")]
     pub fn try_post_message_with_data_and_message_port_post_message_options(
@@ -13947,22 +13971,22 @@ extern "C" {
         options: &MessagePortPostMessageOptions,
     ) -> Result<(), JsValue>;
     #[doc = " The **`close()`** method of the MessagePort interface disconnects the port, so it is no longer active."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessagePort/close)"]
     #[wasm_bindgen(method)]
     pub fn close(this: &MessagePort);
     #[doc = " The **`close()`** method of the MessagePort interface disconnects the port, so it is no longer active."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessagePort/close)"]
     #[wasm_bindgen(method, catch, js_name = "close")]
     pub fn try_close(this: &MessagePort) -> Result<(), JsValue>;
     #[doc = " The **`start()`** method of the MessagePort interface starts the sending of messages queued on the port."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessagePort/start)"]
     #[wasm_bindgen(method)]
     pub fn start(this: &MessagePort);
     #[doc = " The **`start()`** method of the MessagePort interface starts the sending of messages queued on the port."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessagePort/start)"]
     #[wasm_bindgen(method, catch, js_name = "start")]
     pub fn try_start(this: &MessagePort) -> Result<(), JsValue>;
@@ -13981,12 +14005,12 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<MessageChannel, JsValue>;
     #[doc = " The **`port1`** read-only property of the the port attached to the context that originated the channel."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessageChannel/port1)"]
     #[wasm_bindgen(method, getter, js_name = "port1")]
     pub fn port_1(this: &MessageChannel) -> MessagePort;
     #[doc = " The **`port2`** read-only property of the the port attached to the context at the other end of the channel, which the message is initially sent to."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessageChannel/port2)"]
     #[wasm_bindgen(method, getter, js_name = "port2")]
     pub fn port_2(this: &MessageChannel) -> MessagePort;
@@ -14337,8 +14361,8 @@ extern "C" {
     pub fn set_streaming_tails(this: &WorkerLoaderWorkerCode, val: &Array);
 }
 impl WorkerLoaderWorkerCode {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `compatibility_date`"]
     #[doc = " * `main_module`"]
     #[doc = " * `modules`"]
@@ -14349,8 +14373,8 @@ impl WorkerLoaderWorkerCode {
     ) -> WorkerLoaderWorkerCode {
         Self::builder(compatibility_date, main_module, modules).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `compatibility_date`"]
     #[doc = " * `main_module`"]
     #[doc = " * `modules`"]
@@ -14414,12 +14438,12 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "now")]
     pub fn try_now(this: &Performance) -> Result<f64, JsValue>;
     #[doc = " The **`toJSON()`** method of the Performance interface is a Serialization; it returns a JSON representation of the Performance object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Performance/toJSON)"]
     #[wasm_bindgen(method, js_name = "toJSON")]
     pub fn to_json(this: &Performance) -> Object;
     #[doc = " The **`toJSON()`** method of the Performance interface is a Serialization; it returns a JSON representation of the Performance object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Performance/toJSON)"]
     #[wasm_bindgen(method, catch, js_name = "toJSON")]
     pub fn try_to_json(this: &Performance) -> Result<Object, JsValue>;
@@ -14457,14 +14481,14 @@ extern "C" {
     pub fn set_ai_search_options(this: &AiSearchSearchRequest, val: &Object);
 }
 impl AiSearchSearchRequest {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`"]
     pub fn new(messages: &Array<Object>) -> AiSearchSearchRequest {
         Self::builder(messages).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`"]
     pub fn builder(messages: &Array<Object>) -> AiSearchSearchRequestBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -14507,14 +14531,14 @@ extern "C" {
     pub fn set_ai_search_options(this: &AiSearchChatCompletionsRequest, val: &Object);
 }
 impl AiSearchChatCompletionsRequest {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`"]
     pub fn new(messages: &Array<Object>) -> AiSearchChatCompletionsRequest {
         Self::builder(messages).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`"]
     pub fn builder(messages: &Array<Object>) -> AiSearchChatCompletionsRequestBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -14557,15 +14581,15 @@ extern "C" {
     pub fn set_chunks(this: &AiSearchSearchResponse, val: &Array<Object>);
 }
 impl AiSearchSearchResponse {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `search_query`"]
     #[doc = " * `chunks`"]
     pub fn new(search_query: &str, chunks: &Array<Object>) -> AiSearchSearchResponse {
         Self::builder(search_query, chunks).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `search_query`"]
     #[doc = " * `chunks`"]
     pub fn builder(search_query: &str, chunks: &Array<Object>) -> AiSearchSearchResponseBuilder {
@@ -14638,28 +14662,34 @@ extern "C" {
     pub fn set_ai_search_model(this: &AiSearchConfig, val: &str);
 }
 impl AiSearchConfig {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"r2\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`: Instance ID (1-32 chars, pattern: ^[a-z0-9_]+(?:-[a-z0-9_]+)*$)"]
     #[doc = " * `source`"]
     pub fn new_r_2(id: &str, source: &str) -> AiSearchConfig {
         Self::builder_r_2(id, source).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"web-crawler\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`: Instance ID (1-32 chars, pattern: ^[a-z0-9_]+(?:-[a-z0-9_]+)*$)"]
     #[doc = " * `source`"]
     pub fn new_web_crawler(id: &str, source: &str) -> AiSearchConfig {
         Self::builder_web_crawler(id, source).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"r2\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`: Instance ID (1-32 chars, pattern: ^[a-z0-9_]+(?:-[a-z0-9_]+)*$)"]
     #[doc = " * `source`"]
     pub fn builder_r_2(id: &str, source: &str) -> AiSearchConfigBuilder {
@@ -14669,10 +14699,12 @@ impl AiSearchConfig {
         inner.set_source(source);
         AiSearchConfigBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"web-crawler\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`: Instance ID (1-32 chars, pattern: ^[a-z0-9_]+(?:-[a-z0-9_]+)*$)"]
     #[doc = " * `source`"]
     pub fn builder_web_crawler(id: &str, source: &str) -> AiSearchConfigBuilder {
@@ -14744,14 +14776,14 @@ extern "C" {
     pub fn set_source(this: &AiSearchInstance, val: &str);
 }
 impl AiSearchInstance {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     pub fn new(id: &str) -> AiSearchInstance {
         Self::builder(id).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     pub fn builder(id: &str) -> AiSearchInstanceBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -14789,13 +14821,13 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiSearchInstanceService;
     #[doc = " Search the AI Search instance for relevant chunks."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `params` - Search request with messages and AI search options"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Search response with matching chunks"]
     #[wasm_bindgen(method, catch)]
     pub async fn search(
@@ -14803,13 +14835,13 @@ extern "C" {
         params: &AiSearchSearchRequest,
     ) -> Result<AiSearchSearchResponse, JsValue>;
     #[doc = " Generate chat completions with AI Search context."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `params` - Chat completions request with optional streaming"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Response object (if streaming) or chat completion result"]
     #[wasm_bindgen(method, catch, js_name = "chatCompletions")]
     pub async fn chat_completions(
@@ -14826,31 +14858,31 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiSearchAccountService;
     #[doc = " List all AI Search instances in the account."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Array of AI Search instances"]
     #[wasm_bindgen(method, catch)]
     pub async fn list(this: &AiSearchAccountService) -> Result<Array<Object>, JsValue>;
     #[doc = " Get an AI Search instance by ID."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `name` - Instance ID"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Instance service for performing operations"]
     #[wasm_bindgen(method)]
     pub fn get(this: &AiSearchAccountService, name: &str) -> AiSearchInstanceService;
     #[doc = " Get an AI Search instance by ID."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `name` - Instance ID"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Instance service for performing operations"]
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn try_get(
@@ -14858,13 +14890,13 @@ extern "C" {
         name: &str,
     ) -> Result<AiSearchInstanceService, JsValue>;
     #[doc = " Create a new AI Search instance."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `config` - Instance configuration"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Instance service for performing operations"]
     #[wasm_bindgen(method, catch)]
     pub async fn create(
@@ -14883,14 +14915,14 @@ extern "C" {
     pub fn set_image(this: &AiImageClassificationInput, val: &Array<Number>);
 }
 impl AiImageClassificationInput {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `image`"]
     pub fn new(image: &Array<Number>) -> AiImageClassificationInput {
         Self::builder(image).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `image`"]
     pub fn builder(image: &Array<Number>) -> AiImageClassificationInputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -14977,14 +15009,14 @@ extern "C" {
     pub fn set_messages(this: &AiImageToTextInput, val: &Array<RoleScopedChatInput>);
 }
 impl AiImageToTextInput {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `image`"]
     pub fn new(image: &Array<Number>) -> AiImageToTextInput {
         Self::builder(image).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `image`"]
     pub fn builder(image: &Array<Number>) -> AiImageToTextInputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -15055,14 +15087,14 @@ extern "C" {
     pub fn set_description(this: &AiImageToTextOutput, val: &str);
 }
 impl AiImageToTextOutput {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `description`"]
     pub fn new(description: &str) -> AiImageToTextOutput {
         Self::builder(description).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `description`"]
     pub fn builder(description: &str) -> AiImageToTextOutputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -15151,14 +15183,14 @@ extern "C" {
     pub fn set_messages(this: &AiImageTextToTextInput, val: &Array<RoleScopedChatInput>);
 }
 impl AiImageTextToTextInput {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `image`"]
     pub fn new(image: &str) -> AiImageTextToTextInput {
         Self::builder(image).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `image`"]
     pub fn builder(image: &str) -> AiImageTextToTextInputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -15233,14 +15265,14 @@ extern "C" {
     pub fn set_description(this: &AiImageTextToTextOutput, val: &str);
 }
 impl AiImageTextToTextOutput {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `description`"]
     pub fn new(description: &str) -> AiImageTextToTextOutput {
         Self::builder(description).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `description`"]
     pub fn builder(description: &str) -> AiImageTextToTextOutputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -15285,15 +15317,15 @@ extern "C" {
     pub fn set_text(this: &AiMultimodalEmbeddingsInput, val: &Array<JsString>);
 }
 impl AiMultimodalEmbeddingsInput {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `image`"]
     #[doc = " * `text`"]
     pub fn new(image: &str, text: &Array<JsString>) -> AiMultimodalEmbeddingsInput {
         Self::builder(image, text).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `image`"]
     #[doc = " * `text`"]
     pub fn builder(image: &str, text: &Array<JsString>) -> AiMultimodalEmbeddingsInputBuilder {
@@ -15326,8 +15358,8 @@ extern "C" {
     pub fn set_shape(this: &AiIMultimodalEmbeddingsOutput, val: &Array<Number>);
 }
 impl AiIMultimodalEmbeddingsOutput {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `data`"]
     #[doc = " * `shape`"]
     pub fn new(
@@ -15336,8 +15368,8 @@ impl AiIMultimodalEmbeddingsOutput {
     ) -> AiIMultimodalEmbeddingsOutput {
         Self::builder(data, shape).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `data`"]
     #[doc = " * `shape`"]
     pub fn builder(
@@ -15386,14 +15418,14 @@ extern "C" {
     pub fn set_image(this: &AiObjectDetectionInput, val: &Array<Number>);
 }
 impl AiObjectDetectionInput {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `image`"]
     pub fn new(image: &Array<Number>) -> AiObjectDetectionInput {
         Self::builder(image).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `image`"]
     pub fn builder(image: &Array<Number>) -> AiObjectDetectionInputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -15440,15 +15472,15 @@ extern "C" {
     pub fn set_sentences(this: &AiSentenceSimilarityInput, val: &Array<JsString>);
 }
 impl AiSentenceSimilarityInput {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `source`"]
     #[doc = " * `sentences`"]
     pub fn new(source: &str, sentences: &Array<JsString>) -> AiSentenceSimilarityInput {
         Self::builder(source, sentences).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `source`"]
     #[doc = " * `sentences`"]
     pub fn builder(source: &str, sentences: &Array<JsString>) -> AiSentenceSimilarityInputBuilder {
@@ -15493,14 +15525,14 @@ extern "C" {
     pub fn set_audio(this: &AiAutomaticSpeechRecognitionInput, val: &Array<Number>);
 }
 impl AiAutomaticSpeechRecognitionInput {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `audio`"]
     pub fn new(audio: &Array<Number>) -> AiAutomaticSpeechRecognitionInput {
         Self::builder(audio).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `audio`"]
     pub fn builder(audio: &Array<Number>) -> AiAutomaticSpeechRecognitionInputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -15601,14 +15633,14 @@ extern "C" {
     pub fn set_max_length(this: &AiSummarizationInput, val: f64);
 }
 impl AiSummarizationInput {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `input_text`"]
     pub fn new(input_text: &str) -> AiSummarizationInput {
         Self::builder(input_text).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `input_text`"]
     pub fn builder(input_text: &str) -> AiSummarizationInputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -15639,14 +15671,14 @@ extern "C" {
     pub fn set_summary(this: &AiSummarizationOutput, val: &str);
 }
 impl AiSummarizationOutput {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `summary`"]
     pub fn new(summary: &str) -> AiSummarizationOutput {
         Self::builder(summary).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `summary`"]
     pub fn builder(summary: &str) -> AiSummarizationOutputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -15687,14 +15719,14 @@ extern "C" {
     pub fn set_text(this: &AiTextClassificationInput, val: &str);
 }
 impl AiTextClassificationInput {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn new(text: &str) -> AiTextClassificationInput {
         Self::builder(text).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder(text: &str) -> AiTextClassificationInputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -15739,28 +15771,28 @@ extern "C" {
     pub fn set_text_with_array(this: &AiTextEmbeddingsInput, val: &Array<JsString>);
 }
 impl AiTextEmbeddingsInput {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn new(text: &str) -> AiTextEmbeddingsInput {
         Self::builder(text).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn new_with_array(text: &Array<JsString>) -> AiTextEmbeddingsInput {
         Self::builder_with_array(text).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder(text: &str) -> AiTextEmbeddingsInputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         AiTextEmbeddingsInputBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder_with_array(text: &Array<JsString>) -> AiTextEmbeddingsInputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -15791,15 +15823,15 @@ extern "C" {
     pub fn set_data(this: &AiTextEmbeddingsOutput, val: &Array<Array<Number>>);
 }
 impl AiTextEmbeddingsOutput {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `shape`"]
     #[doc = " * `data`"]
     pub fn new(shape: &Array<Number>, data: &Array<Array<Number>>) -> AiTextEmbeddingsOutput {
         Self::builder(shape, data).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `shape`"]
     #[doc = " * `data`"]
     pub fn builder(
@@ -15861,49 +15893,59 @@ extern "C" {
     pub fn set_name(this: &RoleScopedChatInput, val: &str);
 }
 impl RoleScopedChatInput {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"user\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_user(content: &str) -> RoleScopedChatInput {
         Self::builder_user(content).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_assistant(content: &str) -> RoleScopedChatInput {
         Self::builder_assistant(content).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"system\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_system(content: &str) -> RoleScopedChatInput {
         Self::builder_system(content).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"tool\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_tool(content: &str) -> RoleScopedChatInput {
         Self::builder_tool(content).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `role`"]
     #[doc = " * `content`"]
     pub fn new(role: &JsValue, content: &str) -> RoleScopedChatInput {
         Self::builder(role, content).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"user\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_user(content: &str) -> RoleScopedChatInputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -15911,10 +15953,12 @@ impl RoleScopedChatInput {
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_assistant(content: &str) -> RoleScopedChatInputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -15922,10 +15966,12 @@ impl RoleScopedChatInput {
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"system\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_system(content: &str) -> RoleScopedChatInputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -15933,10 +15979,12 @@ impl RoleScopedChatInput {
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"tool\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_tool(content: &str) -> RoleScopedChatInputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -15944,8 +15992,8 @@ impl RoleScopedChatInput {
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `role`"]
     #[doc = " * `content`"]
     pub fn builder(role: &JsValue, content: &str) -> RoleScopedChatInputBuilder {
@@ -15986,15 +16034,15 @@ extern "C" {
     pub fn set_parameters(this: &AiTextGenerationToolLegacyInput, val: &Object);
 }
 impl AiTextGenerationToolLegacyInput {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `description`"]
     pub fn new(name: &str, description: &str) -> AiTextGenerationToolLegacyInput {
         Self::builder(name, description).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `description`"]
     pub fn builder(name: &str, description: &str) -> AiTextGenerationToolLegacyInputBuilder {
@@ -16033,25 +16081,29 @@ extern "C" {
     pub fn set_function(this: &AiTextGenerationToolInput, val: &Object);
 }
 impl AiTextGenerationToolInput {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `function`"]
     pub fn new_function(function: &Object) -> AiTextGenerationToolInput {
         Self::builder_function(function).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `type`"]
     #[doc = " * `function`"]
     pub fn new(r#type: &JsValue, function: &Object) -> AiTextGenerationToolInput {
         Self::builder(r#type, function).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `function`"]
     pub fn builder_function(function: &Object) -> AiTextGenerationToolInputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -16059,8 +16111,8 @@ impl AiTextGenerationToolInput {
         inner.set_function(function);
         AiTextGenerationToolInputBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `type`"]
     #[doc = " * `function`"]
     pub fn builder(r#type: &JsValue, function: &Object) -> AiTextGenerationToolInputBuilder {
@@ -16093,15 +16145,15 @@ extern "C" {
     pub fn set_code(this: &AiTextGenerationFunctionsInput, val: &str);
 }
 impl AiTextGenerationFunctionsInput {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `code`"]
     pub fn new(name: &str, code: &str) -> AiTextGenerationFunctionsInput {
         Self::builder(name, code).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `code`"]
     pub fn builder(name: &str, code: &str) -> AiTextGenerationFunctionsInputBuilder {
@@ -16134,14 +16186,14 @@ extern "C" {
     pub fn set_json_schema(this: &AiTextGenerationResponseFormat, val: &JsValue);
 }
 impl AiTextGenerationResponseFormat {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `type`"]
     pub fn new(r#type: &str) -> AiTextGenerationResponseFormat {
         Self::builder(r#type).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `type`"]
     pub fn builder(r#type: &str) -> AiTextGenerationResponseFormatBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -16336,15 +16388,15 @@ extern "C" {
     pub fn set_arguments(this: &AiTextGenerationToolLegacyOutput, val: &JsValue);
 }
 impl AiTextGenerationToolLegacyOutput {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `arguments`"]
     pub fn new(name: &str, arguments: &JsValue) -> AiTextGenerationToolLegacyOutput {
         Self::builder(name, arguments).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `arguments`"]
     pub fn builder(name: &str, arguments: &JsValue) -> AiTextGenerationToolLegacyOutputBuilder {
@@ -16381,19 +16433,23 @@ extern "C" {
     pub fn set_function(this: &AiTextGenerationToolOutput, val: &Object);
 }
 impl AiTextGenerationToolOutput {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `function`"]
     pub fn new_function(id: &str, function: &Object) -> AiTextGenerationToolOutput {
         Self::builder_function(id, function).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `function`"]
     pub fn builder_function(id: &str, function: &Object) -> AiTextGenerationToolOutputBuilder {
@@ -16431,16 +16487,16 @@ extern "C" {
     pub fn set_total_tokens(this: &UsageTags, val: f64);
 }
 impl UsageTags {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt_tokens`"]
     #[doc = " * `completion_tokens`"]
     #[doc = " * `total_tokens`"]
     pub fn new(prompt_tokens: f64, completion_tokens: f64, total_tokens: f64) -> UsageTags {
         Self::builder(prompt_tokens, completion_tokens, total_tokens).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt_tokens`"]
     #[doc = " * `completion_tokens`"]
     #[doc = " * `total_tokens`"]
@@ -16541,14 +16597,14 @@ extern "C" {
     pub fn set_lang(this: &AiTextToSpeechInput, val: &str);
 }
 impl AiTextToSpeechInput {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`"]
     pub fn new(prompt: &str) -> AiTextToSpeechInput {
         Self::builder(prompt).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`"]
     pub fn builder(prompt: &str) -> AiTextToSpeechInputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -16637,14 +16693,14 @@ extern "C" {
     pub fn set_seed(this: &AiTextToImageInput, val: f64);
 }
 impl AiTextToImageInput {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`"]
     pub fn new(prompt: &str) -> AiTextToImageInput {
         Self::builder(prompt).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`"]
     pub fn builder(prompt: &str) -> AiTextToImageInputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -16735,15 +16791,15 @@ extern "C" {
     pub fn set_source_lang(this: &AiTranslationInput, val: &str);
 }
 impl AiTranslationInput {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     #[doc = " * `target_lang`"]
     pub fn new(text: &str, target_lang: &str) -> AiTranslationInput {
         Self::builder(text, target_lang).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     #[doc = " * `target_lang`"]
     pub fn builder(text: &str, target_lang: &str) -> AiTranslationInputBuilder {
@@ -17578,80 +17634,98 @@ extern "C" {
     pub fn set_type(this: &EasyInputMessage, val: &str);
 }
 impl EasyInputMessage {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"user\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_user(content: &str) -> EasyInputMessage {
         Self::builder_user(content).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_assistant(content: &str) -> EasyInputMessage {
         Self::builder_assistant(content).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"system\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_system(content: &str) -> EasyInputMessage {
         Self::builder_system(content).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_developer(content: &str) -> EasyInputMessage {
         Self::builder_developer(content).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"user\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_user_with_response_input_message_content_list(content: &Array) -> EasyInputMessage {
         Self::builder_user_with_response_input_message_content_list(content).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_assistant_with_response_input_message_content_list(
         content: &Array,
     ) -> EasyInputMessage {
         Self::builder_assistant_with_response_input_message_content_list(content).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"system\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_system_with_response_input_message_content_list(
         content: &Array,
     ) -> EasyInputMessage {
         Self::builder_system_with_response_input_message_content_list(content).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_developer_with_response_input_message_content_list(
         content: &Array,
     ) -> EasyInputMessage {
         Self::builder_developer_with_response_input_message_content_list(content).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"user\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_user(content: &str) -> EasyInputMessageBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -17659,10 +17733,12 @@ impl EasyInputMessage {
         inner.set_role("user");
         EasyInputMessageBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_assistant(content: &str) -> EasyInputMessageBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -17670,10 +17746,12 @@ impl EasyInputMessage {
         inner.set_role_with_js_value("assistant");
         EasyInputMessageBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"system\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_system(content: &str) -> EasyInputMessageBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -17681,10 +17759,12 @@ impl EasyInputMessage {
         inner.set_role_with_js_value_1("system");
         EasyInputMessageBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_developer(content: &str) -> EasyInputMessageBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -17692,10 +17772,12 @@ impl EasyInputMessage {
         inner.set_role_with_js_value_2("developer");
         EasyInputMessageBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"user\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_user_with_response_input_message_content_list(
         content: &Array,
@@ -17705,10 +17787,12 @@ impl EasyInputMessage {
         inner.set_role("user");
         EasyInputMessageBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_assistant_with_response_input_message_content_list(
         content: &Array,
@@ -17718,10 +17802,12 @@ impl EasyInputMessage {
         inner.set_role_with_js_value("assistant");
         EasyInputMessageBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"system\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_system_with_response_input_message_content_list(
         content: &Array,
@@ -17731,10 +17817,12 @@ impl EasyInputMessage {
         inner.set_role_with_js_value_1("system");
         EasyInputMessageBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_developer_with_response_input_message_content_list(
         content: &Array,
@@ -17790,10 +17878,12 @@ extern "C" {
     pub fn set_description_with_null(this: &ResponsesFunctionTool, val: &Null);
 }
 impl ResponsesFunctionTool {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `parameters`"]
     #[doc = " * `strict`"]
@@ -17804,10 +17894,12 @@ impl ResponsesFunctionTool {
     ) -> ResponsesFunctionTool {
         Self::builder_function(name, parameters, strict).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `parameters`"]
     #[doc = " * `strict`"]
@@ -17901,14 +17993,14 @@ extern "C" {
     pub fn set_version_with_null(this: &ResponsePrompt, val: &Null);
 }
 impl ResponsePrompt {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     pub fn new(id: &str) -> ResponsePrompt {
         Self::builder(id).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     pub fn builder(id: &str) -> ResponsePromptBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -18065,18 +18157,22 @@ extern "C" {
     pub fn set_type(this: &ResponseContentReasoningText, val: &str);
 }
 impl ResponseContentReasoningText {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"reasoning_text\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn new_reasoning_text(text: &str) -> ResponseContentReasoningText {
         Self::builder_reasoning_text(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"reasoning_text\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder_reasoning_text(text: &str) -> ResponseContentReasoningTextBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -18104,14 +18200,14 @@ extern "C" {
     pub fn set_id(this: &ResponseConversationParam, val: &str);
 }
 impl ResponseConversationParam {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     pub fn new(id: &str) -> ResponseConversationParam {
         Self::builder(id).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     pub fn builder(id: &str) -> ResponseConversationParamBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -18146,19 +18242,23 @@ extern "C" {
     pub fn set_type(this: &ResponseCreatedEvent, val: &str);
 }
 impl ResponseCreatedEvent {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.created\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `response`"]
     #[doc = " * `sequence_number`"]
     pub fn new_responsecreated(response: &Response, sequence_number: f64) -> ResponseCreatedEvent {
         Self::builder_responsecreated(response, sequence_number).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.created\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `response`"]
     #[doc = " * `sequence_number`"]
     pub fn builder_responsecreated(
@@ -18213,10 +18313,12 @@ extern "C" {
     pub fn set_id(this: &ResponseCustomToolCallOutput, val: &str);
 }
 impl ResponseCustomToolCallOutput {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `call_id`"]
     #[doc = " * `output`"]
     pub fn new_custom_tool_call_output(
@@ -18225,10 +18327,12 @@ impl ResponseCustomToolCallOutput {
     ) -> ResponseCustomToolCallOutput {
         Self::builder_custom_tool_call_output(call_id, output).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `call_id`"]
     #[doc = " * `output`"]
     pub fn new_custom_tool_call_output_with_array(
@@ -18237,10 +18341,12 @@ impl ResponseCustomToolCallOutput {
     ) -> ResponseCustomToolCallOutput {
         Self::builder_custom_tool_call_output_with_array(call_id, output).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `call_id`"]
     #[doc = " * `output`"]
     pub fn builder_custom_tool_call_output(
@@ -18253,10 +18359,12 @@ impl ResponseCustomToolCallOutput {
         inner.set_type("custom_tool_call_output");
         ResponseCustomToolCallOutputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `call_id`"]
     #[doc = " * `output`"]
     pub fn builder_custom_tool_call_output_with_array(
@@ -18331,154 +18439,192 @@ extern "C" {
     pub fn set_message(this: &ResponseError, val: &str);
 }
 impl ResponseError {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"server_error\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_server_error(message: &str) -> ResponseError {
         Self::builder_server_error(message).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"rate_limit_exceeded\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_rate_limit_exceeded(message: &str) -> ResponseError {
         Self::builder_rate_limit_exceeded(message).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"invalid_prompt\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_invalid_prompt(message: &str) -> ResponseError {
         Self::builder_invalid_prompt(message).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"vector_store_timeout\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_vector_store_timeout(message: &str) -> ResponseError {
         Self::builder_vector_store_timeout(message).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"invalid_image\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_invalid_image(message: &str) -> ResponseError {
         Self::builder_invalid_image(message).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"invalid_image_format\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_invalid_image_format(message: &str) -> ResponseError {
         Self::builder_invalid_image_format(message).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"invalid_base64_image\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_invalid_base_64_image(message: &str) -> ResponseError {
         Self::builder_invalid_base_64_image(message).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"invalid_image_url\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_invalid_image_url(message: &str) -> ResponseError {
         Self::builder_invalid_image_url(message).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"image_too_large\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_image_too_large(message: &str) -> ResponseError {
         Self::builder_image_too_large(message).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"image_too_small\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_image_too_small(message: &str) -> ResponseError {
         Self::builder_image_too_small(message).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"image_parse_error\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_image_parse_error(message: &str) -> ResponseError {
         Self::builder_image_parse_error(message).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"image_content_policy_violation\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_image_content_policy_violation(message: &str) -> ResponseError {
         Self::builder_image_content_policy_violation(message).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"invalid_image_mode\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_invalid_image_mode(message: &str) -> ResponseError {
         Self::builder_invalid_image_mode(message).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"image_file_too_large\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_image_file_too_large(message: &str) -> ResponseError {
         Self::builder_image_file_too_large(message).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"unsupported_image_media_type\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_unsupported_image_media_type(message: &str) -> ResponseError {
         Self::builder_unsupported_image_media_type(message).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"empty_image_file\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_empty_image_file(message: &str) -> ResponseError {
         Self::builder_empty_image_file(message).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"failed_to_download_image\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_failed_to_download_image(message: &str) -> ResponseError {
         Self::builder_failed_to_download_image(message).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"image_file_not_found\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_image_file_not_found(message: &str) -> ResponseError {
         Self::builder_image_file_not_found(message).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"server_error\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_server_error(message: &str) -> ResponseErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -18486,10 +18632,12 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"rate_limit_exceeded\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_rate_limit_exceeded(message: &str) -> ResponseErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -18497,10 +18645,12 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"invalid_prompt\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_invalid_prompt(message: &str) -> ResponseErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -18508,10 +18658,12 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"vector_store_timeout\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_vector_store_timeout(message: &str) -> ResponseErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -18519,10 +18671,12 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"invalid_image\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_invalid_image(message: &str) -> ResponseErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -18530,10 +18684,12 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"invalid_image_format\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_invalid_image_format(message: &str) -> ResponseErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -18541,10 +18697,12 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"invalid_base64_image\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_invalid_base_64_image(message: &str) -> ResponseErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -18552,10 +18710,12 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"invalid_image_url\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_invalid_image_url(message: &str) -> ResponseErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -18563,10 +18723,12 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"image_too_large\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_image_too_large(message: &str) -> ResponseErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -18574,10 +18736,12 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"image_too_small\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_image_too_small(message: &str) -> ResponseErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -18585,10 +18749,12 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"image_parse_error\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_image_parse_error(message: &str) -> ResponseErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -18596,10 +18762,12 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"image_content_policy_violation\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_image_content_policy_violation(message: &str) -> ResponseErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -18607,10 +18775,12 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"invalid_image_mode\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_invalid_image_mode(message: &str) -> ResponseErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -18618,10 +18788,12 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"image_file_too_large\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_image_file_too_large(message: &str) -> ResponseErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -18629,10 +18801,12 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"unsupported_image_media_type\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_unsupported_image_media_type(message: &str) -> ResponseErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -18640,10 +18814,12 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"empty_image_file\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_empty_image_file(message: &str) -> ResponseErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -18651,10 +18827,12 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"failed_to_download_image\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_failed_to_download_image(message: &str) -> ResponseErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -18662,10 +18840,12 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `code: \"image_file_not_found\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_image_file_not_found(message: &str) -> ResponseErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -18713,10 +18893,12 @@ extern "C" {
     pub fn set_type(this: &ResponseErrorEvent, val: &str);
 }
 impl ResponseErrorEvent {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"error\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `code`"]
     #[doc = " * `message`"]
     #[doc = " * `param`"]
@@ -18729,10 +18911,12 @@ impl ResponseErrorEvent {
     ) -> ResponseErrorEvent {
         Self::builder_error(code, message, param, sequence_number).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"error\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `code`"]
     #[doc = " * `message`"]
     #[doc = " * `param`"]
@@ -18779,19 +18963,23 @@ extern "C" {
     pub fn set_type(this: &ResponseFailedEvent, val: &str);
 }
 impl ResponseFailedEvent {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.failed\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `response`"]
     #[doc = " * `sequence_number`"]
     pub fn new_responsefailed(response: &Response, sequence_number: f64) -> ResponseFailedEvent {
         Self::builder_responsefailed(response, sequence_number).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.failed\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `response`"]
     #[doc = " * `sequence_number`"]
     pub fn builder_responsefailed(
@@ -18824,10 +19012,14 @@ extern "C" {
     pub fn set_type(this: &ResponseFormatText, val: &str);
 }
 impl ResponseFormatText {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"text\"`"]
     pub fn new_text() -> ResponseFormatText {
         Self::builder_text().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"text\"`"]
     pub fn builder_text() -> ResponseFormatTextBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -18854,10 +19046,14 @@ extern "C" {
     pub fn set_type(this: &ResponseFormatJSONObject, val: &str);
 }
 impl ResponseFormatJSONObject {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"json_object\"`"]
     pub fn new_json_object() -> ResponseFormatJSONObject {
         Self::builder_json_object().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"json_object\"`"]
     pub fn builder_json_object() -> ResponseFormatJSONObjectBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -18904,19 +19100,23 @@ extern "C" {
     pub fn set_strict_with_null(this: &ResponseFormatTextJSONSchemaConfig, val: &Null);
 }
 impl ResponseFormatTextJSONSchemaConfig {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"json_schema\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `schema`"]
     pub fn new_json_schema(name: &str, schema: &Object) -> ResponseFormatTextJSONSchemaConfig {
         Self::builder_json_schema(name, schema).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"json_schema\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `schema`"]
     pub fn builder_json_schema(
@@ -18977,10 +19177,12 @@ extern "C" {
     pub fn set_type(this: &ResponseFunctionCallArgumentsDeltaEvent, val: &str);
 }
 impl ResponseFunctionCallArgumentsDeltaEvent {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.function_call_arguments.delta\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `delta`"]
     #[doc = " * `item_id`"]
     #[doc = " * `output_index`"]
@@ -18999,10 +19201,12 @@ impl ResponseFunctionCallArgumentsDeltaEvent {
         )
         .build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.function_call_arguments.delta\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `delta`"]
     #[doc = " * `item_id`"]
     #[doc = " * `output_index`"]
@@ -19061,10 +19265,12 @@ extern "C" {
     pub fn set_type(this: &ResponseFunctionCallArgumentsDoneEvent, val: &str);
 }
 impl ResponseFunctionCallArgumentsDoneEvent {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.function_call_arguments.done\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `arguments`"]
     #[doc = " * `item_id`"]
     #[doc = " * `name`"]
@@ -19086,10 +19292,12 @@ impl ResponseFunctionCallArgumentsDoneEvent {
         )
         .build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.function_call_arguments.done\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `arguments`"]
     #[doc = " * `item_id`"]
     #[doc = " * `name`"]
@@ -19159,10 +19367,12 @@ extern "C" {
     pub fn set_status_with_js_value_1(this: &ResponseFunctionToolCall, val: &str);
 }
 impl ResponseFunctionToolCall {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"function_call\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `arguments`"]
     #[doc = " * `call_id`"]
     #[doc = " * `name`"]
@@ -19173,10 +19383,12 @@ impl ResponseFunctionToolCall {
     ) -> ResponseFunctionToolCall {
         Self::builder_function_call(arguments, call_id, name).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"function_call\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `arguments`"]
     #[doc = " * `call_id`"]
     #[doc = " * `name`"]
@@ -19228,14 +19440,14 @@ extern "C" {
     pub fn set_id(this: &ResponseFunctionToolCallItem, val: &str);
 }
 impl ResponseFunctionToolCallItem {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     pub fn new(id: &str) -> ResponseFunctionToolCallItem {
         Self::builder(id).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     pub fn builder(id: &str) -> ResponseFunctionToolCallItemBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -19292,10 +19504,12 @@ extern "C" {
     pub fn set_status_with_js_value_1(this: &ResponseFunctionToolCallOutputItem, val: &str);
 }
 impl ResponseFunctionToolCallOutputItem {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `call_id`"]
     #[doc = " * `output`"]
@@ -19306,10 +19520,12 @@ impl ResponseFunctionToolCallOutputItem {
     ) -> ResponseFunctionToolCallOutputItem {
         Self::builder_function_call_output(id, call_id, output).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `call_id`"]
     #[doc = " * `output`"]
@@ -19320,10 +19536,12 @@ impl ResponseFunctionToolCallOutputItem {
     ) -> ResponseFunctionToolCallOutputItem {
         Self::builder_function_call_output_with_array(id, call_id, output).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `call_id`"]
     #[doc = " * `output`"]
@@ -19339,10 +19557,12 @@ impl ResponseFunctionToolCallOutputItem {
         inner.set_type("function_call_output");
         ResponseFunctionToolCallOutputItemBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `call_id`"]
     #[doc = " * `output`"]
@@ -19406,10 +19626,12 @@ extern "C" {
     pub fn set_type(this: &ResponseIncompleteEvent, val: &str);
 }
 impl ResponseIncompleteEvent {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.incomplete\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `response`"]
     #[doc = " * `sequence_number`"]
     pub fn new_responseincomplete(
@@ -19418,10 +19640,12 @@ impl ResponseIncompleteEvent {
     ) -> ResponseIncompleteEvent {
         Self::builder_responseincomplete(response, sequence_number).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.incomplete\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `response`"]
     #[doc = " * `sequence_number`"]
     pub fn builder_responseincomplete(
@@ -19473,21 +19697,29 @@ extern "C" {
     pub fn set_image_url_with_null(this: &ResponseInputImage, val: &Null);
 }
 impl ResponseInputImage {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `detail: \"low\"`"]
     #[doc = " * `type: \"input_image\"`"]
     pub fn new_low_input_image() -> ResponseInputImage {
         Self::builder_low_input_image().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `detail: \"high\"`"]
     #[doc = " * `type: \"input_image\"`"]
     pub fn new_high_input_image() -> ResponseInputImage {
         Self::builder_high_input_image().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `detail: \"auto\"`"]
     #[doc = " * `type: \"input_image\"`"]
     pub fn new_auto_input_image() -> ResponseInputImage {
         Self::builder_auto_input_image().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `detail: \"low\"`"]
     #[doc = " * `type: \"input_image\"`"]
     pub fn builder_low_input_image() -> ResponseInputImageBuilder {
@@ -19496,6 +19728,8 @@ impl ResponseInputImage {
         inner.set_type("input_image");
         ResponseInputImageBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `detail: \"high\"`"]
     #[doc = " * `type: \"input_image\"`"]
     pub fn builder_high_input_image() -> ResponseInputImageBuilder {
@@ -19504,6 +19738,8 @@ impl ResponseInputImage {
         inner.set_type("input_image");
         ResponseInputImageBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `detail: \"auto\"`"]
     #[doc = " * `type: \"input_image\"`"]
     pub fn builder_auto_input_image() -> ResponseInputImageBuilder {
@@ -19557,10 +19793,14 @@ extern "C" {
     pub fn set_image_url_with_null(this: &ResponseInputImageContent, val: &Null);
 }
 impl ResponseInputImageContent {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"input_image\"`"]
     pub fn new_input_image() -> ResponseInputImageContent {
         Self::builder_input_image().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"input_image\"`"]
     pub fn builder_input_image() -> ResponseInputImageContentBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -19647,10 +19887,12 @@ extern "C" {
     pub fn set_status_with_null(this: &ResponseInputItemFunctionCallOutput, val: &Null);
 }
 impl ResponseInputItemFunctionCallOutput {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `call_id`"]
     #[doc = " * `output`"]
     pub fn new_function_call_output(
@@ -19659,10 +19901,12 @@ impl ResponseInputItemFunctionCallOutput {
     ) -> ResponseInputItemFunctionCallOutput {
         Self::builder_function_call_output(call_id, output).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `call_id`"]
     #[doc = " * `output`"]
     pub fn new_function_call_output_with_response_function_call_output_item_list(
@@ -19674,10 +19918,12 @@ impl ResponseInputItemFunctionCallOutput {
         )
         .build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `call_id`"]
     #[doc = " * `output`"]
     pub fn builder_function_call_output(
@@ -19690,10 +19936,12 @@ impl ResponseInputItemFunctionCallOutput {
         inner.set_type("function_call_output");
         ResponseInputItemFunctionCallOutputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `call_id`"]
     #[doc = " * `output`"]
     pub fn builder_function_call_output_with_response_function_call_output_item_list(
@@ -19772,34 +20020,42 @@ extern "C" {
     pub fn set_type(this: &ResponseInputItemMessage, val: &str);
 }
 impl ResponseInputItemMessage {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"user\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_user(content: &Array) -> ResponseInputItemMessage {
         Self::builder_user(content).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"system\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_system(content: &Array) -> ResponseInputItemMessage {
         Self::builder_system(content).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_developer(content: &Array) -> ResponseInputItemMessage {
         Self::builder_developer(content).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"user\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_user(content: &Array) -> ResponseInputItemMessageBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -19807,10 +20063,12 @@ impl ResponseInputItemMessage {
         inner.set_role("user");
         ResponseInputItemMessageBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"system\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_system(content: &Array) -> ResponseInputItemMessageBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -19818,10 +20076,12 @@ impl ResponseInputItemMessage {
         inner.set_role_with_js_value("system");
         ResponseInputItemMessageBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_developer(content: &Array) -> ResponseInputItemMessageBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -19893,37 +20153,45 @@ extern "C" {
     pub fn set_type(this: &ResponseInputMessageItem, val: &str);
 }
 impl ResponseInputMessageItem {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"user\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
     pub fn new_user(id: &str, content: &Array) -> ResponseInputMessageItem {
         Self::builder_user(id, content).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"system\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
     pub fn new_system(id: &str, content: &Array) -> ResponseInputMessageItem {
         Self::builder_system(id, content).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
     pub fn new_developer(id: &str, content: &Array) -> ResponseInputMessageItem {
         Self::builder_developer(id, content).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"user\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
     pub fn builder_user(id: &str, content: &Array) -> ResponseInputMessageItemBuilder {
@@ -19933,10 +20201,12 @@ impl ResponseInputMessageItem {
         inner.set_role("user");
         ResponseInputMessageItemBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"system\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
     pub fn builder_system(id: &str, content: &Array) -> ResponseInputMessageItemBuilder {
@@ -19946,10 +20216,12 @@ impl ResponseInputMessageItem {
         inner.set_role_with_js_value("system");
         ResponseInputMessageItemBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
     pub fn builder_developer(id: &str, content: &Array) -> ResponseInputMessageItemBuilder {
@@ -19999,18 +20271,22 @@ extern "C" {
     pub fn set_type(this: &ResponseInputText, val: &str);
 }
 impl ResponseInputText {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"input_text\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn new_input_text(text: &str) -> ResponseInputText {
         Self::builder_input_text(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"input_text\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder_input_text(text: &str) -> ResponseInputTextBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -20042,18 +20318,22 @@ extern "C" {
     pub fn set_type(this: &ResponseInputTextContent, val: &str);
 }
 impl ResponseInputTextContent {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"input_text\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn new_input_text(text: &str) -> ResponseInputTextContent {
         Self::builder_input_text(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"input_text\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder_input_text(text: &str) -> ResponseInputTextContentBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -20107,10 +20387,12 @@ extern "C" {
     pub fn set_type(this: &ResponseOutputItemAddedEvent, val: &str);
 }
 impl ResponseOutputItemAddedEvent {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.output_item.added\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `item`"]
     #[doc = " * `output_index`"]
     #[doc = " * `sequence_number`"]
@@ -20121,10 +20403,12 @@ impl ResponseOutputItemAddedEvent {
     ) -> ResponseOutputItemAddedEvent {
         Self::builder_responseoutput_itemadded(item, output_index, sequence_number).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.output_item.added\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `item`"]
     #[doc = " * `output_index`"]
     #[doc = " * `sequence_number`"]
@@ -20182,10 +20466,12 @@ extern "C" {
     pub fn set_type(this: &ResponseOutputItemDoneEvent, val: &str);
 }
 impl ResponseOutputItemDoneEvent {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.output_item.done\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `item`"]
     #[doc = " * `output_index`"]
     #[doc = " * `sequence_number`"]
@@ -20196,10 +20482,12 @@ impl ResponseOutputItemDoneEvent {
     ) -> ResponseOutputItemDoneEvent {
         Self::builder_responseoutput_itemdone(item, output_index, sequence_number).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.output_item.done\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `item`"]
     #[doc = " * `output_index`"]
     #[doc = " * `sequence_number`"]
@@ -20257,45 +20545,53 @@ extern "C" {
     pub fn set_type(this: &ResponseOutputMessage, val: &str);
 }
 impl ResponseOutputMessage {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"in_progress\"`"]
     #[doc = " * `type: \"message\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
     pub fn new_assistant_in_progress_message(id: &str, content: &Array) -> ResponseOutputMessage {
         Self::builder_assistant_in_progress_message(id, content).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"completed\"`"]
     #[doc = " * `type: \"message\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
     pub fn new_assistant_completed_message(id: &str, content: &Array) -> ResponseOutputMessage {
         Self::builder_assistant_completed_message(id, content).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"incomplete\"`"]
     #[doc = " * `type: \"message\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
     pub fn new_assistant_incomplete_message(id: &str, content: &Array) -> ResponseOutputMessage {
         Self::builder_assistant_incomplete_message(id, content).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"in_progress\"`"]
     #[doc = " * `type: \"message\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
     pub fn builder_assistant_in_progress_message(
@@ -20310,12 +20606,14 @@ impl ResponseOutputMessage {
         inner.set_type("message");
         ResponseOutputMessageBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"completed\"`"]
     #[doc = " * `type: \"message\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
     pub fn builder_assistant_completed_message(
@@ -20330,12 +20628,14 @@ impl ResponseOutputMessage {
         inner.set_type("message");
         ResponseOutputMessageBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"incomplete\"`"]
     #[doc = " * `type: \"message\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
     pub fn builder_assistant_incomplete_message(
@@ -20374,18 +20674,22 @@ extern "C" {
     pub fn set_type(this: &ResponseOutputRefusal, val: &str);
 }
 impl ResponseOutputRefusal {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"refusal\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `refusal`"]
     pub fn new_refusal(refusal: &str) -> ResponseOutputRefusal {
         Self::builder_refusal(refusal).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"refusal\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `refusal`"]
     pub fn builder_refusal(refusal: &str) -> ResponseOutputRefusalBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -20421,18 +20725,22 @@ extern "C" {
     pub fn set_logprobs(this: &ResponseOutputText, val: &Array<Logprob>);
 }
 impl ResponseOutputText {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"output_text\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn new_output_text(text: &str) -> ResponseOutputText {
         Self::builder_output_text(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"output_text\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder_output_text(text: &str) -> ResponseOutputTextBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -20490,10 +20798,12 @@ extern "C" {
     pub fn set_status_with_js_value_1(this: &ResponseReasoningItem, val: &str);
 }
 impl ResponseReasoningItem {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"reasoning\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `summary`"]
     pub fn new_reasoning(
@@ -20502,10 +20812,12 @@ impl ResponseReasoningItem {
     ) -> ResponseReasoningItem {
         Self::builder_reasoning(id, summary).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"reasoning\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `summary`"]
     pub fn builder_reasoning(
@@ -20566,18 +20878,22 @@ extern "C" {
     pub fn set_type(this: &ResponseReasoningSummaryItem, val: &str);
 }
 impl ResponseReasoningSummaryItem {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"summary_text\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn new_summary_text(text: &str) -> ResponseReasoningSummaryItem {
         Self::builder_summary_text(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"summary_text\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder_summary_text(text: &str) -> ResponseReasoningSummaryItemBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -20609,18 +20925,22 @@ extern "C" {
     pub fn set_type(this: &ResponseReasoningContentItem, val: &str);
 }
 impl ResponseReasoningContentItem {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"reasoning_text\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn new_reasoning_text(text: &str) -> ResponseReasoningContentItem {
         Self::builder_reasoning_text(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"reasoning_text\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder_reasoning_text(text: &str) -> ResponseReasoningContentItemBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -20668,10 +20988,12 @@ extern "C" {
     pub fn set_type(this: &ResponseReasoningTextDeltaEvent, val: &str);
 }
 impl ResponseReasoningTextDeltaEvent {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.reasoning_text.delta\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `delta`"]
     #[doc = " * `item_id`"]
@@ -20693,10 +21015,12 @@ impl ResponseReasoningTextDeltaEvent {
         )
         .build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.reasoning_text.delta\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `delta`"]
     #[doc = " * `item_id`"]
@@ -20758,10 +21082,12 @@ extern "C" {
     pub fn set_type(this: &ResponseReasoningTextDoneEvent, val: &str);
 }
 impl ResponseReasoningTextDoneEvent {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.reasoning_text.done\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `item_id`"]
     #[doc = " * `output_index`"]
@@ -20783,10 +21109,12 @@ impl ResponseReasoningTextDoneEvent {
         )
         .build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.reasoning_text.done\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `item_id`"]
     #[doc = " * `output_index`"]
@@ -20848,10 +21176,12 @@ extern "C" {
     pub fn set_type(this: &ResponseRefusalDeltaEvent, val: &str);
 }
 impl ResponseRefusalDeltaEvent {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.refusal.delta\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `delta`"]
     #[doc = " * `item_id`"]
@@ -20873,10 +21203,12 @@ impl ResponseRefusalDeltaEvent {
         )
         .build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.refusal.delta\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `delta`"]
     #[doc = " * `item_id`"]
@@ -20938,10 +21270,12 @@ extern "C" {
     pub fn set_type(this: &ResponseRefusalDoneEvent, val: &str);
 }
 impl ResponseRefusalDoneEvent {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.refusal.done\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `item_id`"]
     #[doc = " * `output_index`"]
@@ -20963,10 +21297,12 @@ impl ResponseRefusalDoneEvent {
         )
         .build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.refusal.done\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `item_id`"]
     #[doc = " * `output_index`"]
@@ -21034,10 +21370,12 @@ extern "C" {
     pub fn set_type(this: &ResponseCompletedEvent, val: &str);
 }
 impl ResponseCompletedEvent {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.completed\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `response`"]
     #[doc = " * `sequence_number`"]
     pub fn new_responsecompleted(
@@ -21046,10 +21384,12 @@ impl ResponseCompletedEvent {
     ) -> ResponseCompletedEvent {
         Self::builder_responsecompleted(response, sequence_number).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.completed\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `response`"]
     #[doc = " * `sequence_number`"]
     pub fn builder_responsecompleted(
@@ -21186,10 +21526,12 @@ extern "C" {
     pub fn set_type(this: &ResponseTextDeltaEvent, val: &str);
 }
 impl ResponseTextDeltaEvent {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.output_text.delta\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `delta`"]
     #[doc = " * `item_id`"]
@@ -21214,10 +21556,12 @@ impl ResponseTextDeltaEvent {
         )
         .build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.output_text.delta\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `delta`"]
     #[doc = " * `item_id`"]
@@ -21286,10 +21630,12 @@ extern "C" {
     pub fn set_type(this: &ResponseTextDoneEvent, val: &str);
 }
 impl ResponseTextDoneEvent {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.output_text.done\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `item_id`"]
     #[doc = " * `logprobs`"]
@@ -21314,10 +21660,12 @@ impl ResponseTextDoneEvent {
         )
         .build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"response.output_text.done\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `item_id`"]
     #[doc = " * `logprobs`"]
@@ -21370,15 +21718,15 @@ extern "C" {
     pub fn set_top_logprobs(this: &Logprob, val: &Array<TopLogprob>);
 }
 impl Logprob {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `token`"]
     #[doc = " * `logprob`"]
     pub fn new(token: &str, logprob: f64) -> Logprob {
         Self::builder(token, logprob).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `token`"]
     #[doc = " * `logprob`"]
     pub fn builder(token: &str, logprob: f64) -> LogprobBuilder {
@@ -21459,16 +21807,16 @@ extern "C" {
     pub fn set_total_tokens(this: &ResponseUsage, val: f64);
 }
 impl ResponseUsage {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `input_tokens`"]
     #[doc = " * `output_tokens`"]
     #[doc = " * `total_tokens`"]
     pub fn new(input_tokens: f64, output_tokens: f64, total_tokens: f64) -> ResponseUsage {
         Self::builder(input_tokens, output_tokens, total_tokens).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `input_tokens`"]
     #[doc = " * `output_tokens`"]
     #[doc = " * `total_tokens`"]
@@ -21509,18 +21857,22 @@ extern "C" {
     pub fn set_type(this: &ToolChoiceFunction, val: &str);
 }
 impl ToolChoiceFunction {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn new_function(name: &str) -> ToolChoiceFunction {
         Self::builder_function(name).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     pub fn builder_function(name: &str) -> ToolChoiceFunctionBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -21722,14 +22074,14 @@ extern "C" {
     pub fn set_vtt(this: &Ai_Cf_Openai_Whisper_Output, val: &str);
 }
 impl Ai_Cf_Openai_Whisper_Output {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: The transcription"]
     pub fn new(text: &str) -> Ai_Cf_Openai_Whisper_Output {
         Self::builder(text).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: The transcription"]
     pub fn builder(text: &str) -> Ai_Cf_Openai_Whisper_OutputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -22209,14 +22561,14 @@ extern "C" {
     pub fn set_vtt(this: &Ai_Cf_Openai_Whisper_Tiny_En_Output, val: &str);
 }
 impl Ai_Cf_Openai_Whisper_Tiny_En_Output {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: The transcription"]
     pub fn new(text: &str) -> Ai_Cf_Openai_Whisper_Tiny_En_Output {
         Self::builder(text).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: The transcription"]
     pub fn builder(text: &str) -> Ai_Cf_Openai_Whisper_Tiny_En_OutputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -22302,14 +22654,14 @@ extern "C" {
     pub fn set_prefix(this: &Ai_Cf_Openai_Whisper_Large_V3_Turbo_Input, val: &str);
 }
 impl Ai_Cf_Openai_Whisper_Large_V3_Turbo_Input {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `audio`: Base64 encoded value of the audio data."]
     pub fn new(audio: &str) -> Ai_Cf_Openai_Whisper_Large_V3_Turbo_Input {
         Self::builder(audio).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `audio`: Base64 encoded value of the audio data."]
     pub fn builder(audio: &str) -> Ai_Cf_Openai_Whisper_Large_V3_Turbo_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -22375,14 +22727,14 @@ extern "C" {
     pub fn set_vtt(this: &Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output, val: &str);
 }
 impl Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: The complete transcription of the audio."]
     pub fn new(text: &str) -> Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output {
         Self::builder(text).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: The complete transcription of the audio."]
     pub fn builder(text: &str) -> Ai_Cf_Openai_Whisper_Large_V3_Turbo_OutputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -22462,14 +22814,14 @@ extern "C" {
     pub fn set_truncate_inputs(this: &Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts, val: bool);
 }
 impl Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `contexts`: List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
     pub fn new(contexts: &Array<Object>) -> Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts {
         Self::builder(contexts).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `contexts`: List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
     pub fn builder(contexts: &Array<Object>) -> Ai_Cf_Baai_Bge_M3_Input_QueryAnd_ContextsBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -22511,28 +22863,28 @@ extern "C" {
     pub fn set_truncate_inputs(this: &Ai_Cf_Baai_Bge_M3_Input_Embedding, val: bool);
 }
 impl Ai_Cf_Baai_Bge_M3_Input_Embedding {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn new(text: &str) -> Ai_Cf_Baai_Bge_M3_Input_Embedding {
         Self::builder(text).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn new_with_array(text: &Array<JsString>) -> Ai_Cf_Baai_Bge_M3_Input_Embedding {
         Self::builder_with_array(text).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder(text: &str) -> Ai_Cf_Baai_Bge_M3_Input_EmbeddingBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         Ai_Cf_Baai_Bge_M3_Input_EmbeddingBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder_with_array(text: &Array<JsString>) -> Ai_Cf_Baai_Bge_M3_Input_EmbeddingBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -22574,14 +22926,14 @@ extern "C" {
     pub fn set_truncate_inputs(this: &Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1, val: bool);
 }
 impl Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1 {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `contexts`: List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
     pub fn new(contexts: &Array<Object>) -> Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1 {
         Self::builder(contexts).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `contexts`: List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
     pub fn builder(contexts: &Array<Object>) -> Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1Builder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -22623,28 +22975,28 @@ extern "C" {
     pub fn set_truncate_inputs(this: &Ai_Cf_Baai_Bge_M3_Input_Embedding_1, val: bool);
 }
 impl Ai_Cf_Baai_Bge_M3_Input_Embedding_1 {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn new(text: &str) -> Ai_Cf_Baai_Bge_M3_Input_Embedding_1 {
         Self::builder(text).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn new_with_array(text: &Array<JsString>) -> Ai_Cf_Baai_Bge_M3_Input_Embedding_1 {
         Self::builder_with_array(text).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder(text: &str) -> Ai_Cf_Baai_Bge_M3_Input_Embedding_1Builder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         Ai_Cf_Baai_Bge_M3_Input_Embedding_1Builder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder_with_array(
         text: &Array<JsString>,
@@ -22911,14 +23263,14 @@ extern "C" {
     pub fn set_steps(this: &Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input, val: f64);
 }
 impl Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: A text description of the image you want to generate."]
     pub fn new(prompt: &str) -> Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input {
         Self::builder(prompt).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: A text description of the image you want to generate."]
     pub fn builder(prompt: &str) -> Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -23076,14 +23428,14 @@ extern "C" {
     pub fn set_lora(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt, val: &str);
 }
 impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt {
         Self::builder(prompt).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_PromptBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -23246,14 +23598,14 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages, val: f64);
 }
 impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn new(messages: &Array<Object>) -> Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages {
         Self::builder(messages).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn builder(
         messages: &Array<Object>,
@@ -23487,14 +23839,14 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt, val: f64);
 }
 impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt {
         Self::builder(prompt).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_PromptBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -23721,14 +24073,14 @@ extern "C" {
     );
 }
 impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn new(messages: &Array<Object>) -> Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages {
         Self::builder(messages).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn builder(
         messages: &Array<Object>,
@@ -24057,14 +24409,14 @@ extern "C" {
     pub fn set_response_format(this: &Ai_Cf_Meta_Llama_Guard_3_8B_Input, val: &Object);
 }
 impl Ai_Cf_Meta_Llama_Guard_3_8B_Input {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn new(messages: &Array<Object>) -> Ai_Cf_Meta_Llama_Guard_3_8B_Input {
         Self::builder(messages).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn builder(messages: &Array<Object>) -> Ai_Cf_Meta_Llama_Guard_3_8B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -24178,14 +24530,14 @@ extern "C" {
     pub fn set_contexts(this: &Ai_Cf_Baai_Bge_Reranker_Base_Input, val: &Array<Object>);
 }
 impl Ai_Cf_Baai_Bge_Reranker_Base_Input {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `contexts`: List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
     pub fn new(contexts: &Array<Object>) -> Ai_Cf_Baai_Bge_Reranker_Base_Input {
         Self::builder(contexts).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `contexts`: List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
     pub fn builder(contexts: &Array<Object>) -> Ai_Cf_Baai_Bge_Reranker_Base_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -24337,14 +24689,14 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Prompt, val: f64);
 }
 impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Prompt {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Prompt {
         Self::builder(prompt).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_PromptBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -24543,14 +24895,14 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages, val: f64);
 }
 impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn new(messages: &Array<Object>) -> Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages {
         Self::builder(messages).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn builder(
         messages: &Array<Object>,
@@ -24693,14 +25045,14 @@ extern "C" {
     pub fn set_tool_calls(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output, val: &Array<Object>);
 }
 impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `response`: The generated text response from the model"]
     pub fn new(response: &str) -> Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output {
         Self::builder(response).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `response`: The generated text response from the model"]
     pub fn builder(response: &str) -> Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_OutputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -24820,14 +25172,14 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Qwen_Qwq_32B_Prompt, val: f64);
 }
 impl Ai_Cf_Qwen_Qwq_32B_Prompt {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Qwen_Qwq_32B_Prompt {
         Self::builder(prompt).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Qwen_Qwq_32B_PromptBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -24963,14 +25315,14 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Qwen_Qwq_32B_Messages, val: f64);
 }
 impl Ai_Cf_Qwen_Qwq_32B_Messages {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn new(messages: &Array<Object>) -> Ai_Cf_Qwen_Qwq_32B_Messages {
         Self::builder(messages).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn builder(messages: &Array<Object>) -> Ai_Cf_Qwen_Qwq_32B_MessagesBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -25060,14 +25412,14 @@ extern "C" {
     pub fn set_tool_calls(this: &Ai_Cf_Qwen_Qwq_32B_Output, val: &Array<Object>);
 }
 impl Ai_Cf_Qwen_Qwq_32B_Output {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `response`: The generated text response from the model"]
     pub fn new(response: &str) -> Ai_Cf_Qwen_Qwq_32B_Output {
         Self::builder(response).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `response`: The generated text response from the model"]
     pub fn builder(response: &str) -> Ai_Cf_Qwen_Qwq_32B_OutputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -25203,14 +25555,14 @@ extern "C" {
     );
 }
 impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Prompt {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Prompt {
         Self::builder(prompt).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_PromptBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -25386,16 +25738,16 @@ extern "C" {
     );
 }
 impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn new(
         messages: &Array<Object>,
     ) -> Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages {
         Self::builder(messages).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn builder(
         messages: &Array<Object>,
@@ -25492,14 +25844,14 @@ extern "C" {
     );
 }
 impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `response`: The generated text response from the model"]
     pub fn new(response: &str) -> Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output {
         Self::builder(response).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `response`: The generated text response from the model"]
     pub fn builder(response: &str) -> Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_OutputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -25619,14 +25971,14 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Google_Gemma_3_12B_It_Prompt, val: f64);
 }
 impl Ai_Cf_Google_Gemma_3_12B_It_Prompt {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Google_Gemma_3_12B_It_Prompt {
         Self::builder(prompt).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Google_Gemma_3_12B_It_PromptBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -25762,14 +26114,14 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Google_Gemma_3_12B_It_Messages, val: f64);
 }
 impl Ai_Cf_Google_Gemma_3_12B_It_Messages {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn new(messages: &Array<Object>) -> Ai_Cf_Google_Gemma_3_12B_It_Messages {
         Self::builder(messages).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn builder(messages: &Array<Object>) -> Ai_Cf_Google_Gemma_3_12B_It_MessagesBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -25859,14 +26211,14 @@ extern "C" {
     pub fn set_tool_calls(this: &Ai_Cf_Google_Gemma_3_12B_It_Output, val: &Array<Object>);
 }
 impl Ai_Cf_Google_Gemma_3_12B_It_Output {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `response`: The generated text response from the model"]
     pub fn new(response: &str) -> Ai_Cf_Google_Gemma_3_12B_It_Output {
         Self::builder(response).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `response`: The generated text response from the model"]
     pub fn builder(response: &str) -> Ai_Cf_Google_Gemma_3_12B_It_OutputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -26003,14 +26355,14 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt, val: f64);
 }
 impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt {
         Self::builder(prompt).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_PromptBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -26243,14 +26595,14 @@ extern "C" {
     );
 }
 impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn new(messages: &Array<Object>) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages {
         Self::builder(messages).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn builder(
         messages: &Array<Object>,
@@ -26346,14 +26698,14 @@ extern "C" {
     );
 }
 impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `requests`"]
     pub fn new(requests: &Array) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch {
         Self::builder(requests).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `requests`"]
     pub fn builder(
         requests: &Array,
@@ -26470,14 +26822,14 @@ extern "C" {
     );
 }
 impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_Inner {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_Inner {
         Self::builder(prompt).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_InnerBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -26672,16 +27024,16 @@ extern "C" {
     );
 }
 impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn new(
         messages: &Array<Object>,
     ) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner {
         Self::builder(messages).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn builder(
         messages: &Array<Object>,
@@ -26785,14 +27137,14 @@ extern "C" {
     );
 }
 impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `response`: The generated text response from the model"]
     pub fn new(response: &str) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output {
         Self::builder(response).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `response`: The generated text response from the model"]
     pub fn builder(response: &str) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -26926,14 +27278,14 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt, val: f64);
 }
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt {
         Self::builder(prompt).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_PromptBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -27123,14 +27475,14 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages, val: f64);
 }
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn new(messages: &Array<Object>) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages {
         Self::builder(messages).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn builder(messages: &Array<Object>) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_MessagesBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -27263,14 +27615,14 @@ extern "C" {
     );
 }
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `requests`"]
     pub fn new(requests: &Array) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch {
         Self::builder(requests).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `requests`"]
     pub fn builder(requests: &Array) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_BatchBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -27362,14 +27714,14 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1, val: f64);
 }
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1 {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1 {
         Self::builder(prompt).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1Builder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -27559,14 +27911,14 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1, val: f64);
 }
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1 {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn new(messages: &Array<Object>) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1 {
         Self::builder(messages).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn builder(messages: &Array<Object>) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1Builder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -28154,14 +28506,14 @@ extern "C" {
     pub fn set_utterance_end_ms(this: &Ai_Cf_Deepgram_Nova_3_Input, val: bool);
 }
 impl Ai_Cf_Deepgram_Nova_3_Input {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `audio`"]
     pub fn new(audio: &Object) -> Ai_Cf_Deepgram_Nova_3_Input {
         Self::builder(audio).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `audio`"]
     pub fn builder(audio: &Object) -> Ai_Cf_Deepgram_Nova_3_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -28580,28 +28932,28 @@ extern "C" {
     pub fn set_dtype_with_js_value_1(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input, val: &str);
 }
 impl Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `audio`: readable stream with audio data and content-type specified for that data"]
     pub fn new(audio: &Object) -> Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input {
         Self::builder(audio).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `audio`: readable stream with audio data and content-type specified for that data"]
     pub fn new_with_str(audio: &str) -> Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input {
         Self::builder_with_str(audio).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `audio`: readable stream with audio data and content-type specified for that data"]
     pub fn builder(audio: &Object) -> Ai_Cf_Pipecat_Ai_Smart_Turn_V2_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_audio(audio);
         Ai_Cf_Pipecat_Ai_Smart_Turn_V2_InputBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `audio`: readable stream with audio data and content-type specified for that data"]
     pub fn builder_with_str(audio: &str) -> Ai_Cf_Pipecat_Ai_Smart_Turn_V2_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -28765,14 +29117,14 @@ extern "C" {
     pub fn set_negative_prompt(this: &Ai_Cf_Leonardo_Phoenix_1_0_Input, val: &str);
 }
 impl Ai_Cf_Leonardo_Phoenix_1_0_Input {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: A text description of the image you want to generate."]
     pub fn new(prompt: &str) -> Ai_Cf_Leonardo_Phoenix_1_0_Input {
         Self::builder(prompt).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: A text description of the image you want to generate."]
     pub fn builder(prompt: &str) -> Ai_Cf_Leonardo_Phoenix_1_0_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -28873,14 +29225,14 @@ extern "C" {
     pub fn set_steps(this: &Ai_Cf_Leonardo_Lucid_Origin_Input, val: f64);
 }
 impl Ai_Cf_Leonardo_Lucid_Origin_Input {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: A text description of the image you want to generate."]
     pub fn new(prompt: &str) -> Ai_Cf_Leonardo_Lucid_Origin_Input {
         Self::builder(prompt).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: A text description of the image you want to generate."]
     pub fn builder(prompt: &str) -> Ai_Cf_Leonardo_Lucid_Origin_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -29050,14 +29402,14 @@ extern "C" {
     pub fn set_bit_rate(this: &Ai_Cf_Deepgram_Aura_1_Input, val: f64);
 }
 impl Ai_Cf_Deepgram_Aura_1_Input {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: The text content to be converted to speech"]
     pub fn new(text: &str) -> Ai_Cf_Deepgram_Aura_1_Input {
         Self::builder(text).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: The text content to be converted to speech"]
     pub fn builder(text: &str) -> Ai_Cf_Deepgram_Aura_1_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -29372,622 +29724,760 @@ extern "C" {
     );
 }
 impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"asm_Beng\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_asm_beng(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_asm_beng(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"awa_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_awa_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_awa_deva(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"ben_Beng\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_ben_beng(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_ben_beng(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"bho_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_bho_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_bho_deva(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"brx_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_brx_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_brx_deva(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"doi_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_doi_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_doi_deva(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"eng_Latn\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_eng_latn(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_eng_latn(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"gom_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_gom_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_gom_deva(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"gon_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_gon_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_gon_deva(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"guj_Gujr\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_guj_gujr(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_guj_gujr(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"hin_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_hin_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_hin_deva(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"hne_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_hne_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_hne_deva(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"kan_Knda\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_kan_knda(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_kan_knda(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"kas_Arab\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_kas_arab(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_kas_arab(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"kas_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_kas_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_kas_deva(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"kha_Latn\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_kha_latn(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_kha_latn(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"lus_Latn\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_lus_latn(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_lus_latn(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mag_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mag_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mag_deva(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mai_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mai_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mai_deva(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mal_Mlym\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mal_mlym(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mal_mlym(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mar_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mar_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mar_deva(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mni_Beng\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mni_beng(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mni_beng(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mni_Mtei\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mni_mtei(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mni_mtei(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"npi_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_npi_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_npi_deva(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"ory_Orya\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_ory_orya(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_ory_orya(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"pan_Guru\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_pan_guru(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_pan_guru(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"san_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_san_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_san_deva(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"sat_Olck\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_sat_olck(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_sat_olck(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"snd_Arab\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_snd_arab(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_snd_arab(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"snd_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_snd_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_snd_deva(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"tam_Taml\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_tam_taml(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_tam_taml(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"tel_Telu\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_tel_telu(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_tel_telu(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"urd_Arab\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_urd_arab(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_urd_arab(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"unr_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_unr_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_unr_deva(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"asm_Beng\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_asm_beng_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_asm_beng_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"awa_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_awa_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_awa_deva_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"ben_Beng\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_ben_beng_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_ben_beng_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"bho_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_bho_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_bho_deva_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"brx_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_brx_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_brx_deva_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"doi_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_doi_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_doi_deva_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"eng_Latn\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_eng_latn_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_eng_latn_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"gom_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_gom_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_gom_deva_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"gon_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_gon_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_gon_deva_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"guj_Gujr\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_guj_gujr_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_guj_gujr_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"hin_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_hin_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_hin_deva_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"hne_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_hne_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_hne_deva_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"kan_Knda\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_kan_knda_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_kan_knda_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"kas_Arab\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_kas_arab_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_kas_arab_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"kas_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_kas_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_kas_deva_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"kha_Latn\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_kha_latn_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_kha_latn_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"lus_Latn\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_lus_latn_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_lus_latn_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mag_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mag_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mag_deva_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mai_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mai_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mai_deva_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mal_Mlym\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mal_mlym_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mal_mlym_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mar_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mar_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mar_deva_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mni_Beng\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mni_beng_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mni_beng_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mni_Mtei\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mni_mtei_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mni_mtei_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"npi_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_npi_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_npi_deva_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"ory_Orya\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_ory_orya_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_ory_orya_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"pan_Guru\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_pan_guru_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_pan_guru_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"san_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_san_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_san_deva_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"sat_Olck\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_sat_olck_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_sat_olck_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"snd_Arab\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_snd_arab_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_snd_arab_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"snd_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_snd_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_snd_deva_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"tam_Taml\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_tam_taml_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_tam_taml_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"tel_Telu\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_tel_telu_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_tel_telu_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"urd_Arab\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_urd_arab_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_urd_arab_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"unr_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn new_unr_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_unr_deva_with_array(text).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"asm_Beng\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_asm_beng(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -29995,10 +30485,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language("asm_Beng");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"awa_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_awa_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30006,10 +30498,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value("awa_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"ben_Beng\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_ben_beng(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30017,10 +30511,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_1("ben_Beng");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"bho_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_bho_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30028,10 +30524,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_2("bho_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"brx_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_brx_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30039,10 +30537,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_3("brx_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"doi_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_doi_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30050,10 +30550,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_4("doi_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"eng_Latn\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_eng_latn(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30061,10 +30563,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_5("eng_Latn");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"gom_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_gom_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30072,10 +30576,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_6("gom_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"gon_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_gon_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30083,10 +30589,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_7("gon_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"guj_Gujr\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_guj_gujr(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30094,10 +30602,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_8("guj_Gujr");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"hin_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_hin_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30105,10 +30615,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_9("hin_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"hne_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_hne_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30116,10 +30628,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_10("hne_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"kan_Knda\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_kan_knda(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30127,10 +30641,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_11("kan_Knda");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"kas_Arab\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_kas_arab(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30138,10 +30654,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_12("kas_Arab");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"kas_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_kas_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30149,10 +30667,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_13("kas_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"kha_Latn\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_kha_latn(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30160,10 +30680,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_14("kha_Latn");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"lus_Latn\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_lus_latn(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30171,10 +30693,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_15("lus_Latn");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mag_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mag_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30182,10 +30706,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_16("mag_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mai_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mai_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30193,10 +30719,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_17("mai_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mal_Mlym\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mal_mlym(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30204,10 +30732,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_18("mal_Mlym");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mar_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mar_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30215,10 +30745,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_19("mar_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mni_Beng\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mni_beng(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30226,10 +30758,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_20("mni_Beng");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mni_Mtei\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mni_mtei(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30237,10 +30771,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_21("mni_Mtei");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"npi_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_npi_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30248,10 +30784,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_22("npi_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"ory_Orya\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_ory_orya(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30259,10 +30797,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_23("ory_Orya");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"pan_Guru\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_pan_guru(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30270,10 +30810,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_24("pan_Guru");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"san_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_san_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30281,10 +30823,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_25("san_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"sat_Olck\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_sat_olck(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30292,10 +30836,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_26("sat_Olck");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"snd_Arab\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_snd_arab(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30303,10 +30849,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_27("snd_Arab");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"snd_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_snd_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30314,10 +30862,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_28("snd_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"tam_Taml\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_tam_taml(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30325,10 +30875,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_29("tam_Taml");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"tel_Telu\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_tel_telu(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30336,10 +30888,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_30("tel_Telu");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"urd_Arab\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_urd_arab(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30347,10 +30901,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_31("urd_Arab");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"unr_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_unr_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -30358,10 +30914,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_32("unr_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"asm_Beng\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_asm_beng_with_array(
         text: &Array<JsString>,
@@ -30371,10 +30929,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language("asm_Beng");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"awa_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_awa_deva_with_array(
         text: &Array<JsString>,
@@ -30384,10 +30944,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value("awa_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"ben_Beng\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_ben_beng_with_array(
         text: &Array<JsString>,
@@ -30397,10 +30959,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_1("ben_Beng");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"bho_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_bho_deva_with_array(
         text: &Array<JsString>,
@@ -30410,10 +30974,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_2("bho_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"brx_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_brx_deva_with_array(
         text: &Array<JsString>,
@@ -30423,10 +30989,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_3("brx_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"doi_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_doi_deva_with_array(
         text: &Array<JsString>,
@@ -30436,10 +31004,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_4("doi_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"eng_Latn\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_eng_latn_with_array(
         text: &Array<JsString>,
@@ -30449,10 +31019,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_5("eng_Latn");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"gom_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_gom_deva_with_array(
         text: &Array<JsString>,
@@ -30462,10 +31034,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_6("gom_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"gon_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_gon_deva_with_array(
         text: &Array<JsString>,
@@ -30475,10 +31049,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_7("gon_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"guj_Gujr\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_guj_gujr_with_array(
         text: &Array<JsString>,
@@ -30488,10 +31064,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_8("guj_Gujr");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"hin_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_hin_deva_with_array(
         text: &Array<JsString>,
@@ -30501,10 +31079,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_9("hin_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"hne_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_hne_deva_with_array(
         text: &Array<JsString>,
@@ -30514,10 +31094,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_10("hne_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"kan_Knda\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_kan_knda_with_array(
         text: &Array<JsString>,
@@ -30527,10 +31109,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_11("kan_Knda");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"kas_Arab\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_kas_arab_with_array(
         text: &Array<JsString>,
@@ -30540,10 +31124,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_12("kas_Arab");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"kas_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_kas_deva_with_array(
         text: &Array<JsString>,
@@ -30553,10 +31139,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_13("kas_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"kha_Latn\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_kha_latn_with_array(
         text: &Array<JsString>,
@@ -30566,10 +31154,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_14("kha_Latn");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"lus_Latn\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_lus_latn_with_array(
         text: &Array<JsString>,
@@ -30579,10 +31169,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_15("lus_Latn");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mag_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mag_deva_with_array(
         text: &Array<JsString>,
@@ -30592,10 +31184,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_16("mag_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mai_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mai_deva_with_array(
         text: &Array<JsString>,
@@ -30605,10 +31199,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_17("mai_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mal_Mlym\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mal_mlym_with_array(
         text: &Array<JsString>,
@@ -30618,10 +31214,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_18("mal_Mlym");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mar_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mar_deva_with_array(
         text: &Array<JsString>,
@@ -30631,10 +31229,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_19("mar_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mni_Beng\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mni_beng_with_array(
         text: &Array<JsString>,
@@ -30644,10 +31244,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_20("mni_Beng");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"mni_Mtei\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mni_mtei_with_array(
         text: &Array<JsString>,
@@ -30657,10 +31259,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_21("mni_Mtei");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"npi_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_npi_deva_with_array(
         text: &Array<JsString>,
@@ -30670,10 +31274,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_22("npi_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"ory_Orya\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_ory_orya_with_array(
         text: &Array<JsString>,
@@ -30683,10 +31289,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_23("ory_Orya");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"pan_Guru\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_pan_guru_with_array(
         text: &Array<JsString>,
@@ -30696,10 +31304,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_24("pan_Guru");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"san_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_san_deva_with_array(
         text: &Array<JsString>,
@@ -30709,10 +31319,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_25("san_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"sat_Olck\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_sat_olck_with_array(
         text: &Array<JsString>,
@@ -30722,10 +31334,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_26("sat_Olck");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"snd_Arab\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_snd_arab_with_array(
         text: &Array<JsString>,
@@ -30735,10 +31349,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_27("snd_Arab");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"snd_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_snd_deva_with_array(
         text: &Array<JsString>,
@@ -30748,10 +31364,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_28("snd_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"tam_Taml\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_tam_taml_with_array(
         text: &Array<JsString>,
@@ -30761,10 +31379,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_29("tam_Taml");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"tel_Telu\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_tel_telu_with_array(
         text: &Array<JsString>,
@@ -30774,10 +31394,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_30("tel_Telu");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"urd_Arab\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_urd_arab_with_array(
         text: &Array<JsString>,
@@ -30787,10 +31409,12 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_31("urd_Arab");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `target_language: \"unr_Deva\"`: Target language to translate to"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_unr_deva_with_array(
         text: &Array<JsString>,
@@ -30824,14 +31448,14 @@ extern "C" {
     );
 }
 impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Output {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `translations`: Translated texts"]
     pub fn new(translations: &Array<JsString>) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Output {
         Self::builder(translations).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `translations`: Translated texts"]
     pub fn builder(
         translations: &Array<JsString>,
@@ -30963,14 +31587,14 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt, val: f64);
 }
 impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt {
         Self::builder(prompt).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_PromptBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -31197,14 +31821,14 @@ extern "C" {
     );
 }
 impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn new(messages: &Array<Object>) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages {
         Self::builder(messages).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn builder(
         messages: &Array<Object>,
@@ -31351,14 +31975,14 @@ extern "C" {
     );
 }
 impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `requests`"]
     pub fn new(requests: &Array) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch {
         Self::builder(requests).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `requests`"]
     pub fn builder(
         requests: &Array,
@@ -31467,14 +32091,14 @@ extern "C" {
     );
 }
 impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1 {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1 {
         Self::builder(prompt).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1Builder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -31703,14 +32327,14 @@ extern "C" {
     );
 }
 impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1 {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn new(messages: &Array<Object>) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1 {
         Self::builder(messages).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `messages`: An array of message objects representing the conversation history."]
     pub fn builder(
         messages: &Array<Object>,
@@ -32178,28 +32802,28 @@ extern "C" {
     pub fn set_text_with_array(this: &Ai_Cf_Pfnet_Plamo_Embedding_1B_Input, val: &Array<JsString>);
 }
 impl Ai_Cf_Pfnet_Plamo_Embedding_1B_Input {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to embed. Can be a single string or a list of strings."]
     pub fn new(text: &str) -> Ai_Cf_Pfnet_Plamo_Embedding_1B_Input {
         Self::builder(text).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to embed. Can be a single string or a list of strings."]
     pub fn new_with_array(text: &Array<JsString>) -> Ai_Cf_Pfnet_Plamo_Embedding_1B_Input {
         Self::builder_with_array(text).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to embed. Can be a single string or a list of strings."]
     pub fn builder(text: &str) -> Ai_Cf_Pfnet_Plamo_Embedding_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         Ai_Cf_Pfnet_Plamo_Embedding_1B_InputBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: Input text to embed. Can be a single string or a list of strings."]
     pub fn builder_with_array(
         text: &Array<JsString>,
@@ -32228,7 +32852,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_data(this: &Ai_Cf_Pfnet_Plamo_Embedding_1B_Output, val: &Array<Array<Number>>);
     #[doc = " Shape of the embedding data as [number_of_embeddings, embedding_dimension]."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @minItems 2"]
     #[doc = " @maxItems 2"]
     #[wasm_bindgen(method, getter)]
@@ -32240,11 +32864,11 @@ extern "C" {
     );
 }
 impl Ai_Cf_Pfnet_Plamo_Embedding_1B_Output {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `data`: Embedding vectors, where each vector is a list of floats."]
     #[doc = " * `shape`: Shape of the embedding data as [number_of_embeddings, embedding_dimension]."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @minItems 2"]
     #[doc = " @maxItems 2"]
     pub fn new(
@@ -32253,11 +32877,11 @@ impl Ai_Cf_Pfnet_Plamo_Embedding_1B_Output {
     ) -> Ai_Cf_Pfnet_Plamo_Embedding_1B_Output {
         Self::builder(data, shape).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `data`: Embedding vectors, where each vector is a list of floats."]
     #[doc = " * `shape`: Shape of the embedding data as [number_of_embeddings, embedding_dimension]."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @minItems 2"]
     #[doc = " @maxItems 2"]
     pub fn builder(
@@ -32351,18 +32975,22 @@ extern "C" {
     pub fn set_tag(this: &Ai_Cf_Deepgram_Flux_Input, val: &str);
 }
 impl Ai_Cf_Deepgram_Flux_Input {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `encoding: \"linear16\"`: Encoding of the audio stream. Currently only supports raw signed little-endian 16-bit PCM."]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `sample_rate`: Sample rate of the audio stream in Hz."]
     pub fn new_linear_16(sample_rate: &str) -> Ai_Cf_Deepgram_Flux_Input {
         Self::builder_linear_16(sample_rate).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `encoding: \"linear16\"`: Encoding of the audio stream. Currently only supports raw signed little-endian 16-bit PCM."]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `sample_rate`: Sample rate of the audio stream in Hz."]
     pub fn builder_linear_16(sample_rate: &str) -> Ai_Cf_Deepgram_Flux_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -32684,14 +33312,14 @@ extern "C" {
     pub fn set_bit_rate(this: &Ai_Cf_Deepgram_Aura_2_En_Input, val: f64);
 }
 impl Ai_Cf_Deepgram_Aura_2_En_Input {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: The text content to be converted to speech"]
     pub fn new(text: &str) -> Ai_Cf_Deepgram_Aura_2_En_Input {
         Self::builder(text).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: The text content to be converted to speech"]
     pub fn builder(text: &str) -> Ai_Cf_Deepgram_Aura_2_En_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -33002,14 +33630,14 @@ extern "C" {
     pub fn set_bit_rate(this: &Ai_Cf_Deepgram_Aura_2_Es_Input, val: f64);
 }
 impl Ai_Cf_Deepgram_Aura_2_Es_Input {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: The text content to be converted to speech"]
     pub fn new(text: &str) -> Ai_Cf_Deepgram_Aura_2_Es_Input {
         Self::builder(text).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `text`: The text content to be converted to speech"]
     pub fn builder(text: &str) -> Ai_Cf_Deepgram_Aura_2_Es_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -33589,8 +34217,8 @@ extern "C" {
     pub fn set_cfdeepgramaura_2_es(this: &AiModels, val: &Base_Ai_Cf_Deepgram_Aura_2_Es);
 }
 impl AiModels {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `@cf/huggingface/distilbert_sst_2_int_8`"]
     #[doc = " * `@cf/stabilityai/stable_diffusion_xl_base_1.0`"]
     #[doc = " * `@cf/runwayml/stable_diffusion_v_1_5_inpainting`"]
@@ -33849,8 +34477,8 @@ impl AiModels {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `@cf/huggingface/distilbert_sst_2_int_8`"]
     #[doc = " * `@cf/stabilityai/stable_diffusion_xl_base_1.0`"]
     #[doc = " * `@cf/runwayml/stable_diffusion_v_1_5_inpainting`"]
@@ -34146,7 +34774,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_websocket(this: &AiOptions, val: bool);
     #[doc = " Tag your requests to group and view them in Cloudflare dashboard."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Rules:"]
     #[doc = " Tags must only contain letters, numbers, and the symbols: : - . / @"]
     #[doc = " Each tag can have maximum 50 characters."]
@@ -34334,8 +34962,8 @@ extern "C" {
     pub fn set_properties(this: &AiModelsSearchObject, val: &Array<Object>);
 }
 impl AiModelsSearchObject {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `source`"]
     #[doc = " * `name`"]
@@ -34354,8 +34982,8 @@ impl AiModelsSearchObject {
     ) -> AiModelsSearchObject {
         Self::builder(id, source, name, description, task, tags, properties).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `source`"]
     #[doc = " * `name`"]
@@ -34421,18 +35049,18 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "gateway")]
     pub fn try_gateway(this: &Ai, gateway_id: &str) -> Result<AiGateway, JsValue>;
     #[doc = " Access the AI Search API for managing AI-powered search instances."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " This is the new API that replaces AutoRAG with better namespace separation:"]
     #[doc = " - Account-level operations: `list()`, `create()`"]
     #[doc = " - Instance-level operations: `get(id).search()`, `get(id).chatCompletions()`, `get(id).delete()`"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Example"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ```js"]
     #[doc = " ```typescript"]
     #[doc = " // List all AI Search instances"]
     #[doc = " const instances = await env.AI.aiSearch.list();"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " // Search an instance"]
     #[doc = " const results = await env.AI.aiSearch.get('my-search').search({"]
     #[doc = "   messages: [{ role: 'user', content: 'What is the policy?' }],"]
@@ -34440,7 +35068,7 @@ extern "C" {
     #[doc = "     retrieval: { max_num_results: 10 }"]
     #[doc = "   }"]
     #[doc = " });"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " // Generate chat completions with AI Search context"]
     #[doc = " const response = await env.AI.aiSearch.get('my-search').chatCompletions({"]
     #[doc = "   messages: [{ role: 'user', content: 'What is the policy?' }],"]
@@ -34451,18 +35079,18 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "aiSearch")]
     pub fn ai_search(this: &Ai) -> AiSearchAccountService;
     #[doc = " Access the AI Search API for managing AI-powered search instances."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " This is the new API that replaces AutoRAG with better namespace separation:"]
     #[doc = " - Account-level operations: `list()`, `create()`"]
     #[doc = " - Instance-level operations: `get(id).search()`, `get(id).chatCompletions()`, `get(id).delete()`"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Example"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ```js"]
     #[doc = " ```typescript"]
     #[doc = " // List all AI Search instances"]
     #[doc = " const instances = await env.AI.aiSearch.list();"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " // Search an instance"]
     #[doc = " const results = await env.AI.aiSearch.get('my-search').search({"]
     #[doc = "   messages: [{ role: 'user', content: 'What is the policy?' }],"]
@@ -34470,7 +35098,7 @@ extern "C" {
     #[doc = "     retrieval: { max_num_results: 10 }"]
     #[doc = "   }"]
     #[doc = " });"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " // Generate chat completions with AI Search context"]
     #[doc = " const response = await env.AI.aiSearch.get('my-search').chatCompletions({"]
     #[doc = "   messages: [{ role: 'user', content: 'What is the policy?' }],"]
@@ -34482,35 +35110,35 @@ extern "C" {
     pub fn try_ai_search(this: &Ai) -> Result<AiSearchAccountService, JsValue>;
     #[doc = " @deprecated AutoRAG has been replaced by AI Search."]
     #[doc = " Use `env.AI.aiSearch` instead for better API design and new features."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Migration guide:"]
     #[doc = " - `env.AI.autorag().list()` â†’ `env.AI.aiSearch.list()`"]
     #[doc = " - `env.AI.autorag('id').search({ query: '...' })` â†’ `env.AI.aiSearch.get('id').search({ messages: [{ role: 'user', content: '...' }] })`"]
     #[doc = " - `env.AI.autorag('id').aiSearch(...)` â†’ `env.AI.aiSearch.get('id').chatCompletions(...)`"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Note: The old API continues to work for backwards compatibility, but new projects should use AI Search."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @see AiSearchAccountService"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `autoragId` - Optional instance ID (omit for account-level operations)"]
     #[wasm_bindgen(method)]
     pub fn autorag(this: &Ai, autorag_id: &str) -> AutoRAG;
     #[doc = " @deprecated AutoRAG has been replaced by AI Search."]
     #[doc = " Use `env.AI.aiSearch` instead for better API design and new features."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Migration guide:"]
     #[doc = " - `env.AI.autorag().list()` â†’ `env.AI.aiSearch.list()`"]
     #[doc = " - `env.AI.autorag('id').search({ query: '...' })` â†’ `env.AI.aiSearch.get('id').search({ messages: [{ role: 'user', content: '...' }] })`"]
     #[doc = " - `env.AI.autorag('id').aiSearch(...)` â†’ `env.AI.aiSearch.get('id').chatCompletions(...)`"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Note: The old API continues to work for backwards compatibility, but new projects should use AI Search."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @see AiSearchAccountService"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `autoragId` - Optional instance ID (omit for account-level operations)"]
     #[wasm_bindgen(method, catch, js_name = "autorag")]
     pub fn try_autorag(this: &Ai, autorag_id: &str) -> Result<AutoRAG, JsValue>;
@@ -34711,14 +35339,14 @@ extern "C" {
     pub fn set_retries(this: &GatewayOptions, val: &GatewayRetries);
 }
 impl GatewayOptions {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     pub fn new(id: &str) -> GatewayOptions {
         Self::builder(id).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     pub fn builder(id: &str) -> GatewayOptionsBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -34995,8 +35623,8 @@ extern "C" {
     pub fn set_created_at(this: &AiGatewayLog, val: &Date);
 }
 impl AiGatewayLog {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `provider`"]
     #[doc = " * `model`"]
@@ -35042,8 +35670,8 @@ impl AiGatewayLog {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `provider`"]
     #[doc = " * `model`"]
@@ -35288,8 +35916,8 @@ extern "C" {
     pub fn set_content_type(this: &AIGatewayHeaders, val: &str);
 }
 impl AIGatewayHeaders {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -35335,8 +35963,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -35382,8 +36010,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -35429,8 +36057,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -35476,8 +36104,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -35523,8 +36151,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -35570,8 +36198,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -35617,8 +36245,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -35664,8 +36292,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -35711,8 +36339,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -35758,8 +36386,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -35805,8 +36433,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -35852,8 +36480,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -35899,8 +36527,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -35946,8 +36574,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -35993,8 +36621,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -36040,8 +36668,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -36087,8 +36715,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -36134,8 +36762,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -36181,8 +36809,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -36228,8 +36856,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -36275,8 +36903,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -36322,8 +36950,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -36369,8 +36997,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -36416,8 +37044,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -36463,8 +37091,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -36510,8 +37138,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -36557,8 +37185,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -36604,8 +37232,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -36651,8 +37279,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -36698,8 +37326,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -36745,8 +37373,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -36792,8 +37420,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -36839,8 +37467,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -36886,8 +37514,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -36933,8 +37561,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -36980,8 +37608,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -37027,8 +37655,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -37074,8 +37702,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -37121,8 +37749,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -37168,8 +37796,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -37215,8 +37843,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -37262,8 +37890,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -37309,8 +37937,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -37356,8 +37984,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -37403,8 +38031,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -37450,8 +38078,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -37497,8 +38125,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -37544,8 +38172,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -37591,8 +38219,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -37638,8 +38266,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -37685,8 +38313,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -37732,8 +38360,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -37779,8 +38407,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -37826,8 +38454,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -37873,8 +38501,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -37920,8 +38548,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -37967,8 +38595,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -38014,8 +38642,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -38061,8 +38689,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -38108,8 +38736,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -38155,8 +38783,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -38202,8 +38830,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -38249,8 +38877,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -38296,8 +38924,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -38343,8 +38971,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -38390,8 +39018,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -38437,8 +39065,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -38484,8 +39112,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -38531,8 +39159,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -38578,8 +39206,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -38625,8 +39253,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -38672,8 +39300,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -38719,8 +39347,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -38766,8 +39394,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -38813,8 +39441,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -38860,8 +39488,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -38907,8 +39535,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -38954,8 +39582,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -39001,8 +39629,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -39048,8 +39676,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -39095,8 +39723,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -39142,8 +39770,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -39189,8 +39817,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -39236,8 +39864,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -39283,8 +39911,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -39330,8 +39958,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -39377,8 +40005,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -39424,8 +40052,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -39471,8 +40099,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -39518,8 +40146,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -39565,8 +40193,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -39612,8 +40240,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -39659,8 +40287,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -39706,8 +40334,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -39753,8 +40381,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -39800,8 +40428,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -39847,8 +40475,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -39894,8 +40522,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -39941,8 +40569,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -39988,8 +40616,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -40035,8 +40663,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -40082,8 +40710,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -40129,8 +40757,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -40176,8 +40804,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -40223,8 +40851,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -40270,8 +40898,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -40317,8 +40945,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -40364,8 +40992,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -40411,8 +41039,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -40458,8 +41086,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -40505,8 +41133,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -40552,8 +41180,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -40599,8 +41227,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -40646,8 +41274,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -40693,8 +41321,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -40740,8 +41368,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -40787,8 +41415,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -40834,8 +41462,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -40881,8 +41509,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -40928,8 +41556,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -40975,8 +41603,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -41022,8 +41650,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -41069,8 +41697,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -41116,8 +41744,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -41163,8 +41791,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -41210,8 +41838,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -41257,8 +41885,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -41304,8 +41932,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -41351,8 +41979,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -41398,8 +42026,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -41445,8 +42073,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -41492,8 +42120,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -41539,8 +42167,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -41586,8 +42214,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -41633,8 +42261,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -41680,8 +42308,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -41727,8 +42355,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -41774,8 +42402,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -41821,8 +42449,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -41868,8 +42496,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -41915,8 +42543,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -41962,8 +42590,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -42009,8 +42637,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -42056,8 +42684,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -42103,8 +42731,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -42150,8 +42778,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -42197,8 +42825,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -42244,8 +42872,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -42291,8 +42919,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -42338,8 +42966,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -42385,8 +43013,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -42432,8 +43060,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -42479,8 +43107,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -42526,8 +43154,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -42573,8 +43201,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -42620,8 +43248,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -42667,8 +43295,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -42714,8 +43342,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -42761,8 +43389,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -42808,8 +43436,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -42855,8 +43483,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -42902,8 +43530,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -42949,8 +43577,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -42996,8 +43624,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -43043,8 +43671,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -43090,8 +43718,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -43137,8 +43765,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -43184,8 +43812,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -43231,8 +43859,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -43278,8 +43906,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -43325,8 +43953,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -43372,8 +44000,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -43419,8 +44047,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -43466,8 +44094,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -43513,8 +44141,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -43560,8 +44188,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -43607,8 +44235,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -43654,8 +44282,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -43701,8 +44329,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -43748,8 +44376,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -43795,8 +44423,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -43842,8 +44470,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -43889,8 +44517,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -43936,8 +44564,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -43983,8 +44611,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -44030,8 +44658,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -44077,8 +44705,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -44124,8 +44752,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -44171,8 +44799,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -44218,8 +44846,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -44265,8 +44893,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -44312,8 +44940,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -44359,8 +44987,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -44406,8 +45034,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -44453,8 +45081,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -44500,8 +45128,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -44547,8 +45175,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -44594,8 +45222,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -44641,8 +45269,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -44688,8 +45316,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -44735,8 +45363,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -44782,8 +45410,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -44829,8 +45457,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -44876,8 +45504,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -44923,8 +45551,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -44970,8 +45598,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -45017,8 +45645,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -45064,8 +45692,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -45111,8 +45739,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -45158,8 +45786,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -45205,8 +45833,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -45252,8 +45880,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -45299,8 +45927,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -45346,8 +45974,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -45393,8 +46021,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -45440,8 +46068,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -45487,8 +46115,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -45534,8 +46162,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -45581,8 +46209,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -45628,8 +46256,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -45675,8 +46303,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -45722,8 +46350,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -45769,8 +46397,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -45816,8 +46444,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -45863,8 +46491,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -45910,8 +46538,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -45957,8 +46585,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -46004,8 +46632,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -46051,8 +46679,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -46098,8 +46726,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -46145,8 +46773,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -46192,8 +46820,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -46239,8 +46867,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -46286,8 +46914,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -46333,8 +46961,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -46380,8 +47008,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -46427,8 +47055,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -46474,8 +47102,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -46521,8 +47149,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -46568,8 +47196,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -46615,8 +47243,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -46662,8 +47290,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -46709,8 +47337,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -46756,8 +47384,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -46803,8 +47431,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -46850,8 +47478,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -46897,8 +47525,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -46944,8 +47572,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -46991,8 +47619,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -47038,8 +47666,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -47085,8 +47713,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -47132,8 +47760,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -47179,8 +47807,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -47226,8 +47854,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -47273,8 +47901,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -47320,8 +47948,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -47367,8 +47995,8 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -47413,8 +48041,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -47459,8 +48087,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -47505,8 +48133,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -47551,8 +48179,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -47597,8 +48225,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -47643,8 +48271,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -47689,8 +48317,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -47735,8 +48363,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -47781,8 +48409,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -47827,8 +48455,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -47873,8 +48501,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -47919,8 +48547,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -47965,8 +48593,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -48011,8 +48639,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -48057,8 +48685,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -48103,8 +48731,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -48149,8 +48777,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -48195,8 +48823,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -48241,8 +48869,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -48287,8 +48915,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -48333,8 +48961,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -48379,8 +49007,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -48425,8 +49053,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -48471,8 +49099,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -48517,8 +49145,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -48563,8 +49191,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -48609,8 +49237,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -48655,8 +49283,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -48701,8 +49329,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -48747,8 +49375,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -48793,8 +49421,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -48839,8 +49467,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -48885,8 +49513,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -48931,8 +49559,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -48977,8 +49605,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -49023,8 +49651,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -49069,8 +49697,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -49115,8 +49743,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -49161,8 +49789,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -49207,8 +49835,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -49253,8 +49881,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -49299,8 +49927,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -49345,8 +49973,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -49391,8 +50019,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -49437,8 +50065,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -49483,8 +50111,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -49529,8 +50157,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -49575,8 +50203,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -49621,8 +50249,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -49667,8 +50295,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -49713,8 +50341,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -49759,8 +50387,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -49805,8 +50433,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -49851,8 +50479,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -49897,8 +50525,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -49943,8 +50571,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -49989,8 +50617,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -50035,8 +50663,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -50081,8 +50709,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -50127,8 +50755,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -50173,8 +50801,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -50219,8 +50847,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -50265,8 +50893,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -50311,8 +50939,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -50357,8 +50985,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -50403,8 +51031,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -50449,8 +51077,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -50495,8 +51123,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -50541,8 +51169,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -50587,8 +51215,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -50633,8 +51261,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -50679,8 +51307,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -50725,8 +51353,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -50771,8 +51399,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -50817,8 +51445,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -50863,8 +51491,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -50909,8 +51537,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -50955,8 +51583,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -51001,8 +51629,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -51047,8 +51675,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -51093,8 +51721,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -51139,8 +51767,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -51185,8 +51813,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -51231,8 +51859,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -51277,8 +51905,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -51323,8 +51951,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -51369,8 +51997,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -51415,8 +52043,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -51461,8 +52089,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -51507,8 +52135,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -51553,8 +52181,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -51599,8 +52227,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -51645,8 +52273,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -51691,8 +52319,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -51737,8 +52365,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -51783,8 +52411,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -51829,8 +52457,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -51875,8 +52503,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -51921,8 +52549,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -51967,8 +52595,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -52013,8 +52641,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -52059,8 +52687,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -52105,8 +52733,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -52151,8 +52779,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -52197,8 +52825,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -52243,8 +52871,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -52289,8 +52917,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -52335,8 +52963,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -52381,8 +53009,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -52427,8 +53055,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -52473,8 +53101,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -52519,8 +53147,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -52565,8 +53193,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -52611,8 +53239,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -52657,8 +53285,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -52703,8 +53331,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -52749,8 +53377,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -52795,8 +53423,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -52841,8 +53469,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -52887,8 +53515,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -52933,8 +53561,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -52979,8 +53607,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -53025,8 +53653,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -53071,8 +53699,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -53117,8 +53745,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -53163,8 +53791,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -53209,8 +53837,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -53255,8 +53883,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -53301,8 +53929,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -53347,8 +53975,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -53393,8 +54021,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -53439,8 +54067,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -53485,8 +54113,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -53531,8 +54159,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -53577,8 +54205,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -53623,8 +54251,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -53669,8 +54297,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -53715,8 +54343,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -53761,8 +54389,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -53807,8 +54435,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -53853,8 +54481,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -53899,8 +54527,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -53945,8 +54573,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -53991,8 +54619,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -54037,8 +54665,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -54083,8 +54711,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -54129,8 +54757,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -54175,8 +54803,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -54221,8 +54849,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -54267,8 +54895,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -54313,8 +54941,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -54359,8 +54987,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -54405,8 +55033,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -54451,8 +55079,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -54497,8 +55125,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -54543,8 +55171,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -54589,8 +55217,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -54635,8 +55263,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -54681,8 +55309,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -54727,8 +55355,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -54773,8 +55401,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -54819,8 +55447,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -54865,8 +55493,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -54911,8 +55539,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -54957,8 +55585,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -55003,8 +55631,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -55049,8 +55677,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -55095,8 +55723,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -55141,8 +55769,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -55187,8 +55815,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -55233,8 +55861,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -55279,8 +55907,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -55325,8 +55953,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -55371,8 +55999,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -55417,8 +56045,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -55463,8 +56091,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -55509,8 +56137,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -55555,8 +56183,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -55601,8 +56229,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -55647,8 +56275,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -55693,8 +56321,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -55739,8 +56367,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -55785,8 +56413,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -55831,8 +56459,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -55877,8 +56505,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -55923,8 +56551,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -55969,8 +56597,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -56015,8 +56643,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -56061,8 +56689,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -56107,8 +56735,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -56153,8 +56781,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -56199,8 +56827,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -56245,8 +56873,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -56291,8 +56919,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -56337,8 +56965,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -56383,8 +57011,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -56429,8 +57057,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -56475,8 +57103,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -56521,8 +57149,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -56567,8 +57195,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -56613,8 +57241,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -56659,8 +57287,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -56705,8 +57333,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -56751,8 +57379,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -56797,8 +57425,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -56843,8 +57471,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -56889,8 +57517,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -56935,8 +57563,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -56981,8 +57609,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -57027,8 +57655,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -57073,8 +57701,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -57119,8 +57747,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -57165,8 +57793,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -57211,8 +57839,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -57257,8 +57885,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -57303,8 +57931,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -57349,8 +57977,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -57395,8 +58023,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -57441,8 +58069,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -57487,8 +58115,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -57533,8 +58161,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -57579,8 +58207,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -57625,8 +58253,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -57671,8 +58299,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -57717,8 +58345,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -57763,8 +58391,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -57809,8 +58437,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -57855,8 +58483,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -57901,8 +58529,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -57947,8 +58575,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -57993,8 +58621,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -58039,8 +58667,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -58085,8 +58713,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -58131,8 +58759,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -58177,8 +58805,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -58223,8 +58851,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -58269,8 +58897,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -58315,8 +58943,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -58361,8 +58989,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -58407,8 +59035,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -58453,8 +59081,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -58499,8 +59127,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -58545,8 +59173,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -58591,8 +59219,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -58637,8 +59265,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -58683,8 +59311,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -58729,8 +59357,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -58775,8 +59403,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -58821,8 +59449,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -58867,8 +59495,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -58913,8 +59541,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -58959,8 +59587,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -59005,8 +59633,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -59051,8 +59679,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -59097,8 +59725,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -59143,8 +59771,8 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
     #[doc = " * `cf_aig_cache_ttl`"]
@@ -59223,8 +59851,8 @@ extern "C" {
     pub fn set_query(this: &AIGatewayUniversalRequest, val: &JsValue);
 }
 impl AIGatewayUniversalRequest {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `provider`"]
     #[doc = " * `endpoint`"]
     #[doc = " * `headers`"]
@@ -59237,8 +59865,8 @@ impl AIGatewayUniversalRequest {
     ) -> AIGatewayUniversalRequest {
         Self::builder(provider, endpoint, headers, query).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `provider`"]
     #[doc = " * `endpoint`"]
     #[doc = " * `headers`"]
@@ -59251,8 +59879,8 @@ impl AIGatewayUniversalRequest {
     ) -> AIGatewayUniversalRequest {
         Self::builder_with_str(provider, endpoint, headers, query).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `provider`"]
     #[doc = " * `endpoint`"]
     #[doc = " * `headers`"]
@@ -59270,8 +59898,8 @@ impl AIGatewayUniversalRequest {
         inner.set_query(query);
         AIGatewayUniversalRequestBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `provider`"]
     #[doc = " * `endpoint`"]
     #[doc = " * `headers`"]
@@ -59452,172 +60080,210 @@ extern "C" {
     pub fn set_value_with_bool(this: &ComparisonFilter, val: bool);
 }
 impl ComparisonFilter {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"eq\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_eq(key: &str, value: &str) -> ComparisonFilter {
         Self::builder_eq(key, value).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"eq\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_eq_with_f64(key: &str, value: f64) -> ComparisonFilter {
         Self::builder_eq_with_f64(key, value).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"eq\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_eq_with_bool(key: &str, value: bool) -> ComparisonFilter {
         Self::builder_eq_with_bool(key, value).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"ne\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_ne(key: &str, value: &str) -> ComparisonFilter {
         Self::builder_ne(key, value).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"ne\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_ne_with_f64(key: &str, value: f64) -> ComparisonFilter {
         Self::builder_ne_with_f64(key, value).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"ne\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_ne_with_bool(key: &str, value: bool) -> ComparisonFilter {
         Self::builder_ne_with_bool(key, value).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"gt\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_gt(key: &str, value: &str) -> ComparisonFilter {
         Self::builder_gt(key, value).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"gt\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_gt_with_f64(key: &str, value: f64) -> ComparisonFilter {
         Self::builder_gt_with_f64(key, value).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"gt\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_gt_with_bool(key: &str, value: bool) -> ComparisonFilter {
         Self::builder_gt_with_bool(key, value).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"gte\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_gte(key: &str, value: &str) -> ComparisonFilter {
         Self::builder_gte(key, value).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"gte\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_gte_with_f64(key: &str, value: f64) -> ComparisonFilter {
         Self::builder_gte_with_f64(key, value).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"gte\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_gte_with_bool(key: &str, value: bool) -> ComparisonFilter {
         Self::builder_gte_with_bool(key, value).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"lt\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_lt(key: &str, value: &str) -> ComparisonFilter {
         Self::builder_lt(key, value).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"lt\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_lt_with_f64(key: &str, value: f64) -> ComparisonFilter {
         Self::builder_lt_with_f64(key, value).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"lt\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_lt_with_bool(key: &str, value: bool) -> ComparisonFilter {
         Self::builder_lt_with_bool(key, value).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"lte\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_lte(key: &str, value: &str) -> ComparisonFilter {
         Self::builder_lte(key, value).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"lte\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_lte_with_f64(key: &str, value: f64) -> ComparisonFilter {
         Self::builder_lte_with_f64(key, value).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"lte\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_lte_with_bool(key: &str, value: bool) -> ComparisonFilter {
         Self::builder_lte_with_bool(key, value).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"eq\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn builder_eq(key: &str, value: &str) -> ComparisonFilterBuilder {
@@ -59627,10 +60293,12 @@ impl ComparisonFilter {
         inner.set_value(value);
         ComparisonFilterBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"eq\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn builder_eq_with_f64(key: &str, value: f64) -> ComparisonFilterBuilder {
@@ -59640,10 +60308,12 @@ impl ComparisonFilter {
         inner.set_value_with_f64(value);
         ComparisonFilterBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"eq\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn builder_eq_with_bool(key: &str, value: bool) -> ComparisonFilterBuilder {
@@ -59653,10 +60323,12 @@ impl ComparisonFilter {
         inner.set_value_with_bool(value);
         ComparisonFilterBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"ne\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn builder_ne(key: &str, value: &str) -> ComparisonFilterBuilder {
@@ -59666,10 +60338,12 @@ impl ComparisonFilter {
         inner.set_value(value);
         ComparisonFilterBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"ne\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn builder_ne_with_f64(key: &str, value: f64) -> ComparisonFilterBuilder {
@@ -59679,10 +60353,12 @@ impl ComparisonFilter {
         inner.set_value_with_f64(value);
         ComparisonFilterBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"ne\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn builder_ne_with_bool(key: &str, value: bool) -> ComparisonFilterBuilder {
@@ -59692,10 +60368,12 @@ impl ComparisonFilter {
         inner.set_value_with_bool(value);
         ComparisonFilterBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"gt\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn builder_gt(key: &str, value: &str) -> ComparisonFilterBuilder {
@@ -59705,10 +60383,12 @@ impl ComparisonFilter {
         inner.set_value(value);
         ComparisonFilterBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"gt\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn builder_gt_with_f64(key: &str, value: f64) -> ComparisonFilterBuilder {
@@ -59718,10 +60398,12 @@ impl ComparisonFilter {
         inner.set_value_with_f64(value);
         ComparisonFilterBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"gt\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn builder_gt_with_bool(key: &str, value: bool) -> ComparisonFilterBuilder {
@@ -59731,10 +60413,12 @@ impl ComparisonFilter {
         inner.set_value_with_bool(value);
         ComparisonFilterBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"gte\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn builder_gte(key: &str, value: &str) -> ComparisonFilterBuilder {
@@ -59744,10 +60428,12 @@ impl ComparisonFilter {
         inner.set_value(value);
         ComparisonFilterBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"gte\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn builder_gte_with_f64(key: &str, value: f64) -> ComparisonFilterBuilder {
@@ -59757,10 +60443,12 @@ impl ComparisonFilter {
         inner.set_value_with_f64(value);
         ComparisonFilterBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"gte\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn builder_gte_with_bool(key: &str, value: bool) -> ComparisonFilterBuilder {
@@ -59770,10 +60458,12 @@ impl ComparisonFilter {
         inner.set_value_with_bool(value);
         ComparisonFilterBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"lt\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn builder_lt(key: &str, value: &str) -> ComparisonFilterBuilder {
@@ -59783,10 +60473,12 @@ impl ComparisonFilter {
         inner.set_value(value);
         ComparisonFilterBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"lt\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn builder_lt_with_f64(key: &str, value: f64) -> ComparisonFilterBuilder {
@@ -59796,10 +60488,12 @@ impl ComparisonFilter {
         inner.set_value_with_f64(value);
         ComparisonFilterBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"lt\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn builder_lt_with_bool(key: &str, value: bool) -> ComparisonFilterBuilder {
@@ -59809,10 +60503,12 @@ impl ComparisonFilter {
         inner.set_value_with_bool(value);
         ComparisonFilterBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"lte\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn builder_lte(key: &str, value: &str) -> ComparisonFilterBuilder {
@@ -59822,10 +60518,12 @@ impl ComparisonFilter {
         inner.set_value(value);
         ComparisonFilterBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"lte\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn builder_lte_with_f64(key: &str, value: f64) -> ComparisonFilterBuilder {
@@ -59835,10 +60533,12 @@ impl ComparisonFilter {
         inner.set_value_with_f64(value);
         ComparisonFilterBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"lte\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn builder_lte_with_bool(key: &str, value: bool) -> ComparisonFilterBuilder {
@@ -59874,26 +60574,32 @@ extern "C" {
     pub fn set_filters(this: &CompoundFilter, val: &Array<ComparisonFilter>);
 }
 impl CompoundFilter {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"and\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `filters`"]
     pub fn new_and(filters: &Array<ComparisonFilter>) -> CompoundFilter {
         Self::builder_and(filters).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"or\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `filters`"]
     pub fn new_or(filters: &Array<ComparisonFilter>) -> CompoundFilter {
         Self::builder_or(filters).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"and\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `filters`"]
     pub fn builder_and(filters: &Array<ComparisonFilter>) -> CompoundFilterBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -59901,10 +60607,12 @@ impl CompoundFilter {
         inner.set_filters(filters);
         CompoundFilterBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `type: \"or\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `filters`"]
     pub fn builder_or(filters: &Array<ComparisonFilter>) -> CompoundFilterBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -59954,14 +60662,14 @@ extern "C" {
     pub fn set_rewrite_query(this: &AutoRagSearchRequest, val: bool);
 }
 impl AutoRagSearchRequest {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `query`"]
     pub fn new(query: &str) -> AutoRagSearchRequest {
         Self::builder(query).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `query`"]
     pub fn builder(query: &str) -> AutoRagSearchRequestBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -60034,10 +60742,12 @@ extern "C" {
     pub fn set_next_page_with_null(this: &AutoRagSearchResponse, val: &Null);
 }
 impl AutoRagSearchResponse {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `object: \"vector_store.search_results.page\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `search_query`"]
     #[doc = " * `data`"]
     #[doc = " * `has_more`"]
@@ -60051,10 +60761,12 @@ impl AutoRagSearchResponse {
         Self::builder_vector_storesearch_resultspage(search_query, data, has_more, next_page)
             .build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `object: \"vector_store.search_results.page\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `search_query`"]
     #[doc = " * `data`"]
     #[doc = " * `has_more`"]
@@ -60415,7 +61127,7 @@ extern "C" {
     #[doc = " \"the same\" for caching purposes. If a request has the same cache key"]
     #[doc = " as some previous request, then we can serve the same cached response for"]
     #[doc = " both. (e.g. 'some-key')"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Only available for Enterprise customers."]
     #[wasm_bindgen(method, getter, js_name = "cacheKey")]
     pub fn cache_key(this: &RequestInitCfProperties) -> Option<String>;
@@ -60425,7 +61137,7 @@ extern "C" {
     #[doc = " to the origin response without modifications to the origin server."]
     #[doc = " This will allow for greater control over the Purge by Cache Tag feature"]
     #[doc = " utilizing changes only in the Workers process."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Only available for Enterprise customers."]
     #[wasm_bindgen(method, getter, js_name = "cacheTags")]
     pub fn cache_tags(this: &RequestInitCfProperties) -> Option<Array<JsString>>;
@@ -60477,7 +61189,7 @@ extern "C" {
     #[doc = " Redirects the request to an alternate origin server. You can use this,"]
     #[doc = " for example, to implement load balancing across several origins."]
     #[doc = " (e.g.us-east.example.com)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Note - For security reasons, the hostname set in resolveOverride must"]
     #[doc = " be proxied on the same Cloudflare zone of the incoming request."]
     #[doc = " Otherwise, the setting is ignored. CNAME hosts are allowed, so to"]
@@ -60605,9 +61317,9 @@ extern "C" {
     #[doc = " positions left side of the overlay 10 pixels from the left edge of the"]
     #[doc = " image it's drawn over. bottom: 0 aligns bottom of the overlay with bottom"]
     #[doc = " of the background image."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Setting both left & right, or both top & bottom is an error."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " If no position is specified, the image will be centered."]
     #[wasm_bindgen(method, getter)]
     pub fn top(this: &RequestInitCfPropertiesImageDraw) -> Option<f64>;
@@ -60627,16 +61339,16 @@ extern "C" {
     pub fn set_right(this: &RequestInitCfPropertiesImageDraw, val: f64);
 }
 impl RequestInitCfPropertiesImageDraw {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `url`: Absolute URL of the image file to use for the drawing. It can be any of"]
     #[doc = " the supported file formats. For drawing of watermarks or non-rectangular"]
     #[doc = " overlays we recommend using PNG or WebP images."]
     pub fn new(url: &str) -> RequestInitCfPropertiesImageDraw {
         Self::builder(url).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `url`: Absolute URL of the image file to use for the drawing. It can be any of"]
     #[doc = " the supported file formats. For drawing of watermarks or non-rectangular"]
     #[doc = " overlays we recommend using PNG or WebP images."]
@@ -60699,7 +61411,7 @@ extern "C" {
     pub fn set_dpr(this: &RequestInitCfPropertiesImage, val: f64);
     #[doc = " Allows you to trim your image. Takes dpr into account and is performed before"]
     #[doc = " resizing or rotation."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " It can be used as:"]
     #[doc = " - left, top, right, bottom - it will specify the number of pixels to cut"]
     #[doc = "   off each side"]
@@ -61113,28 +61825,28 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type IncomingRequestCfPropertiesBase;
     #[doc = " [ASN](https://www.iana.org/assignments/as-numbers/as-numbers.xhtml) of the incoming request."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example 395747"]
     #[wasm_bindgen(method, getter)]
     pub fn asn(this: &IncomingRequestCfPropertiesBase) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_asn(this: &IncomingRequestCfPropertiesBase, val: f64);
     #[doc = " The organization which owns the ASN of the incoming request."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"Google Cloud\""]
     #[wasm_bindgen(method, getter, js_name = "asOrganization")]
     pub fn as_organization(this: &IncomingRequestCfPropertiesBase) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "asOrganization")]
     pub fn set_as_organization(this: &IncomingRequestCfPropertiesBase, val: &str);
     #[doc = " The original value of the `Accept-Encoding` header if Cloudflare modified it."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"gzip, deflate, br\""]
     #[wasm_bindgen(method, getter, js_name = "clientAcceptEncoding")]
     pub fn client_accept_encoding(this: &IncomingRequestCfPropertiesBase) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "clientAcceptEncoding")]
     pub fn set_client_accept_encoding(this: &IncomingRequestCfPropertiesBase, val: &str);
     #[doc = " The number of milliseconds it took for the request to reach your worker."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example 22"]
     #[wasm_bindgen(method, getter, js_name = "clientTcpRtt")]
     pub fn client_tcp_rtt(this: &IncomingRequestCfPropertiesBase) -> Option<f64>;
@@ -61142,7 +61854,7 @@ extern "C" {
     pub fn set_client_tcp_rtt(this: &IncomingRequestCfPropertiesBase, val: f64);
     #[doc = " The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"DFW\""]
     #[wasm_bindgen(method, getter)]
     pub fn colo(this: &IncomingRequestCfPropertiesBase) -> String;
@@ -61151,9 +61863,9 @@ extern "C" {
     #[doc = " Represents the upstream's response to a"]
     #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
     #[doc = " from cloudflare."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " For workers with no upstream, this will always be `1`."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example 3"]
     #[wasm_bindgen(method, getter, js_name = "edgeRequestKeepAliveStatus")]
     pub fn edge_request_keep_alive_status(this: &IncomingRequestCfPropertiesBase) -> JsValue;
@@ -61185,16 +61897,16 @@ extern "C" {
         val: f64,
     );
     #[doc = " The HTTP Protocol the request used."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"HTTP/2\""]
     #[wasm_bindgen(method, getter, js_name = "httpProtocol")]
     pub fn http_protocol(this: &IncomingRequestCfPropertiesBase) -> String;
     #[wasm_bindgen(method, setter, js_name = "httpProtocol")]
     pub fn set_http_protocol(this: &IncomingRequestCfPropertiesBase, val: &str);
     #[doc = " The browser-requested prioritization information in the request object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " If no information was set, defaults to the empty string `\"\"`"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
     #[doc = " @default \"\""]
     #[wasm_bindgen(method, getter, js_name = "requestPriority")]
@@ -61203,7 +61915,7 @@ extern "C" {
     pub fn set_request_priority(this: &IncomingRequestCfPropertiesBase, val: &str);
     #[doc = " The TLS version of the connection to Cloudflare."]
     #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"TLSv1.3\""]
     #[wasm_bindgen(method, getter, js_name = "tlsVersion")]
     pub fn tls_version(this: &IncomingRequestCfPropertiesBase) -> String;
@@ -61211,14 +61923,14 @@ extern "C" {
     pub fn set_tls_version(this: &IncomingRequestCfPropertiesBase, val: &str);
     #[doc = " The cipher for the connection to Cloudflare."]
     #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
     #[wasm_bindgen(method, getter, js_name = "tlsCipher")]
     pub fn tls_cipher(this: &IncomingRequestCfPropertiesBase) -> String;
     #[wasm_bindgen(method, setter, js_name = "tlsCipher")]
     pub fn set_tls_cipher(this: &IncomingRequestCfPropertiesBase, val: &str);
     #[doc = " Metadata containing the [`HELLO`](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.1.2) and [`FINISHED`](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.9) messages from this request's TLS handshake."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " If the incoming request was served over plaintext (without TLS) this field is undefined."]
     #[wasm_bindgen(method, getter, js_name = "tlsExportedAuthenticator")]
     pub fn tls_exported_authenticator(
@@ -61231,35 +61943,35 @@ extern "C" {
     );
 }
 impl IncomingRequestCfPropertiesBase {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `colo`: The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"DFW\""]
     #[doc = " * `edge_request_keep_alive_status`: Represents the upstream's response to a"]
     #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
     #[doc = " from cloudflare."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " For workers with no upstream, this will always be `1`."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example 3"]
     #[doc = " * `http_protocol`: The HTTP Protocol the request used."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"HTTP/2\""]
     #[doc = " * `request_priority`: The browser-requested prioritization information in the request object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " If no information was set, defaults to the empty string `\"\"`"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
     #[doc = " @default \"\""]
     #[doc = " * `tls_version`: The TLS version of the connection to Cloudflare."]
     #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"TLSv1.3\""]
     #[doc = " * `tls_cipher`: The cipher for the connection to Cloudflare."]
     #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
     pub fn new(
         colo: &str,
@@ -61279,35 +61991,35 @@ impl IncomingRequestCfPropertiesBase {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `colo`: The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"DFW\""]
     #[doc = " * `edge_request_keep_alive_status`: Represents the upstream's response to a"]
     #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
     #[doc = " from cloudflare."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " For workers with no upstream, this will always be `1`."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example 3"]
     #[doc = " * `http_protocol`: The HTTP Protocol the request used."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"HTTP/2\""]
     #[doc = " * `request_priority`: The browser-requested prioritization information in the request object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " If no information was set, defaults to the empty string `\"\"`"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
     #[doc = " @default \"\""]
     #[doc = " * `tls_version`: The TLS version of the connection to Cloudflare."]
     #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"TLSv1.3\""]
     #[doc = " * `tls_cipher`: The cipher for the connection to Cloudflare."]
     #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
     pub fn builder(
         colo: &str,
@@ -61365,7 +62077,7 @@ extern "C" {
     pub type IncomingRequestCfPropertiesBotManagementBase;
     #[doc = " Cloudflareâ€™s [level of certainty](https://developers.cloudflare.com/bots/concepts/bot-score/) that a request comes from a bot,"]
     #[doc = " represented as an integer percentage between `1` (almost certainly a bot) and `99` (almost certainly human)."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example 54"]
     #[wasm_bindgen(method, getter)]
     pub fn score(this: &IncomingRequestCfPropertiesBotManagementBase) -> f64;
@@ -61398,11 +62110,11 @@ extern "C" {
     );
 }
 impl IncomingRequestCfPropertiesBotManagementBase {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `score`: Cloudflareâ€™s [level of certainty](https://developers.cloudflare.com/bots/concepts/bot-score/) that a request comes from a bot,"]
     #[doc = " represented as an integer percentage between `1` (almost certainly a bot) and `99` (almost certainly human)."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example 54"]
     #[doc = " * `verified_bot`: A boolean value that is true if the request comes from a good bot, like Google or Bing."]
     #[doc = " Most customers choose to allow this traffic. For more details, see [Traffic from known bots](https://developers.cloudflare.com/firewall/known-issues-and-faq/#how-does-firewall-rules-handle-traffic-from-known-bots)."]
@@ -61426,11 +62138,11 @@ impl IncomingRequestCfPropertiesBotManagementBase {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `score`: Cloudflareâ€™s [level of certainty](https://developers.cloudflare.com/bots/concepts/bot-score/) that a request comes from a bot,"]
     #[doc = " represented as an integer percentage between `1` (almost certainly a bot) and `99` (almost certainly human)."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example 54"]
     #[doc = " * `verified_bot`: A boolean value that is true if the request comes from a good bot, like Google or Bing."]
     #[doc = " Most customers choose to allow this traffic. For more details, see [Traffic from known bots](https://developers.cloudflare.com/firewall/known-issues-and-faq/#how-does-firewall-rules-handle-traffic-from-known-bots)."]
@@ -61478,7 +62190,7 @@ extern "C" {
         val: &IncomingRequestCfPropertiesBotManagementBase,
     );
     #[doc = " Duplicate of `botManagement.score`."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @deprecated"]
     #[wasm_bindgen(method, getter, js_name = "clientTrustScore")]
     pub fn client_trust_score(this: &IncomingRequestCfPropertiesBotManagement) -> f64;
@@ -61486,11 +62198,11 @@ extern "C" {
     pub fn set_client_trust_score(this: &IncomingRequestCfPropertiesBotManagement, val: f64);
 }
 impl IncomingRequestCfPropertiesBotManagement {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `bot_management`: Results of Cloudflare's Bot Management analysis"]
     #[doc = " * `client_trust_score`: Duplicate of `botManagement.score`."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @deprecated"]
     pub fn new(
         bot_management: &IncomingRequestCfPropertiesBotManagementBase,
@@ -61498,11 +62210,11 @@ impl IncomingRequestCfPropertiesBotManagement {
     ) -> IncomingRequestCfPropertiesBotManagement {
         Self::builder(bot_management, client_trust_score).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `bot_management`: Results of Cloudflare's Bot Management analysis"]
     #[doc = " * `client_trust_score`: Duplicate of `botManagement.score`."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @deprecated"]
     pub fn builder(
         bot_management: &IncomingRequestCfPropertiesBotManagementBase,
@@ -61537,14 +62249,14 @@ extern "C" {
     );
 }
 impl IncomingRequestCfPropertiesBotManagementEnterprise {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `bot_management`: Results of Cloudflare's Bot Management analysis"]
     pub fn new(bot_management: &JsValue) -> IncomingRequestCfPropertiesBotManagementEnterprise {
         Self::builder(bot_management).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `bot_management`: Results of Cloudflare's Bot Management analysis"]
     pub fn builder(
         bot_management: &JsValue,
@@ -61568,7 +62280,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type IncomingRequestCfPropertiesCloudflareForSaaSEnterprise;
     #[doc = " Custom metadata set per-host in [Cloudflare for SaaS](https://developers.cloudflare.com/cloudflare-for-platforms/cloudflare-for-saas/)."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " This field is only present if you have Cloudflare for SaaS enabled on your account"]
     #[doc = " and you have followed the [required steps to enable it]((https://developers.cloudflare.com/cloudflare-for-platforms/cloudflare-for-saas/domain-support/custom-metadata/))."]
     #[wasm_bindgen(method, getter, js_name = "hostMetadata")]
@@ -61609,15 +62321,15 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type IncomingRequestCfPropertiesCloudflareAccessOrApiShield;
     #[doc = " Information about the client certificate presented to Cloudflare."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " This is populated when the incoming request is served over TLS using"]
     #[doc = " either Cloudflare Access or API Shield (mTLS)"]
     #[doc = " and the presented SSL certificate has a valid"]
     #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
     #[doc = " (i.e., not `null` or `\"\"`)."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Otherwise, a set of placeholder values are used."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The property `certPresented` will be set to `\"1\"` when"]
     #[doc = " the object is populated (i.e. the above conditions were met)."]
     #[wasm_bindgen(method, getter, js_name = "tlsClientAuth")]
@@ -61636,18 +62348,18 @@ extern "C" {
     );
 }
 impl IncomingRequestCfPropertiesCloudflareAccessOrApiShield {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `tls_client_auth`: Information about the client certificate presented to Cloudflare."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " This is populated when the incoming request is served over TLS using"]
     #[doc = " either Cloudflare Access or API Shield (mTLS)"]
     #[doc = " and the presented SSL certificate has a valid"]
     #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
     #[doc = " (i.e., not `null` or `\"\"`)."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Otherwise, a set of placeholder values are used."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The property `certPresented` will be set to `\"1\"` when"]
     #[doc = " the object is populated (i.e. the above conditions were met)."]
     pub fn new(
@@ -61655,18 +62367,18 @@ impl IncomingRequestCfPropertiesCloudflareAccessOrApiShield {
     ) -> IncomingRequestCfPropertiesCloudflareAccessOrApiShield {
         Self::builder(tls_client_auth).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `tls_client_auth`: Information about the client certificate presented to Cloudflare."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " This is populated when the incoming request is served over TLS using"]
     #[doc = " either Cloudflare Access or API Shield (mTLS)"]
     #[doc = " and the presented SSL certificate has a valid"]
     #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
     #[doc = " (i.e., not `null` or `\"\"`)."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Otherwise, a set of placeholder values are used."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The property `certPresented` will be set to `\"1\"` when"]
     #[doc = " the object is populated (i.e. the above conditions were met)."]
     pub fn new_with_incoming_request_cf_properties_tls_client_auth_placeholder(
@@ -61677,18 +62389,18 @@ impl IncomingRequestCfPropertiesCloudflareAccessOrApiShield {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `tls_client_auth`: Information about the client certificate presented to Cloudflare."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " This is populated when the incoming request is served over TLS using"]
     #[doc = " either Cloudflare Access or API Shield (mTLS)"]
     #[doc = " and the presented SSL certificate has a valid"]
     #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
     #[doc = " (i.e., not `null` or `\"\"`)."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Otherwise, a set of placeholder values are used."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The property `certPresented` will be set to `\"1\"` when"]
     #[doc = " the object is populated (i.e. the above conditions were met)."]
     pub fn builder(
@@ -61698,18 +62410,18 @@ impl IncomingRequestCfPropertiesCloudflareAccessOrApiShield {
         inner.set_tls_client_auth(tls_client_auth);
         IncomingRequestCfPropertiesCloudflareAccessOrApiShieldBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `tls_client_auth`: Information about the client certificate presented to Cloudflare."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " This is populated when the incoming request is served over TLS using"]
     #[doc = " either Cloudflare Access or API Shield (mTLS)"]
     #[doc = " and the presented SSL certificate has a valid"]
     #[doc = " [Certificate Serial Number](https://ldapwiki.com/wiki/Certificate%20Serial%20Number)"]
     #[doc = " (i.e., not `null` or `\"\"`)."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Otherwise, a set of placeholder values are used."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The property `certPresented` will be set to `\"1\"` when"]
     #[doc = " the object is populated (i.e. the above conditions were met)."]
     pub fn builder_with_incoming_request_cf_properties_tls_client_auth_placeholder(
@@ -61736,7 +62448,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type IncomingRequestCfPropertiesExportedAuthenticatorMetadata;
     #[doc = " The client's [`HELLO` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.1.2), encoded in hexadecimal"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"44372ba35fa1270921d318f34c12f155dc87b682cf36a790cfaa3ba8737a1b5d\""]
     #[wasm_bindgen(method, getter, js_name = "clientHandshake")]
     pub fn client_handshake(
@@ -61748,7 +62460,7 @@ extern "C" {
         val: &str,
     );
     #[doc = " The server's [`HELLO` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.1.2), encoded in hexadecimal"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"44372ba35fa1270921d318f34c12f155dc87b682cf36a790cfaa3ba8737a1b5d\""]
     #[wasm_bindgen(method, getter, js_name = "serverHandshake")]
     pub fn server_handshake(
@@ -61760,7 +62472,7 @@ extern "C" {
         val: &str,
     );
     #[doc = " The client's [`FINISHED` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.9), encoded in hexadecimal"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"084ee802fe1348f688220e2a6040a05b2199a761f33cf753abb1b006792d3f8b\""]
     #[wasm_bindgen(method, getter, js_name = "clientFinished")]
     pub fn client_finished(
@@ -61772,7 +62484,7 @@ extern "C" {
         val: &str,
     );
     #[doc = " The server's [`FINISHED` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.9), encoded in hexadecimal"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"084ee802fe1348f688220e2a6040a05b2199a761f33cf753abb1b006792d3f8b\""]
     #[wasm_bindgen(method, getter, js_name = "serverFinished")]
     pub fn server_finished(
@@ -61785,19 +62497,19 @@ extern "C" {
     );
 }
 impl IncomingRequestCfPropertiesExportedAuthenticatorMetadata {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `client_handshake`: The client's [`HELLO` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.1.2), encoded in hexadecimal"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"44372ba35fa1270921d318f34c12f155dc87b682cf36a790cfaa3ba8737a1b5d\""]
     #[doc = " * `server_handshake`: The server's [`HELLO` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.1.2), encoded in hexadecimal"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"44372ba35fa1270921d318f34c12f155dc87b682cf36a790cfaa3ba8737a1b5d\""]
     #[doc = " * `client_finished`: The client's [`FINISHED` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.9), encoded in hexadecimal"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"084ee802fe1348f688220e2a6040a05b2199a761f33cf753abb1b006792d3f8b\""]
     #[doc = " * `server_finished`: The server's [`FINISHED` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.9), encoded in hexadecimal"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"084ee802fe1348f688220e2a6040a05b2199a761f33cf753abb1b006792d3f8b\""]
     pub fn new(
         client_handshake: &str,
@@ -61813,19 +62525,19 @@ impl IncomingRequestCfPropertiesExportedAuthenticatorMetadata {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `client_handshake`: The client's [`HELLO` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.1.2), encoded in hexadecimal"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"44372ba35fa1270921d318f34c12f155dc87b682cf36a790cfaa3ba8737a1b5d\""]
     #[doc = " * `server_handshake`: The server's [`HELLO` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.1.2), encoded in hexadecimal"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"44372ba35fa1270921d318f34c12f155dc87b682cf36a790cfaa3ba8737a1b5d\""]
     #[doc = " * `client_finished`: The client's [`FINISHED` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.9), encoded in hexadecimal"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"084ee802fe1348f688220e2a6040a05b2199a761f33cf753abb1b006792d3f8b\""]
     #[doc = " * `server_finished`: The server's [`FINISHED` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.9), encoded in hexadecimal"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"084ee802fe1348f688220e2a6040a05b2199a761f33cf753abb1b006792d3f8b\""]
     pub fn builder(
         client_handshake: &str,
@@ -61855,13 +62567,13 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type IncomingRequestCfPropertiesGeographicInformation;
     #[doc = " The [ISO 3166-1 Alpha 2](https://www.iso.org/iso-3166-country-codes.html) country code the request originated from."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " If your worker is [configured to accept TOR connections](https://support.cloudflare.com/hc/en-us/articles/203306930-Understanding-Cloudflare-Tor-support-and-Onion-Routing), this may also be `\"T1\"`, indicating a request that originated over TOR."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " If Cloudflare is unable to determine where the request originated this property is omitted."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The country code `\"T1\"` is used for requests originating on TOR."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"GB\""]
     #[wasm_bindgen(method, getter)]
     pub fn country(this: &IncomingRequestCfPropertiesGeographicInformation) -> Option<JsValue>;
@@ -61876,7 +62588,7 @@ extern "C" {
         val: &str,
     );
     #[doc = " If present, this property indicates that the request originated in the EU"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"1\""]
     #[wasm_bindgen(method, getter, js_name = "isEUCountry")]
     pub fn is_eu_country(this: &IncomingRequestCfPropertiesGeographicInformation)
@@ -61884,7 +62596,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "isEUCountry")]
     pub fn set_is_eu_country(this: &IncomingRequestCfPropertiesGeographicInformation, val: &str);
     #[doc = " A two-letter code indicating the continent the request originated from."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"AN\""]
     #[wasm_bindgen(method, getter)]
     pub fn continent(
@@ -61896,35 +62608,35 @@ extern "C" {
         val: &ContinentCode,
     );
     #[doc = " The city the request originated from"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"Austin\""]
     #[wasm_bindgen(method, getter)]
     pub fn city(this: &IncomingRequestCfPropertiesGeographicInformation) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_city(this: &IncomingRequestCfPropertiesGeographicInformation, val: &str);
     #[doc = " Postal code of the incoming request"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"78701\""]
     #[wasm_bindgen(method, getter, js_name = "postalCode")]
     pub fn postal_code(this: &IncomingRequestCfPropertiesGeographicInformation) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "postalCode")]
     pub fn set_postal_code(this: &IncomingRequestCfPropertiesGeographicInformation, val: &str);
     #[doc = " Latitude of the incoming request"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"30.27130\""]
     #[wasm_bindgen(method, getter)]
     pub fn latitude(this: &IncomingRequestCfPropertiesGeographicInformation) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_latitude(this: &IncomingRequestCfPropertiesGeographicInformation, val: &str);
     #[doc = " Longitude of the incoming request"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"-97.74260\""]
     #[wasm_bindgen(method, getter)]
     pub fn longitude(this: &IncomingRequestCfPropertiesGeographicInformation) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_longitude(this: &IncomingRequestCfPropertiesGeographicInformation, val: &str);
     #[doc = " Timezone of the incoming request"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"America/Chicago\""]
     #[wasm_bindgen(method, getter)]
     pub fn timezone(this: &IncomingRequestCfPropertiesGeographicInformation) -> Option<String>;
@@ -61932,7 +62644,7 @@ extern "C" {
     pub fn set_timezone(this: &IncomingRequestCfPropertiesGeographicInformation, val: &str);
     #[doc = " If known, the ISO 3166-2 name for the first level region associated with"]
     #[doc = " the IP address of the incoming request"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"Texas\""]
     #[wasm_bindgen(method, getter)]
     pub fn region(this: &IncomingRequestCfPropertiesGeographicInformation) -> Option<String>;
@@ -61940,14 +62652,14 @@ extern "C" {
     pub fn set_region(this: &IncomingRequestCfPropertiesGeographicInformation, val: &str);
     #[doc = " If known, the ISO 3166-2 code for the first-level region associated with"]
     #[doc = " the IP address of the incoming request"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"TX\""]
     #[wasm_bindgen(method, getter, js_name = "regionCode")]
     pub fn region_code(this: &IncomingRequestCfPropertiesGeographicInformation) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "regionCode")]
     pub fn set_region_code(this: &IncomingRequestCfPropertiesGeographicInformation, val: &str);
     #[doc = " Metro code (DMA) of the incoming request"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"635\""]
     #[wasm_bindgen(method, getter, js_name = "metroCode")]
     pub fn metro_code(this: &IncomingRequestCfPropertiesGeographicInformation) -> Option<String>;
@@ -62031,7 +62743,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "certPresented")]
     pub fn set_cert_presented(this: &IncomingRequestCfPropertiesTLSClientAuth, val: &str);
     #[doc = " Result of certificate verification."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"FAILED:self signed certificate\""]
     #[wasm_bindgen(method, getter, js_name = "certVerified")]
     pub fn cert_verified(this: &IncomingRequestCfPropertiesTLSClientAuth)
@@ -62042,7 +62754,7 @@ extern "C" {
         val: &CertVerificationStatus,
     );
     #[doc = " The presented certificate's revokation status."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " - A value of `\"1\"` indicates the certificate has been revoked"]
     #[doc = " - A value of `\"0\"` indicates the certificate has not been revoked"]
     #[wasm_bindgen(method, getter, js_name = "certRevoked")]
@@ -62055,28 +62767,28 @@ extern "C" {
         val: &str,
     );
     #[doc = " The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"CN=cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
     #[wasm_bindgen(method, getter, js_name = "certIssuerDN")]
     pub fn cert_issuer_dn(this: &IncomingRequestCfPropertiesTLSClientAuth) -> String;
     #[wasm_bindgen(method, setter, js_name = "certIssuerDN")]
     pub fn set_cert_issuer_dn(this: &IncomingRequestCfPropertiesTLSClientAuth, val: &str);
     #[doc = " The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"CN=*.cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
     #[wasm_bindgen(method, getter, js_name = "certSubjectDN")]
     pub fn cert_subject_dn(this: &IncomingRequestCfPropertiesTLSClientAuth) -> String;
     #[wasm_bindgen(method, setter, js_name = "certSubjectDN")]
     pub fn set_cert_subject_dn(this: &IncomingRequestCfPropertiesTLSClientAuth, val: &str);
     #[doc = " The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"CN=cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
     #[wasm_bindgen(method, getter, js_name = "certIssuerDNRFC2253")]
     pub fn cert_issuer_dnrfc_2253(this: &IncomingRequestCfPropertiesTLSClientAuth) -> String;
     #[wasm_bindgen(method, setter, js_name = "certIssuerDNRFC2253")]
     pub fn set_cert_issuer_dnrfc_2253(this: &IncomingRequestCfPropertiesTLSClientAuth, val: &str);
     #[doc = " The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"CN=*.cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
     #[wasm_bindgen(method, getter, js_name = "certSubjectDNRFC2253")]
     pub fn cert_subject_dnrfc_2253(this: &IncomingRequestCfPropertiesTLSClientAuth) -> String;
@@ -62093,56 +62805,56 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "certSubjectDNLegacy")]
     pub fn set_cert_subject_dn_legacy(this: &IncomingRequestCfPropertiesTLSClientAuth, val: &str);
     #[doc = " The certificate's serial number"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"00936EACBE07F201DF\""]
     #[wasm_bindgen(method, getter, js_name = "certSerial")]
     pub fn cert_serial(this: &IncomingRequestCfPropertiesTLSClientAuth) -> String;
     #[wasm_bindgen(method, setter, js_name = "certSerial")]
     pub fn set_cert_serial(this: &IncomingRequestCfPropertiesTLSClientAuth, val: &str);
     #[doc = " The certificate issuer's serial number"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"2489002934BDFEA34\""]
     #[wasm_bindgen(method, getter, js_name = "certIssuerSerial")]
     pub fn cert_issuer_serial(this: &IncomingRequestCfPropertiesTLSClientAuth) -> String;
     #[wasm_bindgen(method, setter, js_name = "certIssuerSerial")]
     pub fn set_cert_issuer_serial(this: &IncomingRequestCfPropertiesTLSClientAuth, val: &str);
     #[doc = " The certificate's Subject Key Identifier"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"BB:AF:7E:02:3D:FA:A6:F1:3C:84:8E:AD:EE:38:98:EC:D9:32:32:D4\""]
     #[wasm_bindgen(method, getter, js_name = "certSKI")]
     pub fn cert_ski(this: &IncomingRequestCfPropertiesTLSClientAuth) -> String;
     #[wasm_bindgen(method, setter, js_name = "certSKI")]
     pub fn set_cert_ski(this: &IncomingRequestCfPropertiesTLSClientAuth, val: &str);
     #[doc = " The certificate issuer's Subject Key Identifier"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"BB:AF:7E:02:3D:FA:A6:F1:3C:84:8E:AD:EE:38:98:EC:D9:32:32:D4\""]
     #[wasm_bindgen(method, getter, js_name = "certIssuerSKI")]
     pub fn cert_issuer_ski(this: &IncomingRequestCfPropertiesTLSClientAuth) -> String;
     #[wasm_bindgen(method, setter, js_name = "certIssuerSKI")]
     pub fn set_cert_issuer_ski(this: &IncomingRequestCfPropertiesTLSClientAuth, val: &str);
     #[doc = " The certificate's SHA-1 fingerprint"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"6b9109f323999e52259cda7373ff0b4d26bd232e\""]
     #[wasm_bindgen(method, getter, js_name = "certFingerprintSHA1")]
     pub fn cert_fingerprint_sha_1(this: &IncomingRequestCfPropertiesTLSClientAuth) -> String;
     #[wasm_bindgen(method, setter, js_name = "certFingerprintSHA1")]
     pub fn set_cert_fingerprint_sha_1(this: &IncomingRequestCfPropertiesTLSClientAuth, val: &str);
     #[doc = " The certificate's SHA-256 fingerprint"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"acf77cf37b4156a2708e34c4eb755f9b5dbbe5ebb55adfec8f11493438d19e6ad3f157f81fa3b98278453d5652b0c1fd1d71e5695ae4d709803a4d3f39de9dea\""]
     #[wasm_bindgen(method, getter, js_name = "certFingerprintSHA256")]
     pub fn cert_fingerprint_sha_256(this: &IncomingRequestCfPropertiesTLSClientAuth) -> String;
     #[wasm_bindgen(method, setter, js_name = "certFingerprintSHA256")]
     pub fn set_cert_fingerprint_sha_256(this: &IncomingRequestCfPropertiesTLSClientAuth, val: &str);
     #[doc = " The effective starting date of the certificate"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
     #[wasm_bindgen(method, getter, js_name = "certNotBefore")]
     pub fn cert_not_before(this: &IncomingRequestCfPropertiesTLSClientAuth) -> String;
     #[wasm_bindgen(method, setter, js_name = "certNotBefore")]
     pub fn set_cert_not_before(this: &IncomingRequestCfPropertiesTLSClientAuth, val: &str);
     #[doc = " The effective expiration date of the certificate"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
     #[wasm_bindgen(method, getter, js_name = "certNotAfter")]
     pub fn cert_not_after(this: &IncomingRequestCfPropertiesTLSClientAuth) -> String;
@@ -62150,54 +62862,56 @@ extern "C" {
     pub fn set_cert_not_after(this: &IncomingRequestCfPropertiesTLSClientAuth, val: &str);
 }
 impl IncomingRequestCfPropertiesTLSClientAuth {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `certPresented: \"1\"`: Always `\"1\"`, indicating that the certificate was presented"]
     #[doc = " * `certRevoked: \"1\"`: The presented certificate's revokation status."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " - A value of `\"1\"` indicates the certificate has been revoked"]
     #[doc = " - A value of `\"0\"` indicates the certificate has not been revoked"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cert_verified`: Result of certificate verification."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"FAILED:self signed certificate\""]
     #[doc = " * `cert_issuer_dn`: The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"CN=cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
     #[doc = " * `cert_subject_dn`: The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"CN=*.cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
     #[doc = " * `cert_issuer_dnrfc_2253`: The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"CN=cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
     #[doc = " * `cert_subject_dnrfc_2253`: The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"CN=*.cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
     #[doc = " * `cert_issuer_dn_legacy`: The certificate issuer's distinguished name (legacy policies)"]
     #[doc = " * `cert_subject_dn_legacy`: The certificate subject's distinguished name (legacy policies)"]
     #[doc = " * `cert_serial`: The certificate's serial number"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"00936EACBE07F201DF\""]
     #[doc = " * `cert_issuer_serial`: The certificate issuer's serial number"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"2489002934BDFEA34\""]
     #[doc = " * `cert_ski`: The certificate's Subject Key Identifier"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"BB:AF:7E:02:3D:FA:A6:F1:3C:84:8E:AD:EE:38:98:EC:D9:32:32:D4\""]
     #[doc = " * `cert_issuer_ski`: The certificate issuer's Subject Key Identifier"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"BB:AF:7E:02:3D:FA:A6:F1:3C:84:8E:AD:EE:38:98:EC:D9:32:32:D4\""]
     #[doc = " * `cert_fingerprint_sha_1`: The certificate's SHA-1 fingerprint"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"6b9109f323999e52259cda7373ff0b4d26bd232e\""]
     #[doc = " * `cert_fingerprint_sha_256`: The certificate's SHA-256 fingerprint"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"acf77cf37b4156a2708e34c4eb755f9b5dbbe5ebb55adfec8f11493438d19e6ad3f157f81fa3b98278453d5652b0c1fd1d71e5695ae4d709803a4d3f39de9dea\""]
     #[doc = " * `cert_not_before`: The effective starting date of the certificate"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
     #[doc = " * `cert_not_after`: The effective expiration date of the certificate"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
     pub fn new_1_1(
         cert_verified: &CertVerificationStatus,
@@ -62235,54 +62949,56 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
         )
         .build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `certPresented: \"1\"`: Always `\"1\"`, indicating that the certificate was presented"]
     #[doc = " * `certRevoked: \"0\"`: The presented certificate's revokation status."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " - A value of `\"1\"` indicates the certificate has been revoked"]
     #[doc = " - A value of `\"0\"` indicates the certificate has not been revoked"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cert_verified`: Result of certificate verification."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"FAILED:self signed certificate\""]
     #[doc = " * `cert_issuer_dn`: The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"CN=cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
     #[doc = " * `cert_subject_dn`: The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"CN=*.cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
     #[doc = " * `cert_issuer_dnrfc_2253`: The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"CN=cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
     #[doc = " * `cert_subject_dnrfc_2253`: The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"CN=*.cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
     #[doc = " * `cert_issuer_dn_legacy`: The certificate issuer's distinguished name (legacy policies)"]
     #[doc = " * `cert_subject_dn_legacy`: The certificate subject's distinguished name (legacy policies)"]
     #[doc = " * `cert_serial`: The certificate's serial number"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"00936EACBE07F201DF\""]
     #[doc = " * `cert_issuer_serial`: The certificate issuer's serial number"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"2489002934BDFEA34\""]
     #[doc = " * `cert_ski`: The certificate's Subject Key Identifier"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"BB:AF:7E:02:3D:FA:A6:F1:3C:84:8E:AD:EE:38:98:EC:D9:32:32:D4\""]
     #[doc = " * `cert_issuer_ski`: The certificate issuer's Subject Key Identifier"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"BB:AF:7E:02:3D:FA:A6:F1:3C:84:8E:AD:EE:38:98:EC:D9:32:32:D4\""]
     #[doc = " * `cert_fingerprint_sha_1`: The certificate's SHA-1 fingerprint"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"6b9109f323999e52259cda7373ff0b4d26bd232e\""]
     #[doc = " * `cert_fingerprint_sha_256`: The certificate's SHA-256 fingerprint"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"acf77cf37b4156a2708e34c4eb755f9b5dbbe5ebb55adfec8f11493438d19e6ad3f157f81fa3b98278453d5652b0c1fd1d71e5695ae4d709803a4d3f39de9dea\""]
     #[doc = " * `cert_not_before`: The effective starting date of the certificate"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
     #[doc = " * `cert_not_after`: The effective expiration date of the certificate"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
     pub fn new_1_0(
         cert_verified: &CertVerificationStatus,
@@ -62320,54 +63036,56 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
         )
         .build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `certPresented: \"1\"`: Always `\"1\"`, indicating that the certificate was presented"]
     #[doc = " * `certRevoked: \"1\"`: The presented certificate's revokation status."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " - A value of `\"1\"` indicates the certificate has been revoked"]
     #[doc = " - A value of `\"0\"` indicates the certificate has not been revoked"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cert_verified`: Result of certificate verification."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"FAILED:self signed certificate\""]
     #[doc = " * `cert_issuer_dn`: The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"CN=cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
     #[doc = " * `cert_subject_dn`: The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"CN=*.cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
     #[doc = " * `cert_issuer_dnrfc_2253`: The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"CN=cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
     #[doc = " * `cert_subject_dnrfc_2253`: The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"CN=*.cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
     #[doc = " * `cert_issuer_dn_legacy`: The certificate issuer's distinguished name (legacy policies)"]
     #[doc = " * `cert_subject_dn_legacy`: The certificate subject's distinguished name (legacy policies)"]
     #[doc = " * `cert_serial`: The certificate's serial number"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"00936EACBE07F201DF\""]
     #[doc = " * `cert_issuer_serial`: The certificate issuer's serial number"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"2489002934BDFEA34\""]
     #[doc = " * `cert_ski`: The certificate's Subject Key Identifier"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"BB:AF:7E:02:3D:FA:A6:F1:3C:84:8E:AD:EE:38:98:EC:D9:32:32:D4\""]
     #[doc = " * `cert_issuer_ski`: The certificate issuer's Subject Key Identifier"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"BB:AF:7E:02:3D:FA:A6:F1:3C:84:8E:AD:EE:38:98:EC:D9:32:32:D4\""]
     #[doc = " * `cert_fingerprint_sha_1`: The certificate's SHA-1 fingerprint"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"6b9109f323999e52259cda7373ff0b4d26bd232e\""]
     #[doc = " * `cert_fingerprint_sha_256`: The certificate's SHA-256 fingerprint"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"acf77cf37b4156a2708e34c4eb755f9b5dbbe5ebb55adfec8f11493438d19e6ad3f157f81fa3b98278453d5652b0c1fd1d71e5695ae4d709803a4d3f39de9dea\""]
     #[doc = " * `cert_not_before`: The effective starting date of the certificate"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
     #[doc = " * `cert_not_after`: The effective expiration date of the certificate"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
     pub fn builder_1_1(
         cert_verified: &CertVerificationStatus,
@@ -62406,54 +63124,56 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
         inner.set_cert_not_after(cert_not_after);
         IncomingRequestCfPropertiesTLSClientAuthBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `certPresented: \"1\"`: Always `\"1\"`, indicating that the certificate was presented"]
     #[doc = " * `certRevoked: \"0\"`: The presented certificate's revokation status."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " - A value of `\"1\"` indicates the certificate has been revoked"]
     #[doc = " - A value of `\"0\"` indicates the certificate has not been revoked"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `cert_verified`: Result of certificate verification."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"FAILED:self signed certificate\""]
     #[doc = " * `cert_issuer_dn`: The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"CN=cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
     #[doc = " * `cert_subject_dn`: The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"CN=*.cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
     #[doc = " * `cert_issuer_dnrfc_2253`: The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"CN=cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
     #[doc = " * `cert_subject_dnrfc_2253`: The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"CN=*.cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
     #[doc = " * `cert_issuer_dn_legacy`: The certificate issuer's distinguished name (legacy policies)"]
     #[doc = " * `cert_subject_dn_legacy`: The certificate subject's distinguished name (legacy policies)"]
     #[doc = " * `cert_serial`: The certificate's serial number"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"00936EACBE07F201DF\""]
     #[doc = " * `cert_issuer_serial`: The certificate issuer's serial number"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"2489002934BDFEA34\""]
     #[doc = " * `cert_ski`: The certificate's Subject Key Identifier"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"BB:AF:7E:02:3D:FA:A6:F1:3C:84:8E:AD:EE:38:98:EC:D9:32:32:D4\""]
     #[doc = " * `cert_issuer_ski`: The certificate issuer's Subject Key Identifier"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"BB:AF:7E:02:3D:FA:A6:F1:3C:84:8E:AD:EE:38:98:EC:D9:32:32:D4\""]
     #[doc = " * `cert_fingerprint_sha_1`: The certificate's SHA-1 fingerprint"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"6b9109f323999e52259cda7373ff0b4d26bd232e\""]
     #[doc = " * `cert_fingerprint_sha_256`: The certificate's SHA-256 fingerprint"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"acf77cf37b4156a2708e34c4eb755f9b5dbbe5ebb55adfec8f11493438d19e6ad3f157f81fa3b98278453d5652b0c1fd1d71e5695ae4d709803a4d3f39de9dea\""]
     #[doc = " * `cert_not_before`: The effective starting date of the certificate"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
     #[doc = " * `cert_not_after`: The effective expiration date of the certificate"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
     pub fn builder_1_0(
         cert_verified: &CertVerificationStatus,
@@ -62628,6 +63348,8 @@ extern "C" {
     );
 }
 impl IncomingRequestCfPropertiesTLSClientAuthPlaceholder {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `certPresented: \"0\"`"]
     #[doc = " * `certVerified: \"NONE\"`"]
     #[doc = " * `certRevoked: \"0\"`"]
@@ -62648,6 +63370,8 @@ impl IncomingRequestCfPropertiesTLSClientAuthPlaceholder {
     pub fn new_0_none_0______________() -> IncomingRequestCfPropertiesTLSClientAuthPlaceholder {
         Self::builder_0_none_0______________().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `certPresented: \"0\"`"]
     #[doc = " * `certVerified: \"NONE\"`"]
     #[doc = " * `certRevoked: \"0\"`"]
@@ -63298,8 +64022,8 @@ extern "C" {
     pub fn set_total_attempts(this: &D1Meta, val: f64);
 }
 impl D1Meta {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `duration`"]
     #[doc = " * `size_after`"]
     #[doc = " * `rows_read`"]
@@ -63327,8 +64051,8 @@ impl D1Meta {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `duration`"]
     #[doc = " * `size_after`"]
     #[doc = " * `rows_read`"]
@@ -63403,18 +64127,22 @@ extern "C" {
     pub fn set_error(this: &D1Response, val: &JsValue);
 }
 impl D1Response {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `success: true`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `meta`"]
     pub fn new_true(meta: &JsValue) -> D1Response {
         Self::builder_true(meta).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `success: true`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `meta`"]
     pub fn builder_true(meta: &JsValue) -> D1ResponseBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -63452,15 +64180,15 @@ extern "C" {
     pub fn set_duration(this: &D1ExecResult, val: f64);
 }
 impl D1ExecResult {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `count`"]
     #[doc = " * `duration`"]
     pub fn new(count: f64, duration: f64) -> D1ExecResult {
         Self::builder(count, duration).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `count`"]
     #[doc = " * `duration`"]
     pub fn builder(count: f64, duration: f64) -> D1ExecResultBuilder {
@@ -63507,27 +64235,27 @@ extern "C" {
     #[doc = " Creates a new D1 Session anchored at the given constraint or the bookmark."]
     #[doc = " All queries executed using the created session will have sequential consistency,"]
     #[doc = " meaning that all writes done through the session will be visible in subsequent reads."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `constraintOrBookmark` - Either the session constraint or the explicit bookmark to anchor the created session."]
     #[wasm_bindgen(method, js_name = "withSession")]
     pub fn with_session(this: &D1Database) -> D1DatabaseSession;
     #[doc = " Creates a new D1 Session anchored at the given constraint or the bookmark."]
     #[doc = " All queries executed using the created session will have sequential consistency,"]
     #[doc = " meaning that all writes done through the session will be visible in subsequent reads."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `constraintOrBookmark` - Either the session constraint or the explicit bookmark to anchor the created session."]
     #[wasm_bindgen(method, catch, js_name = "withSession")]
     pub fn try_with_session(this: &D1Database) -> Result<D1DatabaseSession, JsValue>;
     #[doc = " Creates a new D1 Session anchored at the given constraint or the bookmark."]
     #[doc = " All queries executed using the created session will have sequential consistency,"]
     #[doc = " meaning that all writes done through the session will be visible in subsequent reads."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `constraintOrBookmark` - Either the session constraint or the explicit bookmark to anchor the created session."]
     #[wasm_bindgen(method, js_name = "withSession")]
     pub fn with_session_with_str(
@@ -63537,9 +64265,9 @@ extern "C" {
     #[doc = " Creates a new D1 Session anchored at the given constraint or the bookmark."]
     #[doc = " All queries executed using the created session will have sequential consistency,"]
     #[doc = " meaning that all writes done through the session will be visible in subsequent reads."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `constraintOrBookmark` - Either the session constraint or the explicit bookmark to anchor the created session."]
     #[wasm_bindgen(method, catch, js_name = "withSession")]
     pub fn try_with_session_with_str(
@@ -63549,9 +64277,9 @@ extern "C" {
     #[doc = " Creates a new D1 Session anchored at the given constraint or the bookmark."]
     #[doc = " All queries executed using the created session will have sequential consistency,"]
     #[doc = " meaning that all writes done through the session will be visible in subsequent reads."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `constraintOrBookmark` - Either the session constraint or the explicit bookmark to anchor the created session."]
     #[wasm_bindgen(method, js_name = "withSession")]
     pub fn with_session_with_d_1_session_constraint(
@@ -63561,9 +64289,9 @@ extern "C" {
     #[doc = " Creates a new D1 Session anchored at the given constraint or the bookmark."]
     #[doc = " All queries executed using the created session will have sequential consistency,"]
     #[doc = " meaning that all writes done through the session will be visible in subsequent reads."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `constraintOrBookmark` - Either the session constraint or the explicit bookmark to anchor the created session."]
     #[wasm_bindgen(method, catch, js_name = "withSession")]
     pub fn try_with_session_with_d_1_session_constraint(
@@ -63592,16 +64320,16 @@ extern "C" {
         statements: &Array<D1PreparedStatement>,
     ) -> Result<Array<D1Result>, JsValue>;
     #[doc = "          If no query has been executed yet, `null` is returned."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The latest session bookmark across all executed queries on the session."]
     #[wasm_bindgen(method, js_name = "getBookmark")]
     pub fn get_bookmark(this: &D1DatabaseSession) -> Option<String>;
     #[doc = "          If no query has been executed yet, `null` is returned."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The latest session bookmark across all executed queries on the session."]
     #[wasm_bindgen(method, catch, js_name = "getBookmark")]
     pub fn try_get_bookmark(this: &D1DatabaseSession) -> Result<Option<String>, JsValue>;
@@ -63655,10 +64383,14 @@ extern "C" {
     pub fn set_column_names(this: &D1PreparedStatementOptions, val: bool);
 }
 impl D1PreparedStatementOptions {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `columnNames: true`"]
     pub fn new_true() -> D1PreparedStatementOptions {
         Self::builder_true().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `columnNames: true`"]
     pub fn builder_true() -> D1PreparedStatementOptionsBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -63724,14 +64456,14 @@ extern "C" {
     pub fn set_message_id(this: &EmailSendResult, val: &str);
 }
 impl EmailSendResult {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message_id`: The Email Message ID"]
     pub fn new(message_id: &str) -> EmailSendResult {
         Self::builder(message_id).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message_id`: The Email Message ID"]
     pub fn builder(message_id: &str) -> EmailSendResultBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -63783,36 +64515,36 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "rawSize")]
     pub fn raw_size(this: &ForwardableEmailMessage) -> f64;
     #[doc = " Reject this email message by returning a permanent SMTP error back to the connecting client including the given reason."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `reason` - The reject reason."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " void"]
     #[wasm_bindgen(method, js_name = "setReject")]
     pub fn set_reject(this: &ForwardableEmailMessage, reason: &str);
     #[doc = " Reject this email message by returning a permanent SMTP error back to the connecting client including the given reason."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `reason` - The reject reason."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " void"]
     #[wasm_bindgen(method, catch, js_name = "setReject")]
     pub fn try_set_reject(this: &ForwardableEmailMessage, reason: &str) -> Result<(), JsValue>;
     #[doc = " Forward this email message to a verified destination address of the account."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `rcptTo` - Verified destination address."]
     #[doc = " * `headers` - A [Headers object](https://developer.mozilla.org/en-US/docs/Web/API/Headers)."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves when the email message is forwarded."]
     #[wasm_bindgen(method, catch)]
     pub async fn forward(
@@ -63820,14 +64552,14 @@ extern "C" {
         rcpt_to: &str,
     ) -> Result<EmailSendResult, JsValue>;
     #[doc = " Forward this email message to a verified destination address of the account."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `rcptTo` - Verified destination address."]
     #[doc = " * `headers` - A [Headers object](https://developer.mozilla.org/en-US/docs/Web/API/Headers)."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves when the email message is forwarded."]
     #[wasm_bindgen(method, catch, js_name = "forward")]
     pub async fn forward_with_headers(
@@ -63836,13 +64568,13 @@ extern "C" {
         headers: &Headers,
     ) -> Result<EmailSendResult, JsValue>;
     #[doc = " Reply to the sender of this email message with a new EmailMessage object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `message` - The reply message."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves when the email message is replied."]
     #[wasm_bindgen(method, catch)]
     pub async fn reply(
@@ -63885,30 +64617,36 @@ extern "C" {
     pub fn set_type(this: &EmailAttachment, val: &str);
 }
 impl EmailAttachment {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `disposition: \"inline\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
     #[doc = " * `type`"]
     pub fn new_inline(content: &str, filename: &str, r#type: &str) -> EmailAttachment {
         Self::builder_inline(content, filename, r#type).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `disposition: \"attachment\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
     #[doc = " * `type`"]
     pub fn new_attachment(content: &str, filename: &str, r#type: &str) -> EmailAttachment {
         Self::builder_attachment(content, filename, r#type).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `disposition: \"inline\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
     #[doc = " * `type`"]
@@ -63919,10 +64657,12 @@ impl EmailAttachment {
     ) -> EmailAttachment {
         Self::builder_inline_with_array_buffer(content, filename, r#type).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `disposition: \"attachment\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
     #[doc = " * `type`"]
@@ -63933,10 +64673,12 @@ impl EmailAttachment {
     ) -> EmailAttachment {
         Self::builder_attachment_with_array_buffer(content, filename, r#type).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `disposition: \"inline\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
     #[doc = " * `type`"]
@@ -63947,10 +64689,12 @@ impl EmailAttachment {
     ) -> EmailAttachment {
         Self::builder_inline_with_js_value(content, filename, r#type).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `disposition: \"attachment\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
     #[doc = " * `type`"]
@@ -63961,10 +64705,12 @@ impl EmailAttachment {
     ) -> EmailAttachment {
         Self::builder_attachment_with_js_value(content, filename, r#type).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `disposition: \"inline\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
     #[doc = " * `type`"]
@@ -63976,10 +64722,12 @@ impl EmailAttachment {
         inner.set_type(r#type);
         EmailAttachmentBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `disposition: \"attachment\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
     #[doc = " * `type`"]
@@ -63995,10 +64743,12 @@ impl EmailAttachment {
         inner.set_type(r#type);
         EmailAttachmentBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `disposition: \"inline\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
     #[doc = " * `type`"]
@@ -64014,10 +64764,12 @@ impl EmailAttachment {
         inner.set_type(r#type);
         EmailAttachmentBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `disposition: \"attachment\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
     #[doc = " * `type`"]
@@ -64033,10 +64785,12 @@ impl EmailAttachment {
         inner.set_type(r#type);
         EmailAttachmentBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `disposition: \"inline\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
     #[doc = " * `type`"]
@@ -64052,10 +64806,12 @@ impl EmailAttachment {
         inner.set_type(r#type);
         EmailAttachmentBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `disposition: \"attachment\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
     #[doc = " * `type`"]
@@ -64103,15 +64859,15 @@ extern "C" {
     pub fn set_email(this: &EmailAddress, val: &str);
 }
 impl EmailAddress {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `email`"]
     pub fn new(name: &str, email: &str) -> EmailAddress {
         Self::builder(name, email).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `email`"]
     pub fn builder(name: &str, email: &str) -> EmailAddressBuilder {
@@ -64202,16 +64958,16 @@ extern "C" {
     pub fn set_attachments(this: &SendEmailBuilder, val: &Array<EmailAttachment>);
 }
 impl SendEmailBuilder {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `from`"]
     #[doc = " * `to`"]
     #[doc = " * `subject`"]
     pub fn new(from: &str, to: &str, subject: &str) -> SendEmailBuilder {
         Self::builder(from, to, subject).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `from`"]
     #[doc = " * `to`"]
     #[doc = " * `subject`"]
@@ -64222,8 +64978,8 @@ impl SendEmailBuilder {
     ) -> SendEmailBuilder {
         Self::builder_with_str_and_array(from, to, subject).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `from`"]
     #[doc = " * `to`"]
     #[doc = " * `subject`"]
@@ -64234,8 +64990,8 @@ impl SendEmailBuilder {
     ) -> SendEmailBuilder {
         Self::builder_with_email_address_and_str(from, to, subject).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `from`"]
     #[doc = " * `to`"]
     #[doc = " * `subject`"]
@@ -64246,8 +65002,8 @@ impl SendEmailBuilder {
     ) -> SendEmailBuilder {
         Self::builder_with_email_address_and_array(from, to, subject).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `from`"]
     #[doc = " * `to`"]
     #[doc = " * `subject`"]
@@ -64258,8 +65014,8 @@ impl SendEmailBuilder {
         inner.set_subject(subject);
         SendEmailBuilderBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `from`"]
     #[doc = " * `to`"]
     #[doc = " * `subject`"]
@@ -64274,8 +65030,8 @@ impl SendEmailBuilder {
         inner.set_subject(subject);
         SendEmailBuilderBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `from`"]
     #[doc = " * `to`"]
     #[doc = " * `subject`"]
@@ -64290,8 +65046,8 @@ impl SendEmailBuilder {
         inner.set_subject(subject);
         SendEmailBuilderBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `from`"]
     #[doc = " * `to`"]
     #[doc = " * `subject`"]
@@ -64384,22 +65140,22 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Hyperdrive;
     #[doc = " Connect directly to Hyperdrive as if it's your database, returning a TCP socket."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Calling this method returns an identical socket to if you call"]
     #[doc = " `connect(\"host:port\")` using the `host` and `port` fields from this object."]
     #[doc = " Pick whichever approach works better with your preferred DB client library."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Note that this socket is not yet authenticated -- it's expected that your"]
     #[doc = " code (or preferably, the client library of your choice) will authenticate"]
     #[doc = " using the information in this class's readonly fields."]
     #[wasm_bindgen(method)]
     pub fn connect(this: &Hyperdrive) -> Socket;
     #[doc = " Connect directly to Hyperdrive as if it's your database, returning a TCP socket."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Calling this method returns an identical socket to if you call"]
     #[doc = " `connect(\"host:port\")` using the `host` and `port` fields from this object."]
     #[doc = " Pick whichever approach works better with your preferred DB client library."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Note that this socket is not yet authenticated -- it's expected that your"]
     #[doc = " code (or preferably, the client library of your choice) will authenticate"]
     #[doc = " using the information in this class's readonly fields."]
@@ -64446,24 +65202,28 @@ extern "C" {
     pub fn set_width(this: &ImageInfoResponse, val: f64);
 }
 impl ImageInfoResponse {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `format: \"image/svg+xml\"`"]
     pub fn new_imagesvgxml() -> ImageInfoResponse {
         Self::builder_imagesvgxml().build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `format`"]
     pub fn new(format: &str) -> ImageInfoResponse {
         Self::builder(format).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `format: \"image/svg+xml\"`"]
     pub fn builder_imagesvgxml() -> ImageInfoResponseBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format("image/svg+xml");
         ImageInfoResponseBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `format`"]
     pub fn builder(format: &str) -> ImageInfoResponseBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -64902,70 +65662,98 @@ extern "C" {
     pub fn set_anim(this: &ImageOutputOptions, val: bool);
 }
 impl ImageOutputOptions {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `format: \"image/jpeg\"`"]
     pub fn new_imagejpeg() -> ImageOutputOptions {
         Self::builder_imagejpeg().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `format: \"image/png\"`"]
     pub fn new_imagepng() -> ImageOutputOptions {
         Self::builder_imagepng().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `format: \"image/gif\"`"]
     pub fn new_imagegif() -> ImageOutputOptions {
         Self::builder_imagegif().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `format: \"image/webp\"`"]
     pub fn new_imagewebp() -> ImageOutputOptions {
         Self::builder_imagewebp().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `format: \"image/avif\"`"]
     pub fn new_imageavif() -> ImageOutputOptions {
         Self::builder_imageavif().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `format: \"rgb\"`"]
     pub fn new_rgb() -> ImageOutputOptions {
         Self::builder_rgb().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `format: \"rgba\"`"]
     pub fn new_rgba() -> ImageOutputOptions {
         Self::builder_rgba().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `format: \"image/jpeg\"`"]
     pub fn builder_imagejpeg() -> ImageOutputOptionsBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format("image/jpeg");
         ImageOutputOptionsBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `format: \"image/png\"`"]
     pub fn builder_imagepng() -> ImageOutputOptionsBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format_with_js_value("image/png");
         ImageOutputOptionsBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `format: \"image/gif\"`"]
     pub fn builder_imagegif() -> ImageOutputOptionsBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format_with_js_value_1("image/gif");
         ImageOutputOptionsBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `format: \"image/webp\"`"]
     pub fn builder_imagewebp() -> ImageOutputOptionsBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format_with_js_value_2("image/webp");
         ImageOutputOptionsBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `format: \"image/avif\"`"]
     pub fn builder_imageavif() -> ImageOutputOptionsBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format_with_js_value_3("image/avif");
         ImageOutputOptionsBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `format: \"rgb\"`"]
     pub fn builder_rgb() -> ImageOutputOptionsBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format_with_js_value_4("rgb");
         ImageOutputOptionsBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `format: \"rgba\"`"]
     pub fn builder_rgba() -> ImageOutputOptionsBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -65032,16 +65820,16 @@ extern "C" {
     pub fn set_creator(this: &ImageMetadata, val: &str);
 }
 impl ImageMetadata {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `require_signed_ur_ls`"]
     #[doc = " * `variants`"]
     pub fn new(id: &str, require_signed_ur_ls: bool, variants: &Array<JsString>) -> ImageMetadata {
         Self::builder(id, require_signed_ur_ls, variants).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `require_signed_ur_ls`"]
     #[doc = " * `variants`"]
@@ -65286,15 +66074,15 @@ extern "C" {
     pub fn set_list_complete(this: &ImageList, val: bool);
 }
 impl ImageList {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `images`"]
     #[doc = " * `list_complete`"]
     pub fn new(images: &Array<ImageMetadata>, list_complete: bool) -> ImageList {
         Self::builder(images, list_complete).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `images`"]
     #[doc = " * `list_complete`"]
     pub fn builder(images: &Array<ImageMetadata>, list_complete: bool) -> ImageListBuilder {
@@ -65322,13 +66110,13 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type HostedImagesBinding;
     #[doc = " Get detailed metadata for a hosted image"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `imageId` - The ID of the image (UUID or custom ID)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Image metadata, or null if not found"]
     #[wasm_bindgen(method, catch)]
     pub async fn details(
@@ -65336,13 +66124,13 @@ extern "C" {
         image_id: &str,
     ) -> Result<Option<ImageMetadata>, JsValue>;
     #[doc = " Get the raw image data for a hosted image"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `imageId` - The ID of the image (UUID or custom ID)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ReadableStream of image bytes, or null if not found"]
     #[wasm_bindgen(method, catch)]
     pub async fn image(
@@ -65350,18 +66138,18 @@ extern "C" {
         image_id: &str,
     ) -> Result<Option<ReadableStream>, JsValue>;
     #[doc = " Upload a new hosted image"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `image` - The image file to upload"]
     #[doc = " * `options` - Upload configuration"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Metadata for the uploaded image"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `ImagesError` — if upload fails"]
     #[wasm_bindgen(method, catch)]
     pub async fn upload(
@@ -65369,18 +66157,18 @@ extern "C" {
         image: &ReadableStream,
     ) -> Result<ImageMetadata, ImagesError>;
     #[doc = " Upload a new hosted image"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `image` - The image file to upload"]
     #[doc = " * `options` - Upload configuration"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Metadata for the uploaded image"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `ImagesError` — if upload fails"]
     #[wasm_bindgen(method, catch, js_name = "upload")]
     pub async fn upload_with_array_buffer(
@@ -65388,18 +66176,18 @@ extern "C" {
         image: &ArrayBuffer,
     ) -> Result<ImageMetadata, ImagesError>;
     #[doc = " Upload a new hosted image"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `image` - The image file to upload"]
     #[doc = " * `options` - Upload configuration"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Metadata for the uploaded image"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `ImagesError` — if upload fails"]
     #[wasm_bindgen(method, catch, js_name = "upload")]
     pub async fn upload_with_js_value_and_options(
@@ -65408,18 +66196,18 @@ extern "C" {
         options: &ImageUploadOptions,
     ) -> Result<ImageMetadata, ImagesError>;
     #[doc = " Upload a new hosted image"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `image` - The image file to upload"]
     #[doc = " * `options` - Upload configuration"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Metadata for the uploaded image"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `ImagesError` — if upload fails"]
     #[wasm_bindgen(method, catch, js_name = "upload")]
     pub async fn upload_with_array_buffer_and_options(
@@ -65428,18 +66216,18 @@ extern "C" {
         options: &ImageUploadOptions,
     ) -> Result<ImageMetadata, ImagesError>;
     #[doc = " Update hosted image metadata"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `imageId` - The ID of the image"]
     #[doc = " * `options` - Properties to update"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " Updated image metadata"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `ImagesError` — if update fails"]
     #[wasm_bindgen(method, catch)]
     pub async fn update(
@@ -65448,43 +66236,43 @@ extern "C" {
         options: &ImageUpdateOptions,
     ) -> Result<ImageMetadata, ImagesError>;
     #[doc = " Delete a hosted image"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `imageId` - The ID of the image"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " True if deleted, false if not found"]
     #[wasm_bindgen(method, catch)]
     pub async fn delete(this: &HostedImagesBinding, image_id: &str) -> Result<bool, JsValue>;
     #[doc = " List hosted images with pagination"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `options` - List configuration"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " List of images with pagination info"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `ImagesError` — if list fails"]
     #[wasm_bindgen(method, catch)]
     pub async fn list(this: &HostedImagesBinding) -> Result<ImageList, ImagesError>;
     #[doc = " List hosted images with pagination"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `options` - List configuration"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " List of images with pagination info"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `ImagesError` — if list fails"]
     #[wasm_bindgen(method, catch, js_name = "list")]
     pub async fn list_with_options(
@@ -65498,13 +66286,13 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImagesBinding;
     #[doc = " Get image metadata (type, width and height)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `stream` - The image bytes"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `ImagesError` — with code 9412 if input is not an image"]
     #[wasm_bindgen(method, catch)]
     pub async fn info(
@@ -65512,13 +66300,13 @@ extern "C" {
         stream: &ReadableStream,
     ) -> Result<ImageInfoResponse, ImagesError>;
     #[doc = " Get image metadata (type, width and height)"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `stream` - The image bytes"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `ImagesError` — with code 9412 if input is not an image"]
     #[wasm_bindgen(method, catch, js_name = "info")]
     pub async fn info_with_options(
@@ -65527,24 +66315,24 @@ extern "C" {
         options: &ImageInputOptions,
     ) -> Result<ImageInfoResponse, ImagesError>;
     #[doc = " Begin applying a series of transformations to an image"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `stream` - The image bytes"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A transform handle"]
     #[wasm_bindgen(method)]
     pub fn input(this: &ImagesBinding, stream: &ReadableStream) -> ImageTransformer;
     #[doc = " Begin applying a series of transformations to an image"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `stream` - The image bytes"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A transform handle"]
     #[wasm_bindgen(method, catch, js_name = "input")]
     pub fn try_input(
@@ -65552,13 +66340,13 @@ extern "C" {
         stream: &ReadableStream,
     ) -> Result<ImageTransformer, JsValue>;
     #[doc = " Begin applying a series of transformations to an image"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `stream` - The image bytes"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A transform handle"]
     #[wasm_bindgen(method, js_name = "input")]
     pub fn input_with_options(
@@ -65567,13 +66355,13 @@ extern "C" {
         options: &ImageInputOptions,
     ) -> ImageTransformer;
     #[doc = " Begin applying a series of transformations to an image"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `stream` - The image bytes"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A transform handle"]
     #[wasm_bindgen(method, catch, js_name = "input")]
     pub fn try_input_with_options(
@@ -65592,17 +66380,17 @@ extern "C" {
     pub type ImageTransformer;
     #[doc = " Apply transform next, returning a transform handle."]
     #[doc = " You can then apply more transformations, draw, or retrieve the output."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `transform`"]
     #[wasm_bindgen(method)]
     pub fn transform(this: &ImageTransformer, transform: &ImageTransform) -> ImageTransformer;
     #[doc = " Apply transform next, returning a transform handle."]
     #[doc = " You can then apply more transformations, draw, or retrieve the output."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `transform`"]
     #[wasm_bindgen(method, catch, js_name = "transform")]
     pub fn try_transform(
@@ -65611,18 +66399,18 @@ extern "C" {
     ) -> Result<ImageTransformer, JsValue>;
     #[doc = " Draw an image on this transformer, returning a transform handle."]
     #[doc = " You can then apply more transformations, draw, or retrieve the output."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `image` - The image (or transformer that will give the image) to draw"]
     #[doc = " * `options` - The options configuring how to draw the image"]
     #[wasm_bindgen(method)]
     pub fn draw(this: &ImageTransformer, image: &ReadableStream) -> ImageTransformer;
     #[doc = " Draw an image on this transformer, returning a transform handle."]
     #[doc = " You can then apply more transformations, draw, or retrieve the output."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `image` - The image (or transformer that will give the image) to draw"]
     #[doc = " * `options` - The options configuring how to draw the image"]
     #[wasm_bindgen(method, catch, js_name = "draw")]
@@ -65632,9 +66420,9 @@ extern "C" {
     ) -> Result<ImageTransformer, JsValue>;
     #[doc = " Draw an image on this transformer, returning a transform handle."]
     #[doc = " You can then apply more transformations, draw, or retrieve the output."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `image` - The image (or transformer that will give the image) to draw"]
     #[doc = " * `options` - The options configuring how to draw the image"]
     #[wasm_bindgen(method, js_name = "draw")]
@@ -65644,9 +66432,9 @@ extern "C" {
     ) -> ImageTransformer;
     #[doc = " Draw an image on this transformer, returning a transform handle."]
     #[doc = " You can then apply more transformations, draw, or retrieve the output."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `image` - The image (or transformer that will give the image) to draw"]
     #[doc = " * `options` - The options configuring how to draw the image"]
     #[wasm_bindgen(method, catch, js_name = "draw")]
@@ -65656,9 +66444,9 @@ extern "C" {
     ) -> Result<ImageTransformer, JsValue>;
     #[doc = " Draw an image on this transformer, returning a transform handle."]
     #[doc = " You can then apply more transformations, draw, or retrieve the output."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `image` - The image (or transformer that will give the image) to draw"]
     #[doc = " * `options` - The options configuring how to draw the image"]
     #[wasm_bindgen(method, js_name = "draw")]
@@ -65669,9 +66457,9 @@ extern "C" {
     ) -> ImageTransformer;
     #[doc = " Draw an image on this transformer, returning a transform handle."]
     #[doc = " You can then apply more transformations, draw, or retrieve the output."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `image` - The image (or transformer that will give the image) to draw"]
     #[doc = " * `options` - The options configuring how to draw the image"]
     #[wasm_bindgen(method, catch, js_name = "draw")]
@@ -65682,9 +66470,9 @@ extern "C" {
     ) -> Result<ImageTransformer, JsValue>;
     #[doc = " Draw an image on this transformer, returning a transform handle."]
     #[doc = " You can then apply more transformations, draw, or retrieve the output."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `image` - The image (or transformer that will give the image) to draw"]
     #[doc = " * `options` - The options configuring how to draw the image"]
     #[wasm_bindgen(method, js_name = "draw")]
@@ -65695,9 +66483,9 @@ extern "C" {
     ) -> ImageTransformer;
     #[doc = " Draw an image on this transformer, returning a transform handle."]
     #[doc = " You can then apply more transformations, draw, or retrieve the output."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `image` - The image (or transformer that will give the image) to draw"]
     #[doc = " * `options` - The options configuring how to draw the image"]
     #[wasm_bindgen(method, catch, js_name = "draw")]
@@ -65708,9 +66496,9 @@ extern "C" {
     ) -> Result<ImageTransformer, JsValue>;
     #[doc = " Retrieve the image that results from applying the transforms to the"]
     #[doc = " provided input"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `options` - Options that apply to the output e.g. output format"]
     #[wasm_bindgen(method, catch)]
     pub async fn output(
@@ -65813,24 +66601,24 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MediaBinding;
     #[doc = " Creates a media transformer from an input stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `media` - The input media bytes"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A MediaTransformer instance for applying transformations"]
     #[wasm_bindgen(method)]
     pub fn input(this: &MediaBinding, media: &ReadableStream) -> MediaTransformer;
     #[doc = " Creates a media transformer from an input stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `media` - The input media bytes"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A MediaTransformer instance for applying transformations"]
     #[wasm_bindgen(method, catch, js_name = "input")]
     pub fn try_input(
@@ -65844,35 +66632,35 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MediaTransformer;
     #[doc = " Applies transformation options to the media content."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `transform` - Configuration for how the media should be transformed"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A generator for producing the transformed media output"]
     #[wasm_bindgen(method)]
     pub fn transform(this: &MediaTransformer) -> MediaTransformationGenerator;
     #[doc = " Applies transformation options to the media content."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `transform` - Configuration for how the media should be transformed"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A generator for producing the transformed media output"]
     #[wasm_bindgen(method, catch, js_name = "transform")]
     pub fn try_transform(this: &MediaTransformer) -> Result<MediaTransformationGenerator, JsValue>;
     #[doc = " Applies transformation options to the media content."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `transform` - Configuration for how the media should be transformed"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A generator for producing the transformed media output"]
     #[wasm_bindgen(method, js_name = "transform")]
     pub fn transform_with_transform(
@@ -65880,13 +66668,13 @@ extern "C" {
         transform: &MediaTransformationInputOptions,
     ) -> MediaTransformationGenerator;
     #[doc = " Applies transformation options to the media content."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `transform` - Configuration for how the media should be transformed"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A generator for producing the transformed media output"]
     #[wasm_bindgen(method, catch, js_name = "transform")]
     pub fn try_transform_with_transform(
@@ -65894,35 +66682,35 @@ extern "C" {
         transform: &MediaTransformationInputOptions,
     ) -> Result<MediaTransformationGenerator, JsValue>;
     #[doc = " Generates the final media output with specified options."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `output` - Configuration for the output format and parameters"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The final transformation result containing the transformed media"]
     #[wasm_bindgen(method)]
     pub fn output(this: &MediaTransformer) -> MediaTransformationResult;
     #[doc = " Generates the final media output with specified options."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `output` - Configuration for the output format and parameters"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The final transformation result containing the transformed media"]
     #[wasm_bindgen(method, catch, js_name = "output")]
     pub fn try_output(this: &MediaTransformer) -> Result<MediaTransformationResult, JsValue>;
     #[doc = " Generates the final media output with specified options."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `output` - Configuration for the output format and parameters"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The final transformation result containing the transformed media"]
     #[wasm_bindgen(method, js_name = "output")]
     pub fn output_with_output(
@@ -65930,13 +66718,13 @@ extern "C" {
         output: &MediaTransformationOutputOptions,
     ) -> MediaTransformationResult;
     #[doc = " Generates the final media output with specified options."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `output` - Configuration for the output format and parameters"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The final transformation result containing the transformed media"]
     #[wasm_bindgen(method, catch, js_name = "output")]
     pub fn try_output_with_output(
@@ -65950,37 +66738,37 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MediaTransformationGenerator;
     #[doc = " Generates the final media output with specified options."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `output` - Configuration for the output format and parameters"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The final transformation result containing the transformed media"]
     #[wasm_bindgen(method)]
     pub fn output(this: &MediaTransformationGenerator) -> MediaTransformationResult;
     #[doc = " Generates the final media output with specified options."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `output` - Configuration for the output format and parameters"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The final transformation result containing the transformed media"]
     #[wasm_bindgen(method, catch, js_name = "output")]
     pub fn try_output(
         this: &MediaTransformationGenerator,
     ) -> Result<MediaTransformationResult, JsValue>;
     #[doc = " Generates the final media output with specified options."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `output` - Configuration for the output format and parameters"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The final transformation result containing the transformed media"]
     #[wasm_bindgen(method, js_name = "output")]
     pub fn output_with_output(
@@ -65988,13 +66776,13 @@ extern "C" {
         output: &MediaTransformationOutputOptions,
     ) -> MediaTransformationResult;
     #[doc = " Generates the final media output with specified options."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `output` - Configuration for the output format and parameters"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The final transformation result containing the transformed media"]
     #[wasm_bindgen(method, catch, js_name = "output")]
     pub fn try_output_with_output(
@@ -66008,23 +66796,23 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MediaTransformationResult;
     #[doc = " Returns the transformed media as a readable stream of bytes."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise containing a readable stream with the transformed media"]
     #[wasm_bindgen(method, catch)]
     pub async fn media(this: &MediaTransformationResult) -> Result<ReadableStream, JsValue>;
     #[doc = " Returns the transformed media as an HTTP response object."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The transformed media as a Promise<Response>, ready to store in cache or return to users"]
     #[wasm_bindgen(method, catch)]
     pub async fn response(this: &MediaTransformationResult) -> Result<Response, JsValue>;
     #[doc = " Returns the MIME type of the transformed media."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise containing the content type string (e.g., 'image/jpeg', 'video/mp4')"]
     #[wasm_bindgen(method, catch, js_name = "contentType")]
     pub async fn content_type(this: &MediaTransformationResult) -> Result<String, JsValue>;
@@ -66265,8 +67053,8 @@ extern "C" {
     pub fn set_data(this: &EventContext, val: &Data);
 }
 impl EventContext {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `request`"]
     #[doc = " * `function_path`"]
     #[doc = " * `wait_until`"]
@@ -66297,8 +67085,8 @@ impl EventContext {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `request`"]
     #[doc = " * `function_path`"]
     #[doc = " * `wait_until`"]
@@ -66390,8 +67178,8 @@ extern "C" {
     pub fn set_plugin_args(this: &EventPluginContext, val: &PluginArgs);
 }
 impl EventPluginContext {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `request`"]
     #[doc = " * `function_path`"]
     #[doc = " * `wait_until`"]
@@ -66425,8 +67213,8 @@ impl EventPluginContext {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `request`"]
     #[doc = " * `function_path`"]
     #[doc = " * `wait_until`"]
@@ -66535,14 +67323,14 @@ extern "C" {
     pub fn set_key(this: &RateLimitOptions, val: &str);
 }
 impl RateLimitOptions {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     pub fn new(key: &str) -> RateLimitOptions {
         Self::builder(key).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `key`"]
     pub fn builder(key: &str) -> RateLimitOptionsBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -66569,14 +67357,14 @@ extern "C" {
     pub fn set_success(this: &RateLimitOutcome, val: bool);
 }
 impl RateLimitOutcome {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `success`"]
     pub fn new(success: bool) -> RateLimitOutcome {
         Self::builder(success).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `success`"]
     pub fn builder(success: bool) -> RateLimitOutcomeBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -66599,9 +67387,9 @@ extern "C" {
     pub type RateLimit;
     #[doc = " Rate limit a request based on the provided options."]
     #[doc = " @see https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with the outcome of the rate limit."]
     #[wasm_bindgen(method, catch)]
     pub async fn limit(
@@ -66974,16 +67762,16 @@ pub mod cloudflare_workers_module {
         pub fn set_instance_id(this: &WorkflowEvent, val: &str);
     }
     impl WorkflowEvent {
-        #[doc = " # Provided fields"]
-        #[doc = " "]
+        #[doc = " # Parameters"]
+        #[doc = ""]
         #[doc = " * `payload`"]
         #[doc = " * `timestamp`"]
         #[doc = " * `instance_id`"]
         pub fn new(payload: &Readonly, timestamp: &Date, instance_id: &str) -> WorkflowEvent {
             Self::builder(payload, timestamp, instance_id).build()
         }
-        #[doc = " # Provided fields"]
-        #[doc = " "]
+        #[doc = " # Parameters"]
+        #[doc = ""]
         #[doc = " * `payload`"]
         #[doc = " * `timestamp`"]
         #[doc = " * `instance_id`"]
@@ -67026,16 +67814,16 @@ pub mod cloudflare_workers_module {
         pub fn set_type(this: &WorkflowStepEvent, val: &str);
     }
     impl WorkflowStepEvent {
-        #[doc = " # Provided fields"]
-        #[doc = " "]
+        #[doc = " # Parameters"]
+        #[doc = ""]
         #[doc = " * `payload`"]
         #[doc = " * `timestamp`"]
         #[doc = " * `type`"]
         pub fn new(payload: &Readonly, timestamp: &Date, r#type: &str) -> WorkflowStepEvent {
             Self::builder(payload, timestamp, r#type).build()
         }
-        #[doc = " # Provided fields"]
-        #[doc = " "]
+        #[doc = " # Parameters"]
+        #[doc = ""]
         #[doc = " * `payload`"]
         #[doc = " * `timestamp`"]
         #[doc = " * `type`"]
@@ -67070,14 +67858,14 @@ pub mod cloudflare_workers_module {
         pub fn set_attempt(this: &WorkflowStepContext, val: f64);
     }
     impl WorkflowStepContext {
-        #[doc = " # Provided fields"]
-        #[doc = " "]
+        #[doc = " # Parameters"]
+        #[doc = ""]
         #[doc = " * `attempt`"]
         pub fn new(attempt: f64) -> WorkflowStepContext {
             Self::builder(attempt).build()
         }
-        #[doc = " # Provided fields"]
-        #[doc = " "]
+        #[doc = " # Parameters"]
+        #[doc = ""]
         #[doc = " * `attempt`"]
         pub fn builder(attempt: f64) -> WorkflowStepContextBuilder {
             let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -67151,14 +67939,14 @@ pub mod cloudflare_workers_module {
         pub fn set_timeout_with_f64(this: &WorkflowStepOptions, val: f64);
     }
     impl WorkflowStepOptions {
-        #[doc = " # Provided fields"]
-        #[doc = " "]
+        #[doc = " # Parameters"]
+        #[doc = ""]
         #[doc = " * `type`"]
         pub fn new(r#type: &str) -> WorkflowStepOptions {
             Self::builder(r#type).build()
         }
-        #[doc = " # Provided fields"]
-        #[doc = " "]
+        #[doc = " # Parameters"]
+        #[doc = ""]
         #[doc = " * `type`"]
         pub fn builder(r#type: &str) -> WorkflowStepOptionsBuilder {
             let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -67311,39 +68099,39 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamBinding;
     #[doc = " Returns a handle scoped to a single video for per-video operations."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `id` - The unique identifier for the video."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A handle for per-video operations."]
     #[wasm_bindgen(method)]
     pub fn video(this: &StreamBinding, id: &str) -> StreamVideoHandle;
     #[doc = " Returns a handle scoped to a single video for per-video operations."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `id` - The unique identifier for the video."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A handle for per-video operations."]
     #[wasm_bindgen(method, catch, js_name = "video")]
     pub fn try_video(this: &StreamBinding, id: &str) -> Result<StreamVideoHandle, JsValue>;
     #[doc = " Uploads a new video from a File."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `file` - The video file to upload."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The uploaded video details."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `BadRequestError` — if the upload parameter is invalid"]
     #[doc = " * `QuotaReachedError` — if the account storage capacity is exceeded"]
     #[doc = " * `MaxFileSizeError` — if the file size is too large"]
@@ -67352,17 +68140,17 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn upload(this: &StreamBinding, file: &File) -> Result<StreamVideo, StreamError>;
     #[doc = " Uploads a new video from a File."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `file` - The video file to upload."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The uploaded video details."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `BadRequestError` — if the upload parameter is invalid"]
     #[doc = " * `QuotaReachedError` — if the account storage capacity is exceeded"]
     #[doc = " * `MaxFileSizeError` — if the file size is too large"]
@@ -67374,17 +68162,17 @@ extern "C" {
         url: &str,
     ) -> Result<StreamVideo, StreamError>;
     #[doc = " Uploads a new video from a File."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `file` - The video file to upload."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The uploaded video details."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `BadRequestError` — if the upload parameter is invalid"]
     #[doc = " * `QuotaReachedError` — if the account storage capacity is exceeded"]
     #[doc = " * `MaxFileSizeError` — if the file size is too large"]
@@ -67397,17 +68185,17 @@ extern "C" {
         params: &StreamUrlUploadParams,
     ) -> Result<StreamVideo, StreamError>;
     #[doc = " Creates a direct upload that allows video uploads without an API key."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `params` - Parameters for the direct upload"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The direct upload details."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `BadRequestError` — if the parameters are invalid"]
     #[doc = " * `RateLimitedError` — if the server received too many requests"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
@@ -67436,29 +68224,29 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_id(this: &StreamVideoHandle, val: &str);
     #[doc = " Get a full videos details"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The full video details."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `NotFoundError` — if the video is not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
     pub async fn details(this: &StreamVideoHandle) -> Result<StreamVideo, StreamError>;
     #[doc = " Update details for a single video."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `params` - The fields to update for the video."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The updated video details."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `NotFoundError` — if the video is not found"]
     #[doc = " * `BadRequestError` — if the parameters are invalid"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
@@ -67468,25 +68256,25 @@ extern "C" {
         params: &StreamUpdateVideoParams,
     ) -> Result<StreamVideo, StreamError>;
     #[doc = " Deletes a video and its copies from Cloudflare Stream."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves when deletion completes."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `NotFoundError` — if the video is not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
     pub async fn delete(this: &StreamVideoHandle) -> Result<(), StreamError>;
     #[doc = " Creates a signed URL token for a video."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The signed token that was created."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `InternalError` — if the signing key cannot be retrieved or the token cannot be signed"]
     #[wasm_bindgen(method, catch, js_name = "generateToken")]
     pub async fn generate_token(this: &StreamVideoHandle) -> Result<String, InternalError>;
@@ -67664,8 +68452,8 @@ extern "C" {
     pub fn set_public_details_with_null(this: &StreamVideo, val: &Null);
 }
 impl StreamVideo {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`: The unique identifier for the video."]
     #[doc = " * `creator`: A user-defined identifier for the media creator."]
     #[doc = " * `thumbnail`: The thumbnail URL for the video."]
@@ -67747,8 +68535,8 @@ impl StreamVideo {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`: The unique identifier for the video."]
     #[doc = " * `creator`: A user-defined identifier for the media creator."]
     #[doc = " * `thumbnail`: The thumbnail URL for the video."]
@@ -67882,16 +68670,16 @@ extern "C" {
     pub fn set_error_reason_text(this: &StreamVideoStatus, val: &str);
 }
 impl StreamVideoStatus {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `state`: The current processing state."]
     #[doc = " * `error_reason_code`: An error reason code, if applicable."]
     #[doc = " * `error_reason_text`: An error reason text, if applicable."]
     pub fn new(state: &str, error_reason_code: &str, error_reason_text: &str) -> StreamVideoStatus {
         Self::builder(state, error_reason_code, error_reason_text).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `state`: The current processing state."]
     #[doc = " * `error_reason_code`: An error reason code, if applicable."]
     #[doc = " * `error_reason_text`: An error reason text, if applicable."]
@@ -67940,15 +68728,15 @@ extern "C" {
     pub fn set_height(this: &StreamVideoInput, val: f64);
 }
 impl StreamVideoInput {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `width`: The input width in pixels."]
     #[doc = " * `height`: The input height in pixels."]
     pub fn new(width: f64, height: f64) -> StreamVideoInput {
         Self::builder(width, height).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `width`: The input width in pixels."]
     #[doc = " * `height`: The input height in pixels."]
     pub fn builder(width: f64, height: f64) -> StreamVideoInputBuilder {
@@ -68001,8 +68789,8 @@ extern "C" {
     pub fn set_logo_with_null(this: &StreamPublicDetails, val: &Null);
 }
 impl StreamPublicDetails {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `title`: The public title for the video."]
     #[doc = " * `share_link`: The public share link."]
     #[doc = " * `channel_link`: The public channel link."]
@@ -68015,8 +68803,8 @@ impl StreamPublicDetails {
     ) -> StreamPublicDetails {
         Self::builder(title, share_link, channel_link, logo).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `title`: The public title for the video."]
     #[doc = " * `share_link`: The public share link."]
     #[doc = " * `channel_link`: The public channel link."]
@@ -68074,8 +68862,8 @@ extern "C" {
     pub fn set_scheduled_deletion_with_null(this: &StreamDirectUpload, val: &Null);
 }
 impl StreamDirectUpload {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `upload_url`: The URL an unauthenticated upload can use for a single multipart request."]
     #[doc = " * `id`: A Cloudflare-generated unique identifier for a media item."]
     #[doc = " * `watermark`: The watermark profile applied to the upload."]
@@ -68088,8 +68876,8 @@ impl StreamDirectUpload {
     ) -> StreamDirectUpload {
         Self::builder(upload_url, id, watermark, scheduled_deletion).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `upload_url`: The URL an unauthenticated upload can use for a single multipart request."]
     #[doc = " * `id`: A Cloudflare-generated unique identifier for a media item."]
     #[doc = " * `watermark`: The watermark profile applied to the upload."]
@@ -68173,14 +68961,14 @@ extern "C" {
     pub fn set_watermark(this: &StreamDirectUploadCreateParams, val: &StreamDirectUploadWatermark);
 }
 impl StreamDirectUploadCreateParams {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `max_duration_seconds`: The maximum duration in seconds for a video upload."]
     pub fn new(max_duration_seconds: f64) -> StreamDirectUploadCreateParams {
         Self::builder(max_duration_seconds).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `max_duration_seconds`: The maximum duration in seconds for a video upload."]
     pub fn builder(max_duration_seconds: f64) -> StreamDirectUploadCreateParamsBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -68244,14 +69032,14 @@ extern "C" {
     pub fn set_id(this: &StreamDirectUploadWatermark, val: &str);
 }
 impl StreamDirectUploadWatermark {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`: The unique identifier for the watermark profile."]
     pub fn new(id: &str) -> StreamDirectUploadWatermark {
         Self::builder(id).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`: The unique identifier for the watermark profile."]
     pub fn builder(id: &str) -> StreamDirectUploadWatermarkBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -68379,18 +69167,18 @@ extern "C" {
     pub type StreamScopedCaptions;
     #[doc = " Uploads the caption or subtitle file to the endpoint for a specific BCP47 language."]
     #[doc = " One caption or subtitle file per language is allowed."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `language` - The BCP 47 language tag for the caption or subtitle."]
     #[doc = " * `file` - The caption or subtitle file to upload."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The created caption entry."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `NotFoundError` — if the video is not found"]
     #[doc = " * `BadRequestError` — if the language or file is invalid"]
     #[doc = " * `MaxFileSizeError` — if the file size is too large"]
@@ -68402,17 +69190,17 @@ extern "C" {
         file: &File,
     ) -> Result<StreamCaption, StreamError>;
     #[doc = " Generate captions or subtitles for the provided language via AI."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `language` - The BCP 47 language tag to generate."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The generated caption entry."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `NotFoundError` — if the video is not found"]
     #[doc = " * `BadRequestError` — if the language is invalid"]
     #[doc = " * `StreamError` — if a generated caption already exists"]
@@ -68427,34 +69215,34 @@ extern "C" {
     ) -> Result<StreamCaption, StreamError>;
     #[doc = " Lists the captions or subtitles."]
     #[doc = " Use the language parameter to filter by a specific language."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `language` - The optional BCP 47 language tag to filter by."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The list of captions or subtitles."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `NotFoundError` — if the video or caption is not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
     pub async fn list(this: &StreamScopedCaptions) -> Result<Array<StreamCaption>, StreamError>;
     #[doc = " Lists the captions or subtitles."]
     #[doc = " Use the language parameter to filter by a specific language."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `language` - The optional BCP 47 language tag to filter by."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The list of captions or subtitles."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `NotFoundError` — if the video or caption is not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch, js_name = "list")]
@@ -68463,17 +69251,17 @@ extern "C" {
         language: &str,
     ) -> Result<Array<StreamCaption>, StreamError>;
     #[doc = " Removes the captions or subtitles from a video."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `language` - The BCP 47 language tag to remove."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves when deletion completes."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `NotFoundError` — if the video or caption is not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
@@ -68486,17 +69274,17 @@ extern "C" {
     pub type StreamScopedDownloads;
     #[doc = " Generates a download for a video when a video is ready to view. Available"]
     #[doc = " types are `default` and `audio`. Defaults to `default` when omitted."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `downloadType` - The download type to create."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The current downloads for the video."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `NotFoundError` — if the video is not found"]
     #[doc = " * `BadRequestError` — if the download type is invalid"]
     #[doc = " * `StreamError` — if the video duration is too long to generate a download"]
@@ -68508,17 +69296,17 @@ extern "C" {
     ) -> Result<StreamDownloadGetResponse, StreamError>;
     #[doc = " Generates a download for a video when a video is ready to view. Available"]
     #[doc = " types are `default` and `audio`. Defaults to `default` when omitted."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `downloadType` - The download type to create."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The current downloads for the video."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `NotFoundError` — if the video is not found"]
     #[doc = " * `BadRequestError` — if the download type is invalid"]
     #[doc = " * `StreamError` — if the video duration is too long to generate a download"]
@@ -68530,13 +69318,13 @@ extern "C" {
         download_type: &StreamDownloadType,
     ) -> Result<StreamDownloadGetResponse, StreamError>;
     #[doc = " Lists the downloads created for a video."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The current downloads for the video."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `NotFoundError` — if the video or downloads are not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
@@ -68545,34 +69333,34 @@ extern "C" {
     ) -> Result<StreamDownloadGetResponse, StreamError>;
     #[doc = " Delete the downloads for a video. Available types are `default` and `audio`."]
     #[doc = " Defaults to `default` when omitted."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `downloadType` - The download type to delete."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves when deletion completes."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `NotFoundError` — if the video or downloads are not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
     pub async fn delete(this: &StreamScopedDownloads) -> Result<(), StreamError>;
     #[doc = " Delete the downloads for a video. Available types are `default` and `audio`."]
     #[doc = " Defaults to `default` when omitted."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `downloadType` - The download type to delete."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves when deletion completes."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `NotFoundError` — if the video or downloads are not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch, js_name = "delete")]
@@ -68587,25 +69375,25 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamVideos;
     #[doc = " Lists all videos in a users account."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The list of videos."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `BadRequestError` — if the parameters are invalid"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
     pub async fn list(this: &StreamVideos) -> Result<Array<StreamVideo>, StreamError>;
     #[doc = " Lists all videos in a users account."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The list of videos."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `BadRequestError` — if the parameters are invalid"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch, js_name = "list")]
@@ -68620,18 +69408,18 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type StreamWatermarks;
     #[doc = " Generate a new watermark profile"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `file` - The image file to upload"]
     #[doc = " * `params` - The watermark creation parameters."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The created watermark profile."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `BadRequestError` — if the parameters are invalid"]
     #[doc = " * `InvalidURLError` — if the URL is invalid"]
     #[doc = " * `MaxFileSizeError` — if the file size is too large"]
@@ -68644,18 +69432,18 @@ extern "C" {
         params: &StreamWatermarkCreateParams,
     ) -> Result<StreamWatermark, StreamError>;
     #[doc = " Generate a new watermark profile"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `file` - The image file to upload"]
     #[doc = " * `params` - The watermark creation parameters."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The created watermark profile."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `BadRequestError` — if the parameters are invalid"]
     #[doc = " * `InvalidURLError` — if the URL is invalid"]
     #[doc = " * `MaxFileSizeError` — if the file size is too large"]
@@ -68668,28 +69456,28 @@ extern "C" {
         params: &StreamWatermarkCreateParams,
     ) -> Result<StreamWatermark, StreamError>;
     #[doc = " Lists all watermark profiles for an account."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The list of watermark profiles."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
     pub async fn list(this: &StreamWatermarks) -> Result<Array<StreamWatermark>, InternalError>;
     #[doc = " Retrieves details for a single watermark profile."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `watermarkId` - The watermark profile identifier."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " The watermark profile details."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `NotFoundError` — if the watermark is not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
@@ -68698,17 +69486,17 @@ extern "C" {
         watermark_id: &str,
     ) -> Result<StreamWatermark, StreamError>;
     #[doc = " Deletes a watermark profile."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `watermarkId` - The watermark profile identifier."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves when deletion completes."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `NotFoundError` — if the watermark is not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
@@ -68853,15 +69641,15 @@ extern "C" {
     pub fn set_status_with_js_value_1(this: &StreamCaption, val: &str);
 }
 impl StreamCaption {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `label`: The language label displayed in the native language to users."]
     #[doc = " * `language`: The language tag in BCP 47 format."]
     pub fn new(label: &str, language: &str) -> StreamCaption {
         Self::builder(label, language).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `label`: The language label displayed in the native language to users."]
     #[doc = " * `language`: The language tag in BCP 47 format."]
     pub fn builder(label: &str, language: &str) -> StreamCaptionBuilder {
@@ -68935,15 +69723,15 @@ extern "C" {
     pub fn set_url(this: &StreamDownload, val: &str);
 }
 impl StreamDownload {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `percent_complete`: Indicates the progress as a percentage between 0 and 100."]
     #[doc = " * `status`: The status of a generated download."]
     pub fn new(percent_complete: f64, status: &StreamDownloadStatus) -> StreamDownload {
         Self::builder(percent_complete, status).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `percent_complete`: Indicates the progress as a percentage between 0 and 100."]
     #[doc = " * `status`: The status of a generated download."]
     pub fn builder(percent_complete: f64, status: &StreamDownloadStatus) -> StreamDownloadBuilder {
@@ -69095,8 +69883,8 @@ extern "C" {
     pub fn set_position(this: &StreamWatermark, val: &StreamWatermarkPosition);
 }
 impl StreamWatermark {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`: The unique identifier for a watermark profile."]
     #[doc = " * `size`: The size of the image in bytes."]
     #[doc = " * `height`: The height of the image in pixels."]
@@ -69146,8 +69934,8 @@ impl StreamWatermark {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`: The unique identifier for a watermark profile."]
     #[doc = " * `size`: The size of the image in bytes."]
     #[doc = " * `height`: The height of the image in pixels."]
@@ -69403,10 +70191,14 @@ extern "C" {
     pub fn set_name(this: &InternalError, val: &str);
 }
 impl InternalError {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `name: \"InternalError\"`"]
     pub fn new_internal_error() -> InternalError {
         Self::builder_internal_error().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `name: \"InternalError\"`"]
     pub fn builder_internal_error() -> InternalErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -69433,10 +70225,14 @@ extern "C" {
     pub fn set_name(this: &BadRequestError, val: &str);
 }
 impl BadRequestError {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `name: \"BadRequestError\"`"]
     pub fn new_bad_request_error() -> BadRequestError {
         Self::builder_bad_request_error().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `name: \"BadRequestError\"`"]
     pub fn builder_bad_request_error() -> BadRequestErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -69463,10 +70259,14 @@ extern "C" {
     pub fn set_name(this: &NotFoundError, val: &str);
 }
 impl NotFoundError {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `name: \"NotFoundError\"`"]
     pub fn new_not_found_error() -> NotFoundError {
         Self::builder_not_found_error().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `name: \"NotFoundError\"`"]
     pub fn builder_not_found_error() -> NotFoundErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -69493,10 +70293,14 @@ extern "C" {
     pub fn set_name(this: &ForbiddenError, val: &str);
 }
 impl ForbiddenError {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `name: \"ForbiddenError\"`"]
     pub fn new_forbidden_error() -> ForbiddenError {
         Self::builder_forbidden_error().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `name: \"ForbiddenError\"`"]
     pub fn builder_forbidden_error() -> ForbiddenErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -69523,10 +70327,14 @@ extern "C" {
     pub fn set_name(this: &RateLimitedError, val: &str);
 }
 impl RateLimitedError {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `name: \"RateLimitedError\"`"]
     pub fn new_rate_limited_error() -> RateLimitedError {
         Self::builder_rate_limited_error().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `name: \"RateLimitedError\"`"]
     pub fn builder_rate_limited_error() -> RateLimitedErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -69553,10 +70361,14 @@ extern "C" {
     pub fn set_name(this: &QuotaReachedError, val: &str);
 }
 impl QuotaReachedError {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `name: \"QuotaReachedError\"`"]
     pub fn new_quota_reached_error() -> QuotaReachedError {
         Self::builder_quota_reached_error().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `name: \"QuotaReachedError\"`"]
     pub fn builder_quota_reached_error() -> QuotaReachedErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -69583,10 +70395,14 @@ extern "C" {
     pub fn set_name(this: &MaxFileSizeError, val: &str);
 }
 impl MaxFileSizeError {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `name: \"MaxFileSizeError\"`"]
     pub fn new_max_file_size_error() -> MaxFileSizeError {
         Self::builder_max_file_size_error().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `name: \"MaxFileSizeError\"`"]
     pub fn builder_max_file_size_error() -> MaxFileSizeErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -69613,10 +70429,14 @@ extern "C" {
     pub fn set_name(this: &InvalidURLError, val: &str);
 }
 impl InvalidURLError {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `name: \"InvalidURLError\"`"]
     pub fn new_invalid_url_error() -> InvalidURLError {
         Self::builder_invalid_url_error().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `name: \"InvalidURLError\"`"]
     pub fn builder_invalid_url_error() -> InvalidURLErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -69643,10 +70463,14 @@ extern "C" {
     pub fn set_name(this: &AlreadyUploadedError, val: &str);
 }
 impl AlreadyUploadedError {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `name: \"AlreadyUploadedError\"`"]
     pub fn new_already_uploaded_error() -> AlreadyUploadedError {
         Self::builder_already_uploaded_error().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `name: \"AlreadyUploadedError\"`"]
     pub fn builder_already_uploaded_error() -> AlreadyUploadedErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -69673,10 +70497,14 @@ extern "C" {
     pub fn set_name(this: &TooManyWatermarksError, val: &str);
 }
 impl TooManyWatermarksError {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `name: \"TooManyWatermarksError\"`"]
     pub fn new_too_many_watermarks_error() -> TooManyWatermarksError {
         Self::builder_too_many_watermarks_error().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `name: \"TooManyWatermarksError\"`"]
     pub fn builder_too_many_watermarks_error() -> TooManyWatermarksErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -69707,15 +70535,15 @@ extern "C" {
     pub fn set_blob(this: &MarkdownDocument, val: &Blob);
 }
 impl MarkdownDocument {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `blob`"]
     pub fn new(name: &str, blob: &Blob) -> MarkdownDocument {
         Self::builder(name, blob).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `blob`"]
     pub fn builder(name: &str, blob: &Blob) -> MarkdownDocumentBuilder {
@@ -69770,30 +70598,36 @@ extern "C" {
     pub fn set_tokens(this: &ConversionResponse, val: f64);
 }
 impl ConversionResponse {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `format: \"markdown\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `mime_type`"]
     #[doc = " * `name`"]
     pub fn new_markdown(id: &str, mime_type: &str, name: &str) -> ConversionResponse {
         Self::builder_markdown(id, mime_type, name).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `format: \"error\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `mime_type`"]
     #[doc = " * `name`"]
     pub fn new_error(id: &str, mime_type: &str, name: &str) -> ConversionResponse {
         Self::builder_error(id, mime_type, name).build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `format: \"markdown\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `mime_type`"]
     #[doc = " * `name`"]
@@ -69805,10 +70639,12 @@ impl ConversionResponse {
         inner.set_name(name);
         ConversionResponseBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `format: \"error\"`"]
-    #[doc = " "]
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = ""]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `mime_type`"]
     #[doc = " * `name`"]
@@ -70024,15 +70860,15 @@ extern "C" {
     pub fn set_extension(this: &SupportedFileFormat, val: &str);
 }
 impl SupportedFileFormat {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `mime_type`"]
     #[doc = " * `extension`"]
     pub fn new(mime_type: &str, extension: &str) -> SupportedFileFormat {
         Self::builder(mime_type, extension).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `mime_type`"]
     #[doc = " * `extension`"]
     pub fn builder(mime_type: &str, extension: &str) -> SupportedFileFormatBuilder {
@@ -70818,14 +71654,14 @@ extern "C" {
     pub fn set_error(this: &VectorizeError, val: &str);
 }
 impl VectorizeError {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `error`"]
     pub fn new(error: &str) -> VectorizeError {
         Self::builder(error).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `error`"]
     pub fn builder(error: &str) -> VectorizeErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -71085,8 +71921,8 @@ extern "C" {
     pub fn set_processed_up_to_mutation(this: &VectorizeIndexInfo, val: f64);
 }
 impl VectorizeIndexInfo {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `vector_count`: The number of records containing vectors within the index."]
     #[doc = " * `dimensions`: Number of dimensions the index has been configured for."]
     #[doc = " * `processed_up_to_datetime`: ISO 8601 datetime of the last processed mutation on in the index. All changes before this mutation will be reflected in the index state."]
@@ -71105,8 +71941,8 @@ impl VectorizeIndexInfo {
         )
         .build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `vector_count`: The number of records containing vectors within the index."]
     #[doc = " * `dimensions`: Number of dimensions the index has been configured for."]
     #[doc = " * `processed_up_to_datetime`: ISO 8601 datetime of the last processed mutation on in the index. All changes before this mutation will be reflected in the index state."]
@@ -71181,22 +72017,22 @@ extern "C" {
     );
 }
 impl VectorizeVector {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`: The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
     #[doc = " * `values`: The vector values"]
     pub fn new(id: &str, values: &JsValue) -> VectorizeVector {
         Self::builder(id, values).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`: The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
     #[doc = " * `values`: The vector values"]
     pub fn new_with_array(id: &str, values: &Array<Number>) -> VectorizeVector {
         Self::builder_with_array(id, values).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`: The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
     #[doc = " * `values`: The vector values"]
     pub fn builder(id: &str, values: &JsValue) -> VectorizeVectorBuilder {
@@ -71205,8 +72041,8 @@ impl VectorizeVector {
         inner.set_values(values);
         VectorizeVectorBuilder { inner }
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`: The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
     #[doc = " * `values`: The vector values"]
     pub fn builder_with_array(id: &str, values: &Array<Number>) -> VectorizeVectorBuilder {
@@ -71277,15 +72113,15 @@ extern "C" {
     pub fn set_count(this: &VectorizeMatches, val: f64);
 }
 impl VectorizeMatches {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `matches`"]
     #[doc = " * `count`"]
     pub fn new(matches: &Array, count: f64) -> VectorizeMatches {
         Self::builder(matches, count).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `matches`"]
     #[doc = " * `count`"]
     pub fn builder(matches: &Array, count: f64) -> VectorizeMatchesBuilder {
@@ -71318,15 +72154,15 @@ extern "C" {
     pub fn set_count(this: &VectorizeVectorMutation, val: f64);
 }
 impl VectorizeVectorMutation {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `ids`"]
     #[doc = " * `count`"]
     pub fn new(ids: &Array<JsString>, count: f64) -> VectorizeVectorMutation {
         Self::builder(ids, count).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `ids`"]
     #[doc = " * `count`"]
     pub fn builder(ids: &Array<JsString>, count: f64) -> VectorizeVectorMutationBuilder {
@@ -71356,14 +72192,14 @@ extern "C" {
     pub fn set_mutation_id(this: &VectorizeAsyncMutation, val: &str);
 }
 impl VectorizeAsyncMutation {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `mutation_id`: The unique identifier for the async mutation operation containing the changeset."]
     pub fn new(mutation_id: &str) -> VectorizeAsyncMutation {
         Self::builder(mutation_id).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `mutation_id`: The unique identifier for the async mutation operation containing the changeset."]
     pub fn builder(mutation_id: &str) -> VectorizeAsyncMutationBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -71385,21 +72221,21 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeIndex;
     #[doc = " Get information about the currently bound index."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with information about the current index."]
     #[wasm_bindgen(method, catch)]
     pub async fn describe(this: &VectorizeIndex) -> Result<VectorizeIndexDetails, JsValue>;
     #[doc = " Use the provided vector to perform a similarity search across the index."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
     #[doc = " * `options` - Configuration options to massage the returned data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, catch)]
     pub async fn query(
@@ -71407,14 +72243,14 @@ extern "C" {
         vector: &Float32Array,
     ) -> Result<VectorizeMatches, JsValue>;
     #[doc = " Use the provided vector to perform a similarity search across the index."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
     #[doc = " * `options` - Configuration options to massage the returned data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, catch, js_name = "query")]
     pub async fn query_with_float64_array(
@@ -71422,14 +72258,14 @@ extern "C" {
         vector: &Float64Array,
     ) -> Result<VectorizeMatches, JsValue>;
     #[doc = " Use the provided vector to perform a similarity search across the index."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
     #[doc = " * `options` - Configuration options to massage the returned data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, catch, js_name = "query")]
     pub async fn query_with_array(
@@ -71437,14 +72273,14 @@ extern "C" {
         vector: &Array<Number>,
     ) -> Result<VectorizeMatches, JsValue>;
     #[doc = " Use the provided vector to perform a similarity search across the index."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
     #[doc = " * `options` - Configuration options to massage the returned data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, catch, js_name = "query")]
     pub async fn query_with_float32_array_and_options(
@@ -71453,14 +72289,14 @@ extern "C" {
         options: &VectorizeQueryOptions,
     ) -> Result<VectorizeMatches, JsValue>;
     #[doc = " Use the provided vector to perform a similarity search across the index."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
     #[doc = " * `options` - Configuration options to massage the returned data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, catch, js_name = "query")]
     pub async fn query_with_float64_array_and_options(
@@ -71469,14 +72305,14 @@ extern "C" {
         options: &VectorizeQueryOptions,
     ) -> Result<VectorizeMatches, JsValue>;
     #[doc = " Use the provided vector to perform a similarity search across the index."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
     #[doc = " * `options` - Configuration options to massage the returned data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, catch, js_name = "query")]
     pub async fn query_with_array_and_options(
@@ -71485,13 +72321,13 @@ extern "C" {
         options: &VectorizeQueryOptions,
     ) -> Result<VectorizeMatches, JsValue>;
     #[doc = " Insert a list of vectors into the index dataset. If a provided id exists, an error will be thrown."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `vectors` - List of vectors that will be inserted."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with the ids & count of records that were successfully processed."]
     #[wasm_bindgen(method, catch)]
     pub async fn insert(
@@ -71499,13 +72335,13 @@ extern "C" {
         vectors: &Array<VectorizeVector>,
     ) -> Result<VectorizeVectorMutation, JsValue>;
     #[doc = " Upsert a list of vectors into the index dataset. If a provided id exists, it will be replaced with the new values."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `vectors` - List of vectors that will be upserted."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with the ids & count of records that were successfully processed."]
     #[wasm_bindgen(method, catch)]
     pub async fn upsert(
@@ -71513,13 +72349,13 @@ extern "C" {
         vectors: &Array<VectorizeVector>,
     ) -> Result<VectorizeVectorMutation, JsValue>;
     #[doc = " Delete a list of vectors with a matching id."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `ids` - List of vector ids that should be deleted."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with the ids & count of records that were successfully processed (and thus deleted)."]
     #[wasm_bindgen(method, catch, js_name = "deleteByIds")]
     pub async fn delete_by_ids(
@@ -71527,13 +72363,13 @@ extern "C" {
         ids: &Array<JsString>,
     ) -> Result<VectorizeVectorMutation, JsValue>;
     #[doc = " Get a list of vectors with a matching id."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `ids` - List of vector ids that should be returned."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with the raw unscored vectors matching the id set."]
     #[wasm_bindgen(method, catch, js_name = "getByIds")]
     pub async fn get_by_ids(
@@ -71547,21 +72383,21 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Vectorize;
     #[doc = " Get information about the currently bound index."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with information about the current index."]
     #[wasm_bindgen(method, catch)]
     pub async fn describe(this: &Vectorize) -> Result<VectorizeIndexInfo, JsValue>;
     #[doc = " Use the provided vector to perform a similarity search across the index."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
     #[doc = " * `options` - Configuration options to massage the returned data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, catch)]
     pub async fn query(
@@ -71569,14 +72405,14 @@ extern "C" {
         vector: &Float32Array,
     ) -> Result<VectorizeMatches, JsValue>;
     #[doc = " Use the provided vector to perform a similarity search across the index."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
     #[doc = " * `options` - Configuration options to massage the returned data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, catch, js_name = "query")]
     pub async fn query_with_float64_array(
@@ -71584,14 +72420,14 @@ extern "C" {
         vector: &Float64Array,
     ) -> Result<VectorizeMatches, JsValue>;
     #[doc = " Use the provided vector to perform a similarity search across the index."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
     #[doc = " * `options` - Configuration options to massage the returned data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, catch, js_name = "query")]
     pub async fn query_with_array(
@@ -71599,14 +72435,14 @@ extern "C" {
         vector: &Array<Number>,
     ) -> Result<VectorizeMatches, JsValue>;
     #[doc = " Use the provided vector to perform a similarity search across the index."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
     #[doc = " * `options` - Configuration options to massage the returned data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, catch, js_name = "query")]
     pub async fn query_with_float32_array_and_options(
@@ -71615,14 +72451,14 @@ extern "C" {
         options: &VectorizeQueryOptions,
     ) -> Result<VectorizeMatches, JsValue>;
     #[doc = " Use the provided vector to perform a similarity search across the index."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
     #[doc = " * `options` - Configuration options to massage the returned data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, catch, js_name = "query")]
     pub async fn query_with_float64_array_and_options(
@@ -71631,14 +72467,14 @@ extern "C" {
         options: &VectorizeQueryOptions,
     ) -> Result<VectorizeMatches, JsValue>;
     #[doc = " Use the provided vector to perform a similarity search across the index."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `vector` - Input vector that will be used to drive the similarity search."]
     #[doc = " * `options` - Configuration options to massage the returned data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, catch, js_name = "query")]
     pub async fn query_with_array_and_options(
@@ -71647,14 +72483,14 @@ extern "C" {
         options: &VectorizeQueryOptions,
     ) -> Result<VectorizeMatches, JsValue>;
     #[doc = " Use the provided vector-id to perform a similarity search across the index."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `vectorId` - Id for a vector in the index against which the index should be queried."]
     #[doc = " * `options` - Configuration options to massage the returned data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, catch, js_name = "queryById")]
     pub async fn query_by_id(
@@ -71662,14 +72498,14 @@ extern "C" {
         vector_id: &str,
     ) -> Result<VectorizeMatches, JsValue>;
     #[doc = " Use the provided vector-id to perform a similarity search across the index."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `vectorId` - Id for a vector in the index against which the index should be queried."]
     #[doc = " * `options` - Configuration options to massage the returned data."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with matched and scored vectors."]
     #[wasm_bindgen(method, catch, js_name = "queryById")]
     pub async fn query_by_id_with_options(
@@ -71678,13 +72514,13 @@ extern "C" {
         options: &VectorizeQueryOptions,
     ) -> Result<VectorizeMatches, JsValue>;
     #[doc = " Insert a list of vectors into the index dataset. If a provided id exists, an error will be thrown."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `vectors` - List of vectors that will be inserted."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with a unique identifier of a mutation containing the insert changeset."]
     #[wasm_bindgen(method, catch)]
     pub async fn insert(
@@ -71692,13 +72528,13 @@ extern "C" {
         vectors: &Array<VectorizeVector>,
     ) -> Result<VectorizeAsyncMutation, JsValue>;
     #[doc = " Upsert a list of vectors into the index dataset. If a provided id exists, it will be replaced with the new values."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `vectors` - List of vectors that will be upserted."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with a unique identifier of a mutation containing the upsert changeset."]
     #[wasm_bindgen(method, catch)]
     pub async fn upsert(
@@ -71706,13 +72542,13 @@ extern "C" {
         vectors: &Array<VectorizeVector>,
     ) -> Result<VectorizeAsyncMutation, JsValue>;
     #[doc = " Delete a list of vectors with a matching id."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `ids` - List of vector ids that should be deleted."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with a unique identifier of a mutation containing the delete changeset."]
     #[wasm_bindgen(method, catch, js_name = "deleteByIds")]
     pub async fn delete_by_ids(
@@ -71720,13 +72556,13 @@ extern "C" {
         ids: &Array<JsString>,
     ) -> Result<VectorizeAsyncMutation, JsValue>;
     #[doc = " Get a list of vectors with a matching id."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `ids` - List of vector ids that should be returned."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with the raw unscored vectors matching the id set."]
     #[wasm_bindgen(method, catch, js_name = "getByIds")]
     pub async fn get_by_ids(
@@ -71756,16 +72592,16 @@ extern "C" {
     pub fn set_timestamp(this: &WorkerVersionMetadata, val: &str);
 }
 impl WorkerVersionMetadata {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`: The ID of the Worker Version using this binding"]
     #[doc = " * `tag`: The tag of the Worker Version using this binding"]
     #[doc = " * `timestamp`: The timestamp of when the Worker Version was uploaded"]
     pub fn new(id: &str, tag: &str, timestamp: &str) -> WorkerVersionMetadata {
         Self::builder(id, tag, timestamp).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `id`: The ID of the Worker Version using this binding"]
     #[doc = " * `tag`: The tag of the Worker Version using this binding"]
     #[doc = " * `timestamp`: The timestamp of when the Worker Version was uploaded"]
@@ -71875,47 +72711,47 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DispatchNamespace;
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `name` - Name of the Worker script."]
     #[doc = " * `args` - Arguments to Worker script."]
     #[doc = " * `options` - Options for Dynamic Dispatch invocation."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A Fetcher object that allows you to send requests to the Worker script."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * If the Worker script does not exist in this dispatch namespace, an error will be thrown."]
     #[wasm_bindgen(method)]
     pub fn get(this: &DispatchNamespace, name: &str) -> JsValue;
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `name` - Name of the Worker script."]
     #[doc = " * `args` - Arguments to Worker script."]
     #[doc = " * `options` - Options for Dynamic Dispatch invocation."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A Fetcher object that allows you to send requests to the Worker script."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * If the Worker script does not exist in this dispatch namespace, an error will be thrown."]
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn try_get(this: &DispatchNamespace, name: &str) -> Result<JsValue, JsValue>;
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `name` - Name of the Worker script."]
     #[doc = " * `args` - Arguments to Worker script."]
     #[doc = " * `options` - Options for Dynamic Dispatch invocation."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A Fetcher object that allows you to send requests to the Worker script."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * If the Worker script does not exist in this dispatch namespace, an error will be thrown."]
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_with_args(
@@ -71924,17 +72760,17 @@ extern "C" {
         args: &DispatchNamespaceArgs,
     ) -> JsValue;
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `name` - Name of the Worker script."]
     #[doc = " * `args` - Arguments to Worker script."]
     #[doc = " * `options` - Options for Dynamic Dispatch invocation."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A Fetcher object that allows you to send requests to the Worker script."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * If the Worker script does not exist in this dispatch namespace, an error will be thrown."]
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn try_get_with_args(
@@ -71943,17 +72779,17 @@ extern "C" {
         args: &DispatchNamespaceArgs,
     ) -> Result<JsValue, JsValue>;
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `name` - Name of the Worker script."]
     #[doc = " * `args` - Arguments to Worker script."]
     #[doc = " * `options` - Options for Dynamic Dispatch invocation."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A Fetcher object that allows you to send requests to the Worker script."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * If the Worker script does not exist in this dispatch namespace, an error will be thrown."]
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_with_args_and_options(
@@ -71963,17 +72799,17 @@ extern "C" {
         options: &DynamicDispatchOptions,
     ) -> JsValue;
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `name` - Name of the Worker script."]
     #[doc = " * `args` - Arguments to Worker script."]
     #[doc = " * `options` - Options for Dynamic Dispatch invocation."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A Fetcher object that allows you to send requests to the Worker script."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Errors"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * If the Worker script does not exist in this dispatch namespace, an error will be thrown."]
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn try_get_with_args_and_options(
@@ -71995,35 +72831,35 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Workflow;
     #[doc = " Get a handle to an existing instance of the Workflow."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `id` - Id for the instance of this Workflow"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with a handle for the Instance"]
     #[wasm_bindgen(method, catch)]
     pub async fn get(this: &Workflow, id: &str) -> Result<WorkflowInstance, JsValue>;
     #[doc = " Create a new instance and return a handle to it. If a provided id exists, an error will be thrown."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `options` - Options when creating an instance including id and params"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with a handle for the Instance"]
     #[wasm_bindgen(method, catch)]
     pub async fn create(this: &Workflow) -> Result<WorkflowInstance, JsValue>;
     #[doc = " Create a new instance and return a handle to it. If a provided id exists, an error will be thrown."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `options` - Options when creating an instance including id and params"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with a handle for the Instance"]
     #[wasm_bindgen(method, catch, js_name = "create")]
     pub async fn create_with_options(
@@ -72032,13 +72868,13 @@ extern "C" {
     ) -> Result<WorkflowInstance, JsValue>;
     #[doc = " Create a batch of instances and return handle for all of them. If a provided id exists, an error will be thrown."]
     #[doc = " `createBatch` is limited at 100 instances at a time or when the RPC limit for the batch (1MiB) is reached."]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Arguments"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " * `batch` - List of Options when creating an instance including name and params"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " ## Returns"]
-    #[doc = " "]
+    #[doc = ""]
     #[doc = " A promise that resolves with a list of handles for the created instances."]
     #[wasm_bindgen(method, catch, js_name = "createBatch")]
     pub async fn create_batch(
@@ -72153,90 +72989,126 @@ extern "C" {
     pub fn set_output(this: &InstanceStatus, val: &JsValue);
 }
 impl InstanceStatus {
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `status: \"queued\"`"]
     pub fn new_queued() -> InstanceStatus {
         Self::builder_queued().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `status: \"running\"`"]
     pub fn new_running() -> InstanceStatus {
         Self::builder_running().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `status: \"paused\"`"]
     pub fn new_paused() -> InstanceStatus {
         Self::builder_paused().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `status: \"errored\"`"]
     pub fn new_errored() -> InstanceStatus {
         Self::builder_errored().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `status: \"terminated\"`"]
     pub fn new_terminated() -> InstanceStatus {
         Self::builder_terminated().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `status: \"complete\"`"]
     pub fn new_complete() -> InstanceStatus {
         Self::builder_complete().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `status: \"waiting\"`"]
     pub fn new_waiting() -> InstanceStatus {
         Self::builder_waiting().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `status: \"waitingForPause\"`"]
     pub fn new_waiting_for_pause() -> InstanceStatus {
         Self::builder_waiting_for_pause().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `status: \"unknown\"`"]
     pub fn new_unknown() -> InstanceStatus {
         Self::builder_unknown().build()
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `status: \"queued\"`"]
     pub fn builder_queued() -> InstanceStatusBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status("queued");
         InstanceStatusBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `status: \"running\"`"]
     pub fn builder_running() -> InstanceStatusBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status_with_js_value("running");
         InstanceStatusBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `status: \"paused\"`"]
     pub fn builder_paused() -> InstanceStatusBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status_with_js_value_1("paused");
         InstanceStatusBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `status: \"errored\"`"]
     pub fn builder_errored() -> InstanceStatusBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status_with_js_value_2("errored");
         InstanceStatusBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `status: \"terminated\"`"]
     pub fn builder_terminated() -> InstanceStatusBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status_with_js_value_3("terminated");
         InstanceStatusBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `status: \"complete\"`"]
     pub fn builder_complete() -> InstanceStatusBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status_with_js_value_4("complete");
         InstanceStatusBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `status: \"waiting\"`"]
     pub fn builder_waiting() -> InstanceStatusBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status_with_js_value_5("waiting");
         InstanceStatusBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `status: \"waitingForPause\"`"]
     pub fn builder_waiting_for_pause() -> InstanceStatusBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status_with_js_value_6("waitingForPause");
         InstanceStatusBuilder { inner }
     }
+    #[doc = " # Inlined fields"]
+    #[doc = ""]
     #[doc = " * `status: \"unknown\"`"]
     pub fn builder_unknown() -> InstanceStatusBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -72275,14 +73147,14 @@ extern "C" {
     pub fn set_message(this: &WorkflowError, val: &str);
 }
 impl WorkflowError {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn new(message: &str) -> WorkflowError {
         Self::builder(message).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder(message: &str) -> WorkflowErrorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -72348,15 +73220,15 @@ extern "C" {
     pub fn set_payload(this: &WorkflowInstanceSendEvent, val: &JsValue);
 }
 impl WorkflowInstanceSendEvent {
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `type`"]
     #[doc = " * `payload`"]
     pub fn new(r#type: &str, payload: &JsValue) -> WorkflowInstanceSendEvent {
         Self::builder(r#type, payload).build()
     }
-    #[doc = " # Provided fields"]
-    #[doc = " "]
+    #[doc = " # Parameters"]
+    #[doc = ""]
     #[doc = " * `type`"]
     #[doc = " * `payload`"]
     pub fn builder(r#type: &str, payload: &JsValue) -> WorkflowInstanceSendEventBuilder {
@@ -72447,14 +73319,14 @@ pub mod pipelines {
         pub fn set_ctx(this: &PipelineTransformationEntrypoint, val: &ExecutionContext);
         #[doc = " run receives an array of PipelineRecord which can be"]
         #[doc = " transformed and returned to the pipeline"]
-        #[doc = " "]
+        #[doc = ""]
         #[doc = " ## Arguments"]
-        #[doc = " "]
+        #[doc = ""]
         #[doc = " * `records` - Incoming records from the pipeline to be transformed"]
         #[doc = " * `metadata` - Information about the specific pipeline calling the transformation entrypoint"]
-        #[doc = " "]
+        #[doc = ""]
         #[doc = " ## Returns"]
-        #[doc = " "]
+        #[doc = ""]
         #[doc = " A promise containing the transformed PipelineRecord array"]
         #[wasm_bindgen(method, catch)]
         pub async fn run(
@@ -72480,15 +73352,15 @@ pub mod pipelines {
         pub fn set_pipeline_name(this: &PipelineBatchMetadata, val: &str);
     }
     impl PipelineBatchMetadata {
-        #[doc = " # Provided fields"]
-        #[doc = " "]
+        #[doc = " # Parameters"]
+        #[doc = ""]
         #[doc = " * `pipeline_id`"]
         #[doc = " * `pipeline_name`"]
         pub fn new(pipeline_id: &str, pipeline_name: &str) -> PipelineBatchMetadata {
             Self::builder(pipeline_id, pipeline_name).build()
         }
-        #[doc = " # Provided fields"]
-        #[doc = " "]
+        #[doc = " # Parameters"]
+        #[doc = ""]
         #[doc = " * `pipeline_id`"]
         #[doc = " * `pipeline_name`"]
         pub fn builder(pipeline_id: &str, pipeline_name: &str) -> PipelineBatchMetadataBuilder {
@@ -72512,9 +73384,9 @@ pub mod pipelines {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Pipeline;
         #[doc = " The Pipeline interface represents the type of a binding to a Pipeline"]
-        #[doc = " "]
+        #[doc = ""]
         #[doc = " ## Arguments"]
-        #[doc = " "]
+        #[doc = ""]
         #[doc = " * `records` - The records to send to the pipeline"]
         #[wasm_bindgen(method, catch)]
         pub async fn send(this: &Pipeline, records: &Array<T>) -> Result<(), JsValue>;

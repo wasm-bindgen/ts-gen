@@ -27,7 +27,15 @@ pub(crate) fn doc_tokens(doc: &Option<String>) -> TokenStream {
             let lines: Vec<TokenStream> = text
                 .lines()
                 .map(|line| {
-                    let line = format!(" {line}");
+                    // Non-empty lines get a leading space so the rendered
+                    // doc reads `/// foo` rather than `///foo`. Empty
+                    // lines stay bare so blank-line separators don't
+                    // emit as a stray `#[doc = " "]`.
+                    let line = if line.is_empty() {
+                        String::new()
+                    } else {
+                        format!(" {line}")
+                    };
                     quote! { #[doc = #line] }
                 })
                 .collect();
