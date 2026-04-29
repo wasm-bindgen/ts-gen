@@ -59,39 +59,17 @@ pub(crate) fn convert_formal_params_with_synthesis(
             .unwrap_or_else(|| format!("arg{i}"));
 
         let type_ref = match param.type_annotation.as_ref() {
-            Some(ann) => match &ann.type_annotation {
-                // The shape we hoist: a directly-inline object literal in
-                // parameter position. This is the `send(builder: { ... })`
-                // pattern; everything else falls through to the regular
-                // `convert_ts_type` path.
-                TSType::TSTypeLiteral(literal) => {
-                    // Prefer the parameter's own name as the discriminating
-                    // segment (`SendEmail.send(builder: {...})` →
-                    // `SendEmailBuilder` reads better than
-                    // `SendEmailSend`). Fall back to the member name when
-                    // the parameter has no usable identifier (destructured
-                    // patterns, anonymous callable args).
-                    let segment = raw_param_name.as_deref().unwrap_or(member_name);
-                    let synth_name = unique_type_name(parent_name, segment, used_type_names);
-                    used_type_names.insert(synth_name.clone());
-                    // Recurse: methods inside the hoisted interface might
-                    // themselves carry anonymous parameter types. They land
-                    // in `synthesized` alongside the parent so the caller
-                    // gets the full transitive set.
-                    let iface = interface_from_signatures(
-                        synth_name.clone(),
-                        Vec::new(),
-                        Vec::new(),
-                        &literal.members,
-                        used_type_names,
-                        &mut synthesized,
-                        docs,
-                        diag,
-                    );
-                    synthesized.push(iface);
-                    TypeRef::Named(synth_name)
-                }
-                other => convert_ts_type(other, diag),
+            Some(ann) => match try_synthesize_inline_param(
+                &ann.type_annotation,
+                parent_name,
+                raw_param_name.as_deref().unwrap_or(member_name),
+                used_type_names,
+                &mut synthesized,
+                docs,
+                diag,
+            ) {
+                Some(synth) => synth,
+                None => convert_ts_type(&ann.type_annotation, diag),
             },
             None => TypeRef::Any,
         };
@@ -138,6 +116,97 @@ fn unique_type_name(parent: &str, member: &str, used: &HashSet<String>) -> Strin
         }
     }
     unreachable!("HashSet exhaustion is impossible in practice");
+}
+
+/// Try to synthesize an anonymous-interface hoist for a parameter type.
+///
+/// Recognised shapes:
+///
+/// * Bare `{ ... }` — directly hoisted into a single interface whose
+///   members are the literal's members.
+/// * `{ ... } | { ... } | …` where every union branch is itself a type
+///   literal — structurally merged into a single interface (see
+///   [`merge_member_branches`]).
+///
+/// Anything else returns `None` so the caller falls back to the regular
+/// type-mapping rules.
+#[allow(clippy::too_many_arguments)]
+fn try_synthesize_inline_param(
+    ts_type: &TSType<'_>,
+    parent_name: &str,
+    segment: &str,
+    used_type_names: &mut HashSet<String>,
+    synth: &mut Vec<InterfaceDecl>,
+    docs: &DocComments<'_>,
+    diag: &mut DiagnosticCollector,
+) -> Option<TypeRef> {
+    match ts_type {
+        TSType::TSTypeLiteral(literal) => {
+            let synth_name = unique_type_name(parent_name, segment, used_type_names);
+            used_type_names.insert(synth_name.clone());
+            // Methods inside the hoisted interface may carry their own
+            // anonymous parameter types — recurse and let those land in
+            // `synth` alongside the parent.
+            let iface = interface_from_signatures(
+                synth_name.clone(),
+                Vec::new(),
+                Vec::new(),
+                &literal.members,
+                used_type_names,
+                synth,
+                docs,
+                diag,
+            );
+            synth.push(iface);
+            Some(TypeRef::Named(synth_name))
+        }
+        TSType::TSUnionType(union) if all_type_literals(&union.types) => {
+            let synth_name = unique_type_name(parent_name, segment, used_type_names);
+            used_type_names.insert(synth_name.clone());
+            // Convert each branch through the regular signature pipeline
+            // first, then structurally merge at the IR level.
+            let branches: Vec<Vec<Member>> = union
+                .types
+                .iter()
+                .filter_map(|t| match t {
+                    TSType::TSTypeLiteral(lit) => Some(
+                        lit.members
+                            .iter()
+                            .flat_map(|sig| {
+                                convert_ts_signature(
+                                    sig,
+                                    Some(&synth_name),
+                                    used_type_names,
+                                    synth,
+                                    docs,
+                                    diag,
+                                )
+                            })
+                            .collect(),
+                    ),
+                    _ => None,
+                })
+                .collect();
+            let merged = crate::parse::literal_union::merge_member_branches(&branches);
+            let classification = crate::parse::classify::classify_interface(&merged);
+            synth.push(InterfaceDecl {
+                name: synth_name.clone(),
+                js_name: synth_name.clone(),
+                type_params: Vec::new(),
+                extends: Vec::new(),
+                members: merged,
+                classification,
+            });
+            Some(TypeRef::Named(synth_name))
+        }
+        _ => None,
+    }
+}
+
+/// Return true when every entry in a union is a type literal — the
+/// signal for "this is an anonymous-interface union we can merge."
+fn all_type_literals(types: &[TSType<'_>]) -> bool {
+    !types.is_empty() && types.iter().all(|t| matches!(t, TSType::TSTypeLiteral(_)))
 }
 
 /// Convert a `TSSignature` (interface body member) to our IR `Member`(s).

@@ -13,17 +13,15 @@ use JsValue as Cf;
 #[allow(dead_code)]
 use JsValue as D1Result;
 #[allow(dead_code)]
+use JsValue as Data;
+#[allow(dead_code)]
 use JsValue as DurableObjectStub;
 #[allow(dead_code)]
 use JsValue as EmailExportedHandler;
 #[allow(dead_code)]
 use JsValue as Error;
 #[allow(dead_code)]
-use JsValue as EventContext;
-#[allow(dead_code)]
 use JsValue as EventListenerOrEventListenerObject;
-#[allow(dead_code)]
-use JsValue as EventPluginContext;
 #[allow(dead_code)]
 use JsValue as EventType;
 #[allow(dead_code)]
@@ -55,8 +53,6 @@ use JsValue as Iterable;
 #[allow(dead_code)]
 use JsValue as IterableIterator;
 #[allow(dead_code)]
-use JsValue as KVNamespaceListResult;
-#[allow(dead_code)]
 use JsValue as Key;
 #[allow(dead_code)]
 use JsValue as Metadata;
@@ -69,11 +65,13 @@ use JsValue as Options;
 #[allow(dead_code)]
 use JsValue as PARAMS;
 #[allow(dead_code)]
+use JsValue as Params;
+#[allow(dead_code)]
+use JsValue as PluginArgs;
+#[allow(dead_code)]
 use JsValue as Props;
 #[allow(dead_code)]
 use JsValue as R;
-#[allow(dead_code)]
-use JsValue as ReadableStreamReadResult;
 #[allow(dead_code)]
 use JsValue as Readonly;
 #[allow(dead_code)]
@@ -83,6 +81,8 @@ use JsValue as RequestInfo;
 #[allow(dead_code)]
 use JsValue as T;
 #[allow(dead_code)]
+use JsValue as TailEventHandler;
+#[allow(dead_code)]
 use JsValue as This;
 #[allow(dead_code)]
 use JsValue as Type;
@@ -90,8 +90,6 @@ use JsValue as Type;
 use JsValue as Value;
 #[allow(dead_code)]
 use JsValue as W;
-#[allow(dead_code)]
-use JsValue as WorkflowStepEvent;
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(thread_local_v2)]
@@ -179,8 +177,104 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_stack(this: &DOMException, val: &JsValue);
 }
-#[allow(dead_code)]
-pub type WorkerGlobalScopeEventMap = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type WorkerGlobalScopeEventMap;
+    #[wasm_bindgen(method, getter)]
+    pub fn fetch(this: &WorkerGlobalScopeEventMap) -> FetchEvent;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_fetch(this: &WorkerGlobalScopeEventMap, val: &FetchEvent);
+    #[wasm_bindgen(method, getter)]
+    pub fn scheduled(this: &WorkerGlobalScopeEventMap) -> ScheduledEvent;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_scheduled(this: &WorkerGlobalScopeEventMap, val: &ScheduledEvent);
+    #[wasm_bindgen(method, getter)]
+    pub fn queue(this: &WorkerGlobalScopeEventMap) -> QueueEvent;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_queue(this: &WorkerGlobalScopeEventMap, val: &QueueEvent);
+    #[wasm_bindgen(method, getter)]
+    pub fn unhandledrejection(this: &WorkerGlobalScopeEventMap) -> PromiseRejectionEvent;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_unhandledrejection(this: &WorkerGlobalScopeEventMap, val: &PromiseRejectionEvent);
+    #[wasm_bindgen(method, getter)]
+    pub fn rejectionhandled(this: &WorkerGlobalScopeEventMap) -> PromiseRejectionEvent;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_rejectionhandled(this: &WorkerGlobalScopeEventMap, val: &PromiseRejectionEvent);
+}
+impl WorkerGlobalScopeEventMap {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> WorkerGlobalScopeEventMapBuilder {
+        WorkerGlobalScopeEventMapBuilder {
+            inner: Self::new(),
+            required: 31u64,
+        }
+    }
+}
+pub struct WorkerGlobalScopeEventMapBuilder {
+    inner: WorkerGlobalScopeEventMap,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl WorkerGlobalScopeEventMapBuilder {
+    pub fn fetch(mut self, val: &FetchEvent) -> Self {
+        self.inner.set_fetch(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn scheduled(mut self, val: &ScheduledEvent) -> Self {
+        self.inner.set_scheduled(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn queue(mut self, val: &QueueEvent) -> Self {
+        self.inner.set_queue(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn unhandledrejection(mut self, val: &PromiseRejectionEvent) -> Self {
+        self.inner.set_unhandledrejection(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn rejectionhandled(mut self, val: &PromiseRejectionEvent) -> Self {
+        self.inner.set_rejectionhandled(val);
+        self.required &= 18446744073709551599u64;
+        self
+    }
+    pub fn build(self) -> Result<WorkerGlobalScopeEventMap, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `fetch`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `scheduled`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `queue`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `unhandledrejection`");
+            }
+            if self.required & 16u64 != 0 {
+                missing.push("missing required property `rejectionhandled`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(WorkerGlobalScopeEventMap),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = EventTarget , extends = Object)]
@@ -8721,8 +8815,102 @@ impl KVNamespaceListKeyBuilder {
         Ok(self.inner)
     }
 }
-#[allow(dead_code)]
-pub type KVNamespaceListResult = JsValue;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type KVNamespaceListResult;
+    #[wasm_bindgen(method, getter, js_name = "cacheStatus")]
+    pub fn cache_status(this: &KVNamespaceListResult) -> Option<String>;
+    #[wasm_bindgen(method, getter)]
+    pub fn cursor(this: &KVNamespaceListResult) -> Option<String>;
+    #[wasm_bindgen(method, getter)]
+    pub fn keys(this: &KVNamespaceListResult) -> Array<KVNamespaceListKey>;
+    #[wasm_bindgen(method, getter)]
+    pub fn list_complete(this: &KVNamespaceListResult) -> JsValue;
+    #[wasm_bindgen(method, setter, js_name = "cacheStatus")]
+    pub fn set_cache_status(this: &KVNamespaceListResult, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "cacheStatus")]
+    pub fn set_cache_status_with_null(this: &KVNamespaceListResult, val: &Null);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_cursor(this: &KVNamespaceListResult, val: &str);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_keys(this: &KVNamespaceListResult, val: &Array<KVNamespaceListKey>);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_list_complete(this: &KVNamespaceListResult, val: bool);
+    #[wasm_bindgen(method, setter, js_name = "list_complete")]
+    pub fn set_list_complete_with_js_value(this: &KVNamespaceListResult, val: bool);
+}
+impl KVNamespaceListResult {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> KVNamespaceListResultBuilder {
+        KVNamespaceListResultBuilder {
+            inner: Self::new(),
+            required: 7u64,
+        }
+    }
+}
+pub struct KVNamespaceListResultBuilder {
+    inner: KVNamespaceListResult,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl KVNamespaceListResultBuilder {
+    pub fn cache_status(mut self, val: &str) -> Self {
+        self.inner.set_cache_status(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn cache_status_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_cache_status_with_null(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn cursor(mut self, val: &str) -> Self {
+        self.inner.set_cursor(val);
+        self
+    }
+    pub fn keys(mut self, val: &Array<KVNamespaceListKey>) -> Self {
+        self.inner.set_keys(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn list_complete(mut self, val: bool) -> Self {
+        self.inner.set_list_complete(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn list_complete_with_js_value(mut self, val: bool) -> Self {
+        self.inner.set_list_complete_with_js_value(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn build(self) -> Result<KVNamespaceListResult, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `cacheStatus`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `keys`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `list_complete`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(KVNamespaceListResult),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -9980,7 +10168,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "customMetadata")]
     pub fn custom_metadata(this: &R2Object) -> Option<Object<JsString>>;
     #[wasm_bindgen(method, getter)]
-    pub fn range(this: &R2Object) -> Option<JsValue>;
+    pub fn range(this: &R2Object) -> Option<R2Range>;
     #[wasm_bindgen(method, getter, js_name = "storageClass")]
     pub fn storage_class(this: &R2Object) -> String;
     #[wasm_bindgen(method, getter, js_name = "ssecKeyMd5")]
@@ -10010,8 +10198,56 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn blob(this: &R2ObjectBody) -> Result<Blob, JsValue>;
 }
-#[allow(dead_code)]
-pub type R2Range = JsValue;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type R2Range;
+    #[wasm_bindgen(method, getter)]
+    pub fn length(this: &R2Range) -> Option<f64>;
+    #[wasm_bindgen(method, getter)]
+    pub fn offset(this: &R2Range) -> Option<f64>;
+    #[wasm_bindgen(method, getter)]
+    pub fn suffix(this: &R2Range) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_length(this: &R2Range, val: f64);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_offset(this: &R2Range, val: f64);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_suffix(this: &R2Range, val: f64);
+}
+impl R2Range {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> R2RangeBuilder {
+        R2RangeBuilder { inner: Self::new() }
+    }
+}
+pub struct R2RangeBuilder {
+    inner: R2Range,
+}
+#[allow(unused_mut)]
+impl R2RangeBuilder {
+    pub fn length(mut self, val: f64) -> Self {
+        self.inner.set_length(val);
+        self
+    }
+    pub fn offset(mut self, val: f64) -> Self {
+        self.inner.set_offset(val);
+        self
+    }
+    pub fn suffix(mut self, val: f64) -> Self {
+        self.inner.set_suffix(val);
+        self
+    }
+    pub fn build(self) -> R2Range {
+        self.inner
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -10092,7 +10328,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn range(this: &R2GetOptions) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_range(this: &R2GetOptions, val: &Object);
+    pub fn set_range(this: &R2GetOptions, val: &R2Range);
     #[wasm_bindgen(method, setter, js_name = "range")]
     pub fn set_range_with_headers(this: &R2GetOptions, val: &Headers);
     #[wasm_bindgen(method, getter, js_name = "ssecKey")]
@@ -10126,7 +10362,7 @@ impl R2GetOptionsBuilder {
         self.inner.set_only_if_with_headers(val);
         self
     }
-    pub fn range(mut self, val: &Object) -> Self {
+    pub fn range(mut self, val: &R2Range) -> Self {
         self.inner.set_range(val);
         self
     }
@@ -11151,8 +11387,77 @@ impl StreamPipeOptionsBuilder {
         self.inner
     }
 }
-#[allow(dead_code)]
-pub type ReadableStreamReadResult = JsValue;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ReadableStreamReadResult;
+    #[wasm_bindgen(method, getter)]
+    pub fn done(this: &ReadableStreamReadResult) -> JsValue;
+    #[wasm_bindgen(method, getter)]
+    pub fn value(this: &ReadableStreamReadResult) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_done(this: &ReadableStreamReadResult, val: bool);
+    #[wasm_bindgen(method, setter, js_name = "done")]
+    pub fn set_done_with_js_value(this: &ReadableStreamReadResult, val: bool);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_value(this: &ReadableStreamReadResult, val: &R);
+    #[wasm_bindgen(method, setter, js_name = "value")]
+    pub fn set_value_with_undefined(this: &ReadableStreamReadResult, val: &Undefined);
+}
+impl ReadableStreamReadResult {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ReadableStreamReadResultBuilder {
+        ReadableStreamReadResultBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct ReadableStreamReadResultBuilder {
+    inner: ReadableStreamReadResult,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ReadableStreamReadResultBuilder {
+    pub fn done(mut self, val: bool) -> Self {
+        self.inner.set_done(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn done_with_js_value(mut self, val: bool) -> Self {
+        self.inner.set_done_with_js_value(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn value(mut self, val: &R) -> Self {
+        self.inner.set_value(val);
+        self
+    }
+    pub fn value_with_undefined(mut self, val: &Undefined) -> Self {
+        self.inner.set_value_with_undefined(val);
+        self
+    }
+    pub fn build(self) -> Result<ReadableStreamReadResult, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `done`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ReadableStreamReadResult),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -13602,8 +13907,92 @@ impl CloseEventInitBuilder {
         self.inner
     }
 }
-#[allow(dead_code)]
-pub type WebSocketEventMap = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type WebSocketEventMap;
+    #[wasm_bindgen(method, getter)]
+    pub fn close(this: &WebSocketEventMap) -> CloseEvent;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_close(this: &WebSocketEventMap, val: &CloseEvent);
+    #[wasm_bindgen(method, getter)]
+    pub fn message(this: &WebSocketEventMap) -> MessageEvent;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_message(this: &WebSocketEventMap, val: &MessageEvent);
+    #[wasm_bindgen(method, getter)]
+    pub fn open(this: &WebSocketEventMap) -> Event;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_open(this: &WebSocketEventMap, val: &Event);
+    #[wasm_bindgen(method, getter)]
+    pub fn error(this: &WebSocketEventMap) -> ErrorEvent;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_error(this: &WebSocketEventMap, val: &ErrorEvent);
+}
+impl WebSocketEventMap {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> WebSocketEventMapBuilder {
+        WebSocketEventMapBuilder {
+            inner: Self::new(),
+            required: 15u64,
+        }
+    }
+}
+pub struct WebSocketEventMapBuilder {
+    inner: WebSocketEventMap,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl WebSocketEventMapBuilder {
+    pub fn close(mut self, val: &CloseEvent) -> Self {
+        self.inner.set_close(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn message(mut self, val: &MessageEvent) -> Self {
+        self.inner.set_message(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn open(mut self, val: &Event) -> Self {
+        self.inner.set_open(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn error(mut self, val: &ErrorEvent) -> Self {
+        self.inner.set_error(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn build(self) -> Result<WebSocketEventMap, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `close`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `message`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `open`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `error`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(WebSocketEventMap),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = EventTarget , extends = Object)]
@@ -14928,18 +15317,423 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiSearchNameNotSetError;
 }
-#[allow(dead_code)]
-pub type AiSearchSearchRequest = Object;
-#[allow(dead_code)]
-pub type AiSearchChatCompletionsRequest = Object;
-#[allow(dead_code)]
-pub type AiSearchSearchResponse = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiSearchSearchRequest;
+    #[wasm_bindgen(method, getter)]
+    pub fn messages(this: &AiSearchSearchRequest) -> Array<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_messages(this: &AiSearchSearchRequest, val: &Array<Object>);
+    #[wasm_bindgen(method, getter)]
+    pub fn ai_search_options(this: &AiSearchSearchRequest) -> Option<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_ai_search_options(this: &AiSearchSearchRequest, val: &Object);
+}
+impl AiSearchSearchRequest {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiSearchSearchRequestBuilder {
+        AiSearchSearchRequestBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct AiSearchSearchRequestBuilder {
+    inner: AiSearchSearchRequest,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiSearchSearchRequestBuilder {
+    pub fn messages(mut self, val: &Array<Object>) -> Self {
+        self.inner.set_messages(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn ai_search_options(mut self, val: &Object) -> Self {
+        self.inner.set_ai_search_options(val);
+        self
+    }
+    pub fn build(self) -> Result<AiSearchSearchRequest, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `messages`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiSearchSearchRequest),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiSearchChatCompletionsRequest;
+    #[wasm_bindgen(method, getter)]
+    pub fn messages(this: &AiSearchChatCompletionsRequest) -> Array<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_messages(this: &AiSearchChatCompletionsRequest, val: &Array<Object>);
+    #[wasm_bindgen(method, getter)]
+    pub fn model(this: &AiSearchChatCompletionsRequest) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_model(this: &AiSearchChatCompletionsRequest, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn stream(this: &AiSearchChatCompletionsRequest) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_stream(this: &AiSearchChatCompletionsRequest, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn ai_search_options(this: &AiSearchChatCompletionsRequest) -> Option<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_ai_search_options(this: &AiSearchChatCompletionsRequest, val: &Object);
+}
+impl AiSearchChatCompletionsRequest {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiSearchChatCompletionsRequestBuilder {
+        AiSearchChatCompletionsRequestBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct AiSearchChatCompletionsRequestBuilder {
+    inner: AiSearchChatCompletionsRequest,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiSearchChatCompletionsRequestBuilder {
+    pub fn messages(mut self, val: &Array<Object>) -> Self {
+        self.inner.set_messages(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn model(mut self, val: &str) -> Self {
+        self.inner.set_model(val);
+        self
+    }
+    pub fn stream(mut self, val: bool) -> Self {
+        self.inner.set_stream(val);
+        self
+    }
+    pub fn ai_search_options(mut self, val: &Object) -> Self {
+        self.inner.set_ai_search_options(val);
+        self
+    }
+    pub fn build(self) -> Result<AiSearchChatCompletionsRequest, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `messages`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiSearchChatCompletionsRequest),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiSearchSearchResponse;
+    #[wasm_bindgen(method, getter)]
+    pub fn search_query(this: &AiSearchSearchResponse) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_search_query(this: &AiSearchSearchResponse, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn chunks(this: &AiSearchSearchResponse) -> Array<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_chunks(this: &AiSearchSearchResponse, val: &Array<Object>);
+}
+impl AiSearchSearchResponse {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiSearchSearchResponseBuilder {
+        AiSearchSearchResponseBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct AiSearchSearchResponseBuilder {
+    inner: AiSearchSearchResponse,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiSearchSearchResponseBuilder {
+    pub fn search_query(mut self, val: &str) -> Self {
+        self.inner.set_search_query(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn chunks(mut self, val: &Array<Object>) -> Self {
+        self.inner.set_chunks(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn build(self) -> Result<AiSearchSearchResponse, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `search_query`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `chunks`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiSearchSearchResponse),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[allow(dead_code)]
 pub type AiSearchListResponse = Array<Object>;
-#[allow(dead_code)]
-pub type AiSearchConfig = Object;
-#[allow(dead_code)]
-pub type AiSearchInstance = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiSearchConfig;
+    #[doc = " Instance ID (1-32 chars, pattern: ^[a-z0-9_]+(?:-[a-z0-9_]+)*$)"]
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &AiSearchConfig) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_id(this: &AiSearchConfig, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &AiSearchConfig) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &AiSearchConfig, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "type")]
+    pub fn set_type_with_js_value(this: &AiSearchConfig, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn source(this: &AiSearchConfig) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_source(this: &AiSearchConfig, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn source_params(this: &AiSearchConfig) -> Option<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_source_params(this: &AiSearchConfig, val: &Object);
+    #[doc = " Token ID (UUID format)"]
+    #[wasm_bindgen(method, getter)]
+    pub fn token_id(this: &AiSearchConfig) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_token_id(this: &AiSearchConfig, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn ai_gateway_id(this: &AiSearchConfig) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_ai_gateway_id(this: &AiSearchConfig, val: &str);
+    #[doc = " Enable query rewriting (default false)"]
+    #[wasm_bindgen(method, getter)]
+    pub fn rewrite_query(this: &AiSearchConfig) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_rewrite_query(this: &AiSearchConfig, val: bool);
+    #[doc = " Enable reranking (default false)"]
+    #[wasm_bindgen(method, getter)]
+    pub fn reranking(this: &AiSearchConfig) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_reranking(this: &AiSearchConfig, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn embedding_model(this: &AiSearchConfig) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_embedding_model(this: &AiSearchConfig, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn ai_search_model(this: &AiSearchConfig) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_ai_search_model(this: &AiSearchConfig, val: &str);
+}
+impl AiSearchConfig {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiSearchConfigBuilder {
+        AiSearchConfigBuilder {
+            inner: Self::new(),
+            required: 7u64,
+        }
+    }
+}
+pub struct AiSearchConfigBuilder {
+    inner: AiSearchConfig,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiSearchConfigBuilder {
+    pub fn id(mut self, val: &str) -> Self {
+        self.inner.set_id(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn type_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_type_with_js_value(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn source(mut self, val: &str) -> Self {
+        self.inner.set_source(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn source_params(mut self, val: &Object) -> Self {
+        self.inner.set_source_params(val);
+        self
+    }
+    pub fn token_id(mut self, val: &str) -> Self {
+        self.inner.set_token_id(val);
+        self
+    }
+    pub fn ai_gateway_id(mut self, val: &str) -> Self {
+        self.inner.set_ai_gateway_id(val);
+        self
+    }
+    pub fn rewrite_query(mut self, val: bool) -> Self {
+        self.inner.set_rewrite_query(val);
+        self
+    }
+    pub fn reranking(mut self, val: bool) -> Self {
+        self.inner.set_reranking(val);
+        self
+    }
+    pub fn embedding_model(mut self, val: &str) -> Self {
+        self.inner.set_embedding_model(val);
+        self
+    }
+    pub fn ai_search_model(mut self, val: &str) -> Self {
+        self.inner.set_ai_search_model(val);
+        self
+    }
+    pub fn build(self) -> Result<AiSearchConfig, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `id`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `source`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiSearchConfig),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiSearchInstance;
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &AiSearchInstance) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_id(this: &AiSearchInstance, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn enable(this: &AiSearchInstance) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_enable(this: &AiSearchInstance, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &AiSearchInstance) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &AiSearchInstance, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "type")]
+    pub fn set_type_with_js_value(this: &AiSearchInstance, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn source(this: &AiSearchInstance) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_source(this: &AiSearchInstance, val: &str);
+}
+impl AiSearchInstance {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiSearchInstanceBuilder {
+        AiSearchInstanceBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct AiSearchInstanceBuilder {
+    inner: AiSearchInstance,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiSearchInstanceBuilder {
+    pub fn id(mut self, val: &str) -> Self {
+        self.inner.set_id(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn enable(mut self, val: bool) -> Self {
+        self.inner.set_enable(val);
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self
+    }
+    pub fn type_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_type_with_js_value(val);
+        self
+    }
+    pub fn source(mut self, val: &str) -> Self {
+        self.inner.set_source(val);
+        self
+    }
+    pub fn build(self) -> Result<AiSearchInstance, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `id`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiSearchInstance),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -14955,8 +15749,10 @@ extern "C" {
     #[doc = " "]
     #[doc = " Search response with matching chunks"]
     #[wasm_bindgen(method, catch)]
-    pub async fn search(this: &AiSearchInstanceService, params: &Object)
-        -> Result<Object, JsValue>;
+    pub async fn search(
+        this: &AiSearchInstanceService,
+        params: &AiSearchSearchRequest,
+    ) -> Result<AiSearchSearchResponse, JsValue>;
     #[doc = " Generate chat completions with AI Search context."]
     #[doc = " "]
     #[doc = " ## Arguments"]
@@ -14969,7 +15765,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "chatCompletions")]
     pub async fn chat_completions(
         this: &AiSearchInstanceService,
-        params: &Object,
+        params: &AiSearchChatCompletionsRequest,
     ) -> Result<JsValue, JsValue>;
     #[doc = " Delete this AI Search instance."]
     #[wasm_bindgen(method, catch)]
@@ -15024,11 +15820,59 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn create(
         this: &AiSearchAccountService,
-        config: &Object,
+        config: &AiSearchConfig,
     ) -> Result<AiSearchInstanceService, JsValue>;
 }
-#[allow(dead_code)]
-pub type AiImageClassificationInput = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiImageClassificationInput;
+    #[wasm_bindgen(method, getter)]
+    pub fn image(this: &AiImageClassificationInput) -> Array<Number>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_image(this: &AiImageClassificationInput, val: &Array<Number>);
+}
+impl AiImageClassificationInput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiImageClassificationInputBuilder {
+        AiImageClassificationInputBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct AiImageClassificationInputBuilder {
+    inner: AiImageClassificationInput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiImageClassificationInputBuilder {
+    pub fn image(mut self, val: &Array<Number>) -> Self {
+        self.inner.set_image(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn build(self) -> Result<AiImageClassificationInput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `image`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiImageClassificationInput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[allow(dead_code)]
 pub type AiImageClassificationOutput = Array<Object>;
 #[wasm_bindgen]
@@ -15037,70 +15881,617 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type BaseAiImageClassification;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &BaseAiImageClassification) -> Object;
+    pub fn inputs(this: &BaseAiImageClassification) -> AiImageClassificationInput;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &BaseAiImageClassification, val: &Object);
+    pub fn set_inputs(this: &BaseAiImageClassification, val: &AiImageClassificationInput);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(this: &BaseAiImageClassification) -> Array<Object>;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
     pub fn set_post_processed_outputs(this: &BaseAiImageClassification, val: &Array<Object>);
 }
-#[allow(dead_code)]
-pub type AiImageToTextInput = Object;
-#[allow(dead_code)]
-pub type AiImageToTextOutput = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiImageToTextInput;
+    #[wasm_bindgen(method, getter)]
+    pub fn image(this: &AiImageToTextInput) -> Array<Number>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_image(this: &AiImageToTextInput, val: &Array<Number>);
+    #[wasm_bindgen(method, getter)]
+    pub fn prompt(this: &AiImageToTextInput) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_prompt(this: &AiImageToTextInput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn max_tokens(this: &AiImageToTextInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_max_tokens(this: &AiImageToTextInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn temperature(this: &AiImageToTextInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_temperature(this: &AiImageToTextInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn top_p(this: &AiImageToTextInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_top_p(this: &AiImageToTextInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn top_k(this: &AiImageToTextInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_top_k(this: &AiImageToTextInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn seed(this: &AiImageToTextInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_seed(this: &AiImageToTextInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn repetition_penalty(this: &AiImageToTextInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_repetition_penalty(this: &AiImageToTextInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn frequency_penalty(this: &AiImageToTextInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_frequency_penalty(this: &AiImageToTextInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn presence_penalty(this: &AiImageToTextInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_presence_penalty(this: &AiImageToTextInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn raw(this: &AiImageToTextInput) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_raw(this: &AiImageToTextInput, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn messages(this: &AiImageToTextInput) -> Option<Array<RoleScopedChatInput>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_messages(this: &AiImageToTextInput, val: &Array<RoleScopedChatInput>);
+}
+impl AiImageToTextInput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiImageToTextInputBuilder {
+        AiImageToTextInputBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct AiImageToTextInputBuilder {
+    inner: AiImageToTextInput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiImageToTextInputBuilder {
+    pub fn image(mut self, val: &Array<Number>) -> Self {
+        self.inner.set_image(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn prompt(mut self, val: &str) -> Self {
+        self.inner.set_prompt(val);
+        self
+    }
+    pub fn max_tokens(mut self, val: f64) -> Self {
+        self.inner.set_max_tokens(val);
+        self
+    }
+    pub fn temperature(mut self, val: f64) -> Self {
+        self.inner.set_temperature(val);
+        self
+    }
+    pub fn top_p(mut self, val: f64) -> Self {
+        self.inner.set_top_p(val);
+        self
+    }
+    pub fn top_k(mut self, val: f64) -> Self {
+        self.inner.set_top_k(val);
+        self
+    }
+    pub fn seed(mut self, val: f64) -> Self {
+        self.inner.set_seed(val);
+        self
+    }
+    pub fn repetition_penalty(mut self, val: f64) -> Self {
+        self.inner.set_repetition_penalty(val);
+        self
+    }
+    pub fn frequency_penalty(mut self, val: f64) -> Self {
+        self.inner.set_frequency_penalty(val);
+        self
+    }
+    pub fn presence_penalty(mut self, val: f64) -> Self {
+        self.inner.set_presence_penalty(val);
+        self
+    }
+    pub fn raw(mut self, val: bool) -> Self {
+        self.inner.set_raw(val);
+        self
+    }
+    pub fn messages(mut self, val: &Array<RoleScopedChatInput>) -> Self {
+        self.inner.set_messages(val);
+        self
+    }
+    pub fn build(self) -> Result<AiImageToTextInput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `image`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiImageToTextInput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiImageToTextOutput;
+    #[wasm_bindgen(method, getter)]
+    pub fn description(this: &AiImageToTextOutput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_description(this: &AiImageToTextOutput, val: &str);
+}
+impl AiImageToTextOutput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiImageToTextOutputBuilder {
+        AiImageToTextOutputBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct AiImageToTextOutputBuilder {
+    inner: AiImageToTextOutput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiImageToTextOutputBuilder {
+    pub fn description(mut self, val: &str) -> Self {
+        self.inner.set_description(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn build(self) -> Result<AiImageToTextOutput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `description`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiImageToTextOutput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type BaseAiImageToText;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &BaseAiImageToText) -> Object;
+    pub fn inputs(this: &BaseAiImageToText) -> AiImageToTextInput;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &BaseAiImageToText, val: &Object);
+    pub fn set_inputs(this: &BaseAiImageToText, val: &AiImageToTextInput);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
-    pub fn post_processed_outputs(this: &BaseAiImageToText) -> Object;
+    pub fn post_processed_outputs(this: &BaseAiImageToText) -> AiImageToTextOutput;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
-    pub fn set_post_processed_outputs(this: &BaseAiImageToText, val: &Object);
+    pub fn set_post_processed_outputs(this: &BaseAiImageToText, val: &AiImageToTextOutput);
 }
-#[allow(dead_code)]
-pub type AiImageTextToTextInput = Object;
-#[allow(dead_code)]
-pub type AiImageTextToTextOutput = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiImageTextToTextInput;
+    #[wasm_bindgen(method, getter)]
+    pub fn image(this: &AiImageTextToTextInput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_image(this: &AiImageTextToTextInput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn prompt(this: &AiImageTextToTextInput) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_prompt(this: &AiImageTextToTextInput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn max_tokens(this: &AiImageTextToTextInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_max_tokens(this: &AiImageTextToTextInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn temperature(this: &AiImageTextToTextInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_temperature(this: &AiImageTextToTextInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn ignore_eos(this: &AiImageTextToTextInput) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_ignore_eos(this: &AiImageTextToTextInput, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn top_p(this: &AiImageTextToTextInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_top_p(this: &AiImageTextToTextInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn top_k(this: &AiImageTextToTextInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_top_k(this: &AiImageTextToTextInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn seed(this: &AiImageTextToTextInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_seed(this: &AiImageTextToTextInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn repetition_penalty(this: &AiImageTextToTextInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_repetition_penalty(this: &AiImageTextToTextInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn frequency_penalty(this: &AiImageTextToTextInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_frequency_penalty(this: &AiImageTextToTextInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn presence_penalty(this: &AiImageTextToTextInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_presence_penalty(this: &AiImageTextToTextInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn raw(this: &AiImageTextToTextInput) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_raw(this: &AiImageTextToTextInput, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn messages(this: &AiImageTextToTextInput) -> Option<Array<RoleScopedChatInput>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_messages(this: &AiImageTextToTextInput, val: &Array<RoleScopedChatInput>);
+}
+impl AiImageTextToTextInput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiImageTextToTextInputBuilder {
+        AiImageTextToTextInputBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct AiImageTextToTextInputBuilder {
+    inner: AiImageTextToTextInput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiImageTextToTextInputBuilder {
+    pub fn image(mut self, val: &str) -> Self {
+        self.inner.set_image(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn prompt(mut self, val: &str) -> Self {
+        self.inner.set_prompt(val);
+        self
+    }
+    pub fn max_tokens(mut self, val: f64) -> Self {
+        self.inner.set_max_tokens(val);
+        self
+    }
+    pub fn temperature(mut self, val: f64) -> Self {
+        self.inner.set_temperature(val);
+        self
+    }
+    pub fn ignore_eos(mut self, val: bool) -> Self {
+        self.inner.set_ignore_eos(val);
+        self
+    }
+    pub fn top_p(mut self, val: f64) -> Self {
+        self.inner.set_top_p(val);
+        self
+    }
+    pub fn top_k(mut self, val: f64) -> Self {
+        self.inner.set_top_k(val);
+        self
+    }
+    pub fn seed(mut self, val: f64) -> Self {
+        self.inner.set_seed(val);
+        self
+    }
+    pub fn repetition_penalty(mut self, val: f64) -> Self {
+        self.inner.set_repetition_penalty(val);
+        self
+    }
+    pub fn frequency_penalty(mut self, val: f64) -> Self {
+        self.inner.set_frequency_penalty(val);
+        self
+    }
+    pub fn presence_penalty(mut self, val: f64) -> Self {
+        self.inner.set_presence_penalty(val);
+        self
+    }
+    pub fn raw(mut self, val: bool) -> Self {
+        self.inner.set_raw(val);
+        self
+    }
+    pub fn messages(mut self, val: &Array<RoleScopedChatInput>) -> Self {
+        self.inner.set_messages(val);
+        self
+    }
+    pub fn build(self) -> Result<AiImageTextToTextInput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `image`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiImageTextToTextInput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiImageTextToTextOutput;
+    #[wasm_bindgen(method, getter)]
+    pub fn description(this: &AiImageTextToTextOutput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_description(this: &AiImageTextToTextOutput, val: &str);
+}
+impl AiImageTextToTextOutput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiImageTextToTextOutputBuilder {
+        AiImageTextToTextOutputBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct AiImageTextToTextOutputBuilder {
+    inner: AiImageTextToTextOutput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiImageTextToTextOutputBuilder {
+    pub fn description(mut self, val: &str) -> Self {
+        self.inner.set_description(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn build(self) -> Result<AiImageTextToTextOutput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `description`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiImageTextToTextOutput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type BaseAiImageTextToText;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &BaseAiImageTextToText) -> Object;
+    pub fn inputs(this: &BaseAiImageTextToText) -> AiImageTextToTextInput;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &BaseAiImageTextToText, val: &Object);
+    pub fn set_inputs(this: &BaseAiImageTextToText, val: &AiImageTextToTextInput);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
-    pub fn post_processed_outputs(this: &BaseAiImageTextToText) -> Object;
+    pub fn post_processed_outputs(this: &BaseAiImageTextToText) -> AiImageTextToTextOutput;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
-    pub fn set_post_processed_outputs(this: &BaseAiImageTextToText, val: &Object);
+    pub fn set_post_processed_outputs(this: &BaseAiImageTextToText, val: &AiImageTextToTextOutput);
 }
-#[allow(dead_code)]
-pub type AiMultimodalEmbeddingsInput = Object;
-#[allow(dead_code)]
-pub type AiIMultimodalEmbeddingsOutput = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiMultimodalEmbeddingsInput;
+    #[wasm_bindgen(method, getter)]
+    pub fn image(this: &AiMultimodalEmbeddingsInput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_image(this: &AiMultimodalEmbeddingsInput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn text(this: &AiMultimodalEmbeddingsInput) -> Array<JsString>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_text(this: &AiMultimodalEmbeddingsInput, val: &Array<JsString>);
+}
+impl AiMultimodalEmbeddingsInput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiMultimodalEmbeddingsInputBuilder {
+        AiMultimodalEmbeddingsInputBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct AiMultimodalEmbeddingsInputBuilder {
+    inner: AiMultimodalEmbeddingsInput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiMultimodalEmbeddingsInputBuilder {
+    pub fn image(mut self, val: &str) -> Self {
+        self.inner.set_image(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn text(mut self, val: &Array<JsString>) -> Self {
+        self.inner.set_text(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn build(self) -> Result<AiMultimodalEmbeddingsInput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `image`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `text`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiMultimodalEmbeddingsInput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiIMultimodalEmbeddingsOutput;
+    #[wasm_bindgen(method, getter)]
+    pub fn data(this: &AiIMultimodalEmbeddingsOutput) -> Array<Array<Number>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_data(this: &AiIMultimodalEmbeddingsOutput, val: &Array<Array<Number>>);
+    #[wasm_bindgen(method, getter)]
+    pub fn shape(this: &AiIMultimodalEmbeddingsOutput) -> Array<Number>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_shape(this: &AiIMultimodalEmbeddingsOutput, val: &Array<Number>);
+}
+impl AiIMultimodalEmbeddingsOutput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiIMultimodalEmbeddingsOutputBuilder {
+        AiIMultimodalEmbeddingsOutputBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct AiIMultimodalEmbeddingsOutputBuilder {
+    inner: AiIMultimodalEmbeddingsOutput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiIMultimodalEmbeddingsOutputBuilder {
+    pub fn data(mut self, val: &Array<Array<Number>>) -> Self {
+        self.inner.set_data(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn shape(mut self, val: &Array<Number>) -> Self {
+        self.inner.set_shape(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn build(self) -> Result<AiIMultimodalEmbeddingsOutput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `data`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `shape`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiIMultimodalEmbeddingsOutput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type BaseAiMultimodalEmbeddings;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &BaseAiMultimodalEmbeddings) -> Object;
+    pub fn inputs(this: &BaseAiMultimodalEmbeddings) -> AiImageTextToTextInput;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &BaseAiMultimodalEmbeddings, val: &Object);
+    pub fn set_inputs(this: &BaseAiMultimodalEmbeddings, val: &AiImageTextToTextInput);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
-    pub fn post_processed_outputs(this: &BaseAiMultimodalEmbeddings) -> Object;
+    pub fn post_processed_outputs(this: &BaseAiMultimodalEmbeddings) -> AiImageTextToTextOutput;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
-    pub fn set_post_processed_outputs(this: &BaseAiMultimodalEmbeddings, val: &Object);
+    pub fn set_post_processed_outputs(
+        this: &BaseAiMultimodalEmbeddings,
+        val: &AiImageTextToTextOutput,
+    );
 }
-#[allow(dead_code)]
-pub type AiObjectDetectionInput = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiObjectDetectionInput;
+    #[wasm_bindgen(method, getter)]
+    pub fn image(this: &AiObjectDetectionInput) -> Array<Number>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_image(this: &AiObjectDetectionInput, val: &Array<Number>);
+}
+impl AiObjectDetectionInput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiObjectDetectionInputBuilder {
+        AiObjectDetectionInputBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct AiObjectDetectionInputBuilder {
+    inner: AiObjectDetectionInput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiObjectDetectionInputBuilder {
+    pub fn image(mut self, val: &Array<Number>) -> Self {
+        self.inner.set_image(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn build(self) -> Result<AiObjectDetectionInput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `image`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiObjectDetectionInput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[allow(dead_code)]
 pub type AiObjectDetectionOutput = Array<Object>;
 #[wasm_bindgen]
@@ -15109,16 +16500,76 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type BaseAiObjectDetection;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &BaseAiObjectDetection) -> Object;
+    pub fn inputs(this: &BaseAiObjectDetection) -> AiObjectDetectionInput;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &BaseAiObjectDetection, val: &Object);
+    pub fn set_inputs(this: &BaseAiObjectDetection, val: &AiObjectDetectionInput);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(this: &BaseAiObjectDetection) -> Array<Object>;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
     pub fn set_post_processed_outputs(this: &BaseAiObjectDetection, val: &Array<Object>);
 }
-#[allow(dead_code)]
-pub type AiSentenceSimilarityInput = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiSentenceSimilarityInput;
+    #[wasm_bindgen(method, getter)]
+    pub fn source(this: &AiSentenceSimilarityInput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_source(this: &AiSentenceSimilarityInput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn sentences(this: &AiSentenceSimilarityInput) -> Array<JsString>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_sentences(this: &AiSentenceSimilarityInput, val: &Array<JsString>);
+}
+impl AiSentenceSimilarityInput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiSentenceSimilarityInputBuilder {
+        AiSentenceSimilarityInputBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct AiSentenceSimilarityInputBuilder {
+    inner: AiSentenceSimilarityInput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiSentenceSimilarityInputBuilder {
+    pub fn source(mut self, val: &str) -> Self {
+        self.inner.set_source(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn sentences(mut self, val: &Array<JsString>) -> Self {
+        self.inner.set_sentences(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn build(self) -> Result<AiSentenceSimilarityInput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `source`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `sentences`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiSentenceSimilarityInput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[allow(dead_code)]
 pub type AiSentenceSimilarityOutput = Array<Number>;
 #[wasm_bindgen]
@@ -15127,52 +16578,308 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type BaseAiSentenceSimilarity;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &BaseAiSentenceSimilarity) -> Object;
+    pub fn inputs(this: &BaseAiSentenceSimilarity) -> AiSentenceSimilarityInput;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &BaseAiSentenceSimilarity, val: &Object);
+    pub fn set_inputs(this: &BaseAiSentenceSimilarity, val: &AiSentenceSimilarityInput);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(this: &BaseAiSentenceSimilarity) -> Array<Number>;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
     pub fn set_post_processed_outputs(this: &BaseAiSentenceSimilarity, val: &Array<Number>);
 }
-#[allow(dead_code)]
-pub type AiAutomaticSpeechRecognitionInput = Object;
-#[allow(dead_code)]
-pub type AiAutomaticSpeechRecognitionOutput = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiAutomaticSpeechRecognitionInput;
+    #[wasm_bindgen(method, getter)]
+    pub fn audio(this: &AiAutomaticSpeechRecognitionInput) -> Array<Number>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_audio(this: &AiAutomaticSpeechRecognitionInput, val: &Array<Number>);
+}
+impl AiAutomaticSpeechRecognitionInput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiAutomaticSpeechRecognitionInputBuilder {
+        AiAutomaticSpeechRecognitionInputBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct AiAutomaticSpeechRecognitionInputBuilder {
+    inner: AiAutomaticSpeechRecognitionInput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiAutomaticSpeechRecognitionInputBuilder {
+    pub fn audio(mut self, val: &Array<Number>) -> Self {
+        self.inner.set_audio(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn build(self) -> Result<AiAutomaticSpeechRecognitionInput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `audio`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiAutomaticSpeechRecognitionInput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiAutomaticSpeechRecognitionOutput;
+    #[wasm_bindgen(method, getter)]
+    pub fn text(this: &AiAutomaticSpeechRecognitionOutput) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_text(this: &AiAutomaticSpeechRecognitionOutput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn words(this: &AiAutomaticSpeechRecognitionOutput) -> Option<Array<Object>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_words(this: &AiAutomaticSpeechRecognitionOutput, val: &Array<Object>);
+    #[wasm_bindgen(method, getter)]
+    pub fn vtt(this: &AiAutomaticSpeechRecognitionOutput) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_vtt(this: &AiAutomaticSpeechRecognitionOutput, val: &str);
+}
+impl AiAutomaticSpeechRecognitionOutput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiAutomaticSpeechRecognitionOutputBuilder {
+        AiAutomaticSpeechRecognitionOutputBuilder { inner: Self::new() }
+    }
+}
+pub struct AiAutomaticSpeechRecognitionOutputBuilder {
+    inner: AiAutomaticSpeechRecognitionOutput,
+}
+#[allow(unused_mut)]
+impl AiAutomaticSpeechRecognitionOutputBuilder {
+    pub fn text(mut self, val: &str) -> Self {
+        self.inner.set_text(val);
+        self
+    }
+    pub fn words(mut self, val: &Array<Object>) -> Self {
+        self.inner.set_words(val);
+        self
+    }
+    pub fn vtt(mut self, val: &str) -> Self {
+        self.inner.set_vtt(val);
+        self
+    }
+    pub fn build(self) -> AiAutomaticSpeechRecognitionOutput {
+        self.inner
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type BaseAiAutomaticSpeechRecognition;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &BaseAiAutomaticSpeechRecognition) -> Object;
+    pub fn inputs(this: &BaseAiAutomaticSpeechRecognition) -> AiAutomaticSpeechRecognitionInput;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &BaseAiAutomaticSpeechRecognition, val: &Object);
+    pub fn set_inputs(
+        this: &BaseAiAutomaticSpeechRecognition,
+        val: &AiAutomaticSpeechRecognitionInput,
+    );
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
-    pub fn post_processed_outputs(this: &BaseAiAutomaticSpeechRecognition) -> Object;
+    pub fn post_processed_outputs(
+        this: &BaseAiAutomaticSpeechRecognition,
+    ) -> AiAutomaticSpeechRecognitionOutput;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
-    pub fn set_post_processed_outputs(this: &BaseAiAutomaticSpeechRecognition, val: &Object);
+    pub fn set_post_processed_outputs(
+        this: &BaseAiAutomaticSpeechRecognition,
+        val: &AiAutomaticSpeechRecognitionOutput,
+    );
 }
-#[allow(dead_code)]
-pub type AiSummarizationInput = Object;
-#[allow(dead_code)]
-pub type AiSummarizationOutput = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiSummarizationInput;
+    #[wasm_bindgen(method, getter)]
+    pub fn input_text(this: &AiSummarizationInput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_input_text(this: &AiSummarizationInput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn max_length(this: &AiSummarizationInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_max_length(this: &AiSummarizationInput, val: f64);
+}
+impl AiSummarizationInput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiSummarizationInputBuilder {
+        AiSummarizationInputBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct AiSummarizationInputBuilder {
+    inner: AiSummarizationInput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiSummarizationInputBuilder {
+    pub fn input_text(mut self, val: &str) -> Self {
+        self.inner.set_input_text(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn max_length(mut self, val: f64) -> Self {
+        self.inner.set_max_length(val);
+        self
+    }
+    pub fn build(self) -> Result<AiSummarizationInput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `input_text`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiSummarizationInput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiSummarizationOutput;
+    #[wasm_bindgen(method, getter)]
+    pub fn summary(this: &AiSummarizationOutput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_summary(this: &AiSummarizationOutput, val: &str);
+}
+impl AiSummarizationOutput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiSummarizationOutputBuilder {
+        AiSummarizationOutputBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct AiSummarizationOutputBuilder {
+    inner: AiSummarizationOutput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiSummarizationOutputBuilder {
+    pub fn summary(mut self, val: &str) -> Self {
+        self.inner.set_summary(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn build(self) -> Result<AiSummarizationOutput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `summary`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiSummarizationOutput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type BaseAiSummarization;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &BaseAiSummarization) -> Object;
+    pub fn inputs(this: &BaseAiSummarization) -> AiSummarizationInput;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &BaseAiSummarization, val: &Object);
+    pub fn set_inputs(this: &BaseAiSummarization, val: &AiSummarizationInput);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
-    pub fn post_processed_outputs(this: &BaseAiSummarization) -> Object;
+    pub fn post_processed_outputs(this: &BaseAiSummarization) -> AiSummarizationOutput;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
-    pub fn set_post_processed_outputs(this: &BaseAiSummarization, val: &Object);
+    pub fn set_post_processed_outputs(this: &BaseAiSummarization, val: &AiSummarizationOutput);
 }
-#[allow(dead_code)]
-pub type AiTextClassificationInput = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiTextClassificationInput;
+    #[wasm_bindgen(method, getter)]
+    pub fn text(this: &AiTextClassificationInput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_text(this: &AiTextClassificationInput, val: &str);
+}
+impl AiTextClassificationInput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiTextClassificationInputBuilder {
+        AiTextClassificationInputBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct AiTextClassificationInputBuilder {
+    inner: AiTextClassificationInput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiTextClassificationInputBuilder {
+    pub fn text(mut self, val: &str) -> Self {
+        self.inner.set_text(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn build(self) -> Result<AiTextClassificationInput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `text`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiTextClassificationInput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[allow(dead_code)]
 pub type AiTextClassificationOutput = Array<Object>;
 #[wasm_bindgen]
@@ -15181,68 +16888,998 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type BaseAiTextClassification;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &BaseAiTextClassification) -> Object;
+    pub fn inputs(this: &BaseAiTextClassification) -> AiTextClassificationInput;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &BaseAiTextClassification, val: &Object);
+    pub fn set_inputs(this: &BaseAiTextClassification, val: &AiTextClassificationInput);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(this: &BaseAiTextClassification) -> Array<Object>;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
     pub fn set_post_processed_outputs(this: &BaseAiTextClassification, val: &Array<Object>);
 }
-#[allow(dead_code)]
-pub type AiTextEmbeddingsInput = Object;
-#[allow(dead_code)]
-pub type AiTextEmbeddingsOutput = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiTextEmbeddingsInput;
+    #[wasm_bindgen(method, getter)]
+    pub fn text(this: &AiTextEmbeddingsInput) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_text(this: &AiTextEmbeddingsInput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "text")]
+    pub fn set_text_with_array(this: &AiTextEmbeddingsInput, val: &Array<JsString>);
+}
+impl AiTextEmbeddingsInput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiTextEmbeddingsInputBuilder {
+        AiTextEmbeddingsInputBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct AiTextEmbeddingsInputBuilder {
+    inner: AiTextEmbeddingsInput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiTextEmbeddingsInputBuilder {
+    pub fn text(mut self, val: &str) -> Self {
+        self.inner.set_text(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn text_with_array(mut self, val: &Array<JsString>) -> Self {
+        self.inner.set_text_with_array(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn build(self) -> Result<AiTextEmbeddingsInput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `text`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiTextEmbeddingsInput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiTextEmbeddingsOutput;
+    #[wasm_bindgen(method, getter)]
+    pub fn shape(this: &AiTextEmbeddingsOutput) -> Array<Number>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_shape(this: &AiTextEmbeddingsOutput, val: &Array<Number>);
+    #[wasm_bindgen(method, getter)]
+    pub fn data(this: &AiTextEmbeddingsOutput) -> Array<Array<Number>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_data(this: &AiTextEmbeddingsOutput, val: &Array<Array<Number>>);
+}
+impl AiTextEmbeddingsOutput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiTextEmbeddingsOutputBuilder {
+        AiTextEmbeddingsOutputBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct AiTextEmbeddingsOutputBuilder {
+    inner: AiTextEmbeddingsOutput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiTextEmbeddingsOutputBuilder {
+    pub fn shape(mut self, val: &Array<Number>) -> Self {
+        self.inner.set_shape(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn data(mut self, val: &Array<Array<Number>>) -> Self {
+        self.inner.set_data(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn build(self) -> Result<AiTextEmbeddingsOutput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `shape`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `data`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiTextEmbeddingsOutput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type BaseAiTextEmbeddings;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &BaseAiTextEmbeddings) -> Object;
+    pub fn inputs(this: &BaseAiTextEmbeddings) -> AiTextEmbeddingsInput;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &BaseAiTextEmbeddings, val: &Object);
+    pub fn set_inputs(this: &BaseAiTextEmbeddings, val: &AiTextEmbeddingsInput);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
-    pub fn post_processed_outputs(this: &BaseAiTextEmbeddings) -> Object;
+    pub fn post_processed_outputs(this: &BaseAiTextEmbeddings) -> AiTextEmbeddingsOutput;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
-    pub fn set_post_processed_outputs(this: &BaseAiTextEmbeddings, val: &Object);
+    pub fn set_post_processed_outputs(this: &BaseAiTextEmbeddings, val: &AiTextEmbeddingsOutput);
 }
-#[allow(dead_code)]
-pub type RoleScopedChatInput = Object;
-#[allow(dead_code)]
-pub type AiTextGenerationToolLegacyInput = Object;
-#[allow(dead_code)]
-pub type AiTextGenerationToolInput = Object;
-#[allow(dead_code)]
-pub type AiTextGenerationFunctionsInput = Object;
-#[allow(dead_code)]
-pub type AiTextGenerationResponseFormat = Object;
-#[allow(dead_code)]
-pub type AiTextGenerationInput = Object;
-#[allow(dead_code)]
-pub type AiTextGenerationToolLegacyOutput = Object;
-#[allow(dead_code)]
-pub type AiTextGenerationToolOutput = Object;
-#[allow(dead_code)]
-pub type UsageTags = Object;
-#[allow(dead_code)]
-pub type AiTextGenerationOutput = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type RoleScopedChatInput;
+    #[wasm_bindgen(method, getter)]
+    pub fn role(this: &RoleScopedChatInput) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_role(this: &RoleScopedChatInput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "role")]
+    pub fn set_role_with_js_value(this: &RoleScopedChatInput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "role")]
+    pub fn set_role_with_js_value_1(this: &RoleScopedChatInput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "role")]
+    pub fn set_role_with_js_value_2(this: &RoleScopedChatInput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "role")]
+    pub fn set_role_with_js_value_3(this: &RoleScopedChatInput, val: &JsValue);
+    #[wasm_bindgen(method, getter)]
+    pub fn content(this: &RoleScopedChatInput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_content(this: &RoleScopedChatInput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn name(this: &RoleScopedChatInput) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_name(this: &RoleScopedChatInput, val: &str);
+}
+impl RoleScopedChatInput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> RoleScopedChatInputBuilder {
+        RoleScopedChatInputBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct RoleScopedChatInputBuilder {
+    inner: RoleScopedChatInput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl RoleScopedChatInputBuilder {
+    pub fn role(mut self, val: &str) -> Self {
+        self.inner.set_role(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn role_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_role_with_js_value(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn role_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_role_with_js_value_1(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn role_with_js_value_2(mut self, val: &str) -> Self {
+        self.inner.set_role_with_js_value_2(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn role_with_js_value_3(mut self, val: &JsValue) -> Self {
+        self.inner.set_role_with_js_value_3(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn content(mut self, val: &str) -> Self {
+        self.inner.set_content(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn name(mut self, val: &str) -> Self {
+        self.inner.set_name(val);
+        self
+    }
+    pub fn build(self) -> Result<RoleScopedChatInput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `role`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `content`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(RoleScopedChatInput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiTextGenerationToolLegacyInput;
+    #[wasm_bindgen(method, getter)]
+    pub fn name(this: &AiTextGenerationToolLegacyInput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_name(this: &AiTextGenerationToolLegacyInput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn description(this: &AiTextGenerationToolLegacyInput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_description(this: &AiTextGenerationToolLegacyInput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn parameters(this: &AiTextGenerationToolLegacyInput) -> Option<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_parameters(this: &AiTextGenerationToolLegacyInput, val: &Object);
+}
+impl AiTextGenerationToolLegacyInput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiTextGenerationToolLegacyInputBuilder {
+        AiTextGenerationToolLegacyInputBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct AiTextGenerationToolLegacyInputBuilder {
+    inner: AiTextGenerationToolLegacyInput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiTextGenerationToolLegacyInputBuilder {
+    pub fn name(mut self, val: &str) -> Self {
+        self.inner.set_name(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn description(mut self, val: &str) -> Self {
+        self.inner.set_description(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn parameters(mut self, val: &Object) -> Self {
+        self.inner.set_parameters(val);
+        self
+    }
+    pub fn build(self) -> Result<AiTextGenerationToolLegacyInput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `name`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `description`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiTextGenerationToolLegacyInput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiTextGenerationToolInput;
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &AiTextGenerationToolInput) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &AiTextGenerationToolInput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "type")]
+    pub fn set_type_with_js_value(this: &AiTextGenerationToolInput, val: &JsValue);
+    #[wasm_bindgen(method, getter)]
+    pub fn function(this: &AiTextGenerationToolInput) -> Object;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_function(this: &AiTextGenerationToolInput, val: &Object);
+}
+impl AiTextGenerationToolInput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiTextGenerationToolInputBuilder {
+        AiTextGenerationToolInputBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct AiTextGenerationToolInputBuilder {
+    inner: AiTextGenerationToolInput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiTextGenerationToolInputBuilder {
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn type_with_js_value(mut self, val: &JsValue) -> Self {
+        self.inner.set_type_with_js_value(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn function(mut self, val: &Object) -> Self {
+        self.inner.set_function(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn build(self) -> Result<AiTextGenerationToolInput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `function`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiTextGenerationToolInput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiTextGenerationFunctionsInput;
+    #[wasm_bindgen(method, getter)]
+    pub fn name(this: &AiTextGenerationFunctionsInput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_name(this: &AiTextGenerationFunctionsInput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn code(this: &AiTextGenerationFunctionsInput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_code(this: &AiTextGenerationFunctionsInput, val: &str);
+}
+impl AiTextGenerationFunctionsInput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiTextGenerationFunctionsInputBuilder {
+        AiTextGenerationFunctionsInputBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct AiTextGenerationFunctionsInputBuilder {
+    inner: AiTextGenerationFunctionsInput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiTextGenerationFunctionsInputBuilder {
+    pub fn name(mut self, val: &str) -> Self {
+        self.inner.set_name(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn code(mut self, val: &str) -> Self {
+        self.inner.set_code(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn build(self) -> Result<AiTextGenerationFunctionsInput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `name`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `code`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiTextGenerationFunctionsInput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiTextGenerationResponseFormat;
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &AiTextGenerationResponseFormat) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &AiTextGenerationResponseFormat, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn json_schema(this: &AiTextGenerationResponseFormat) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_json_schema(this: &AiTextGenerationResponseFormat, val: &JsValue);
+}
+impl AiTextGenerationResponseFormat {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiTextGenerationResponseFormatBuilder {
+        AiTextGenerationResponseFormatBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct AiTextGenerationResponseFormatBuilder {
+    inner: AiTextGenerationResponseFormat,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiTextGenerationResponseFormatBuilder {
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn json_schema(mut self, val: &JsValue) -> Self {
+        self.inner.set_json_schema(val);
+        self
+    }
+    pub fn build(self) -> Result<AiTextGenerationResponseFormat, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiTextGenerationResponseFormat),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiTextGenerationInput;
+    #[wasm_bindgen(method, getter)]
+    pub fn prompt(this: &AiTextGenerationInput) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_prompt(this: &AiTextGenerationInput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn raw(this: &AiTextGenerationInput) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_raw(this: &AiTextGenerationInput, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn stream(this: &AiTextGenerationInput) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_stream(this: &AiTextGenerationInput, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn max_tokens(this: &AiTextGenerationInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_max_tokens(this: &AiTextGenerationInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn temperature(this: &AiTextGenerationInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_temperature(this: &AiTextGenerationInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn top_p(this: &AiTextGenerationInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_top_p(this: &AiTextGenerationInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn top_k(this: &AiTextGenerationInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_top_k(this: &AiTextGenerationInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn seed(this: &AiTextGenerationInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_seed(this: &AiTextGenerationInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn repetition_penalty(this: &AiTextGenerationInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_repetition_penalty(this: &AiTextGenerationInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn frequency_penalty(this: &AiTextGenerationInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_frequency_penalty(this: &AiTextGenerationInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn presence_penalty(this: &AiTextGenerationInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_presence_penalty(this: &AiTextGenerationInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn messages(this: &AiTextGenerationInput) -> Option<Array<RoleScopedChatInput>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_messages(this: &AiTextGenerationInput, val: &Array<RoleScopedChatInput>);
+    #[wasm_bindgen(method, getter)]
+    pub fn response_format(this: &AiTextGenerationInput) -> Option<AiTextGenerationResponseFormat>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_response_format(this: &AiTextGenerationInput, val: &AiTextGenerationResponseFormat);
+    #[wasm_bindgen(method, getter)]
+    pub fn tools(this: &AiTextGenerationInput) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_tools(this: &AiTextGenerationInput, val: &Array<AiTextGenerationToolInput>);
+    #[wasm_bindgen(method, setter, js_name = "tools")]
+    pub fn set_tools_with_array(
+        this: &AiTextGenerationInput,
+        val: &Array<AiTextGenerationToolLegacyInput>,
+    );
+    #[wasm_bindgen(method, setter, js_name = "tools")]
+    pub fn set_tools_with_js_value(this: &AiTextGenerationInput, val: &JsValue);
+    #[wasm_bindgen(method, getter)]
+    pub fn functions(this: &AiTextGenerationInput)
+        -> Option<Array<AiTextGenerationFunctionsInput>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_functions(this: &AiTextGenerationInput, val: &Array<AiTextGenerationFunctionsInput>);
+}
+impl AiTextGenerationInput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiTextGenerationInputBuilder {
+        AiTextGenerationInputBuilder { inner: Self::new() }
+    }
+}
+pub struct AiTextGenerationInputBuilder {
+    inner: AiTextGenerationInput,
+}
+#[allow(unused_mut)]
+impl AiTextGenerationInputBuilder {
+    pub fn prompt(mut self, val: &str) -> Self {
+        self.inner.set_prompt(val);
+        self
+    }
+    pub fn raw(mut self, val: bool) -> Self {
+        self.inner.set_raw(val);
+        self
+    }
+    pub fn stream(mut self, val: bool) -> Self {
+        self.inner.set_stream(val);
+        self
+    }
+    pub fn max_tokens(mut self, val: f64) -> Self {
+        self.inner.set_max_tokens(val);
+        self
+    }
+    pub fn temperature(mut self, val: f64) -> Self {
+        self.inner.set_temperature(val);
+        self
+    }
+    pub fn top_p(mut self, val: f64) -> Self {
+        self.inner.set_top_p(val);
+        self
+    }
+    pub fn top_k(mut self, val: f64) -> Self {
+        self.inner.set_top_k(val);
+        self
+    }
+    pub fn seed(mut self, val: f64) -> Self {
+        self.inner.set_seed(val);
+        self
+    }
+    pub fn repetition_penalty(mut self, val: f64) -> Self {
+        self.inner.set_repetition_penalty(val);
+        self
+    }
+    pub fn frequency_penalty(mut self, val: f64) -> Self {
+        self.inner.set_frequency_penalty(val);
+        self
+    }
+    pub fn presence_penalty(mut self, val: f64) -> Self {
+        self.inner.set_presence_penalty(val);
+        self
+    }
+    pub fn messages(mut self, val: &Array<RoleScopedChatInput>) -> Self {
+        self.inner.set_messages(val);
+        self
+    }
+    pub fn response_format(mut self, val: &AiTextGenerationResponseFormat) -> Self {
+        self.inner.set_response_format(val);
+        self
+    }
+    pub fn tools(mut self, val: &Array<AiTextGenerationToolInput>) -> Self {
+        self.inner.set_tools(val);
+        self
+    }
+    pub fn tools_with_array(mut self, val: &Array<AiTextGenerationToolLegacyInput>) -> Self {
+        self.inner.set_tools_with_array(val);
+        self
+    }
+    pub fn tools_with_js_value(mut self, val: &JsValue) -> Self {
+        self.inner.set_tools_with_js_value(val);
+        self
+    }
+    pub fn functions(mut self, val: &Array<AiTextGenerationFunctionsInput>) -> Self {
+        self.inner.set_functions(val);
+        self
+    }
+    pub fn build(self) -> AiTextGenerationInput {
+        self.inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiTextGenerationToolLegacyOutput;
+    #[wasm_bindgen(method, getter)]
+    pub fn name(this: &AiTextGenerationToolLegacyOutput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_name(this: &AiTextGenerationToolLegacyOutput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn arguments(this: &AiTextGenerationToolLegacyOutput) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_arguments(this: &AiTextGenerationToolLegacyOutput, val: &JsValue);
+}
+impl AiTextGenerationToolLegacyOutput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiTextGenerationToolLegacyOutputBuilder {
+        AiTextGenerationToolLegacyOutputBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct AiTextGenerationToolLegacyOutputBuilder {
+    inner: AiTextGenerationToolLegacyOutput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiTextGenerationToolLegacyOutputBuilder {
+    pub fn name(mut self, val: &str) -> Self {
+        self.inner.set_name(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn arguments(mut self, val: &JsValue) -> Self {
+        self.inner.set_arguments(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn build(self) -> Result<AiTextGenerationToolLegacyOutput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `name`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `arguments`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiTextGenerationToolLegacyOutput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiTextGenerationToolOutput;
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &AiTextGenerationToolOutput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_id(this: &AiTextGenerationToolOutput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &AiTextGenerationToolOutput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &AiTextGenerationToolOutput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn function(this: &AiTextGenerationToolOutput) -> Object;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_function(this: &AiTextGenerationToolOutput, val: &Object);
+}
+impl AiTextGenerationToolOutput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiTextGenerationToolOutputBuilder {
+        AiTextGenerationToolOutputBuilder {
+            inner: Self::new(),
+            required: 7u64,
+        }
+    }
+}
+pub struct AiTextGenerationToolOutputBuilder {
+    inner: AiTextGenerationToolOutput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiTextGenerationToolOutputBuilder {
+    pub fn id(mut self, val: &str) -> Self {
+        self.inner.set_id(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn function(mut self, val: &Object) -> Self {
+        self.inner.set_function(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn build(self) -> Result<AiTextGenerationToolOutput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `id`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `function`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiTextGenerationToolOutput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type UsageTags;
+    #[wasm_bindgen(method, getter)]
+    pub fn prompt_tokens(this: &UsageTags) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_prompt_tokens(this: &UsageTags, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn completion_tokens(this: &UsageTags) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_completion_tokens(this: &UsageTags, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn total_tokens(this: &UsageTags) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_total_tokens(this: &UsageTags, val: f64);
+}
+impl UsageTags {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> UsageTagsBuilder {
+        UsageTagsBuilder {
+            inner: Self::new(),
+            required: 7u64,
+        }
+    }
+}
+pub struct UsageTagsBuilder {
+    inner: UsageTags,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl UsageTagsBuilder {
+    pub fn prompt_tokens(mut self, val: f64) -> Self {
+        self.inner.set_prompt_tokens(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn completion_tokens(mut self, val: f64) -> Self {
+        self.inner.set_completion_tokens(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn total_tokens(mut self, val: f64) -> Self {
+        self.inner.set_total_tokens(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn build(self) -> Result<UsageTags, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `prompt_tokens`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `completion_tokens`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `total_tokens`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(UsageTags),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiTextGenerationOutput;
+    #[wasm_bindgen(method, getter)]
+    pub fn response(this: &AiTextGenerationOutput) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_response(this: &AiTextGenerationOutput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn tool_calls(this: &AiTextGenerationOutput) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_tool_calls(this: &AiTextGenerationOutput, val: &JsValue);
+    #[wasm_bindgen(method, getter)]
+    pub fn usage(this: &AiTextGenerationOutput) -> Option<UsageTags>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_usage(this: &AiTextGenerationOutput, val: &UsageTags);
+}
+impl AiTextGenerationOutput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiTextGenerationOutputBuilder {
+        AiTextGenerationOutputBuilder { inner: Self::new() }
+    }
+}
+pub struct AiTextGenerationOutputBuilder {
+    inner: AiTextGenerationOutput,
+}
+#[allow(unused_mut)]
+impl AiTextGenerationOutputBuilder {
+    pub fn response(mut self, val: &str) -> Self {
+        self.inner.set_response(val);
+        self
+    }
+    pub fn tool_calls(mut self, val: &JsValue) -> Self {
+        self.inner.set_tool_calls(val);
+        self
+    }
+    pub fn usage(mut self, val: &UsageTags) -> Self {
+        self.inner.set_usage(val);
+        self
+    }
+    pub fn build(self) -> AiTextGenerationOutput {
+        self.inner
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type BaseAiTextGeneration;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &BaseAiTextGeneration) -> Object;
+    pub fn inputs(this: &BaseAiTextGeneration) -> AiTextGenerationInput;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &BaseAiTextGeneration, val: &Object);
+    pub fn set_inputs(this: &BaseAiTextGeneration, val: &AiTextGenerationInput);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
-    pub fn post_processed_outputs(this: &BaseAiTextGeneration) -> Object;
+    pub fn post_processed_outputs(this: &BaseAiTextGeneration) -> AiTextGenerationOutput;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
-    pub fn set_post_processed_outputs(this: &BaseAiTextGeneration, val: &Object);
+    pub fn set_post_processed_outputs(this: &BaseAiTextGeneration, val: &AiTextGenerationOutput);
 }
-#[allow(dead_code)]
-pub type AiTextToSpeechInput = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiTextToSpeechInput;
+    #[wasm_bindgen(method, getter)]
+    pub fn prompt(this: &AiTextToSpeechInput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_prompt(this: &AiTextToSpeechInput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn lang(this: &AiTextToSpeechInput) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_lang(this: &AiTextToSpeechInput, val: &str);
+}
+impl AiTextToSpeechInput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiTextToSpeechInputBuilder {
+        AiTextToSpeechInputBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct AiTextToSpeechInputBuilder {
+    inner: AiTextToSpeechInput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiTextToSpeechInputBuilder {
+    pub fn prompt(mut self, val: &str) -> Self {
+        self.inner.set_prompt(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn lang(mut self, val: &str) -> Self {
+        self.inner.set_lang(val);
+        self
+    }
+    pub fn build(self) -> Result<AiTextToSpeechInput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `prompt`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiTextToSpeechInput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[allow(dead_code)]
 pub type AiTextToSpeechOutput = JsValue;
 #[wasm_bindgen]
@@ -15251,9 +17888,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type BaseAiTextToSpeech;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &BaseAiTextToSpeech) -> Object;
+    pub fn inputs(this: &BaseAiTextToSpeech) -> AiTextToSpeechInput;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &BaseAiTextToSpeech, val: &Object);
+    pub fn set_inputs(this: &BaseAiTextToSpeech, val: &AiTextToSpeechInput);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(this: &BaseAiTextToSpeech) -> JsValue;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
@@ -15261,8 +17898,136 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
     pub fn set_post_processed_outputs_with_object(this: &BaseAiTextToSpeech, val: &Object);
 }
-#[allow(dead_code)]
-pub type AiTextToImageInput = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiTextToImageInput;
+    #[wasm_bindgen(method, getter)]
+    pub fn prompt(this: &AiTextToImageInput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_prompt(this: &AiTextToImageInput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn negative_prompt(this: &AiTextToImageInput) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_negative_prompt(this: &AiTextToImageInput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn height(this: &AiTextToImageInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_height(this: &AiTextToImageInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn width(this: &AiTextToImageInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_width(this: &AiTextToImageInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn image(this: &AiTextToImageInput) -> Option<Array<Number>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_image(this: &AiTextToImageInput, val: &Array<Number>);
+    #[wasm_bindgen(method, getter, js_name = "image_b64")]
+    pub fn image_b_64(this: &AiTextToImageInput) -> Option<String>;
+    #[wasm_bindgen(method, setter, js_name = "image_b64")]
+    pub fn set_image_b_64(this: &AiTextToImageInput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn mask(this: &AiTextToImageInput) -> Option<Array<Number>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_mask(this: &AiTextToImageInput, val: &Array<Number>);
+    #[wasm_bindgen(method, getter)]
+    pub fn num_steps(this: &AiTextToImageInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_num_steps(this: &AiTextToImageInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn strength(this: &AiTextToImageInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_strength(this: &AiTextToImageInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn guidance(this: &AiTextToImageInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_guidance(this: &AiTextToImageInput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn seed(this: &AiTextToImageInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_seed(this: &AiTextToImageInput, val: f64);
+}
+impl AiTextToImageInput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiTextToImageInputBuilder {
+        AiTextToImageInputBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct AiTextToImageInputBuilder {
+    inner: AiTextToImageInput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiTextToImageInputBuilder {
+    pub fn prompt(mut self, val: &str) -> Self {
+        self.inner.set_prompt(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn negative_prompt(mut self, val: &str) -> Self {
+        self.inner.set_negative_prompt(val);
+        self
+    }
+    pub fn height(mut self, val: f64) -> Self {
+        self.inner.set_height(val);
+        self
+    }
+    pub fn width(mut self, val: f64) -> Self {
+        self.inner.set_width(val);
+        self
+    }
+    pub fn image(mut self, val: &Array<Number>) -> Self {
+        self.inner.set_image(val);
+        self
+    }
+    pub fn image_b_64(mut self, val: &str) -> Self {
+        self.inner.set_image_b_64(val);
+        self
+    }
+    pub fn mask(mut self, val: &Array<Number>) -> Self {
+        self.inner.set_mask(val);
+        self
+    }
+    pub fn num_steps(mut self, val: f64) -> Self {
+        self.inner.set_num_steps(val);
+        self
+    }
+    pub fn strength(mut self, val: f64) -> Self {
+        self.inner.set_strength(val);
+        self
+    }
+    pub fn guidance(mut self, val: f64) -> Self {
+        self.inner.set_guidance(val);
+        self
+    }
+    pub fn seed(mut self, val: f64) -> Self {
+        self.inner.set_seed(val);
+        self
+    }
+    pub fn build(self) -> Result<AiTextToImageInput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `prompt`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiTextToImageInput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[allow(dead_code)]
 pub type AiTextToImageOutput = ReadableStream;
 #[wasm_bindgen]
@@ -15271,83 +18036,2505 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type BaseAiTextToImage;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &BaseAiTextToImage) -> Object;
+    pub fn inputs(this: &BaseAiTextToImage) -> AiTextToImageInput;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &BaseAiTextToImage, val: &Object);
+    pub fn set_inputs(this: &BaseAiTextToImage, val: &AiTextToImageInput);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(this: &BaseAiTextToImage) -> ReadableStream;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
     pub fn set_post_processed_outputs(this: &BaseAiTextToImage, val: &ReadableStream);
 }
-#[allow(dead_code)]
-pub type AiTranslationInput = Object;
-#[allow(dead_code)]
-pub type AiTranslationOutput = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiTranslationInput;
+    #[wasm_bindgen(method, getter)]
+    pub fn text(this: &AiTranslationInput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_text(this: &AiTranslationInput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn target_lang(this: &AiTranslationInput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_target_lang(this: &AiTranslationInput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn source_lang(this: &AiTranslationInput) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_source_lang(this: &AiTranslationInput, val: &str);
+}
+impl AiTranslationInput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiTranslationInputBuilder {
+        AiTranslationInputBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct AiTranslationInputBuilder {
+    inner: AiTranslationInput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiTranslationInputBuilder {
+    pub fn text(mut self, val: &str) -> Self {
+        self.inner.set_text(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn target_lang(mut self, val: &str) -> Self {
+        self.inner.set_target_lang(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn source_lang(mut self, val: &str) -> Self {
+        self.inner.set_source_lang(val);
+        self
+    }
+    pub fn build(self) -> Result<AiTranslationInput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `text`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `target_lang`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiTranslationInput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiTranslationOutput;
+    #[wasm_bindgen(method, getter)]
+    pub fn translated_text(this: &AiTranslationOutput) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_translated_text(this: &AiTranslationOutput, val: &str);
+}
+impl AiTranslationOutput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiTranslationOutputBuilder {
+        AiTranslationOutputBuilder { inner: Self::new() }
+    }
+}
+pub struct AiTranslationOutputBuilder {
+    inner: AiTranslationOutput,
+}
+#[allow(unused_mut)]
+impl AiTranslationOutputBuilder {
+    pub fn translated_text(mut self, val: &str) -> Self {
+        self.inner.set_translated_text(val);
+        self
+    }
+    pub fn build(self) -> AiTranslationOutput {
+        self.inner
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type BaseAiTranslation;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &BaseAiTranslation) -> Object;
+    pub fn inputs(this: &BaseAiTranslation) -> AiTranslationInput;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &BaseAiTranslation, val: &Object);
+    pub fn set_inputs(this: &BaseAiTranslation, val: &AiTranslationInput);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
-    pub fn post_processed_outputs(this: &BaseAiTranslation) -> Object;
+    pub fn post_processed_outputs(this: &BaseAiTranslation) -> AiTranslationOutput;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
-    pub fn set_post_processed_outputs(this: &BaseAiTranslation, val: &Object);
+    pub fn set_post_processed_outputs(this: &BaseAiTranslation, val: &AiTranslationOutput);
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponsesInput;
+    #[wasm_bindgen(method, getter)]
+    pub fn background(this: &ResponsesInput) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_background(this: &ResponsesInput, val: bool);
+    #[wasm_bindgen(method, setter, js_name = "background")]
+    pub fn set_background_with_null(this: &ResponsesInput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn conversation(this: &ResponsesInput) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_conversation(this: &ResponsesInput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "conversation")]
+    pub fn set_conversation_with_response_conversation_param(
+        this: &ResponsesInput,
+        val: &ResponseConversationParam,
+    );
+    #[wasm_bindgen(method, setter, js_name = "conversation")]
+    pub fn set_conversation_with_null(this: &ResponsesInput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn include(this: &ResponsesInput) -> Option<Array<ResponseIncludable>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_include(this: &ResponsesInput, val: &Array<ResponseIncludable>);
+    #[wasm_bindgen(method, setter, js_name = "include")]
+    pub fn set_include_with_null(this: &ResponsesInput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn input(this: &ResponsesInput) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_input(this: &ResponsesInput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "input")]
+    pub fn set_input_with_array(this: &ResponsesInput, val: &Array<EasyInputMessage>);
+    #[wasm_bindgen(method, setter, js_name = "input")]
+    pub fn set_input_with_array_1(this: &ResponsesInput, val: &Array<ResponseInputItemMessage>);
+    #[wasm_bindgen(method, setter, js_name = "input")]
+    pub fn set_input_with_array_2(this: &ResponsesInput, val: &Array<ResponseOutputMessage>);
+    #[wasm_bindgen(method, setter, js_name = "input")]
+    pub fn set_input_with_array_3(this: &ResponsesInput, val: &Array<ResponseFunctionToolCall>);
+    #[wasm_bindgen(method, setter, js_name = "input")]
+    pub fn set_input_with_array_4(
+        this: &ResponsesInput,
+        val: &Array<ResponseInputItemFunctionCallOutput>,
+    );
+    #[wasm_bindgen(method, setter, js_name = "input")]
+    pub fn set_input_with_array_5(this: &ResponsesInput, val: &Array<ResponseReasoningItem>);
+    #[wasm_bindgen(method, getter)]
+    pub fn instructions(this: &ResponsesInput) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_instructions(this: &ResponsesInput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "instructions")]
+    pub fn set_instructions_with_null(this: &ResponsesInput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn max_output_tokens(this: &ResponsesInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_max_output_tokens(this: &ResponsesInput, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "max_output_tokens")]
+    pub fn set_max_output_tokens_with_null(this: &ResponsesInput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn parallel_tool_calls(this: &ResponsesInput) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_parallel_tool_calls(this: &ResponsesInput, val: bool);
+    #[wasm_bindgen(method, setter, js_name = "parallel_tool_calls")]
+    pub fn set_parallel_tool_calls_with_null(this: &ResponsesInput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn previous_response_id(this: &ResponsesInput) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_previous_response_id(this: &ResponsesInput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "previous_response_id")]
+    pub fn set_previous_response_id_with_null(this: &ResponsesInput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn prompt_cache_key(this: &ResponsesInput) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_prompt_cache_key(this: &ResponsesInput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn reasoning(this: &ResponsesInput) -> Option<Reasoning>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_reasoning(this: &ResponsesInput, val: &Reasoning);
+    #[wasm_bindgen(method, setter, js_name = "reasoning")]
+    pub fn set_reasoning_with_null(this: &ResponsesInput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn safety_identifier(this: &ResponsesInput) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_safety_identifier(this: &ResponsesInput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn service_tier(this: &ResponsesInput) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_service_tier(this: &ResponsesInput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "service_tier")]
+    pub fn set_service_tier_with_js_value(this: &ResponsesInput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "service_tier")]
+    pub fn set_service_tier_with_js_value_1(this: &ResponsesInput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "service_tier")]
+    pub fn set_service_tier_with_js_value_2(this: &ResponsesInput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "service_tier")]
+    pub fn set_service_tier_with_js_value_3(this: &ResponsesInput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "service_tier")]
+    pub fn set_service_tier_with_null(this: &ResponsesInput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn stream(this: &ResponsesInput) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_stream(this: &ResponsesInput, val: bool);
+    #[wasm_bindgen(method, setter, js_name = "stream")]
+    pub fn set_stream_with_null(this: &ResponsesInput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn stream_options(this: &ResponsesInput) -> Option<StreamOptions>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_stream_options(this: &ResponsesInput, val: &StreamOptions);
+    #[wasm_bindgen(method, setter, js_name = "stream_options")]
+    pub fn set_stream_options_with_null(this: &ResponsesInput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn temperature(this: &ResponsesInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_temperature(this: &ResponsesInput, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "temperature")]
+    pub fn set_temperature_with_null(this: &ResponsesInput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn text(this: &ResponsesInput) -> Option<ResponseTextConfig>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_text(this: &ResponsesInput, val: &ResponseTextConfig);
+    #[wasm_bindgen(method, getter)]
+    pub fn tool_choice(this: &ResponsesInput) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_tool_choice(this: &ResponsesInput, val: &ToolChoiceOptions);
+    #[wasm_bindgen(method, setter, js_name = "tool_choice")]
+    pub fn set_tool_choice_with_tool_choice_function(
+        this: &ResponsesInput,
+        val: &ToolChoiceFunction,
+    );
+    #[wasm_bindgen(method, getter)]
+    pub fn tools(this: &ResponsesInput) -> Option<Array<ResponsesFunctionTool>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_tools(this: &ResponsesInput, val: &Array<ResponsesFunctionTool>);
+    #[wasm_bindgen(method, getter)]
+    pub fn top_p(this: &ResponsesInput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_top_p(this: &ResponsesInput, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "top_p")]
+    pub fn set_top_p_with_null(this: &ResponsesInput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn truncation(this: &ResponsesInput) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_truncation(this: &ResponsesInput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "truncation")]
+    pub fn set_truncation_with_js_value(this: &ResponsesInput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "truncation")]
+    pub fn set_truncation_with_null(this: &ResponsesInput, val: &Null);
+}
+impl ResponsesInput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponsesInputBuilder {
+        ResponsesInputBuilder { inner: Self::new() }
+    }
+}
+pub struct ResponsesInputBuilder {
+    inner: ResponsesInput,
+}
+#[allow(unused_mut)]
+impl ResponsesInputBuilder {
+    pub fn background(mut self, val: bool) -> Self {
+        self.inner.set_background(val);
+        self
+    }
+    pub fn background_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_background_with_null(val);
+        self
+    }
+    pub fn conversation(mut self, val: &str) -> Self {
+        self.inner.set_conversation(val);
+        self
+    }
+    pub fn conversation_with_response_conversation_param(
+        mut self,
+        val: &ResponseConversationParam,
+    ) -> Self {
+        self.inner
+            .set_conversation_with_response_conversation_param(val);
+        self
+    }
+    pub fn conversation_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_conversation_with_null(val);
+        self
+    }
+    pub fn include(mut self, val: &Array<ResponseIncludable>) -> Self {
+        self.inner.set_include(val);
+        self
+    }
+    pub fn include_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_include_with_null(val);
+        self
+    }
+    pub fn input(mut self, val: &str) -> Self {
+        self.inner.set_input(val);
+        self
+    }
+    pub fn input_with_array(mut self, val: &Array<EasyInputMessage>) -> Self {
+        self.inner.set_input_with_array(val);
+        self
+    }
+    pub fn input_with_array_1(mut self, val: &Array<ResponseInputItemMessage>) -> Self {
+        self.inner.set_input_with_array_1(val);
+        self
+    }
+    pub fn input_with_array_2(mut self, val: &Array<ResponseOutputMessage>) -> Self {
+        self.inner.set_input_with_array_2(val);
+        self
+    }
+    pub fn input_with_array_3(mut self, val: &Array<ResponseFunctionToolCall>) -> Self {
+        self.inner.set_input_with_array_3(val);
+        self
+    }
+    pub fn input_with_array_4(mut self, val: &Array<ResponseInputItemFunctionCallOutput>) -> Self {
+        self.inner.set_input_with_array_4(val);
+        self
+    }
+    pub fn input_with_array_5(mut self, val: &Array<ResponseReasoningItem>) -> Self {
+        self.inner.set_input_with_array_5(val);
+        self
+    }
+    pub fn instructions(mut self, val: &str) -> Self {
+        self.inner.set_instructions(val);
+        self
+    }
+    pub fn instructions_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_instructions_with_null(val);
+        self
+    }
+    pub fn max_output_tokens(mut self, val: f64) -> Self {
+        self.inner.set_max_output_tokens(val);
+        self
+    }
+    pub fn max_output_tokens_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_max_output_tokens_with_null(val);
+        self
+    }
+    pub fn parallel_tool_calls(mut self, val: bool) -> Self {
+        self.inner.set_parallel_tool_calls(val);
+        self
+    }
+    pub fn parallel_tool_calls_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_parallel_tool_calls_with_null(val);
+        self
+    }
+    pub fn previous_response_id(mut self, val: &str) -> Self {
+        self.inner.set_previous_response_id(val);
+        self
+    }
+    pub fn previous_response_id_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_previous_response_id_with_null(val);
+        self
+    }
+    pub fn prompt_cache_key(mut self, val: &str) -> Self {
+        self.inner.set_prompt_cache_key(val);
+        self
+    }
+    pub fn reasoning(mut self, val: &Reasoning) -> Self {
+        self.inner.set_reasoning(val);
+        self
+    }
+    pub fn reasoning_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_reasoning_with_null(val);
+        self
+    }
+    pub fn safety_identifier(mut self, val: &str) -> Self {
+        self.inner.set_safety_identifier(val);
+        self
+    }
+    pub fn service_tier(mut self, val: &str) -> Self {
+        self.inner.set_service_tier(val);
+        self
+    }
+    pub fn service_tier_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_service_tier_with_js_value(val);
+        self
+    }
+    pub fn service_tier_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_service_tier_with_js_value_1(val);
+        self
+    }
+    pub fn service_tier_with_js_value_2(mut self, val: &str) -> Self {
+        self.inner.set_service_tier_with_js_value_2(val);
+        self
+    }
+    pub fn service_tier_with_js_value_3(mut self, val: &str) -> Self {
+        self.inner.set_service_tier_with_js_value_3(val);
+        self
+    }
+    pub fn service_tier_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_service_tier_with_null(val);
+        self
+    }
+    pub fn stream(mut self, val: bool) -> Self {
+        self.inner.set_stream(val);
+        self
+    }
+    pub fn stream_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_stream_with_null(val);
+        self
+    }
+    pub fn stream_options(mut self, val: &StreamOptions) -> Self {
+        self.inner.set_stream_options(val);
+        self
+    }
+    pub fn stream_options_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_stream_options_with_null(val);
+        self
+    }
+    pub fn temperature(mut self, val: f64) -> Self {
+        self.inner.set_temperature(val);
+        self
+    }
+    pub fn temperature_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_temperature_with_null(val);
+        self
+    }
+    pub fn text(mut self, val: &ResponseTextConfig) -> Self {
+        self.inner.set_text(val);
+        self
+    }
+    pub fn tool_choice(mut self, val: &ToolChoiceOptions) -> Self {
+        self.inner.set_tool_choice(val);
+        self
+    }
+    pub fn tool_choice_with_tool_choice_function(mut self, val: &ToolChoiceFunction) -> Self {
+        self.inner.set_tool_choice_with_tool_choice_function(val);
+        self
+    }
+    pub fn tools(mut self, val: &Array<ResponsesFunctionTool>) -> Self {
+        self.inner.set_tools(val);
+        self
+    }
+    pub fn top_p(mut self, val: f64) -> Self {
+        self.inner.set_top_p(val);
+        self
+    }
+    pub fn top_p_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_top_p_with_null(val);
+        self
+    }
+    pub fn truncation(mut self, val: &str) -> Self {
+        self.inner.set_truncation(val);
+        self
+    }
+    pub fn truncation_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_truncation_with_js_value(val);
+        self
+    }
+    pub fn truncation_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_truncation_with_null(val);
+        self
+    }
+    pub fn build(self) -> ResponsesInput {
+        self.inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponsesOutput;
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &ResponsesOutput) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_id(this: &ResponsesOutput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn created_at(this: &ResponsesOutput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_created_at(this: &ResponsesOutput, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn output_text(this: &ResponsesOutput) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_output_text(this: &ResponsesOutput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn error(this: &ResponsesOutput) -> Option<ResponseError>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_error(this: &ResponsesOutput, val: &ResponseError);
+    #[wasm_bindgen(method, setter, js_name = "error")]
+    pub fn set_error_with_null(this: &ResponsesOutput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn incomplete_details(this: &ResponsesOutput) -> Option<ResponseIncompleteDetails>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_incomplete_details(this: &ResponsesOutput, val: &ResponseIncompleteDetails);
+    #[wasm_bindgen(method, setter, js_name = "incomplete_details")]
+    pub fn set_incomplete_details_with_null(this: &ResponsesOutput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn instructions(this: &ResponsesOutput) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_instructions(this: &ResponsesOutput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "instructions")]
+    pub fn set_instructions_with_array(this: &ResponsesOutput, val: &Array<EasyInputMessage>);
+    #[wasm_bindgen(method, setter, js_name = "instructions")]
+    pub fn set_instructions_with_array_1(
+        this: &ResponsesOutput,
+        val: &Array<ResponseInputItemMessage>,
+    );
+    #[wasm_bindgen(method, setter, js_name = "instructions")]
+    pub fn set_instructions_with_array_2(
+        this: &ResponsesOutput,
+        val: &Array<ResponseOutputMessage>,
+    );
+    #[wasm_bindgen(method, setter, js_name = "instructions")]
+    pub fn set_instructions_with_array_3(
+        this: &ResponsesOutput,
+        val: &Array<ResponseFunctionToolCall>,
+    );
+    #[wasm_bindgen(method, setter, js_name = "instructions")]
+    pub fn set_instructions_with_array_4(
+        this: &ResponsesOutput,
+        val: &Array<ResponseInputItemFunctionCallOutput>,
+    );
+    #[wasm_bindgen(method, setter, js_name = "instructions")]
+    pub fn set_instructions_with_array_5(
+        this: &ResponsesOutput,
+        val: &Array<ResponseReasoningItem>,
+    );
+    #[wasm_bindgen(method, setter, js_name = "instructions")]
+    pub fn set_instructions_with_null(this: &ResponsesOutput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn object(this: &ResponsesOutput) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_object(this: &ResponsesOutput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn output(this: &ResponsesOutput) -> Option<Array>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_output(this: &ResponsesOutput, val: &Array<ResponseOutputMessage>);
+    #[wasm_bindgen(method, setter, js_name = "output")]
+    pub fn set_output_with_array(this: &ResponsesOutput, val: &Array<ResponseFunctionToolCall>);
+    #[wasm_bindgen(method, setter, js_name = "output")]
+    pub fn set_output_with_array_1(this: &ResponsesOutput, val: &Array<ResponseReasoningItem>);
+    #[wasm_bindgen(method, getter)]
+    pub fn parallel_tool_calls(this: &ResponsesOutput) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_parallel_tool_calls(this: &ResponsesOutput, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn temperature(this: &ResponsesOutput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_temperature(this: &ResponsesOutput, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "temperature")]
+    pub fn set_temperature_with_null(this: &ResponsesOutput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn tool_choice(this: &ResponsesOutput) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_tool_choice(this: &ResponsesOutput, val: &ToolChoiceOptions);
+    #[wasm_bindgen(method, setter, js_name = "tool_choice")]
+    pub fn set_tool_choice_with_tool_choice_function(
+        this: &ResponsesOutput,
+        val: &ToolChoiceFunction,
+    );
+    #[wasm_bindgen(method, getter)]
+    pub fn tools(this: &ResponsesOutput) -> Option<Array<ResponsesFunctionTool>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_tools(this: &ResponsesOutput, val: &Array<ResponsesFunctionTool>);
+    #[wasm_bindgen(method, getter)]
+    pub fn top_p(this: &ResponsesOutput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_top_p(this: &ResponsesOutput, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "top_p")]
+    pub fn set_top_p_with_null(this: &ResponsesOutput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn max_output_tokens(this: &ResponsesOutput) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_max_output_tokens(this: &ResponsesOutput, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "max_output_tokens")]
+    pub fn set_max_output_tokens_with_null(this: &ResponsesOutput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn previous_response_id(this: &ResponsesOutput) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_previous_response_id(this: &ResponsesOutput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "previous_response_id")]
+    pub fn set_previous_response_id_with_null(this: &ResponsesOutput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn prompt(this: &ResponsesOutput) -> Option<ResponsePrompt>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_prompt(this: &ResponsesOutput, val: &ResponsePrompt);
+    #[wasm_bindgen(method, setter, js_name = "prompt")]
+    pub fn set_prompt_with_null(this: &ResponsesOutput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn reasoning(this: &ResponsesOutput) -> Option<Reasoning>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_reasoning(this: &ResponsesOutput, val: &Reasoning);
+    #[wasm_bindgen(method, setter, js_name = "reasoning")]
+    pub fn set_reasoning_with_null(this: &ResponsesOutput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn safety_identifier(this: &ResponsesOutput) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_safety_identifier(this: &ResponsesOutput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn service_tier(this: &ResponsesOutput) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_service_tier(this: &ResponsesOutput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "service_tier")]
+    pub fn set_service_tier_with_js_value(this: &ResponsesOutput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "service_tier")]
+    pub fn set_service_tier_with_js_value_1(this: &ResponsesOutput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "service_tier")]
+    pub fn set_service_tier_with_js_value_2(this: &ResponsesOutput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "service_tier")]
+    pub fn set_service_tier_with_js_value_3(this: &ResponsesOutput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "service_tier")]
+    pub fn set_service_tier_with_null(this: &ResponsesOutput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn status(this: &ResponsesOutput) -> Option<ResponseStatus>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_status(this: &ResponsesOutput, val: &ResponseStatus);
+    #[wasm_bindgen(method, getter)]
+    pub fn text(this: &ResponsesOutput) -> Option<ResponseTextConfig>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_text(this: &ResponsesOutput, val: &ResponseTextConfig);
+    #[wasm_bindgen(method, getter)]
+    pub fn truncation(this: &ResponsesOutput) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_truncation(this: &ResponsesOutput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "truncation")]
+    pub fn set_truncation_with_js_value(this: &ResponsesOutput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "truncation")]
+    pub fn set_truncation_with_null(this: &ResponsesOutput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn usage(this: &ResponsesOutput) -> Option<ResponseUsage>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_usage(this: &ResponsesOutput, val: &ResponseUsage);
+}
+impl ResponsesOutput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponsesOutputBuilder {
+        ResponsesOutputBuilder { inner: Self::new() }
+    }
+}
+pub struct ResponsesOutputBuilder {
+    inner: ResponsesOutput,
+}
+#[allow(unused_mut)]
+impl ResponsesOutputBuilder {
+    pub fn id(mut self, val: &str) -> Self {
+        self.inner.set_id(val);
+        self
+    }
+    pub fn created_at(mut self, val: f64) -> Self {
+        self.inner.set_created_at(val);
+        self
+    }
+    pub fn output_text(mut self, val: &str) -> Self {
+        self.inner.set_output_text(val);
+        self
+    }
+    pub fn error(mut self, val: &ResponseError) -> Self {
+        self.inner.set_error(val);
+        self
+    }
+    pub fn error_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_error_with_null(val);
+        self
+    }
+    pub fn incomplete_details(mut self, val: &ResponseIncompleteDetails) -> Self {
+        self.inner.set_incomplete_details(val);
+        self
+    }
+    pub fn incomplete_details_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_incomplete_details_with_null(val);
+        self
+    }
+    pub fn instructions(mut self, val: &str) -> Self {
+        self.inner.set_instructions(val);
+        self
+    }
+    pub fn instructions_with_array(mut self, val: &Array<EasyInputMessage>) -> Self {
+        self.inner.set_instructions_with_array(val);
+        self
+    }
+    pub fn instructions_with_array_1(mut self, val: &Array<ResponseInputItemMessage>) -> Self {
+        self.inner.set_instructions_with_array_1(val);
+        self
+    }
+    pub fn instructions_with_array_2(mut self, val: &Array<ResponseOutputMessage>) -> Self {
+        self.inner.set_instructions_with_array_2(val);
+        self
+    }
+    pub fn instructions_with_array_3(mut self, val: &Array<ResponseFunctionToolCall>) -> Self {
+        self.inner.set_instructions_with_array_3(val);
+        self
+    }
+    pub fn instructions_with_array_4(
+        mut self,
+        val: &Array<ResponseInputItemFunctionCallOutput>,
+    ) -> Self {
+        self.inner.set_instructions_with_array_4(val);
+        self
+    }
+    pub fn instructions_with_array_5(mut self, val: &Array<ResponseReasoningItem>) -> Self {
+        self.inner.set_instructions_with_array_5(val);
+        self
+    }
+    pub fn instructions_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_instructions_with_null(val);
+        self
+    }
+    pub fn object(mut self, val: &str) -> Self {
+        self.inner.set_object(val);
+        self
+    }
+    pub fn output(mut self, val: &Array<ResponseOutputMessage>) -> Self {
+        self.inner.set_output(val);
+        self
+    }
+    pub fn output_with_array(mut self, val: &Array<ResponseFunctionToolCall>) -> Self {
+        self.inner.set_output_with_array(val);
+        self
+    }
+    pub fn output_with_array_1(mut self, val: &Array<ResponseReasoningItem>) -> Self {
+        self.inner.set_output_with_array_1(val);
+        self
+    }
+    pub fn parallel_tool_calls(mut self, val: bool) -> Self {
+        self.inner.set_parallel_tool_calls(val);
+        self
+    }
+    pub fn temperature(mut self, val: f64) -> Self {
+        self.inner.set_temperature(val);
+        self
+    }
+    pub fn temperature_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_temperature_with_null(val);
+        self
+    }
+    pub fn tool_choice(mut self, val: &ToolChoiceOptions) -> Self {
+        self.inner.set_tool_choice(val);
+        self
+    }
+    pub fn tool_choice_with_tool_choice_function(mut self, val: &ToolChoiceFunction) -> Self {
+        self.inner.set_tool_choice_with_tool_choice_function(val);
+        self
+    }
+    pub fn tools(mut self, val: &Array<ResponsesFunctionTool>) -> Self {
+        self.inner.set_tools(val);
+        self
+    }
+    pub fn top_p(mut self, val: f64) -> Self {
+        self.inner.set_top_p(val);
+        self
+    }
+    pub fn top_p_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_top_p_with_null(val);
+        self
+    }
+    pub fn max_output_tokens(mut self, val: f64) -> Self {
+        self.inner.set_max_output_tokens(val);
+        self
+    }
+    pub fn max_output_tokens_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_max_output_tokens_with_null(val);
+        self
+    }
+    pub fn previous_response_id(mut self, val: &str) -> Self {
+        self.inner.set_previous_response_id(val);
+        self
+    }
+    pub fn previous_response_id_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_previous_response_id_with_null(val);
+        self
+    }
+    pub fn prompt(mut self, val: &ResponsePrompt) -> Self {
+        self.inner.set_prompt(val);
+        self
+    }
+    pub fn prompt_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_prompt_with_null(val);
+        self
+    }
+    pub fn reasoning(mut self, val: &Reasoning) -> Self {
+        self.inner.set_reasoning(val);
+        self
+    }
+    pub fn reasoning_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_reasoning_with_null(val);
+        self
+    }
+    pub fn safety_identifier(mut self, val: &str) -> Self {
+        self.inner.set_safety_identifier(val);
+        self
+    }
+    pub fn service_tier(mut self, val: &str) -> Self {
+        self.inner.set_service_tier(val);
+        self
+    }
+    pub fn service_tier_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_service_tier_with_js_value(val);
+        self
+    }
+    pub fn service_tier_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_service_tier_with_js_value_1(val);
+        self
+    }
+    pub fn service_tier_with_js_value_2(mut self, val: &str) -> Self {
+        self.inner.set_service_tier_with_js_value_2(val);
+        self
+    }
+    pub fn service_tier_with_js_value_3(mut self, val: &str) -> Self {
+        self.inner.set_service_tier_with_js_value_3(val);
+        self
+    }
+    pub fn service_tier_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_service_tier_with_null(val);
+        self
+    }
+    pub fn status(mut self, val: &ResponseStatus) -> Self {
+        self.inner.set_status(val);
+        self
+    }
+    pub fn text(mut self, val: &ResponseTextConfig) -> Self {
+        self.inner.set_text(val);
+        self
+    }
+    pub fn truncation(mut self, val: &str) -> Self {
+        self.inner.set_truncation(val);
+        self
+    }
+    pub fn truncation_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_truncation_with_js_value(val);
+        self
+    }
+    pub fn truncation_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_truncation_with_null(val);
+        self
+    }
+    pub fn usage(mut self, val: &ResponseUsage) -> Self {
+        self.inner.set_usage(val);
+        self
+    }
+    pub fn build(self) -> ResponsesOutput {
+        self.inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type EasyInputMessage;
+    #[wasm_bindgen(method, getter)]
+    pub fn content(this: &EasyInputMessage) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_content(this: &EasyInputMessage, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "content")]
+    pub fn set_content_with_array(this: &EasyInputMessage, val: &Array<ResponseInputText>);
+    #[wasm_bindgen(method, setter, js_name = "content")]
+    pub fn set_content_with_array_1(this: &EasyInputMessage, val: &Array<ResponseInputImage>);
+    #[wasm_bindgen(method, getter)]
+    pub fn role(this: &EasyInputMessage) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_role(this: &EasyInputMessage, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "role")]
+    pub fn set_role_with_js_value(this: &EasyInputMessage, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "role")]
+    pub fn set_role_with_js_value_1(this: &EasyInputMessage, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "role")]
+    pub fn set_role_with_js_value_2(this: &EasyInputMessage, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &EasyInputMessage) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &EasyInputMessage, val: &str);
+}
+impl EasyInputMessage {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> EasyInputMessageBuilder {
+        EasyInputMessageBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct EasyInputMessageBuilder {
+    inner: EasyInputMessage,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl EasyInputMessageBuilder {
+    pub fn content(mut self, val: &str) -> Self {
+        self.inner.set_content(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn content_with_array(mut self, val: &Array<ResponseInputText>) -> Self {
+        self.inner.set_content_with_array(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn content_with_array_1(mut self, val: &Array<ResponseInputImage>) -> Self {
+        self.inner.set_content_with_array_1(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn role(mut self, val: &str) -> Self {
+        self.inner.set_role(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn role_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_role_with_js_value(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn role_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_role_with_js_value_1(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn role_with_js_value_2(mut self, val: &str) -> Self {
+        self.inner.set_role_with_js_value_2(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self
+    }
+    pub fn build(self) -> Result<EasyInputMessage, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `content`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `role`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(EasyInputMessage),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponsesFunctionTool;
+    #[wasm_bindgen(method, getter)]
+    pub fn name(this: &ResponsesFunctionTool) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_name(this: &ResponsesFunctionTool, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn parameters(this: &ResponsesFunctionTool) -> Option<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_parameters(this: &ResponsesFunctionTool, val: &Object);
+    #[wasm_bindgen(method, setter, js_name = "parameters")]
+    pub fn set_parameters_with_null(this: &ResponsesFunctionTool, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn strict(this: &ResponsesFunctionTool) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_strict(this: &ResponsesFunctionTool, val: bool);
+    #[wasm_bindgen(method, setter, js_name = "strict")]
+    pub fn set_strict_with_null(this: &ResponsesFunctionTool, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponsesFunctionTool) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponsesFunctionTool, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn description(this: &ResponsesFunctionTool) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_description(this: &ResponsesFunctionTool, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "description")]
+    pub fn set_description_with_null(this: &ResponsesFunctionTool, val: &Null);
+}
+impl ResponsesFunctionTool {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponsesFunctionToolBuilder {
+        ResponsesFunctionToolBuilder {
+            inner: Self::new(),
+            required: 15u64,
+        }
+    }
+}
+pub struct ResponsesFunctionToolBuilder {
+    inner: ResponsesFunctionTool,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponsesFunctionToolBuilder {
+    pub fn name(mut self, val: &str) -> Self {
+        self.inner.set_name(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn parameters(mut self, val: &Object) -> Self {
+        self.inner.set_parameters(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn parameters_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_parameters_with_null(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn strict(mut self, val: bool) -> Self {
+        self.inner.set_strict(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn strict_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_strict_with_null(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn description(mut self, val: &str) -> Self {
+        self.inner.set_description(val);
+        self
+    }
+    pub fn description_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_description_with_null(val);
+        self
+    }
+    pub fn build(self) -> Result<ResponsesFunctionTool, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `name`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `parameters`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `strict`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponsesFunctionTool),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseIncompleteDetails;
+    #[wasm_bindgen(method, getter)]
+    pub fn reason(this: &ResponseIncompleteDetails) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_reason(this: &ResponseIncompleteDetails, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "reason")]
+    pub fn set_reason_with_js_value(this: &ResponseIncompleteDetails, val: &str);
+}
+impl ResponseIncompleteDetails {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseIncompleteDetailsBuilder {
+        ResponseIncompleteDetailsBuilder { inner: Self::new() }
+    }
+}
+pub struct ResponseIncompleteDetailsBuilder {
+    inner: ResponseIncompleteDetails,
+}
+#[allow(unused_mut)]
+impl ResponseIncompleteDetailsBuilder {
+    pub fn reason(mut self, val: &str) -> Self {
+        self.inner.set_reason(val);
+        self
+    }
+    pub fn reason_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_reason_with_js_value(val);
+        self
+    }
+    pub fn build(self) -> ResponseIncompleteDetails {
+        self.inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponsePrompt;
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &ResponsePrompt) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_id(this: &ResponsePrompt, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn variables(this: &ResponsePrompt) -> Option<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_variables(this: &ResponsePrompt, val: &Object);
+    #[wasm_bindgen(method, setter, js_name = "variables")]
+    pub fn set_variables_with_null(this: &ResponsePrompt, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn version(this: &ResponsePrompt) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_version(this: &ResponsePrompt, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "version")]
+    pub fn set_version_with_null(this: &ResponsePrompt, val: &Null);
+}
+impl ResponsePrompt {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponsePromptBuilder {
+        ResponsePromptBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct ResponsePromptBuilder {
+    inner: ResponsePrompt,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponsePromptBuilder {
+    pub fn id(mut self, val: &str) -> Self {
+        self.inner.set_id(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn variables(mut self, val: &Object) -> Self {
+        self.inner.set_variables(val);
+        self
+    }
+    pub fn variables_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_variables_with_null(val);
+        self
+    }
+    pub fn version(mut self, val: &str) -> Self {
+        self.inner.set_version(val);
+        self
+    }
+    pub fn version_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_version_with_null(val);
+        self
+    }
+    pub fn build(self) -> Result<ResponsePrompt, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `id`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponsePrompt),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Reasoning;
+    #[wasm_bindgen(method, getter)]
+    pub fn effort(this: &Reasoning) -> Option<Option<JsValue>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_effort(this: &Reasoning, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "effort")]
+    pub fn set_effort_with_js_value(this: &Reasoning, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "effort")]
+    pub fn set_effort_with_js_value_1(this: &Reasoning, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "effort")]
+    pub fn set_effort_with_js_value_2(this: &Reasoning, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "effort")]
+    pub fn set_effort_with_null(this: &Reasoning, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn generate_summary(this: &Reasoning) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_generate_summary(this: &Reasoning, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "generate_summary")]
+    pub fn set_generate_summary_with_js_value(this: &Reasoning, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "generate_summary")]
+    pub fn set_generate_summary_with_js_value_1(this: &Reasoning, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "generate_summary")]
+    pub fn set_generate_summary_with_null(this: &Reasoning, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn summary(this: &Reasoning) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_summary(this: &Reasoning, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "summary")]
+    pub fn set_summary_with_js_value(this: &Reasoning, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "summary")]
+    pub fn set_summary_with_js_value_1(this: &Reasoning, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "summary")]
+    pub fn set_summary_with_null(this: &Reasoning, val: &Null);
+}
+impl Reasoning {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ReasoningBuilder {
+        ReasoningBuilder { inner: Self::new() }
+    }
+}
+pub struct ReasoningBuilder {
+    inner: Reasoning,
+}
+#[allow(unused_mut)]
+impl ReasoningBuilder {
+    pub fn effort(mut self, val: &str) -> Self {
+        self.inner.set_effort(val);
+        self
+    }
+    pub fn effort_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_effort_with_js_value(val);
+        self
+    }
+    pub fn effort_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_effort_with_js_value_1(val);
+        self
+    }
+    pub fn effort_with_js_value_2(mut self, val: &str) -> Self {
+        self.inner.set_effort_with_js_value_2(val);
+        self
+    }
+    pub fn effort_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_effort_with_null(val);
+        self
+    }
+    pub fn generate_summary(mut self, val: &str) -> Self {
+        self.inner.set_generate_summary(val);
+        self
+    }
+    pub fn generate_summary_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_generate_summary_with_js_value(val);
+        self
+    }
+    pub fn generate_summary_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_generate_summary_with_js_value_1(val);
+        self
+    }
+    pub fn generate_summary_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_generate_summary_with_null(val);
+        self
+    }
+    pub fn summary(mut self, val: &str) -> Self {
+        self.inner.set_summary(val);
+        self
+    }
+    pub fn summary_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_summary_with_js_value(val);
+        self
+    }
+    pub fn summary_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_summary_with_js_value_1(val);
+        self
+    }
+    pub fn summary_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_summary_with_null(val);
+        self
+    }
+    pub fn build(self) -> Reasoning {
+        self.inner
+    }
 }
 #[allow(dead_code)]
-pub type ResponsesInput = Object;
-#[allow(dead_code)]
-pub type ResponsesOutput = Object;
-#[allow(dead_code)]
-pub type EasyInputMessage = Object;
-#[allow(dead_code)]
-pub type ResponsesFunctionTool = Object;
-#[allow(dead_code)]
-pub type ResponseIncompleteDetails = Object;
-#[allow(dead_code)]
-pub type ResponsePrompt = Object;
-#[allow(dead_code)]
-pub type Reasoning = Object;
-#[allow(dead_code)]
 pub type ResponseContent = JsValue;
-#[allow(dead_code)]
-pub type ResponseContentReasoningText = Object;
-#[allow(dead_code)]
-pub type ResponseConversationParam = Object;
-#[allow(dead_code)]
-pub type ResponseCreatedEvent = Object;
-#[allow(dead_code)]
-pub type ResponseCustomToolCallOutput = Object;
-#[allow(dead_code)]
-pub type ResponseError = Object;
-#[allow(dead_code)]
-pub type ResponseErrorEvent = Object;
-#[allow(dead_code)]
-pub type ResponseFailedEvent = Object;
-#[allow(dead_code)]
-pub type ResponseFormatText = Object;
-#[allow(dead_code)]
-pub type ResponseFormatJSONObject = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseContentReasoningText;
+    #[wasm_bindgen(method, getter)]
+    pub fn text(this: &ResponseContentReasoningText) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_text(this: &ResponseContentReasoningText, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseContentReasoningText) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseContentReasoningText, val: &str);
+}
+impl ResponseContentReasoningText {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseContentReasoningTextBuilder {
+        ResponseContentReasoningTextBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct ResponseContentReasoningTextBuilder {
+    inner: ResponseContentReasoningText,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseContentReasoningTextBuilder {
+    pub fn text(mut self, val: &str) -> Self {
+        self.inner.set_text(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseContentReasoningText, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `text`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseContentReasoningText),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseConversationParam;
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &ResponseConversationParam) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_id(this: &ResponseConversationParam, val: &str);
+}
+impl ResponseConversationParam {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseConversationParamBuilder {
+        ResponseConversationParamBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct ResponseConversationParamBuilder {
+    inner: ResponseConversationParam,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseConversationParamBuilder {
+    pub fn id(mut self, val: &str) -> Self {
+        self.inner.set_id(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseConversationParam, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `id`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseConversationParam),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseCreatedEvent;
+    #[wasm_bindgen(method, getter)]
+    pub fn response(this: &ResponseCreatedEvent) -> Response;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_response(this: &ResponseCreatedEvent, val: &Response);
+    #[wasm_bindgen(method, getter)]
+    pub fn sequence_number(this: &ResponseCreatedEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_sequence_number(this: &ResponseCreatedEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseCreatedEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseCreatedEvent, val: &str);
+}
+impl ResponseCreatedEvent {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseCreatedEventBuilder {
+        ResponseCreatedEventBuilder {
+            inner: Self::new(),
+            required: 7u64,
+        }
+    }
+}
+pub struct ResponseCreatedEventBuilder {
+    inner: ResponseCreatedEvent,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseCreatedEventBuilder {
+    pub fn response(mut self, val: &Response) -> Self {
+        self.inner.set_response(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn sequence_number(mut self, val: f64) -> Self {
+        self.inner.set_sequence_number(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseCreatedEvent, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `response`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `sequence_number`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseCreatedEvent),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseCustomToolCallOutput;
+    #[wasm_bindgen(method, getter)]
+    pub fn call_id(this: &ResponseCustomToolCallOutput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_call_id(this: &ResponseCustomToolCallOutput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn output(this: &ResponseCustomToolCallOutput) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_output(this: &ResponseCustomToolCallOutput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "output")]
+    pub fn set_output_with_array(
+        this: &ResponseCustomToolCallOutput,
+        val: &Array<ResponseInputText>,
+    );
+    #[wasm_bindgen(method, setter, js_name = "output")]
+    pub fn set_output_with_array_1(
+        this: &ResponseCustomToolCallOutput,
+        val: &Array<ResponseInputImage>,
+    );
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseCustomToolCallOutput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseCustomToolCallOutput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &ResponseCustomToolCallOutput) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_id(this: &ResponseCustomToolCallOutput, val: &str);
+}
+impl ResponseCustomToolCallOutput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseCustomToolCallOutputBuilder {
+        ResponseCustomToolCallOutputBuilder {
+            inner: Self::new(),
+            required: 7u64,
+        }
+    }
+}
+pub struct ResponseCustomToolCallOutputBuilder {
+    inner: ResponseCustomToolCallOutput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseCustomToolCallOutputBuilder {
+    pub fn call_id(mut self, val: &str) -> Self {
+        self.inner.set_call_id(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn output(mut self, val: &str) -> Self {
+        self.inner.set_output(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn output_with_array(mut self, val: &Array<ResponseInputText>) -> Self {
+        self.inner.set_output_with_array(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn output_with_array_1(mut self, val: &Array<ResponseInputImage>) -> Self {
+        self.inner.set_output_with_array_1(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn id(mut self, val: &str) -> Self {
+        self.inner.set_id(val);
+        self
+    }
+    pub fn build(self) -> Result<ResponseCustomToolCallOutput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `call_id`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `output`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseCustomToolCallOutput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseError;
+    #[wasm_bindgen(method, getter)]
+    pub fn code(this: &ResponseError) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_code(this: &ResponseError, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "code")]
+    pub fn set_code_with_js_value(this: &ResponseError, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "code")]
+    pub fn set_code_with_js_value_1(this: &ResponseError, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "code")]
+    pub fn set_code_with_js_value_2(this: &ResponseError, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "code")]
+    pub fn set_code_with_js_value_3(this: &ResponseError, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "code")]
+    pub fn set_code_with_js_value_4(this: &ResponseError, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "code")]
+    pub fn set_code_with_js_value_5(this: &ResponseError, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "code")]
+    pub fn set_code_with_js_value_6(this: &ResponseError, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "code")]
+    pub fn set_code_with_js_value_7(this: &ResponseError, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "code")]
+    pub fn set_code_with_js_value_8(this: &ResponseError, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "code")]
+    pub fn set_code_with_js_value_9(this: &ResponseError, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "code")]
+    pub fn set_code_with_js_value_10(this: &ResponseError, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "code")]
+    pub fn set_code_with_js_value_11(this: &ResponseError, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "code")]
+    pub fn set_code_with_js_value_12(this: &ResponseError, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "code")]
+    pub fn set_code_with_js_value_13(this: &ResponseError, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "code")]
+    pub fn set_code_with_js_value_14(this: &ResponseError, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "code")]
+    pub fn set_code_with_js_value_15(this: &ResponseError, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "code")]
+    pub fn set_code_with_js_value_16(this: &ResponseError, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn message(this: &ResponseError) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_message(this: &ResponseError, val: &str);
+}
+impl ResponseError {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseErrorBuilder {
+        ResponseErrorBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct ResponseErrorBuilder {
+    inner: ResponseError,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseErrorBuilder {
+    pub fn code(mut self, val: &str) -> Self {
+        self.inner.set_code(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn code_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_code_with_js_value(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn code_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_code_with_js_value_1(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn code_with_js_value_2(mut self, val: &str) -> Self {
+        self.inner.set_code_with_js_value_2(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn code_with_js_value_3(mut self, val: &str) -> Self {
+        self.inner.set_code_with_js_value_3(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn code_with_js_value_4(mut self, val: &str) -> Self {
+        self.inner.set_code_with_js_value_4(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn code_with_js_value_5(mut self, val: &str) -> Self {
+        self.inner.set_code_with_js_value_5(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn code_with_js_value_6(mut self, val: &str) -> Self {
+        self.inner.set_code_with_js_value_6(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn code_with_js_value_7(mut self, val: &str) -> Self {
+        self.inner.set_code_with_js_value_7(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn code_with_js_value_8(mut self, val: &str) -> Self {
+        self.inner.set_code_with_js_value_8(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn code_with_js_value_9(mut self, val: &str) -> Self {
+        self.inner.set_code_with_js_value_9(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn code_with_js_value_10(mut self, val: &str) -> Self {
+        self.inner.set_code_with_js_value_10(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn code_with_js_value_11(mut self, val: &str) -> Self {
+        self.inner.set_code_with_js_value_11(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn code_with_js_value_12(mut self, val: &str) -> Self {
+        self.inner.set_code_with_js_value_12(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn code_with_js_value_13(mut self, val: &str) -> Self {
+        self.inner.set_code_with_js_value_13(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn code_with_js_value_14(mut self, val: &str) -> Self {
+        self.inner.set_code_with_js_value_14(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn code_with_js_value_15(mut self, val: &str) -> Self {
+        self.inner.set_code_with_js_value_15(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn code_with_js_value_16(mut self, val: &str) -> Self {
+        self.inner.set_code_with_js_value_16(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn message(mut self, val: &str) -> Self {
+        self.inner.set_message(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseError, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `code`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `message`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseError),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseErrorEvent;
+    #[wasm_bindgen(method, getter)]
+    pub fn code(this: &ResponseErrorEvent) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_code(this: &ResponseErrorEvent, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "code")]
+    pub fn set_code_with_null(this: &ResponseErrorEvent, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn message(this: &ResponseErrorEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_message(this: &ResponseErrorEvent, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn param(this: &ResponseErrorEvent) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_param(this: &ResponseErrorEvent, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "param")]
+    pub fn set_param_with_null(this: &ResponseErrorEvent, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn sequence_number(this: &ResponseErrorEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_sequence_number(this: &ResponseErrorEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseErrorEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseErrorEvent, val: &str);
+}
+impl ResponseErrorEvent {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseErrorEventBuilder {
+        ResponseErrorEventBuilder {
+            inner: Self::new(),
+            required: 31u64,
+        }
+    }
+}
+pub struct ResponseErrorEventBuilder {
+    inner: ResponseErrorEvent,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseErrorEventBuilder {
+    pub fn code(mut self, val: &str) -> Self {
+        self.inner.set_code(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn code_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_code_with_null(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn message(mut self, val: &str) -> Self {
+        self.inner.set_message(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn param(mut self, val: &str) -> Self {
+        self.inner.set_param(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn param_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_param_with_null(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn sequence_number(mut self, val: f64) -> Self {
+        self.inner.set_sequence_number(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551599u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseErrorEvent, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `code`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `message`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `param`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `sequence_number`");
+            }
+            if self.required & 16u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseErrorEvent),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseFailedEvent;
+    #[wasm_bindgen(method, getter)]
+    pub fn response(this: &ResponseFailedEvent) -> Response;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_response(this: &ResponseFailedEvent, val: &Response);
+    #[wasm_bindgen(method, getter)]
+    pub fn sequence_number(this: &ResponseFailedEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_sequence_number(this: &ResponseFailedEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseFailedEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseFailedEvent, val: &str);
+}
+impl ResponseFailedEvent {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseFailedEventBuilder {
+        ResponseFailedEventBuilder {
+            inner: Self::new(),
+            required: 7u64,
+        }
+    }
+}
+pub struct ResponseFailedEventBuilder {
+    inner: ResponseFailedEvent,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseFailedEventBuilder {
+    pub fn response(mut self, val: &Response) -> Self {
+        self.inner.set_response(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn sequence_number(mut self, val: f64) -> Self {
+        self.inner.set_sequence_number(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseFailedEvent, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `response`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `sequence_number`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseFailedEvent),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseFormatText;
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseFormatText) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseFormatText, val: &str);
+}
+impl ResponseFormatText {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseFormatTextBuilder {
+        ResponseFormatTextBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct ResponseFormatTextBuilder {
+    inner: ResponseFormatText,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseFormatTextBuilder {
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseFormatText, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseFormatText),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseFormatJSONObject;
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseFormatJSONObject) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseFormatJSONObject, val: &str);
+}
+impl ResponseFormatJSONObject {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseFormatJSONObjectBuilder {
+        ResponseFormatJSONObjectBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct ResponseFormatJSONObjectBuilder {
+    inner: ResponseFormatJSONObject,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseFormatJSONObjectBuilder {
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseFormatJSONObject, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseFormatJSONObject),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[allow(dead_code)]
 pub type ResponseFormatTextConfig = JsValue;
-#[allow(dead_code)]
-pub type ResponseFormatTextJSONSchemaConfig = Object;
-#[allow(dead_code)]
-pub type ResponseFunctionCallArgumentsDeltaEvent = Object;
-#[allow(dead_code)]
-pub type ResponseFunctionCallArgumentsDoneEvent = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseFormatTextJSONSchemaConfig;
+    #[wasm_bindgen(method, getter)]
+    pub fn name(this: &ResponseFormatTextJSONSchemaConfig) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_name(this: &ResponseFormatTextJSONSchemaConfig, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn schema(this: &ResponseFormatTextJSONSchemaConfig) -> Object;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_schema(this: &ResponseFormatTextJSONSchemaConfig, val: &Object);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseFormatTextJSONSchemaConfig) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseFormatTextJSONSchemaConfig, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn description(this: &ResponseFormatTextJSONSchemaConfig) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_description(this: &ResponseFormatTextJSONSchemaConfig, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn strict(this: &ResponseFormatTextJSONSchemaConfig) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_strict(this: &ResponseFormatTextJSONSchemaConfig, val: bool);
+    #[wasm_bindgen(method, setter, js_name = "strict")]
+    pub fn set_strict_with_null(this: &ResponseFormatTextJSONSchemaConfig, val: &Null);
+}
+impl ResponseFormatTextJSONSchemaConfig {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseFormatTextJSONSchemaConfigBuilder {
+        ResponseFormatTextJSONSchemaConfigBuilder {
+            inner: Self::new(),
+            required: 7u64,
+        }
+    }
+}
+pub struct ResponseFormatTextJSONSchemaConfigBuilder {
+    inner: ResponseFormatTextJSONSchemaConfig,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseFormatTextJSONSchemaConfigBuilder {
+    pub fn name(mut self, val: &str) -> Self {
+        self.inner.set_name(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn schema(mut self, val: &Object) -> Self {
+        self.inner.set_schema(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn description(mut self, val: &str) -> Self {
+        self.inner.set_description(val);
+        self
+    }
+    pub fn strict(mut self, val: bool) -> Self {
+        self.inner.set_strict(val);
+        self
+    }
+    pub fn strict_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_strict_with_null(val);
+        self
+    }
+    pub fn build(self) -> Result<ResponseFormatTextJSONSchemaConfig, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `name`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `schema`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseFormatTextJSONSchemaConfig),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseFunctionCallArgumentsDeltaEvent;
+    #[wasm_bindgen(method, getter)]
+    pub fn delta(this: &ResponseFunctionCallArgumentsDeltaEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_delta(this: &ResponseFunctionCallArgumentsDeltaEvent, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn item_id(this: &ResponseFunctionCallArgumentsDeltaEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_item_id(this: &ResponseFunctionCallArgumentsDeltaEvent, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn output_index(this: &ResponseFunctionCallArgumentsDeltaEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_output_index(this: &ResponseFunctionCallArgumentsDeltaEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn sequence_number(this: &ResponseFunctionCallArgumentsDeltaEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_sequence_number(this: &ResponseFunctionCallArgumentsDeltaEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseFunctionCallArgumentsDeltaEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseFunctionCallArgumentsDeltaEvent, val: &str);
+}
+impl ResponseFunctionCallArgumentsDeltaEvent {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseFunctionCallArgumentsDeltaEventBuilder {
+        ResponseFunctionCallArgumentsDeltaEventBuilder {
+            inner: Self::new(),
+            required: 31u64,
+        }
+    }
+}
+pub struct ResponseFunctionCallArgumentsDeltaEventBuilder {
+    inner: ResponseFunctionCallArgumentsDeltaEvent,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseFunctionCallArgumentsDeltaEventBuilder {
+    pub fn delta(mut self, val: &str) -> Self {
+        self.inner.set_delta(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn item_id(mut self, val: &str) -> Self {
+        self.inner.set_item_id(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn output_index(mut self, val: f64) -> Self {
+        self.inner.set_output_index(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn sequence_number(mut self, val: f64) -> Self {
+        self.inner.set_sequence_number(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551599u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseFunctionCallArgumentsDeltaEvent, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `delta`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `item_id`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `output_index`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `sequence_number`");
+            }
+            if self.required & 16u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseFunctionCallArgumentsDeltaEvent),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseFunctionCallArgumentsDoneEvent;
+    #[wasm_bindgen(method, getter)]
+    pub fn arguments(this: &ResponseFunctionCallArgumentsDoneEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_arguments(this: &ResponseFunctionCallArgumentsDoneEvent, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn item_id(this: &ResponseFunctionCallArgumentsDoneEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_item_id(this: &ResponseFunctionCallArgumentsDoneEvent, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn name(this: &ResponseFunctionCallArgumentsDoneEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_name(this: &ResponseFunctionCallArgumentsDoneEvent, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn output_index(this: &ResponseFunctionCallArgumentsDoneEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_output_index(this: &ResponseFunctionCallArgumentsDoneEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn sequence_number(this: &ResponseFunctionCallArgumentsDoneEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_sequence_number(this: &ResponseFunctionCallArgumentsDoneEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseFunctionCallArgumentsDoneEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseFunctionCallArgumentsDoneEvent, val: &str);
+}
+impl ResponseFunctionCallArgumentsDoneEvent {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseFunctionCallArgumentsDoneEventBuilder {
+        ResponseFunctionCallArgumentsDoneEventBuilder {
+            inner: Self::new(),
+            required: 63u64,
+        }
+    }
+}
+pub struct ResponseFunctionCallArgumentsDoneEventBuilder {
+    inner: ResponseFunctionCallArgumentsDoneEvent,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseFunctionCallArgumentsDoneEventBuilder {
+    pub fn arguments(mut self, val: &str) -> Self {
+        self.inner.set_arguments(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn item_id(mut self, val: &str) -> Self {
+        self.inner.set_item_id(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn name(mut self, val: &str) -> Self {
+        self.inner.set_name(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn output_index(mut self, val: f64) -> Self {
+        self.inner.set_output_index(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn sequence_number(mut self, val: f64) -> Self {
+        self.inner.set_sequence_number(val);
+        self.required &= 18446744073709551599u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551583u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseFunctionCallArgumentsDoneEvent, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `arguments`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `item_id`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `name`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `output_index`");
+            }
+            if self.required & 16u64 != 0 {
+                missing.push("missing required property `sequence_number`");
+            }
+            if self.required & 32u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseFunctionCallArgumentsDoneEvent),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[allow(dead_code)]
 pub type ResponseFunctionCallOutputItem = JsValue;
 #[allow(dead_code)]
 pub type ResponseFunctionCallOutputItemList = Array;
-#[allow(dead_code)]
-pub type ResponseFunctionToolCall = Object;
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseFunctionToolCall;
+    #[wasm_bindgen(method, getter)]
+    pub fn arguments(this: &ResponseFunctionToolCall) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_arguments(this: &ResponseFunctionToolCall, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn call_id(this: &ResponseFunctionToolCall) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_call_id(this: &ResponseFunctionToolCall, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn name(this: &ResponseFunctionToolCall) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_name(this: &ResponseFunctionToolCall, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseFunctionToolCall) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseFunctionToolCall, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &ResponseFunctionToolCall) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_id(this: &ResponseFunctionToolCall, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn status(this: &ResponseFunctionToolCall) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_status(this: &ResponseFunctionToolCall, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value(this: &ResponseFunctionToolCall, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value_1(this: &ResponseFunctionToolCall, val: &str);
+}
+impl ResponseFunctionToolCall {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseFunctionToolCallBuilder {
+        ResponseFunctionToolCallBuilder {
+            inner: Self::new(),
+            required: 15u64,
+        }
+    }
+}
+pub struct ResponseFunctionToolCallBuilder {
+    inner: ResponseFunctionToolCall,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseFunctionToolCallBuilder {
+    pub fn arguments(mut self, val: &str) -> Self {
+        self.inner.set_arguments(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn call_id(mut self, val: &str) -> Self {
+        self.inner.set_call_id(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn name(mut self, val: &str) -> Self {
+        self.inner.set_name(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn id(mut self, val: &str) -> Self {
+        self.inner.set_id(val);
+        self
+    }
+    pub fn status(mut self, val: &str) -> Self {
+        self.inner.set_status(val);
+        self
+    }
+    pub fn status_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value(val);
+        self
+    }
+    pub fn status_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value_1(val);
+        self
+    }
+    pub fn build(self) -> Result<ResponseFunctionToolCall, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `arguments`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `call_id`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `name`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseFunctionToolCall),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = ResponseFunctionToolCall , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseFunctionToolCallItem;
     #[wasm_bindgen(method, getter)]
@@ -15395,8 +20582,132 @@ impl ResponseFunctionToolCallItemBuilder {
         Ok(self.inner)
     }
 }
-#[allow(dead_code)]
-pub type ResponseFunctionToolCallOutputItem = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseFunctionToolCallOutputItem;
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &ResponseFunctionToolCallOutputItem) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_id(this: &ResponseFunctionToolCallOutputItem, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn call_id(this: &ResponseFunctionToolCallOutputItem) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_call_id(this: &ResponseFunctionToolCallOutputItem, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn output(this: &ResponseFunctionToolCallOutputItem) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_output(this: &ResponseFunctionToolCallOutputItem, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "output")]
+    pub fn set_output_with_array(
+        this: &ResponseFunctionToolCallOutputItem,
+        val: &Array<ResponseInputText>,
+    );
+    #[wasm_bindgen(method, setter, js_name = "output")]
+    pub fn set_output_with_array_1(
+        this: &ResponseFunctionToolCallOutputItem,
+        val: &Array<ResponseInputImage>,
+    );
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseFunctionToolCallOutputItem) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseFunctionToolCallOutputItem, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn status(this: &ResponseFunctionToolCallOutputItem) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_status(this: &ResponseFunctionToolCallOutputItem, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value(this: &ResponseFunctionToolCallOutputItem, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value_1(this: &ResponseFunctionToolCallOutputItem, val: &str);
+}
+impl ResponseFunctionToolCallOutputItem {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseFunctionToolCallOutputItemBuilder {
+        ResponseFunctionToolCallOutputItemBuilder {
+            inner: Self::new(),
+            required: 15u64,
+        }
+    }
+}
+pub struct ResponseFunctionToolCallOutputItemBuilder {
+    inner: ResponseFunctionToolCallOutputItem,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseFunctionToolCallOutputItemBuilder {
+    pub fn id(mut self, val: &str) -> Self {
+        self.inner.set_id(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn call_id(mut self, val: &str) -> Self {
+        self.inner.set_call_id(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn output(mut self, val: &str) -> Self {
+        self.inner.set_output(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn output_with_array(mut self, val: &Array<ResponseInputText>) -> Self {
+        self.inner.set_output_with_array(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn output_with_array_1(mut self, val: &Array<ResponseInputImage>) -> Self {
+        self.inner.set_output_with_array_1(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn status(mut self, val: &str) -> Self {
+        self.inner.set_status(val);
+        self
+    }
+    pub fn status_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value(val);
+        self
+    }
+    pub fn status_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value_1(val);
+        self
+    }
+    pub fn build(self) -> Result<ResponseFunctionToolCallOutputItem, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `id`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `call_id`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `output`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseFunctionToolCallOutputItem),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ResponseIncludable {
@@ -15405,58 +20716,1909 @@ pub enum ResponseIncludable {
     #[wasm_bindgen(js_name = "message.output_text.logprobs")]
     MessageoutputTextlogprobs,
 }
-#[allow(dead_code)]
-pub type ResponseIncompleteEvent = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseIncompleteEvent;
+    #[wasm_bindgen(method, getter)]
+    pub fn response(this: &ResponseIncompleteEvent) -> Response;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_response(this: &ResponseIncompleteEvent, val: &Response);
+    #[wasm_bindgen(method, getter)]
+    pub fn sequence_number(this: &ResponseIncompleteEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_sequence_number(this: &ResponseIncompleteEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseIncompleteEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseIncompleteEvent, val: &str);
+}
+impl ResponseIncompleteEvent {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseIncompleteEventBuilder {
+        ResponseIncompleteEventBuilder {
+            inner: Self::new(),
+            required: 7u64,
+        }
+    }
+}
+pub struct ResponseIncompleteEventBuilder {
+    inner: ResponseIncompleteEvent,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseIncompleteEventBuilder {
+    pub fn response(mut self, val: &Response) -> Self {
+        self.inner.set_response(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn sequence_number(mut self, val: f64) -> Self {
+        self.inner.set_sequence_number(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseIncompleteEvent, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `response`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `sequence_number`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseIncompleteEvent),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[allow(dead_code)]
 pub type ResponseInput = Array;
 #[allow(dead_code)]
 pub type ResponseInputContent = JsValue;
-#[allow(dead_code)]
-pub type ResponseInputImage = Object;
-#[allow(dead_code)]
-pub type ResponseInputImageContent = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseInputImage;
+    #[wasm_bindgen(method, getter)]
+    pub fn detail(this: &ResponseInputImage) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_detail(this: &ResponseInputImage, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "detail")]
+    pub fn set_detail_with_js_value(this: &ResponseInputImage, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "detail")]
+    pub fn set_detail_with_js_value_1(this: &ResponseInputImage, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseInputImage) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseInputImage, val: &str);
+    #[doc = " Base64 encoded image"]
+    #[wasm_bindgen(method, getter)]
+    pub fn image_url(this: &ResponseInputImage) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_image_url(this: &ResponseInputImage, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "image_url")]
+    pub fn set_image_url_with_null(this: &ResponseInputImage, val: &Null);
+}
+impl ResponseInputImage {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseInputImageBuilder {
+        ResponseInputImageBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct ResponseInputImageBuilder {
+    inner: ResponseInputImage,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseInputImageBuilder {
+    pub fn detail(mut self, val: &str) -> Self {
+        self.inner.set_detail(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn detail_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_detail_with_js_value(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn detail_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_detail_with_js_value_1(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn image_url(mut self, val: &str) -> Self {
+        self.inner.set_image_url(val);
+        self
+    }
+    pub fn image_url_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_image_url_with_null(val);
+        self
+    }
+    pub fn build(self) -> Result<ResponseInputImage, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `detail`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseInputImage),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseInputImageContent;
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseInputImageContent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseInputImageContent, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn detail(this: &ResponseInputImageContent) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_detail(this: &ResponseInputImageContent, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "detail")]
+    pub fn set_detail_with_js_value(this: &ResponseInputImageContent, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "detail")]
+    pub fn set_detail_with_js_value_1(this: &ResponseInputImageContent, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "detail")]
+    pub fn set_detail_with_null(this: &ResponseInputImageContent, val: &Null);
+    #[doc = " Base64 encoded image"]
+    #[wasm_bindgen(method, getter)]
+    pub fn image_url(this: &ResponseInputImageContent) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_image_url(this: &ResponseInputImageContent, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "image_url")]
+    pub fn set_image_url_with_null(this: &ResponseInputImageContent, val: &Null);
+}
+impl ResponseInputImageContent {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseInputImageContentBuilder {
+        ResponseInputImageContentBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct ResponseInputImageContentBuilder {
+    inner: ResponseInputImageContent,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseInputImageContentBuilder {
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn detail(mut self, val: &str) -> Self {
+        self.inner.set_detail(val);
+        self
+    }
+    pub fn detail_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_detail_with_js_value(val);
+        self
+    }
+    pub fn detail_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_detail_with_js_value_1(val);
+        self
+    }
+    pub fn detail_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_detail_with_null(val);
+        self
+    }
+    pub fn image_url(mut self, val: &str) -> Self {
+        self.inner.set_image_url(val);
+        self
+    }
+    pub fn image_url_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_image_url_with_null(val);
+        self
+    }
+    pub fn build(self) -> Result<ResponseInputImageContent, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseInputImageContent),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[allow(dead_code)]
 pub type ResponseInputItem = JsValue;
-#[allow(dead_code)]
-pub type ResponseInputItemFunctionCallOutput = Object;
-#[allow(dead_code)]
-pub type ResponseInputItemMessage = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseInputItemFunctionCallOutput;
+    #[wasm_bindgen(method, getter)]
+    pub fn call_id(this: &ResponseInputItemFunctionCallOutput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_call_id(this: &ResponseInputItemFunctionCallOutput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn output(this: &ResponseInputItemFunctionCallOutput) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_output(this: &ResponseInputItemFunctionCallOutput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "output")]
+    pub fn set_output_with_array(
+        this: &ResponseInputItemFunctionCallOutput,
+        val: &Array<ResponseInputTextContent>,
+    );
+    #[wasm_bindgen(method, setter, js_name = "output")]
+    pub fn set_output_with_array_1(
+        this: &ResponseInputItemFunctionCallOutput,
+        val: &Array<ResponseInputImageContent>,
+    );
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseInputItemFunctionCallOutput) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseInputItemFunctionCallOutput, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &ResponseInputItemFunctionCallOutput) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_id(this: &ResponseInputItemFunctionCallOutput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "id")]
+    pub fn set_id_with_null(this: &ResponseInputItemFunctionCallOutput, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn status(this: &ResponseInputItemFunctionCallOutput) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_status(this: &ResponseInputItemFunctionCallOutput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value(this: &ResponseInputItemFunctionCallOutput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value_1(this: &ResponseInputItemFunctionCallOutput, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_null(this: &ResponseInputItemFunctionCallOutput, val: &Null);
+}
+impl ResponseInputItemFunctionCallOutput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseInputItemFunctionCallOutputBuilder {
+        ResponseInputItemFunctionCallOutputBuilder {
+            inner: Self::new(),
+            required: 7u64,
+        }
+    }
+}
+pub struct ResponseInputItemFunctionCallOutputBuilder {
+    inner: ResponseInputItemFunctionCallOutput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseInputItemFunctionCallOutputBuilder {
+    pub fn call_id(mut self, val: &str) -> Self {
+        self.inner.set_call_id(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn output(mut self, val: &str) -> Self {
+        self.inner.set_output(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn output_with_array(mut self, val: &Array<ResponseInputTextContent>) -> Self {
+        self.inner.set_output_with_array(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn output_with_array_1(mut self, val: &Array<ResponseInputImageContent>) -> Self {
+        self.inner.set_output_with_array_1(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn id(mut self, val: &str) -> Self {
+        self.inner.set_id(val);
+        self
+    }
+    pub fn id_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_id_with_null(val);
+        self
+    }
+    pub fn status(mut self, val: &str) -> Self {
+        self.inner.set_status(val);
+        self
+    }
+    pub fn status_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value(val);
+        self
+    }
+    pub fn status_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value_1(val);
+        self
+    }
+    pub fn status_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_status_with_null(val);
+        self
+    }
+    pub fn build(self) -> Result<ResponseInputItemFunctionCallOutput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `call_id`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `output`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseInputItemFunctionCallOutput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseInputItemMessage;
+    #[wasm_bindgen(method, getter)]
+    pub fn content(this: &ResponseInputItemMessage) -> Array;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_content(this: &ResponseInputItemMessage, val: &Array<ResponseInputText>);
+    #[wasm_bindgen(method, setter, js_name = "content")]
+    pub fn set_content_with_array(this: &ResponseInputItemMessage, val: &Array<ResponseInputImage>);
+    #[wasm_bindgen(method, getter)]
+    pub fn role(this: &ResponseInputItemMessage) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_role(this: &ResponseInputItemMessage, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "role")]
+    pub fn set_role_with_js_value(this: &ResponseInputItemMessage, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "role")]
+    pub fn set_role_with_js_value_1(this: &ResponseInputItemMessage, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn status(this: &ResponseInputItemMessage) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_status(this: &ResponseInputItemMessage, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value(this: &ResponseInputItemMessage, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value_1(this: &ResponseInputItemMessage, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseInputItemMessage) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseInputItemMessage, val: &str);
+}
+impl ResponseInputItemMessage {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseInputItemMessageBuilder {
+        ResponseInputItemMessageBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct ResponseInputItemMessageBuilder {
+    inner: ResponseInputItemMessage,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseInputItemMessageBuilder {
+    pub fn content(mut self, val: &Array<ResponseInputText>) -> Self {
+        self.inner.set_content(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn content_with_array(mut self, val: &Array<ResponseInputImage>) -> Self {
+        self.inner.set_content_with_array(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn role(mut self, val: &str) -> Self {
+        self.inner.set_role(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn role_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_role_with_js_value(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn role_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_role_with_js_value_1(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn status(mut self, val: &str) -> Self {
+        self.inner.set_status(val);
+        self
+    }
+    pub fn status_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value(val);
+        self
+    }
+    pub fn status_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value_1(val);
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self
+    }
+    pub fn build(self) -> Result<ResponseInputItemMessage, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `content`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `role`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseInputItemMessage),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[allow(dead_code)]
 pub type ResponseInputMessageContentList = Array;
-#[allow(dead_code)]
-pub type ResponseInputMessageItem = Object;
-#[allow(dead_code)]
-pub type ResponseInputText = Object;
-#[allow(dead_code)]
-pub type ResponseInputTextContent = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseInputMessageItem;
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &ResponseInputMessageItem) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_id(this: &ResponseInputMessageItem, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn content(this: &ResponseInputMessageItem) -> Array;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_content(this: &ResponseInputMessageItem, val: &Array<ResponseInputText>);
+    #[wasm_bindgen(method, setter, js_name = "content")]
+    pub fn set_content_with_array(this: &ResponseInputMessageItem, val: &Array<ResponseInputImage>);
+    #[wasm_bindgen(method, getter)]
+    pub fn role(this: &ResponseInputMessageItem) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_role(this: &ResponseInputMessageItem, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "role")]
+    pub fn set_role_with_js_value(this: &ResponseInputMessageItem, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "role")]
+    pub fn set_role_with_js_value_1(this: &ResponseInputMessageItem, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn status(this: &ResponseInputMessageItem) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_status(this: &ResponseInputMessageItem, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value(this: &ResponseInputMessageItem, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value_1(this: &ResponseInputMessageItem, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseInputMessageItem) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseInputMessageItem, val: &str);
+}
+impl ResponseInputMessageItem {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseInputMessageItemBuilder {
+        ResponseInputMessageItemBuilder {
+            inner: Self::new(),
+            required: 7u64,
+        }
+    }
+}
+pub struct ResponseInputMessageItemBuilder {
+    inner: ResponseInputMessageItem,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseInputMessageItemBuilder {
+    pub fn id(mut self, val: &str) -> Self {
+        self.inner.set_id(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn content(mut self, val: &Array<ResponseInputText>) -> Self {
+        self.inner.set_content(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn content_with_array(mut self, val: &Array<ResponseInputImage>) -> Self {
+        self.inner.set_content_with_array(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn role(mut self, val: &str) -> Self {
+        self.inner.set_role(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn role_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_role_with_js_value(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn role_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_role_with_js_value_1(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn status(mut self, val: &str) -> Self {
+        self.inner.set_status(val);
+        self
+    }
+    pub fn status_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value(val);
+        self
+    }
+    pub fn status_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value_1(val);
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self
+    }
+    pub fn build(self) -> Result<ResponseInputMessageItem, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `id`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `content`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `role`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseInputMessageItem),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseInputText;
+    #[wasm_bindgen(method, getter)]
+    pub fn text(this: &ResponseInputText) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_text(this: &ResponseInputText, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseInputText) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseInputText, val: &str);
+}
+impl ResponseInputText {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseInputTextBuilder {
+        ResponseInputTextBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct ResponseInputTextBuilder {
+    inner: ResponseInputText,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseInputTextBuilder {
+    pub fn text(mut self, val: &str) -> Self {
+        self.inner.set_text(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseInputText, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `text`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseInputText),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseInputTextContent;
+    #[wasm_bindgen(method, getter)]
+    pub fn text(this: &ResponseInputTextContent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_text(this: &ResponseInputTextContent, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseInputTextContent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseInputTextContent, val: &str);
+}
+impl ResponseInputTextContent {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseInputTextContentBuilder {
+        ResponseInputTextContentBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct ResponseInputTextContentBuilder {
+    inner: ResponseInputTextContent,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseInputTextContentBuilder {
+    pub fn text(mut self, val: &str) -> Self {
+        self.inner.set_text(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseInputTextContent, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `text`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseInputTextContent),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[allow(dead_code)]
 pub type ResponseItem = JsValue;
 #[allow(dead_code)]
 pub type ResponseOutputItem = JsValue;
-#[allow(dead_code)]
-pub type ResponseOutputItemAddedEvent = Object;
-#[allow(dead_code)]
-pub type ResponseOutputItemDoneEvent = Object;
-#[allow(dead_code)]
-pub type ResponseOutputMessage = Object;
-#[allow(dead_code)]
-pub type ResponseOutputRefusal = Object;
-#[allow(dead_code)]
-pub type ResponseOutputText = Object;
-#[allow(dead_code)]
-pub type ResponseReasoningItem = Object;
-#[allow(dead_code)]
-pub type ResponseReasoningSummaryItem = Object;
-#[allow(dead_code)]
-pub type ResponseReasoningContentItem = Object;
-#[allow(dead_code)]
-pub type ResponseReasoningTextDeltaEvent = Object;
-#[allow(dead_code)]
-pub type ResponseReasoningTextDoneEvent = Object;
-#[allow(dead_code)]
-pub type ResponseRefusalDeltaEvent = Object;
-#[allow(dead_code)]
-pub type ResponseRefusalDoneEvent = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseOutputItemAddedEvent;
+    #[wasm_bindgen(method, getter)]
+    pub fn item(this: &ResponseOutputItemAddedEvent) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_item(this: &ResponseOutputItemAddedEvent, val: &ResponseOutputMessage);
+    #[wasm_bindgen(method, setter, js_name = "item")]
+    pub fn set_item_with_response_function_tool_call(
+        this: &ResponseOutputItemAddedEvent,
+        val: &ResponseFunctionToolCall,
+    );
+    #[wasm_bindgen(method, setter, js_name = "item")]
+    pub fn set_item_with_response_reasoning_item(
+        this: &ResponseOutputItemAddedEvent,
+        val: &ResponseReasoningItem,
+    );
+    #[wasm_bindgen(method, getter)]
+    pub fn output_index(this: &ResponseOutputItemAddedEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_output_index(this: &ResponseOutputItemAddedEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn sequence_number(this: &ResponseOutputItemAddedEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_sequence_number(this: &ResponseOutputItemAddedEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseOutputItemAddedEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseOutputItemAddedEvent, val: &str);
+}
+impl ResponseOutputItemAddedEvent {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseOutputItemAddedEventBuilder {
+        ResponseOutputItemAddedEventBuilder {
+            inner: Self::new(),
+            required: 15u64,
+        }
+    }
+}
+pub struct ResponseOutputItemAddedEventBuilder {
+    inner: ResponseOutputItemAddedEvent,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseOutputItemAddedEventBuilder {
+    pub fn item(mut self, val: &ResponseOutputMessage) -> Self {
+        self.inner.set_item(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn item_with_response_function_tool_call(mut self, val: &ResponseFunctionToolCall) -> Self {
+        self.inner.set_item_with_response_function_tool_call(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn item_with_response_reasoning_item(mut self, val: &ResponseReasoningItem) -> Self {
+        self.inner.set_item_with_response_reasoning_item(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn output_index(mut self, val: f64) -> Self {
+        self.inner.set_output_index(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn sequence_number(mut self, val: f64) -> Self {
+        self.inner.set_sequence_number(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseOutputItemAddedEvent, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `item`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `output_index`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `sequence_number`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseOutputItemAddedEvent),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseOutputItemDoneEvent;
+    #[wasm_bindgen(method, getter)]
+    pub fn item(this: &ResponseOutputItemDoneEvent) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_item(this: &ResponseOutputItemDoneEvent, val: &ResponseOutputMessage);
+    #[wasm_bindgen(method, setter, js_name = "item")]
+    pub fn set_item_with_response_function_tool_call(
+        this: &ResponseOutputItemDoneEvent,
+        val: &ResponseFunctionToolCall,
+    );
+    #[wasm_bindgen(method, setter, js_name = "item")]
+    pub fn set_item_with_response_reasoning_item(
+        this: &ResponseOutputItemDoneEvent,
+        val: &ResponseReasoningItem,
+    );
+    #[wasm_bindgen(method, getter)]
+    pub fn output_index(this: &ResponseOutputItemDoneEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_output_index(this: &ResponseOutputItemDoneEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn sequence_number(this: &ResponseOutputItemDoneEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_sequence_number(this: &ResponseOutputItemDoneEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseOutputItemDoneEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseOutputItemDoneEvent, val: &str);
+}
+impl ResponseOutputItemDoneEvent {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseOutputItemDoneEventBuilder {
+        ResponseOutputItemDoneEventBuilder {
+            inner: Self::new(),
+            required: 15u64,
+        }
+    }
+}
+pub struct ResponseOutputItemDoneEventBuilder {
+    inner: ResponseOutputItemDoneEvent,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseOutputItemDoneEventBuilder {
+    pub fn item(mut self, val: &ResponseOutputMessage) -> Self {
+        self.inner.set_item(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn item_with_response_function_tool_call(mut self, val: &ResponseFunctionToolCall) -> Self {
+        self.inner.set_item_with_response_function_tool_call(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn item_with_response_reasoning_item(mut self, val: &ResponseReasoningItem) -> Self {
+        self.inner.set_item_with_response_reasoning_item(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn output_index(mut self, val: f64) -> Self {
+        self.inner.set_output_index(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn sequence_number(mut self, val: f64) -> Self {
+        self.inner.set_sequence_number(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseOutputItemDoneEvent, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `item`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `output_index`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `sequence_number`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseOutputItemDoneEvent),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseOutputMessage;
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &ResponseOutputMessage) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_id(this: &ResponseOutputMessage, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn content(this: &ResponseOutputMessage) -> Array;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_content(this: &ResponseOutputMessage, val: &Array<ResponseOutputText>);
+    #[wasm_bindgen(method, setter, js_name = "content")]
+    pub fn set_content_with_array(this: &ResponseOutputMessage, val: &Array<ResponseOutputRefusal>);
+    #[wasm_bindgen(method, getter)]
+    pub fn role(this: &ResponseOutputMessage) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_role(this: &ResponseOutputMessage, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn status(this: &ResponseOutputMessage) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_status(this: &ResponseOutputMessage, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value(this: &ResponseOutputMessage, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value_1(this: &ResponseOutputMessage, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseOutputMessage) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseOutputMessage, val: &str);
+}
+impl ResponseOutputMessage {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseOutputMessageBuilder {
+        ResponseOutputMessageBuilder {
+            inner: Self::new(),
+            required: 31u64,
+        }
+    }
+}
+pub struct ResponseOutputMessageBuilder {
+    inner: ResponseOutputMessage,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseOutputMessageBuilder {
+    pub fn id(mut self, val: &str) -> Self {
+        self.inner.set_id(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn content(mut self, val: &Array<ResponseOutputText>) -> Self {
+        self.inner.set_content(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn content_with_array(mut self, val: &Array<ResponseOutputRefusal>) -> Self {
+        self.inner.set_content_with_array(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn role(mut self, val: &str) -> Self {
+        self.inner.set_role(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn status(mut self, val: &str) -> Self {
+        self.inner.set_status(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn status_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn status_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value_1(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551599u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseOutputMessage, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `id`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `content`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `role`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `status`");
+            }
+            if self.required & 16u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseOutputMessage),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseOutputRefusal;
+    #[wasm_bindgen(method, getter)]
+    pub fn refusal(this: &ResponseOutputRefusal) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_refusal(this: &ResponseOutputRefusal, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseOutputRefusal) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseOutputRefusal, val: &str);
+}
+impl ResponseOutputRefusal {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseOutputRefusalBuilder {
+        ResponseOutputRefusalBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct ResponseOutputRefusalBuilder {
+    inner: ResponseOutputRefusal,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseOutputRefusalBuilder {
+    pub fn refusal(mut self, val: &str) -> Self {
+        self.inner.set_refusal(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseOutputRefusal, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `refusal`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseOutputRefusal),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseOutputText;
+    #[wasm_bindgen(method, getter)]
+    pub fn text(this: &ResponseOutputText) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_text(this: &ResponseOutputText, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseOutputText) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseOutputText, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn logprobs(this: &ResponseOutputText) -> Option<Array<Logprob>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_logprobs(this: &ResponseOutputText, val: &Array<Logprob>);
+}
+impl ResponseOutputText {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseOutputTextBuilder {
+        ResponseOutputTextBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct ResponseOutputTextBuilder {
+    inner: ResponseOutputText,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseOutputTextBuilder {
+    pub fn text(mut self, val: &str) -> Self {
+        self.inner.set_text(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn logprobs(mut self, val: &Array<Logprob>) -> Self {
+        self.inner.set_logprobs(val);
+        self
+    }
+    pub fn build(self) -> Result<ResponseOutputText, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `text`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseOutputText),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseReasoningItem;
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &ResponseReasoningItem) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_id(this: &ResponseReasoningItem, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn summary(this: &ResponseReasoningItem) -> Array<ResponseReasoningSummaryItem>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_summary(this: &ResponseReasoningItem, val: &Array<ResponseReasoningSummaryItem>);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseReasoningItem) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseReasoningItem, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn content(this: &ResponseReasoningItem) -> Option<Array<ResponseReasoningContentItem>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_content(this: &ResponseReasoningItem, val: &Array<ResponseReasoningContentItem>);
+    #[wasm_bindgen(method, getter)]
+    pub fn encrypted_content(this: &ResponseReasoningItem) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_encrypted_content(this: &ResponseReasoningItem, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "encrypted_content")]
+    pub fn set_encrypted_content_with_null(this: &ResponseReasoningItem, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn status(this: &ResponseReasoningItem) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_status(this: &ResponseReasoningItem, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value(this: &ResponseReasoningItem, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value_1(this: &ResponseReasoningItem, val: &str);
+}
+impl ResponseReasoningItem {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseReasoningItemBuilder {
+        ResponseReasoningItemBuilder {
+            inner: Self::new(),
+            required: 7u64,
+        }
+    }
+}
+pub struct ResponseReasoningItemBuilder {
+    inner: ResponseReasoningItem,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseReasoningItemBuilder {
+    pub fn id(mut self, val: &str) -> Self {
+        self.inner.set_id(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn summary(mut self, val: &Array<ResponseReasoningSummaryItem>) -> Self {
+        self.inner.set_summary(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn content(mut self, val: &Array<ResponseReasoningContentItem>) -> Self {
+        self.inner.set_content(val);
+        self
+    }
+    pub fn encrypted_content(mut self, val: &str) -> Self {
+        self.inner.set_encrypted_content(val);
+        self
+    }
+    pub fn encrypted_content_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_encrypted_content_with_null(val);
+        self
+    }
+    pub fn status(mut self, val: &str) -> Self {
+        self.inner.set_status(val);
+        self
+    }
+    pub fn status_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value(val);
+        self
+    }
+    pub fn status_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value_1(val);
+        self
+    }
+    pub fn build(self) -> Result<ResponseReasoningItem, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `id`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `summary`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseReasoningItem),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseReasoningSummaryItem;
+    #[wasm_bindgen(method, getter)]
+    pub fn text(this: &ResponseReasoningSummaryItem) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_text(this: &ResponseReasoningSummaryItem, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseReasoningSummaryItem) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseReasoningSummaryItem, val: &str);
+}
+impl ResponseReasoningSummaryItem {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseReasoningSummaryItemBuilder {
+        ResponseReasoningSummaryItemBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct ResponseReasoningSummaryItemBuilder {
+    inner: ResponseReasoningSummaryItem,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseReasoningSummaryItemBuilder {
+    pub fn text(mut self, val: &str) -> Self {
+        self.inner.set_text(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseReasoningSummaryItem, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `text`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseReasoningSummaryItem),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseReasoningContentItem;
+    #[wasm_bindgen(method, getter)]
+    pub fn text(this: &ResponseReasoningContentItem) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_text(this: &ResponseReasoningContentItem, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseReasoningContentItem) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseReasoningContentItem, val: &str);
+}
+impl ResponseReasoningContentItem {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseReasoningContentItemBuilder {
+        ResponseReasoningContentItemBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct ResponseReasoningContentItemBuilder {
+    inner: ResponseReasoningContentItem,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseReasoningContentItemBuilder {
+    pub fn text(mut self, val: &str) -> Self {
+        self.inner.set_text(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseReasoningContentItem, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `text`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseReasoningContentItem),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseReasoningTextDeltaEvent;
+    #[wasm_bindgen(method, getter)]
+    pub fn content_index(this: &ResponseReasoningTextDeltaEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_content_index(this: &ResponseReasoningTextDeltaEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn delta(this: &ResponseReasoningTextDeltaEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_delta(this: &ResponseReasoningTextDeltaEvent, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn item_id(this: &ResponseReasoningTextDeltaEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_item_id(this: &ResponseReasoningTextDeltaEvent, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn output_index(this: &ResponseReasoningTextDeltaEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_output_index(this: &ResponseReasoningTextDeltaEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn sequence_number(this: &ResponseReasoningTextDeltaEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_sequence_number(this: &ResponseReasoningTextDeltaEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseReasoningTextDeltaEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseReasoningTextDeltaEvent, val: &str);
+}
+impl ResponseReasoningTextDeltaEvent {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseReasoningTextDeltaEventBuilder {
+        ResponseReasoningTextDeltaEventBuilder {
+            inner: Self::new(),
+            required: 63u64,
+        }
+    }
+}
+pub struct ResponseReasoningTextDeltaEventBuilder {
+    inner: ResponseReasoningTextDeltaEvent,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseReasoningTextDeltaEventBuilder {
+    pub fn content_index(mut self, val: f64) -> Self {
+        self.inner.set_content_index(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn delta(mut self, val: &str) -> Self {
+        self.inner.set_delta(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn item_id(mut self, val: &str) -> Self {
+        self.inner.set_item_id(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn output_index(mut self, val: f64) -> Self {
+        self.inner.set_output_index(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn sequence_number(mut self, val: f64) -> Self {
+        self.inner.set_sequence_number(val);
+        self.required &= 18446744073709551599u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551583u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseReasoningTextDeltaEvent, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `content_index`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `delta`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `item_id`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `output_index`");
+            }
+            if self.required & 16u64 != 0 {
+                missing.push("missing required property `sequence_number`");
+            }
+            if self.required & 32u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseReasoningTextDeltaEvent),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseReasoningTextDoneEvent;
+    #[wasm_bindgen(method, getter)]
+    pub fn content_index(this: &ResponseReasoningTextDoneEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_content_index(this: &ResponseReasoningTextDoneEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn item_id(this: &ResponseReasoningTextDoneEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_item_id(this: &ResponseReasoningTextDoneEvent, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn output_index(this: &ResponseReasoningTextDoneEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_output_index(this: &ResponseReasoningTextDoneEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn sequence_number(this: &ResponseReasoningTextDoneEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_sequence_number(this: &ResponseReasoningTextDoneEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn text(this: &ResponseReasoningTextDoneEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_text(this: &ResponseReasoningTextDoneEvent, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseReasoningTextDoneEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseReasoningTextDoneEvent, val: &str);
+}
+impl ResponseReasoningTextDoneEvent {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseReasoningTextDoneEventBuilder {
+        ResponseReasoningTextDoneEventBuilder {
+            inner: Self::new(),
+            required: 63u64,
+        }
+    }
+}
+pub struct ResponseReasoningTextDoneEventBuilder {
+    inner: ResponseReasoningTextDoneEvent,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseReasoningTextDoneEventBuilder {
+    pub fn content_index(mut self, val: f64) -> Self {
+        self.inner.set_content_index(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn item_id(mut self, val: &str) -> Self {
+        self.inner.set_item_id(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn output_index(mut self, val: f64) -> Self {
+        self.inner.set_output_index(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn sequence_number(mut self, val: f64) -> Self {
+        self.inner.set_sequence_number(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn text(mut self, val: &str) -> Self {
+        self.inner.set_text(val);
+        self.required &= 18446744073709551599u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551583u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseReasoningTextDoneEvent, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `content_index`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `item_id`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `output_index`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `sequence_number`");
+            }
+            if self.required & 16u64 != 0 {
+                missing.push("missing required property `text`");
+            }
+            if self.required & 32u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseReasoningTextDoneEvent),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseRefusalDeltaEvent;
+    #[wasm_bindgen(method, getter)]
+    pub fn content_index(this: &ResponseRefusalDeltaEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_content_index(this: &ResponseRefusalDeltaEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn delta(this: &ResponseRefusalDeltaEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_delta(this: &ResponseRefusalDeltaEvent, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn item_id(this: &ResponseRefusalDeltaEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_item_id(this: &ResponseRefusalDeltaEvent, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn output_index(this: &ResponseRefusalDeltaEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_output_index(this: &ResponseRefusalDeltaEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn sequence_number(this: &ResponseRefusalDeltaEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_sequence_number(this: &ResponseRefusalDeltaEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseRefusalDeltaEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseRefusalDeltaEvent, val: &str);
+}
+impl ResponseRefusalDeltaEvent {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseRefusalDeltaEventBuilder {
+        ResponseRefusalDeltaEventBuilder {
+            inner: Self::new(),
+            required: 63u64,
+        }
+    }
+}
+pub struct ResponseRefusalDeltaEventBuilder {
+    inner: ResponseRefusalDeltaEvent,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseRefusalDeltaEventBuilder {
+    pub fn content_index(mut self, val: f64) -> Self {
+        self.inner.set_content_index(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn delta(mut self, val: &str) -> Self {
+        self.inner.set_delta(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn item_id(mut self, val: &str) -> Self {
+        self.inner.set_item_id(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn output_index(mut self, val: f64) -> Self {
+        self.inner.set_output_index(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn sequence_number(mut self, val: f64) -> Self {
+        self.inner.set_sequence_number(val);
+        self.required &= 18446744073709551599u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551583u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseRefusalDeltaEvent, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `content_index`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `delta`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `item_id`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `output_index`");
+            }
+            if self.required & 16u64 != 0 {
+                missing.push("missing required property `sequence_number`");
+            }
+            if self.required & 32u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseRefusalDeltaEvent),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseRefusalDoneEvent;
+    #[wasm_bindgen(method, getter)]
+    pub fn content_index(this: &ResponseRefusalDoneEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_content_index(this: &ResponseRefusalDoneEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn item_id(this: &ResponseRefusalDoneEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_item_id(this: &ResponseRefusalDoneEvent, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn output_index(this: &ResponseRefusalDoneEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_output_index(this: &ResponseRefusalDoneEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn refusal(this: &ResponseRefusalDoneEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_refusal(this: &ResponseRefusalDoneEvent, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn sequence_number(this: &ResponseRefusalDoneEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_sequence_number(this: &ResponseRefusalDoneEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseRefusalDoneEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseRefusalDoneEvent, val: &str);
+}
+impl ResponseRefusalDoneEvent {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseRefusalDoneEventBuilder {
+        ResponseRefusalDoneEventBuilder {
+            inner: Self::new(),
+            required: 63u64,
+        }
+    }
+}
+pub struct ResponseRefusalDoneEventBuilder {
+    inner: ResponseRefusalDoneEvent,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseRefusalDoneEventBuilder {
+    pub fn content_index(mut self, val: f64) -> Self {
+        self.inner.set_content_index(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn item_id(mut self, val: &str) -> Self {
+        self.inner.set_item_id(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn output_index(mut self, val: f64) -> Self {
+        self.inner.set_output_index(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn refusal(mut self, val: &str) -> Self {
+        self.inner.set_refusal(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn sequence_number(mut self, val: f64) -> Self {
+        self.inner.set_sequence_number(val);
+        self.required &= 18446744073709551599u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551583u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseRefusalDoneEvent, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `content_index`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `item_id`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `output_index`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `refusal`");
+            }
+            if self.required & 16u64 != 0 {
+                missing.push("missing required property `sequence_number`");
+            }
+            if self.required & 32u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseRefusalDoneEvent),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ResponseStatus {
@@ -15475,22 +22637,659 @@ pub enum ResponseStatus {
 }
 #[allow(dead_code)]
 pub type ResponseStreamEvent = JsValue;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseCompletedEvent;
+    #[wasm_bindgen(method, getter)]
+    pub fn response(this: &ResponseCompletedEvent) -> Response;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_response(this: &ResponseCompletedEvent, val: &Response);
+    #[wasm_bindgen(method, getter)]
+    pub fn sequence_number(this: &ResponseCompletedEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_sequence_number(this: &ResponseCompletedEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseCompletedEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseCompletedEvent, val: &str);
+}
+impl ResponseCompletedEvent {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseCompletedEventBuilder {
+        ResponseCompletedEventBuilder {
+            inner: Self::new(),
+            required: 7u64,
+        }
+    }
+}
+pub struct ResponseCompletedEventBuilder {
+    inner: ResponseCompletedEvent,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseCompletedEventBuilder {
+    pub fn response(mut self, val: &Response) -> Self {
+        self.inner.set_response(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn sequence_number(mut self, val: f64) -> Self {
+        self.inner.set_sequence_number(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseCompletedEvent, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `response`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `sequence_number`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseCompletedEvent),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseTextConfig;
+    #[wasm_bindgen(method, getter)]
+    pub fn format(this: &ResponseTextConfig) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_format(this: &ResponseTextConfig, val: &ResponseFormatText);
+    #[wasm_bindgen(method, setter, js_name = "format")]
+    pub fn set_format_with_response_format_text_json_schema_config(
+        this: &ResponseTextConfig,
+        val: &ResponseFormatTextJSONSchemaConfig,
+    );
+    #[wasm_bindgen(method, setter, js_name = "format")]
+    pub fn set_format_with_response_format_json_object(
+        this: &ResponseTextConfig,
+        val: &ResponseFormatJSONObject,
+    );
+    #[wasm_bindgen(method, getter)]
+    pub fn verbosity(this: &ResponseTextConfig) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_verbosity(this: &ResponseTextConfig, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "verbosity")]
+    pub fn set_verbosity_with_js_value(this: &ResponseTextConfig, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "verbosity")]
+    pub fn set_verbosity_with_js_value_1(this: &ResponseTextConfig, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "verbosity")]
+    pub fn set_verbosity_with_null(this: &ResponseTextConfig, val: &Null);
+}
+impl ResponseTextConfig {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseTextConfigBuilder {
+        ResponseTextConfigBuilder { inner: Self::new() }
+    }
+}
+pub struct ResponseTextConfigBuilder {
+    inner: ResponseTextConfig,
+}
+#[allow(unused_mut)]
+impl ResponseTextConfigBuilder {
+    pub fn format(mut self, val: &ResponseFormatText) -> Self {
+        self.inner.set_format(val);
+        self
+    }
+    pub fn format_with_response_format_text_json_schema_config(
+        mut self,
+        val: &ResponseFormatTextJSONSchemaConfig,
+    ) -> Self {
+        self.inner
+            .set_format_with_response_format_text_json_schema_config(val);
+        self
+    }
+    pub fn format_with_response_format_json_object(
+        mut self,
+        val: &ResponseFormatJSONObject,
+    ) -> Self {
+        self.inner.set_format_with_response_format_json_object(val);
+        self
+    }
+    pub fn verbosity(mut self, val: &str) -> Self {
+        self.inner.set_verbosity(val);
+        self
+    }
+    pub fn verbosity_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_verbosity_with_js_value(val);
+        self
+    }
+    pub fn verbosity_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_verbosity_with_js_value_1(val);
+        self
+    }
+    pub fn verbosity_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_verbosity_with_null(val);
+        self
+    }
+    pub fn build(self) -> ResponseTextConfig {
+        self.inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseTextDeltaEvent;
+    #[wasm_bindgen(method, getter)]
+    pub fn content_index(this: &ResponseTextDeltaEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_content_index(this: &ResponseTextDeltaEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn delta(this: &ResponseTextDeltaEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_delta(this: &ResponseTextDeltaEvent, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn item_id(this: &ResponseTextDeltaEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_item_id(this: &ResponseTextDeltaEvent, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn logprobs(this: &ResponseTextDeltaEvent) -> Array<Logprob>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_logprobs(this: &ResponseTextDeltaEvent, val: &Array<Logprob>);
+    #[wasm_bindgen(method, getter)]
+    pub fn output_index(this: &ResponseTextDeltaEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_output_index(this: &ResponseTextDeltaEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn sequence_number(this: &ResponseTextDeltaEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_sequence_number(this: &ResponseTextDeltaEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseTextDeltaEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseTextDeltaEvent, val: &str);
+}
+impl ResponseTextDeltaEvent {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseTextDeltaEventBuilder {
+        ResponseTextDeltaEventBuilder {
+            inner: Self::new(),
+            required: 127u64,
+        }
+    }
+}
+pub struct ResponseTextDeltaEventBuilder {
+    inner: ResponseTextDeltaEvent,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseTextDeltaEventBuilder {
+    pub fn content_index(mut self, val: f64) -> Self {
+        self.inner.set_content_index(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn delta(mut self, val: &str) -> Self {
+        self.inner.set_delta(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn item_id(mut self, val: &str) -> Self {
+        self.inner.set_item_id(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn logprobs(mut self, val: &Array<Logprob>) -> Self {
+        self.inner.set_logprobs(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn output_index(mut self, val: f64) -> Self {
+        self.inner.set_output_index(val);
+        self.required &= 18446744073709551599u64;
+        self
+    }
+    pub fn sequence_number(mut self, val: f64) -> Self {
+        self.inner.set_sequence_number(val);
+        self.required &= 18446744073709551583u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551551u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseTextDeltaEvent, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `content_index`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `delta`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `item_id`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `logprobs`");
+            }
+            if self.required & 16u64 != 0 {
+                missing.push("missing required property `output_index`");
+            }
+            if self.required & 32u64 != 0 {
+                missing.push("missing required property `sequence_number`");
+            }
+            if self.required & 64u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseTextDeltaEvent),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseTextDoneEvent;
+    #[wasm_bindgen(method, getter)]
+    pub fn content_index(this: &ResponseTextDoneEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_content_index(this: &ResponseTextDoneEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn item_id(this: &ResponseTextDoneEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_item_id(this: &ResponseTextDoneEvent, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn logprobs(this: &ResponseTextDoneEvent) -> Array<Logprob>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_logprobs(this: &ResponseTextDoneEvent, val: &Array<Logprob>);
+    #[wasm_bindgen(method, getter)]
+    pub fn output_index(this: &ResponseTextDoneEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_output_index(this: &ResponseTextDoneEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn sequence_number(this: &ResponseTextDoneEvent) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_sequence_number(this: &ResponseTextDoneEvent, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn text(this: &ResponseTextDoneEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_text(this: &ResponseTextDoneEvent, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ResponseTextDoneEvent) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ResponseTextDoneEvent, val: &str);
+}
+impl ResponseTextDoneEvent {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseTextDoneEventBuilder {
+        ResponseTextDoneEventBuilder {
+            inner: Self::new(),
+            required: 127u64,
+        }
+    }
+}
+pub struct ResponseTextDoneEventBuilder {
+    inner: ResponseTextDoneEvent,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseTextDoneEventBuilder {
+    pub fn content_index(mut self, val: f64) -> Self {
+        self.inner.set_content_index(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn item_id(mut self, val: &str) -> Self {
+        self.inner.set_item_id(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn logprobs(mut self, val: &Array<Logprob>) -> Self {
+        self.inner.set_logprobs(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn output_index(mut self, val: f64) -> Self {
+        self.inner.set_output_index(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn sequence_number(mut self, val: f64) -> Self {
+        self.inner.set_sequence_number(val);
+        self.required &= 18446744073709551599u64;
+        self
+    }
+    pub fn text(mut self, val: &str) -> Self {
+        self.inner.set_text(val);
+        self.required &= 18446744073709551583u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551551u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseTextDoneEvent, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `content_index`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `item_id`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `logprobs`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `output_index`");
+            }
+            if self.required & 16u64 != 0 {
+                missing.push("missing required property `sequence_number`");
+            }
+            if self.required & 32u64 != 0 {
+                missing.push("missing required property `text`");
+            }
+            if self.required & 64u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseTextDoneEvent),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Logprob;
+    #[wasm_bindgen(method, getter)]
+    pub fn token(this: &Logprob) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_token(this: &Logprob, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn logprob(this: &Logprob) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_logprob(this: &Logprob, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn top_logprobs(this: &Logprob) -> Option<Array<TopLogprob>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_top_logprobs(this: &Logprob, val: &Array<TopLogprob>);
+}
+impl Logprob {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> LogprobBuilder {
+        LogprobBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct LogprobBuilder {
+    inner: Logprob,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl LogprobBuilder {
+    pub fn token(mut self, val: &str) -> Self {
+        self.inner.set_token(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn logprob(mut self, val: f64) -> Self {
+        self.inner.set_logprob(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn top_logprobs(mut self, val: &Array<TopLogprob>) -> Self {
+        self.inner.set_top_logprobs(val);
+        self
+    }
+    pub fn build(self) -> Result<Logprob, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `token`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `logprob`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(Logprob),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type TopLogprob;
+    #[wasm_bindgen(method, getter)]
+    pub fn token(this: &TopLogprob) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_token(this: &TopLogprob, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn logprob(this: &TopLogprob) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_logprob(this: &TopLogprob, val: f64);
+}
+impl TopLogprob {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> TopLogprobBuilder {
+        TopLogprobBuilder { inner: Self::new() }
+    }
+}
+pub struct TopLogprobBuilder {
+    inner: TopLogprob,
+}
+#[allow(unused_mut)]
+impl TopLogprobBuilder {
+    pub fn token(mut self, val: &str) -> Self {
+        self.inner.set_token(val);
+        self
+    }
+    pub fn logprob(mut self, val: f64) -> Self {
+        self.inner.set_logprob(val);
+        self
+    }
+    pub fn build(self) -> TopLogprob {
+        self.inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ResponseUsage;
+    #[wasm_bindgen(method, getter)]
+    pub fn input_tokens(this: &ResponseUsage) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_input_tokens(this: &ResponseUsage, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn output_tokens(this: &ResponseUsage) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_output_tokens(this: &ResponseUsage, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn total_tokens(this: &ResponseUsage) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_total_tokens(this: &ResponseUsage, val: f64);
+}
+impl ResponseUsage {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ResponseUsageBuilder {
+        ResponseUsageBuilder {
+            inner: Self::new(),
+            required: 7u64,
+        }
+    }
+}
+pub struct ResponseUsageBuilder {
+    inner: ResponseUsage,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ResponseUsageBuilder {
+    pub fn input_tokens(mut self, val: f64) -> Self {
+        self.inner.set_input_tokens(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn output_tokens(mut self, val: f64) -> Self {
+        self.inner.set_output_tokens(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn total_tokens(mut self, val: f64) -> Self {
+        self.inner.set_total_tokens(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn build(self) -> Result<ResponseUsage, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `input_tokens`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `output_tokens`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `total_tokens`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ResponseUsage),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[allow(dead_code)]
-pub type ResponseCompletedEvent = Object;
-#[allow(dead_code)]
-pub type ResponseTextConfig = Object;
-#[allow(dead_code)]
-pub type ResponseTextDeltaEvent = Object;
-#[allow(dead_code)]
-pub type ResponseTextDoneEvent = Object;
-#[allow(dead_code)]
-pub type Logprob = Object;
-#[allow(dead_code)]
-pub type TopLogprob = Object;
-#[allow(dead_code)]
-pub type ResponseUsage = Object;
-#[allow(dead_code)]
-pub type ToolChoiceFunction = Object;
+pub type Tool = ResponsesFunctionTool;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ToolChoiceFunction;
+    #[wasm_bindgen(method, getter)]
+    pub fn name(this: &ToolChoiceFunction) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_name(this: &ToolChoiceFunction, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ToolChoiceFunction) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ToolChoiceFunction, val: &str);
+}
+impl ToolChoiceFunction {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ToolChoiceFunctionBuilder {
+        ToolChoiceFunctionBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct ToolChoiceFunctionBuilder {
+    inner: ToolChoiceFunction,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ToolChoiceFunctionBuilder {
+    pub fn name(mut self, val: &str) -> Self {
+        self.inner.set_name(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn build(self) -> Result<ToolChoiceFunction, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `name`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ToolChoiceFunction),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ToolChoiceOptions {
@@ -15499,10 +23298,104 @@ pub enum ToolChoiceOptions {
 }
 #[allow(dead_code)]
 pub type ReasoningEffort = JsOption<JsValue>;
-#[allow(dead_code)]
-pub type StreamOptions = Object;
-#[allow(dead_code)]
-pub type Ai_Cf_Baai_Bge_Base_En_V1_5_Input = JsValue;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StreamOptions;
+    #[wasm_bindgen(method, getter)]
+    pub fn include_obfuscation(this: &StreamOptions) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_include_obfuscation(this: &StreamOptions, val: bool);
+}
+impl StreamOptions {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> StreamOptionsBuilder {
+        StreamOptionsBuilder { inner: Self::new() }
+    }
+}
+pub struct StreamOptionsBuilder {
+    inner: StreamOptions,
+}
+#[allow(unused_mut)]
+impl StreamOptionsBuilder {
+    pub fn include_obfuscation(mut self, val: bool) -> Self {
+        self.inner.set_include_obfuscation(val);
+        self
+    }
+    pub fn build(self) -> StreamOptions {
+        self.inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Ai_Cf_Baai_Bge_Base_En_V1_5_Input;
+    #[doc = " The pooling method used in the embedding process. `cls` pooling will generate more accurate embeddings on larger inputs - however, embeddings created with cls pooling are not compatible with embeddings generated with mean pooling. The default pooling method is `mean` in order for this to not be a breaking change, but we highly suggest using the new `cls` pooling for better accuracy."]
+    #[wasm_bindgen(method, getter)]
+    pub fn pooling(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input) -> Option<JsValue>;
+    #[doc = " Batch of the embeddings requests to run using async-queue"]
+    #[wasm_bindgen(method, getter)]
+    pub fn requests(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input) -> Option<Array<Object>>;
+    #[wasm_bindgen(method, getter)]
+    pub fn text(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_pooling(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "pooling")]
+    pub fn set_pooling_with_js_value(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input, val: &str);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_requests(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input, val: &Array<Object>);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_text(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "text")]
+    pub fn set_text_with_array(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input, val: &Array<JsString>);
+}
+impl Ai_Cf_Baai_Bge_Base_En_V1_5_Input {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> Ai_Cf_Baai_Bge_Base_En_V1_5_InputBuilder {
+        Ai_Cf_Baai_Bge_Base_En_V1_5_InputBuilder { inner: Self::new() }
+    }
+}
+pub struct Ai_Cf_Baai_Bge_Base_En_V1_5_InputBuilder {
+    inner: Ai_Cf_Baai_Bge_Base_En_V1_5_Input,
+}
+#[allow(unused_mut)]
+impl Ai_Cf_Baai_Bge_Base_En_V1_5_InputBuilder {
+    pub fn pooling(mut self, val: &str) -> Self {
+        self.inner.set_pooling(val);
+        self
+    }
+    pub fn pooling_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_pooling_with_js_value(val);
+        self
+    }
+    pub fn requests(mut self, val: &Array<Object>) -> Self {
+        self.inner.set_requests(val);
+        self
+    }
+    pub fn text(mut self, val: &str) -> Self {
+        self.inner.set_text(val);
+        self
+    }
+    pub fn text_with_array(mut self, val: &Array<JsString>) -> Self {
+        self.inner.set_text_with_array(val);
+        self
+    }
+    pub fn build(self) -> Ai_Cf_Baai_Bge_Base_En_V1_5_Input {
+        self.inner
+    }
+}
 #[allow(dead_code)]
 pub type Ai_Cf_Baai_Bge_Base_En_V1_5_Output = JsValue;
 #[wasm_bindgen]
@@ -15546,9 +23439,12 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Base_Ai_Cf_Baai_Bge_Base_En_V1_5;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &Base_Ai_Cf_Baai_Bge_Base_En_V1_5) -> JsValue;
+    pub fn inputs(this: &Base_Ai_Cf_Baai_Bge_Base_En_V1_5) -> Ai_Cf_Baai_Bge_Base_En_V1_5_Input;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &Base_Ai_Cf_Baai_Bge_Base_En_V1_5, val: &Object);
+    pub fn set_inputs(
+        this: &Base_Ai_Cf_Baai_Bge_Base_En_V1_5,
+        val: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input,
+    );
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(this: &Base_Ai_Cf_Baai_Bge_Base_En_V1_5) -> JsValue;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
@@ -15655,8 +23551,68 @@ extern "C" {
         val: &Ai_Cf_Openai_Whisper_Output,
     );
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Meta_M2M100_1_2B_Input = JsValue;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Ai_Cf_Meta_M2M100_1_2B_Input;
+    #[doc = " Batch of the embeddings requests to run using async-queue"]
+    #[wasm_bindgen(method, getter)]
+    pub fn requests(this: &Ai_Cf_Meta_M2M100_1_2B_Input) -> Option<Array<Object>>;
+    #[doc = " The language code of the source text (e.g., 'en' for English). Defaults to 'en' if not specified"]
+    #[wasm_bindgen(method, getter)]
+    pub fn source_lang(this: &Ai_Cf_Meta_M2M100_1_2B_Input) -> Option<String>;
+    #[doc = " The language code to translate the text into (e.g., 'es' for Spanish)"]
+    #[wasm_bindgen(method, getter)]
+    pub fn target_lang(this: &Ai_Cf_Meta_M2M100_1_2B_Input) -> Option<String>;
+    #[doc = " The text to be translated"]
+    #[wasm_bindgen(method, getter)]
+    pub fn text(this: &Ai_Cf_Meta_M2M100_1_2B_Input) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_requests(this: &Ai_Cf_Meta_M2M100_1_2B_Input, val: &Array<Object>);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_source_lang(this: &Ai_Cf_Meta_M2M100_1_2B_Input, val: &str);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_target_lang(this: &Ai_Cf_Meta_M2M100_1_2B_Input, val: &str);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_text(this: &Ai_Cf_Meta_M2M100_1_2B_Input, val: &str);
+}
+impl Ai_Cf_Meta_M2M100_1_2B_Input {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> Ai_Cf_Meta_M2M100_1_2B_InputBuilder {
+        Ai_Cf_Meta_M2M100_1_2B_InputBuilder { inner: Self::new() }
+    }
+}
+pub struct Ai_Cf_Meta_M2M100_1_2B_InputBuilder {
+    inner: Ai_Cf_Meta_M2M100_1_2B_Input,
+}
+#[allow(unused_mut)]
+impl Ai_Cf_Meta_M2M100_1_2B_InputBuilder {
+    pub fn requests(mut self, val: &Array<Object>) -> Self {
+        self.inner.set_requests(val);
+        self
+    }
+    pub fn source_lang(mut self, val: &str) -> Self {
+        self.inner.set_source_lang(val);
+        self
+    }
+    pub fn target_lang(mut self, val: &str) -> Self {
+        self.inner.set_target_lang(val);
+        self
+    }
+    pub fn text(mut self, val: &str) -> Self {
+        self.inner.set_text(val);
+        self
+    }
+    pub fn build(self) -> Ai_Cf_Meta_M2M100_1_2B_Input {
+        self.inner
+    }
+}
 #[allow(dead_code)]
 pub type Ai_Cf_Meta_M2M100_1_2B_Output = JsValue;
 #[wasm_bindgen]
@@ -15700,9 +23656,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Base_Ai_Cf_Meta_M2M100_1_2B;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &Base_Ai_Cf_Meta_M2M100_1_2B) -> JsValue;
+    pub fn inputs(this: &Base_Ai_Cf_Meta_M2M100_1_2B) -> Ai_Cf_Meta_M2M100_1_2B_Input;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &Base_Ai_Cf_Meta_M2M100_1_2B, val: &Object);
+    pub fn set_inputs(this: &Base_Ai_Cf_Meta_M2M100_1_2B, val: &Ai_Cf_Meta_M2M100_1_2B_Input);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(this: &Base_Ai_Cf_Meta_M2M100_1_2B) -> JsValue;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
@@ -15713,8 +23669,70 @@ extern "C" {
         val: &Ai_Cf_Meta_M2M100_1_2B_AsyncResponse,
     );
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Baai_Bge_Small_En_V1_5_Input = JsValue;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Ai_Cf_Baai_Bge_Small_En_V1_5_Input;
+    #[doc = " The pooling method used in the embedding process. `cls` pooling will generate more accurate embeddings on larger inputs - however, embeddings created with cls pooling are not compatible with embeddings generated with mean pooling. The default pooling method is `mean` in order for this to not be a breaking change, but we highly suggest using the new `cls` pooling for better accuracy."]
+    #[wasm_bindgen(method, getter)]
+    pub fn pooling(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input) -> Option<JsValue>;
+    #[doc = " Batch of the embeddings requests to run using async-queue"]
+    #[wasm_bindgen(method, getter)]
+    pub fn requests(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input) -> Option<Array<Object>>;
+    #[wasm_bindgen(method, getter)]
+    pub fn text(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_pooling(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "pooling")]
+    pub fn set_pooling_with_js_value(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input, val: &str);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_requests(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input, val: &Array<Object>);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_text(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "text")]
+    pub fn set_text_with_array(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input, val: &Array<JsString>);
+}
+impl Ai_Cf_Baai_Bge_Small_En_V1_5_Input {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> Ai_Cf_Baai_Bge_Small_En_V1_5_InputBuilder {
+        Ai_Cf_Baai_Bge_Small_En_V1_5_InputBuilder { inner: Self::new() }
+    }
+}
+pub struct Ai_Cf_Baai_Bge_Small_En_V1_5_InputBuilder {
+    inner: Ai_Cf_Baai_Bge_Small_En_V1_5_Input,
+}
+#[allow(unused_mut)]
+impl Ai_Cf_Baai_Bge_Small_En_V1_5_InputBuilder {
+    pub fn pooling(mut self, val: &str) -> Self {
+        self.inner.set_pooling(val);
+        self
+    }
+    pub fn pooling_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_pooling_with_js_value(val);
+        self
+    }
+    pub fn requests(mut self, val: &Array<Object>) -> Self {
+        self.inner.set_requests(val);
+        self
+    }
+    pub fn text(mut self, val: &str) -> Self {
+        self.inner.set_text(val);
+        self
+    }
+    pub fn text_with_array(mut self, val: &Array<JsString>) -> Self {
+        self.inner.set_text_with_array(val);
+        self
+    }
+    pub fn build(self) -> Ai_Cf_Baai_Bge_Small_En_V1_5_Input {
+        self.inner
+    }
+}
 #[allow(dead_code)]
 pub type Ai_Cf_Baai_Bge_Small_En_V1_5_Output = JsValue;
 #[wasm_bindgen]
@@ -15758,9 +23776,12 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Base_Ai_Cf_Baai_Bge_Small_En_V1_5;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &Base_Ai_Cf_Baai_Bge_Small_En_V1_5) -> JsValue;
+    pub fn inputs(this: &Base_Ai_Cf_Baai_Bge_Small_En_V1_5) -> Ai_Cf_Baai_Bge_Small_En_V1_5_Input;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &Base_Ai_Cf_Baai_Bge_Small_En_V1_5, val: &Object);
+    pub fn set_inputs(
+        this: &Base_Ai_Cf_Baai_Bge_Small_En_V1_5,
+        val: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input,
+    );
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(this: &Base_Ai_Cf_Baai_Bge_Small_En_V1_5) -> JsValue;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
@@ -15771,8 +23792,70 @@ extern "C" {
         val: &Ai_Cf_Baai_Bge_Small_En_V1_5_AsyncResponse,
     );
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Baai_Bge_Large_En_V1_5_Input = JsValue;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Ai_Cf_Baai_Bge_Large_En_V1_5_Input;
+    #[doc = " The pooling method used in the embedding process. `cls` pooling will generate more accurate embeddings on larger inputs - however, embeddings created with cls pooling are not compatible with embeddings generated with mean pooling. The default pooling method is `mean` in order for this to not be a breaking change, but we highly suggest using the new `cls` pooling for better accuracy."]
+    #[wasm_bindgen(method, getter)]
+    pub fn pooling(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input) -> Option<JsValue>;
+    #[doc = " Batch of the embeddings requests to run using async-queue"]
+    #[wasm_bindgen(method, getter)]
+    pub fn requests(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input) -> Option<Array<Object>>;
+    #[wasm_bindgen(method, getter)]
+    pub fn text(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_pooling(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "pooling")]
+    pub fn set_pooling_with_js_value(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input, val: &str);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_requests(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input, val: &Array<Object>);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_text(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "text")]
+    pub fn set_text_with_array(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input, val: &Array<JsString>);
+}
+impl Ai_Cf_Baai_Bge_Large_En_V1_5_Input {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> Ai_Cf_Baai_Bge_Large_En_V1_5_InputBuilder {
+        Ai_Cf_Baai_Bge_Large_En_V1_5_InputBuilder { inner: Self::new() }
+    }
+}
+pub struct Ai_Cf_Baai_Bge_Large_En_V1_5_InputBuilder {
+    inner: Ai_Cf_Baai_Bge_Large_En_V1_5_Input,
+}
+#[allow(unused_mut)]
+impl Ai_Cf_Baai_Bge_Large_En_V1_5_InputBuilder {
+    pub fn pooling(mut self, val: &str) -> Self {
+        self.inner.set_pooling(val);
+        self
+    }
+    pub fn pooling_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_pooling_with_js_value(val);
+        self
+    }
+    pub fn requests(mut self, val: &Array<Object>) -> Self {
+        self.inner.set_requests(val);
+        self
+    }
+    pub fn text(mut self, val: &str) -> Self {
+        self.inner.set_text(val);
+        self
+    }
+    pub fn text_with_array(mut self, val: &Array<JsString>) -> Self {
+        self.inner.set_text_with_array(val);
+        self
+    }
+    pub fn build(self) -> Ai_Cf_Baai_Bge_Large_En_V1_5_Input {
+        self.inner
+    }
+}
 #[allow(dead_code)]
 pub type Ai_Cf_Baai_Bge_Large_En_V1_5_Output = JsValue;
 #[wasm_bindgen]
@@ -15816,9 +23899,12 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Base_Ai_Cf_Baai_Bge_Large_En_V1_5;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &Base_Ai_Cf_Baai_Bge_Large_En_V1_5) -> JsValue;
+    pub fn inputs(this: &Base_Ai_Cf_Baai_Bge_Large_En_V1_5) -> Ai_Cf_Baai_Bge_Large_En_V1_5_Input;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &Base_Ai_Cf_Baai_Bge_Large_En_V1_5, val: &Object);
+    pub fn set_inputs(
+        this: &Base_Ai_Cf_Baai_Bge_Large_En_V1_5,
+        val: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input,
+    );
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(this: &Base_Ai_Cf_Baai_Bge_Large_En_V1_5) -> JsValue;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
@@ -17174,8 +25260,55 @@ impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesBuilder {
         Ok(self.inner)
     }
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output;
+    #[doc = " The generated text response from the model"]
+    #[wasm_bindgen(method, getter)]
+    pub fn response(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_response(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output, val: &str);
+    #[doc = " An array of tool calls requests made during the response generation"]
+    #[wasm_bindgen(method, getter)]
+    pub fn tool_calls(
+        this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output,
+    ) -> Option<Array<Object>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_tool_calls(
+        this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output,
+        val: &Array<Object>,
+    );
+}
+impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_OutputBuilder {
+        Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_OutputBuilder { inner: Self::new() }
+    }
+}
+pub struct Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_OutputBuilder {
+    inner: Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output,
+}
+#[allow(unused_mut)]
+impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_OutputBuilder {
+    pub fn response(mut self, val: &str) -> Self {
+        self.inner.set_response(val);
+        self
+    }
+    pub fn tool_calls(mut self, val: &Array<Object>) -> Self {
+        self.inner.set_tool_calls(val);
+        self
+    }
+    pub fn build(self) -> Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output {
+        self.inner
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -17194,11 +25327,13 @@ extern "C" {
         val: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages,
     );
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
-    pub fn post_processed_outputs(this: &Base_Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct) -> Object;
+    pub fn post_processed_outputs(
+        this: &Base_Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct,
+    ) -> Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
     pub fn set_post_processed_outputs(
         this: &Base_Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct,
-        val: &Object,
+        val: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output,
     );
 }
 #[allow(dead_code)]
@@ -18590,8 +26725,76 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1Builder {
         self.inner
     }
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output;
+    #[doc = " The generated text response from the model"]
+    #[wasm_bindgen(method, getter)]
+    pub fn response(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_response(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output, val: &str);
+    #[doc = " Usage statistics for the inference request"]
+    #[wasm_bindgen(method, getter)]
+    pub fn usage(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output) -> Option<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_usage(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output, val: &Object);
+    #[doc = " An array of tool calls requests made during the response generation"]
+    #[wasm_bindgen(method, getter)]
+    pub fn tool_calls(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output)
+        -> Option<Array<Object>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_tool_calls(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output, val: &Array<Object>);
+}
+impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_OutputBuilder {
+        Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_OutputBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_OutputBuilder {
+    inner: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_OutputBuilder {
+    pub fn response(mut self, val: &str) -> Self {
+        self.inner.set_response(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn usage(mut self, val: &Object) -> Self {
+        self.inner.set_usage(val);
+        self
+    }
+    pub fn tool_calls(mut self, val: &Array<Object>) -> Self {
+        self.inner.set_tool_calls(val);
+        self
+    }
+    pub fn build(self) -> Result<Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `response`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -18610,11 +26813,13 @@ extern "C" {
         val: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages,
     );
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
-    pub fn post_processed_outputs(this: &Base_Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct) -> Object;
+    pub fn post_processed_outputs(
+        this: &Base_Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct,
+    ) -> Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
     pub fn set_post_processed_outputs(
         this: &Base_Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct,
-        val: &Object,
+        val: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output,
     );
 }
 #[allow(dead_code)]
@@ -18936,8 +27141,75 @@ impl Ai_Cf_Qwen_Qwq_32B_MessagesBuilder {
         Ok(self.inner)
     }
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Qwen_Qwq_32B_Output = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Ai_Cf_Qwen_Qwq_32B_Output;
+    #[doc = " The generated text response from the model"]
+    #[wasm_bindgen(method, getter)]
+    pub fn response(this: &Ai_Cf_Qwen_Qwq_32B_Output) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_response(this: &Ai_Cf_Qwen_Qwq_32B_Output, val: &str);
+    #[doc = " Usage statistics for the inference request"]
+    #[wasm_bindgen(method, getter)]
+    pub fn usage(this: &Ai_Cf_Qwen_Qwq_32B_Output) -> Option<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_usage(this: &Ai_Cf_Qwen_Qwq_32B_Output, val: &Object);
+    #[doc = " An array of tool calls requests made during the response generation"]
+    #[wasm_bindgen(method, getter)]
+    pub fn tool_calls(this: &Ai_Cf_Qwen_Qwq_32B_Output) -> Option<Array<Object>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_tool_calls(this: &Ai_Cf_Qwen_Qwq_32B_Output, val: &Array<Object>);
+}
+impl Ai_Cf_Qwen_Qwq_32B_Output {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> Ai_Cf_Qwen_Qwq_32B_OutputBuilder {
+        Ai_Cf_Qwen_Qwq_32B_OutputBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct Ai_Cf_Qwen_Qwq_32B_OutputBuilder {
+    inner: Ai_Cf_Qwen_Qwq_32B_Output,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl Ai_Cf_Qwen_Qwq_32B_OutputBuilder {
+    pub fn response(mut self, val: &str) -> Self {
+        self.inner.set_response(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn usage(mut self, val: &Object) -> Self {
+        self.inner.set_usage(val);
+        self
+    }
+    pub fn tool_calls(mut self, val: &Array<Object>) -> Self {
+        self.inner.set_tool_calls(val);
+        self
+    }
+    pub fn build(self) -> Result<Ai_Cf_Qwen_Qwq_32B_Output, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `response`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(Ai_Cf_Qwen_Qwq_32B_Output),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -18953,9 +27225,12 @@ extern "C" {
         val: &Ai_Cf_Qwen_Qwq_32B_Messages,
     );
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
-    pub fn post_processed_outputs(this: &Base_Ai_Cf_Qwen_Qwq_32B) -> Object;
+    pub fn post_processed_outputs(this: &Base_Ai_Cf_Qwen_Qwq_32B) -> Ai_Cf_Qwen_Qwq_32B_Output;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
-    pub fn set_post_processed_outputs(this: &Base_Ai_Cf_Qwen_Qwq_32B, val: &Object);
+    pub fn set_post_processed_outputs(
+        this: &Base_Ai_Cf_Qwen_Qwq_32B,
+        val: &Ai_Cf_Qwen_Qwq_32B_Output,
+    );
 }
 #[allow(dead_code)]
 pub type Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Input = JsValue;
@@ -19337,8 +27612,80 @@ impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesBuilder {
         Ok(self.inner)
     }
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output;
+    #[doc = " The generated text response from the model"]
+    #[wasm_bindgen(method, getter)]
+    pub fn response(this: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_response(this: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output, val: &str);
+    #[doc = " Usage statistics for the inference request"]
+    #[wasm_bindgen(method, getter)]
+    pub fn usage(this: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output) -> Option<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_usage(this: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output, val: &Object);
+    #[doc = " An array of tool calls requests made during the response generation"]
+    #[wasm_bindgen(method, getter)]
+    pub fn tool_calls(
+        this: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output,
+    ) -> Option<Array<Object>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_tool_calls(
+        this: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output,
+        val: &Array<Object>,
+    );
+}
+impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_OutputBuilder {
+        Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_OutputBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_OutputBuilder {
+    inner: Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_OutputBuilder {
+    pub fn response(mut self, val: &str) -> Self {
+        self.inner.set_response(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn usage(mut self, val: &Object) -> Self {
+        self.inner.set_usage(val);
+        self
+    }
+    pub fn tool_calls(mut self, val: &Array<Object>) -> Self {
+        self.inner.set_tool_calls(val);
+        self
+    }
+    pub fn build(self) -> Result<Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `response`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -19359,11 +27706,11 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(
         this: &Base_Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct,
-    ) -> Object;
+    ) -> Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
     pub fn set_post_processed_outputs(
         this: &Base_Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct,
-        val: &Object,
+        val: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output,
     );
 }
 #[allow(dead_code)]
@@ -19685,8 +28032,75 @@ impl Ai_Cf_Google_Gemma_3_12B_It_MessagesBuilder {
         Ok(self.inner)
     }
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Google_Gemma_3_12B_It_Output = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Ai_Cf_Google_Gemma_3_12B_It_Output;
+    #[doc = " The generated text response from the model"]
+    #[wasm_bindgen(method, getter)]
+    pub fn response(this: &Ai_Cf_Google_Gemma_3_12B_It_Output) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_response(this: &Ai_Cf_Google_Gemma_3_12B_It_Output, val: &str);
+    #[doc = " Usage statistics for the inference request"]
+    #[wasm_bindgen(method, getter)]
+    pub fn usage(this: &Ai_Cf_Google_Gemma_3_12B_It_Output) -> Option<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_usage(this: &Ai_Cf_Google_Gemma_3_12B_It_Output, val: &Object);
+    #[doc = " An array of tool calls requests made during the response generation"]
+    #[wasm_bindgen(method, getter)]
+    pub fn tool_calls(this: &Ai_Cf_Google_Gemma_3_12B_It_Output) -> Option<Array<Object>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_tool_calls(this: &Ai_Cf_Google_Gemma_3_12B_It_Output, val: &Array<Object>);
+}
+impl Ai_Cf_Google_Gemma_3_12B_It_Output {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> Ai_Cf_Google_Gemma_3_12B_It_OutputBuilder {
+        Ai_Cf_Google_Gemma_3_12B_It_OutputBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct Ai_Cf_Google_Gemma_3_12B_It_OutputBuilder {
+    inner: Ai_Cf_Google_Gemma_3_12B_It_Output,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl Ai_Cf_Google_Gemma_3_12B_It_OutputBuilder {
+    pub fn response(mut self, val: &str) -> Self {
+        self.inner.set_response(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn usage(mut self, val: &Object) -> Self {
+        self.inner.set_usage(val);
+        self
+    }
+    pub fn tool_calls(mut self, val: &Array<Object>) -> Self {
+        self.inner.set_tool_calls(val);
+        self
+    }
+    pub fn build(self) -> Result<Ai_Cf_Google_Gemma_3_12B_It_Output, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `response`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(Ai_Cf_Google_Gemma_3_12B_It_Output),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -19705,9 +28119,14 @@ extern "C" {
         val: &Ai_Cf_Google_Gemma_3_12B_It_Messages,
     );
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
-    pub fn post_processed_outputs(this: &Base_Ai_Cf_Google_Gemma_3_12B_It) -> Object;
+    pub fn post_processed_outputs(
+        this: &Base_Ai_Cf_Google_Gemma_3_12B_It,
+    ) -> Ai_Cf_Google_Gemma_3_12B_It_Output;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
-    pub fn set_post_processed_outputs(this: &Base_Ai_Cf_Google_Gemma_3_12B_It, val: &Object);
+    pub fn set_post_processed_outputs(
+        this: &Base_Ai_Cf_Google_Gemma_3_12B_It,
+        val: &Ai_Cf_Google_Gemma_3_12B_It_Output,
+    );
 }
 #[allow(dead_code)]
 pub type Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Input = JsValue;
@@ -20637,8 +29056,80 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerBuilder {
         Ok(self.inner)
     }
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output;
+    #[doc = " The generated text response from the model"]
+    #[wasm_bindgen(method, getter)]
+    pub fn response(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_response(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output, val: &str);
+    #[doc = " Usage statistics for the inference request"]
+    #[wasm_bindgen(method, getter)]
+    pub fn usage(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output) -> Option<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_usage(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output, val: &Object);
+    #[doc = " An array of tool calls requests made during the response generation"]
+    #[wasm_bindgen(method, getter)]
+    pub fn tool_calls(
+        this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output,
+    ) -> Option<Array<Object>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_tool_calls(
+        this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output,
+        val: &Array<Object>,
+    );
+}
+impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputBuilder {
+        Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputBuilder {
+    inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputBuilder {
+    pub fn response(mut self, val: &str) -> Self {
+        self.inner.set_response(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn usage(mut self, val: &Object) -> Self {
+        self.inner.set_usage(val);
+        self
+    }
+    pub fn tool_calls(mut self, val: &Array<Object>) -> Self {
+        self.inner.set_tool_calls(val);
+        self
+    }
+    pub fn build(self) -> Result<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `response`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -20662,11 +29153,13 @@ extern "C" {
         val: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch,
     );
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
-    pub fn post_processed_outputs(this: &Base_Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct) -> Object;
+    pub fn post_processed_outputs(
+        this: &Base_Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct,
+    ) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
     pub fn set_post_processed_outputs(
         this: &Base_Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct,
-        val: &Object,
+        val: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output,
     );
 }
 #[allow(dead_code)]
@@ -22502,8 +30995,85 @@ extern "C" {
         val: &Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output,
     );
 }
-#[allow(dead_code)]
-pub type Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input = JsValue;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input;
+    #[doc = " readable stream with audio data and content-type specified for that data"]
+    #[wasm_bindgen(method, getter)]
+    pub fn audio(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input) -> JsValue;
+    #[doc = " type of data PCM data that's sent to the inference server as raw array"]
+    #[wasm_bindgen(method, getter)]
+    pub fn dtype(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_audio(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input, val: &Object);
+    #[wasm_bindgen(method, setter, js_name = "audio")]
+    pub fn set_audio_with_str(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input, val: &str);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_dtype(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "dtype")]
+    pub fn set_dtype_with_js_value(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "dtype")]
+    pub fn set_dtype_with_js_value_1(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input, val: &str);
+}
+impl Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> Ai_Cf_Pipecat_Ai_Smart_Turn_V2_InputBuilder {
+        Ai_Cf_Pipecat_Ai_Smart_Turn_V2_InputBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct Ai_Cf_Pipecat_Ai_Smart_Turn_V2_InputBuilder {
+    inner: Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl Ai_Cf_Pipecat_Ai_Smart_Turn_V2_InputBuilder {
+    pub fn audio(mut self, val: &Object) -> Self {
+        self.inner.set_audio(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn audio_with_str(mut self, val: &str) -> Self {
+        self.inner.set_audio_with_str(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn dtype(mut self, val: &str) -> Self {
+        self.inner.set_dtype(val);
+        self
+    }
+    pub fn dtype_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_dtype_with_js_value(val);
+        self
+    }
+    pub fn dtype_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_dtype_with_js_value_1(val);
+        self
+    }
+    pub fn build(self) -> Result<Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `audio`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -22554,9 +31124,14 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Base_Ai_Cf_Pipecat_Ai_Smart_Turn_V2;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &Base_Ai_Cf_Pipecat_Ai_Smart_Turn_V2) -> JsValue;
+    pub fn inputs(
+        this: &Base_Ai_Cf_Pipecat_Ai_Smart_Turn_V2,
+    ) -> Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &Base_Ai_Cf_Pipecat_Ai_Smart_Turn_V2, val: &Object);
+    pub fn set_inputs(
+        this: &Base_Ai_Cf_Pipecat_Ai_Smart_Turn_V2,
+        val: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input,
+    );
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(
         this: &Base_Ai_Cf_Pipecat_Ai_Smart_Turn_V2,
@@ -22573,13 +31148,13 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Base_Ai_Cf_Openai_Gpt_Oss_120B;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &Base_Ai_Cf_Openai_Gpt_Oss_120B) -> Object;
+    pub fn inputs(this: &Base_Ai_Cf_Openai_Gpt_Oss_120B) -> ResponsesInput;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &Base_Ai_Cf_Openai_Gpt_Oss_120B, val: &Object);
+    pub fn set_inputs(this: &Base_Ai_Cf_Openai_Gpt_Oss_120B, val: &ResponsesInput);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
-    pub fn post_processed_outputs(this: &Base_Ai_Cf_Openai_Gpt_Oss_120B) -> Object;
+    pub fn post_processed_outputs(this: &Base_Ai_Cf_Openai_Gpt_Oss_120B) -> ResponsesOutput;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
-    pub fn set_post_processed_outputs(this: &Base_Ai_Cf_Openai_Gpt_Oss_120B, val: &Object);
+    pub fn set_post_processed_outputs(this: &Base_Ai_Cf_Openai_Gpt_Oss_120B, val: &ResponsesOutput);
 }
 #[wasm_bindgen]
 extern "C" {
@@ -22587,13 +31162,13 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Base_Ai_Cf_Openai_Gpt_Oss_20B;
     #[wasm_bindgen(method, getter)]
-    pub fn inputs(this: &Base_Ai_Cf_Openai_Gpt_Oss_20B) -> Object;
+    pub fn inputs(this: &Base_Ai_Cf_Openai_Gpt_Oss_20B) -> ResponsesInput;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &Base_Ai_Cf_Openai_Gpt_Oss_20B, val: &Object);
+    pub fn set_inputs(this: &Base_Ai_Cf_Openai_Gpt_Oss_20B, val: &ResponsesInput);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
-    pub fn post_processed_outputs(this: &Base_Ai_Cf_Openai_Gpt_Oss_20B) -> Object;
+    pub fn post_processed_outputs(this: &Base_Ai_Cf_Openai_Gpt_Oss_20B) -> ResponsesOutput;
     #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
-    pub fn set_post_processed_outputs(this: &Base_Ai_Cf_Openai_Gpt_Oss_20B, val: &Object);
+    pub fn set_post_processed_outputs(this: &Base_Ai_Cf_Openai_Gpt_Oss_20B, val: &ResponsesOutput);
 }
 #[wasm_bindgen]
 extern "C" {
@@ -27160,12 +35735,302 @@ impl AiModelsBuilder {
         Ok(self.inner)
     }
 }
-#[allow(dead_code)]
-pub type AiOptions = Object;
-#[allow(dead_code)]
-pub type AiModelsSearchParams = Object;
-#[allow(dead_code)]
-pub type AiModelsSearchObject = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiOptions;
+    #[doc = " Send requests as an asynchronous batch job, only works for supported models"]
+    #[doc = " https://developers.cloudflare.com/workers-ai/features/batch-api"]
+    #[wasm_bindgen(method, getter, js_name = "queueRequest")]
+    pub fn queue_request(this: &AiOptions) -> Option<bool>;
+    #[wasm_bindgen(method, setter, js_name = "queueRequest")]
+    pub fn set_queue_request(this: &AiOptions, val: bool);
+    #[doc = " Establish websocket connections, only works for supported models"]
+    #[wasm_bindgen(method, getter)]
+    pub fn websocket(this: &AiOptions) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_websocket(this: &AiOptions, val: bool);
+    #[doc = " Tag your requests to group and view them in Cloudflare dashboard."]
+    #[doc = " "]
+    #[doc = " Rules:"]
+    #[doc = " Tags must only contain letters, numbers, and the symbols: : - . / @"]
+    #[doc = " Each tag can have maximum 50 characters."]
+    #[doc = " Maximum 5 tags are allowed each request."]
+    #[doc = " Duplicate tags will removed."]
+    #[wasm_bindgen(method, getter)]
+    pub fn tags(this: &AiOptions) -> Option<Array<JsString>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_tags(this: &AiOptions, val: &Array<JsString>);
+    #[wasm_bindgen(method, getter)]
+    pub fn gateway(this: &AiOptions) -> Option<GatewayOptions>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_gateway(this: &AiOptions, val: &GatewayOptions);
+    #[wasm_bindgen(method, getter, js_name = "returnRawResponse")]
+    pub fn return_raw_response(this: &AiOptions) -> Option<bool>;
+    #[wasm_bindgen(method, setter, js_name = "returnRawResponse")]
+    pub fn set_return_raw_response(this: &AiOptions, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn prefix(this: &AiOptions) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_prefix(this: &AiOptions, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "extraHeaders")]
+    pub fn extra_headers(this: &AiOptions) -> Option<Object>;
+    #[wasm_bindgen(method, setter, js_name = "extraHeaders")]
+    pub fn set_extra_headers(this: &AiOptions, val: &Object);
+}
+impl AiOptions {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiOptionsBuilder {
+        AiOptionsBuilder { inner: Self::new() }
+    }
+}
+pub struct AiOptionsBuilder {
+    inner: AiOptions,
+}
+#[allow(unused_mut)]
+impl AiOptionsBuilder {
+    pub fn queue_request(mut self, val: bool) -> Self {
+        self.inner.set_queue_request(val);
+        self
+    }
+    pub fn websocket(mut self, val: bool) -> Self {
+        self.inner.set_websocket(val);
+        self
+    }
+    pub fn tags(mut self, val: &Array<JsString>) -> Self {
+        self.inner.set_tags(val);
+        self
+    }
+    pub fn gateway(mut self, val: &GatewayOptions) -> Self {
+        self.inner.set_gateway(val);
+        self
+    }
+    pub fn return_raw_response(mut self, val: bool) -> Self {
+        self.inner.set_return_raw_response(val);
+        self
+    }
+    pub fn prefix(mut self, val: &str) -> Self {
+        self.inner.set_prefix(val);
+        self
+    }
+    pub fn extra_headers(mut self, val: &Object) -> Self {
+        self.inner.set_extra_headers(val);
+        self
+    }
+    pub fn build(self) -> AiOptions {
+        self.inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiModelsSearchParams;
+    #[wasm_bindgen(method, getter)]
+    pub fn author(this: &AiModelsSearchParams) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_author(this: &AiModelsSearchParams, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn hide_experimental(this: &AiModelsSearchParams) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_hide_experimental(this: &AiModelsSearchParams, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn page(this: &AiModelsSearchParams) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_page(this: &AiModelsSearchParams, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn per_page(this: &AiModelsSearchParams) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_per_page(this: &AiModelsSearchParams, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn search(this: &AiModelsSearchParams) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_search(this: &AiModelsSearchParams, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn source(this: &AiModelsSearchParams) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_source(this: &AiModelsSearchParams, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn task(this: &AiModelsSearchParams) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_task(this: &AiModelsSearchParams, val: &str);
+}
+impl AiModelsSearchParams {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiModelsSearchParamsBuilder {
+        AiModelsSearchParamsBuilder { inner: Self::new() }
+    }
+}
+pub struct AiModelsSearchParamsBuilder {
+    inner: AiModelsSearchParams,
+}
+#[allow(unused_mut)]
+impl AiModelsSearchParamsBuilder {
+    pub fn author(mut self, val: &str) -> Self {
+        self.inner.set_author(val);
+        self
+    }
+    pub fn hide_experimental(mut self, val: bool) -> Self {
+        self.inner.set_hide_experimental(val);
+        self
+    }
+    pub fn page(mut self, val: f64) -> Self {
+        self.inner.set_page(val);
+        self
+    }
+    pub fn per_page(mut self, val: f64) -> Self {
+        self.inner.set_per_page(val);
+        self
+    }
+    pub fn search(mut self, val: &str) -> Self {
+        self.inner.set_search(val);
+        self
+    }
+    pub fn source(mut self, val: f64) -> Self {
+        self.inner.set_source(val);
+        self
+    }
+    pub fn task(mut self, val: &str) -> Self {
+        self.inner.set_task(val);
+        self
+    }
+    pub fn build(self) -> AiModelsSearchParams {
+        self.inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiModelsSearchObject;
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &AiModelsSearchObject) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_id(this: &AiModelsSearchObject, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn source(this: &AiModelsSearchObject) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_source(this: &AiModelsSearchObject, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn name(this: &AiModelsSearchObject) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_name(this: &AiModelsSearchObject, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn description(this: &AiModelsSearchObject) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_description(this: &AiModelsSearchObject, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn task(this: &AiModelsSearchObject) -> Object;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_task(this: &AiModelsSearchObject, val: &Object);
+    #[wasm_bindgen(method, getter)]
+    pub fn tags(this: &AiModelsSearchObject) -> Array<JsString>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_tags(this: &AiModelsSearchObject, val: &Array<JsString>);
+    #[wasm_bindgen(method, getter)]
+    pub fn properties(this: &AiModelsSearchObject) -> Array<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_properties(this: &AiModelsSearchObject, val: &Array<Object>);
+}
+impl AiModelsSearchObject {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiModelsSearchObjectBuilder {
+        AiModelsSearchObjectBuilder {
+            inner: Self::new(),
+            required: 127u64,
+        }
+    }
+}
+pub struct AiModelsSearchObjectBuilder {
+    inner: AiModelsSearchObject,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiModelsSearchObjectBuilder {
+    pub fn id(mut self, val: &str) -> Self {
+        self.inner.set_id(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn source(mut self, val: f64) -> Self {
+        self.inner.set_source(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn name(mut self, val: &str) -> Self {
+        self.inner.set_name(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn description(mut self, val: &str) -> Self {
+        self.inner.set_description(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn task(mut self, val: &Object) -> Self {
+        self.inner.set_task(val);
+        self.required &= 18446744073709551599u64;
+        self
+    }
+    pub fn tags(mut self, val: &Array<JsString>) -> Self {
+        self.inner.set_tags(val);
+        self.required &= 18446744073709551583u64;
+        self
+    }
+    pub fn properties(mut self, val: &Array<Object>) -> Self {
+        self.inner.set_properties(val);
+        self.required &= 18446744073709551551u64;
+        self
+    }
+    pub fn build(self) -> Result<AiModelsSearchObject, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `id`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `source`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `name`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `description`");
+            }
+            if self.required & 16u64 != 0 {
+                missing.push("missing required property `task`");
+            }
+            if self.required & 32u64 != 0 {
+                missing.push("missing required property `tags`");
+            }
+            if self.required & 64u64 != 0 {
+                missing.push("missing required property `properties`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiModelsSearchObject),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -27299,62 +36164,696 @@ extern "C" {
         options: &Options,
     ) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn models(this: &Ai) -> Result<Array<Object>, JsValue>;
+    pub async fn models(this: &Ai) -> Result<Array<AiModelsSearchObject>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "models")]
-    pub async fn models_with_params(this: &Ai, params: &Object) -> Result<Array<Object>, JsValue>;
+    pub async fn models_with_params(
+        this: &Ai,
+        params: &AiModelsSearchParams,
+    ) -> Result<Array<AiModelsSearchObject>, JsValue>;
     #[wasm_bindgen(method, js_name = "toMarkdown")]
     pub fn to_markdown(this: &Ai) -> ToMarkdownService;
     #[wasm_bindgen(method, catch, js_name = "toMarkdown")]
     pub fn try_to_markdown(this: &Ai) -> Result<ToMarkdownService, JsValue>;
     #[wasm_bindgen(method, js_name = "toMarkdown")]
-    pub fn to_markdown_with_array(this: &Ai, files: &Array<Object>) -> ToMarkdownService;
+    pub fn to_markdown_with_array(this: &Ai, files: &Array<MarkdownDocument>) -> ToMarkdownService;
     #[wasm_bindgen(method, catch, js_name = "toMarkdown")]
     pub fn try_to_markdown_with_array(
         this: &Ai,
-        files: &Array<Object>,
+        files: &Array<MarkdownDocument>,
     ) -> Result<ToMarkdownService, JsValue>;
     #[wasm_bindgen(method, js_name = "toMarkdown")]
     pub fn to_markdown_with_array_and_options(
         this: &Ai,
-        files: &Array<Object>,
-        options: &Object,
+        files: &Array<MarkdownDocument>,
+        options: &ConversionRequestOptions,
     ) -> ToMarkdownService;
     #[wasm_bindgen(method, catch, js_name = "toMarkdown")]
     pub fn try_to_markdown_with_array_and_options(
         this: &Ai,
-        files: &Array<Object>,
-        options: &Object,
+        files: &Array<MarkdownDocument>,
+        options: &ConversionRequestOptions,
     ) -> Result<ToMarkdownService, JsValue>;
     #[wasm_bindgen(method, js_name = "toMarkdown")]
-    pub fn to_markdown_with_object(this: &Ai, files: &Object) -> ToMarkdownService;
-    #[wasm_bindgen(method, catch, js_name = "toMarkdown")]
-    pub fn try_to_markdown_with_object(
+    pub fn to_markdown_with_markdown_document(
         this: &Ai,
-        files: &Object,
-    ) -> Result<ToMarkdownService, JsValue>;
-    #[wasm_bindgen(method, js_name = "toMarkdown")]
-    pub fn to_markdown_with_object_and_options(
-        this: &Ai,
-        files: &Object,
-        options: &Object,
+        files: &MarkdownDocument,
     ) -> ToMarkdownService;
     #[wasm_bindgen(method, catch, js_name = "toMarkdown")]
-    pub fn try_to_markdown_with_object_and_options(
+    pub fn try_to_markdown_with_markdown_document(
         this: &Ai,
-        files: &Object,
-        options: &Object,
+        files: &MarkdownDocument,
+    ) -> Result<ToMarkdownService, JsValue>;
+    #[wasm_bindgen(method, js_name = "toMarkdown")]
+    pub fn to_markdown_with_markdown_document_and_options(
+        this: &Ai,
+        files: &MarkdownDocument,
+        options: &ConversionRequestOptions,
+    ) -> ToMarkdownService;
+    #[wasm_bindgen(method, catch, js_name = "toMarkdown")]
+    pub fn try_to_markdown_with_markdown_document_and_options(
+        this: &Ai,
+        files: &MarkdownDocument,
+        options: &ConversionRequestOptions,
     ) -> Result<ToMarkdownService, JsValue>;
 }
-#[allow(dead_code)]
-pub type GatewayRetries = Object;
-#[allow(dead_code)]
-pub type GatewayOptions = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type GatewayRetries;
+    #[wasm_bindgen(method, getter, js_name = "maxAttempts")]
+    pub fn max_attempts(this: &GatewayRetries) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter, js_name = "maxAttempts")]
+    pub fn set_max_attempts(this: &GatewayRetries, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "maxAttempts")]
+    pub fn set_max_attempts_with_js_value(this: &GatewayRetries, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "maxAttempts")]
+    pub fn set_max_attempts_with_js_value_1(this: &GatewayRetries, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "maxAttempts")]
+    pub fn set_max_attempts_with_js_value_2(this: &GatewayRetries, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "maxAttempts")]
+    pub fn set_max_attempts_with_js_value_3(this: &GatewayRetries, val: f64);
+    #[wasm_bindgen(method, getter, js_name = "retryDelayMs")]
+    pub fn retry_delay_ms(this: &GatewayRetries) -> Option<f64>;
+    #[wasm_bindgen(method, setter, js_name = "retryDelayMs")]
+    pub fn set_retry_delay_ms(this: &GatewayRetries, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn backoff(this: &GatewayRetries) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_backoff(this: &GatewayRetries, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "backoff")]
+    pub fn set_backoff_with_js_value(this: &GatewayRetries, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "backoff")]
+    pub fn set_backoff_with_js_value_1(this: &GatewayRetries, val: &str);
+}
+impl GatewayRetries {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> GatewayRetriesBuilder {
+        GatewayRetriesBuilder { inner: Self::new() }
+    }
+}
+pub struct GatewayRetriesBuilder {
+    inner: GatewayRetries,
+}
+#[allow(unused_mut)]
+impl GatewayRetriesBuilder {
+    pub fn max_attempts(mut self, val: f64) -> Self {
+        self.inner.set_max_attempts(val);
+        self
+    }
+    pub fn max_attempts_with_js_value(mut self, val: f64) -> Self {
+        self.inner.set_max_attempts_with_js_value(val);
+        self
+    }
+    pub fn max_attempts_with_js_value_1(mut self, val: f64) -> Self {
+        self.inner.set_max_attempts_with_js_value_1(val);
+        self
+    }
+    pub fn max_attempts_with_js_value_2(mut self, val: f64) -> Self {
+        self.inner.set_max_attempts_with_js_value_2(val);
+        self
+    }
+    pub fn max_attempts_with_js_value_3(mut self, val: f64) -> Self {
+        self.inner.set_max_attempts_with_js_value_3(val);
+        self
+    }
+    pub fn retry_delay_ms(mut self, val: f64) -> Self {
+        self.inner.set_retry_delay_ms(val);
+        self
+    }
+    pub fn backoff(mut self, val: &str) -> Self {
+        self.inner.set_backoff(val);
+        self
+    }
+    pub fn backoff_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_backoff_with_js_value(val);
+        self
+    }
+    pub fn backoff_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_backoff_with_js_value_1(val);
+        self
+    }
+    pub fn build(self) -> GatewayRetries {
+        self.inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type GatewayOptions;
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &GatewayOptions) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_id(this: &GatewayOptions, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "cacheKey")]
+    pub fn cache_key(this: &GatewayOptions) -> Option<String>;
+    #[wasm_bindgen(method, setter, js_name = "cacheKey")]
+    pub fn set_cache_key(this: &GatewayOptions, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "cacheTtl")]
+    pub fn cache_ttl(this: &GatewayOptions) -> Option<f64>;
+    #[wasm_bindgen(method, setter, js_name = "cacheTtl")]
+    pub fn set_cache_ttl(this: &GatewayOptions, val: f64);
+    #[wasm_bindgen(method, getter, js_name = "skipCache")]
+    pub fn skip_cache(this: &GatewayOptions) -> Option<bool>;
+    #[wasm_bindgen(method, setter, js_name = "skipCache")]
+    pub fn set_skip_cache(this: &GatewayOptions, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn metadata(this: &GatewayOptions) -> Option<Object<JsOption<JsValue>>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_metadata(this: &GatewayOptions, val: &Object<Number>);
+    #[wasm_bindgen(method, setter, js_name = "metadata")]
+    pub fn set_metadata_with_record(this: &GatewayOptions, val: &Object<JsString>);
+    #[wasm_bindgen(method, setter, js_name = "metadata")]
+    pub fn set_metadata_with_record_1(this: &GatewayOptions, val: &Object<Boolean>);
+    #[wasm_bindgen(method, setter, js_name = "metadata")]
+    pub fn set_metadata_with_record_2(this: &GatewayOptions, val: &Object<BigInt>);
+    #[wasm_bindgen(method, setter, js_name = "metadata")]
+    pub fn set_metadata_with_record_3(this: &GatewayOptions, val: &Object<Null>);
+    #[wasm_bindgen(method, getter, js_name = "collectLog")]
+    pub fn collect_log(this: &GatewayOptions) -> Option<bool>;
+    #[wasm_bindgen(method, setter, js_name = "collectLog")]
+    pub fn set_collect_log(this: &GatewayOptions, val: bool);
+    #[wasm_bindgen(method, getter, js_name = "eventId")]
+    pub fn event_id(this: &GatewayOptions) -> Option<String>;
+    #[wasm_bindgen(method, setter, js_name = "eventId")]
+    pub fn set_event_id(this: &GatewayOptions, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "requestTimeoutMs")]
+    pub fn request_timeout_ms(this: &GatewayOptions) -> Option<f64>;
+    #[wasm_bindgen(method, setter, js_name = "requestTimeoutMs")]
+    pub fn set_request_timeout_ms(this: &GatewayOptions, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn retries(this: &GatewayOptions) -> Option<GatewayRetries>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_retries(this: &GatewayOptions, val: &GatewayRetries);
+}
+impl GatewayOptions {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> GatewayOptionsBuilder {
+        GatewayOptionsBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct GatewayOptionsBuilder {
+    inner: GatewayOptions,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl GatewayOptionsBuilder {
+    pub fn id(mut self, val: &str) -> Self {
+        self.inner.set_id(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn cache_key(mut self, val: &str) -> Self {
+        self.inner.set_cache_key(val);
+        self
+    }
+    pub fn cache_ttl(mut self, val: f64) -> Self {
+        self.inner.set_cache_ttl(val);
+        self
+    }
+    pub fn skip_cache(mut self, val: bool) -> Self {
+        self.inner.set_skip_cache(val);
+        self
+    }
+    pub fn metadata(mut self, val: &Object<Number>) -> Self {
+        self.inner.set_metadata(val);
+        self
+    }
+    pub fn metadata_with_record(mut self, val: &Object<JsString>) -> Self {
+        self.inner.set_metadata_with_record(val);
+        self
+    }
+    pub fn metadata_with_record_1(mut self, val: &Object<Boolean>) -> Self {
+        self.inner.set_metadata_with_record_1(val);
+        self
+    }
+    pub fn metadata_with_record_2(mut self, val: &Object<BigInt>) -> Self {
+        self.inner.set_metadata_with_record_2(val);
+        self
+    }
+    pub fn metadata_with_record_3(mut self, val: &Object<Null>) -> Self {
+        self.inner.set_metadata_with_record_3(val);
+        self
+    }
+    pub fn collect_log(mut self, val: bool) -> Self {
+        self.inner.set_collect_log(val);
+        self
+    }
+    pub fn event_id(mut self, val: &str) -> Self {
+        self.inner.set_event_id(val);
+        self
+    }
+    pub fn request_timeout_ms(mut self, val: f64) -> Self {
+        self.inner.set_request_timeout_ms(val);
+        self
+    }
+    pub fn retries(mut self, val: &GatewayRetries) -> Self {
+        self.inner.set_retries(val);
+        self
+    }
+    pub fn build(self) -> Result<GatewayOptions, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `id`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(GatewayOptions),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[allow(dead_code)]
 pub type UniversalGatewayOptions = JsValue;
-#[allow(dead_code)]
-pub type AiGatewayPatchLog = Object;
-#[allow(dead_code)]
-pub type AiGatewayLog = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiGatewayPatchLog;
+    #[wasm_bindgen(method, getter)]
+    pub fn score(this: &AiGatewayPatchLog) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_score(this: &AiGatewayPatchLog, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "score")]
+    pub fn set_score_with_null(this: &AiGatewayPatchLog, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn feedback(this: &AiGatewayPatchLog) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_feedback(this: &AiGatewayPatchLog, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "feedback")]
+    pub fn set_feedback_with_js_value(this: &AiGatewayPatchLog, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "feedback")]
+    pub fn set_feedback_with_null(this: &AiGatewayPatchLog, val: &Null);
+    #[wasm_bindgen(method, getter)]
+    pub fn metadata(this: &AiGatewayPatchLog) -> Option<Object<JsOption<JsValue>>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_metadata(this: &AiGatewayPatchLog, val: &Object<Number>);
+    #[wasm_bindgen(method, setter, js_name = "metadata")]
+    pub fn set_metadata_with_record(this: &AiGatewayPatchLog, val: &Object<JsString>);
+    #[wasm_bindgen(method, setter, js_name = "metadata")]
+    pub fn set_metadata_with_record_1(this: &AiGatewayPatchLog, val: &Object<Boolean>);
+    #[wasm_bindgen(method, setter, js_name = "metadata")]
+    pub fn set_metadata_with_record_2(this: &AiGatewayPatchLog, val: &Object<BigInt>);
+    #[wasm_bindgen(method, setter, js_name = "metadata")]
+    pub fn set_metadata_with_record_3(this: &AiGatewayPatchLog, val: &Object<Null>);
+    #[wasm_bindgen(method, setter, js_name = "metadata")]
+    pub fn set_metadata_with_null(this: &AiGatewayPatchLog, val: &Null);
+}
+impl AiGatewayPatchLog {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiGatewayPatchLogBuilder {
+        AiGatewayPatchLogBuilder { inner: Self::new() }
+    }
+}
+pub struct AiGatewayPatchLogBuilder {
+    inner: AiGatewayPatchLog,
+}
+#[allow(unused_mut)]
+impl AiGatewayPatchLogBuilder {
+    pub fn score(mut self, val: f64) -> Self {
+        self.inner.set_score(val);
+        self
+    }
+    pub fn score_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_score_with_null(val);
+        self
+    }
+    pub fn feedback(mut self, val: f64) -> Self {
+        self.inner.set_feedback(val);
+        self
+    }
+    pub fn feedback_with_js_value(mut self, val: f64) -> Self {
+        self.inner.set_feedback_with_js_value(val);
+        self
+    }
+    pub fn feedback_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_feedback_with_null(val);
+        self
+    }
+    pub fn metadata(mut self, val: &Object<Number>) -> Self {
+        self.inner.set_metadata(val);
+        self
+    }
+    pub fn metadata_with_record(mut self, val: &Object<JsString>) -> Self {
+        self.inner.set_metadata_with_record(val);
+        self
+    }
+    pub fn metadata_with_record_1(mut self, val: &Object<Boolean>) -> Self {
+        self.inner.set_metadata_with_record_1(val);
+        self
+    }
+    pub fn metadata_with_record_2(mut self, val: &Object<BigInt>) -> Self {
+        self.inner.set_metadata_with_record_2(val);
+        self
+    }
+    pub fn metadata_with_record_3(mut self, val: &Object<Null>) -> Self {
+        self.inner.set_metadata_with_record_3(val);
+        self
+    }
+    pub fn metadata_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_metadata_with_null(val);
+        self
+    }
+    pub fn build(self) -> AiGatewayPatchLog {
+        self.inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiGatewayLog;
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &AiGatewayLog) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_id(this: &AiGatewayLog, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn provider(this: &AiGatewayLog) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_provider(this: &AiGatewayLog, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn model(this: &AiGatewayLog) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_model(this: &AiGatewayLog, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn model_type(this: &AiGatewayLog) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_model_type(this: &AiGatewayLog, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn path(this: &AiGatewayLog) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_path(this: &AiGatewayLog, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn duration(this: &AiGatewayLog) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_duration(this: &AiGatewayLog, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn request_type(this: &AiGatewayLog) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_request_type(this: &AiGatewayLog, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn request_content_type(this: &AiGatewayLog) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_request_content_type(this: &AiGatewayLog, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn status_code(this: &AiGatewayLog) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_status_code(this: &AiGatewayLog, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn response_content_type(this: &AiGatewayLog) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_response_content_type(this: &AiGatewayLog, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn success(this: &AiGatewayLog) -> bool;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_success(this: &AiGatewayLog, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn cached(this: &AiGatewayLog) -> bool;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_cached(this: &AiGatewayLog, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn tokens_in(this: &AiGatewayLog) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_tokens_in(this: &AiGatewayLog, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn tokens_out(this: &AiGatewayLog) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_tokens_out(this: &AiGatewayLog, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn metadata(this: &AiGatewayLog) -> Option<Object<JsOption<JsValue>>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_metadata(this: &AiGatewayLog, val: &Object<Number>);
+    #[wasm_bindgen(method, setter, js_name = "metadata")]
+    pub fn set_metadata_with_record(this: &AiGatewayLog, val: &Object<JsString>);
+    #[wasm_bindgen(method, setter, js_name = "metadata")]
+    pub fn set_metadata_with_record_1(this: &AiGatewayLog, val: &Object<Boolean>);
+    #[wasm_bindgen(method, setter, js_name = "metadata")]
+    pub fn set_metadata_with_record_2(this: &AiGatewayLog, val: &Object<BigInt>);
+    #[wasm_bindgen(method, setter, js_name = "metadata")]
+    pub fn set_metadata_with_record_3(this: &AiGatewayLog, val: &Object<Null>);
+    #[wasm_bindgen(method, getter)]
+    pub fn step(this: &AiGatewayLog) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_step(this: &AiGatewayLog, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn cost(this: &AiGatewayLog) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_cost(this: &AiGatewayLog, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn custom_cost(this: &AiGatewayLog) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_custom_cost(this: &AiGatewayLog, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn request_size(this: &AiGatewayLog) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_request_size(this: &AiGatewayLog, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn request_head(this: &AiGatewayLog) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_request_head(this: &AiGatewayLog, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn request_head_complete(this: &AiGatewayLog) -> bool;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_request_head_complete(this: &AiGatewayLog, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn response_size(this: &AiGatewayLog) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_response_size(this: &AiGatewayLog, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn response_head(this: &AiGatewayLog) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_response_head(this: &AiGatewayLog, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn response_head_complete(this: &AiGatewayLog) -> bool;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_response_head_complete(this: &AiGatewayLog, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn created_at(this: &AiGatewayLog) -> Date;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_created_at(this: &AiGatewayLog, val: &Date);
+}
+impl AiGatewayLog {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AiGatewayLogBuilder {
+        AiGatewayLogBuilder {
+            inner: Self::new(),
+            required: 8191u64,
+        }
+    }
+}
+pub struct AiGatewayLogBuilder {
+    inner: AiGatewayLog,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AiGatewayLogBuilder {
+    pub fn id(mut self, val: &str) -> Self {
+        self.inner.set_id(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn provider(mut self, val: &str) -> Self {
+        self.inner.set_provider(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn model(mut self, val: &str) -> Self {
+        self.inner.set_model(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn model_type(mut self, val: &str) -> Self {
+        self.inner.set_model_type(val);
+        self
+    }
+    pub fn path(mut self, val: &str) -> Self {
+        self.inner.set_path(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn duration(mut self, val: f64) -> Self {
+        self.inner.set_duration(val);
+        self.required &= 18446744073709551599u64;
+        self
+    }
+    pub fn request_type(mut self, val: &str) -> Self {
+        self.inner.set_request_type(val);
+        self
+    }
+    pub fn request_content_type(mut self, val: &str) -> Self {
+        self.inner.set_request_content_type(val);
+        self
+    }
+    pub fn status_code(mut self, val: f64) -> Self {
+        self.inner.set_status_code(val);
+        self.required &= 18446744073709551583u64;
+        self
+    }
+    pub fn response_content_type(mut self, val: &str) -> Self {
+        self.inner.set_response_content_type(val);
+        self
+    }
+    pub fn success(mut self, val: bool) -> Self {
+        self.inner.set_success(val);
+        self.required &= 18446744073709551551u64;
+        self
+    }
+    pub fn cached(mut self, val: bool) -> Self {
+        self.inner.set_cached(val);
+        self.required &= 18446744073709551487u64;
+        self
+    }
+    pub fn tokens_in(mut self, val: f64) -> Self {
+        self.inner.set_tokens_in(val);
+        self
+    }
+    pub fn tokens_out(mut self, val: f64) -> Self {
+        self.inner.set_tokens_out(val);
+        self
+    }
+    pub fn metadata(mut self, val: &Object<Number>) -> Self {
+        self.inner.set_metadata(val);
+        self
+    }
+    pub fn metadata_with_record(mut self, val: &Object<JsString>) -> Self {
+        self.inner.set_metadata_with_record(val);
+        self
+    }
+    pub fn metadata_with_record_1(mut self, val: &Object<Boolean>) -> Self {
+        self.inner.set_metadata_with_record_1(val);
+        self
+    }
+    pub fn metadata_with_record_2(mut self, val: &Object<BigInt>) -> Self {
+        self.inner.set_metadata_with_record_2(val);
+        self
+    }
+    pub fn metadata_with_record_3(mut self, val: &Object<Null>) -> Self {
+        self.inner.set_metadata_with_record_3(val);
+        self
+    }
+    pub fn step(mut self, val: f64) -> Self {
+        self.inner.set_step(val);
+        self
+    }
+    pub fn cost(mut self, val: f64) -> Self {
+        self.inner.set_cost(val);
+        self
+    }
+    pub fn custom_cost(mut self, val: bool) -> Self {
+        self.inner.set_custom_cost(val);
+        self
+    }
+    pub fn request_size(mut self, val: f64) -> Self {
+        self.inner.set_request_size(val);
+        self.required &= 18446744073709551359u64;
+        self
+    }
+    pub fn request_head(mut self, val: &str) -> Self {
+        self.inner.set_request_head(val);
+        self
+    }
+    pub fn request_head_complete(mut self, val: bool) -> Self {
+        self.inner.set_request_head_complete(val);
+        self.required &= 18446744073709551103u64;
+        self
+    }
+    pub fn response_size(mut self, val: f64) -> Self {
+        self.inner.set_response_size(val);
+        self.required &= 18446744073709550591u64;
+        self
+    }
+    pub fn response_head(mut self, val: &str) -> Self {
+        self.inner.set_response_head(val);
+        self
+    }
+    pub fn response_head_complete(mut self, val: bool) -> Self {
+        self.inner.set_response_head_complete(val);
+        self.required &= 18446744073709549567u64;
+        self
+    }
+    pub fn created_at(mut self, val: &Date) -> Self {
+        self.inner.set_created_at(val);
+        self.required &= 18446744073709547519u64;
+        self
+    }
+    pub fn build(self) -> Result<AiGatewayLog, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `id`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `provider`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `model`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `path`");
+            }
+            if self.required & 16u64 != 0 {
+                missing.push("missing required property `duration`");
+            }
+            if self.required & 32u64 != 0 {
+                missing.push("missing required property `status_code`");
+            }
+            if self.required & 64u64 != 0 {
+                missing.push("missing required property `success`");
+            }
+            if self.required & 128u64 != 0 {
+                missing.push("missing required property `cached`");
+            }
+            if self.required & 256u64 != 0 {
+                missing.push("missing required property `request_size`");
+            }
+            if self.required & 512u64 != 0 {
+                missing.push("missing required property `request_head_complete`");
+            }
+            if self.required & 1024u64 != 0 {
+                missing.push("missing required property `response_size`");
+            }
+            if self.required & 2048u64 != 0 {
+                missing.push("missing required property `response_head_complete`");
+            }
+            if self.required & 4096u64 != 0 {
+                missing.push("missing required property `created_at`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AiGatewayLog),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AIGatewayProviders {
@@ -27399,10 +36898,377 @@ pub enum AIGatewayProviders {
     #[wasm_bindgen(js_name = "adobe-firefly")]
     AdobeFirefly,
 }
-#[allow(dead_code)]
-pub type AIGatewayHeaders = Object;
-#[allow(dead_code)]
-pub type AIGatewayUniversalRequest = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AIGatewayHeaders;
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-metadata")]
+    pub fn cf_aig_metadata(this: &AIGatewayHeaders) -> JsValue;
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-metadata")]
+    pub fn set_cf_aig_metadata(this: &AIGatewayHeaders, val: &Object<Number>);
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-metadata")]
+    pub fn set_cf_aig_metadata_with_record(this: &AIGatewayHeaders, val: &Object<JsString>);
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-metadata")]
+    pub fn set_cf_aig_metadata_with_record_1(this: &AIGatewayHeaders, val: &Object<Boolean>);
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-metadata")]
+    pub fn set_cf_aig_metadata_with_record_2(this: &AIGatewayHeaders, val: &Object<BigInt>);
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-metadata")]
+    pub fn set_cf_aig_metadata_with_record_3(this: &AIGatewayHeaders, val: &Object<Null>);
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-metadata")]
+    pub fn set_cf_aig_metadata_with_str(this: &AIGatewayHeaders, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-custom-cost")]
+    pub fn cf_aig_custom_cost(this: &AIGatewayHeaders) -> JsValue;
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-custom-cost")]
+    pub fn set_cf_aig_custom_cost(this: &AIGatewayHeaders, val: &Object);
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-custom-cost")]
+    pub fn set_cf_aig_custom_cost_with_str(this: &AIGatewayHeaders, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-cache-ttl")]
+    pub fn cf_aig_cache_ttl(this: &AIGatewayHeaders) -> JsValue;
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-cache-ttl")]
+    pub fn set_cf_aig_cache_ttl(this: &AIGatewayHeaders, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-cache-ttl")]
+    pub fn set_cf_aig_cache_ttl_with_str(this: &AIGatewayHeaders, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-skip-cache")]
+    pub fn cf_aig_skip_cache(this: &AIGatewayHeaders) -> JsValue;
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-skip-cache")]
+    pub fn set_cf_aig_skip_cache(this: &AIGatewayHeaders, val: bool);
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-skip-cache")]
+    pub fn set_cf_aig_skip_cache_with_str(this: &AIGatewayHeaders, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-cache-key")]
+    pub fn cf_aig_cache_key(this: &AIGatewayHeaders) -> String;
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-cache-key")]
+    pub fn set_cf_aig_cache_key(this: &AIGatewayHeaders, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-event-id")]
+    pub fn cf_aig_event_id(this: &AIGatewayHeaders) -> String;
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-event-id")]
+    pub fn set_cf_aig_event_id(this: &AIGatewayHeaders, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-request-timeout")]
+    pub fn cf_aig_request_timeout(this: &AIGatewayHeaders) -> JsValue;
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-request-timeout")]
+    pub fn set_cf_aig_request_timeout(this: &AIGatewayHeaders, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-request-timeout")]
+    pub fn set_cf_aig_request_timeout_with_str(this: &AIGatewayHeaders, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-max-attempts")]
+    pub fn cf_aig_max_attempts(this: &AIGatewayHeaders) -> JsValue;
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-max-attempts")]
+    pub fn set_cf_aig_max_attempts(this: &AIGatewayHeaders, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-max-attempts")]
+    pub fn set_cf_aig_max_attempts_with_str(this: &AIGatewayHeaders, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-retry-delay")]
+    pub fn cf_aig_retry_delay(this: &AIGatewayHeaders) -> JsValue;
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-retry-delay")]
+    pub fn set_cf_aig_retry_delay(this: &AIGatewayHeaders, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-retry-delay")]
+    pub fn set_cf_aig_retry_delay_with_str(this: &AIGatewayHeaders, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-backoff")]
+    pub fn cf_aig_backoff(this: &AIGatewayHeaders) -> String;
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-backoff")]
+    pub fn set_cf_aig_backoff(this: &AIGatewayHeaders, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "cf-aig-collect-log")]
+    pub fn cf_aig_collect_log(this: &AIGatewayHeaders) -> JsValue;
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-collect-log")]
+    pub fn set_cf_aig_collect_log(this: &AIGatewayHeaders, val: bool);
+    #[wasm_bindgen(method, setter, js_name = "cf-aig-collect-log")]
+    pub fn set_cf_aig_collect_log_with_str(this: &AIGatewayHeaders, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "Authorization")]
+    pub fn authorization(this: &AIGatewayHeaders) -> String;
+    #[wasm_bindgen(method, setter, js_name = "Authorization")]
+    pub fn set_authorization(this: &AIGatewayHeaders, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "Content-Type")]
+    pub fn content_type(this: &AIGatewayHeaders) -> String;
+    #[wasm_bindgen(method, setter, js_name = "Content-Type")]
+    pub fn set_content_type(this: &AIGatewayHeaders, val: &str);
+}
+impl AIGatewayHeaders {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AIGatewayHeadersBuilder {
+        AIGatewayHeadersBuilder {
+            inner: Self::new(),
+            required: 8191u64,
+        }
+    }
+}
+pub struct AIGatewayHeadersBuilder {
+    inner: AIGatewayHeaders,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AIGatewayHeadersBuilder {
+    pub fn cf_aig_metadata(mut self, val: &Object<Number>) -> Self {
+        self.inner.set_cf_aig_metadata(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn cf_aig_metadata_with_record(mut self, val: &Object<JsString>) -> Self {
+        self.inner.set_cf_aig_metadata_with_record(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn cf_aig_metadata_with_record_1(mut self, val: &Object<Boolean>) -> Self {
+        self.inner.set_cf_aig_metadata_with_record_1(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn cf_aig_metadata_with_record_2(mut self, val: &Object<BigInt>) -> Self {
+        self.inner.set_cf_aig_metadata_with_record_2(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn cf_aig_metadata_with_record_3(mut self, val: &Object<Null>) -> Self {
+        self.inner.set_cf_aig_metadata_with_record_3(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn cf_aig_metadata_with_str(mut self, val: &str) -> Self {
+        self.inner.set_cf_aig_metadata_with_str(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn cf_aig_custom_cost(mut self, val: &Object) -> Self {
+        self.inner.set_cf_aig_custom_cost(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn cf_aig_custom_cost_with_str(mut self, val: &str) -> Self {
+        self.inner.set_cf_aig_custom_cost_with_str(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn cf_aig_cache_ttl(mut self, val: f64) -> Self {
+        self.inner.set_cf_aig_cache_ttl(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn cf_aig_cache_ttl_with_str(mut self, val: &str) -> Self {
+        self.inner.set_cf_aig_cache_ttl_with_str(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn cf_aig_skip_cache(mut self, val: bool) -> Self {
+        self.inner.set_cf_aig_skip_cache(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn cf_aig_skip_cache_with_str(mut self, val: &str) -> Self {
+        self.inner.set_cf_aig_skip_cache_with_str(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn cf_aig_cache_key(mut self, val: &str) -> Self {
+        self.inner.set_cf_aig_cache_key(val);
+        self.required &= 18446744073709551599u64;
+        self
+    }
+    pub fn cf_aig_event_id(mut self, val: &str) -> Self {
+        self.inner.set_cf_aig_event_id(val);
+        self.required &= 18446744073709551583u64;
+        self
+    }
+    pub fn cf_aig_request_timeout(mut self, val: f64) -> Self {
+        self.inner.set_cf_aig_request_timeout(val);
+        self.required &= 18446744073709551551u64;
+        self
+    }
+    pub fn cf_aig_request_timeout_with_str(mut self, val: &str) -> Self {
+        self.inner.set_cf_aig_request_timeout_with_str(val);
+        self.required &= 18446744073709551551u64;
+        self
+    }
+    pub fn cf_aig_max_attempts(mut self, val: f64) -> Self {
+        self.inner.set_cf_aig_max_attempts(val);
+        self.required &= 18446744073709551487u64;
+        self
+    }
+    pub fn cf_aig_max_attempts_with_str(mut self, val: &str) -> Self {
+        self.inner.set_cf_aig_max_attempts_with_str(val);
+        self.required &= 18446744073709551487u64;
+        self
+    }
+    pub fn cf_aig_retry_delay(mut self, val: f64) -> Self {
+        self.inner.set_cf_aig_retry_delay(val);
+        self.required &= 18446744073709551359u64;
+        self
+    }
+    pub fn cf_aig_retry_delay_with_str(mut self, val: &str) -> Self {
+        self.inner.set_cf_aig_retry_delay_with_str(val);
+        self.required &= 18446744073709551359u64;
+        self
+    }
+    pub fn cf_aig_backoff(mut self, val: &str) -> Self {
+        self.inner.set_cf_aig_backoff(val);
+        self.required &= 18446744073709551103u64;
+        self
+    }
+    pub fn cf_aig_collect_log(mut self, val: bool) -> Self {
+        self.inner.set_cf_aig_collect_log(val);
+        self.required &= 18446744073709550591u64;
+        self
+    }
+    pub fn cf_aig_collect_log_with_str(mut self, val: &str) -> Self {
+        self.inner.set_cf_aig_collect_log_with_str(val);
+        self.required &= 18446744073709550591u64;
+        self
+    }
+    pub fn authorization(mut self, val: &str) -> Self {
+        self.inner.set_authorization(val);
+        self.required &= 18446744073709549567u64;
+        self
+    }
+    pub fn content_type(mut self, val: &str) -> Self {
+        self.inner.set_content_type(val);
+        self.required &= 18446744073709547519u64;
+        self
+    }
+    pub fn build(self) -> Result<AIGatewayHeaders, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `cf-aig-metadata`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `cf-aig-custom-cost`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `cf-aig-cache-ttl`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `cf-aig-skip-cache`");
+            }
+            if self.required & 16u64 != 0 {
+                missing.push("missing required property `cf-aig-cache-key`");
+            }
+            if self.required & 32u64 != 0 {
+                missing.push("missing required property `cf-aig-event-id`");
+            }
+            if self.required & 64u64 != 0 {
+                missing.push("missing required property `cf-aig-request-timeout`");
+            }
+            if self.required & 128u64 != 0 {
+                missing.push("missing required property `cf-aig-max-attempts`");
+            }
+            if self.required & 256u64 != 0 {
+                missing.push("missing required property `cf-aig-retry-delay`");
+            }
+            if self.required & 512u64 != 0 {
+                missing.push("missing required property `cf-aig-backoff`");
+            }
+            if self.required & 1024u64 != 0 {
+                missing.push("missing required property `cf-aig-collect-log`");
+            }
+            if self.required & 2048u64 != 0 {
+                missing.push("missing required property `Authorization`");
+            }
+            if self.required & 4096u64 != 0 {
+                missing.push("missing required property `Content-Type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AIGatewayHeaders),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AIGatewayUniversalRequest;
+    #[wasm_bindgen(method, getter)]
+    pub fn provider(this: &AIGatewayUniversalRequest) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_provider(this: &AIGatewayUniversalRequest, val: &AIGatewayProviders);
+    #[wasm_bindgen(method, setter, js_name = "provider")]
+    pub fn set_provider_with_str(this: &AIGatewayUniversalRequest, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn endpoint(this: &AIGatewayUniversalRequest) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_endpoint(this: &AIGatewayUniversalRequest, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn headers(this: &AIGatewayUniversalRequest) -> AIGatewayHeaders;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_headers(this: &AIGatewayUniversalRequest, val: &AIGatewayHeaders);
+    #[wasm_bindgen(method, getter)]
+    pub fn query(this: &AIGatewayUniversalRequest) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_query(this: &AIGatewayUniversalRequest, val: &JsValue);
+}
+impl AIGatewayUniversalRequest {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AIGatewayUniversalRequestBuilder {
+        AIGatewayUniversalRequestBuilder {
+            inner: Self::new(),
+            required: 15u64,
+        }
+    }
+}
+pub struct AIGatewayUniversalRequestBuilder {
+    inner: AIGatewayUniversalRequest,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AIGatewayUniversalRequestBuilder {
+    pub fn provider(mut self, val: &AIGatewayProviders) -> Self {
+        self.inner.set_provider(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn provider_with_str(mut self, val: &str) -> Self {
+        self.inner.set_provider_with_str(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn endpoint(mut self, val: &str) -> Self {
+        self.inner.set_endpoint(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn headers(mut self, val: &AIGatewayHeaders) -> Self {
+        self.inner.set_headers(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn query(mut self, val: &JsValue) -> Self {
+        self.inner.set_query(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn build(self) -> Result<AIGatewayUniversalRequest, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `provider`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `endpoint`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `headers`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `query`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AIGatewayUniversalRequest),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -27421,26 +37287,33 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiGateway;
     #[wasm_bindgen(method, catch, js_name = "patchLog")]
-    pub async fn patch_log(this: &AiGateway, log_id: &str, data: &Object) -> Result<(), JsValue>;
+    pub async fn patch_log(
+        this: &AiGateway,
+        log_id: &str,
+        data: &AiGatewayPatchLog,
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getLog")]
-    pub async fn get_log(this: &AiGateway, log_id: &str) -> Result<Object, JsValue>;
+    pub async fn get_log(this: &AiGateway, log_id: &str) -> Result<AiGatewayLog, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn run(this: &AiGateway, data: &Object) -> Result<Response, JsValue>;
+    pub async fn run(
+        this: &AiGateway,
+        data: &AIGatewayUniversalRequest,
+    ) -> Result<Response, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "run")]
     pub async fn run_with_array(
         this: &AiGateway,
-        data: &Array<Object>,
+        data: &Array<AIGatewayUniversalRequest>,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "run")]
-    pub async fn run_with_object_and_options(
+    pub async fn run_with_ai_gateway_universal_request_and_options(
         this: &AiGateway,
-        data: &Object,
+        data: &AIGatewayUniversalRequest,
         options: &AiGatewayOptions,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "run")]
     pub async fn run_with_array_and_options(
         this: &AiGateway,
-        data: &Array<Object>,
+        data: &Array<AIGatewayUniversalRequest>,
         options: &AiGatewayOptions,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getUrl")]
@@ -27519,18 +37392,403 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AutoRAGNameNotSetError;
 }
-#[allow(dead_code)]
-pub type ComparisonFilter = Object;
-#[allow(dead_code)]
-pub type CompoundFilter = Object;
-#[allow(dead_code)]
-pub type AutoRagSearchRequest = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ComparisonFilter;
+    #[wasm_bindgen(method, getter)]
+    pub fn key(this: &ComparisonFilter) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_key(this: &ComparisonFilter, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &ComparisonFilter) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &ComparisonFilter, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "type")]
+    pub fn set_type_with_js_value(this: &ComparisonFilter, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "type")]
+    pub fn set_type_with_js_value_1(this: &ComparisonFilter, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "type")]
+    pub fn set_type_with_js_value_2(this: &ComparisonFilter, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "type")]
+    pub fn set_type_with_js_value_3(this: &ComparisonFilter, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "type")]
+    pub fn set_type_with_js_value_4(this: &ComparisonFilter, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn value(this: &ComparisonFilter) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_value(this: &ComparisonFilter, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "value")]
+    pub fn set_value_with_f64(this: &ComparisonFilter, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "value")]
+    pub fn set_value_with_bool(this: &ComparisonFilter, val: bool);
+}
+impl ComparisonFilter {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ComparisonFilterBuilder {
+        ComparisonFilterBuilder {
+            inner: Self::new(),
+            required: 7u64,
+        }
+    }
+}
+pub struct ComparisonFilterBuilder {
+    inner: ComparisonFilter,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ComparisonFilterBuilder {
+    pub fn key(mut self, val: &str) -> Self {
+        self.inner.set_key(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn type_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_type_with_js_value(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn type_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_type_with_js_value_1(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn type_with_js_value_2(mut self, val: &str) -> Self {
+        self.inner.set_type_with_js_value_2(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn type_with_js_value_3(mut self, val: &str) -> Self {
+        self.inner.set_type_with_js_value_3(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn type_with_js_value_4(mut self, val: &str) -> Self {
+        self.inner.set_type_with_js_value_4(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn value(mut self, val: &str) -> Self {
+        self.inner.set_value(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn value_with_f64(mut self, val: f64) -> Self {
+        self.inner.set_value_with_f64(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn value_with_bool(mut self, val: bool) -> Self {
+        self.inner.set_value_with_bool(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn build(self) -> Result<ComparisonFilter, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `key`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `value`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ComparisonFilter),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type CompoundFilter;
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &CompoundFilter) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &CompoundFilter, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "type")]
+    pub fn set_type_with_js_value(this: &CompoundFilter, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn filters(this: &CompoundFilter) -> Array<ComparisonFilter>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_filters(this: &CompoundFilter, val: &Array<ComparisonFilter>);
+}
+impl CompoundFilter {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> CompoundFilterBuilder {
+        CompoundFilterBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct CompoundFilterBuilder {
+    inner: CompoundFilter,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl CompoundFilterBuilder {
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn type_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_type_with_js_value(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn filters(mut self, val: &Array<ComparisonFilter>) -> Self {
+        self.inner.set_filters(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn build(self) -> Result<CompoundFilter, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `filters`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(CompoundFilter),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AutoRagSearchRequest;
+    #[wasm_bindgen(method, getter)]
+    pub fn query(this: &AutoRagSearchRequest) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_query(this: &AutoRagSearchRequest, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn filters(this: &AutoRagSearchRequest) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_filters(this: &AutoRagSearchRequest, val: &CompoundFilter);
+    #[wasm_bindgen(method, setter, js_name = "filters")]
+    pub fn set_filters_with_comparison_filter(this: &AutoRagSearchRequest, val: &ComparisonFilter);
+    #[wasm_bindgen(method, getter)]
+    pub fn max_num_results(this: &AutoRagSearchRequest) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_max_num_results(this: &AutoRagSearchRequest, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn ranking_options(this: &AutoRagSearchRequest) -> Option<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_ranking_options(this: &AutoRagSearchRequest, val: &Object);
+    #[wasm_bindgen(method, getter)]
+    pub fn reranking(this: &AutoRagSearchRequest) -> Option<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_reranking(this: &AutoRagSearchRequest, val: &Object);
+    #[wasm_bindgen(method, getter)]
+    pub fn rewrite_query(this: &AutoRagSearchRequest) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_rewrite_query(this: &AutoRagSearchRequest, val: bool);
+}
+impl AutoRagSearchRequest {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AutoRagSearchRequestBuilder {
+        AutoRagSearchRequestBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct AutoRagSearchRequestBuilder {
+    inner: AutoRagSearchRequest,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AutoRagSearchRequestBuilder {
+    pub fn query(mut self, val: &str) -> Self {
+        self.inner.set_query(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn filters(mut self, val: &CompoundFilter) -> Self {
+        self.inner.set_filters(val);
+        self
+    }
+    pub fn filters_with_comparison_filter(mut self, val: &ComparisonFilter) -> Self {
+        self.inner.set_filters_with_comparison_filter(val);
+        self
+    }
+    pub fn max_num_results(mut self, val: f64) -> Self {
+        self.inner.set_max_num_results(val);
+        self
+    }
+    pub fn ranking_options(mut self, val: &Object) -> Self {
+        self.inner.set_ranking_options(val);
+        self
+    }
+    pub fn reranking(mut self, val: &Object) -> Self {
+        self.inner.set_reranking(val);
+        self
+    }
+    pub fn rewrite_query(mut self, val: bool) -> Self {
+        self.inner.set_rewrite_query(val);
+        self
+    }
+    pub fn build(self) -> Result<AutoRagSearchRequest, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `query`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AutoRagSearchRequest),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[allow(dead_code)]
 pub type AutoRagAiSearchRequest = JsValue;
 #[allow(dead_code)]
 pub type AutoRagAiSearchRequestStreaming = JsValue;
-#[allow(dead_code)]
-pub type AutoRagSearchResponse = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AutoRagSearchResponse;
+    #[wasm_bindgen(method, getter)]
+    pub fn object(this: &AutoRagSearchResponse) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_object(this: &AutoRagSearchResponse, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn search_query(this: &AutoRagSearchResponse) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_search_query(this: &AutoRagSearchResponse, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn data(this: &AutoRagSearchResponse) -> Array<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_data(this: &AutoRagSearchResponse, val: &Array<Object>);
+    #[wasm_bindgen(method, getter)]
+    pub fn has_more(this: &AutoRagSearchResponse) -> bool;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_has_more(this: &AutoRagSearchResponse, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn next_page(this: &AutoRagSearchResponse) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_next_page(this: &AutoRagSearchResponse, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "next_page")]
+    pub fn set_next_page_with_null(this: &AutoRagSearchResponse, val: &Null);
+}
+impl AutoRagSearchResponse {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> AutoRagSearchResponseBuilder {
+        AutoRagSearchResponseBuilder {
+            inner: Self::new(),
+            required: 31u64,
+        }
+    }
+}
+pub struct AutoRagSearchResponseBuilder {
+    inner: AutoRagSearchResponse,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl AutoRagSearchResponseBuilder {
+    pub fn object(mut self, val: &str) -> Self {
+        self.inner.set_object(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn search_query(mut self, val: &str) -> Self {
+        self.inner.set_search_query(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn data(mut self, val: &Array<Object>) -> Self {
+        self.inner.set_data(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn has_more(mut self, val: bool) -> Self {
+        self.inner.set_has_more(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn next_page(mut self, val: &str) -> Self {
+        self.inner.set_next_page(val);
+        self.required &= 18446744073709551599u64;
+        self
+    }
+    pub fn next_page_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_next_page_with_null(val);
+        self.required &= 18446744073709551599u64;
+        self
+    }
+    pub fn build(self) -> Result<AutoRagSearchResponse, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `object`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `search_query`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `data`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `has_more`");
+            }
+            if self.required & 16u64 != 0 {
+                missing.push("missing required property `next_page`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(AutoRagSearchResponse),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[allow(dead_code)]
 pub type AutoRagListResponse = Array<Object>;
 #[allow(dead_code)]
@@ -27548,7 +37806,10 @@ extern "C" {
     #[doc = " Note: The new API uses a messages array instead of a query string."]
     #[doc = " @see AiSearchInstanceService.search"]
     #[wasm_bindgen(method, catch)]
-    pub async fn search(this: &AutoRAG, params: &Object) -> Result<Object, JsValue>;
+    pub async fn search(
+        this: &AutoRAG,
+        params: &AutoRagSearchRequest,
+    ) -> Result<AutoRagSearchResponse, JsValue>;
     #[doc = " @deprecated Use `env.AI.aiSearch.get(id).chatCompletions(...)` instead."]
     #[doc = " @see AiSearchInstanceService.chatCompletions"]
     #[wasm_bindgen(method, catch, js_name = "aiSearch")]
@@ -31337,8 +41598,127 @@ extern "C" {
         message: &EmailMessage,
     ) -> Result<EmailSendResult, JsValue>;
 }
-#[allow(dead_code)]
-pub type EmailAttachment = JsValue;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type EmailAttachment;
+    #[wasm_bindgen(method, getter)]
+    pub fn content(this: &EmailAttachment) -> JsValue;
+    #[wasm_bindgen(method, getter, js_name = "contentId")]
+    pub fn content_id(this: &EmailAttachment) -> Option<JsValue>;
+    #[wasm_bindgen(method, getter)]
+    pub fn disposition(this: &EmailAttachment) -> JsValue;
+    #[wasm_bindgen(method, getter)]
+    pub fn filename(this: &EmailAttachment) -> String;
+    #[wasm_bindgen(method, getter)]
+    pub fn r#type(this: &EmailAttachment) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_content(this: &EmailAttachment, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "content")]
+    pub fn set_content_with_array_buffer(this: &EmailAttachment, val: &ArrayBuffer);
+    #[wasm_bindgen(method, setter, js_name = "content")]
+    pub fn set_content_with_js_value(this: &EmailAttachment, val: &Object);
+    #[wasm_bindgen(method, setter, js_name = "contentId")]
+    pub fn set_content_id(this: &EmailAttachment, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "contentId")]
+    pub fn set_content_id_with_undefined(this: &EmailAttachment, val: &Undefined);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_disposition(this: &EmailAttachment, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "disposition")]
+    pub fn set_disposition_with_js_value(this: &EmailAttachment, val: &str);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_filename(this: &EmailAttachment, val: &str);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &EmailAttachment, val: &str);
+}
+impl EmailAttachment {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> EmailAttachmentBuilder {
+        EmailAttachmentBuilder {
+            inner: Self::new(),
+            required: 15u64,
+        }
+    }
+}
+pub struct EmailAttachmentBuilder {
+    inner: EmailAttachment,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl EmailAttachmentBuilder {
+    pub fn content(mut self, val: &str) -> Self {
+        self.inner.set_content(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn content_with_array_buffer(mut self, val: &ArrayBuffer) -> Self {
+        self.inner.set_content_with_array_buffer(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn content_with_js_value(mut self, val: &Object) -> Self {
+        self.inner.set_content_with_js_value(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn content_id(mut self, val: &str) -> Self {
+        self.inner.set_content_id(val);
+        self
+    }
+    pub fn content_id_with_undefined(mut self, val: &Undefined) -> Self {
+        self.inner.set_content_id_with_undefined(val);
+        self
+    }
+    pub fn disposition(mut self, val: &str) -> Self {
+        self.inner.set_disposition(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn disposition_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_disposition_with_js_value(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn filename(mut self, val: &str) -> Self {
+        self.inner.set_filename(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn r#type(mut self, val: &str) -> Self {
+        self.inner.set_type(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn build(self) -> Result<EmailAttachment, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `content`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `disposition`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `filename`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `type`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(EmailAttachment),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -31467,9 +41847,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_html(this: &SendEmailBuilder, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn attachments(this: &SendEmailBuilder) -> Option<Array>;
+    pub fn attachments(this: &SendEmailBuilder) -> Option<Array<EmailAttachment>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_attachments(this: &SendEmailBuilder, val: &Array<Object>);
+    pub fn set_attachments(this: &SendEmailBuilder, val: &Array<EmailAttachment>);
 }
 impl SendEmailBuilder {
     #[allow(clippy::new_without_default)]
@@ -31552,7 +41932,7 @@ impl SendEmailBuilderBuilder {
         self.inner.set_html(val);
         self
     }
-    pub fn attachments(mut self, val: &Array<Object>) -> Self {
+    pub fn attachments(mut self, val: &Array<EmailAttachment>) -> Self {
         self.inner.set_attachments(val);
         self
     }
@@ -31643,16 +42023,585 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn database(this: &Hyperdrive) -> String;
 }
-#[allow(dead_code)]
-pub type ImageInfoResponse = JsValue;
-#[allow(dead_code)]
-pub type ImageTransform = Object;
-#[allow(dead_code)]
-pub type ImageDrawOptions = Object;
-#[allow(dead_code)]
-pub type ImageInputOptions = Object;
-#[allow(dead_code)]
-pub type ImageOutputOptions = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ImageInfoResponse;
+    #[wasm_bindgen(method, getter, js_name = "fileSize")]
+    pub fn file_size(this: &ImageInfoResponse) -> Option<f64>;
+    #[wasm_bindgen(method, getter)]
+    pub fn format(this: &ImageInfoResponse) -> JsValue;
+    #[wasm_bindgen(method, getter)]
+    pub fn height(this: &ImageInfoResponse) -> Option<f64>;
+    #[wasm_bindgen(method, getter)]
+    pub fn width(this: &ImageInfoResponse) -> Option<f64>;
+    #[wasm_bindgen(method, setter, js_name = "fileSize")]
+    pub fn set_file_size(this: &ImageInfoResponse, val: f64);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_format(this: &ImageInfoResponse, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "format")]
+    pub fn set_format_with_str(this: &ImageInfoResponse, val: &str);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_height(this: &ImageInfoResponse, val: f64);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_width(this: &ImageInfoResponse, val: f64);
+}
+impl ImageInfoResponse {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ImageInfoResponseBuilder {
+        ImageInfoResponseBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct ImageInfoResponseBuilder {
+    inner: ImageInfoResponse,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ImageInfoResponseBuilder {
+    pub fn file_size(mut self, val: f64) -> Self {
+        self.inner.set_file_size(val);
+        self
+    }
+    pub fn format(mut self, val: &str) -> Self {
+        self.inner.set_format(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn format_with_str(mut self, val: &str) -> Self {
+        self.inner.set_format_with_str(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn height(mut self, val: f64) -> Self {
+        self.inner.set_height(val);
+        self
+    }
+    pub fn width(mut self, val: f64) -> Self {
+        self.inner.set_width(val);
+        self
+    }
+    pub fn build(self) -> Result<ImageInfoResponse, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `format`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ImageInfoResponse),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ImageTransform;
+    #[wasm_bindgen(method, getter)]
+    pub fn width(this: &ImageTransform) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_width(this: &ImageTransform, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn height(this: &ImageTransform) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_height(this: &ImageTransform, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn background(this: &ImageTransform) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_background(this: &ImageTransform, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn blur(this: &ImageTransform) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_blur(this: &ImageTransform, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn border(this: &ImageTransform) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_border(this: &ImageTransform, val: &Object);
+    #[wasm_bindgen(method, getter)]
+    pub fn brightness(this: &ImageTransform) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_brightness(this: &ImageTransform, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn contrast(this: &ImageTransform) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_contrast(this: &ImageTransform, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn fit(this: &ImageTransform) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_fit(this: &ImageTransform, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "fit")]
+    pub fn set_fit_with_js_value(this: &ImageTransform, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "fit")]
+    pub fn set_fit_with_js_value_1(this: &ImageTransform, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "fit")]
+    pub fn set_fit_with_js_value_2(this: &ImageTransform, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "fit")]
+    pub fn set_fit_with_js_value_3(this: &ImageTransform, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "fit")]
+    pub fn set_fit_with_js_value_4(this: &ImageTransform, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn flip(this: &ImageTransform) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_flip(this: &ImageTransform, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "flip")]
+    pub fn set_flip_with_js_value(this: &ImageTransform, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "flip")]
+    pub fn set_flip_with_js_value_1(this: &ImageTransform, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn gamma(this: &ImageTransform) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_gamma(this: &ImageTransform, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn segment(this: &ImageTransform) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_segment(this: &ImageTransform, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn gravity(this: &ImageTransform) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_gravity(this: &ImageTransform, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "gravity")]
+    pub fn set_gravity_with_js_value(this: &ImageTransform, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "gravity")]
+    pub fn set_gravity_with_js_value_1(this: &ImageTransform, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "gravity")]
+    pub fn set_gravity_with_js_value_2(this: &ImageTransform, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "gravity")]
+    pub fn set_gravity_with_js_value_3(this: &ImageTransform, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "gravity")]
+    pub fn set_gravity_with_js_value_4(this: &ImageTransform, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "gravity")]
+    pub fn set_gravity_with_js_value_5(this: &ImageTransform, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "gravity")]
+    pub fn set_gravity_with_js_value_6(this: &ImageTransform, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "gravity")]
+    pub fn set_gravity_with_object(this: &ImageTransform, val: &Object);
+    #[wasm_bindgen(method, getter)]
+    pub fn rotate(this: &ImageTransform) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_rotate(this: &ImageTransform, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "rotate")]
+    pub fn set_rotate_with_js_value(this: &ImageTransform, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "rotate")]
+    pub fn set_rotate_with_js_value_1(this: &ImageTransform, val: f64);
+    #[wasm_bindgen(method, setter, js_name = "rotate")]
+    pub fn set_rotate_with_js_value_2(this: &ImageTransform, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn saturation(this: &ImageTransform) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_saturation(this: &ImageTransform, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn sharpen(this: &ImageTransform) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_sharpen(this: &ImageTransform, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn trim(this: &ImageTransform) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_trim(this: &ImageTransform, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "trim")]
+    pub fn set_trim_with_object(this: &ImageTransform, val: &Object);
+}
+impl ImageTransform {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ImageTransformBuilder {
+        ImageTransformBuilder { inner: Self::new() }
+    }
+}
+pub struct ImageTransformBuilder {
+    inner: ImageTransform,
+}
+#[allow(unused_mut)]
+impl ImageTransformBuilder {
+    pub fn width(mut self, val: f64) -> Self {
+        self.inner.set_width(val);
+        self
+    }
+    pub fn height(mut self, val: f64) -> Self {
+        self.inner.set_height(val);
+        self
+    }
+    pub fn background(mut self, val: &str) -> Self {
+        self.inner.set_background(val);
+        self
+    }
+    pub fn blur(mut self, val: f64) -> Self {
+        self.inner.set_blur(val);
+        self
+    }
+    pub fn border(mut self, val: &Object) -> Self {
+        self.inner.set_border(val);
+        self
+    }
+    pub fn brightness(mut self, val: f64) -> Self {
+        self.inner.set_brightness(val);
+        self
+    }
+    pub fn contrast(mut self, val: f64) -> Self {
+        self.inner.set_contrast(val);
+        self
+    }
+    pub fn fit(mut self, val: &str) -> Self {
+        self.inner.set_fit(val);
+        self
+    }
+    pub fn fit_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_fit_with_js_value(val);
+        self
+    }
+    pub fn fit_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_fit_with_js_value_1(val);
+        self
+    }
+    pub fn fit_with_js_value_2(mut self, val: &str) -> Self {
+        self.inner.set_fit_with_js_value_2(val);
+        self
+    }
+    pub fn fit_with_js_value_3(mut self, val: &str) -> Self {
+        self.inner.set_fit_with_js_value_3(val);
+        self
+    }
+    pub fn fit_with_js_value_4(mut self, val: &str) -> Self {
+        self.inner.set_fit_with_js_value_4(val);
+        self
+    }
+    pub fn flip(mut self, val: &str) -> Self {
+        self.inner.set_flip(val);
+        self
+    }
+    pub fn flip_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_flip_with_js_value(val);
+        self
+    }
+    pub fn flip_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_flip_with_js_value_1(val);
+        self
+    }
+    pub fn gamma(mut self, val: f64) -> Self {
+        self.inner.set_gamma(val);
+        self
+    }
+    pub fn segment(mut self, val: &str) -> Self {
+        self.inner.set_segment(val);
+        self
+    }
+    pub fn gravity(mut self, val: &str) -> Self {
+        self.inner.set_gravity(val);
+        self
+    }
+    pub fn gravity_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_gravity_with_js_value(val);
+        self
+    }
+    pub fn gravity_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_gravity_with_js_value_1(val);
+        self
+    }
+    pub fn gravity_with_js_value_2(mut self, val: &str) -> Self {
+        self.inner.set_gravity_with_js_value_2(val);
+        self
+    }
+    pub fn gravity_with_js_value_3(mut self, val: &str) -> Self {
+        self.inner.set_gravity_with_js_value_3(val);
+        self
+    }
+    pub fn gravity_with_js_value_4(mut self, val: &str) -> Self {
+        self.inner.set_gravity_with_js_value_4(val);
+        self
+    }
+    pub fn gravity_with_js_value_5(mut self, val: &str) -> Self {
+        self.inner.set_gravity_with_js_value_5(val);
+        self
+    }
+    pub fn gravity_with_js_value_6(mut self, val: &str) -> Self {
+        self.inner.set_gravity_with_js_value_6(val);
+        self
+    }
+    pub fn gravity_with_object(mut self, val: &Object) -> Self {
+        self.inner.set_gravity_with_object(val);
+        self
+    }
+    pub fn rotate(mut self, val: f64) -> Self {
+        self.inner.set_rotate(val);
+        self
+    }
+    pub fn rotate_with_js_value(mut self, val: f64) -> Self {
+        self.inner.set_rotate_with_js_value(val);
+        self
+    }
+    pub fn rotate_with_js_value_1(mut self, val: f64) -> Self {
+        self.inner.set_rotate_with_js_value_1(val);
+        self
+    }
+    pub fn rotate_with_js_value_2(mut self, val: f64) -> Self {
+        self.inner.set_rotate_with_js_value_2(val);
+        self
+    }
+    pub fn saturation(mut self, val: f64) -> Self {
+        self.inner.set_saturation(val);
+        self
+    }
+    pub fn sharpen(mut self, val: f64) -> Self {
+        self.inner.set_sharpen(val);
+        self
+    }
+    pub fn trim(mut self, val: &str) -> Self {
+        self.inner.set_trim(val);
+        self
+    }
+    pub fn trim_with_object(mut self, val: &Object) -> Self {
+        self.inner.set_trim_with_object(val);
+        self
+    }
+    pub fn build(self) -> ImageTransform {
+        self.inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ImageDrawOptions;
+    #[wasm_bindgen(method, getter)]
+    pub fn opacity(this: &ImageDrawOptions) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_opacity(this: &ImageDrawOptions, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn repeat(this: &ImageDrawOptions) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_repeat(this: &ImageDrawOptions, val: bool);
+    #[wasm_bindgen(method, setter, js_name = "repeat")]
+    pub fn set_repeat_with_str(this: &ImageDrawOptions, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn top(this: &ImageDrawOptions) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_top(this: &ImageDrawOptions, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn left(this: &ImageDrawOptions) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_left(this: &ImageDrawOptions, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn bottom(this: &ImageDrawOptions) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_bottom(this: &ImageDrawOptions, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn right(this: &ImageDrawOptions) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_right(this: &ImageDrawOptions, val: f64);
+}
+impl ImageDrawOptions {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ImageDrawOptionsBuilder {
+        ImageDrawOptionsBuilder { inner: Self::new() }
+    }
+}
+pub struct ImageDrawOptionsBuilder {
+    inner: ImageDrawOptions,
+}
+#[allow(unused_mut)]
+impl ImageDrawOptionsBuilder {
+    pub fn opacity(mut self, val: f64) -> Self {
+        self.inner.set_opacity(val);
+        self
+    }
+    pub fn repeat(mut self, val: bool) -> Self {
+        self.inner.set_repeat(val);
+        self
+    }
+    pub fn repeat_with_str(mut self, val: &str) -> Self {
+        self.inner.set_repeat_with_str(val);
+        self
+    }
+    pub fn top(mut self, val: f64) -> Self {
+        self.inner.set_top(val);
+        self
+    }
+    pub fn left(mut self, val: f64) -> Self {
+        self.inner.set_left(val);
+        self
+    }
+    pub fn bottom(mut self, val: f64) -> Self {
+        self.inner.set_bottom(val);
+        self
+    }
+    pub fn right(mut self, val: f64) -> Self {
+        self.inner.set_right(val);
+        self
+    }
+    pub fn build(self) -> ImageDrawOptions {
+        self.inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ImageInputOptions;
+    #[wasm_bindgen(method, getter)]
+    pub fn encoding(this: &ImageInputOptions) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_encoding(this: &ImageInputOptions, val: &str);
+}
+impl ImageInputOptions {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ImageInputOptionsBuilder {
+        ImageInputOptionsBuilder { inner: Self::new() }
+    }
+}
+pub struct ImageInputOptionsBuilder {
+    inner: ImageInputOptions,
+}
+#[allow(unused_mut)]
+impl ImageInputOptionsBuilder {
+    pub fn encoding(mut self, val: &str) -> Self {
+        self.inner.set_encoding(val);
+        self
+    }
+    pub fn build(self) -> ImageInputOptions {
+        self.inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ImageOutputOptions;
+    #[wasm_bindgen(method, getter)]
+    pub fn format(this: &ImageOutputOptions) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_format(this: &ImageOutputOptions, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "format")]
+    pub fn set_format_with_js_value(this: &ImageOutputOptions, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "format")]
+    pub fn set_format_with_js_value_1(this: &ImageOutputOptions, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "format")]
+    pub fn set_format_with_js_value_2(this: &ImageOutputOptions, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "format")]
+    pub fn set_format_with_js_value_3(this: &ImageOutputOptions, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "format")]
+    pub fn set_format_with_js_value_4(this: &ImageOutputOptions, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "format")]
+    pub fn set_format_with_js_value_5(this: &ImageOutputOptions, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn quality(this: &ImageOutputOptions) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_quality(this: &ImageOutputOptions, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn background(this: &ImageOutputOptions) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_background(this: &ImageOutputOptions, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn anim(this: &ImageOutputOptions) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_anim(this: &ImageOutputOptions, val: bool);
+}
+impl ImageOutputOptions {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ImageOutputOptionsBuilder {
+        ImageOutputOptionsBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct ImageOutputOptionsBuilder {
+    inner: ImageOutputOptions,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ImageOutputOptionsBuilder {
+    pub fn format(mut self, val: &str) -> Self {
+        self.inner.set_format(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn format_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_format_with_js_value(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn format_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_format_with_js_value_1(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn format_with_js_value_2(mut self, val: &str) -> Self {
+        self.inner.set_format_with_js_value_2(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn format_with_js_value_3(mut self, val: &str) -> Self {
+        self.inner.set_format_with_js_value_3(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn format_with_js_value_4(mut self, val: &str) -> Self {
+        self.inner.set_format_with_js_value_4(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn format_with_js_value_5(mut self, val: &str) -> Self {
+        self.inner.set_format_with_js_value_5(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn quality(mut self, val: f64) -> Self {
+        self.inner.set_quality(val);
+        self
+    }
+    pub fn background(mut self, val: &str) -> Self {
+        self.inner.set_background(val);
+        self
+    }
+    pub fn anim(mut self, val: bool) -> Self {
+        self.inner.set_anim(val);
+        self
+    }
+    pub fn build(self) -> Result<ImageOutputOptions, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `format`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ImageOutputOptions),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -32219,7 +43168,7 @@ extern "C" {
     pub async fn info(
         this: &ImagesBinding,
         stream: &ReadableStream,
-    ) -> Result<JsValue, ImagesError>;
+    ) -> Result<ImageInfoResponse, ImagesError>;
     #[doc = " Get image metadata (type, width and height)"]
     #[doc = " "]
     #[doc = " ## Arguments"]
@@ -32233,8 +43182,8 @@ extern "C" {
     pub async fn info_with_options(
         this: &ImagesBinding,
         stream: &ReadableStream,
-        options: &Object,
-    ) -> Result<JsValue, ImagesError>;
+        options: &ImageInputOptions,
+    ) -> Result<ImageInfoResponse, ImagesError>;
     #[doc = " Begin applying a series of transformations to an image"]
     #[doc = " "]
     #[doc = " ## Arguments"]
@@ -32273,7 +43222,7 @@ extern "C" {
     pub fn input_with_options(
         this: &ImagesBinding,
         stream: &ReadableStream,
-        options: &Object,
+        options: &ImageInputOptions,
     ) -> ImageTransformer;
     #[doc = " Begin applying a series of transformations to an image"]
     #[doc = " "]
@@ -32288,7 +43237,7 @@ extern "C" {
     pub fn try_input_with_options(
         this: &ImagesBinding,
         stream: &ReadableStream,
-        options: &Object,
+        options: &ImageInputOptions,
     ) -> Result<ImageTransformer, JsValue>;
     #[doc = " Access hosted images CRUD operations"]
     #[wasm_bindgen(method, getter)]
@@ -32306,7 +43255,7 @@ extern "C" {
     #[doc = " "]
     #[doc = " * `transform`"]
     #[wasm_bindgen(method)]
-    pub fn transform(this: &ImageTransformer, transform: &Object) -> ImageTransformer;
+    pub fn transform(this: &ImageTransformer, transform: &ImageTransform) -> ImageTransformer;
     #[doc = " Apply transform next, returning a transform handle."]
     #[doc = " You can then apply more transformations, draw, or retrieve the output."]
     #[doc = " "]
@@ -32316,7 +43265,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "transform")]
     pub fn try_transform(
         this: &ImageTransformer,
-        transform: &Object,
+        transform: &ImageTransform,
     ) -> Result<ImageTransformer, JsValue>;
     #[doc = " Draw an image on this transformer, returning a transform handle."]
     #[doc = " You can then apply more transformations, draw, or retrieve the output."]
@@ -32374,7 +43323,7 @@ extern "C" {
     pub fn draw_with_js_value_and_options(
         this: &ImageTransformer,
         image: &ReadableStream,
-        options: &Object,
+        options: &ImageDrawOptions,
     ) -> ImageTransformer;
     #[doc = " Draw an image on this transformer, returning a transform handle."]
     #[doc = " You can then apply more transformations, draw, or retrieve the output."]
@@ -32387,7 +43336,7 @@ extern "C" {
     pub fn try_draw_with_js_value_and_options(
         this: &ImageTransformer,
         image: &ReadableStream,
-        options: &Object,
+        options: &ImageDrawOptions,
     ) -> Result<ImageTransformer, JsValue>;
     #[doc = " Draw an image on this transformer, returning a transform handle."]
     #[doc = " You can then apply more transformations, draw, or retrieve the output."]
@@ -32400,7 +43349,7 @@ extern "C" {
     pub fn draw_with_image_transformer_and_options(
         this: &ImageTransformer,
         image: &ImageTransformer,
-        options: &Object,
+        options: &ImageDrawOptions,
     ) -> ImageTransformer;
     #[doc = " Draw an image on this transformer, returning a transform handle."]
     #[doc = " You can then apply more transformations, draw, or retrieve the output."]
@@ -32413,7 +43362,7 @@ extern "C" {
     pub fn try_draw_with_image_transformer_and_options(
         this: &ImageTransformer,
         image: &ImageTransformer,
-        options: &Object,
+        options: &ImageDrawOptions,
     ) -> Result<ImageTransformer, JsValue>;
     #[doc = " Retrieve the image that results from applying the transforms to the"]
     #[doc = " provided input"]
@@ -32424,11 +43373,43 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn output(
         this: &ImageTransformer,
-        options: &Object,
+        options: &ImageOutputOptions,
     ) -> Result<ImageTransformationResult, JsValue>;
 }
-#[allow(dead_code)]
-pub type ImageTransformationOutputOptions = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ImageTransformationOutputOptions;
+    #[wasm_bindgen(method, getter)]
+    pub fn encoding(this: &ImageTransformationOutputOptions) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_encoding(this: &ImageTransformationOutputOptions, val: &str);
+}
+impl ImageTransformationOutputOptions {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ImageTransformationOutputOptionsBuilder {
+        ImageTransformationOutputOptionsBuilder { inner: Self::new() }
+    }
+}
+pub struct ImageTransformationOutputOptionsBuilder {
+    inner: ImageTransformationOutputOptions,
+}
+#[allow(unused_mut)]
+impl ImageTransformationOutputOptionsBuilder {
+    pub fn encoding(mut self, val: &str) -> Self {
+        self.inner.set_encoding(val);
+        self
+    }
+    pub fn build(self) -> ImageTransformationOutputOptions {
+        self.inner
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -32454,13 +43435,15 @@ extern "C" {
     pub fn try_image(this: &ImageTransformationResult) -> Result<ReadableStream, JsValue>;
     #[doc = " The bytes of the response"]
     #[wasm_bindgen(method, js_name = "image")]
-    pub fn image_with_options(this: &ImageTransformationResult, options: &Object)
-        -> ReadableStream;
+    pub fn image_with_options(
+        this: &ImageTransformationResult,
+        options: &ImageTransformationOutputOptions,
+    ) -> ReadableStream;
     #[doc = " The bytes of the response"]
     #[wasm_bindgen(method, catch, js_name = "image")]
     pub fn try_image_with_options(
         this: &ImageTransformationResult,
-        options: &Object,
+        options: &ImageTransformationOutputOptions,
     ) -> Result<ReadableStream, JsValue>;
 }
 #[wasm_bindgen]
@@ -32554,7 +43537,7 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "transform")]
     pub fn transform_with_transform(
         this: &MediaTransformer,
-        transform: &Object,
+        transform: &MediaTransformationInputOptions,
     ) -> MediaTransformationGenerator;
     #[doc = " Applies transformation options to the media content."]
     #[doc = " "]
@@ -32568,7 +43551,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "transform")]
     pub fn try_transform_with_transform(
         this: &MediaTransformer,
-        transform: &Object,
+        transform: &MediaTransformationInputOptions,
     ) -> Result<MediaTransformationGenerator, JsValue>;
     #[doc = " Generates the final media output with specified options."]
     #[doc = " "]
@@ -32604,7 +43587,7 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "output")]
     pub fn output_with_output(
         this: &MediaTransformer,
-        output: &Object,
+        output: &MediaTransformationOutputOptions,
     ) -> MediaTransformationResult;
     #[doc = " Generates the final media output with specified options."]
     #[doc = " "]
@@ -32618,7 +43601,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "output")]
     pub fn try_output_with_output(
         this: &MediaTransformer,
-        output: &Object,
+        output: &MediaTransformationOutputOptions,
     ) -> Result<MediaTransformationResult, JsValue>;
 }
 #[wasm_bindgen]
@@ -32662,7 +43645,7 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "output")]
     pub fn output_with_output(
         this: &MediaTransformationGenerator,
-        output: &Object,
+        output: &MediaTransformationOutputOptions,
     ) -> MediaTransformationResult;
     #[doc = " Generates the final media output with specified options."]
     #[doc = " "]
@@ -32676,7 +43659,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "output")]
     pub fn try_output_with_output(
         this: &MediaTransformationGenerator,
-        output: &Object,
+        output: &MediaTransformationOutputOptions,
     ) -> Result<MediaTransformationResult, JsValue>;
 }
 #[wasm_bindgen]
@@ -32706,10 +43689,181 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "contentType")]
     pub async fn content_type(this: &MediaTransformationResult) -> Result<String, JsValue>;
 }
-#[allow(dead_code)]
-pub type MediaTransformationInputOptions = Object;
-#[allow(dead_code)]
-pub type MediaTransformationOutputOptions = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type MediaTransformationInputOptions;
+    #[doc = " How the media should be resized to fit the specified dimensions"]
+    #[wasm_bindgen(method, getter)]
+    pub fn fit(this: &MediaTransformationInputOptions) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_fit(this: &MediaTransformationInputOptions, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "fit")]
+    pub fn set_fit_with_js_value(this: &MediaTransformationInputOptions, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "fit")]
+    pub fn set_fit_with_js_value_1(this: &MediaTransformationInputOptions, val: &str);
+    #[doc = " Target width in pixels"]
+    #[wasm_bindgen(method, getter)]
+    pub fn width(this: &MediaTransformationInputOptions) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_width(this: &MediaTransformationInputOptions, val: f64);
+    #[doc = " Target height in pixels"]
+    #[wasm_bindgen(method, getter)]
+    pub fn height(this: &MediaTransformationInputOptions) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_height(this: &MediaTransformationInputOptions, val: f64);
+}
+impl MediaTransformationInputOptions {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> MediaTransformationInputOptionsBuilder {
+        MediaTransformationInputOptionsBuilder { inner: Self::new() }
+    }
+}
+pub struct MediaTransformationInputOptionsBuilder {
+    inner: MediaTransformationInputOptions,
+}
+#[allow(unused_mut)]
+impl MediaTransformationInputOptionsBuilder {
+    pub fn fit(mut self, val: &str) -> Self {
+        self.inner.set_fit(val);
+        self
+    }
+    pub fn fit_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_fit_with_js_value(val);
+        self
+    }
+    pub fn fit_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_fit_with_js_value_1(val);
+        self
+    }
+    pub fn width(mut self, val: f64) -> Self {
+        self.inner.set_width(val);
+        self
+    }
+    pub fn height(mut self, val: f64) -> Self {
+        self.inner.set_height(val);
+        self
+    }
+    pub fn build(self) -> MediaTransformationInputOptions {
+        self.inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type MediaTransformationOutputOptions;
+    #[doc = " Output mode determining the type of media to generate"]
+    #[wasm_bindgen(method, getter)]
+    pub fn mode(this: &MediaTransformationOutputOptions) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_mode(this: &MediaTransformationOutputOptions, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "mode")]
+    pub fn set_mode_with_js_value(this: &MediaTransformationOutputOptions, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "mode")]
+    pub fn set_mode_with_js_value_1(this: &MediaTransformationOutputOptions, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "mode")]
+    pub fn set_mode_with_js_value_2(this: &MediaTransformationOutputOptions, val: &str);
+    #[doc = " Whether to include audio in the output"]
+    #[wasm_bindgen(method, getter)]
+    pub fn audio(this: &MediaTransformationOutputOptions) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_audio(this: &MediaTransformationOutputOptions, val: bool);
+    #[doc = " Starting timestamp for frame extraction or start time for clips. (e.g. '2s')."]
+    #[wasm_bindgen(method, getter)]
+    pub fn time(this: &MediaTransformationOutputOptions) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_time(this: &MediaTransformationOutputOptions, val: &str);
+    #[doc = " Duration for video clips, audio extraction, and spritesheet generation (e.g. '5s')."]
+    #[wasm_bindgen(method, getter)]
+    pub fn duration(this: &MediaTransformationOutputOptions) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_duration(this: &MediaTransformationOutputOptions, val: &str);
+    #[doc = " Number of frames in the spritesheet."]
+    #[wasm_bindgen(method, getter, js_name = "imageCount")]
+    pub fn image_count(this: &MediaTransformationOutputOptions) -> Option<f64>;
+    #[wasm_bindgen(method, setter, js_name = "imageCount")]
+    pub fn set_image_count(this: &MediaTransformationOutputOptions, val: f64);
+    #[doc = " Output format for the generated media."]
+    #[wasm_bindgen(method, getter)]
+    pub fn format(this: &MediaTransformationOutputOptions) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_format(this: &MediaTransformationOutputOptions, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "format")]
+    pub fn set_format_with_js_value(this: &MediaTransformationOutputOptions, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "format")]
+    pub fn set_format_with_js_value_1(this: &MediaTransformationOutputOptions, val: &str);
+}
+impl MediaTransformationOutputOptions {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> MediaTransformationOutputOptionsBuilder {
+        MediaTransformationOutputOptionsBuilder { inner: Self::new() }
+    }
+}
+pub struct MediaTransformationOutputOptionsBuilder {
+    inner: MediaTransformationOutputOptions,
+}
+#[allow(unused_mut)]
+impl MediaTransformationOutputOptionsBuilder {
+    pub fn mode(mut self, val: &str) -> Self {
+        self.inner.set_mode(val);
+        self
+    }
+    pub fn mode_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_mode_with_js_value(val);
+        self
+    }
+    pub fn mode_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_mode_with_js_value_1(val);
+        self
+    }
+    pub fn mode_with_js_value_2(mut self, val: &str) -> Self {
+        self.inner.set_mode_with_js_value_2(val);
+        self
+    }
+    pub fn audio(mut self, val: bool) -> Self {
+        self.inner.set_audio(val);
+        self
+    }
+    pub fn time(mut self, val: &str) -> Self {
+        self.inner.set_time(val);
+        self
+    }
+    pub fn duration(mut self, val: &str) -> Self {
+        self.inner.set_duration(val);
+        self
+    }
+    pub fn image_count(mut self, val: f64) -> Self {
+        self.inner.set_image_count(val);
+        self
+    }
+    pub fn format(mut self, val: &str) -> Self {
+        self.inner.set_format(val);
+        self
+    }
+    pub fn format_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_format_with_js_value(val);
+        self
+    }
+    pub fn format_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_format_with_js_value_1(val);
+        self
+    }
+    pub fn build(self) -> MediaTransformationOutputOptions {
+        self.inner
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -32733,12 +43887,299 @@ impl MediaError {
 }
 #[allow(dead_code)]
 pub type Params = Object;
-#[allow(dead_code)]
-pub type EventContext = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type EventContext;
+    #[wasm_bindgen(method, getter)]
+    pub fn request(this: &EventContext) -> Request;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_request(this: &EventContext, val: &Request);
+    #[wasm_bindgen(method, getter, js_name = "functionPath")]
+    pub fn function_path(this: &EventContext) -> String;
+    #[wasm_bindgen(method, setter, js_name = "functionPath")]
+    pub fn set_function_path(this: &EventContext, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "waitUntil")]
+    pub fn wait_until(this: &EventContext) -> Function<fn(Promise) -> Undefined>;
+    #[wasm_bindgen(method, setter, js_name = "waitUntil")]
+    pub fn set_wait_until(this: &EventContext, val: &Function<fn(Promise) -> Undefined>);
+    #[wasm_bindgen(method, getter, js_name = "passThroughOnException")]
+    pub fn pass_through_on_exception(this: &EventContext) -> Function<fn() -> Undefined>;
+    #[wasm_bindgen(method, setter, js_name = "passThroughOnException")]
+    pub fn set_pass_through_on_exception(this: &EventContext, val: &Function<fn() -> Undefined>);
+    #[wasm_bindgen(method, getter)]
+    pub fn next(this: &EventContext) -> Function<fn(JsValue, RequestInit) -> Promise<Response>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_next(
+        this: &EventContext,
+        val: &Function<fn(JsValue, RequestInit) -> Promise<Response>>,
+    );
+    #[wasm_bindgen(method, getter)]
+    pub fn env(this: &EventContext) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_env(this: &EventContext, val: &JsValue);
+    #[wasm_bindgen(method, getter)]
+    pub fn params(this: &EventContext) -> Params;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_params(this: &EventContext, val: &Params);
+    #[wasm_bindgen(method, getter)]
+    pub fn data(this: &EventContext) -> Data;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_data(this: &EventContext, val: &Data);
+}
+impl EventContext {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> EventContextBuilder {
+        EventContextBuilder {
+            inner: Self::new(),
+            required: 255u64,
+        }
+    }
+}
+pub struct EventContextBuilder {
+    inner: EventContext,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl EventContextBuilder {
+    pub fn request(mut self, val: &Request) -> Self {
+        self.inner.set_request(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn function_path(mut self, val: &str) -> Self {
+        self.inner.set_function_path(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn wait_until(mut self, val: &Function<fn(Promise) -> Undefined>) -> Self {
+        self.inner.set_wait_until(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn pass_through_on_exception(mut self, val: &Function<fn() -> Undefined>) -> Self {
+        self.inner.set_pass_through_on_exception(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn next(mut self, val: &Function<fn(JsValue, RequestInit) -> Promise<Response>>) -> Self {
+        self.inner.set_next(val);
+        self.required &= 18446744073709551599u64;
+        self
+    }
+    pub fn env(mut self, val: &JsValue) -> Self {
+        self.inner.set_env(val);
+        self.required &= 18446744073709551583u64;
+        self
+    }
+    pub fn params(mut self, val: &Params) -> Self {
+        self.inner.set_params(val);
+        self.required &= 18446744073709551551u64;
+        self
+    }
+    pub fn data(mut self, val: &Data) -> Self {
+        self.inner.set_data(val);
+        self.required &= 18446744073709551487u64;
+        self
+    }
+    pub fn build(self) -> Result<EventContext, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `request`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `functionPath`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `waitUntil`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `passThroughOnException`");
+            }
+            if self.required & 16u64 != 0 {
+                missing.push("missing required property `next`");
+            }
+            if self.required & 32u64 != 0 {
+                missing.push("missing required property `env`");
+            }
+            if self.required & 64u64 != 0 {
+                missing.push("missing required property `params`");
+            }
+            if self.required & 128u64 != 0 {
+                missing.push("missing required property `data`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(EventContext),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[allow(dead_code)]
 pub type PagesFunction = Function<fn(EventContext) -> JsValue>;
-#[allow(dead_code)]
-pub type EventPluginContext = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type EventPluginContext;
+    #[wasm_bindgen(method, getter)]
+    pub fn request(this: &EventPluginContext) -> Request;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_request(this: &EventPluginContext, val: &Request);
+    #[wasm_bindgen(method, getter, js_name = "functionPath")]
+    pub fn function_path(this: &EventPluginContext) -> String;
+    #[wasm_bindgen(method, setter, js_name = "functionPath")]
+    pub fn set_function_path(this: &EventPluginContext, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "waitUntil")]
+    pub fn wait_until(this: &EventPluginContext) -> Function<fn(Promise) -> Undefined>;
+    #[wasm_bindgen(method, setter, js_name = "waitUntil")]
+    pub fn set_wait_until(this: &EventPluginContext, val: &Function<fn(Promise) -> Undefined>);
+    #[wasm_bindgen(method, getter, js_name = "passThroughOnException")]
+    pub fn pass_through_on_exception(this: &EventPluginContext) -> Function<fn() -> Undefined>;
+    #[wasm_bindgen(method, setter, js_name = "passThroughOnException")]
+    pub fn set_pass_through_on_exception(
+        this: &EventPluginContext,
+        val: &Function<fn() -> Undefined>,
+    );
+    #[wasm_bindgen(method, getter)]
+    pub fn next(
+        this: &EventPluginContext,
+    ) -> Function<fn(JsValue, RequestInit) -> Promise<Response>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_next(
+        this: &EventPluginContext,
+        val: &Function<fn(JsValue, RequestInit) -> Promise<Response>>,
+    );
+    #[wasm_bindgen(method, getter)]
+    pub fn env(this: &EventPluginContext) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_env(this: &EventPluginContext, val: &JsValue);
+    #[wasm_bindgen(method, getter)]
+    pub fn params(this: &EventPluginContext) -> Params;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_params(this: &EventPluginContext, val: &Params);
+    #[wasm_bindgen(method, getter)]
+    pub fn data(this: &EventPluginContext) -> Data;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_data(this: &EventPluginContext, val: &Data);
+    #[wasm_bindgen(method, getter, js_name = "pluginArgs")]
+    pub fn plugin_args(this: &EventPluginContext) -> PluginArgs;
+    #[wasm_bindgen(method, setter, js_name = "pluginArgs")]
+    pub fn set_plugin_args(this: &EventPluginContext, val: &PluginArgs);
+}
+impl EventPluginContext {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> EventPluginContextBuilder {
+        EventPluginContextBuilder {
+            inner: Self::new(),
+            required: 511u64,
+        }
+    }
+}
+pub struct EventPluginContextBuilder {
+    inner: EventPluginContext,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl EventPluginContextBuilder {
+    pub fn request(mut self, val: &Request) -> Self {
+        self.inner.set_request(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn function_path(mut self, val: &str) -> Self {
+        self.inner.set_function_path(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn wait_until(mut self, val: &Function<fn(Promise) -> Undefined>) -> Self {
+        self.inner.set_wait_until(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn pass_through_on_exception(mut self, val: &Function<fn() -> Undefined>) -> Self {
+        self.inner.set_pass_through_on_exception(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn next(mut self, val: &Function<fn(JsValue, RequestInit) -> Promise<Response>>) -> Self {
+        self.inner.set_next(val);
+        self.required &= 18446744073709551599u64;
+        self
+    }
+    pub fn env(mut self, val: &JsValue) -> Self {
+        self.inner.set_env(val);
+        self.required &= 18446744073709551583u64;
+        self
+    }
+    pub fn params(mut self, val: &Params) -> Self {
+        self.inner.set_params(val);
+        self.required &= 18446744073709551551u64;
+        self
+    }
+    pub fn data(mut self, val: &Data) -> Self {
+        self.inner.set_data(val);
+        self.required &= 18446744073709551487u64;
+        self
+    }
+    pub fn plugin_args(mut self, val: &PluginArgs) -> Self {
+        self.inner.set_plugin_args(val);
+        self.required &= 18446744073709551359u64;
+        self
+    }
+    pub fn build(self) -> Result<EventPluginContext, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `request`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `functionPath`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `waitUntil`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `passThroughOnException`");
+            }
+            if self.required & 16u64 != 0 {
+                missing.push("missing required property `next`");
+            }
+            if self.required & 32u64 != 0 {
+                missing.push("missing required property `env`");
+            }
+            if self.required & 64u64 != 0 {
+                missing.push("missing required property `params`");
+            }
+            if self.required & 128u64 != 0 {
+                missing.push("missing required property `data`");
+            }
+            if self.required & 256u64 != 0 {
+                missing.push("missing required property `pluginArgs`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(EventPluginContext),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[allow(dead_code)]
 pub type PagesPluginFunction = Function<fn(EventPluginContext) -> JsValue>;
 #[wasm_bindgen]
@@ -33216,6 +44657,252 @@ pub mod cloudflare_workers_module {
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "CloudflareWorkersModule")]
         #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type WorkflowStepConfig;
+        #[wasm_bindgen(method, getter)]
+        pub fn retries(this: &WorkflowStepConfig) -> Option<Object>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_retries(this: &WorkflowStepConfig, val: &Object);
+        #[wasm_bindgen(method, getter)]
+        pub fn timeout(this: &WorkflowStepConfig) -> Option<JsValue>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_timeout(this: &WorkflowStepConfig, val: &JsValue);
+        #[wasm_bindgen(method, setter, js_name = "timeout")]
+        pub fn set_timeout_with_f64(this: &WorkflowStepConfig, val: f64);
+    }
+    impl WorkflowStepConfig {
+        #[allow(clippy::new_without_default)]
+        pub fn new() -> Self {
+            #[allow(unused_imports)]
+            use wasm_bindgen::JsCast;
+            JsCast::unchecked_into(js_sys::Object::new())
+        }
+        pub fn builder() -> WorkflowStepConfigBuilder {
+            WorkflowStepConfigBuilder { inner: Self::new() }
+        }
+    }
+    pub struct WorkflowStepConfigBuilder {
+        inner: WorkflowStepConfig,
+    }
+    #[allow(unused_mut)]
+    impl WorkflowStepConfigBuilder {
+        pub fn retries(mut self, val: &Object) -> Self {
+            self.inner.set_retries(val);
+            self
+        }
+        pub fn timeout(mut self, val: &JsValue) -> Self {
+            self.inner.set_timeout(val);
+            self
+        }
+        pub fn timeout_with_f64(mut self, val: f64) -> Self {
+            self.inner.set_timeout_with_f64(val);
+            self
+        }
+        pub fn build(self) -> WorkflowStepConfig {
+            self.inner
+        }
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , js_namespace = "CloudflareWorkersModule")]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type WorkflowEvent;
+        #[wasm_bindgen(method, getter)]
+        pub fn payload(this: &WorkflowEvent) -> Readonly;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_payload(this: &WorkflowEvent, val: &Readonly);
+        #[wasm_bindgen(method, getter)]
+        pub fn timestamp(this: &WorkflowEvent) -> Date;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_timestamp(this: &WorkflowEvent, val: &Date);
+        #[wasm_bindgen(method, getter, js_name = "instanceId")]
+        pub fn instance_id(this: &WorkflowEvent) -> String;
+        #[wasm_bindgen(method, setter, js_name = "instanceId")]
+        pub fn set_instance_id(this: &WorkflowEvent, val: &str);
+    }
+    impl WorkflowEvent {
+        #[allow(clippy::new_without_default)]
+        pub fn new() -> Self {
+            #[allow(unused_imports)]
+            use wasm_bindgen::JsCast;
+            JsCast::unchecked_into(js_sys::Object::new())
+        }
+        pub fn builder() -> WorkflowEventBuilder {
+            WorkflowEventBuilder {
+                inner: Self::new(),
+                required: 7u64,
+            }
+        }
+    }
+    pub struct WorkflowEventBuilder {
+        inner: WorkflowEvent,
+        required: u64,
+    }
+    #[allow(unused_mut)]
+    impl WorkflowEventBuilder {
+        pub fn payload(mut self, val: &Readonly) -> Self {
+            self.inner.set_payload(val);
+            self.required &= 18446744073709551614u64;
+            self
+        }
+        pub fn timestamp(mut self, val: &Date) -> Self {
+            self.inner.set_timestamp(val);
+            self.required &= 18446744073709551613u64;
+            self
+        }
+        pub fn instance_id(mut self, val: &str) -> Self {
+            self.inner.set_instance_id(val);
+            self.required &= 18446744073709551611u64;
+            self
+        }
+        pub fn build(self) -> Result<WorkflowEvent, JsValue> {
+            if self.required != 0 {
+                let mut missing = Vec::new();
+                if self.required & 1u64 != 0 {
+                    missing.push("missing required property `payload`");
+                }
+                if self.required & 2u64 != 0 {
+                    missing.push("missing required property `timestamp`");
+                }
+                if self.required & 4u64 != 0 {
+                    missing.push("missing required property `instanceId`");
+                }
+                return Err(JsValue::from_str(&format!(
+                    "{}: {}",
+                    stringify!(WorkflowEvent),
+                    missing.join(", ")
+                )));
+            }
+            Ok(self.inner)
+        }
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , js_namespace = "CloudflareWorkersModule")]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type WorkflowStepEvent;
+        #[wasm_bindgen(method, getter)]
+        pub fn payload(this: &WorkflowStepEvent) -> Readonly;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_payload(this: &WorkflowStepEvent, val: &Readonly);
+        #[wasm_bindgen(method, getter)]
+        pub fn timestamp(this: &WorkflowStepEvent) -> Date;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_timestamp(this: &WorkflowStepEvent, val: &Date);
+        #[wasm_bindgen(method, getter)]
+        pub fn r#type(this: &WorkflowStepEvent) -> String;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_type(this: &WorkflowStepEvent, val: &str);
+    }
+    impl WorkflowStepEvent {
+        #[allow(clippy::new_without_default)]
+        pub fn new() -> Self {
+            #[allow(unused_imports)]
+            use wasm_bindgen::JsCast;
+            JsCast::unchecked_into(js_sys::Object::new())
+        }
+        pub fn builder() -> WorkflowStepEventBuilder {
+            WorkflowStepEventBuilder {
+                inner: Self::new(),
+                required: 7u64,
+            }
+        }
+    }
+    pub struct WorkflowStepEventBuilder {
+        inner: WorkflowStepEvent,
+        required: u64,
+    }
+    #[allow(unused_mut)]
+    impl WorkflowStepEventBuilder {
+        pub fn payload(mut self, val: &Readonly) -> Self {
+            self.inner.set_payload(val);
+            self.required &= 18446744073709551614u64;
+            self
+        }
+        pub fn timestamp(mut self, val: &Date) -> Self {
+            self.inner.set_timestamp(val);
+            self.required &= 18446744073709551613u64;
+            self
+        }
+        pub fn r#type(mut self, val: &str) -> Self {
+            self.inner.set_type(val);
+            self.required &= 18446744073709551611u64;
+            self
+        }
+        pub fn build(self) -> Result<WorkflowStepEvent, JsValue> {
+            if self.required != 0 {
+                let mut missing = Vec::new();
+                if self.required & 1u64 != 0 {
+                    missing.push("missing required property `payload`");
+                }
+                if self.required & 2u64 != 0 {
+                    missing.push("missing required property `timestamp`");
+                }
+                if self.required & 4u64 != 0 {
+                    missing.push("missing required property `type`");
+                }
+                return Err(JsValue::from_str(&format!(
+                    "{}: {}",
+                    stringify!(WorkflowStepEvent),
+                    missing.join(", ")
+                )));
+            }
+            Ok(self.inner)
+        }
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , js_namespace = "CloudflareWorkersModule")]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type WorkflowStepContext;
+        #[wasm_bindgen(method, getter)]
+        pub fn attempt(this: &WorkflowStepContext) -> f64;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_attempt(this: &WorkflowStepContext, val: f64);
+    }
+    impl WorkflowStepContext {
+        #[allow(clippy::new_without_default)]
+        pub fn new() -> Self {
+            #[allow(unused_imports)]
+            use wasm_bindgen::JsCast;
+            JsCast::unchecked_into(js_sys::Object::new())
+        }
+        pub fn builder() -> WorkflowStepContextBuilder {
+            WorkflowStepContextBuilder {
+                inner: Self::new(),
+                required: 1u64,
+            }
+        }
+    }
+    pub struct WorkflowStepContextBuilder {
+        inner: WorkflowStepContext,
+        required: u64,
+    }
+    #[allow(unused_mut)]
+    impl WorkflowStepContextBuilder {
+        pub fn attempt(mut self, val: f64) -> Self {
+            self.inner.set_attempt(val);
+            self.required &= 18446744073709551614u64;
+            self
+        }
+        pub fn build(self) -> Result<WorkflowStepContext, JsValue> {
+            if self.required != 0 {
+                let mut missing = Vec::new();
+                if self.required & 1u64 != 0 {
+                    missing.push("missing required property `attempt`");
+                }
+                return Err(JsValue::from_str(&format!(
+                    "{}: {}",
+                    stringify!(WorkflowStepContext),
+                    missing.join(", ")
+                )));
+            }
+            Ok(self.inner)
+        }
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , js_namespace = "CloudflareWorkersModule")]
+        #[derive(Debug, Clone, PartialEq, Eq)]
         pub type WorkflowStep;
         #[wasm_bindgen(method, catch)]
         pub async fn r#do(
@@ -33529,7 +45216,7 @@ extern "C" {
     pub async fn upload_with_url_and_params(
         this: &StreamBinding,
         url: &str,
-        params: &Object,
+        params: &StreamUrlUploadParams,
     ) -> Result<StreamVideo, StreamError>;
     #[doc = " Creates a direct upload that allows video uploads without an API key."]
     #[doc = " "]
@@ -33549,8 +45236,8 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "createDirectUpload")]
     pub async fn create_direct_upload(
         this: &StreamBinding,
-        params: &Object,
-    ) -> Result<Object, StreamError>;
+        params: &StreamDirectUploadCreateParams,
+    ) -> Result<StreamDirectUpload, StreamError>;
     #[wasm_bindgen(method, getter)]
     pub fn videos(this: &StreamBinding) -> StreamVideos;
     #[wasm_bindgen(method, setter)]
@@ -33600,7 +45287,7 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn update(
         this: &StreamVideoHandle,
-        params: &Object,
+        params: &StreamUpdateVideoParams,
     ) -> Result<StreamVideo, StreamError>;
     #[doc = " Deletes a video and its copies from Cloudflare Stream."]
     #[doc = " "]
@@ -33675,9 +45362,9 @@ extern "C" {
     pub fn set_ready_to_stream_at_with_null(this: &StreamVideo, val: &Null);
     #[doc = " Processing status information."]
     #[wasm_bindgen(method, getter)]
-    pub fn status(this: &StreamVideo) -> Object;
+    pub fn status(this: &StreamVideo) -> StreamVideoStatus;
     #[wasm_bindgen(method, setter)]
-    pub fn set_status(this: &StreamVideo, val: &Object);
+    pub fn set_status(this: &StreamVideo, val: &StreamVideoStatus);
     #[doc = " A user modifiable key-value store."]
     #[wasm_bindgen(method, getter)]
     pub fn meta(this: &StreamVideo) -> Object<JsString>;
@@ -33757,9 +45444,9 @@ extern "C" {
     pub fn set_duration(this: &StreamVideo, val: f64);
     #[doc = " Input metadata for the original upload."]
     #[wasm_bindgen(method, getter)]
-    pub fn input(this: &StreamVideo) -> Object;
+    pub fn input(this: &StreamVideo) -> StreamVideoInput;
     #[wasm_bindgen(method, setter)]
-    pub fn set_input(this: &StreamVideo, val: &Object);
+    pub fn set_input(this: &StreamVideo, val: &StreamVideoInput);
     #[doc = " Playback URLs for the video."]
     #[wasm_bindgen(method, getter, js_name = "hlsPlaybackUrl")]
     pub fn hls_playback_url(this: &StreamVideo) -> String;
@@ -33771,9 +45458,9 @@ extern "C" {
     pub fn set_dash_playback_url(this: &StreamVideo, val: &str);
     #[doc = " The watermark applied to the video, if any."]
     #[wasm_bindgen(method, getter)]
-    pub fn watermark(this: &StreamVideo) -> Option<Object>;
+    pub fn watermark(this: &StreamVideo) -> Option<StreamWatermark>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_watermark(this: &StreamVideo, val: &Object);
+    pub fn set_watermark(this: &StreamVideo, val: &StreamWatermark);
     #[wasm_bindgen(method, setter, js_name = "watermark")]
     pub fn set_watermark_with_null(this: &StreamVideo, val: &Null);
     #[doc = " The live input id associated with the video, if any."]
@@ -33792,9 +45479,9 @@ extern "C" {
     pub fn set_clipped_from_id_with_null(this: &StreamVideo, val: &Null);
     #[doc = " Public details associated with the video."]
     #[wasm_bindgen(method, getter, js_name = "publicDetails")]
-    pub fn public_details(this: &StreamVideo) -> Option<Object>;
+    pub fn public_details(this: &StreamVideo) -> Option<StreamPublicDetails>;
     #[wasm_bindgen(method, setter, js_name = "publicDetails")]
-    pub fn set_public_details(this: &StreamVideo, val: &Object);
+    pub fn set_public_details(this: &StreamVideo, val: &StreamPublicDetails);
     #[wasm_bindgen(method, setter, js_name = "publicDetails")]
     pub fn set_public_details_with_null(this: &StreamVideo, val: &Null);
 }
@@ -33858,7 +45545,7 @@ impl StreamVideoBuilder {
         self.required &= 18446744073709551583u64;
         self
     }
-    pub fn status(mut self, val: &Object) -> Self {
+    pub fn status(mut self, val: &StreamVideoStatus) -> Self {
         self.inner.set_status(val);
         self.required &= 18446744073709551551u64;
         self
@@ -33957,7 +45644,7 @@ impl StreamVideoBuilder {
         self.required &= 18446744073709289471u64;
         self
     }
-    pub fn input(mut self, val: &Object) -> Self {
+    pub fn input(mut self, val: &StreamVideoInput) -> Self {
         self.inner.set_input(val);
         self.required &= 18446744073709027327u64;
         self
@@ -33972,7 +45659,7 @@ impl StreamVideoBuilder {
         self.required &= 18446744073707454463u64;
         self
     }
-    pub fn watermark(mut self, val: &Object) -> Self {
+    pub fn watermark(mut self, val: &StreamWatermark) -> Self {
         self.inner.set_watermark(val);
         self.required &= 18446744073705357311u64;
         self
@@ -34000,7 +45687,7 @@ impl StreamVideoBuilder {
         self.required &= 18446744073701163007u64;
         self
     }
-    pub fn public_details(mut self, val: &Object) -> Self {
+    pub fn public_details(mut self, val: &StreamPublicDetails) -> Self {
         self.inner.set_public_details(val);
         self.required &= 18446744073692774399u64;
         self
@@ -34097,20 +45784,677 @@ impl StreamVideoBuilder {
         Ok(self.inner)
     }
 }
-#[allow(dead_code)]
-pub type StreamVideoStatus = Object;
-#[allow(dead_code)]
-pub type StreamVideoInput = Object;
-#[allow(dead_code)]
-pub type StreamPublicDetails = Object;
-#[allow(dead_code)]
-pub type StreamDirectUpload = Object;
-#[allow(dead_code)]
-pub type StreamDirectUploadCreateParams = Object;
-#[allow(dead_code)]
-pub type StreamDirectUploadWatermark = Object;
-#[allow(dead_code)]
-pub type StreamUrlUploadParams = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StreamVideoStatus;
+    #[doc = " The current processing state."]
+    #[wasm_bindgen(method, getter)]
+    pub fn state(this: &StreamVideoStatus) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_state(this: &StreamVideoStatus, val: &str);
+    #[doc = " The current processing step."]
+    #[wasm_bindgen(method, getter)]
+    pub fn step(this: &StreamVideoStatus) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_step(this: &StreamVideoStatus, val: &str);
+    #[doc = " The percent complete as a string."]
+    #[wasm_bindgen(method, getter, js_name = "pctComplete")]
+    pub fn pct_complete(this: &StreamVideoStatus) -> Option<String>;
+    #[wasm_bindgen(method, setter, js_name = "pctComplete")]
+    pub fn set_pct_complete(this: &StreamVideoStatus, val: &str);
+    #[doc = " An error reason code, if applicable."]
+    #[wasm_bindgen(method, getter, js_name = "errorReasonCode")]
+    pub fn error_reason_code(this: &StreamVideoStatus) -> String;
+    #[wasm_bindgen(method, setter, js_name = "errorReasonCode")]
+    pub fn set_error_reason_code(this: &StreamVideoStatus, val: &str);
+    #[doc = " An error reason text, if applicable."]
+    #[wasm_bindgen(method, getter, js_name = "errorReasonText")]
+    pub fn error_reason_text(this: &StreamVideoStatus) -> String;
+    #[wasm_bindgen(method, setter, js_name = "errorReasonText")]
+    pub fn set_error_reason_text(this: &StreamVideoStatus, val: &str);
+}
+impl StreamVideoStatus {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> StreamVideoStatusBuilder {
+        StreamVideoStatusBuilder {
+            inner: Self::new(),
+            required: 7u64,
+        }
+    }
+}
+pub struct StreamVideoStatusBuilder {
+    inner: StreamVideoStatus,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl StreamVideoStatusBuilder {
+    pub fn state(mut self, val: &str) -> Self {
+        self.inner.set_state(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn step(mut self, val: &str) -> Self {
+        self.inner.set_step(val);
+        self
+    }
+    pub fn pct_complete(mut self, val: &str) -> Self {
+        self.inner.set_pct_complete(val);
+        self
+    }
+    pub fn error_reason_code(mut self, val: &str) -> Self {
+        self.inner.set_error_reason_code(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn error_reason_text(mut self, val: &str) -> Self {
+        self.inner.set_error_reason_text(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn build(self) -> Result<StreamVideoStatus, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `state`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `errorReasonCode`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `errorReasonText`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(StreamVideoStatus),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StreamVideoInput;
+    #[doc = " The input width in pixels."]
+    #[wasm_bindgen(method, getter)]
+    pub fn width(this: &StreamVideoInput) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_width(this: &StreamVideoInput, val: f64);
+    #[doc = " The input height in pixels."]
+    #[wasm_bindgen(method, getter)]
+    pub fn height(this: &StreamVideoInput) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_height(this: &StreamVideoInput, val: f64);
+}
+impl StreamVideoInput {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> StreamVideoInputBuilder {
+        StreamVideoInputBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct StreamVideoInputBuilder {
+    inner: StreamVideoInput,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl StreamVideoInputBuilder {
+    pub fn width(mut self, val: f64) -> Self {
+        self.inner.set_width(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn height(mut self, val: f64) -> Self {
+        self.inner.set_height(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn build(self) -> Result<StreamVideoInput, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `width`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `height`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(StreamVideoInput),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StreamPublicDetails;
+    #[doc = " The public title for the video."]
+    #[wasm_bindgen(method, getter)]
+    pub fn title(this: &StreamPublicDetails) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_title(this: &StreamPublicDetails, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "title")]
+    pub fn set_title_with_null(this: &StreamPublicDetails, val: &Null);
+    #[doc = " The public share link."]
+    #[wasm_bindgen(method, getter)]
+    pub fn share_link(this: &StreamPublicDetails) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_share_link(this: &StreamPublicDetails, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "share_link")]
+    pub fn set_share_link_with_null(this: &StreamPublicDetails, val: &Null);
+    #[doc = " The public channel link."]
+    #[wasm_bindgen(method, getter)]
+    pub fn channel_link(this: &StreamPublicDetails) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_channel_link(this: &StreamPublicDetails, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "channel_link")]
+    pub fn set_channel_link_with_null(this: &StreamPublicDetails, val: &Null);
+    #[doc = " The public logo URL."]
+    #[wasm_bindgen(method, getter)]
+    pub fn logo(this: &StreamPublicDetails) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_logo(this: &StreamPublicDetails, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "logo")]
+    pub fn set_logo_with_null(this: &StreamPublicDetails, val: &Null);
+}
+impl StreamPublicDetails {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> StreamPublicDetailsBuilder {
+        StreamPublicDetailsBuilder {
+            inner: Self::new(),
+            required: 15u64,
+        }
+    }
+}
+pub struct StreamPublicDetailsBuilder {
+    inner: StreamPublicDetails,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl StreamPublicDetailsBuilder {
+    pub fn title(mut self, val: &str) -> Self {
+        self.inner.set_title(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn title_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_title_with_null(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn share_link(mut self, val: &str) -> Self {
+        self.inner.set_share_link(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn share_link_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_share_link_with_null(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn channel_link(mut self, val: &str) -> Self {
+        self.inner.set_channel_link(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn channel_link_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_channel_link_with_null(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn logo(mut self, val: &str) -> Self {
+        self.inner.set_logo(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn logo_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_logo_with_null(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn build(self) -> Result<StreamPublicDetails, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `title`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `share_link`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `channel_link`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `logo`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(StreamPublicDetails),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StreamDirectUpload;
+    #[doc = " The URL an unauthenticated upload can use for a single multipart request."]
+    #[wasm_bindgen(method, getter, js_name = "uploadURL")]
+    pub fn upload_url(this: &StreamDirectUpload) -> String;
+    #[wasm_bindgen(method, setter, js_name = "uploadURL")]
+    pub fn set_upload_url(this: &StreamDirectUpload, val: &str);
+    #[doc = " A Cloudflare-generated unique identifier for a media item."]
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &StreamDirectUpload) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_id(this: &StreamDirectUpload, val: &str);
+    #[doc = " The watermark profile applied to the upload."]
+    #[wasm_bindgen(method, getter)]
+    pub fn watermark(this: &StreamDirectUpload) -> Option<StreamWatermark>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_watermark(this: &StreamDirectUpload, val: &StreamWatermark);
+    #[wasm_bindgen(method, setter, js_name = "watermark")]
+    pub fn set_watermark_with_null(this: &StreamDirectUpload, val: &Null);
+    #[doc = " The scheduled deletion time, if any."]
+    #[wasm_bindgen(method, getter, js_name = "scheduledDeletion")]
+    pub fn scheduled_deletion(this: &StreamDirectUpload) -> Option<String>;
+    #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
+    pub fn set_scheduled_deletion(this: &StreamDirectUpload, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
+    pub fn set_scheduled_deletion_with_null(this: &StreamDirectUpload, val: &Null);
+}
+impl StreamDirectUpload {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> StreamDirectUploadBuilder {
+        StreamDirectUploadBuilder {
+            inner: Self::new(),
+            required: 15u64,
+        }
+    }
+}
+pub struct StreamDirectUploadBuilder {
+    inner: StreamDirectUpload,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl StreamDirectUploadBuilder {
+    pub fn upload_url(mut self, val: &str) -> Self {
+        self.inner.set_upload_url(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn id(mut self, val: &str) -> Self {
+        self.inner.set_id(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn watermark(mut self, val: &StreamWatermark) -> Self {
+        self.inner.set_watermark(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn watermark_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_watermark_with_null(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn scheduled_deletion(mut self, val: &str) -> Self {
+        self.inner.set_scheduled_deletion(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn scheduled_deletion_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_scheduled_deletion_with_null(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn build(self) -> Result<StreamDirectUpload, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `uploadURL`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `id`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `watermark`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `scheduledDeletion`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(StreamDirectUpload),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StreamDirectUploadCreateParams;
+    #[doc = " The maximum duration in seconds for a video upload."]
+    #[wasm_bindgen(method, getter, js_name = "maxDurationSeconds")]
+    pub fn max_duration_seconds(this: &StreamDirectUploadCreateParams) -> f64;
+    #[wasm_bindgen(method, setter, js_name = "maxDurationSeconds")]
+    pub fn set_max_duration_seconds(this: &StreamDirectUploadCreateParams, val: f64);
+    #[doc = " The date and time after upload when videos will not be accepted."]
+    #[wasm_bindgen(method, getter)]
+    pub fn expiry(this: &StreamDirectUploadCreateParams) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_expiry(this: &StreamDirectUploadCreateParams, val: &str);
+    #[doc = " A user-defined identifier for the media creator."]
+    #[wasm_bindgen(method, getter)]
+    pub fn creator(this: &StreamDirectUploadCreateParams) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_creator(this: &StreamDirectUploadCreateParams, val: &str);
+    #[doc = " A user modifiable key-value store used to reference other systems of record for"]
+    #[doc = " managing videos."]
+    #[wasm_bindgen(method, getter)]
+    pub fn meta(this: &StreamDirectUploadCreateParams) -> Option<Object<JsString>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_meta(this: &StreamDirectUploadCreateParams, val: &Object<JsString>);
+    #[doc = " Lists the origins allowed to display the video."]
+    #[wasm_bindgen(method, getter, js_name = "allowedOrigins")]
+    pub fn allowed_origins(this: &StreamDirectUploadCreateParams) -> Option<Array<JsString>>;
+    #[wasm_bindgen(method, setter, js_name = "allowedOrigins")]
+    pub fn set_allowed_origins(this: &StreamDirectUploadCreateParams, val: &Array<JsString>);
+    #[doc = " Indicates whether the video can be accessed using the id. When set to `true`,"]
+    #[doc = " a signed token must be generated with a signing key to view the video."]
+    #[wasm_bindgen(method, getter, js_name = "requireSignedURLs")]
+    pub fn require_signed_ur_ls(this: &StreamDirectUploadCreateParams) -> Option<bool>;
+    #[wasm_bindgen(method, setter, js_name = "requireSignedURLs")]
+    pub fn set_require_signed_ur_ls(this: &StreamDirectUploadCreateParams, val: bool);
+    #[doc = " The thumbnail timestamp percentage."]
+    #[wasm_bindgen(method, getter, js_name = "thumbnailTimestampPct")]
+    pub fn thumbnail_timestamp_pct(this: &StreamDirectUploadCreateParams) -> Option<f64>;
+    #[wasm_bindgen(method, setter, js_name = "thumbnailTimestampPct")]
+    pub fn set_thumbnail_timestamp_pct(this: &StreamDirectUploadCreateParams, val: f64);
+    #[doc = " The date and time at which the video will be deleted. Include `null` to remove"]
+    #[doc = " a scheduled deletion."]
+    #[wasm_bindgen(method, getter, js_name = "scheduledDeletion")]
+    pub fn scheduled_deletion(this: &StreamDirectUploadCreateParams) -> Option<String>;
+    #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
+    pub fn set_scheduled_deletion(this: &StreamDirectUploadCreateParams, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
+    pub fn set_scheduled_deletion_with_null(this: &StreamDirectUploadCreateParams, val: &Null);
+    #[doc = " The watermark profile to apply."]
+    #[wasm_bindgen(method, getter)]
+    pub fn watermark(this: &StreamDirectUploadCreateParams) -> Option<StreamDirectUploadWatermark>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_watermark(this: &StreamDirectUploadCreateParams, val: &StreamDirectUploadWatermark);
+}
+impl StreamDirectUploadCreateParams {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> StreamDirectUploadCreateParamsBuilder {
+        StreamDirectUploadCreateParamsBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct StreamDirectUploadCreateParamsBuilder {
+    inner: StreamDirectUploadCreateParams,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl StreamDirectUploadCreateParamsBuilder {
+    pub fn max_duration_seconds(mut self, val: f64) -> Self {
+        self.inner.set_max_duration_seconds(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn expiry(mut self, val: &str) -> Self {
+        self.inner.set_expiry(val);
+        self
+    }
+    pub fn creator(mut self, val: &str) -> Self {
+        self.inner.set_creator(val);
+        self
+    }
+    pub fn meta(mut self, val: &Object<JsString>) -> Self {
+        self.inner.set_meta(val);
+        self
+    }
+    pub fn allowed_origins(mut self, val: &Array<JsString>) -> Self {
+        self.inner.set_allowed_origins(val);
+        self
+    }
+    pub fn require_signed_ur_ls(mut self, val: bool) -> Self {
+        self.inner.set_require_signed_ur_ls(val);
+        self
+    }
+    pub fn thumbnail_timestamp_pct(mut self, val: f64) -> Self {
+        self.inner.set_thumbnail_timestamp_pct(val);
+        self
+    }
+    pub fn scheduled_deletion(mut self, val: &str) -> Self {
+        self.inner.set_scheduled_deletion(val);
+        self
+    }
+    pub fn scheduled_deletion_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_scheduled_deletion_with_null(val);
+        self
+    }
+    pub fn watermark(mut self, val: &StreamDirectUploadWatermark) -> Self {
+        self.inner.set_watermark(val);
+        self
+    }
+    pub fn build(self) -> Result<StreamDirectUploadCreateParams, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `maxDurationSeconds`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(StreamDirectUploadCreateParams),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StreamDirectUploadWatermark;
+    #[doc = " The unique identifier for the watermark profile."]
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &StreamDirectUploadWatermark) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_id(this: &StreamDirectUploadWatermark, val: &str);
+}
+impl StreamDirectUploadWatermark {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> StreamDirectUploadWatermarkBuilder {
+        StreamDirectUploadWatermarkBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct StreamDirectUploadWatermarkBuilder {
+    inner: StreamDirectUploadWatermark,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl StreamDirectUploadWatermarkBuilder {
+    pub fn id(mut self, val: &str) -> Self {
+        self.inner.set_id(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn build(self) -> Result<StreamDirectUploadWatermark, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `id`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(StreamDirectUploadWatermark),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StreamUrlUploadParams;
+    #[doc = " Lists the origins allowed to display the video. Enter allowed origin"]
+    #[doc = " domains in an array and use `*` for wildcard subdomains. Empty arrays allow the"]
+    #[doc = " video to be viewed on any origin."]
+    #[wasm_bindgen(method, getter, js_name = "allowedOrigins")]
+    pub fn allowed_origins(this: &StreamUrlUploadParams) -> Option<Array<JsString>>;
+    #[wasm_bindgen(method, setter, js_name = "allowedOrigins")]
+    pub fn set_allowed_origins(this: &StreamUrlUploadParams, val: &Array<JsString>);
+    #[doc = " A user-defined identifier for the media creator."]
+    #[wasm_bindgen(method, getter)]
+    pub fn creator(this: &StreamUrlUploadParams) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_creator(this: &StreamUrlUploadParams, val: &str);
+    #[doc = " A user modifiable key-value store used to reference other systems of"]
+    #[doc = " record for managing videos."]
+    #[wasm_bindgen(method, getter)]
+    pub fn meta(this: &StreamUrlUploadParams) -> Option<Object<JsString>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_meta(this: &StreamUrlUploadParams, val: &Object<JsString>);
+    #[doc = " Indicates whether the video can be a accessed using the id. When"]
+    #[doc = " set to `true`, a signed token must be generated with a signing key to view the"]
+    #[doc = " video."]
+    #[wasm_bindgen(method, getter, js_name = "requireSignedURLs")]
+    pub fn require_signed_ur_ls(this: &StreamUrlUploadParams) -> Option<bool>;
+    #[wasm_bindgen(method, setter, js_name = "requireSignedURLs")]
+    pub fn set_require_signed_ur_ls(this: &StreamUrlUploadParams, val: bool);
+    #[doc = " Indicates the date and time at which the video will be deleted. Omit"]
+    #[doc = " the field to indicate no change, or include with a `null` value to remove an"]
+    #[doc = " existing scheduled deletion. If specified, must be at least 30 days from upload"]
+    #[doc = " time."]
+    #[wasm_bindgen(method, getter, js_name = "scheduledDeletion")]
+    pub fn scheduled_deletion(this: &StreamUrlUploadParams) -> Option<String>;
+    #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
+    pub fn set_scheduled_deletion(this: &StreamUrlUploadParams, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
+    pub fn set_scheduled_deletion_with_null(this: &StreamUrlUploadParams, val: &Null);
+    #[doc = " The timestamp for a thumbnail image calculated as a percentage value"]
+    #[doc = " of the video's duration. To convert from a second-wise timestamp to a"]
+    #[doc = " percentage, divide the desired timestamp by the total duration of the video. If"]
+    #[doc = " this value is not set, the default thumbnail image is taken from 0s of the"]
+    #[doc = " video."]
+    #[wasm_bindgen(method, getter, js_name = "thumbnailTimestampPct")]
+    pub fn thumbnail_timestamp_pct(this: &StreamUrlUploadParams) -> Option<f64>;
+    #[wasm_bindgen(method, setter, js_name = "thumbnailTimestampPct")]
+    pub fn set_thumbnail_timestamp_pct(this: &StreamUrlUploadParams, val: f64);
+    #[doc = " The identifier for the watermark profile"]
+    #[wasm_bindgen(method, getter, js_name = "watermarkId")]
+    pub fn watermark_id(this: &StreamUrlUploadParams) -> Option<String>;
+    #[wasm_bindgen(method, setter, js_name = "watermarkId")]
+    pub fn set_watermark_id(this: &StreamUrlUploadParams, val: &str);
+}
+impl StreamUrlUploadParams {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> StreamUrlUploadParamsBuilder {
+        StreamUrlUploadParamsBuilder { inner: Self::new() }
+    }
+}
+pub struct StreamUrlUploadParamsBuilder {
+    inner: StreamUrlUploadParams,
+}
+#[allow(unused_mut)]
+impl StreamUrlUploadParamsBuilder {
+    pub fn allowed_origins(mut self, val: &Array<JsString>) -> Self {
+        self.inner.set_allowed_origins(val);
+        self
+    }
+    pub fn creator(mut self, val: &str) -> Self {
+        self.inner.set_creator(val);
+        self
+    }
+    pub fn meta(mut self, val: &Object<JsString>) -> Self {
+        self.inner.set_meta(val);
+        self
+    }
+    pub fn require_signed_ur_ls(mut self, val: bool) -> Self {
+        self.inner.set_require_signed_ur_ls(val);
+        self
+    }
+    pub fn scheduled_deletion(mut self, val: &str) -> Self {
+        self.inner.set_scheduled_deletion(val);
+        self
+    }
+    pub fn scheduled_deletion_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_scheduled_deletion_with_null(val);
+        self
+    }
+    pub fn thumbnail_timestamp_pct(mut self, val: f64) -> Self {
+        self.inner.set_thumbnail_timestamp_pct(val);
+        self
+    }
+    pub fn watermark_id(mut self, val: &str) -> Self {
+        self.inner.set_watermark_id(val);
+        self
+    }
+    pub fn build(self) -> StreamUrlUploadParams {
+        self.inner
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -34139,7 +46483,7 @@ extern "C" {
         this: &StreamScopedCaptions,
         language: &str,
         file: &File,
-    ) -> Result<Object, StreamError>;
+    ) -> Result<StreamCaption, StreamError>;
     #[doc = " Generate captions or subtitles for the provided language via AI."]
     #[doc = " "]
     #[doc = " ## Arguments"]
@@ -34163,7 +46507,7 @@ extern "C" {
     pub async fn generate(
         this: &StreamScopedCaptions,
         language: &str,
-    ) -> Result<Object, StreamError>;
+    ) -> Result<StreamCaption, StreamError>;
     #[doc = " Lists the captions or subtitles."]
     #[doc = " Use the language parameter to filter by a specific language."]
     #[doc = " "]
@@ -34180,7 +46524,7 @@ extern "C" {
     #[doc = " * `NotFoundError` — if the video or caption is not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn list(this: &StreamScopedCaptions) -> Result<Array<Object>, StreamError>;
+    pub async fn list(this: &StreamScopedCaptions) -> Result<Array<StreamCaption>, StreamError>;
     #[doc = " Lists the captions or subtitles."]
     #[doc = " Use the language parameter to filter by a specific language."]
     #[doc = " "]
@@ -34200,7 +46544,7 @@ extern "C" {
     pub async fn list_with_language(
         this: &StreamScopedCaptions,
         language: &str,
-    ) -> Result<Array<Object>, StreamError>;
+    ) -> Result<Array<StreamCaption>, StreamError>;
     #[doc = " Removes the captions or subtitles from a video."]
     #[doc = " "]
     #[doc = " ## Arguments"]
@@ -34242,7 +46586,9 @@ extern "C" {
     #[doc = " * `StreamError` — if the video is not ready to stream"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn generate(this: &StreamScopedDownloads) -> Result<Object, StreamError>;
+    pub async fn generate(
+        this: &StreamScopedDownloads,
+    ) -> Result<StreamDownloadGetResponse, StreamError>;
     #[doc = " Generates a download for a video when a video is ready to view. Available"]
     #[doc = " types are `default` and `audio`. Defaults to `default` when omitted."]
     #[doc = " "]
@@ -34265,7 +46611,7 @@ extern "C" {
     pub async fn generate_with_download_type(
         this: &StreamScopedDownloads,
         download_type: &StreamDownloadType,
-    ) -> Result<Object, StreamError>;
+    ) -> Result<StreamDownloadGetResponse, StreamError>;
     #[doc = " Lists the downloads created for a video."]
     #[doc = " "]
     #[doc = " ## Returns"]
@@ -34277,7 +46623,9 @@ extern "C" {
     #[doc = " * `NotFoundError` — if the video or downloads are not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn get(this: &StreamScopedDownloads) -> Result<Object, StreamError>;
+    pub async fn get(
+        this: &StreamScopedDownloads,
+    ) -> Result<StreamDownloadGetResponse, StreamError>;
     #[doc = " Delete the downloads for a video. Available types are `default` and `audio`."]
     #[doc = " Defaults to `default` when omitted."]
     #[doc = " "]
@@ -34346,7 +46694,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "list")]
     pub async fn list_with_params(
         this: &StreamVideos,
-        params: &Object,
+        params: &StreamVideosListParams,
     ) -> Result<Array<StreamVideo>, StreamError>;
 }
 #[wasm_bindgen]
@@ -34376,8 +46724,8 @@ extern "C" {
     pub async fn generate(
         this: &StreamWatermarks,
         file: &File,
-        params: &Object,
-    ) -> Result<Object, StreamError>;
+        params: &StreamWatermarkCreateParams,
+    ) -> Result<StreamWatermark, StreamError>;
     #[doc = " Generate a new watermark profile"]
     #[doc = " "]
     #[doc = " ## Arguments"]
@@ -34400,8 +46748,8 @@ extern "C" {
     pub async fn generate_with_url(
         this: &StreamWatermarks,
         url: &str,
-        params: &Object,
-    ) -> Result<Object, StreamError>;
+        params: &StreamWatermarkCreateParams,
+    ) -> Result<StreamWatermark, StreamError>;
     #[doc = " Lists all watermark profiles for an account."]
     #[doc = " "]
     #[doc = " ## Returns"]
@@ -34412,7 +46760,7 @@ extern "C" {
     #[doc = " "]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn list(this: &StreamWatermarks) -> Result<Array<Object>, InternalError>;
+    pub async fn list(this: &StreamWatermarks) -> Result<Array<StreamWatermark>, InternalError>;
     #[doc = " Retrieves details for a single watermark profile."]
     #[doc = " "]
     #[doc = " ## Arguments"]
@@ -34428,7 +46776,10 @@ extern "C" {
     #[doc = " * `NotFoundError` — if the watermark is not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn get(this: &StreamWatermarks, watermark_id: &str) -> Result<Object, StreamError>;
+    pub async fn get(
+        this: &StreamWatermarks,
+        watermark_id: &str,
+    ) -> Result<StreamWatermark, StreamError>;
     #[doc = " Deletes a watermark profile."]
     #[doc = " "]
     #[doc = " ## Arguments"]
@@ -34446,10 +46797,210 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn delete(this: &StreamWatermarks, watermark_id: &str) -> Result<(), StreamError>;
 }
-#[allow(dead_code)]
-pub type StreamUpdateVideoParams = Object;
-#[allow(dead_code)]
-pub type StreamCaption = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StreamUpdateVideoParams;
+    #[doc = " Lists the origins allowed to display the video. Enter allowed origin"]
+    #[doc = " domains in an array and use `*` for wildcard subdomains. Empty arrays allow the"]
+    #[doc = " video to be viewed on any origin."]
+    #[wasm_bindgen(method, getter, js_name = "allowedOrigins")]
+    pub fn allowed_origins(this: &StreamUpdateVideoParams) -> Option<Array<JsString>>;
+    #[wasm_bindgen(method, setter, js_name = "allowedOrigins")]
+    pub fn set_allowed_origins(this: &StreamUpdateVideoParams, val: &Array<JsString>);
+    #[doc = " A user-defined identifier for the media creator."]
+    #[wasm_bindgen(method, getter)]
+    pub fn creator(this: &StreamUpdateVideoParams) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_creator(this: &StreamUpdateVideoParams, val: &str);
+    #[doc = " The maximum duration in seconds for a video upload. Can be set for a"]
+    #[doc = " video that is not yet uploaded to limit its duration. Uploads that exceed the"]
+    #[doc = " specified duration will fail during processing. A value of `-1` means the value"]
+    #[doc = " is unknown."]
+    #[wasm_bindgen(method, getter, js_name = "maxDurationSeconds")]
+    pub fn max_duration_seconds(this: &StreamUpdateVideoParams) -> Option<f64>;
+    #[wasm_bindgen(method, setter, js_name = "maxDurationSeconds")]
+    pub fn set_max_duration_seconds(this: &StreamUpdateVideoParams, val: f64);
+    #[doc = " A user modifiable key-value store used to reference other systems of"]
+    #[doc = " record for managing videos."]
+    #[wasm_bindgen(method, getter)]
+    pub fn meta(this: &StreamUpdateVideoParams) -> Option<Object<JsString>>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_meta(this: &StreamUpdateVideoParams, val: &Object<JsString>);
+    #[doc = " Indicates whether the video can be a accessed using the id. When"]
+    #[doc = " set to `true`, a signed token must be generated with a signing key to view the"]
+    #[doc = " video."]
+    #[wasm_bindgen(method, getter, js_name = "requireSignedURLs")]
+    pub fn require_signed_ur_ls(this: &StreamUpdateVideoParams) -> Option<bool>;
+    #[wasm_bindgen(method, setter, js_name = "requireSignedURLs")]
+    pub fn set_require_signed_ur_ls(this: &StreamUpdateVideoParams, val: bool);
+    #[doc = " Indicates the date and time at which the video will be deleted. Omit"]
+    #[doc = " the field to indicate no change, or include with a `null` value to remove an"]
+    #[doc = " existing scheduled deletion. If specified, must be at least 30 days from upload"]
+    #[doc = " time."]
+    #[wasm_bindgen(method, getter, js_name = "scheduledDeletion")]
+    pub fn scheduled_deletion(this: &StreamUpdateVideoParams) -> Option<String>;
+    #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
+    pub fn set_scheduled_deletion(this: &StreamUpdateVideoParams, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
+    pub fn set_scheduled_deletion_with_null(this: &StreamUpdateVideoParams, val: &Null);
+    #[doc = " The timestamp for a thumbnail image calculated as a percentage value"]
+    #[doc = " of the video's duration. To convert from a second-wise timestamp to a"]
+    #[doc = " percentage, divide the desired timestamp by the total duration of the video. If"]
+    #[doc = " this value is not set, the default thumbnail image is taken from 0s of the"]
+    #[doc = " video."]
+    #[wasm_bindgen(method, getter, js_name = "thumbnailTimestampPct")]
+    pub fn thumbnail_timestamp_pct(this: &StreamUpdateVideoParams) -> Option<f64>;
+    #[wasm_bindgen(method, setter, js_name = "thumbnailTimestampPct")]
+    pub fn set_thumbnail_timestamp_pct(this: &StreamUpdateVideoParams, val: f64);
+}
+impl StreamUpdateVideoParams {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> StreamUpdateVideoParamsBuilder {
+        StreamUpdateVideoParamsBuilder { inner: Self::new() }
+    }
+}
+pub struct StreamUpdateVideoParamsBuilder {
+    inner: StreamUpdateVideoParams,
+}
+#[allow(unused_mut)]
+impl StreamUpdateVideoParamsBuilder {
+    pub fn allowed_origins(mut self, val: &Array<JsString>) -> Self {
+        self.inner.set_allowed_origins(val);
+        self
+    }
+    pub fn creator(mut self, val: &str) -> Self {
+        self.inner.set_creator(val);
+        self
+    }
+    pub fn max_duration_seconds(mut self, val: f64) -> Self {
+        self.inner.set_max_duration_seconds(val);
+        self
+    }
+    pub fn meta(mut self, val: &Object<JsString>) -> Self {
+        self.inner.set_meta(val);
+        self
+    }
+    pub fn require_signed_ur_ls(mut self, val: bool) -> Self {
+        self.inner.set_require_signed_ur_ls(val);
+        self
+    }
+    pub fn scheduled_deletion(mut self, val: &str) -> Self {
+        self.inner.set_scheduled_deletion(val);
+        self
+    }
+    pub fn scheduled_deletion_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_scheduled_deletion_with_null(val);
+        self
+    }
+    pub fn thumbnail_timestamp_pct(mut self, val: f64) -> Self {
+        self.inner.set_thumbnail_timestamp_pct(val);
+        self
+    }
+    pub fn build(self) -> StreamUpdateVideoParams {
+        self.inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StreamCaption;
+    #[doc = " Whether the caption was generated via AI."]
+    #[wasm_bindgen(method, getter)]
+    pub fn generated(this: &StreamCaption) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_generated(this: &StreamCaption, val: bool);
+    #[doc = " The language label displayed in the native language to users."]
+    #[wasm_bindgen(method, getter)]
+    pub fn label(this: &StreamCaption) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_label(this: &StreamCaption, val: &str);
+    #[doc = " The language tag in BCP 47 format."]
+    #[wasm_bindgen(method, getter)]
+    pub fn language(this: &StreamCaption) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_language(this: &StreamCaption, val: &str);
+    #[doc = " The status of a generated caption."]
+    #[wasm_bindgen(method, getter)]
+    pub fn status(this: &StreamCaption) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_status(this: &StreamCaption, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value(this: &StreamCaption, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value_1(this: &StreamCaption, val: &str);
+}
+impl StreamCaption {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> StreamCaptionBuilder {
+        StreamCaptionBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct StreamCaptionBuilder {
+    inner: StreamCaption,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl StreamCaptionBuilder {
+    pub fn generated(mut self, val: bool) -> Self {
+        self.inner.set_generated(val);
+        self
+    }
+    pub fn label(mut self, val: &str) -> Self {
+        self.inner.set_label(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn language(mut self, val: &str) -> Self {
+        self.inner.set_language(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn status(mut self, val: &str) -> Self {
+        self.inner.set_status(val);
+        self
+    }
+    pub fn status_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value(val);
+        self
+    }
+    pub fn status_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value_1(val);
+        self
+    }
+    pub fn build(self) -> Result<StreamCaption, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `label`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `language`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(StreamCaption),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StreamDownloadStatus {
@@ -34468,10 +47019,123 @@ pub enum StreamDownloadType {
     #[wasm_bindgen(js_name = "audio")]
     Audio,
 }
-#[allow(dead_code)]
-pub type StreamDownload = Object;
-#[allow(dead_code)]
-pub type StreamDownloadGetResponse = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StreamDownload;
+    #[doc = " Indicates the progress as a percentage between 0 and 100."]
+    #[wasm_bindgen(method, getter, js_name = "percentComplete")]
+    pub fn percent_complete(this: &StreamDownload) -> f64;
+    #[wasm_bindgen(method, setter, js_name = "percentComplete")]
+    pub fn set_percent_complete(this: &StreamDownload, val: f64);
+    #[doc = " The status of a generated download."]
+    #[wasm_bindgen(method, getter)]
+    pub fn status(this: &StreamDownload) -> StreamDownloadStatus;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_status(this: &StreamDownload, val: &StreamDownloadStatus);
+    #[doc = " The URL to access the generated download."]
+    #[wasm_bindgen(method, getter)]
+    pub fn url(this: &StreamDownload) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_url(this: &StreamDownload, val: &str);
+}
+impl StreamDownload {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> StreamDownloadBuilder {
+        StreamDownloadBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct StreamDownloadBuilder {
+    inner: StreamDownload,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl StreamDownloadBuilder {
+    pub fn percent_complete(mut self, val: f64) -> Self {
+        self.inner.set_percent_complete(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn status(mut self, val: &StreamDownloadStatus) -> Self {
+        self.inner.set_status(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn url(mut self, val: &str) -> Self {
+        self.inner.set_url(val);
+        self
+    }
+    pub fn build(self) -> Result<StreamDownload, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `percentComplete`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `status`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(StreamDownload),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StreamDownloadGetResponse;
+    #[doc = " The audio-only download. Only present if this download type has been created."]
+    #[wasm_bindgen(method, getter)]
+    pub fn audio(this: &StreamDownloadGetResponse) -> Option<StreamDownload>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_audio(this: &StreamDownloadGetResponse, val: &StreamDownload);
+    #[doc = " The default video download. Only present if this download type has been created."]
+    #[wasm_bindgen(method, getter)]
+    pub fn default(this: &StreamDownloadGetResponse) -> Option<StreamDownload>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_default(this: &StreamDownloadGetResponse, val: &StreamDownload);
+}
+impl StreamDownloadGetResponse {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> StreamDownloadGetResponseBuilder {
+        StreamDownloadGetResponseBuilder { inner: Self::new() }
+    }
+}
+pub struct StreamDownloadGetResponseBuilder {
+    inner: StreamDownloadGetResponse,
+}
+#[allow(unused_mut)]
+impl StreamDownloadGetResponseBuilder {
+    pub fn audio(mut self, val: &StreamDownload) -> Self {
+        self.inner.set_audio(val);
+        self
+    }
+    pub fn default(mut self, val: &StreamDownload) -> Self {
+        self.inner.set_default(val);
+        self
+    }
+    pub fn build(self) -> StreamDownloadGetResponse {
+        self.inner
+    }
+}
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StreamWatermarkPosition {
@@ -34486,12 +47150,358 @@ pub enum StreamWatermarkPosition {
     #[wasm_bindgen(js_name = "center")]
     Center,
 }
-#[allow(dead_code)]
-pub type StreamWatermark = Object;
-#[allow(dead_code)]
-pub type StreamWatermarkCreateParams = Object;
-#[allow(dead_code)]
-pub type StreamVideosListParams = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StreamWatermark;
+    #[doc = " The unique identifier for a watermark profile."]
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &StreamWatermark) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_id(this: &StreamWatermark, val: &str);
+    #[doc = " The size of the image in bytes."]
+    #[wasm_bindgen(method, getter)]
+    pub fn size(this: &StreamWatermark) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_size(this: &StreamWatermark, val: f64);
+    #[doc = " The height of the image in pixels."]
+    #[wasm_bindgen(method, getter)]
+    pub fn height(this: &StreamWatermark) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_height(this: &StreamWatermark, val: f64);
+    #[doc = " The width of the image in pixels."]
+    #[wasm_bindgen(method, getter)]
+    pub fn width(this: &StreamWatermark) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_width(this: &StreamWatermark, val: f64);
+    #[doc = " The date and a time a watermark profile was created."]
+    #[wasm_bindgen(method, getter)]
+    pub fn created(this: &StreamWatermark) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_created(this: &StreamWatermark, val: &str);
+    #[doc = " The source URL for a downloaded image. If the watermark profile was created via"]
+    #[doc = " direct upload, this field is null."]
+    #[wasm_bindgen(method, getter, js_name = "downloadedFrom")]
+    pub fn downloaded_from(this: &StreamWatermark) -> Option<String>;
+    #[wasm_bindgen(method, setter, js_name = "downloadedFrom")]
+    pub fn set_downloaded_from(this: &StreamWatermark, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "downloadedFrom")]
+    pub fn set_downloaded_from_with_null(this: &StreamWatermark, val: &Null);
+    #[doc = " A short description of the watermark profile."]
+    #[wasm_bindgen(method, getter)]
+    pub fn name(this: &StreamWatermark) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_name(this: &StreamWatermark, val: &str);
+    #[doc = " The translucency of the image. A value of `0.0` makes the image completely"]
+    #[doc = " transparent, and `1.0` makes the image completely opaque. Note that if the image"]
+    #[doc = " is already semi-transparent, setting this to `1.0` will not make the image"]
+    #[doc = " completely opaque."]
+    #[wasm_bindgen(method, getter)]
+    pub fn opacity(this: &StreamWatermark) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_opacity(this: &StreamWatermark, val: f64);
+    #[doc = " The whitespace between the adjacent edges (determined by position) of the video"]
+    #[doc = " and the image. `0.0` indicates no padding, and `1.0` indicates a fully padded"]
+    #[doc = " video width or length, as determined by the algorithm."]
+    #[wasm_bindgen(method, getter)]
+    pub fn padding(this: &StreamWatermark) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_padding(this: &StreamWatermark, val: f64);
+    #[doc = " The size of the image relative to the overall size of the video. This parameter"]
+    #[doc = " will adapt to horizontal and vertical videos automatically. `0.0` indicates no"]
+    #[doc = " scaling (use the size of the image as-is), and `1.0 `fills the entire video."]
+    #[wasm_bindgen(method, getter)]
+    pub fn scale(this: &StreamWatermark) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_scale(this: &StreamWatermark, val: f64);
+    #[doc = " The location of the image. Valid positions are: `upperRight`, `upperLeft`,"]
+    #[doc = " `lowerLeft`, `lowerRight`, and `center`. Note that `center` ignores the"]
+    #[doc = " `padding` parameter."]
+    #[wasm_bindgen(method, getter)]
+    pub fn position(this: &StreamWatermark) -> StreamWatermarkPosition;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_position(this: &StreamWatermark, val: &StreamWatermarkPosition);
+}
+impl StreamWatermark {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> StreamWatermarkBuilder {
+        StreamWatermarkBuilder {
+            inner: Self::new(),
+            required: 2047u64,
+        }
+    }
+}
+pub struct StreamWatermarkBuilder {
+    inner: StreamWatermark,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl StreamWatermarkBuilder {
+    pub fn id(mut self, val: &str) -> Self {
+        self.inner.set_id(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn size(mut self, val: f64) -> Self {
+        self.inner.set_size(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn height(mut self, val: f64) -> Self {
+        self.inner.set_height(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn width(mut self, val: f64) -> Self {
+        self.inner.set_width(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn created(mut self, val: &str) -> Self {
+        self.inner.set_created(val);
+        self.required &= 18446744073709551599u64;
+        self
+    }
+    pub fn downloaded_from(mut self, val: &str) -> Self {
+        self.inner.set_downloaded_from(val);
+        self.required &= 18446744073709551583u64;
+        self
+    }
+    pub fn downloaded_from_with_null(mut self, val: &Null) -> Self {
+        self.inner.set_downloaded_from_with_null(val);
+        self.required &= 18446744073709551583u64;
+        self
+    }
+    pub fn name(mut self, val: &str) -> Self {
+        self.inner.set_name(val);
+        self.required &= 18446744073709551551u64;
+        self
+    }
+    pub fn opacity(mut self, val: f64) -> Self {
+        self.inner.set_opacity(val);
+        self.required &= 18446744073709551487u64;
+        self
+    }
+    pub fn padding(mut self, val: f64) -> Self {
+        self.inner.set_padding(val);
+        self.required &= 18446744073709551359u64;
+        self
+    }
+    pub fn scale(mut self, val: f64) -> Self {
+        self.inner.set_scale(val);
+        self.required &= 18446744073709551103u64;
+        self
+    }
+    pub fn position(mut self, val: &StreamWatermarkPosition) -> Self {
+        self.inner.set_position(val);
+        self.required &= 18446744073709550591u64;
+        self
+    }
+    pub fn build(self) -> Result<StreamWatermark, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `id`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `size`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `height`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `width`");
+            }
+            if self.required & 16u64 != 0 {
+                missing.push("missing required property `created`");
+            }
+            if self.required & 32u64 != 0 {
+                missing.push("missing required property `downloadedFrom`");
+            }
+            if self.required & 64u64 != 0 {
+                missing.push("missing required property `name`");
+            }
+            if self.required & 128u64 != 0 {
+                missing.push("missing required property `opacity`");
+            }
+            if self.required & 256u64 != 0 {
+                missing.push("missing required property `padding`");
+            }
+            if self.required & 512u64 != 0 {
+                missing.push("missing required property `scale`");
+            }
+            if self.required & 1024u64 != 0 {
+                missing.push("missing required property `position`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(StreamWatermark),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StreamWatermarkCreateParams;
+    #[doc = " A short description of the watermark profile."]
+    #[wasm_bindgen(method, getter)]
+    pub fn name(this: &StreamWatermarkCreateParams) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_name(this: &StreamWatermarkCreateParams, val: &str);
+    #[doc = " The translucency of the image. A value of `0.0` makes the image completely"]
+    #[doc = " transparent, and `1.0` makes the image completely opaque. Note that if the"]
+    #[doc = " image is already semi-transparent, setting this to `1.0` will not make the"]
+    #[doc = " image completely opaque."]
+    #[wasm_bindgen(method, getter)]
+    pub fn opacity(this: &StreamWatermarkCreateParams) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_opacity(this: &StreamWatermarkCreateParams, val: f64);
+    #[doc = " The whitespace between the adjacent edges (determined by position) of the"]
+    #[doc = " video and the image. `0.0` indicates no padding, and `1.0` indicates a fully"]
+    #[doc = " padded video width or length, as determined by the algorithm."]
+    #[wasm_bindgen(method, getter)]
+    pub fn padding(this: &StreamWatermarkCreateParams) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_padding(this: &StreamWatermarkCreateParams, val: f64);
+    #[doc = " The size of the image relative to the overall size of the video. This"]
+    #[doc = " parameter will adapt to horizontal and vertical videos automatically. `0.0`"]
+    #[doc = " indicates no scaling (use the size of the image as-is), and `1.0 `fills the"]
+    #[doc = " entire video."]
+    #[wasm_bindgen(method, getter)]
+    pub fn scale(this: &StreamWatermarkCreateParams) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_scale(this: &StreamWatermarkCreateParams, val: f64);
+    #[doc = " The location of the image."]
+    #[wasm_bindgen(method, getter)]
+    pub fn position(this: &StreamWatermarkCreateParams) -> Option<StreamWatermarkPosition>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_position(this: &StreamWatermarkCreateParams, val: &StreamWatermarkPosition);
+}
+impl StreamWatermarkCreateParams {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> StreamWatermarkCreateParamsBuilder {
+        StreamWatermarkCreateParamsBuilder { inner: Self::new() }
+    }
+}
+pub struct StreamWatermarkCreateParamsBuilder {
+    inner: StreamWatermarkCreateParams,
+}
+#[allow(unused_mut)]
+impl StreamWatermarkCreateParamsBuilder {
+    pub fn name(mut self, val: &str) -> Self {
+        self.inner.set_name(val);
+        self
+    }
+    pub fn opacity(mut self, val: f64) -> Self {
+        self.inner.set_opacity(val);
+        self
+    }
+    pub fn padding(mut self, val: f64) -> Self {
+        self.inner.set_padding(val);
+        self
+    }
+    pub fn scale(mut self, val: f64) -> Self {
+        self.inner.set_scale(val);
+        self
+    }
+    pub fn position(mut self, val: &StreamWatermarkPosition) -> Self {
+        self.inner.set_position(val);
+        self
+    }
+    pub fn build(self) -> StreamWatermarkCreateParams {
+        self.inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StreamVideosListParams;
+    #[doc = " The maximum number of videos to return."]
+    #[wasm_bindgen(method, getter)]
+    pub fn limit(this: &StreamVideosListParams) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_limit(this: &StreamVideosListParams, val: f64);
+    #[doc = " Return videos created before this timestamp."]
+    #[doc = " (RFC3339/RFC3339Nano)"]
+    #[wasm_bindgen(method, getter)]
+    pub fn before(this: &StreamVideosListParams) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_before(this: &StreamVideosListParams, val: &str);
+    #[doc = " Comparison operator for the `before` field."]
+    #[doc = " @default 'lt'"]
+    #[wasm_bindgen(method, getter, js_name = "beforeComp")]
+    pub fn before_comp(this: &StreamVideosListParams) -> Option<StreamPaginationComparison>;
+    #[wasm_bindgen(method, setter, js_name = "beforeComp")]
+    pub fn set_before_comp(this: &StreamVideosListParams, val: &StreamPaginationComparison);
+    #[doc = " Return videos created after this timestamp."]
+    #[doc = " (RFC3339/RFC3339Nano)"]
+    #[wasm_bindgen(method, getter)]
+    pub fn after(this: &StreamVideosListParams) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_after(this: &StreamVideosListParams, val: &str);
+    #[doc = " Comparison operator for the `after` field."]
+    #[doc = " @default 'gte'"]
+    #[wasm_bindgen(method, getter, js_name = "afterComp")]
+    pub fn after_comp(this: &StreamVideosListParams) -> Option<StreamPaginationComparison>;
+    #[wasm_bindgen(method, setter, js_name = "afterComp")]
+    pub fn set_after_comp(this: &StreamVideosListParams, val: &StreamPaginationComparison);
+}
+impl StreamVideosListParams {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> StreamVideosListParamsBuilder {
+        StreamVideosListParamsBuilder { inner: Self::new() }
+    }
+}
+pub struct StreamVideosListParamsBuilder {
+    inner: StreamVideosListParams,
+}
+#[allow(unused_mut)]
+impl StreamVideosListParamsBuilder {
+    pub fn limit(mut self, val: f64) -> Self {
+        self.inner.set_limit(val);
+        self
+    }
+    pub fn before(mut self, val: &str) -> Self {
+        self.inner.set_before(val);
+        self
+    }
+    pub fn before_comp(mut self, val: &StreamPaginationComparison) -> Self {
+        self.inner.set_before_comp(val);
+        self
+    }
+    pub fn after(mut self, val: &str) -> Self {
+        self.inner.set_after(val);
+        self
+    }
+    pub fn after_comp(mut self, val: &StreamPaginationComparison) -> Self {
+        self.inner.set_after_comp(val);
+        self
+    }
+    pub fn build(self) -> StreamVideosListParams {
+        self.inner
+    }
+}
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StreamPaginationComparison {
@@ -35029,20 +48039,421 @@ impl TooManyWatermarksErrorBuilder {
         Ok(self.inner)
     }
 }
-#[allow(dead_code)]
-pub type MarkdownDocument = Object;
-#[allow(dead_code)]
-pub type ConversionResponse = JsValue;
-#[allow(dead_code)]
-pub type ImageConversionOptions = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type MarkdownDocument;
+    #[wasm_bindgen(method, getter)]
+    pub fn name(this: &MarkdownDocument) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_name(this: &MarkdownDocument, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn blob(this: &MarkdownDocument) -> Blob;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_blob(this: &MarkdownDocument, val: &Blob);
+}
+impl MarkdownDocument {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> MarkdownDocumentBuilder {
+        MarkdownDocumentBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct MarkdownDocumentBuilder {
+    inner: MarkdownDocument,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl MarkdownDocumentBuilder {
+    pub fn name(mut self, val: &str) -> Self {
+        self.inner.set_name(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn blob(mut self, val: &Blob) -> Self {
+        self.inner.set_blob(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn build(self) -> Result<MarkdownDocument, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `name`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `blob`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(MarkdownDocument),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ConversionResponse;
+    #[wasm_bindgen(method, getter)]
+    pub fn data(this: &ConversionResponse) -> Option<String>;
+    #[wasm_bindgen(method, getter)]
+    pub fn error(this: &ConversionResponse) -> Option<String>;
+    #[wasm_bindgen(method, getter)]
+    pub fn format(this: &ConversionResponse) -> JsValue;
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &ConversionResponse) -> String;
+    #[wasm_bindgen(method, getter, js_name = "mimeType")]
+    pub fn mime_type(this: &ConversionResponse) -> String;
+    #[wasm_bindgen(method, getter)]
+    pub fn name(this: &ConversionResponse) -> String;
+    #[wasm_bindgen(method, getter)]
+    pub fn tokens(this: &ConversionResponse) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_data(this: &ConversionResponse, val: &str);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_error(this: &ConversionResponse, val: &str);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_format(this: &ConversionResponse, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "format")]
+    pub fn set_format_with_js_value(this: &ConversionResponse, val: &str);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_id(this: &ConversionResponse, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "mimeType")]
+    pub fn set_mime_type(this: &ConversionResponse, val: &str);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_name(this: &ConversionResponse, val: &str);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_tokens(this: &ConversionResponse, val: f64);
+}
+impl ConversionResponse {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ConversionResponseBuilder {
+        ConversionResponseBuilder {
+            inner: Self::new(),
+            required: 15u64,
+        }
+    }
+}
+pub struct ConversionResponseBuilder {
+    inner: ConversionResponse,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl ConversionResponseBuilder {
+    pub fn data(mut self, val: &str) -> Self {
+        self.inner.set_data(val);
+        self
+    }
+    pub fn error(mut self, val: &str) -> Self {
+        self.inner.set_error(val);
+        self
+    }
+    pub fn format(mut self, val: &str) -> Self {
+        self.inner.set_format(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn format_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_format_with_js_value(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn id(mut self, val: &str) -> Self {
+        self.inner.set_id(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn mime_type(mut self, val: &str) -> Self {
+        self.inner.set_mime_type(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn name(mut self, val: &str) -> Self {
+        self.inner.set_name(val);
+        self.required &= 18446744073709551607u64;
+        self
+    }
+    pub fn tokens(mut self, val: f64) -> Self {
+        self.inner.set_tokens(val);
+        self
+    }
+    pub fn build(self) -> Result<ConversionResponse, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `format`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `id`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `mimeType`");
+            }
+            if self.required & 8u64 != 0 {
+                missing.push("missing required property `name`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(ConversionResponse),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ImageConversionOptions;
+    #[wasm_bindgen(method, getter, js_name = "descriptionLanguage")]
+    pub fn description_language(this: &ImageConversionOptions) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter, js_name = "descriptionLanguage")]
+    pub fn set_description_language(this: &ImageConversionOptions, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "descriptionLanguage")]
+    pub fn set_description_language_with_js_value(this: &ImageConversionOptions, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "descriptionLanguage")]
+    pub fn set_description_language_with_js_value_1(this: &ImageConversionOptions, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "descriptionLanguage")]
+    pub fn set_description_language_with_js_value_2(this: &ImageConversionOptions, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "descriptionLanguage")]
+    pub fn set_description_language_with_js_value_3(this: &ImageConversionOptions, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "descriptionLanguage")]
+    pub fn set_description_language_with_js_value_4(this: &ImageConversionOptions, val: &str);
+}
+impl ImageConversionOptions {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ImageConversionOptionsBuilder {
+        ImageConversionOptionsBuilder { inner: Self::new() }
+    }
+}
+pub struct ImageConversionOptionsBuilder {
+    inner: ImageConversionOptions,
+}
+#[allow(unused_mut)]
+impl ImageConversionOptionsBuilder {
+    pub fn description_language(mut self, val: &str) -> Self {
+        self.inner.set_description_language(val);
+        self
+    }
+    pub fn description_language_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_description_language_with_js_value(val);
+        self
+    }
+    pub fn description_language_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_description_language_with_js_value_1(val);
+        self
+    }
+    pub fn description_language_with_js_value_2(mut self, val: &str) -> Self {
+        self.inner.set_description_language_with_js_value_2(val);
+        self
+    }
+    pub fn description_language_with_js_value_3(mut self, val: &str) -> Self {
+        self.inner.set_description_language_with_js_value_3(val);
+        self
+    }
+    pub fn description_language_with_js_value_4(mut self, val: &str) -> Self {
+        self.inner.set_description_language_with_js_value_4(val);
+        self
+    }
+    pub fn build(self) -> ImageConversionOptions {
+        self.inner
+    }
+}
 #[allow(dead_code)]
 pub type EmbeddedImageConversionOptions = JsValue;
-#[allow(dead_code)]
-pub type ConversionOptions = Object;
-#[allow(dead_code)]
-pub type ConversionRequestOptions = Object;
-#[allow(dead_code)]
-pub type SupportedFileFormat = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ConversionOptions;
+    #[wasm_bindgen(method, getter)]
+    pub fn html(this: &ConversionOptions) -> Option<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_html(this: &ConversionOptions, val: &Object);
+    #[wasm_bindgen(method, getter)]
+    pub fn docx(this: &ConversionOptions) -> Option<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_docx(this: &ConversionOptions, val: &Object);
+    #[wasm_bindgen(method, getter)]
+    pub fn image(this: &ConversionOptions) -> Option<ImageConversionOptions>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_image(this: &ConversionOptions, val: &ImageConversionOptions);
+    #[wasm_bindgen(method, getter)]
+    pub fn pdf(this: &ConversionOptions) -> Option<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_pdf(this: &ConversionOptions, val: &Object);
+}
+impl ConversionOptions {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ConversionOptionsBuilder {
+        ConversionOptionsBuilder { inner: Self::new() }
+    }
+}
+pub struct ConversionOptionsBuilder {
+    inner: ConversionOptions,
+}
+#[allow(unused_mut)]
+impl ConversionOptionsBuilder {
+    pub fn html(mut self, val: &Object) -> Self {
+        self.inner.set_html(val);
+        self
+    }
+    pub fn docx(mut self, val: &Object) -> Self {
+        self.inner.set_docx(val);
+        self
+    }
+    pub fn image(mut self, val: &ImageConversionOptions) -> Self {
+        self.inner.set_image(val);
+        self
+    }
+    pub fn pdf(mut self, val: &Object) -> Self {
+        self.inner.set_pdf(val);
+        self
+    }
+    pub fn build(self) -> ConversionOptions {
+        self.inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ConversionRequestOptions;
+    #[wasm_bindgen(method, getter)]
+    pub fn gateway(this: &ConversionRequestOptions) -> Option<GatewayOptions>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_gateway(this: &ConversionRequestOptions, val: &GatewayOptions);
+    #[wasm_bindgen(method, getter, js_name = "extraHeaders")]
+    pub fn extra_headers(this: &ConversionRequestOptions) -> Option<Object>;
+    #[wasm_bindgen(method, setter, js_name = "extraHeaders")]
+    pub fn set_extra_headers(this: &ConversionRequestOptions, val: &Object);
+    #[wasm_bindgen(method, getter, js_name = "conversionOptions")]
+    pub fn conversion_options(this: &ConversionRequestOptions) -> Option<ConversionOptions>;
+    #[wasm_bindgen(method, setter, js_name = "conversionOptions")]
+    pub fn set_conversion_options(this: &ConversionRequestOptions, val: &ConversionOptions);
+}
+impl ConversionRequestOptions {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> ConversionRequestOptionsBuilder {
+        ConversionRequestOptionsBuilder { inner: Self::new() }
+    }
+}
+pub struct ConversionRequestOptionsBuilder {
+    inner: ConversionRequestOptions,
+}
+#[allow(unused_mut)]
+impl ConversionRequestOptionsBuilder {
+    pub fn gateway(mut self, val: &GatewayOptions) -> Self {
+        self.inner.set_gateway(val);
+        self
+    }
+    pub fn extra_headers(mut self, val: &Object) -> Self {
+        self.inner.set_extra_headers(val);
+        self
+    }
+    pub fn conversion_options(mut self, val: &ConversionOptions) -> Self {
+        self.inner.set_conversion_options(val);
+        self
+    }
+    pub fn build(self) -> ConversionRequestOptions {
+        self.inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type SupportedFileFormat;
+    #[wasm_bindgen(method, getter, js_name = "mimeType")]
+    pub fn mime_type(this: &SupportedFileFormat) -> String;
+    #[wasm_bindgen(method, setter, js_name = "mimeType")]
+    pub fn set_mime_type(this: &SupportedFileFormat, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn extension(this: &SupportedFileFormat) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_extension(this: &SupportedFileFormat, val: &str);
+}
+impl SupportedFileFormat {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> SupportedFileFormatBuilder {
+        SupportedFileFormatBuilder {
+            inner: Self::new(),
+            required: 3u64,
+        }
+    }
+}
+pub struct SupportedFileFormatBuilder {
+    inner: SupportedFileFormat,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl SupportedFileFormatBuilder {
+    pub fn mime_type(mut self, val: &str) -> Self {
+        self.inner.set_mime_type(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn extension(mut self, val: &str) -> Self {
+        self.inner.set_extension(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn build(self) -> Result<SupportedFileFormat, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `mimeType`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `extension`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(SupportedFileFormat),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -35051,27 +48462,28 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn transform(
         this: &ToMarkdownService,
-        files: &Array<Object>,
-    ) -> Result<Array, JsValue>;
+        files: &Array<MarkdownDocument>,
+    ) -> Result<Array<ConversionResponse>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "transform")]
     pub async fn transform_with_array_and_options(
         this: &ToMarkdownService,
-        files: &Array<Object>,
-        options: &Object,
-    ) -> Result<Array, JsValue>;
+        files: &Array<MarkdownDocument>,
+        options: &ConversionRequestOptions,
+    ) -> Result<Array<ConversionResponse>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "transform")]
-    pub async fn transform_with_object(
+    pub async fn transform_with_markdown_document(
         this: &ToMarkdownService,
-        files: &Object,
-    ) -> Result<Array, JsValue>;
+        files: &MarkdownDocument,
+    ) -> Result<Array<ConversionResponse>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "transform")]
-    pub async fn transform_with_object_and_options(
+    pub async fn transform_with_markdown_document_and_options(
         this: &ToMarkdownService,
-        files: &Object,
-        options: &Object,
-    ) -> Result<Array, JsValue>;
+        files: &MarkdownDocument,
+        options: &ConversionRequestOptions,
+    ) -> Result<Array<ConversionResponse>, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn supported(this: &ToMarkdownService) -> Result<Array<Object>, JsValue>;
+    pub async fn supported(this: &ToMarkdownService)
+        -> Result<Array<SupportedFileFormat>, JsValue>;
 }
 pub mod tail_stream {
     use wasm_bindgen::prelude::*;
@@ -35700,6 +49112,96 @@ pub mod tail_stream {
             }
         }
     }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type TailEventHandlerObject;
+        #[wasm_bindgen(method, getter)]
+        pub fn outcome(this: &TailEventHandlerObject) -> Option<TailEventHandler>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_outcome(this: &TailEventHandlerObject, val: &TailEventHandler);
+        #[wasm_bindgen(method, getter, js_name = "spanOpen")]
+        pub fn span_open(this: &TailEventHandlerObject) -> Option<TailEventHandler>;
+        #[wasm_bindgen(method, setter, js_name = "spanOpen")]
+        pub fn set_span_open(this: &TailEventHandlerObject, val: &TailEventHandler);
+        #[wasm_bindgen(method, getter, js_name = "spanClose")]
+        pub fn span_close(this: &TailEventHandlerObject) -> Option<TailEventHandler>;
+        #[wasm_bindgen(method, setter, js_name = "spanClose")]
+        pub fn set_span_close(this: &TailEventHandlerObject, val: &TailEventHandler);
+        #[wasm_bindgen(method, getter, js_name = "diagnosticChannel")]
+        pub fn diagnostic_channel(this: &TailEventHandlerObject) -> Option<TailEventHandler>;
+        #[wasm_bindgen(method, setter, js_name = "diagnosticChannel")]
+        pub fn set_diagnostic_channel(this: &TailEventHandlerObject, val: &TailEventHandler);
+        #[wasm_bindgen(method, getter)]
+        pub fn exception(this: &TailEventHandlerObject) -> Option<TailEventHandler>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_exception(this: &TailEventHandlerObject, val: &TailEventHandler);
+        #[wasm_bindgen(method, getter)]
+        pub fn log(this: &TailEventHandlerObject) -> Option<TailEventHandler>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_log(this: &TailEventHandlerObject, val: &TailEventHandler);
+        #[wasm_bindgen(method, getter)]
+        pub fn r#return(this: &TailEventHandlerObject) -> Option<TailEventHandler>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_return(this: &TailEventHandlerObject, val: &TailEventHandler);
+        #[wasm_bindgen(method, getter)]
+        pub fn attributes(this: &TailEventHandlerObject) -> Option<TailEventHandler>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_attributes(this: &TailEventHandlerObject, val: &TailEventHandler);
+    }
+    impl TailEventHandlerObject {
+        #[allow(clippy::new_without_default)]
+        pub fn new() -> Self {
+            #[allow(unused_imports)]
+            use wasm_bindgen::JsCast;
+            JsCast::unchecked_into(js_sys::Object::new())
+        }
+        pub fn builder() -> TailEventHandlerObjectBuilder {
+            TailEventHandlerObjectBuilder { inner: Self::new() }
+        }
+    }
+    pub struct TailEventHandlerObjectBuilder {
+        inner: TailEventHandlerObject,
+    }
+    #[allow(unused_mut)]
+    impl TailEventHandlerObjectBuilder {
+        pub fn outcome(mut self, val: &TailEventHandler) -> Self {
+            self.inner.set_outcome(val);
+            self
+        }
+        pub fn span_open(mut self, val: &TailEventHandler) -> Self {
+            self.inner.set_span_open(val);
+            self
+        }
+        pub fn span_close(mut self, val: &TailEventHandler) -> Self {
+            self.inner.set_span_close(val);
+            self
+        }
+        pub fn diagnostic_channel(mut self, val: &TailEventHandler) -> Self {
+            self.inner.set_diagnostic_channel(val);
+            self
+        }
+        pub fn exception(mut self, val: &TailEventHandler) -> Self {
+            self.inner.set_exception(val);
+            self
+        }
+        pub fn log(mut self, val: &TailEventHandler) -> Self {
+            self.inner.set_log(val);
+            self
+        }
+        pub fn r#return(mut self, val: &TailEventHandler) -> Self {
+            self.inner.set_return(val);
+            self
+        }
+        pub fn attributes(mut self, val: &TailEventHandler) -> Self {
+            self.inner.set_attributes(val);
+            self
+        }
+        pub fn build(self) -> TailEventHandlerObject {
+            self.inner
+        }
+    }
 }
 #[allow(dead_code)]
 pub type VectorizeVectorMetadataValue = JsValue;
@@ -35789,8 +49291,12 @@ pub enum VectorizeVectorMetadataFilterCollectionOp {
     #[wasm_bindgen(js_name = "$nin")]
     nin,
 }
-#[allow(dead_code)]
-pub type VectorizeVectorMetadataFilter = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type VectorizeVectorMetadataFilter;
+}
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VectorizeDistanceMetric {
@@ -35838,9 +49344,9 @@ extern "C" {
         val: &VectorizeMetadataRetrievalLevel,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn filter(this: &VectorizeQueryOptions) -> Option<Object>;
+    pub fn filter(this: &VectorizeQueryOptions) -> Option<VectorizeVectorMetadataFilter>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_filter(this: &VectorizeQueryOptions, val: &Object);
+    pub fn set_filter(this: &VectorizeQueryOptions, val: &VectorizeVectorMetadataFilter);
 }
 impl VectorizeQueryOptions {
     #[allow(clippy::new_without_default)]
@@ -35882,7 +49388,7 @@ impl VectorizeQueryOptionsBuilder {
             .set_return_metadata_with_vectorize_metadata_retrieval_level(val);
         self
     }
-    pub fn filter(mut self, val: &Object) -> Self {
+    pub fn filter(mut self, val: &VectorizeVectorMetadataFilter) -> Self {
         self.inner.set_filter(val);
         self
     }
@@ -35890,8 +49396,56 @@ impl VectorizeQueryOptionsBuilder {
         self.inner
     }
 }
-#[allow(dead_code)]
-pub type VectorizeIndexConfig = JsValue;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type VectorizeIndexConfig;
+    #[wasm_bindgen(method, getter)]
+    pub fn dimensions(this: &VectorizeIndexConfig) -> Option<f64>;
+    #[wasm_bindgen(method, getter)]
+    pub fn metric(this: &VectorizeIndexConfig) -> Option<VectorizeDistanceMetric>;
+    #[wasm_bindgen(method, getter)]
+    pub fn preset(this: &VectorizeIndexConfig) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_dimensions(this: &VectorizeIndexConfig, val: f64);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_metric(this: &VectorizeIndexConfig, val: &VectorizeDistanceMetric);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_preset(this: &VectorizeIndexConfig, val: &str);
+}
+impl VectorizeIndexConfig {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> VectorizeIndexConfigBuilder {
+        VectorizeIndexConfigBuilder { inner: Self::new() }
+    }
+}
+pub struct VectorizeIndexConfigBuilder {
+    inner: VectorizeIndexConfig,
+}
+#[allow(unused_mut)]
+impl VectorizeIndexConfigBuilder {
+    pub fn dimensions(mut self, val: f64) -> Self {
+        self.inner.set_dimensions(val);
+        self
+    }
+    pub fn metric(mut self, val: &VectorizeDistanceMetric) -> Self {
+        self.inner.set_metric(val);
+        self
+    }
+    pub fn preset(mut self, val: &str) -> Self {
+        self.inner.set_preset(val);
+        self
+    }
+    pub fn build(self) -> VectorizeIndexConfig {
+        self.inner
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -35912,9 +49466,9 @@ extern "C" {
     pub fn set_description(this: &VectorizeIndexDetails, val: &str);
     #[doc = " The index configuration, including the dimension size and distance metric."]
     #[wasm_bindgen(method, getter)]
-    pub fn config(this: &VectorizeIndexDetails) -> JsValue;
+    pub fn config(this: &VectorizeIndexDetails) -> VectorizeIndexConfig;
     #[wasm_bindgen(method, setter)]
-    pub fn set_config(this: &VectorizeIndexDetails, val: &Object);
+    pub fn set_config(this: &VectorizeIndexDetails, val: &VectorizeIndexConfig);
     #[doc = " The number of records containing vectors within the index."]
     #[wasm_bindgen(method, getter, js_name = "vectorsCount")]
     pub fn vectors_count(this: &VectorizeIndexDetails) -> f64;
@@ -36693,8 +50247,83 @@ extern "C" {
         ids: &Array<JsString>,
     ) -> Result<Array<VectorizeVector>, JsValue>;
 }
-#[allow(dead_code)]
-pub type WorkerVersionMetadata = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type WorkerVersionMetadata;
+    #[doc = " The ID of the Worker Version using this binding"]
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &WorkerVersionMetadata) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_id(this: &WorkerVersionMetadata, val: &str);
+    #[doc = " The tag of the Worker Version using this binding"]
+    #[wasm_bindgen(method, getter)]
+    pub fn tag(this: &WorkerVersionMetadata) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_tag(this: &WorkerVersionMetadata, val: &str);
+    #[doc = " The timestamp of when the Worker Version was uploaded"]
+    #[wasm_bindgen(method, getter)]
+    pub fn timestamp(this: &WorkerVersionMetadata) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_timestamp(this: &WorkerVersionMetadata, val: &str);
+}
+impl WorkerVersionMetadata {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> WorkerVersionMetadataBuilder {
+        WorkerVersionMetadataBuilder {
+            inner: Self::new(),
+            required: 7u64,
+        }
+    }
+}
+pub struct WorkerVersionMetadataBuilder {
+    inner: WorkerVersionMetadata,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl WorkerVersionMetadataBuilder {
+    pub fn id(mut self, val: &str) -> Self {
+        self.inner.set_id(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn tag(mut self, val: &str) -> Self {
+        self.inner.set_tag(val);
+        self.required &= 18446744073709551613u64;
+        self
+    }
+    pub fn timestamp(mut self, val: &str) -> Self {
+        self.inner.set_timestamp(val);
+        self.required &= 18446744073709551611u64;
+        self
+    }
+    pub fn build(self) -> Result<WorkerVersionMetadata, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `id`");
+            }
+            if self.required & 2u64 != 0 {
+                missing.push("missing required property `tag`");
+            }
+            if self.required & 4u64 != 0 {
+                missing.push("missing required property `timestamp`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(WorkerVersionMetadata),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -37034,8 +50663,128 @@ impl WorkflowInstanceCreateOptionsBuilder {
         self.inner
     }
 }
-#[allow(dead_code)]
-pub type InstanceStatus = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type InstanceStatus;
+    #[wasm_bindgen(method, getter)]
+    pub fn status(this: &InstanceStatus) -> JsValue;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_status(this: &InstanceStatus, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value(this: &InstanceStatus, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value_1(this: &InstanceStatus, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value_2(this: &InstanceStatus, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value_3(this: &InstanceStatus, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value_4(this: &InstanceStatus, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value_5(this: &InstanceStatus, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value_6(this: &InstanceStatus, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "status")]
+    pub fn set_status_with_js_value_7(this: &InstanceStatus, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn error(this: &InstanceStatus) -> Option<Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_error(this: &InstanceStatus, val: &Object);
+    #[wasm_bindgen(method, getter)]
+    pub fn output(this: &InstanceStatus) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_output(this: &InstanceStatus, val: &JsValue);
+}
+impl InstanceStatus {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> InstanceStatusBuilder {
+        InstanceStatusBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct InstanceStatusBuilder {
+    inner: InstanceStatus,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl InstanceStatusBuilder {
+    pub fn status(mut self, val: &str) -> Self {
+        self.inner.set_status(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn status_with_js_value(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn status_with_js_value_1(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value_1(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn status_with_js_value_2(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value_2(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn status_with_js_value_3(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value_3(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn status_with_js_value_4(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value_4(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn status_with_js_value_5(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value_5(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn status_with_js_value_6(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value_6(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn status_with_js_value_7(mut self, val: &str) -> Self {
+        self.inner.set_status_with_js_value_7(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn error(mut self, val: &Object) -> Self {
+        self.inner.set_error(val);
+        self
+    }
+    pub fn output(mut self, val: &JsValue) -> Self {
+        self.inner.set_output(val);
+        self
+    }
+    pub fn build(self) -> Result<InstanceStatus, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `status`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(InstanceStatus),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -37117,7 +50866,7 @@ extern "C" {
     pub async fn restart(this: &WorkflowInstance) -> Result<(), JsValue>;
     #[doc = " Returns the current status of the instance."]
     #[wasm_bindgen(method, catch)]
-    pub async fn status(this: &WorkflowInstance) -> Result<Object, JsValue>;
+    pub async fn status(this: &WorkflowInstance) -> Result<InstanceStatus, JsValue>;
     #[doc = " Send an event to this instance."]
     #[wasm_bindgen(method, catch, js_name = "sendEvent")]
     pub async fn send_event(
@@ -37273,13 +51022,73 @@ pub mod pipelines {
         pub async fn run(
             this: &PipelineTransformationEntrypoint,
             records: &Array<I>,
-            metadata: &Object,
+            metadata: &PipelineBatchMetadata,
         ) -> Result<Array<O>, JsValue>;
     }
     #[allow(dead_code)]
     pub type PipelineRecord = Object;
-    #[allow(dead_code)]
-    pub type PipelineBatchMetadata = Object;
+    #[wasm_bindgen(module = "cloudflare:pipelines")]
+    extern "C" {
+        # [wasm_bindgen (extends = Object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type PipelineBatchMetadata;
+        #[wasm_bindgen(method, getter, js_name = "pipelineId")]
+        pub fn pipeline_id(this: &PipelineBatchMetadata) -> String;
+        #[wasm_bindgen(method, setter, js_name = "pipelineId")]
+        pub fn set_pipeline_id(this: &PipelineBatchMetadata, val: &str);
+        #[wasm_bindgen(method, getter, js_name = "pipelineName")]
+        pub fn pipeline_name(this: &PipelineBatchMetadata) -> String;
+        #[wasm_bindgen(method, setter, js_name = "pipelineName")]
+        pub fn set_pipeline_name(this: &PipelineBatchMetadata, val: &str);
+    }
+    impl PipelineBatchMetadata {
+        #[allow(clippy::new_without_default)]
+        pub fn new() -> Self {
+            #[allow(unused_imports)]
+            use wasm_bindgen::JsCast;
+            JsCast::unchecked_into(js_sys::Object::new())
+        }
+        pub fn builder() -> PipelineBatchMetadataBuilder {
+            PipelineBatchMetadataBuilder {
+                inner: Self::new(),
+                required: 3u64,
+            }
+        }
+    }
+    pub struct PipelineBatchMetadataBuilder {
+        inner: PipelineBatchMetadata,
+        required: u64,
+    }
+    #[allow(unused_mut)]
+    impl PipelineBatchMetadataBuilder {
+        pub fn pipeline_id(mut self, val: &str) -> Self {
+            self.inner.set_pipeline_id(val);
+            self.required &= 18446744073709551614u64;
+            self
+        }
+        pub fn pipeline_name(mut self, val: &str) -> Self {
+            self.inner.set_pipeline_name(val);
+            self.required &= 18446744073709551613u64;
+            self
+        }
+        pub fn build(self) -> Result<PipelineBatchMetadata, JsValue> {
+            if self.required != 0 {
+                let mut missing = Vec::new();
+                if self.required & 1u64 != 0 {
+                    missing.push("missing required property `pipelineId`");
+                }
+                if self.required & 2u64 != 0 {
+                    missing.push("missing required property `pipelineName`");
+                }
+                return Err(JsValue::from_str(&format!(
+                    "{}: {}",
+                    stringify!(PipelineBatchMetadata),
+                    missing.join(", ")
+                )));
+            }
+            Ok(self.inner)
+        }
+    }
     #[wasm_bindgen(module = "cloudflare:pipelines")]
     extern "C" {
         # [wasm_bindgen (extends = Object)]

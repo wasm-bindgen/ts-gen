@@ -277,9 +277,12 @@ emits builder methods `headers`, `headers_with_array`,
 
 ## Anonymous interface synthesis
 
-A directly-inline `{ … }` type in parameter position is treated as if
-the user had declared a sibling `interface` of the same shape and
-referenced it by name. The Rust output for
+An inline `{ … }` type — or a union of `{ … }` types — that appears
+in a position where a named interface would do is promoted to a real
+`InterfaceDecl` so consumers get a typed builder rather than an opaque
+`Object`. Two positions trigger synthesis:
+
+### Parameter position
 
 ```ts
 interface SendEmail {
@@ -293,7 +296,7 @@ interface SendEmail {
 }
 ```
 
-is identical to what would be emitted for
+is treated as if the user had written
 
 ```ts
 interface SendEmailBuilder {
@@ -308,21 +311,69 @@ interface SendEmail {
 }
 ```
 
-The synthesized type therefore inherits every other rule that applies
-to interfaces: dictionary-vs-class-like classification (see
+### Type-alias position
+
+```ts
+type R2Range = {
+  offset?: number;
+  length?: number;
+  suffix?: number;
+};
+```
+
+is treated as if the user had written `interface R2Range { … }`.
+Type aliases whose target is a single inline literal — or a union of
+inline literals (see below) — promote directly to interfaces; aliases
+to anything else (named types, primitives, function types, generics,
+`Record<…>`, etc.) keep their existing alias semantics.
+
+### Union of inline literals
+
+When every branch of a union is itself an inline literal, the branches
+are **structurally merged** into a single interface body. The merge
+covers both positions above:
+
+```ts
+type EmailAttachment =
+  | { disposition: "inline";     contentId: string;    filename: string; … }
+  | { disposition: "attachment"; contentId?: undefined; filename: string; … };
+```
+
+becomes a single `interface EmailAttachment { … }` whose members are
+the union of every branch's properties, with optionality and types
+adjusted so the merged shape is valid against every branch.
+
+The merge rules:
+
+* **Property optionality**: a property is required iff it is present
+  and non-optional in **every** branch. If any branch declares it
+  optional, or omits it entirely, the merged property is optional.
+* **Property type**: the union of the branch types where the property
+  appears. The resulting union goes through the regular union
+  resolution — [subtyping LUB](#subtyping-lub-across-unions) when the
+  members share a common ancestor, `JsValue` otherwise.
+* **Read-only**: writable iff writable in every branch where it
+  appears. A `readonly` declaration in any branch downgrades the
+  merged property to read-only.
+* **Methods of the same name**: every branch's signature survives as
+  an overload, then flows through [signature flattening](#signature-flattening)
+  to produce the disambiguated bindings.
+* **Index signatures**: dedup by structural equality; the first one
+  wins on conflict.
+
+The synthesized type then inherits every other rule that applies to
+interfaces: dictionary-vs-class-like classification (see
 [Interfaces](#interfaces-class-like-vs-dictionary)), the dictionary-
 builder treatment for property-only shapes (see
-[Dictionary builders](#dictionary-builders)), and the union-typed setter
-expansion (see [Signature flattening](#signature-flattening)) that
-turns `from: string |
-EmailAddress` into separate `set_from(val: &str)` /
-`set_from_with_email_address(val: &EmailAddress)` setters and matching
+[Dictionary builders](#dictionary-builders)), and the union-typed
+setter expansion (see [Signature flattening](#signature-flattening))
+that turns `from: string | EmailAddress` into separate setter and
 builder methods.
 
 ### Naming
 
-The synthesized type's name is `<Parent><ParamSegment>` PascalCased,
-where:
+For **parameter** position the synthesized name is
+`<Parent><ParamSegment>` PascalCased:
 
 * `<Parent>` is the surrounding interface or class name.
 * `<ParamSegment>` is the parameter's own identifier (`builder` →
@@ -331,6 +382,9 @@ where:
   or otherwise unnamed (e.g. `WorkflowInstance.sendEvent({ event })`
   synthesizes `WorkflowInstanceSendEvent`).
 
+For **type-alias** position the synthesized name is the alias's own
+name — `type R2Range = { … }` synthesizes `interface R2Range { … }`.
+
 Collisions with names already in scope (user-declared types or other
 synthesized types) get a numeric suffix: two methods on the same
 parent both taking `(options: { … })` produce `FooOptions` and
@@ -338,12 +392,12 @@ parent both taking `(options: { … })` produce `FooOptions` and
 
 ### Hoisting scope
 
-Only **directly-inline** type literals in parameter position are
-hoisted. Anonymous types nested inside a generic, a union, an array,
-or a property of another object literal are not hoisted — they follow
-the regular type-mapping rules and erase to `Object`. Inline literals
-inside the *body* of a hoisted interface are themselves hoisted
-recursively, using the synthesized parent's name.
+Only **directly-inline** type literals (or unions of such) are
+synthesized. Anonymous types nested inside a generic, an array,
+`Record<…>`, or a property of another object literal are not hoisted
+— they follow the regular type-mapping rules and erase to `Object`.
+Inline literals inside the *body* of a hoisted interface are themselves
+hoisted recursively, using the synthesized parent's name.
 
 ## `var X: { new(...): T }` patterns
 

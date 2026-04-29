@@ -112,10 +112,106 @@ impl MixedWithIndexBuilder {
         Ok(self.inner)
     }
 }
-#[allow(dead_code)]
-pub type HasName = Object;
-#[allow(dead_code)]
-pub type HasAge = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type HasName;
+    #[wasm_bindgen(method, getter)]
+    pub fn name(this: &HasName) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_name(this: &HasName, val: &str);
+}
+impl HasName {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> HasNameBuilder {
+        HasNameBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct HasNameBuilder {
+    inner: HasName,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl HasNameBuilder {
+    pub fn name(mut self, val: &str) -> Self {
+        self.inner.set_name(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn build(self) -> Result<HasName, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `name`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(HasName),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type HasAge;
+    #[wasm_bindgen(method, getter)]
+    pub fn age(this: &HasAge) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_age(this: &HasAge, val: f64);
+}
+impl HasAge {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_imports)]
+        use wasm_bindgen::JsCast;
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+    pub fn builder() -> HasAgeBuilder {
+        HasAgeBuilder {
+            inner: Self::new(),
+            required: 1u64,
+        }
+    }
+}
+pub struct HasAgeBuilder {
+    inner: HasAge,
+    required: u64,
+}
+#[allow(unused_mut)]
+impl HasAgeBuilder {
+    pub fn age(mut self, val: f64) -> Self {
+        self.inner.set_age(val);
+        self.required &= 18446744073709551614u64;
+        self
+    }
+    pub fn build(self) -> Result<HasAge, JsValue> {
+        if self.required != 0 {
+            let mut missing = Vec::new();
+            if self.required & 1u64 != 0 {
+                missing.push("missing required property `age`");
+            }
+            return Err(JsValue::from_str(&format!(
+                "{}: {}",
+                stringify!(HasAge),
+                missing.join(", ")
+            )));
+        }
+        Ok(self.inner)
+    }
+}
 #[allow(dead_code)]
 pub type Person = JsValue;
 #[wasm_bindgen]

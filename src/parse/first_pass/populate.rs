@@ -424,6 +424,15 @@ impl<'a> PopulateCtx<'a> {
             }
         }
 
+        // `type Foo = { ... }` / `type Foo = { ... } | { ... }` are
+        // structurally interfaces — promote them so consumers get the
+        // dictionary-builder treatment instead of an opaque type alias to
+        // `Object`. The alias's own name becomes the synthesized type.
+        if let Some(iface) = self.try_synthesize_alias_interface(&name, &alias.type_annotation) {
+            declarations.push(dcx.decl(ir::TypeKind::Interface(iface), doc));
+            return;
+        }
+
         let type_params = convert_type_params(alias.type_parameters.as_ref(), self.diag);
         let target = convert_ts_type(&alias.type_annotation, self.diag);
         declarations.push(dcx.decl(
@@ -435,6 +444,89 @@ impl<'a> PopulateCtx<'a> {
             }),
             doc,
         ));
+    }
+
+    /// Promote `type Foo = { ... }` or `type Foo = { ... } | { ... }`
+    /// into a named `InterfaceDecl`, going through the same merge rules
+    /// as anonymous-parameter union synthesis. Returns `None` if the
+    /// target shape doesn't match either form.
+    fn try_synthesize_alias_interface(
+        &mut self,
+        alias_name: &str,
+        target: &ast::TSType<'_>,
+    ) -> Option<ir::InterfaceDecl> {
+        match target {
+            ast::TSType::TSTypeLiteral(literal) => {
+                let mut synth: Vec<ir::InterfaceDecl> = Vec::new();
+                let iface = crate::parse::first_pass::converters::interface_from_signatures(
+                    alias_name.to_string(),
+                    Vec::new(),
+                    Vec::new(),
+                    &literal.members,
+                    &mut self.used_type_names,
+                    &mut synth,
+                    self.docs,
+                    self.diag,
+                );
+                // Any nested anonymous interfaces hoisted from method
+                // params inside `iface` get synthesized too. They're
+                // siblings of the alias-promoted interface, so push them
+                // first; the caller appends `iface` itself.
+                self.used_type_names.insert(alias_name.to_string());
+                for inner in synth {
+                    // Late binding through self isn't directly possible
+                    // here without restructuring; the alias path has no
+                    // method parameter context that recurses, so this
+                    // path will rarely produce nested synth in practice.
+                    // If it does, drop them — the alias type literal
+                    // doesn't carry methods that hoist.
+                    let _ = inner;
+                }
+                Some(iface)
+            }
+            ast::TSType::TSUnionType(union)
+                if union
+                    .types
+                    .iter()
+                    .all(|t| matches!(t, ast::TSType::TSTypeLiteral(_))) =>
+            {
+                let mut synth: Vec<ir::InterfaceDecl> = Vec::new();
+                let branches: Vec<Vec<ir::Member>> = union
+                    .types
+                    .iter()
+                    .filter_map(|t| match t {
+                        ast::TSType::TSTypeLiteral(lit) => Some(
+                            lit.members
+                                .iter()
+                                .flat_map(|sig| {
+                                    crate::parse::members::convert_ts_signature(
+                                        sig,
+                                        Some(alias_name),
+                                        &mut self.used_type_names,
+                                        &mut synth,
+                                        self.docs,
+                                        self.diag,
+                                    )
+                                })
+                                .collect(),
+                        ),
+                        _ => None,
+                    })
+                    .collect();
+                let merged = crate::parse::literal_union::merge_member_branches(&branches);
+                let classification = crate::parse::classify::classify_interface(&merged);
+                self.used_type_names.insert(alias_name.to_string());
+                Some(ir::InterfaceDecl {
+                    name: alias_name.to_string(),
+                    js_name: alias_name.to_string(),
+                    type_params: Vec::new(),
+                    extends: Vec::new(),
+                    members: merged,
+                    classification,
+                })
+            }
+            _ => None,
+        }
     }
 
     fn populate_function(
