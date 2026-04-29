@@ -2651,25 +2651,25 @@ extern "C" {
         entries: &Object<T>,
         options: &DurableObjectPutOptions,
     ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, catch)]
-    pub async fn delete(this: &DurableObjectTransaction, key: &str) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "delete")]
-    pub async fn delete_with_key_and_options(
+    #[wasm_bindgen(method, js_name = "delete")]
+    fn delete_raw(this: &DurableObjectTransaction, key: &str) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, js_name = "delete")]
+    fn delete_with_key_and_options_raw(
         this: &DurableObjectTransaction,
         key: &str,
         options: &DurableObjectPutOptions,
-    ) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "delete")]
-    pub async fn delete_with_keys(
+    ) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, js_name = "delete")]
+    fn delete_with_keys_raw(
         this: &DurableObjectTransaction,
         keys: &Array<JsString>,
-    ) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "delete")]
-    pub async fn delete_with_keys_and_options(
+    ) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, js_name = "delete")]
+    fn delete_with_keys_and_options_raw(
         this: &DurableObjectTransaction,
         keys: &Array<JsString>,
         options: &DurableObjectPutOptions,
-    ) -> Result<bool, JsValue>;
+    ) -> ::js_sys::Promise;
     #[wasm_bindgen(method)]
     pub fn rollback(this: &DurableObjectTransaction);
     #[wasm_bindgen(method, catch, js_name = "rollback")]
@@ -2710,6 +2710,50 @@ extern "C" {
         this: &DurableObjectTransaction,
         options: &DurableObjectSetAlarmOptions,
     ) -> Result<(), JsValue>;
+}
+impl DurableObjectTransaction {
+    pub async fn delete(&self, key: &str) -> Result<bool, JsValue> {
+        let __promise = self.delete_raw(key);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_bool()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected boolean"))
+    }
+}
+impl DurableObjectTransaction {
+    pub async fn delete_with_key_and_options(
+        &self,
+        key: &str,
+        options: &DurableObjectPutOptions,
+    ) -> Result<bool, JsValue> {
+        let __promise = self.delete_with_key_and_options_raw(key, options);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_bool()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected boolean"))
+    }
+}
+impl DurableObjectTransaction {
+    pub async fn delete_with_keys(&self, keys: &Array<JsString>) -> Result<bool, JsValue> {
+        let __promise = self.delete_with_keys_raw(keys);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_bool()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected boolean"))
+    }
+}
+impl DurableObjectTransaction {
+    pub async fn delete_with_keys_and_options(
+        &self,
+        keys: &Array<JsString>,
+        options: &DurableObjectPutOptions,
+    ) -> Result<bool, JsValue> {
+        let __promise = self.delete_with_keys_and_options_raw(keys, options);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_bool()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected boolean"))
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -2762,25 +2806,25 @@ extern "C" {
         entries: &Object<T>,
         options: &DurableObjectPutOptions,
     ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, catch)]
-    pub async fn delete(this: &DurableObjectStorage, key: &str) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "delete")]
-    pub async fn delete_with_key_and_options(
+    #[wasm_bindgen(method, js_name = "delete")]
+    fn delete_raw(this: &DurableObjectStorage, key: &str) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, js_name = "delete")]
+    fn delete_with_key_and_options_raw(
         this: &DurableObjectStorage,
         key: &str,
         options: &DurableObjectPutOptions,
-    ) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "delete")]
-    pub async fn delete_with_keys(
+    ) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, js_name = "delete")]
+    fn delete_with_keys_raw(
         this: &DurableObjectStorage,
         keys: &Array<JsString>,
-    ) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "delete")]
-    pub async fn delete_with_keys_and_options(
+    ) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, js_name = "delete")]
+    fn delete_with_keys_and_options_raw(
         this: &DurableObjectStorage,
         keys: &Array<JsString>,
         options: &DurableObjectPutOptions,
-    ) -> Result<bool, JsValue>;
+    ) -> ::js_sys::Promise;
     #[wasm_bindgen(method, catch, js_name = "deleteAll")]
     pub async fn delete_all(this: &DurableObjectStorage) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "deleteAll")]
@@ -2844,23 +2888,106 @@ extern "C" {
         this: &DurableObjectStorage,
         closure: &Function<fn() -> T>,
     ) -> Result<JsValue, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "getCurrentBookmark")]
-    pub async fn get_current_bookmark(this: &DurableObjectStorage) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "getBookmarkForTime")]
-    pub async fn get_bookmark_for_time(
-        this: &DurableObjectStorage,
-        timestamp: f64,
-    ) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "getBookmarkForTime")]
-    pub async fn get_bookmark_for_time_with_date(
+    #[wasm_bindgen(method, js_name = "getCurrentBookmark")]
+    fn get_current_bookmark_raw(this: &DurableObjectStorage) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, js_name = "getBookmarkForTime")]
+    fn get_bookmark_for_time_raw(this: &DurableObjectStorage, timestamp: f64) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, js_name = "getBookmarkForTime")]
+    fn get_bookmark_for_time_with_date_raw(
         this: &DurableObjectStorage,
         timestamp: &Date,
-    ) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "onNextSessionRestoreBookmark")]
-    pub async fn on_next_session_restore_bookmark(
+    ) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, js_name = "onNextSessionRestoreBookmark")]
+    fn on_next_session_restore_bookmark_raw(
         this: &DurableObjectStorage,
         bookmark: &str,
-    ) -> Result<String, JsValue>;
+    ) -> ::js_sys::Promise;
+}
+impl DurableObjectStorage {
+    pub async fn delete(&self, key: &str) -> Result<bool, JsValue> {
+        let __promise = self.delete_raw(key);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_bool()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected boolean"))
+    }
+}
+impl DurableObjectStorage {
+    pub async fn delete_with_key_and_options(
+        &self,
+        key: &str,
+        options: &DurableObjectPutOptions,
+    ) -> Result<bool, JsValue> {
+        let __promise = self.delete_with_key_and_options_raw(key, options);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_bool()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected boolean"))
+    }
+}
+impl DurableObjectStorage {
+    pub async fn delete_with_keys(&self, keys: &Array<JsString>) -> Result<bool, JsValue> {
+        let __promise = self.delete_with_keys_raw(keys);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_bool()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected boolean"))
+    }
+}
+impl DurableObjectStorage {
+    pub async fn delete_with_keys_and_options(
+        &self,
+        keys: &Array<JsString>,
+        options: &DurableObjectPutOptions,
+    ) -> Result<bool, JsValue> {
+        let __promise = self.delete_with_keys_and_options_raw(keys, options);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_bool()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected boolean"))
+    }
+}
+impl DurableObjectStorage {
+    pub async fn get_current_bookmark(&self) -> Result<String, JsValue> {
+        let __promise = self.get_current_bookmark_raw();
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_string()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected string"))
+    }
+}
+impl DurableObjectStorage {
+    pub async fn get_bookmark_for_time(&self, timestamp: f64) -> Result<String, JsValue> {
+        let __promise = self.get_bookmark_for_time_raw(timestamp);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_string()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected string"))
+    }
+}
+impl DurableObjectStorage {
+    pub async fn get_bookmark_for_time_with_date(
+        &self,
+        timestamp: &Date,
+    ) -> Result<String, JsValue> {
+        let __promise = self.get_bookmark_for_time_with_date_raw(timestamp);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_string()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected string"))
+    }
+}
+impl DurableObjectStorage {
+    pub async fn on_next_session_restore_bookmark(
+        &self,
+        bookmark: &str,
+    ) -> Result<String, JsValue> {
+        let __promise = self.on_next_session_restore_bookmark_raw(bookmark);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_string()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected string"))
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -4020,11 +4147,8 @@ extern "C" {
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/bytes)"]
     #[wasm_bindgen(method, catch)]
     pub async fn bytes(this: &Blob) -> Result<Uint8Array, JsValue>;
-    #[doc = " The **`text()`** method of the string containing the contents of the blob, interpreted as UTF-8."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/text)"]
-    #[wasm_bindgen(method, catch)]
-    pub async fn text(this: &Blob) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "text")]
+    fn text_raw(this: &Blob) -> ::js_sys::Promise;
     #[doc = " The **`stream()`** method of the Blob interface returns a ReadableStream which upon reading returns the data contained within the `Blob`."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/stream)"]
@@ -4035,6 +4159,18 @@ extern "C" {
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/stream)"]
     #[wasm_bindgen(method, catch, js_name = "stream")]
     pub fn try_stream(this: &Blob) -> Result<ReadableStream, JsValue>;
+}
+impl Blob {
+    #[doc = " The **`text()`** method of the string containing the contents of the blob, interpreted as UTF-8."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/text)"]
+    pub async fn text(&self) -> Result<String, JsValue> {
+        let __promise = self.text_raw();
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_string()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected string"))
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -4182,30 +4318,30 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Cache;
-    #[wasm_bindgen(method, catch)]
-    pub async fn delete(this: &Cache, request: &Request) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "delete")]
-    pub async fn delete_with_str(this: &Cache, request: &str) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "delete")]
-    pub async fn delete_with_url(this: &Cache, request: &URL) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "delete")]
-    pub async fn delete_with_js_value_and_options(
+    #[wasm_bindgen(method, js_name = "delete")]
+    fn delete_raw(this: &Cache, request: &Request) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, js_name = "delete")]
+    fn delete_with_str_raw(this: &Cache, request: &str) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, js_name = "delete")]
+    fn delete_with_url_raw(this: &Cache, request: &URL) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, js_name = "delete")]
+    fn delete_with_js_value_and_options_raw(
         this: &Cache,
         request: &Request,
         options: &CacheQueryOptions,
-    ) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "delete")]
-    pub async fn delete_with_str_and_options(
+    ) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, js_name = "delete")]
+    fn delete_with_str_and_options_raw(
         this: &Cache,
         request: &str,
         options: &CacheQueryOptions,
-    ) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "delete")]
-    pub async fn delete_with_url_and_options(
+    ) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, js_name = "delete")]
+    fn delete_with_url_and_options_raw(
         this: &Cache,
         request: &URL,
         options: &CacheQueryOptions,
-    ) -> Result<bool, JsValue>;
+    ) -> ::js_sys::Promise;
     #[wasm_bindgen(method, catch)]
     pub async fn r#match(this: &Cache, request: &Request) -> Result<Option<Response>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "match")]
@@ -4244,6 +4380,72 @@ extern "C" {
         request: &URL,
         response: &Response,
     ) -> Result<(), JsValue>;
+}
+impl Cache {
+    pub async fn delete(&self, request: &Request) -> Result<bool, JsValue> {
+        let __promise = self.delete_raw(request);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_bool()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected boolean"))
+    }
+}
+impl Cache {
+    pub async fn delete_with_str(&self, request: &str) -> Result<bool, JsValue> {
+        let __promise = self.delete_with_str_raw(request);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_bool()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected boolean"))
+    }
+}
+impl Cache {
+    pub async fn delete_with_url(&self, request: &URL) -> Result<bool, JsValue> {
+        let __promise = self.delete_with_url_raw(request);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_bool()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected boolean"))
+    }
+}
+impl Cache {
+    pub async fn delete_with_js_value_and_options(
+        &self,
+        request: &Request,
+        options: &CacheQueryOptions,
+    ) -> Result<bool, JsValue> {
+        let __promise = self.delete_with_js_value_and_options_raw(request, options);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_bool()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected boolean"))
+    }
+}
+impl Cache {
+    pub async fn delete_with_str_and_options(
+        &self,
+        request: &str,
+        options: &CacheQueryOptions,
+    ) -> Result<bool, JsValue> {
+        let __promise = self.delete_with_str_and_options_raw(request, options);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_bool()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected boolean"))
+    }
+}
+impl Cache {
+    pub async fn delete_with_url_and_options(
+        &self,
+        request: &URL,
+        options: &CacheQueryOptions,
+    ) -> Result<bool, JsValue> {
+        let __promise = self.delete_with_url_and_options_raw(request, options);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_bool()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected boolean"))
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -4440,94 +4642,70 @@ extern "C" {
         key: &CryptoKey,
         data: &Object,
     ) -> Result<ArrayBuffer, JsValue>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, catch)]
-    pub async fn verify(
+    #[wasm_bindgen(method, js_name = "verify")]
+    fn verify_raw(
         this: &SubtleCrypto,
         algorithm: &str,
         key: &CryptoKey,
         signature: &ArrayBuffer,
         data: &ArrayBuffer,
-    ) -> Result<bool, JsValue>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_subtle_crypto_sign_algorithm_and_array_buffer_and_array_buffer(
+    ) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, js_name = "verify")]
+    fn verify_with_subtle_crypto_sign_algorithm_and_array_buffer_and_array_buffer_raw(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
         signature: &ArrayBuffer,
         data: &ArrayBuffer,
-    ) -> Result<bool, JsValue>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_str_and_js_value_and_array_buffer(
+    ) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, js_name = "verify")]
+    fn verify_with_str_and_js_value_and_array_buffer_raw(
         this: &SubtleCrypto,
         algorithm: &str,
         key: &CryptoKey,
         signature: &Object,
         data: &ArrayBuffer,
-    ) -> Result<bool, JsValue>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_subtle_crypto_sign_algorithm_and_js_value_and_array_buffer(
+    ) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, js_name = "verify")]
+    fn verify_with_subtle_crypto_sign_algorithm_and_js_value_and_array_buffer_raw(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
         signature: &Object,
         data: &ArrayBuffer,
-    ) -> Result<bool, JsValue>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_str_and_array_buffer_and_js_value(
+    ) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, js_name = "verify")]
+    fn verify_with_str_and_array_buffer_and_js_value_raw(
         this: &SubtleCrypto,
         algorithm: &str,
         key: &CryptoKey,
         signature: &ArrayBuffer,
         data: &Object,
-    ) -> Result<bool, JsValue>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_subtle_crypto_sign_algorithm_and_array_buffer_and_js_value(
+    ) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, js_name = "verify")]
+    fn verify_with_subtle_crypto_sign_algorithm_and_array_buffer_and_js_value_raw(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
         signature: &ArrayBuffer,
         data: &Object,
-    ) -> Result<bool, JsValue>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_str_and_js_value_and_js_value(
+    ) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, js_name = "verify")]
+    fn verify_with_str_and_js_value_and_js_value_raw(
         this: &SubtleCrypto,
         algorithm: &str,
         key: &CryptoKey,
         signature: &Object,
         data: &Object,
-    ) -> Result<bool, JsValue>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_subtle_crypto_sign_algorithm_and_js_value_and_js_value(
+    ) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, js_name = "verify")]
+    fn verify_with_subtle_crypto_sign_algorithm_and_js_value_and_js_value_raw(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
         signature: &Object,
         data: &Object,
-    ) -> Result<bool, JsValue>;
+    ) -> ::js_sys::Promise;
     #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
@@ -4949,6 +5127,165 @@ extern "C" {
         a: &Object,
         b: &Object,
     ) -> Result<bool, JsValue>;
+}
+impl SubtleCrypto {
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    pub async fn verify(
+        &self,
+        algorithm: &str,
+        key: &CryptoKey,
+        signature: &ArrayBuffer,
+        data: &ArrayBuffer,
+    ) -> Result<bool, JsValue> {
+        let __promise = self.verify_raw(algorithm, key, signature, data);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_bool()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected boolean"))
+    }
+}
+impl SubtleCrypto {
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    pub async fn verify_with_subtle_crypto_sign_algorithm_and_array_buffer_and_array_buffer(
+        &self,
+        algorithm: &SubtleCryptoSignAlgorithm,
+        key: &CryptoKey,
+        signature: &ArrayBuffer,
+        data: &ArrayBuffer,
+    ) -> Result<bool, JsValue> {
+        let __promise = self
+            .verify_with_subtle_crypto_sign_algorithm_and_array_buffer_and_array_buffer_raw(
+                algorithm, key, signature, data,
+            );
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_bool()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected boolean"))
+    }
+}
+impl SubtleCrypto {
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    pub async fn verify_with_str_and_js_value_and_array_buffer(
+        &self,
+        algorithm: &str,
+        key: &CryptoKey,
+        signature: &Object,
+        data: &ArrayBuffer,
+    ) -> Result<bool, JsValue> {
+        let __promise =
+            self.verify_with_str_and_js_value_and_array_buffer_raw(algorithm, key, signature, data);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_bool()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected boolean"))
+    }
+}
+impl SubtleCrypto {
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    pub async fn verify_with_subtle_crypto_sign_algorithm_and_js_value_and_array_buffer(
+        &self,
+        algorithm: &SubtleCryptoSignAlgorithm,
+        key: &CryptoKey,
+        signature: &Object,
+        data: &ArrayBuffer,
+    ) -> Result<bool, JsValue> {
+        let __promise = self
+            .verify_with_subtle_crypto_sign_algorithm_and_js_value_and_array_buffer_raw(
+                algorithm, key, signature, data,
+            );
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_bool()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected boolean"))
+    }
+}
+impl SubtleCrypto {
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    pub async fn verify_with_str_and_array_buffer_and_js_value(
+        &self,
+        algorithm: &str,
+        key: &CryptoKey,
+        signature: &ArrayBuffer,
+        data: &Object,
+    ) -> Result<bool, JsValue> {
+        let __promise =
+            self.verify_with_str_and_array_buffer_and_js_value_raw(algorithm, key, signature, data);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_bool()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected boolean"))
+    }
+}
+impl SubtleCrypto {
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    pub async fn verify_with_subtle_crypto_sign_algorithm_and_array_buffer_and_js_value(
+        &self,
+        algorithm: &SubtleCryptoSignAlgorithm,
+        key: &CryptoKey,
+        signature: &ArrayBuffer,
+        data: &Object,
+    ) -> Result<bool, JsValue> {
+        let __promise = self
+            .verify_with_subtle_crypto_sign_algorithm_and_array_buffer_and_js_value_raw(
+                algorithm, key, signature, data,
+            );
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_bool()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected boolean"))
+    }
+}
+impl SubtleCrypto {
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    pub async fn verify_with_str_and_js_value_and_js_value(
+        &self,
+        algorithm: &str,
+        key: &CryptoKey,
+        signature: &Object,
+        data: &Object,
+    ) -> Result<bool, JsValue> {
+        let __promise =
+            self.verify_with_str_and_js_value_and_js_value_raw(algorithm, key, signature, data);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_bool()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected boolean"))
+    }
+}
+impl SubtleCrypto {
+    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
+    pub async fn verify_with_subtle_crypto_sign_algorithm_and_js_value_and_js_value(
+        &self,
+        algorithm: &SubtleCryptoSignAlgorithm,
+        key: &CryptoKey,
+        signature: &Object,
+        data: &Object,
+    ) -> Result<bool, JsValue> {
+        let __promise = self
+            .verify_with_subtle_crypto_sign_algorithm_and_js_value_and_js_value_raw(
+                algorithm, key, signature, data,
+            );
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_bool()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected boolean"))
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -7707,14 +8044,23 @@ extern "C" {
     pub async fn array_buffer(this: &Body) -> Result<ArrayBuffer, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn bytes(this: &Body) -> Result<Uint8Array, JsValue>;
-    #[wasm_bindgen(method, catch)]
-    pub async fn text(this: &Body) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "text")]
+    fn text_raw(this: &Body) -> ::js_sys::Promise;
     #[wasm_bindgen(method, catch)]
     pub async fn json(this: &Body) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "formData")]
     pub async fn form_data(this: &Body) -> Result<FormData, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn blob(this: &Body) -> Result<Blob, JsValue>;
+}
+impl Body {
+    pub async fn text(&self) -> Result<String, JsValue> {
+        let __promise = self.text_raw();
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_string()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected string"))
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -9615,12 +9961,21 @@ extern "C" {
     pub async fn array_buffer(this: &R2ObjectBody) -> Result<ArrayBuffer, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn bytes(this: &R2ObjectBody) -> Result<Uint8Array, JsValue>;
-    #[wasm_bindgen(method, catch)]
-    pub async fn text(this: &R2ObjectBody) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "text")]
+    fn text_raw(this: &R2ObjectBody) -> ::js_sys::Promise;
     #[wasm_bindgen(method, catch)]
     pub async fn json(this: &R2ObjectBody) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn blob(this: &R2ObjectBody) -> Result<Blob, JsValue>;
+}
+impl R2ObjectBody {
+    pub async fn text(&self) -> Result<String, JsValue> {
+        let __promise = self.text_raw();
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_string()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected string"))
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -59973,15 +60328,45 @@ extern "C" {
         data: &Array<AIGatewayUniversalRequest>,
         options: &AiGatewayOptions,
     ) -> Result<Response, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "getUrl")]
-    pub async fn get_url(this: &AiGateway) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "getUrl")]
-    pub async fn get_url_with_ai_gateway_providers(
+    #[wasm_bindgen(method, js_name = "getUrl")]
+    fn get_url_raw(this: &AiGateway) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, js_name = "getUrl")]
+    fn get_url_with_ai_gateway_providers_raw(
         this: &AiGateway,
         provider: &AIGatewayProviders,
-    ) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "getUrl")]
-    pub async fn get_url_with_str(this: &AiGateway, provider: &str) -> Result<String, JsValue>;
+    ) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, js_name = "getUrl")]
+    fn get_url_with_str_raw(this: &AiGateway, provider: &str) -> ::js_sys::Promise;
+}
+impl AiGateway {
+    pub async fn get_url(&self) -> Result<String, JsValue> {
+        let __promise = self.get_url_raw();
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_string()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected string"))
+    }
+}
+impl AiGateway {
+    pub async fn get_url_with_ai_gateway_providers(
+        &self,
+        provider: &AIGatewayProviders,
+    ) -> Result<String, JsValue> {
+        let __promise = self.get_url_with_ai_gateway_providers_raw(provider);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_string()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected string"))
+    }
+}
+impl AiGateway {
+    pub async fn get_url_with_str(&self, provider: &str) -> Result<String, JsValue> {
+        let __promise = self.get_url_with_str_raw(provider);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_string()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected string"))
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -66235,17 +66620,8 @@ extern "C" {
         image_id: &str,
         options: &ImageUpdateOptions,
     ) -> Result<ImageMetadata, ImagesError>;
-    #[doc = " Delete a hosted image"]
-    #[doc = ""]
-    #[doc = " ## Arguments"]
-    #[doc = ""]
-    #[doc = " * `imageId` - The ID of the image"]
-    #[doc = ""]
-    #[doc = " ## Returns"]
-    #[doc = ""]
-    #[doc = " True if deleted, false if not found"]
-    #[wasm_bindgen(method, catch)]
-    pub async fn delete(this: &HostedImagesBinding, image_id: &str) -> Result<bool, JsValue>;
+    #[wasm_bindgen(method, js_name = "delete")]
+    fn delete_raw(this: &HostedImagesBinding, image_id: &str) -> ::js_sys::Promise;
     #[doc = " List hosted images with pagination"]
     #[doc = ""]
     #[doc = " ## Arguments"]
@@ -66279,6 +66655,24 @@ extern "C" {
         this: &HostedImagesBinding,
         options: &ImageListOptions,
     ) -> Result<ImageList, ImagesError>;
+}
+impl HostedImagesBinding {
+    #[doc = " Delete a hosted image"]
+    #[doc = ""]
+    #[doc = " ## Arguments"]
+    #[doc = ""]
+    #[doc = " * `imageId` - The ID of the image"]
+    #[doc = ""]
+    #[doc = " ## Returns"]
+    #[doc = ""]
+    #[doc = " True if deleted, false if not found"]
+    pub async fn delete(&self, image_id: &str) -> Result<bool, JsValue> {
+        let __promise = self.delete_raw(image_id);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_bool()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected boolean"))
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -66809,13 +67203,22 @@ extern "C" {
     #[doc = " The transformed media as a Promise<Response>, ready to store in cache or return to users"]
     #[wasm_bindgen(method, catch)]
     pub async fn response(this: &MediaTransformationResult) -> Result<Response, JsValue>;
+    #[wasm_bindgen(method, js_name = "contentType")]
+    fn content_type_raw(this: &MediaTransformationResult) -> ::js_sys::Promise;
+}
+impl MediaTransformationResult {
     #[doc = " Returns the MIME type of the transformed media."]
     #[doc = ""]
     #[doc = " ## Returns"]
     #[doc = ""]
     #[doc = " A promise containing the content type string (e.g., 'image/jpeg', 'video/mp4')"]
-    #[wasm_bindgen(method, catch, js_name = "contentType")]
-    pub async fn content_type(this: &MediaTransformationResult) -> Result<String, JsValue>;
+    pub async fn content_type(&self) -> Result<String, JsValue> {
+        let __promise = self.content_type_raw();
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_string()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected string"))
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -68088,10 +68491,19 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SecretsStoreSecret;
+    #[wasm_bindgen(method, js_name = "get")]
+    fn get_raw(this: &SecretsStoreSecret) -> ::js_sys::Promise;
+}
+impl SecretsStoreSecret {
     #[doc = " Get a secret from the Secrets Store, returning a string of the secret value"]
     #[doc = " if it exists, or throws an error if it does not exist"]
-    #[wasm_bindgen(method, catch)]
-    pub async fn get(this: &SecretsStoreSecret) -> Result<String, JsValue>;
+    pub async fn get(&self) -> Result<String, JsValue> {
+        let __promise = self.get_raw();
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_string()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected string"))
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -68267,6 +68679,18 @@ extern "C" {
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
     pub async fn delete(this: &StreamVideoHandle) -> Result<(), StreamError>;
+    #[wasm_bindgen(method, js_name = "generateToken")]
+    fn generate_token_raw(this: &StreamVideoHandle) -> ::js_sys::Promise;
+    #[wasm_bindgen(method, getter)]
+    pub fn downloads(this: &StreamVideoHandle) -> StreamScopedDownloads;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_downloads(this: &StreamVideoHandle, val: &StreamScopedDownloads);
+    #[wasm_bindgen(method, getter)]
+    pub fn captions(this: &StreamVideoHandle) -> StreamScopedCaptions;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_captions(this: &StreamVideoHandle, val: &StreamScopedCaptions);
+}
+impl StreamVideoHandle {
     #[doc = " Creates a signed URL token for a video."]
     #[doc = ""]
     #[doc = " ## Returns"]
@@ -68276,16 +68700,13 @@ extern "C" {
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `InternalError` — if the signing key cannot be retrieved or the token cannot be signed"]
-    #[wasm_bindgen(method, catch, js_name = "generateToken")]
-    pub async fn generate_token(this: &StreamVideoHandle) -> Result<String, InternalError>;
-    #[wasm_bindgen(method, getter)]
-    pub fn downloads(this: &StreamVideoHandle) -> StreamScopedDownloads;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_downloads(this: &StreamVideoHandle, val: &StreamScopedDownloads);
-    #[wasm_bindgen(method, getter)]
-    pub fn captions(this: &StreamVideoHandle) -> StreamScopedCaptions;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_captions(this: &StreamVideoHandle, val: &StreamScopedCaptions);
+    pub async fn generate_token(&self) -> Result<String, InternalError> {
+        let __promise = self.generate_token_raw();
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_string()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected string").into())
+    }
 }
 #[wasm_bindgen]
 extern "C" {

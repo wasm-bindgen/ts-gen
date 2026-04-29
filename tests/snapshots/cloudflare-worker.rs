@@ -102,14 +102,23 @@ extern "C" {
     pub fn try_clone(this: &Request) -> Result<Request, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "arrayBuffer")]
     pub async fn array_buffer(this: &Request) -> Result<ArrayBuffer, JsValue>;
-    #[wasm_bindgen(method, catch)]
-    pub async fn text(this: &Request) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "text")]
+    fn text_raw(this: &Request) -> ::js_sys::Promise;
     #[wasm_bindgen(method, catch)]
     pub async fn json(this: &Request) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn blob(this: &Request) -> Result<Blob, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "formData")]
     pub async fn form_data(this: &Request) -> Result<FormData, JsValue>;
+}
+impl Request {
+    pub async fn text(&self) -> Result<String, JsValue> {
+        let __promise = self.text_raw();
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_string()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected string"))
+    }
 }
 #[allow(dead_code)]
 pub type RequestInfo = JsValue;
@@ -313,14 +322,23 @@ extern "C" {
     pub fn try_clone(this: &Response) -> Result<Response, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "arrayBuffer")]
     pub async fn array_buffer(this: &Response) -> Result<ArrayBuffer, JsValue>;
-    #[wasm_bindgen(method, catch)]
-    pub async fn text(this: &Response) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "text")]
+    fn text_raw(this: &Response) -> ::js_sys::Promise;
     #[wasm_bindgen(method, catch, js_name = "json")]
     pub async fn json_1(this: &Response) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn blob(this: &Response) -> Result<Blob, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "formData")]
     pub async fn form_data(this: &Response) -> Result<FormData, JsValue>;
+}
+impl Response {
+    pub async fn text(&self) -> Result<String, JsValue> {
+        let __promise = self.text_raw();
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_string()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected string"))
+    }
 }
 #[wasm_bindgen]
 extern "C" {

@@ -211,10 +211,19 @@ extern "C" {
     pub type DefaultProcessor;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(config: &Object) -> Result<DefaultProcessor, JsValue>;
-    #[wasm_bindgen(method, catch)]
-    pub async fn process(this: &DefaultProcessor, input: &str) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "process")]
+    fn process_raw(this: &DefaultProcessor, input: &str) -> ::js_sys::Promise;
     #[wasm_bindgen(method, getter)]
     pub fn name(this: &DefaultProcessor) -> String;
+}
+impl DefaultProcessor {
+    pub async fn process(&self, input: &str) -> Result<String, JsValue> {
+        let __promise = self.process_raw(input);
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_string()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected string"))
+    }
 }
 #[wasm_bindgen]
 extern "C" {

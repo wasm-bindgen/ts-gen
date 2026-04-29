@@ -735,6 +735,7 @@ fn generate_extern_block(config: &ClassConfig) -> TokenStream {
     use std::collections::HashMap;
 
     let mut items = Vec::new();
+    let mut impl_items: Vec<TokenStream> = Vec::new();
     let mut used_names: HashSet<String> = HashSet::new();
 
     // Pre-group methods/statics/constructors by js_name.
@@ -835,7 +836,11 @@ fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                     config.scope,
                 );
                 for sig in &sigs {
-                    items.push(generate_expanded_method(config, sig));
+                    let emitted = generate_expanded_method(config, sig);
+                    items.push(emitted.extern_item);
+                    if let Some(impl_item) = emitted.impl_item {
+                        impl_items.push(impl_item);
+                    }
                 }
             }
             Member::StaticMethod(m) => {
@@ -863,7 +868,11 @@ fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                     config.scope,
                 );
                 for sig in &sigs {
-                    items.push(generate_expanded_static_method(config, sig));
+                    let emitted = generate_expanded_static_method(config, sig);
+                    items.push(emitted.extern_item);
+                    if let Some(impl_item) = emitted.impl_item {
+                        impl_items.push(impl_item);
+                    }
                 }
             }
             Member::Getter(g) => {
@@ -908,6 +917,7 @@ fn generate_extern_block(config: &ClassConfig) -> TokenStream {
         extern "C" {
             #(#items)*
         }
+        #(#impl_items)*
         #public_alias
     }
 }
@@ -1023,8 +1033,30 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
     }
 }
 
+/// One emitted member: an extern item, plus an optional inherent-impl
+/// item that has to live outside the surrounding `extern "C"` block.
+struct EmittedMember {
+    /// Goes inside the `extern "C" { ... }` block.
+    extern_item: TokenStream,
+    /// Goes after the extern block, inside `impl #this_type { ... }`.
+    impl_item: Option<TokenStream>,
+}
+
+impl From<TokenStream> for EmittedMember {
+    fn from(extern_item: TokenStream) -> Self {
+        Self {
+            extern_item,
+            impl_item: None,
+        }
+    }
+}
+
 /// Generate an instance method binding from an expanded signature.
-fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> TokenStream {
+fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> EmittedMember {
+    if sig.needs_primitive_async_wrapper() {
+        return generate_primitive_async_method(config, sig, /*is_static=*/ false);
+    }
+
     let rust_ident = super::typemap::make_ident(&sig.rust_name);
     let this_type = super::typemap::make_ident(&config.effective_rust_name());
     let params = generate_concrete_params(
@@ -1074,10 +1106,115 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
         #[wasm_bindgen(#(#wb_parts),*)]
         pub #async_kw fn #rust_ident(this: &#this_type, #params) #ret;
     }
+    .into()
+}
+
+/// Emit a `Promise<primitive>` method or static method as a
+/// `Promise`-returning extern plus a public `async fn` wrapper that awaits
+/// it and casts the resolved `JsValue`. See
+/// [`FunctionSignature::needs_primitive_async_wrapper`] for why.
+fn generate_primitive_async_method(
+    config: &ClassConfig,
+    sig: &FunctionSignature,
+    is_static: bool,
+) -> EmittedMember {
+    let public_ident = super::typemap::make_ident(&sig.rust_name);
+    let raw_ident = super::typemap::make_ident(&format!("{}_raw", sig.rust_name));
+    let this_type = super::typemap::make_ident(&config.effective_rust_name());
+    let params = generate_concrete_params(
+        &sig.params,
+        config.cgctx,
+        config.scope,
+        &config.from_module(),
+    );
+    let arg_idents: Vec<_> = sig
+        .params
+        .iter()
+        .map(|p| super::typemap::make_ident(&p.name))
+        .collect();
+    let doc = super::doc_tokens(&sig.doc);
+
+    // No `catch` on the raw extern: promise rejection is surfaced through
+    // `JsFuture::from(...).await?` in the wrapper below.
+    let mut wb_parts: Vec<TokenStream> = if is_static {
+        vec![quote! { static_method_of = #this_type }]
+    } else {
+        vec![quote! { method }]
+    };
+    // The raw extern's Rust ident is suffixed with `_raw`, so always pin
+    // the JS name explicitly.
+    let js_name = &sig.js_name;
+    wb_parts.push(quote! { js_name = #js_name });
+
+    let extern_params = if is_static {
+        quote! { #params }
+    } else {
+        quote! { this: &#this_type, #params }
+    };
+    let extern_item = quote! {
+        #[wasm_bindgen(#(#wb_parts),*)]
+        fn #raw_ident(#extern_params) -> ::js_sys::Promise;
+    };
+
+    let (cast_expr, err_msg) = match sig.return_type {
+        TypeRef::Boolean => (quote! { __raw.as_bool() }, "expected boolean"),
+        TypeRef::String => (quote! { __raw.as_string() }, "expected string"),
+        TypeRef::Number => (quote! { __raw.as_f64() }, "expected number"),
+        _ => unreachable!("guarded by FunctionSignature::needs_primitive_async_wrapper"),
+    };
+
+    let ret_ty = to_return_type(
+        &sig.return_type,
+        /*catch=*/ true,
+        sig.error_type.as_ref(),
+        config.cgctx,
+        config.scope,
+        &config.from_module(),
+    );
+
+    let call_expr = if is_static {
+        quote! { Self::#raw_ident(#(#arg_idents),*) }
+    } else {
+        quote! { self.#raw_ident(#(#arg_idents),*) }
+    };
+    let receiver = if is_static {
+        quote! {}
+    } else {
+        quote! { &self, }
+    };
+
+    // For a custom `@throws` error type, defer to its `From<JsValue>` impl
+    // (same constraint wasm-bindgen's `catch` imposes); skip the `.into()`
+    // when the error type is `JsValue` itself, to avoid a
+    // `clippy::useless_conversion` lint.
+    let err_expr = if sig.error_type.is_some() {
+        quote! { ::wasm_bindgen::JsValue::from_str(#err_msg).into() }
+    } else {
+        quote! { ::wasm_bindgen::JsValue::from_str(#err_msg) }
+    };
+    let impl_item = quote! {
+        impl #this_type {
+            #doc
+            pub async fn #public_ident(#receiver #params) -> #ret_ty {
+                let __promise = #call_expr;
+                let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+                #cast_expr.ok_or_else(|| #err_expr)
+            }
+        }
+    };
+
+    EmittedMember {
+        extern_item,
+        impl_item: Some(impl_item),
+    }
 }
 
 /// Generate a static method binding from an expanded signature.
-fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature) -> TokenStream {
+fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature) -> EmittedMember {
+    if sig.needs_primitive_async_wrapper() {
+        return generate_primitive_async_method(config, sig, /*is_static=*/ true);
+    }
+
     let rust_ident = super::typemap::make_ident(&sig.rust_name);
     let class_ident = super::typemap::make_ident(&config.effective_rust_name());
     let params = generate_concrete_params(
@@ -1126,6 +1263,7 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
         #[wasm_bindgen(#(#wb_parts),*)]
         pub #async_kw fn #rust_ident(#params) #ret;
     }
+    .into()
 }
 
 /// Generate an instance getter binding.

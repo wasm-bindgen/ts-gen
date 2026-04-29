@@ -156,14 +156,23 @@ extern "C" {
     #[doc = " Returns the body as an ArrayBuffer."]
     #[wasm_bindgen(method, catch, js_name = "arrayBuffer")]
     pub async fn array_buffer(this: &Body) -> Result<ArrayBuffer, JsValue>;
-    #[wasm_bindgen(method, catch)]
-    pub async fn text(this: &Body) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "text")]
+    fn text_raw(this: &Body) -> ::js_sys::Promise;
     #[wasm_bindgen(method, catch)]
     pub async fn json(this: &Body) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn blob(this: &Body) -> Result<Blob, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "formData")]
     pub async fn form_data(this: &Body) -> Result<FormData, JsValue>;
+}
+impl Body {
+    pub async fn text(&self) -> Result<String, JsValue> {
+        let __promise = self.text_raw();
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_string()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected string"))
+    }
 }
 #[wasm_bindgen]
 extern "C" {

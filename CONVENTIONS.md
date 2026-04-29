@@ -689,6 +689,63 @@ pub async fn fetch(url: &str) -> Result<Response, JsValue>;
 * `wasm-bindgen` rewraps the `T` as `Promise<T>` on the JS side.
 * Constructors and setters never become async.
 
+### `Promise<primitive>` splits into a raw extern + Rust-side wrapper
+
+When the resolved type is `boolean`, `string`, or `number`, ts-gen splits
+the emit into two pieces:
+
+```ts
+class Body {
+  text(): Promise<string>;
+}
+```
+
+```rust
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(method, js_name = "text")]
+    fn text_raw(this: &Body) -> ::js_sys::Promise;
+}
+impl Body {
+    pub async fn text(&self) -> Result<String, JsValue> {
+        let __promise = self.text_raw();
+        let __raw = ::wasm_bindgen_futures::JsFuture::from(__promise).await?;
+        __raw
+            .as_string()
+            .ok_or_else(|| ::wasm_bindgen::JsValue::from_str("expected string").into())
+    }
+}
+```
+
+Why split:
+
+* Some `wasm-bindgen` flavours (notably the workers-rs fork) tightened
+  `Promise<T>` / `JsFuture<T>` to require `T: JsGeneric`, which Rust
+  primitives (`bool`, `String`, `f64`) don't impl. A direct
+  `pub async fn -> Result<bool, JsValue>` extern fails to compile under
+  those flavours; routing through `js_sys::Promise` (which has no such
+  constraint) sidesteps the issue.
+* The `JsValue::as_*` cast is shared with every primitive return — doing
+  it once in the wrapper keeps callers from typing `.as_bool().ok_or(…)`
+  by hand at every call site.
+* When the JS contract is violated (resolved value isn't the declared
+  primitive type), the wrapper surfaces a precise
+  `expected boolean` / `expected string` / `expected number` error
+  instead of `None`.
+
+The public signature (`pub async fn text -> Result<String, JsValue>`) is
+identical to the single-extern path.
+
+Custom error types (`@throws`) interact via `From<JsValue>`: the body
+returns `Result<T, JsValue>` shape internally, and both the `?` and the
+trailing `.into()` defer to the user's `From<JsValue> for CustomError`
+impl — the same constraint wasm-bindgen's `catch` already imposes for
+custom-error returns.
+
+Today this split applies to instance and static methods. Free functions
+returning `Promise<primitive>` still emit the single-extern form; extend
+when a fixture demands it.
+
 ## `@throws` JSDoc → typed error
 
 ```ts

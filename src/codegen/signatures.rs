@@ -151,6 +151,27 @@ pub struct FunctionSignature {
     pub doc: Option<String>,
 }
 
+impl FunctionSignature {
+    /// True when this is an `async fn` whose unwrapped return type is a
+    /// Rust primitive (`bool`, `String`, `f64`).
+    ///
+    /// Some `wasm-bindgen` flavours (notably the workers-rs fork)
+    /// tightened `Promise<T>` / `JsFuture<T>` to require `T: JsGeneric`,
+    /// which Rust primitives don't impl. For those signatures we emit a
+    /// `Promise`-returning extern plus an `async fn` wrapper that does
+    /// the `JsValue::as_*` cast itself. The public API stays identical
+    /// (`pub async fn -> Result<T, JsValue>`), and a violated JS contract
+    /// surfaces as a precise `expected boolean`/`string`/`number` error
+    /// instead of `None`.
+    pub fn needs_primitive_async_wrapper(&self) -> bool {
+        self.is_async
+            && matches!(
+                self.return_type,
+                TypeRef::Boolean | TypeRef::String | TypeRef::Number
+            )
+    }
+}
+
 /// Assign a unique name within the extern block.
 ///
 /// If `candidate` is already taken, appends `_1`, `_2`, etc. until a unique
