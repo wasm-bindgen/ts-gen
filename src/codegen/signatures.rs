@@ -491,10 +491,25 @@ fn flatten_type(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId
             .into_iter()
             .map(|t| TypeRef::Set(Box::new(t)))
             .collect(),
-        // Two-arg containers: cartesian product
+        // Two-arg containers: cartesian product, with one carve-out — when
+        // the value side is a union (flattens to >1 alternative), emit a
+        // single Record carrying the original union instead of cloning the
+        // method per arm. The arms would each lower to a distinct
+        // `Object<JsString>` / `Object<Number>` / `Object<Boolean>`
+        // signature whose phantom `T` is purely a compile-time tag — at
+        // runtime they're the same JS object, so the explosion is pure
+        // API-surface noise. Folding the union back at this layer leaves
+        // typemap to lower `Record<K, Union>` to plain `&Object` via its
+        // existing JsValue-erasure path.
         TypeRef::Record(k, v) => {
             let ks = flatten_type(k, cgctx, scope);
             let vs = flatten_type(v, cgctx, scope);
+            if vs.len() > 1 {
+                return ks
+                    .into_iter()
+                    .map(|k| TypeRef::Record(Box::new(k), v.clone()))
+                    .collect();
+            }
             let mut result = Vec::new();
             for k in &ks {
                 for v in &vs {

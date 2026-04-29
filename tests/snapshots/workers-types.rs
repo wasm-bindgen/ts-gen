@@ -14338,9 +14338,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn modules(this: &WorkerLoaderWorkerCode) -> Object;
     #[wasm_bindgen(method, setter)]
-    pub fn set_modules(this: &WorkerLoaderWorkerCode, val: &Object<WorkerLoaderModule>);
-    #[wasm_bindgen(method, setter, js_name = "modules")]
-    pub fn set_modules_with_record(this: &WorkerLoaderWorkerCode, val: &Object<JsString>);
+    pub fn set_modules(this: &WorkerLoaderWorkerCode, val: &Object);
     #[wasm_bindgen(method, getter)]
     pub fn env(this: &WorkerLoaderWorkerCode) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
@@ -35312,15 +35310,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn metadata(this: &GatewayOptions) -> Option<Object<JsOption<JsValue>>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_metadata(this: &GatewayOptions, val: &Object<Number>);
-    #[wasm_bindgen(method, setter, js_name = "metadata")]
-    pub fn set_metadata_with_record(this: &GatewayOptions, val: &Object<JsString>);
-    #[wasm_bindgen(method, setter, js_name = "metadata")]
-    pub fn set_metadata_with_record_1(this: &GatewayOptions, val: &Object<Boolean>);
-    #[wasm_bindgen(method, setter, js_name = "metadata")]
-    pub fn set_metadata_with_record_2(this: &GatewayOptions, val: &Object<BigInt>);
-    #[wasm_bindgen(method, setter, js_name = "metadata")]
-    pub fn set_metadata_with_record_3(this: &GatewayOptions, val: &Object<Null>);
+    pub fn set_metadata(this: &GatewayOptions, val: &Object<JsOption<JsValue>>);
     #[wasm_bindgen(method, getter, js_name = "collectLog")]
     pub fn collect_log(this: &GatewayOptions) -> Option<bool>;
     #[wasm_bindgen(method, setter, js_name = "collectLog")]
@@ -35370,24 +35360,8 @@ impl GatewayOptionsBuilder {
         self.inner.set_skip_cache(val);
         self
     }
-    pub fn metadata(self, val: &Object<Number>) -> Self {
+    pub fn metadata(self, val: &Object<JsOption<JsValue>>) -> Self {
         self.inner.set_metadata(val);
-        self
-    }
-    pub fn metadata_with_record(self, val: &Object<JsString>) -> Self {
-        self.inner.set_metadata_with_record(val);
-        self
-    }
-    pub fn metadata_with_record_1(self, val: &Object<Boolean>) -> Self {
-        self.inner.set_metadata_with_record_1(val);
-        self
-    }
-    pub fn metadata_with_record_2(self, val: &Object<BigInt>) -> Self {
-        self.inner.set_metadata_with_record_2(val);
-        self
-    }
-    pub fn metadata_with_record_3(self, val: &Object<Null>) -> Self {
-        self.inner.set_metadata_with_record_3(val);
         self
     }
     pub fn collect_log(self, val: bool) -> Self {
@@ -35434,15 +35408,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn metadata(this: &AiGatewayPatchLog) -> Option<Object<JsOption<JsValue>>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_metadata(this: &AiGatewayPatchLog, val: &Object<Number>);
-    #[wasm_bindgen(method, setter, js_name = "metadata")]
-    pub fn set_metadata_with_record(this: &AiGatewayPatchLog, val: &Object<JsString>);
-    #[wasm_bindgen(method, setter, js_name = "metadata")]
-    pub fn set_metadata_with_record_1(this: &AiGatewayPatchLog, val: &Object<Boolean>);
-    #[wasm_bindgen(method, setter, js_name = "metadata")]
-    pub fn set_metadata_with_record_2(this: &AiGatewayPatchLog, val: &Object<BigInt>);
-    #[wasm_bindgen(method, setter, js_name = "metadata")]
-    pub fn set_metadata_with_record_3(this: &AiGatewayPatchLog, val: &Object<Null>);
+    pub fn set_metadata(this: &AiGatewayPatchLog, val: &Object<JsOption<JsValue>>);
     #[wasm_bindgen(method, setter, js_name = "metadata")]
     pub fn set_metadata_with_null(this: &AiGatewayPatchLog, val: &Null);
 }
@@ -35480,24 +35446,8 @@ impl AiGatewayPatchLogBuilder {
         self.inner.set_feedback_with_null(val);
         self
     }
-    pub fn metadata(self, val: &Object<Number>) -> Self {
+    pub fn metadata(self, val: &Object<JsOption<JsValue>>) -> Self {
         self.inner.set_metadata(val);
-        self
-    }
-    pub fn metadata_with_record(self, val: &Object<JsString>) -> Self {
-        self.inner.set_metadata_with_record(val);
-        self
-    }
-    pub fn metadata_with_record_1(self, val: &Object<Boolean>) -> Self {
-        self.inner.set_metadata_with_record_1(val);
-        self
-    }
-    pub fn metadata_with_record_2(self, val: &Object<BigInt>) -> Self {
-        self.inner.set_metadata_with_record_2(val);
-        self
-    }
-    pub fn metadata_with_record_3(self, val: &Object<Null>) -> Self {
-        self.inner.set_metadata_with_record_3(val);
         self
     }
     pub fn metadata_with_null(self, val: &Null) -> Self {
@@ -35572,15 +35522,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn metadata(this: &AiGatewayLog) -> Option<Object<JsOption<JsValue>>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_metadata(this: &AiGatewayLog, val: &Object<Number>);
-    #[wasm_bindgen(method, setter, js_name = "metadata")]
-    pub fn set_metadata_with_record(this: &AiGatewayLog, val: &Object<JsString>);
-    #[wasm_bindgen(method, setter, js_name = "metadata")]
-    pub fn set_metadata_with_record_1(this: &AiGatewayLog, val: &Object<Boolean>);
-    #[wasm_bindgen(method, setter, js_name = "metadata")]
-    pub fn set_metadata_with_record_2(this: &AiGatewayLog, val: &Object<BigInt>);
-    #[wasm_bindgen(method, setter, js_name = "metadata")]
-    pub fn set_metadata_with_record_3(this: &AiGatewayLog, val: &Object<Null>);
+    pub fn set_metadata(this: &AiGatewayLog, val: &Object<JsOption<JsValue>>);
     #[wasm_bindgen(method, getter)]
     pub fn step(this: &AiGatewayLog) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
@@ -35745,24 +35687,8 @@ impl AiGatewayLogBuilder {
         self.inner.set_tokens_out(val);
         self
     }
-    pub fn metadata(self, val: &Object<Number>) -> Self {
+    pub fn metadata(self, val: &Object<JsOption<JsValue>>) -> Self {
         self.inner.set_metadata(val);
-        self
-    }
-    pub fn metadata_with_record(self, val: &Object<JsString>) -> Self {
-        self.inner.set_metadata_with_record(val);
-        self
-    }
-    pub fn metadata_with_record_1(self, val: &Object<Boolean>) -> Self {
-        self.inner.set_metadata_with_record_1(val);
-        self
-    }
-    pub fn metadata_with_record_2(self, val: &Object<BigInt>) -> Self {
-        self.inner.set_metadata_with_record_2(val);
-        self
-    }
-    pub fn metadata_with_record_3(self, val: &Object<Null>) -> Self {
-        self.inner.set_metadata_with_record_3(val);
         self
     }
     pub fn step(self, val: f64) -> Self {
@@ -35841,15 +35767,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "cf-aig-metadata")]
     pub fn cf_aig_metadata(this: &AIGatewayHeaders) -> JsValue;
     #[wasm_bindgen(method, setter, js_name = "cf-aig-metadata")]
-    pub fn set_cf_aig_metadata(this: &AIGatewayHeaders, val: &Object<Number>);
-    #[wasm_bindgen(method, setter, js_name = "cf-aig-metadata")]
-    pub fn set_cf_aig_metadata_with_record(this: &AIGatewayHeaders, val: &Object<JsString>);
-    #[wasm_bindgen(method, setter, js_name = "cf-aig-metadata")]
-    pub fn set_cf_aig_metadata_with_record_1(this: &AIGatewayHeaders, val: &Object<Boolean>);
-    #[wasm_bindgen(method, setter, js_name = "cf-aig-metadata")]
-    pub fn set_cf_aig_metadata_with_record_2(this: &AIGatewayHeaders, val: &Object<BigInt>);
-    #[wasm_bindgen(method, setter, js_name = "cf-aig-metadata")]
-    pub fn set_cf_aig_metadata_with_record_3(this: &AIGatewayHeaders, val: &Object<Null>);
+    pub fn set_cf_aig_metadata(this: &AIGatewayHeaders, val: &Object<JsOption<JsValue>>);
     #[wasm_bindgen(method, setter, js_name = "cf-aig-metadata")]
     pub fn set_cf_aig_metadata_with_str(this: &AIGatewayHeaders, val: &str);
     #[wasm_bindgen(method, getter, js_name = "cf-aig-custom-cost")]
@@ -71997,24 +71915,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn metadata(this: &VectorizeVector) -> Option<Object>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_metadata(this: &VectorizeVector, val: &Object<JsString>);
-    #[wasm_bindgen(method, setter, js_name = "metadata")]
-    pub fn set_metadata_with_record(this: &VectorizeVector, val: &Object<Number>);
-    #[wasm_bindgen(method, setter, js_name = "metadata")]
-    pub fn set_metadata_with_record_1(this: &VectorizeVector, val: &Object<Boolean>);
-    #[wasm_bindgen(method, setter, js_name = "metadata")]
-    pub fn set_metadata_with_record_2(this: &VectorizeVector, val: &Object<Array<JsString>>);
-    #[wasm_bindgen(method, setter, js_name = "metadata")]
-    pub fn set_metadata_with_record_3(this: &VectorizeVector, val: &Object<Object<JsString>>);
-    #[wasm_bindgen(method, setter, js_name = "metadata")]
-    pub fn set_metadata_with_record_4(this: &VectorizeVector, val: &Object<Object<Number>>);
-    #[wasm_bindgen(method, setter, js_name = "metadata")]
-    pub fn set_metadata_with_record_5(this: &VectorizeVector, val: &Object<Object<Boolean>>);
-    #[wasm_bindgen(method, setter, js_name = "metadata")]
-    pub fn set_metadata_with_record_6(
-        this: &VectorizeVector,
-        val: &Object<Object<Array<JsString>>>,
-    );
+    pub fn set_metadata(this: &VectorizeVector, val: &Object);
 }
 impl VectorizeVector {
     #[doc = " ## Arguments"]
@@ -72060,36 +71961,8 @@ impl VectorizeVectorBuilder {
         self.inner.set_namespace(val);
         self
     }
-    pub fn metadata(self, val: &Object<JsString>) -> Self {
+    pub fn metadata(self, val: &Object) -> Self {
         self.inner.set_metadata(val);
-        self
-    }
-    pub fn metadata_with_record(self, val: &Object<Number>) -> Self {
-        self.inner.set_metadata_with_record(val);
-        self
-    }
-    pub fn metadata_with_record_1(self, val: &Object<Boolean>) -> Self {
-        self.inner.set_metadata_with_record_1(val);
-        self
-    }
-    pub fn metadata_with_record_2(self, val: &Object<Array<JsString>>) -> Self {
-        self.inner.set_metadata_with_record_2(val);
-        self
-    }
-    pub fn metadata_with_record_3(self, val: &Object<Object<JsString>>) -> Self {
-        self.inner.set_metadata_with_record_3(val);
-        self
-    }
-    pub fn metadata_with_record_4(self, val: &Object<Object<Number>>) -> Self {
-        self.inner.set_metadata_with_record_4(val);
-        self
-    }
-    pub fn metadata_with_record_5(self, val: &Object<Object<Boolean>>) -> Self {
-        self.inner.set_metadata_with_record_5(val);
-        self
-    }
-    pub fn metadata_with_record_6(self, val: &Object<Object<Array<JsString>>>) -> Self {
-        self.inner.set_metadata_with_record_6(val);
         self
     }
     pub fn build(self) -> VectorizeVector {
