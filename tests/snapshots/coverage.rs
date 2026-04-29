@@ -489,13 +489,13 @@ extern "C" {
     pub async fn get(
         this: &Cache,
         key: &str,
-    ) -> Result<Option<Map<JsString, Array<JsString>>>, JsValue>;
+    ) -> Result<JsOption<Map<JsString, Array<JsString>>>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn set(
         this: &Cache,
         key: &str,
         value: &Map<JsString, Array<JsString>>,
-    ) -> Result<(), JsValue>;
+    ) -> Result<Undefined, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {

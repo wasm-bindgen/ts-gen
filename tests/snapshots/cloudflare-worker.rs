@@ -423,7 +423,7 @@ extern "C" {
         controller: &ScheduledController,
         env: &E,
         ctx: &ExecutionContext,
-    ) -> Result<(), JsValue>;
+    ) -> Result<Undefined, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {

@@ -689,31 +689,28 @@ pub async fn fetch(url: &str) -> Result<Response, JsValue>;
 * `wasm-bindgen` rewraps the `T` as `Promise<T>` on the JS side.
 * Constructors and setters never become async.
 
-### Primitive `T` lowers to its `js_sys` wrapper
+### Async return primitives lower to `js_sys` wrappers
 
-When `T` is `boolean`, `number`, or `string`, the async return uses the
-`js_sys` wrapper type — `Boolean`, `Number`, `JsString` — instead of the
-Rust primitive (`bool`, `f64`, `String`):
+Primitive types behave differently in `Promise<T>` than they do in
+sync returns or arguments:
 
-```ts
-text(): Promise<string>;
-```
+| TypeScript                     | Async return                  |
+| ------------------------------ | ----------------------------- |
+| `Promise<boolean>`             | `Result<Boolean, JsValue>`    |
+| `Promise<number>`              | `Result<Number, JsValue>`     |
+| `Promise<string>`              | `Result<JsString, JsValue>`   |
+| `Promise<void>`                | `Result<Undefined, JsValue>`  |
+| `Promise<T \| null>`           | `Result<JsOption<T>, JsValue>`|
+| `Promise<Foo>` (named JS type) | `Result<Foo, JsValue>`        |
 
-```rust
-#[wasm_bindgen(method, catch)]
-pub async fn text(this: &Body) -> Result<JsString, JsValue>;
-```
-
-Some `wasm-bindgen` flavours (notably the workers-rs fork) require
-`T: JsGeneric` (an externref-backed type) for `Promise<T>` /
-`JsFuture<T>`, which Rust primitives don't satisfy. The `js_sys`
-wrappers are externref-backed, so they work. Callers recover the Rust
-primitive via `value_of()` (for `Boolean` / `Number`) or
+`wasm-bindgen`'s typed `Promise<T>` / `JsFuture<T>` require
+`T: JsGeneric` — an externref-backed type — which bare Rust
+primitives aren't. The `js_sys` wrappers are. Callers recover Rust
+primitives via `value_of()` (for `Boolean` / `Number`) or
 `String::from(_)` / `.into()` (for `JsString`).
 
-This only applies to async return position. Synchronous returns,
-arguments, and properties keep the Rust primitive; the JsGeneric
-constraint is specific to `Promise<T>` / `JsFuture<T>`.
+Sync returns, arguments, and properties keep the bare-primitive
+lowering.
 
 ## `@throws` JSDoc → typed error
 
