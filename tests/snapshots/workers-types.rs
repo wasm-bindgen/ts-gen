@@ -3150,11 +3150,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn indexes(this: &AnalyticsEngineDataPoint) -> Option<Array<JsOption<JsValue>>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_indexes(this: &AnalyticsEngineDataPoint, val: &Array<ArrayBuffer>);
-    #[wasm_bindgen(method, setter, js_name = "indexes")]
-    pub fn set_indexes_with_array(this: &AnalyticsEngineDataPoint, val: &Array<JsString>);
-    #[wasm_bindgen(method, setter, js_name = "indexes")]
-    pub fn set_indexes_with_array_1(this: &AnalyticsEngineDataPoint, val: &Array<Null>);
+    pub fn set_indexes(this: &AnalyticsEngineDataPoint, val: &Array<JsOption<JsValue>>);
     #[wasm_bindgen(method, getter)]
     pub fn doubles(this: &AnalyticsEngineDataPoint) -> Option<Array<Number>>;
     #[wasm_bindgen(method, setter)]
@@ -3162,11 +3158,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn blobs(this: &AnalyticsEngineDataPoint) -> Option<Array<JsOption<JsValue>>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_blobs(this: &AnalyticsEngineDataPoint, val: &Array<ArrayBuffer>);
-    #[wasm_bindgen(method, setter, js_name = "blobs")]
-    pub fn set_blobs_with_array(this: &AnalyticsEngineDataPoint, val: &Array<JsString>);
-    #[wasm_bindgen(method, setter, js_name = "blobs")]
-    pub fn set_blobs_with_array_1(this: &AnalyticsEngineDataPoint, val: &Array<Null>);
+    pub fn set_blobs(this: &AnalyticsEngineDataPoint, val: &Array<JsOption<JsValue>>);
 }
 impl AnalyticsEngineDataPoint {
     pub fn new() -> AnalyticsEngineDataPoint {
@@ -3182,32 +3174,16 @@ pub struct AnalyticsEngineDataPointBuilder {
     inner: AnalyticsEngineDataPoint,
 }
 impl AnalyticsEngineDataPointBuilder {
-    pub fn indexes(self, val: &Array<ArrayBuffer>) -> Self {
+    pub fn indexes(self, val: &Array<JsOption<JsValue>>) -> Self {
         self.inner.set_indexes(val);
-        self
-    }
-    pub fn indexes_with_array(self, val: &Array<JsString>) -> Self {
-        self.inner.set_indexes_with_array(val);
-        self
-    }
-    pub fn indexes_with_array_1(self, val: &Array<Null>) -> Self {
-        self.inner.set_indexes_with_array_1(val);
         self
     }
     pub fn doubles(self, val: &Array<Number>) -> Self {
         self.inner.set_doubles(val);
         self
     }
-    pub fn blobs(self, val: &Array<ArrayBuffer>) -> Self {
+    pub fn blobs(self, val: &Array<JsOption<JsValue>>) -> Self {
         self.inner.set_blobs(val);
-        self
-    }
-    pub fn blobs_with_array(self, val: &Array<JsString>) -> Self {
-        self.inner.set_blobs_with_array(val);
-        self
-    }
-    pub fn blobs_with_array_1(self, val: &Array<Null>) -> Self {
-        self.inner.set_blobs_with_array_1(val);
         self
     }
     pub fn build(self) -> AnalyticsEngineDataPoint {
@@ -3922,31 +3898,10 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Blob, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Blob")]
-    pub fn new_with_array(r#type: &Array<ArrayBuffer>) -> Result<Blob, JsValue>;
+    pub fn new_with_type(r#type: &Array) -> Result<Blob, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Blob")]
-    pub fn new_with_array_1(r#type: &Array<Object>) -> Result<Blob, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Blob")]
-    pub fn new_with_array_2(r#type: &Array<JsString>) -> Result<Blob, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Blob")]
-    pub fn new_with_array_3(r#type: &Array<Blob>) -> Result<Blob, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Blob")]
-    pub fn new_with_array_and_options(
-        r#type: &Array<ArrayBuffer>,
-        options: &BlobOptions,
-    ) -> Result<Blob, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Blob")]
-    pub fn new_with_array_and_options_1(
-        r#type: &Array<Object>,
-        options: &BlobOptions,
-    ) -> Result<Blob, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Blob")]
-    pub fn new_with_array_and_options_2(
-        r#type: &Array<JsString>,
-        options: &BlobOptions,
-    ) -> Result<Blob, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Blob")]
-    pub fn new_with_array_and_options_3(
-        r#type: &Array<Blob>,
+    pub fn new_with_type_and_options(
+        r#type: &Array,
         options: &BlobOptions,
     ) -> Result<Blob, JsValue>;
     #[doc = " The **`size`** read-only property of the Blob interface returns the size of the Blob or File in bytes."]
@@ -4074,36 +4029,12 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type File;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new(bits: &Array<ArrayBuffer>, name: &str) -> Result<File, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "File")]
-    pub fn new_with_array(bits: &Array<Object>, name: &str) -> Result<File, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "File")]
-    pub fn new_with_array_1(bits: &Array<JsString>, name: &str) -> Result<File, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "File")]
-    pub fn new_with_array_2(bits: &Array<Blob>, name: &str) -> Result<File, JsValue>;
+    pub fn new(bits: &Array, name: &str) -> Result<File, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "File")]
     pub fn new_with_null(bits: &Null, name: &str) -> Result<File, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "File")]
     pub fn new_with_array_and_options(
-        bits: &Array<ArrayBuffer>,
-        name: &str,
-        options: &FileOptions,
-    ) -> Result<File, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "File")]
-    pub fn new_with_array_and_options_1(
-        bits: &Array<Object>,
-        name: &str,
-        options: &FileOptions,
-    ) -> Result<File, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "File")]
-    pub fn new_with_array_and_options_2(
-        bits: &Array<JsString>,
-        name: &str,
-        options: &FileOptions,
-    ) -> Result<File, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "File")]
-    pub fn new_with_array_and_options_3(
-        bits: &Array<Blob>,
+        bits: &Array,
         name: &str,
         options: &FileOptions,
     ) -> Result<File, JsValue>;
@@ -9219,9 +9150,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn include(this: &R2ListOptions) -> Option<Array>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_include(this: &R2ListOptions, val: &Array<JsString>);
-    #[wasm_bindgen(method, setter, js_name = "include")]
-    pub fn set_include_with_array(this: &R2ListOptions, val: &Array<JsString>);
+    pub fn set_include(this: &R2ListOptions, val: &Array);
 }
 impl R2ListOptions {
     pub fn new() -> R2ListOptions {
@@ -9257,12 +9186,8 @@ impl R2ListOptionsBuilder {
         self.inner.set_start_after(val);
         self
     }
-    pub fn include(self, val: &Array<JsString>) -> Self {
+    pub fn include(self, val: &Array) -> Self {
         self.inner.set_include(val);
-        self
-    }
-    pub fn include_with_array(self, val: &Array<JsString>) -> Self {
-        self.inner.set_include_with_array(val);
         self
     }
     pub fn build(self) -> R2ListOptions {
@@ -12954,9 +12879,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn inputs(this: &URLPatternResult) -> Array;
     #[wasm_bindgen(method, setter)]
-    pub fn set_inputs(this: &URLPatternResult, val: &Array<JsString>);
-    #[wasm_bindgen(method, setter, js_name = "inputs")]
-    pub fn set_inputs_with_array(this: &URLPatternResult, val: &Array<URLPatternInit>);
+    pub fn set_inputs(this: &URLPatternResult, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn protocol(this: &URLPatternResult) -> URLPatternComponentResult;
     #[wasm_bindgen(method, setter)]
@@ -16898,20 +16821,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_input(this: &ResponsesInput, val: &str);
     #[wasm_bindgen(method, setter, js_name = "input")]
-    pub fn set_input_with_array(this: &ResponsesInput, val: &Array<EasyInputMessage>);
-    #[wasm_bindgen(method, setter, js_name = "input")]
-    pub fn set_input_with_array_1(this: &ResponsesInput, val: &Array<ResponseInputItemMessage>);
-    #[wasm_bindgen(method, setter, js_name = "input")]
-    pub fn set_input_with_array_2(this: &ResponsesInput, val: &Array<ResponseOutputMessage>);
-    #[wasm_bindgen(method, setter, js_name = "input")]
-    pub fn set_input_with_array_3(this: &ResponsesInput, val: &Array<ResponseFunctionToolCall>);
-    #[wasm_bindgen(method, setter, js_name = "input")]
-    pub fn set_input_with_array_4(
-        this: &ResponsesInput,
-        val: &Array<ResponseInputItemFunctionCallOutput>,
-    );
-    #[wasm_bindgen(method, setter, js_name = "input")]
-    pub fn set_input_with_array_5(this: &ResponsesInput, val: &Array<ResponseReasoningItem>);
+    pub fn set_input_with_array(this: &ResponsesInput, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn instructions(this: &ResponsesInput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -17064,28 +16974,8 @@ impl ResponsesInputBuilder {
         self.inner.set_input(val);
         self
     }
-    pub fn input_with_array(self, val: &Array<EasyInputMessage>) -> Self {
+    pub fn input_with_array(self, val: &Array) -> Self {
         self.inner.set_input_with_array(val);
-        self
-    }
-    pub fn input_with_array_1(self, val: &Array<ResponseInputItemMessage>) -> Self {
-        self.inner.set_input_with_array_1(val);
-        self
-    }
-    pub fn input_with_array_2(self, val: &Array<ResponseOutputMessage>) -> Self {
-        self.inner.set_input_with_array_2(val);
-        self
-    }
-    pub fn input_with_array_3(self, val: &Array<ResponseFunctionToolCall>) -> Self {
-        self.inner.set_input_with_array_3(val);
-        self
-    }
-    pub fn input_with_array_4(self, val: &Array<ResponseInputItemFunctionCallOutput>) -> Self {
-        self.inner.set_input_with_array_4(val);
-        self
-    }
-    pub fn input_with_array_5(self, val: &Array<ResponseReasoningItem>) -> Self {
-        self.inner.set_input_with_array_5(val);
         self
     }
     pub fn instructions(self, val: &str) -> Self {
@@ -17258,32 +17148,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_instructions(this: &ResponsesOutput, val: &str);
     #[wasm_bindgen(method, setter, js_name = "instructions")]
-    pub fn set_instructions_with_array(this: &ResponsesOutput, val: &Array<EasyInputMessage>);
-    #[wasm_bindgen(method, setter, js_name = "instructions")]
-    pub fn set_instructions_with_array_1(
-        this: &ResponsesOutput,
-        val: &Array<ResponseInputItemMessage>,
-    );
-    #[wasm_bindgen(method, setter, js_name = "instructions")]
-    pub fn set_instructions_with_array_2(
-        this: &ResponsesOutput,
-        val: &Array<ResponseOutputMessage>,
-    );
-    #[wasm_bindgen(method, setter, js_name = "instructions")]
-    pub fn set_instructions_with_array_3(
-        this: &ResponsesOutput,
-        val: &Array<ResponseFunctionToolCall>,
-    );
-    #[wasm_bindgen(method, setter, js_name = "instructions")]
-    pub fn set_instructions_with_array_4(
-        this: &ResponsesOutput,
-        val: &Array<ResponseInputItemFunctionCallOutput>,
-    );
-    #[wasm_bindgen(method, setter, js_name = "instructions")]
-    pub fn set_instructions_with_array_5(
-        this: &ResponsesOutput,
-        val: &Array<ResponseReasoningItem>,
-    );
+    pub fn set_instructions_with_array(this: &ResponsesOutput, val: &Array);
     #[wasm_bindgen(method, setter, js_name = "instructions")]
     pub fn set_instructions_with_null(this: &ResponsesOutput, val: &Null);
     #[wasm_bindgen(method, getter)]
@@ -17293,11 +17158,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn output(this: &ResponsesOutput) -> Option<Array>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_output(this: &ResponsesOutput, val: &Array<ResponseOutputMessage>);
-    #[wasm_bindgen(method, setter, js_name = "output")]
-    pub fn set_output_with_array(this: &ResponsesOutput, val: &Array<ResponseFunctionToolCall>);
-    #[wasm_bindgen(method, setter, js_name = "output")]
-    pub fn set_output_with_array_1(this: &ResponsesOutput, val: &Array<ResponseReasoningItem>);
+    pub fn set_output(this: &ResponsesOutput, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn parallel_tool_calls(this: &ResponsesOutput) -> Option<bool>;
     #[wasm_bindgen(method, setter)]
@@ -17436,31 +17297,8 @@ impl ResponsesOutputBuilder {
         self.inner.set_instructions(val);
         self
     }
-    pub fn instructions_with_array(self, val: &Array<EasyInputMessage>) -> Self {
+    pub fn instructions_with_array(self, val: &Array) -> Self {
         self.inner.set_instructions_with_array(val);
-        self
-    }
-    pub fn instructions_with_array_1(self, val: &Array<ResponseInputItemMessage>) -> Self {
-        self.inner.set_instructions_with_array_1(val);
-        self
-    }
-    pub fn instructions_with_array_2(self, val: &Array<ResponseOutputMessage>) -> Self {
-        self.inner.set_instructions_with_array_2(val);
-        self
-    }
-    pub fn instructions_with_array_3(self, val: &Array<ResponseFunctionToolCall>) -> Self {
-        self.inner.set_instructions_with_array_3(val);
-        self
-    }
-    pub fn instructions_with_array_4(
-        self,
-        val: &Array<ResponseInputItemFunctionCallOutput>,
-    ) -> Self {
-        self.inner.set_instructions_with_array_4(val);
-        self
-    }
-    pub fn instructions_with_array_5(self, val: &Array<ResponseReasoningItem>) -> Self {
-        self.inner.set_instructions_with_array_5(val);
         self
     }
     pub fn instructions_with_null(self, val: &Null) -> Self {
@@ -17471,16 +17309,8 @@ impl ResponsesOutputBuilder {
         self.inner.set_object(val);
         self
     }
-    pub fn output(self, val: &Array<ResponseOutputMessage>) -> Self {
+    pub fn output(self, val: &Array) -> Self {
         self.inner.set_output(val);
-        self
-    }
-    pub fn output_with_array(self, val: &Array<ResponseFunctionToolCall>) -> Self {
-        self.inner.set_output_with_array(val);
-        self
-    }
-    pub fn output_with_array_1(self, val: &Array<ResponseReasoningItem>) -> Self {
-        self.inner.set_output_with_array_1(val);
         self
     }
     pub fn parallel_tool_calls(self, val: bool) -> Self {
@@ -17613,9 +17443,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_content(this: &EasyInputMessage, val: &str);
     #[wasm_bindgen(method, setter, js_name = "content")]
-    pub fn set_content_with_array(this: &EasyInputMessage, val: &Array<ResponseInputText>);
-    #[wasm_bindgen(method, setter, js_name = "content")]
-    pub fn set_content_with_array_1(this: &EasyInputMessage, val: &Array<ResponseInputImage>);
+    pub fn set_content_with_array(this: &EasyInputMessage, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn role(this: &EasyInputMessage) -> JsValue;
     #[wasm_bindgen(method, setter)]
@@ -18292,15 +18120,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_output(this: &ResponseCustomToolCallOutput, val: &str);
     #[wasm_bindgen(method, setter, js_name = "output")]
-    pub fn set_output_with_array(
-        this: &ResponseCustomToolCallOutput,
-        val: &Array<ResponseInputText>,
-    );
-    #[wasm_bindgen(method, setter, js_name = "output")]
-    pub fn set_output_with_array_1(
-        this: &ResponseCustomToolCallOutput,
-        val: &Array<ResponseInputImage>,
-    );
+    pub fn set_output_with_array(this: &ResponseCustomToolCallOutput, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn r#type(this: &ResponseCustomToolCallOutput) -> String;
     #[wasm_bindgen(method, setter)]
@@ -18371,7 +18191,7 @@ impl ResponseCustomToolCallOutput {
     ) -> ResponseCustomToolCallOutputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_call_id(call_id);
-        inner.set_output(output);
+        inner.set_output_with_array(output);
         inner.set_type("custom_tool_call_output");
         ResponseCustomToolCallOutputBuilder { inner }
     }
@@ -19479,15 +19299,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_output(this: &ResponseFunctionToolCallOutputItem, val: &str);
     #[wasm_bindgen(method, setter, js_name = "output")]
-    pub fn set_output_with_array(
-        this: &ResponseFunctionToolCallOutputItem,
-        val: &Array<ResponseInputText>,
-    );
-    #[wasm_bindgen(method, setter, js_name = "output")]
-    pub fn set_output_with_array_1(
-        this: &ResponseFunctionToolCallOutputItem,
-        val: &Array<ResponseInputImage>,
-    );
+    pub fn set_output_with_array(this: &ResponseFunctionToolCallOutputItem, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn r#type(this: &ResponseFunctionToolCallOutputItem) -> String;
     #[wasm_bindgen(method, setter)]
@@ -19572,7 +19384,7 @@ impl ResponseFunctionToolCallOutputItem {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_call_id(call_id);
-        inner.set_output(output);
+        inner.set_output_with_array(output);
         inner.set_type("function_call_output");
         ResponseFunctionToolCallOutputItemBuilder { inner }
     }
@@ -19854,15 +19666,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_output(this: &ResponseInputItemFunctionCallOutput, val: &str);
     #[wasm_bindgen(method, setter, js_name = "output")]
-    pub fn set_output_with_array(
-        this: &ResponseInputItemFunctionCallOutput,
-        val: &Array<ResponseInputTextContent>,
-    );
-    #[wasm_bindgen(method, setter, js_name = "output")]
-    pub fn set_output_with_array_1(
-        this: &ResponseInputItemFunctionCallOutput,
-        val: &Array<ResponseInputImageContent>,
-    );
+    pub fn set_output_with_array(this: &ResponseInputItemFunctionCallOutput, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn r#type(this: &ResponseInputItemFunctionCallOutput) -> String;
     #[wasm_bindgen(method, setter)]
@@ -19993,9 +19797,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn content(this: &ResponseInputItemMessage) -> Array;
     #[wasm_bindgen(method, setter)]
-    pub fn set_content(this: &ResponseInputItemMessage, val: &Array<ResponseInputText>);
-    #[wasm_bindgen(method, setter, js_name = "content")]
-    pub fn set_content_with_array(this: &ResponseInputItemMessage, val: &Array<ResponseInputImage>);
+    pub fn set_content(this: &ResponseInputItemMessage, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn role(this: &ResponseInputItemMessage) -> JsValue;
     #[wasm_bindgen(method, setter)]
@@ -20126,9 +19928,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn content(this: &ResponseInputMessageItem) -> Array;
     #[wasm_bindgen(method, setter)]
-    pub fn set_content(this: &ResponseInputMessageItem, val: &Array<ResponseInputText>);
-    #[wasm_bindgen(method, setter, js_name = "content")]
-    pub fn set_content_with_array(this: &ResponseInputMessageItem, val: &Array<ResponseInputImage>);
+    pub fn set_content(this: &ResponseInputMessageItem, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn role(this: &ResponseInputMessageItem) -> JsValue;
     #[wasm_bindgen(method, setter)]
@@ -20522,9 +20322,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn content(this: &ResponseOutputMessage) -> Array;
     #[wasm_bindgen(method, setter)]
-    pub fn set_content(this: &ResponseOutputMessage, val: &Array<ResponseOutputText>);
-    #[wasm_bindgen(method, setter, js_name = "content")]
-    pub fn set_content_with_array(this: &ResponseOutputMessage, val: &Array<ResponseOutputRefusal>);
+    pub fn set_content(this: &ResponseOutputMessage, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn role(this: &ResponseOutputMessage) -> String;
     #[wasm_bindgen(method, setter)]
@@ -23536,7 +23334,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn tools(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages) -> Option<Array>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages, val: &Array<Object>);
+    pub fn set_tools(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages, val: &Array);
     #[doc = " If true, the response will be streamed back incrementally."]
     #[wasm_bindgen(method, getter)]
     pub fn stream(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages) -> Option<bool>;
@@ -23629,7 +23427,7 @@ impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesBuilder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &Array<Object>) -> Self {
+    pub fn tools(self, val: &Array) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -23991,10 +23789,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn tools(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages) -> Option<Array>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(
-        this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages,
-        val: &Array<Object>,
-    );
+    pub fn set_tools(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn response_format(
         this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages,
@@ -24096,7 +23891,7 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_MessagesBuilder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &Array<Object>) -> Self {
+    pub fn tools(self, val: &Array) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -24830,7 +24625,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn tools(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages) -> Option<Array>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages, val: &Array<Object>);
+    pub fn set_tools(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn response_format(
         this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages,
@@ -24918,7 +24713,7 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_MessagesBuilder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &Array<Object>) -> Self {
+    pub fn tools(self, val: &Array) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -25255,7 +25050,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn tools(this: &Ai_Cf_Qwen_Qwq_32B_Messages) -> Option<Array>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(this: &Ai_Cf_Qwen_Qwq_32B_Messages, val: &Array<Object>);
+    pub fn set_tools(this: &Ai_Cf_Qwen_Qwq_32B_Messages, val: &Array);
     #[doc = " JSON schema that should be fulfilled for the response."]
     #[wasm_bindgen(method, getter)]
     pub fn guided_json(this: &Ai_Cf_Qwen_Qwq_32B_Messages) -> Option<Object>;
@@ -25336,7 +25131,7 @@ impl Ai_Cf_Qwen_Qwq_32B_MessagesBuilder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &Array<Object>) -> Self {
+    pub fn tools(self, val: &Array) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -25648,10 +25443,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn tools(this: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages) -> Option<Array>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(
-        this: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages,
-        val: &Array<Object>,
-    );
+    pub fn set_tools(this: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages, val: &Array);
     #[doc = " JSON schema that should be fulfilled for the response."]
     #[wasm_bindgen(method, getter)]
     pub fn guided_json(
@@ -25763,7 +25555,7 @@ impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesBuilder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &Array<Object>) -> Self {
+    pub fn tools(self, val: &Array) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -26054,7 +25846,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn tools(this: &Ai_Cf_Google_Gemma_3_12B_It_Messages) -> Option<Array>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(this: &Ai_Cf_Google_Gemma_3_12B_It_Messages, val: &Array<Object>);
+    pub fn set_tools(this: &Ai_Cf_Google_Gemma_3_12B_It_Messages, val: &Array);
     #[doc = " JSON schema that should be fulfilled for the response."]
     #[wasm_bindgen(method, getter)]
     pub fn guided_json(this: &Ai_Cf_Google_Gemma_3_12B_It_Messages) -> Option<Object>;
@@ -26135,7 +25927,7 @@ impl Ai_Cf_Google_Gemma_3_12B_It_MessagesBuilder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &Array<Object>) -> Self {
+    pub fn tools(self, val: &Array) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -26507,10 +26299,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn tools(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages) -> Option<Array>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(
-        this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages,
-        val: &Array<Object>,
-    );
+    pub fn set_tools(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn response_format(
         this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages,
@@ -26618,7 +26407,7 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesBuilder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &Array<Object>) -> Self {
+    pub fn tools(self, val: &Array) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -26685,15 +26474,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn requests(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch) -> Array;
     #[wasm_bindgen(method, setter)]
-    pub fn set_requests(
-        this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch,
-        val: &Array<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_Inner>,
-    );
-    #[wasm_bindgen(method, setter, js_name = "requests")]
-    pub fn set_requests_with_array(
-        this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch,
-        val: &Array<Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner>,
-    );
+    pub fn set_requests(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch, val: &Array);
 }
 impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch {
     #[doc = " ## Arguments"]
@@ -26922,10 +26703,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn tools(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner) -> Option<Array>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(
-        this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner,
-        val: &Array<Object>,
-    );
+    pub fn set_tools(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn response_format(
         this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner,
@@ -27049,7 +26827,7 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerBuilder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &Array<Object>) -> Self {
+    pub fn tools(self, val: &Array) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -27411,7 +27189,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn tools(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages) -> Option<Array>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages, val: &Array<Object>);
+    pub fn set_tools(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn response_format(
         this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages,
@@ -27496,7 +27274,7 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_MessagesBuilder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &Array<Object>) -> Self {
+    pub fn tools(self, val: &Array) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -27602,15 +27380,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn requests(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch) -> Array;
     #[wasm_bindgen(method, setter)]
-    pub fn set_requests(
-        this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch,
-        val: &Array<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1>,
-    );
-    #[wasm_bindgen(method, setter, js_name = "requests")]
-    pub fn set_requests_with_array(
-        this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch,
-        val: &Array<Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1>,
-    );
+    pub fn set_requests(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch, val: &Array);
 }
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch {
     #[doc = " ## Arguments"]
@@ -27847,7 +27617,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn tools(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1) -> Option<Array>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1, val: &Array<Object>);
+    pub fn set_tools(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn response_format(
         this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1,
@@ -27932,7 +27702,7 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1Builder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &Array<Object>) -> Self {
+    pub fn tools(self, val: &Array) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -31739,10 +31509,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn tools(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages) -> Option<Array>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(
-        this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages,
-        val: &Array<Object>,
-    );
+    pub fn set_tools(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn response_format(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages,
@@ -31844,7 +31611,7 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_MessagesBuilder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &Array<Object>) -> Self {
+    pub fn tools(self, val: &Array) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -31962,15 +31729,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn requests(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch) -> Array;
     #[wasm_bindgen(method, setter)]
-    pub fn set_requests(
-        this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch,
-        val: &Array<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1>,
-    );
-    #[wasm_bindgen(method, setter, js_name = "requests")]
-    pub fn set_requests_with_array(
-        this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch,
-        val: &Array<Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1>,
-    );
+    pub fn set_requests(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch, val: &Array);
 }
 impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch {
     #[doc = " ## Arguments"]
@@ -32244,10 +32003,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn tools(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1) -> Option<Array>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(
-        this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1,
-        val: &Array<Object>,
-    );
+    pub fn set_tools(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn response_format(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1,
@@ -32350,7 +32106,7 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1Builder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &Array<Object>) -> Self {
+    pub fn tools(self, val: &Array) -> Self {
         self.inner.set_tools(val);
         self
     }

@@ -643,36 +643,6 @@ pub fn show_with_value_a_and_opts(value: f64, opts: &ShowOpts);
 disambiguation, including readability adjustments when the same
 parameter name appears in multiple alternatives.
 
-### Carve-out: union-typed `Record` values don't fan out
-
-`Record<K, U>` where `U` is a union (e.g. `Record<string, string | number
-| boolean>`) emits a single binding rather than one per union arm:
-
-```rust
-// Single Record(K, Union) lowers to plain `&Object` via the existing
-// JsValue-erasure path for unions in argument position.
-pub fn set_metadata(this: &Foo, val: &Object);
-```
-
-instead of
-
-```rust
-pub fn set_metadata(this: &Foo, val: &Object<JsString>);
-pub fn set_metadata_with_record_1(this: &Foo, val: &Object<Number>);
-pub fn set_metadata_with_record_2(this: &Foo, val: &Object<Boolean>);
-```
-
-The phantom `<T>` on `Object<T>` is purely a compile-time tag — at
-runtime every typed-Record arm is the same JS object. Cartesian-expanding
-the value-side union just clones the method per arm and forces callers
-to pick one of N siblings whose only difference is a phantom that
-nothing checks. The carve-out lives in `flatten_type` for `Record(K, V)`
-and only kicks in when `V` flattens to more than one alternative.
-
-Single-typed Records (`Record<string, string>`) still emit
-`&Object<JsString>` — the typed phantom is meaningful when the value
-side is monomorphic.
-
 ### Why a single pipeline
 
 Treating optional, union, overload, and variadic as one parameter-axis
@@ -762,6 +732,27 @@ The lattice is built from:
 When the deepest common ancestor is `Object` (no useful narrowing), the
 union erases to `JsValue` — the existing default. This rule is universal:
 it applies to `@throws` unions and to any TS union return type.
+
+The same LUB rule also runs at flatten-time for the inner type of
+generic containers (`Array<T>`, `Set<T>`, `Promise<T>`, `Map<K, V>`,
+`Record<K, V>`). When the inner type fans out to multiple alternatives,
+they collapse to either:
+
+* their LUB (when every alt is `TypeRef::Named` and they share an
+  ancestor more specific than `Object`) — e.g. `Array<TypeError |
+  RangeError>` emits `Array<Error>` rather than two phantom-sibling
+  `Array<TypeError>` / `Array<RangeError>` bindings; or
+* the original union (otherwise) — `Record<string, string | number |
+  boolean>` lowers to bare `&Object` via the existing `is_jsvalue_arg`
+  elision in `to_syn_type`.
+
+This keeps one binding per outer container shape rather than fanning
+out per inner-arm phantom. The phantom on `Array<T>`, `Object<T>`, etc.
+is a compile-time tag — at runtime every arm is the same JS object, so
+the explosion was pure API-surface noise. Single-typed containers
+(`Record<string, string>` → `&Object<JsString>`) keep their meaningful
+phantom because flatten produces a single alternative and the collapse
+step is a no-op.
 
 ## Module declarations and namespace nesting
 

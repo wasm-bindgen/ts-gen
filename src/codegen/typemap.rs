@@ -518,7 +518,7 @@ pub fn to_syn_type(
             // emit that ancestor instead of erasing to `JsValue`. Falls back
             // to `JsValue` for non-named members or when only `Object` is
             // common (which is no better than `JsValue` in practice).
-            if let Some(lub) = union_lub(members, ctx, scope) {
+            if let Some(lub) = lub_named(members, ctx, scope) {
                 let lub_ty = to_syn_type(&TypeRef::Named(lub), pos, ctx, scope, from_module);
                 return lub_ty;
             }
@@ -828,11 +828,19 @@ pub(crate) fn make_ident(name: &str) -> syn::Ident {
     }
 }
 
-/// Try to compute a subtyping LUB across the members of a union. Returns
+/// Try to compute a subtyping LUB across a list of `TypeRef`s. Returns
 /// `Some(name)` only when every member is a `TypeRef::Named` *and* the
 /// resulting LUB is more specific than `Object` (a `Object` LUB is no
 /// better than the default `JsValue` erasure, so we treat it as no LUB).
-fn union_lub(
+///
+/// Used by:
+/// * `TypeRef::Union` lowering — collapses unions of named subtypes to
+///   their shared ancestor instead of erasing to `JsValue`.
+/// * `signatures::flatten_type` — collapses generic-container element
+///   alternatives so e.g. `Array<TypeError | RangeError>` emits one
+///   `Array<Error>` rather than two phantom-sibling `Array<TypeError>`
+///   / `Array<RangeError>` bindings.
+pub(crate) fn lub_named(
     members: &[TypeRef],
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
