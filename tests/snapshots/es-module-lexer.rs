@@ -243,13 +243,13 @@ pub mod es_module_lexer {
         pub fn set_idx(this: &ParseError, val: f64);
     }
     impl ParseError {
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `idx`"]
         pub fn new(idx: f64) -> ParseError {
             Self::builder(idx).build()
         }
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `idx`"]
         pub fn builder(idx: f64) -> ParseErrorBuilder {

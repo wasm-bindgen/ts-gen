@@ -543,7 +543,7 @@ fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
                     init_calls.push(quote! { inner.#setter_ident(#literal_expr); });
                     let bullet_head = format!("`{field_js_name}: {literal_display}`");
                     literal_doc_bullets.push(match field_doc {
-                        Some(doc) => format!("* {bullet_head}: {}", doc.trim()),
+                        Some(doc) => format!("* {bullet_head} - {}", doc.trim()),
                         None => format!("* {bullet_head}"),
                     });
                 }
@@ -558,7 +558,7 @@ fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
                     value_params.push(param.clone());
                     let bullet_head = format!("`{}`", param.name);
                     provided_doc_bullets.push(match field_doc {
-                        Some(doc) => format!("* {bullet_head}: {}", doc.trim()),
+                        Some(doc) => format!("* {bullet_head} - {}", doc.trim()),
                         None => format!("* {bullet_head}"),
                     });
                 }
@@ -625,14 +625,14 @@ fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
         // skipped when its bullet list is empty.
         let mut doc_text = String::new();
         if !plan.literal_doc_bullets.is_empty() {
-            doc_text.push_str("# Inlined fields\n\n");
+            doc_text.push_str("## Inlined fields\n\n");
             doc_text.push_str(&plan.literal_doc_bullets.join("\n"));
         }
         if !plan.provided_doc_bullets.is_empty() {
             if !doc_text.is_empty() {
                 doc_text.push_str("\n\n");
             }
-            doc_text.push_str("# Parameters\n\n");
+            doc_text.push_str("## Arguments\n\n");
             doc_text.push_str(&plan.provided_doc_bullets.join("\n"));
         }
         let doc_attr = if doc_text.is_empty() {
