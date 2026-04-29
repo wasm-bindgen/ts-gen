@@ -26,7 +26,8 @@ jobs:
     - uses: dtolnay/rust-toolchain@stable
       with:
         components: rustfmt
-    - run: cargo fmt --all -- --check
+    - uses: extractions/setup-just@v2
+    - run: just fmt
 
   clippy:
     name: Clippy
@@ -36,7 +37,8 @@ jobs:
     - uses: dtolnay/rust-toolchain@stable
       with:
         components: clippy
-    - run: cargo clippy --no-deps --workspace --all-features --exclude ts-gen-wasm-bindgen-tests -- -D warnings
+    - uses: extractions/setup-just@v2
+    - run: just clippy
 
   test:
     name: Test (unit + snapshot)
@@ -44,9 +46,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
-    - run: cargo test -p ts-gen
+    - uses: extractions/setup-just@v2
+    - run: just test
 
-  test_wasm_bindgen:
+  test_integration:
     name: Test (wasm-bindgen integration)
     runs-on: ubuntu-latest
     steps:
@@ -57,7 +60,11 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: '20'
-    - run: npm install --prefix crates/wasm-bindgen-tests
-    - run: cargo test -p ts-gen-wasm-bindgen-tests --target wasm32-unknown-unknown
-      env:
-        NODE_PATH: ${{ github.workspace }}/crates/wasm-bindgen-tests/node_modules
+    - uses: extractions/setup-just@v2
+    # `just test-integration` invokes the wasm-bindgen-test-runner that
+    # ships with `wasm-bindgen-cli`. Install at the lockfile-pinned version
+    # so the schema matches the wasm-bindgen crate version.
+    - uses: taiki-e/install-action@v2
+      with:
+        tool: wasm-bindgen-cli@0.2.120
+    - run: just test-integration

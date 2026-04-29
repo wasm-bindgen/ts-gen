@@ -1,10 +1,9 @@
-//! @ts-gen --lib-name node:console ../ts-gen/tests/fixtures/node-console.d.ts
 #![cfg(target_arch = "wasm32")]
 
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_test::*;
 
-use ts_gen_wasm_bindgen_tests::console::*;
+use ts_gen_integration_tests::console::*;
 
 #[wasm_bindgen]
 extern "C" {

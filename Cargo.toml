@@ -1,6 +1,6 @@
 [workspace]
 members = [
-    "crates/wasm-bindgen-tests",
+    "integration-tests",
 ]
 exclude = [
     "examples/cloudflare-worker",
