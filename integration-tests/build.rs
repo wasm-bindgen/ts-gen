@@ -196,10 +196,7 @@ fn generate_bindings(entry: &Entry, out_dir: &Path) {
         );
     }
 
-    let options = ts_gen::codegen::GenerateOptions {
-        skip_promise_ext: true,
-    };
-    let rust_code = ts_gen::codegen::generate_with_options(&module, &gctx, &options)
+    let rust_code = ts_gen::codegen::generate(&module, &gctx)
         .unwrap_or_else(|e| panic!("codegen failed for {}: {e}", entry.mod_name));
 
     // Generated code uses inner attributes (`#![...]`, `//!`) which are only

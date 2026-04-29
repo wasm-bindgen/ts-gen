@@ -2,25 +2,6 @@
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
-#[doc = r" Extension trait for awaiting `js_sys::Promise<T>`."]
-#[doc = r""]
-#[doc = r" Since `IntoFuture` can't be implemented for `js_sys::Promise` from"]
-#[doc = r" generated code (orphan rule), use `.into_future().await` instead:"]
-#[doc = r" ```ignore"]
-#[doc = r" use bindings::PromiseExt;"]
-#[doc = r" let data: ArrayBuffer = promise.into_future().await?;"]
-#[doc = r" ```"]
-#[allow(dead_code)]
-pub trait PromiseExt {
-    type Output;
-    fn into_future(self) -> wasm_bindgen_futures::JsFuture<Self::Output>;
-}
-impl<T: 'static + wasm_bindgen::convert::FromWasmAbi> PromiseExt for js_sys::Promise<T> {
-    type Output = T;
-    fn into_future(self) -> wasm_bindgen_futures::JsFuture<T> {
-        wasm_bindgen_futures::JsFuture::from(self)
-    }
-}
 #[allow(dead_code)]
 use JsValue as Blob;
 #[allow(dead_code)]
@@ -173,27 +154,16 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "bodyUsed")]
     pub fn body_used(this: &Body) -> bool;
     #[doc = " Returns the body as an ArrayBuffer."]
-    #[wasm_bindgen(method, js_name = "arrayBuffer")]
-    pub fn array_buffer(this: &Body) -> Promise<ArrayBuffer>;
-    #[doc = " Returns the body as an ArrayBuffer."]
     #[wasm_bindgen(method, catch, js_name = "arrayBuffer")]
-    pub fn try_array_buffer(this: &Body) -> Result<Promise<ArrayBuffer>, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn text(this: &Body) -> Promise<JsString>;
-    #[wasm_bindgen(method, catch, js_name = "text")]
-    pub fn try_text(this: &Body) -> Result<Promise<JsString>, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn json(this: &Body) -> Promise;
-    #[wasm_bindgen(method, catch, js_name = "json")]
-    pub fn try_json(this: &Body) -> Result<Promise, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn blob(this: &Body) -> Promise<Blob>;
-    #[wasm_bindgen(method, catch, js_name = "blob")]
-    pub fn try_blob(this: &Body) -> Result<Promise<Blob>, JsValue>;
-    #[wasm_bindgen(method, js_name = "formData")]
-    pub fn form_data(this: &Body) -> Promise<FormData>;
+    pub async fn array_buffer(this: &Body) -> Result<ArrayBuffer, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn text(this: &Body) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn json(this: &Body) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn blob(this: &Body) -> Result<Blob, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "formData")]
-    pub fn try_form_data(this: &Body) -> Result<Promise<FormData>, JsValue>;
+    pub async fn form_data(this: &Body) -> Result<FormData, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -286,34 +256,20 @@ extern "C" {
     pub fn env(this: &DurableObject) -> Object;
     #[wasm_bindgen(method, setter)]
     pub fn set_env(this: &DurableObject, val: &Object);
-    #[wasm_bindgen(method)]
-    pub fn alarm(this: &DurableObject) -> Promise<Undefined>;
-    #[wasm_bindgen(method, catch, js_name = "alarm")]
-    pub fn try_alarm(this: &DurableObject) -> Result<Promise<Undefined>, JsValue>;
-    #[wasm_bindgen(method, js_name = "webSocketMessage")]
-    pub fn web_socket_message(
+    #[wasm_bindgen(method, catch)]
+    pub async fn alarm(this: &DurableObject) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "webSocketMessage")]
+    pub async fn web_socket_message(
         this: &DurableObject,
         ws: &WebSocket,
         message: &str,
-    ) -> Promise<Undefined>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "webSocketMessage")]
-    pub fn try_web_socket_message(
-        this: &DurableObject,
-        ws: &WebSocket,
-        message: &str,
-    ) -> Result<Promise<Undefined>, JsValue>;
-    #[wasm_bindgen(method, js_name = "webSocketMessage")]
-    pub fn web_socket_message_with_array_buffer(
+    pub async fn web_socket_message_with_array_buffer(
         this: &DurableObject,
         ws: &WebSocket,
         message: &ArrayBuffer,
-    ) -> Promise<Undefined>;
-    #[wasm_bindgen(method, catch, js_name = "webSocketMessage")]
-    pub fn try_web_socket_message_with_array_buffer(
-        this: &DurableObject,
-        ws: &WebSocket,
-        message: &ArrayBuffer,
-    ) -> Result<Promise<Undefined>, JsValue>;
+    ) -> Result<(), JsValue>;
 }
 pub mod web_assembly {
     use wasm_bindgen::prelude::*;
@@ -339,59 +295,35 @@ pub mod web_assembly {
     }
     #[wasm_bindgen]
     extern "C" {
-        #[wasm_bindgen(js_namespace = "WebAssembly")]
-        pub fn compile(bytes: &ArrayBuffer) -> Promise<Module>;
+        #[wasm_bindgen(catch, js_namespace = "WebAssembly")]
+        pub async fn compile(bytes: &ArrayBuffer) -> Result<Module, JsValue>;
     }
     #[wasm_bindgen]
     extern "C" {
-        #[wasm_bindgen(catch, js_name = "compile", js_namespace = "WebAssembly")]
-        pub fn try_compile(bytes: &ArrayBuffer) -> Result<Promise<Module>, JsValue>;
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        #[wasm_bindgen(js_namespace = "WebAssembly")]
-        pub fn instantiate(module: &Module) -> Promise<Instance>;
+        #[wasm_bindgen(catch, js_namespace = "WebAssembly")]
+        pub async fn instantiate(module: &Module) -> Result<Instance, JsValue>;
     }
     #[wasm_bindgen]
     extern "C" {
         #[wasm_bindgen(catch, js_name = "instantiate", js_namespace = "WebAssembly")]
-        pub fn try_instantiate(module: &Module) -> Result<Promise<Instance>, JsValue>;
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        #[wasm_bindgen(js_name = "instantiate", js_namespace = "WebAssembly")]
-        pub fn instantiate_with_imports(module: &Module, imports: &Object) -> Promise<Instance>;
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "instantiate", js_namespace = "WebAssembly")]
-        pub fn try_instantiate_with_imports(
+        pub async fn instantiate_with_imports(
             module: &Module,
             imports: &Object,
-        ) -> Result<Promise<Instance>, JsValue>;
+        ) -> Result<Instance, JsValue>;
     }
 }
 #[wasm_bindgen]
 extern "C" {
-    pub fn fetch(input: &RequestInfo) -> Promise<Response>;
+    #[wasm_bindgen(catch)]
+    pub async fn fetch(input: &RequestInfo) -> Result<Response, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetch")]
-    pub fn try_fetch(input: &RequestInfo) -> Result<Promise<Response>, JsValue>;
-}
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(js_name = "fetch")]
-    pub fn fetch_with_init(input: &RequestInfo, init: &RequestInit) -> Promise<Response>;
-}
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "fetch")]
-    pub fn try_fetch_with_init(
+    pub async fn fetch_with_init(
         input: &RequestInfo,
         init: &RequestInit,
-    ) -> Result<Promise<Response>, JsValue>;
+    ) -> Result<Response, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -452,10 +384,8 @@ pub mod sockets {
         # [wasm_bindgen (extends = Object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Socket;
-        #[wasm_bindgen(method)]
-        pub fn close(this: &Socket) -> Promise<Undefined>;
-        #[wasm_bindgen(method, catch, js_name = "close")]
-        pub fn try_close(this: &Socket) -> Result<Promise<Undefined>, JsValue>;
+        #[wasm_bindgen(method, catch)]
+        pub async fn close(this: &Socket) -> Result<(), JsValue>;
         #[wasm_bindgen(method, getter)]
         pub fn closed(this: &Socket) -> Promise<Undefined>;
         #[wasm_bindgen(method, getter)]

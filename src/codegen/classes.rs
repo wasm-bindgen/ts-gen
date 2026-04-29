@@ -693,10 +693,16 @@ fn generate_expanded_method(config: &ClassConfig, sig: &ExpandedSignature) -> To
         quote! { -> #ret_ty }
     };
 
+    let async_kw = if sig.is_async {
+        quote! { async }
+    } else {
+        quote! {}
+    };
+
     quote! {
         #doc
         #[wasm_bindgen(#(#wb_parts),*)]
-        pub fn #rust_ident(this: &#this_type, #params) #ret;
+        pub #async_kw fn #rust_ident(this: &#this_type, #params) #ret;
     }
 }
 
@@ -727,10 +733,16 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &ExpandedSignature
         quote! { -> #ret_ty }
     };
 
+    let async_kw = if sig.is_async {
+        quote! { async }
+    } else {
+        quote! {}
+    };
+
     quote! {
         #doc
         #[wasm_bindgen(#(#wb_parts),*)]
-        pub fn #rust_ident(#params) #ret;
+        pub #async_kw fn #rust_ident(#params) #ret;
     }
 }
 

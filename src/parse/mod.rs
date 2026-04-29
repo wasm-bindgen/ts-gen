@@ -559,27 +559,32 @@ fn member_key(member: &crate::ir::Member) -> MemberKey {
     }
 }
 
-/// Merge declarations with the same name:
+/// Merge declarations with the same name AND the same module context:
 /// - Interface + Interface → merge members (TypeScript declaration merging)
 /// - Interface + Class → merge interface members into class (var+interface pattern)
 /// - Class + Class → merge members
+///
+/// Types in different module contexts (e.g. a global `interface EmailMessage`
+/// and a `cloudflare:email`-scoped `class EmailMessage`) intentionally do NOT
+/// merge — they're distinct Rust types that happen to share a JS name.
 fn merge_class_pairs(
     declarations: Vec<crate::ir::TypeDeclaration>,
 ) -> Vec<crate::ir::TypeDeclaration> {
-    use crate::ir::{TypeDeclaration, TypeKind};
+    use crate::ir::{ModuleContext, TypeDeclaration, TypeKind};
     use std::collections::HashMap;
 
-    let mut class_map: HashMap<String, usize> = HashMap::new();
-    let mut iface_map: HashMap<String, usize> = HashMap::new();
+    type Key = (String, ModuleContext);
+    let mut class_map: HashMap<Key, usize> = HashMap::new();
+    let mut iface_map: HashMap<Key, usize> = HashMap::new();
     let mut result: Vec<TypeDeclaration> = Vec::new();
 
     for decl in declarations {
         match &decl.kind {
             TypeKind::Class(class_decl) => {
-                let name = class_decl.name.clone();
+                let key = (class_decl.name.clone(), decl.module_context.clone());
 
                 // Merge into existing class
-                if let Some(&existing_idx) = class_map.get(&name) {
+                if let Some(&existing_idx) = class_map.get(&key) {
                     if let TypeKind::Class(ref mut existing) = result[existing_idx].kind {
                         merge_members(&mut existing.members, class_decl.members.clone());
                     }
@@ -587,7 +592,7 @@ fn merge_class_pairs(
                 }
 
                 // Merge into existing interface (promote to class)
-                if let Some(&iface_idx) = iface_map.get(&name) {
+                if let Some(&iface_idx) = iface_map.get(&key) {
                     // Replace the interface with this class, merging members
                     let mut new_class = class_decl.clone();
                     if let TypeKind::Interface(ref iface) = result[iface_idx].kind {
@@ -606,20 +611,20 @@ fn merge_class_pairs(
                         scope_id: decl.scope_id,
                         exported: decl.exported,
                     };
-                    class_map.insert(name.clone(), iface_idx);
-                    iface_map.remove(&name);
+                    class_map.insert(key.clone(), iface_idx);
+                    iface_map.remove(&key);
                     continue;
                 }
 
                 let idx = result.len();
-                class_map.insert(name, idx);
+                class_map.insert(key, idx);
                 result.push(decl);
             }
             TypeKind::Interface(iface_decl) => {
-                let name = iface_decl.name.clone();
+                let key = (iface_decl.name.clone(), decl.module_context.clone());
 
                 // Merge into existing class
-                if let Some(&class_idx) = class_map.get(&name) {
+                if let Some(&class_idx) = class_map.get(&key) {
                     if let TypeKind::Class(ref mut class) = result[class_idx].kind {
                         merge_members(&mut class.members, iface_decl.members.clone());
                         if class.extends.is_none() {
@@ -633,7 +638,7 @@ fn merge_class_pairs(
                 }
 
                 // Merge into existing interface
-                if let Some(&existing_idx) = iface_map.get(&name) {
+                if let Some(&existing_idx) = iface_map.get(&key) {
                     if let TypeKind::Interface(ref mut existing) = result[existing_idx].kind {
                         merge_members(&mut existing.members, iface_decl.members.clone());
                         // Merge extends
@@ -647,7 +652,7 @@ fn merge_class_pairs(
                 }
 
                 let idx = result.len();
-                iface_map.insert(name, idx);
+                iface_map.insert(key, idx);
                 result.push(decl);
             }
             _ => {
@@ -662,7 +667,12 @@ fn merge_class_pairs(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ir::{GetterMember, Member, MethodMember, TypeRef};
+    use crate::ir::{
+        ClassDecl, GetterMember, InterfaceClassification, InterfaceDecl, Member, MethodMember,
+        ModuleContext, TypeDeclaration, TypeKind, TypeRef,
+    };
+    use crate::parse::scope::ScopeId;
+    use std::rc::Rc;
 
     fn method(name: &str) -> Member {
         Member::Method(MethodMember {
@@ -683,6 +693,47 @@ mod tests {
             optional: false,
             doc: None,
         })
+    }
+
+    /// Helper for building a top-level `TypeDeclaration` with the given kind
+    /// and module context. Defaults exported=true and scope=root for tests
+    /// that don't care about those fields.
+    fn decl(kind: TypeKind, ctx: ModuleContext) -> TypeDeclaration {
+        TypeDeclaration {
+            kind,
+            module_context: ctx,
+            doc: None,
+            scope_id: ScopeId(0),
+            exported: true,
+        }
+    }
+
+    fn iface(name: &str, members: Vec<Member>) -> InterfaceDecl {
+        InterfaceDecl {
+            name: name.to_string(),
+            js_name: name.to_string(),
+            type_params: vec![],
+            extends: vec![],
+            members,
+            classification: InterfaceClassification::ClassLike,
+        }
+    }
+
+    fn class(name: &str, members: Vec<Member>, ctx: ModuleContext) -> ClassDecl {
+        ClassDecl {
+            name: name.to_string(),
+            js_name: name.to_string(),
+            type_params: vec![],
+            extends: None,
+            implements: vec![],
+            is_abstract: false,
+            members,
+            type_module_context: ctx,
+        }
+    }
+
+    fn module(spec: &str) -> ModuleContext {
+        ModuleContext::Module(Rc::from(spec))
     }
 
     #[test]
@@ -716,5 +767,122 @@ mod tests {
         assert_eq!(base.len(), 2);
         assert!(matches!(&base[0], Member::Getter(g) if g.js_name == "data"));
         assert!(matches!(&base[1], Member::Method(m) if m.name == "data"));
+    }
+
+    // ─── merge_class_pairs ──────────────────────────────────────────────
+
+    #[test]
+    fn test_merge_class_pairs_interface_and_interface_same_context() {
+        // Same name + same context (both global) → merge members.
+        let a = decl(
+            TypeKind::Interface(iface("Widget", vec![method("foo")])),
+            ModuleContext::Global,
+        );
+        let b = decl(
+            TypeKind::Interface(iface("Widget", vec![method("bar")])),
+            ModuleContext::Global,
+        );
+        let merged = merge_class_pairs(vec![a, b]);
+        assert_eq!(merged.len(), 1);
+        let TypeKind::Interface(merged_iface) = &merged[0].kind else {
+            panic!("expected merged interface");
+        };
+        assert_eq!(merged_iface.members.len(), 2);
+    }
+
+    #[test]
+    fn test_merge_class_pairs_interface_and_class_same_context() {
+        // var X: { new(...) } + interface X { ... } pattern: interface gets
+        // promoted into the class, members merged.
+        let iface_decl = decl(
+            TypeKind::Interface(iface("Widget", vec![method("read")])),
+            ModuleContext::Global,
+        );
+        let class_decl = decl(
+            TypeKind::Class(class(
+                "Widget",
+                vec![method("write")],
+                ModuleContext::Global,
+            )),
+            ModuleContext::Global,
+        );
+        let merged = merge_class_pairs(vec![iface_decl, class_decl]);
+        assert_eq!(merged.len(), 1);
+        let TypeKind::Class(merged_class) = &merged[0].kind else {
+            panic!("expected merged class");
+        };
+        assert_eq!(merged_class.members.len(), 2);
+    }
+
+    #[test]
+    fn test_merge_class_pairs_keeps_distinct_module_contexts() {
+        // Regression guard for the email/cloudflare:email bug:
+        //   global `interface EmailMessage { from; to }`
+        // and
+        //   declare module "cloudflare:email" { class EmailMessage { new(...) } }
+        // share a JS name but live in different module contexts. They MUST
+        // stay as two separate `TypeDeclaration`s — the global interface is
+        // the receiver type for `SendEmail.send`/`reply`, the module-scoped
+        // class carries the constructor.
+        let global_iface = decl(
+            TypeKind::Interface(iface("EmailMessage", vec![getter("from"), getter("to")])),
+            ModuleContext::Global,
+        );
+        let module_class = decl(
+            TypeKind::Class(class(
+                "EmailMessage",
+                vec![method("constructor")],
+                module("cloudflare:email"),
+            )),
+            module("cloudflare:email"),
+        );
+
+        let merged = merge_class_pairs(vec![global_iface, module_class]);
+        assert_eq!(
+            merged.len(),
+            2,
+            "interface and class in different module contexts must not merge",
+        );
+
+        // Order is preserved by `merge_class_pairs` (stable insertion order),
+        // so check both decls round-trip with their original kinds + contexts.
+        assert!(matches!(merged[0].kind, TypeKind::Interface(ref i) if i.name == "EmailMessage"));
+        assert_eq!(merged[0].module_context, ModuleContext::Global);
+        assert!(matches!(merged[1].kind, TypeKind::Class(ref c) if c.name == "EmailMessage"));
+        assert_eq!(merged[1].module_context, module("cloudflare:email"));
+    }
+
+    #[test]
+    fn test_merge_class_pairs_class_and_class_same_context() {
+        let a = decl(
+            TypeKind::Class(class("Foo", vec![method("a")], ModuleContext::Global)),
+            ModuleContext::Global,
+        );
+        let b = decl(
+            TypeKind::Class(class("Foo", vec![method("b")], ModuleContext::Global)),
+            ModuleContext::Global,
+        );
+        let merged = merge_class_pairs(vec![a, b]);
+        assert_eq!(merged.len(), 1);
+        let TypeKind::Class(c) = &merged[0].kind else {
+            panic!("expected merged class");
+        };
+        assert_eq!(c.members.len(), 2);
+    }
+
+    #[test]
+    fn test_merge_class_pairs_two_modules_with_same_name() {
+        // Same name, two distinct modules — should remain separate even
+        // though both are non-global.
+        let a = decl(
+            TypeKind::Interface(iface("Connection", vec![method("a")])),
+            module("module:foo"),
+        );
+        let b = decl(
+            TypeKind::Interface(iface("Connection", vec![method("b")])),
+            module("module:bar"),
+        );
+        let merged = merge_class_pairs(vec![a, b]);
+        assert_eq!(merged.len(), 2);
     }
 }

@@ -81,12 +81,18 @@ pub struct ExpandedSignature {
     pub params: Vec<ConcreteParam>,
     /// Whether to apply `catch` (wrap return in `Result<T, JsValue>`)
     pub catch: bool,
-    /// Return type
+    /// Return type. For `is_async` signatures this is the *unwrapped* `T` from
+    /// the original `Promise<T>` — wasm-bindgen's async fn lowering rewraps it
+    /// as a Promise on the JS side automatically.
     pub return_type: TypeRef,
     /// Doc comment (only on the primary/shortest signature)
     pub doc: Option<String>,
     /// What kind of callable this is
     pub kind: SignatureKind,
+    /// Emit as `async fn`. Set when the original return type was `Promise<T>`
+    /// and `kind` permits async (i.e. not a constructor/setter). The
+    /// `return_type` field carries the unwrapped `T`.
+    pub is_async: bool,
 }
 
 /// Assign a unique name within the extern block.
@@ -163,10 +169,40 @@ pub fn expand_signatures(
     // Phase 3: Naming — compute candidate names, then assign final unique names.
     let candidate_names = compute_rust_names(&base_rust_name, &deduped);
     let is_constructor = kind == SignatureKind::Constructor;
+
+    // Promise-returning methods/functions/static-methods collapse into a single
+    // async signature instead of the usual `name` + `try_name` pair. The async
+    // form is fallible (`-> Result<T, JsValue>`) and `.await`-able, which is
+    // strictly more useful than a sync `-> Promise<T>` plus a `try_` variant.
+    // Constructors and setters never become async — they don't return promises.
+    let async_eligible = !matches!(
+        kind,
+        SignatureKind::Constructor | SignatureKind::Setter | SignatureKind::StaticSetter
+    );
+    let (async_unwrapped_ret, is_async) = match return_type {
+        TypeRef::Promise(inner) if async_eligible => (inner.as_ref().clone(), true),
+        _ => (return_type.clone(), false),
+    };
+
     let mut result = Vec::new();
 
     for (candidate, concrete_params) in candidate_names.into_iter().zip(deduped) {
         let rust_name = dedupe_name(&candidate, used_names);
+
+        if is_async {
+            // Single async + catch signature; no `try_` companion.
+            result.push(ExpandedSignature {
+                rust_name,
+                js_name: js_name.to_string(),
+                params: concrete_params,
+                catch: true,
+                return_type: async_unwrapped_ret.clone(),
+                doc: doc.clone(),
+                kind,
+                is_async: true,
+            });
+            continue;
+        }
 
         result.push(ExpandedSignature {
             rust_name: rust_name.clone(),
@@ -176,6 +212,7 @@ pub fn expand_signatures(
             return_type: return_type.clone(),
             doc: doc.clone(),
             kind,
+            is_async: false,
         });
 
         // try_ variant (not for constructors or setters)
@@ -194,6 +231,7 @@ pub fn expand_signatures(
                 return_type: return_type.clone(),
                 doc: doc.clone(),
                 kind,
+                is_async: false,
             });
         }
     }
@@ -720,6 +758,144 @@ mod tests {
         assert_eq!(sigs.len(), 1);
         assert_eq!(sigs[0].rust_name, "new");
         assert!(sigs[0].catch);
+        assert!(!sigs[0].is_async);
+    }
+
+    #[test]
+    fn test_promise_method_collapses_to_async() {
+        // `foo(): Promise<string>` on a method should produce a single
+        // `async fn foo() -> Result<string, JsValue>` signature — no `try_foo`
+        // companion, since the async + catch form is already fallible.
+        let mut used = no_used();
+        let sigs = expand(
+            "foo",
+            &[],
+            &TypeRef::Promise(Box::new(TypeRef::String)),
+            SignatureKind::Method,
+            &None,
+            &mut used,
+        );
+        assert_eq!(sigs.len(), 1, "promise method should not get a try_ pair");
+        assert_eq!(sigs[0].rust_name, "foo");
+        assert!(sigs[0].is_async, "promise method must be async");
+        assert!(sigs[0].catch, "async promise method must catch");
+        // Return type is unwrapped from Promise<T> — wasm-bindgen rewraps as a
+        // Promise on the JS side automatically when `async fn` is used.
+        assert_eq!(sigs[0].return_type, TypeRef::String);
+    }
+
+    #[test]
+    fn test_promise_function_collapses_to_async() {
+        let mut used = no_used();
+        let sigs = expand(
+            "fetch",
+            &[param("url")],
+            &TypeRef::Promise(Box::new(TypeRef::Named("Response".into()))),
+            SignatureKind::Function,
+            &None,
+            &mut used,
+        );
+        assert_eq!(sigs.len(), 1);
+        assert_eq!(sigs[0].rust_name, "fetch");
+        assert!(sigs[0].is_async);
+        assert!(sigs[0].catch);
+        assert_eq!(sigs[0].return_type, TypeRef::Named("Response".into()));
+    }
+
+    #[test]
+    fn test_promise_static_method_collapses_to_async() {
+        let mut used = no_used();
+        let sigs = expand(
+            "all",
+            &[param("promises")],
+            &TypeRef::Promise(Box::new(TypeRef::Any)),
+            SignatureKind::StaticMethod,
+            &None,
+            &mut used,
+        );
+        assert_eq!(sigs.len(), 1);
+        assert!(sigs[0].is_async);
+        assert!(sigs[0].catch);
+    }
+
+    #[test]
+    fn test_sync_method_keeps_try_pair() {
+        // Regression guard — sync methods must still get the `name` + `try_name`
+        // pair. The async collapse should only apply when the return type is
+        // `Promise<T>`.
+        let mut used = no_used();
+        let sigs = expand(
+            "compute",
+            &[param("x")],
+            &TypeRef::Number,
+            SignatureKind::Method,
+            &None,
+            &mut used,
+        );
+        assert_eq!(sigs.len(), 2);
+        assert_eq!(sigs[0].rust_name, "compute");
+        assert!(!sigs[0].is_async);
+        assert!(!sigs[0].catch);
+        assert_eq!(sigs[1].rust_name, "try_compute");
+        assert!(!sigs[1].is_async);
+        assert!(sigs[1].catch);
+    }
+
+    #[test]
+    fn test_promise_overloads_each_collapse() {
+        // Two overloads, both promise-returning. Each surviving expanded
+        // signature should be a standalone async fn — no `try_` siblings, even
+        // when overload disambiguation produces multiple bindings.
+        let mut used = no_used();
+        let sigs = expand_overloads(
+            "send",
+            &[
+                &[typed_param(
+                    "message",
+                    TypeRef::Named("EmailMessage".into()),
+                )],
+                &[typed_param("builder", TypeRef::Object)],
+            ],
+            &TypeRef::Promise(Box::new(TypeRef::Named("EmailSendResult".into()))),
+            SignatureKind::Method,
+            &None,
+            &mut used,
+        );
+        assert_eq!(sigs.len(), 2, "two overloads → two sigs, no try_ variants");
+        for sig in &sigs {
+            assert!(sig.is_async, "{} should be async", sig.rust_name);
+            assert!(sig.catch, "{} should catch", sig.rust_name);
+            assert!(
+                !sig.rust_name.starts_with("try_"),
+                "no try_ variant expected for promise overloads, got {}",
+                sig.rust_name,
+            );
+        }
+        // Names should disambiguate via the standard `_with_<param>` suffix.
+        assert_eq!(sigs[0].rust_name, "send");
+        assert_eq!(sigs[1].rust_name, "send_with_builder");
+    }
+
+    #[test]
+    fn test_promise_setter_does_not_become_async() {
+        // Setters are never async — even if (somehow) the prop type was a
+        // Promise, the setter signature itself is sync `set_x(val)`.
+        let mut used = no_used();
+        let sigs = expand(
+            "value",
+            &[typed_param(
+                "val",
+                TypeRef::Promise(Box::new(TypeRef::String)),
+            )],
+            &TypeRef::Void,
+            SignatureKind::Setter,
+            &None,
+            &mut used,
+        );
+        assert_eq!(sigs.len(), 1);
+        assert_eq!(sigs[0].rust_name, "set_value");
+        assert!(!sigs[0].is_async);
+        // Setters never get `try_` either.
     }
 
     #[test]

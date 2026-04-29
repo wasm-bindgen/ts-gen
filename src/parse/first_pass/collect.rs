@@ -113,6 +113,18 @@ impl<'a> CollectCtx<'a> {
                         let imported = spec.local.name().to_string();
                         self.register_import(&exported_name, &imported, &source, scope);
                     }
+                } else {
+                    // `export { local as exported }` without a source — record the
+                    // local→export rename so populate can use the public name when
+                    // emitting the local declaration (e.g. promoting a constructor
+                    // variable to a class). Skip identity renames.
+                    for spec in &export.specifiers {
+                        let exported_name = spec.exported.name().to_string();
+                        let local = spec.local.name().to_string();
+                        if exported_name != local {
+                            self.registry.export_renames.insert(local, exported_name);
+                        }
+                    }
                 }
             }
             ast::Statement::ExportDefaultDeclaration(export) => match &export.declaration {
