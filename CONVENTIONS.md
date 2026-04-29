@@ -35,6 +35,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [Type aliases and `export { X as Y }`](#type-aliases-and-export--x-as-y-)
 * [String and numeric enums](#string-and-numeric-enums)
 * [Multiple-context name resolution](#multiple-context-name-resolution)
+* [External type mapping and web platform defaults](#external-type-mapping-and-web-platform-defaults)
 
 ---
 
@@ -165,82 +166,173 @@ their members union, their `extends` lists merge.
 
 ## Dictionary builders
 
-Dictionaries get an `impl` block with a Rust-side `new()` plus an
-ergonomic builder, depending on the property mix.
+Required properties go in via the constructor; optional properties chain
+fluently through a wrapper that ends in `build()`. Required-ness is
+enforced by the type system, so neither `new` nor `build` needs to
+return a `Result`.
 
-### All-mutable properties → builder
+### Why `builder(reqs)` instead of arg-free `builder()`
+
+The common Rust idiom (`derive_builder`, `bon`, `typed-builder`) is an
+arg-free `Foo::builder()` followed by fluent setters and a fallible
+`build() -> Result<Foo, Error>`. Those crates take that shape because
+*derive macros* can't reliably infer which fields are required without
+extra annotations, so they degrade to runtime checks.
+
+ts-gen has the required/optional split directly from the TS source
+(`?` markers on each property), so we use it: required fields go in
+the constructor signature, optionals stay fluent. The trade-off is one
+syntactic step away from `Foo::builder().req_a(x).req_b(y).build()?`
+toward `Foo::builder(x, y).build()` — but in exchange every required
+field is checked at compile time and `build()` is infallible.
+
+Precedent for the constructor-takes-required-args shape exists in
+e.g. `tokio::process::Command::new(program)` and
+`http::Request::Builder::method(_)`-style chains. It's not the most
+common Rust idiom but it's not unprecedented — and it's the only
+shape that captures the "required" half of TypeScript's optional-marker
+information.
+
+
+
+### Required + optional properties → `new(reqs)` and `builder(reqs)`
 
 ```ts
-interface ResponseInit {
-  status?: number;
-  statusText?: string;
-  headers?: Headers;
+interface SendEmailMessage {
+  from: string;
+  to: string;
+  subject: string;
+  text?: string;
+  html?: string;
 }
 ```
 
 emits:
 
 ```rust
-impl ResponseInit {
-    pub fn new() -> Self { /* unchecked_into of new Object */ }
-    pub fn builder() -> ResponseInitBuilder { /* … */ }
+impl SendEmailMessage {
+    pub fn new(from: &str, to: &str, subject: &str) -> Self {
+        Self::builder(from, to, subject).build()
+    }
+
+    pub fn builder(from: &str, to: &str, subject: &str) -> SendEmailMessageBuilder {
+        let inner = <js_sys::Object as JsCast>::unchecked_into::<Self>(js_sys::Object::new());
+        inner.set_from(from);
+        inner.set_to(to);
+        inner.set_subject(subject);
+        SendEmailMessageBuilder { inner }
+    }
 }
 
-pub struct ResponseInitBuilder { inner: ResponseInit }
-impl ResponseInitBuilder {
-    pub fn status(mut self, val: f64) -> Self {
-        self.inner.set_status(val);
-        self
-    }
-    pub fn status_text(mut self, val: &str) -> Self { /* … */ }
-    pub fn headers(mut self, val: &Headers) -> Self { /* … */ }
-    pub fn build(self) -> ResponseInit { self.inner }
+pub struct SendEmailMessageBuilder { inner: SendEmailMessage }
+impl SendEmailMessageBuilder {
+    pub fn text(self, val: &str) -> Self { self.inner.set_text(val); self }
+    pub fn html(self, val: &str) -> Self { self.inner.set_html(val); self }
+    pub fn build(self) -> SendEmailMessage { self.inner }
 }
 ```
 
-The builder's setter methods take ownership of `self` and return `Self`,
-producing the standard fluent chain:
+Two call patterns:
 
 ```rust
-let init = ResponseInit::builder().status(200.0).status_text("OK").build();
+// All required, no optionals
+let msg = SendEmailMessage::new(from, to, subject);
+
+// Required + some optionals
+let msg = SendEmailMessage::builder(from, to, subject)
+    .text("hi")
+    .build();
 ```
 
-### Required properties → fallible `build() -> Result<T, JsValue>`
+`new(reqs)` and `builder(reqs)` always take the same arguments — `new`
+is just `Self::builder(reqs).build()` for the no-optionals case.
 
-When at least one property is required (no `?` and no `readonly` exempting
-it), the builder tracks unset required props with a `required: u64`
-bitmask and `build()` returns a `Result`:
+### All-optional properties → `new()` and `builder()`
+
+```ts
+interface ResponseInit { status?: number; headers?: Headers; }
+```
+
+emits the same shape as above, but with zero-arg `new()` and `builder()`:
 
 ```rust
-pub struct NumberIndexedBuilder {
-    inner: NumberIndexed,
-    required: u64,
-}
-impl NumberIndexedBuilder {
-    pub fn length(mut self, val: f64) -> Self {
-        self.inner.set_length(val);
-        self.required &= 18446744073709551614u64; // clear bit 0
-        self
-    }
-    pub fn build(self) -> Result<NumberIndexed, JsValue> {
-        if self.required != 0 {
-            let mut missing = Vec::new();
-            if self.required & 1u64 != 0 {
-                missing.push("missing required property `length`");
-            }
-            return Err(JsValue::from_str(&format!(
-                "{}: {}",
-                stringify!(NumberIndexed),
-                missing.join(", ")
-            )));
-        }
-        Ok(self.inner)
-    }
-}
+let init = ResponseInit::builder().status(200.0).build();
+let init = ResponseInit::new();  // empty object
 ```
 
-The bitmask supports up to 64 required properties per dictionary, which
-is more than enough for any realistic options bag.
+### Required-property cartesian product across union types
+
+When a required property has union-typed setter overloads (e.g.
+`from: string | EmailAddress`), each combination of overloads across
+required fields produces a distinct `new*` / `builder*` pair. The
+naming follows the standard
+[`_with_X` / `_with_X_and_Y` rule](#signature-flattening). For
+`SendEmailBuilder` with `from: string | EmailAddress` and
+`to: string | string[]`:
+
+```rust
+SendEmailBuilder::new(from: &str, to: &str, subject: &str)
+SendEmailBuilder::new_with_str_and_array(from: &str, to: &Array<JsString>, subject: &str)
+SendEmailBuilder::new_with_email_address_and_str(from: &EmailAddress, to: &str, subject: &str)
+SendEmailBuilder::new_with_email_address_and_array(from: &EmailAddress, to: &Array<JsString>, subject: &str)
+// matching builder*, builder_with_*, etc.
+```
+
+### Generated doc comments
+
+Every `new*` and `builder*` variant ships with a doc block listing
+exactly what it does:
+
+* Each baked-in literal renders as a bullet
+  `` `field_name: literal_value` `` followed by the field's JSDoc (if
+  any).
+* Caller-provided fields land under a `# Provided fields` heading,
+  one bullet per parameter, again pulling from the field's JSDoc.
+
+For example:
+
+```rust
+/// * `disposition: "inline"`: One of "inline" (default) or "attachment"
+///
+/// # Provided fields
+///
+/// * `content`: A file attachment for an email message
+/// * `filename`: ...
+/// * `type`: ...
+pub fn new_inline(content: &str, filename: &str, type_: &str) -> EmailAttachment
+```
+
+### Literal-type discriminator collapse
+
+When a required property's union has string/number/boolean *literal*
+members (e.g. `disposition: "inline" | "attachment"`), the literal
+becomes part of the function name and the parameter is dropped. The
+user picks the variant by calling the right constructor, no string
+typo'ing required:
+
+```ts
+type EmailAttachment =
+  | { disposition: "inline"; content: string | ArrayBuffer; filename: string; type: string }
+  | { disposition: "attachment"; content: string | ArrayBuffer; filename: string; type: string };
+```
+
+emits:
+
+```rust
+EmailAttachment::new_inline(content: &str, filename: &str, type_: &str)
+EmailAttachment::new_inline_with_array_buffer(content: &ArrayBuffer, filename: &str, type_: &str)
+EmailAttachment::new_attachment(content: &str, filename: &str, type_: &str)
+EmailAttachment::new_attachment_with_array_buffer(content: &ArrayBuffer, filename: &str, type_: &str)
+```
+
+Mixed unions like `disposition: "inline" | string` produce one variant
+per literal *plus* a generic catch-all that takes the field as a
+parameter:
+
+```rust
+EmailAttachment::new_inline(content, filename, type_)        // disposition baked in
+EmailAttachment::new(disposition: &str, content, filename, type_)  // catch-all
+```
 
 ### Has any `readonly` property → `new()` only, no builder
 
@@ -258,13 +350,12 @@ impl FooWithReadonly {
 Callers must construct the underlying JS object themselves and cast
 into `FooWithReadonly` — there's no Rust-side builder for these.
 
-### Variadic / overloaded setters
+### Optional-property union setters
 
-When a property's setter has union types (or the spec defines multiple
-setter overloads), each variant becomes a distinct builder method with
-the standard `_with_<type>` suffix — same naming machinery as method
-overloads (see [Signature flattening](#signature-flattening)). Calling more than one of
-them on the same builder overwrites earlier values.
+When an *optional* property's setter has union types, each variant
+becomes a distinct builder method with the standard `_with_<type>`
+suffix. Calling more than one of them on the same builder overwrites
+earlier values.
 
 ```ts
 interface ResponseInit {
@@ -640,14 +731,33 @@ it applies to `@throws` unions and to any TS union return type.
 
 ```ts
 declare module "cloudflare:email" {
-  // ...
+  class EmailMessage { ... }
+}
+interface SendEmail {
+  send(message: EmailMessage): Promise<EmailSendResult>;
 }
 ```
 
-emits a `pub mod email { ... }` (the prefix `cloudflare:` is stripped to
-the part after the last `:`). All bindings inside use
-`#[wasm_bindgen(module = "cloudflare:email")]`. Cross-module references
-go through the parent scope's re-exports.
+emits a `pub mod email { ... }` (the prefix `cloudflare:` is stripped
+to the part after the last `:`; protocol prefixes like `node:` and
+`cloudflare:` are dropped via
+`util::naming::module_specifier_to_ident`). All bindings inside use
+`#[wasm_bindgen(module = "cloudflare:email")]`.
+
+References that cross a module boundary are emitted as **qualified
+paths**, not bare idents:
+
+* From `Global` → `Module(m)`: prefix `m::` (e.g.
+  `&email::EmailMessage`).
+* From `Module(m)` → `Module(n)`: prefix `super::n::` (hop up to the
+  parent file scope, then down into the sibling).
+* From `Module(m)` → `Global`: bare ident — the inner module's
+  `use super::*;` makes parent items visible already.
+
+Qualification keys off the *resolved* declaration's `module_context`,
+not the textual name, so a global `interface Foo` and a module-scoped
+`class Foo` qualify independently. The use-site scope chain picks the
+visible one.
 
 ```ts
 namespace WebAssembly {
@@ -688,3 +798,32 @@ When the same name appears in different `ModuleContext`s (e.g. a global
 `EmailMessage`), they remain distinct types. `merge_class_pairs` keys on
 `(name, ModuleContext)` to keep them separate. Same-context same-name
 still merges as expected.
+
+## External type mapping and web platform defaults
+
+Names that resolve through scope but aren't declared in the input
+source — `Blob`, `Headers`, `Event`, `ReadableStream`, `Response`, … —
+fall through to the **external map**. The resolution order at each use
+site is:
+
+1. **`js_sys::*` glob** for the names listed in `JS_SYS_RESERVED`
+   (`Error`, `Promise`, `Map`, `Array`, `Object`, …). Emitted as bare
+   idents, no `use` alias needed.
+2. **User-supplied `--external` mappings**, in priority order:
+   explicit type maps (`Blob=::web_sys::Blob`) > module maps
+   (`node:buffer=node_buffer_sys`) > wildcard module maps
+   (`node:*=node_sys::*`).
+3. **Built-in web platform defaults**: `Blob`, `Event`, `Headers`,
+   `ReadableStream`, `Response`, `URL`, `URLSearchParams`,
+   `WebSocket`, … all map to their `::web_sys::*` equivalents
+   automatically. The full list lives in
+   `external_map::WEB_SYS_DEFAULTS`. Run with `--no-web-sys` to
+   disable these defaults (e.g. for environments that don't link
+   `web_sys`).
+4. **Fallback**: emit a `#[allow(dead_code)] use JsValue as Foo;`
+   alias plus an error diagnostic so the output still compiles while
+   surfacing the missing mapping.
+
+User mappings always override the defaults. The `js_sys` short-circuit
+is unaffected by `--no-web-sys` — those names are part of the
+generated file's `use js_sys::*;` prelude.

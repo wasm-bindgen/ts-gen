@@ -415,6 +415,7 @@ fn populate_builtin_scope(gctx: &mut GlobalContext, scope: ScopeId) {
             exported: false,
         });
         gctx.scopes.insert(scope, name.to_string(), type_id);
+        gctx.builtin_type_ids.insert(type_id);
     }
 
     // Web platform built-in types (ReadableStream, Request, etc.).
@@ -459,6 +460,7 @@ fn populate_builtin_scope(gctx: &mut GlobalContext, scope: ScopeId) {
             exported: false,
         });
         gctx.scopes.insert(scope, name.to_string(), type_id);
+        gctx.builtin_type_ids.insert(type_id);
     }
 }
 

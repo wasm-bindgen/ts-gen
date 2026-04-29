@@ -18,10 +18,11 @@ use std::collections::{HashMap, HashSet};
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::context::GlobalContext;
-use crate::ir::{self, TypeKind, TypeRef};
+use crate::context::{GlobalContext, TypeId};
+use crate::ir::{self, ModuleContext, TypeKind, TypeRef};
 use crate::parse::scope::ScopeId;
 use crate::util::diagnostics::DiagnosticCollector;
+use crate::util::naming::module_specifier_to_ident;
 
 /// js_sys type names reserved by the `use js_sys::*` glob import.
 /// User-defined types that collide with these will be renamed.
@@ -130,8 +131,18 @@ impl TypePosition {
 pub struct CodegenContext<'a> {
     /// Read-only access to the global context (scopes, modules, external map).
     pub gctx: &'a GlobalContext,
-    /// Set of type names defined in this codegen unit (classes, interfaces, enums, etc.).
-    pub local_types: HashSet<String>,
+    /// Names of types defined in this codegen unit, used to detect
+    /// collisions with the `js_sys` glob and as a fallback when a use
+    /// site bypasses scope-chain resolution (tests / direct entry
+    /// points). Same-named types from different module contexts collapse
+    /// here, which is fine because the value is only used as a fallback —
+    /// `local_type_ids` is the authoritative "is this ours to emit?" set.
+    pub local_types: HashMap<String, ModuleContext>,
+    /// `TypeId`s of declarations this codegen unit will emit. The
+    /// authoritative source for "local" — same-name distinct
+    /// declarations have distinct `TypeId`s, so this is the lookup key
+    /// when scope resolution gives us a hit.
+    pub local_type_ids: HashSet<TypeId>,
     /// Type aliases whose target is a union or other non-representable type.
 
     /// Local types that collide with js_sys reserved names — maps original name → renamed name.
@@ -151,7 +162,8 @@ impl<'a> CodegenContext<'a> {
     pub fn from_module(module: &ir::Module, gctx: &'a GlobalContext) -> Self {
         let mut ctx = CodegenContext {
             gctx,
-            local_types: HashSet::new(),
+            local_types: HashMap::new(),
+            local_type_ids: HashSet::new(),
             renamed_locals: HashMap::new(),
             root_scope: module.builtin_scope,
             file_scopes: module.file_scopes.clone(),
@@ -160,7 +172,7 @@ impl<'a> CodegenContext<'a> {
         };
         for &type_id in &module.types {
             let decl = gctx.get_type(type_id);
-            ctx.collect_declaration(&decl.kind);
+            ctx.collect_declaration(type_id, &decl.kind, &decl.module_context);
         }
         ctx.resolve_collisions();
         ctx
@@ -170,7 +182,8 @@ impl<'a> CodegenContext<'a> {
     pub fn empty(gctx: &'a GlobalContext, root_scope: ScopeId) -> Self {
         CodegenContext {
             gctx,
-            local_types: HashSet::new(),
+            local_types: HashMap::new(),
+            local_type_ids: HashSet::new(),
             renamed_locals: HashMap::new(),
             root_scope,
             file_scopes: vec![],
@@ -281,10 +294,11 @@ impl<'a> CodegenContext<'a> {
         let reserved: HashSet<&str> = JS_SYS_RESERVED.iter().copied().collect();
 
         for name in &reserved {
-            if self.local_types.contains(*name) {
+            if self.local_types.contains_key(*name) {
                 let mut renamed = format!("{name}_");
                 let mut i = 2;
-                while self.local_types.contains(&renamed) || reserved.contains(renamed.as_str()) {
+                while self.local_types.contains_key(&renamed) || reserved.contains(renamed.as_str())
+                {
                     renamed = format!("{name}_{i}");
                     i += 1;
                 }
@@ -293,30 +307,94 @@ impl<'a> CodegenContext<'a> {
         }
     }
 
-    fn collect_declaration(&mut self, kind: &ir::TypeKind) {
+    fn collect_declaration(&mut self, type_id: TypeId, kind: &ir::TypeKind, mctx: &ModuleContext) {
         match kind {
             ir::TypeKind::Class(c) => {
-                self.local_types.insert(c.name.clone());
+                self.local_types.insert(c.name.clone(), mctx.clone());
+                self.local_type_ids.insert(type_id);
             }
             ir::TypeKind::Interface(i) => {
-                self.local_types.insert(i.name.clone());
+                self.local_types.insert(i.name.clone(), mctx.clone());
+                self.local_type_ids.insert(type_id);
             }
             ir::TypeKind::StringEnum(e) => {
-                self.local_types.insert(e.name.clone());
+                self.local_types.insert(e.name.clone(), mctx.clone());
+                self.local_type_ids.insert(type_id);
             }
             ir::TypeKind::NumericEnum(e) => {
-                self.local_types.insert(e.name.clone());
+                self.local_types.insert(e.name.clone(), mctx.clone());
+                self.local_type_ids.insert(type_id);
             }
             ir::TypeKind::TypeAlias(_) => {
                 // Type aliases are resolved through the scope during codegen.
                 // No special collection needed.
             }
             ir::TypeKind::Namespace(ns) => {
+                // Namespaces don't have an Id-of-themselves to chase here —
+                // their nested declarations carry their own TypeIds via the
+                // global registry, but the IR doesn't expose them on
+                // NamespaceDecl. Walk the structure for `local_types` only.
                 for inner in &ns.declarations {
-                    self.collect_declaration(&inner.kind);
+                    // Without a TypeId on hand, we synthesize a placeholder:
+                    // namespaced declarations are surfaced through the scope
+                    // chain, so name + module_context coverage in
+                    // `local_types` is enough for the fallback path.
+                    self.collect_declaration_name_only(&inner.kind, &inner.module_context);
                 }
             }
             ir::TypeKind::Function(_) | ir::TypeKind::Variable(_) => {}
+        }
+    }
+
+    fn collect_declaration_name_only(&mut self, kind: &ir::TypeKind, mctx: &ModuleContext) {
+        match kind {
+            ir::TypeKind::Class(c) => {
+                self.local_types.insert(c.name.clone(), mctx.clone());
+            }
+            ir::TypeKind::Interface(i) => {
+                self.local_types.insert(i.name.clone(), mctx.clone());
+            }
+            ir::TypeKind::StringEnum(e) => {
+                self.local_types.insert(e.name.clone(), mctx.clone());
+            }
+            ir::TypeKind::NumericEnum(e) => {
+                self.local_types.insert(e.name.clone(), mctx.clone());
+            }
+            ir::TypeKind::Namespace(ns) => {
+                for inner in &ns.declarations {
+                    self.collect_declaration_name_only(&inner.kind, &inner.module_context);
+                }
+            }
+            _ => {}
+        }
+    }
+
+    /// Compute the path prefix (`mod_a::`, `super::mod_b::`, …) needed
+    /// to reach `target` from a callsite emitted inside `from`. Returns
+    /// `None` when no prefix is needed: same-module refs, and
+    /// module→parent refs (visible through `use super::*;`).
+    fn module_qualifier(
+        &self,
+        from: &ModuleContext,
+        target: &ModuleContext,
+    ) -> Option<TokenStream> {
+        if from == target {
+            return None;
+        }
+        match (from, target) {
+            (ModuleContext::Global, ModuleContext::Global) => None,
+            // Module → its own parent: free via `use super::*;`.
+            (ModuleContext::Module(_), ModuleContext::Global) => None,
+            // Global → Module(m): qualify with `m::`.
+            (ModuleContext::Global, ModuleContext::Module(m)) => {
+                let ident = make_ident(&module_specifier_to_ident(m));
+                Some(quote! { #ident:: })
+            }
+            // Module(a) → Module(b): hop up to parent, then down into b.
+            (ModuleContext::Module(_), ModuleContext::Module(m)) => {
+                let ident = make_ident(&module_specifier_to_ident(m));
+                Some(quote! { super::#ident:: })
+            }
         }
     }
 }
@@ -337,6 +415,7 @@ pub fn to_syn_type(
     pos: TypePosition,
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
+    from_module: &ModuleContext,
 ) -> TokenStream {
     // When inner, intercept primitives and nullable early to use JS wrapper forms
     if pos.inner {
@@ -346,7 +425,7 @@ pub fn to_syn_type(
             TypeRef::String | TypeRef::StringLiteral(_) => return quote! { JsString },
             TypeRef::Void | TypeRef::Undefined => return quote! { Undefined },
             TypeRef::Nullable(inner) => {
-                let inner_ty = to_syn_type(inner, pos, ctx, scope);
+                let inner_ty = to_syn_type(inner, pos, ctx, scope, from_module);
                 return quote! { JsOption<#inner_ty> };
             }
             _ => {}
@@ -396,21 +475,21 @@ pub fn to_syn_type(
 
         // === Built-in Generic Containers ===
         TypeRef::Promise(inner) => maybe_ref(
-            generic_container(quote! { Promise }, inner, pos, ctx, scope),
+            generic_container(quote! { Promise }, inner, pos, ctx, scope, from_module),
             borrow,
         ),
         TypeRef::Array(inner) => maybe_ref(
-            generic_container(quote! { Array }, inner, pos, ctx, scope),
+            generic_container(quote! { Array }, inner, pos, ctx, scope, from_module),
             borrow,
         ),
         TypeRef::Record(_k, v) => maybe_ref(
-            generic_container(quote! { Object }, v, pos, ctx, scope),
+            generic_container(quote! { Object }, v, pos, ctx, scope, from_module),
             borrow,
         ),
         TypeRef::Map(k, v) => {
             let inner_pos = pos.to_inner();
-            let k_arg = to_syn_type(k, inner_pos, ctx, scope);
-            let v_arg = to_syn_type(v, inner_pos, ctx, scope);
+            let k_arg = to_syn_type(k, inner_pos, ctx, scope, from_module);
+            let v_arg = to_syn_type(v, inner_pos, ctx, scope, from_module);
             let base = if is_jsvalue_arg(&k_arg) && is_jsvalue_arg(&v_arg) {
                 quote! { Map }
             } else {
@@ -419,17 +498,17 @@ pub fn to_syn_type(
             maybe_ref(base, borrow)
         }
         TypeRef::Set(inner) => maybe_ref(
-            generic_container(quote! { Set }, inner, pos, ctx, scope),
+            generic_container(quote! { Set }, inner, pos, ctx, scope, from_module),
             borrow,
         ),
 
         // === Structural Types ===
         TypeRef::Nullable(inner) => {
             if pos.inner {
-                let inner_ty = to_syn_type(inner, pos, ctx, scope);
+                let inner_ty = to_syn_type(inner, pos, ctx, scope, from_module);
                 quote! { JsOption<#inner_ty> }
             } else {
-                let inner_ty = to_syn_type(inner, pos, ctx, scope);
+                let inner_ty = to_syn_type(inner, pos, ctx, scope, from_module);
                 quote! { Option<#inner_ty> }
             }
         }
@@ -440,12 +519,26 @@ pub fn to_syn_type(
             // to `JsValue` for non-named members or when only `Object` is
             // common (which is no better than `JsValue` in practice).
             if let Some(lub) = union_lub(members, ctx, scope) {
-                let lub_ty = to_syn_type(&TypeRef::Named(lub), pos, ctx, scope);
+                let lub_ty = to_syn_type(&TypeRef::Named(lub), pos, ctx, scope, from_module);
                 return lub_ty;
+            }
+            if let Some(c) = ctx {
+                c.warn(format!(
+                    "union with no common supertype erased to JsValue ({} variants)",
+                    members.len()
+                ));
             }
             maybe_ref(quote! { JsValue }, borrow)
         }
-        TypeRef::Intersection(_) => maybe_ref(quote! { JsValue }, borrow),
+        TypeRef::Intersection(parts) => {
+            if let Some(c) = ctx {
+                c.warn(format!(
+                    "intersection of {} types erased to JsValue (no structural merge yet)",
+                    parts.len()
+                ));
+            }
+            maybe_ref(quote! { JsValue }, borrow)
+        }
         TypeRef::Tuple(elems) => {
             let base = if elems.is_empty() {
                 quote! { Array }
@@ -453,7 +546,7 @@ pub fn to_syn_type(
                 let inner_pos = pos.to_inner();
                 let elem_types: Vec<TokenStream> = elems
                     .iter()
-                    .map(|e| to_syn_type(e, inner_pos, ctx, scope))
+                    .map(|e| to_syn_type(e, inner_pos, ctx, scope, from_module))
                     .collect();
                 quote! { ArrayTuple<(#(#elem_types),*)> }
             };
@@ -465,9 +558,9 @@ pub fn to_syn_type(
                 .params
                 .iter()
                 .take(8)
-                .map(|p| to_syn_type(&p.type_ref, inner_pos, ctx, scope))
+                .map(|p| to_syn_type(&p.type_ref, inner_pos, ctx, scope, from_module))
                 .collect();
-            let ret = to_syn_type(&sig.return_type, inner_pos, ctx, scope);
+            let ret = to_syn_type(&sig.return_type, inner_pos, ctx, scope, from_module);
             let base = if params.iter().all(is_jsvalue_arg) && is_jsvalue_arg(&ret) {
                 quote! { Function }
             } else {
@@ -493,10 +586,10 @@ pub fn to_syn_type(
             if let Some(c) = ctx {
                 if let Some(target) = c.resolve_alias(name, scope) {
                     let target = target.clone();
-                    return to_syn_type(&target, pos, ctx, scope);
+                    return to_syn_type(&target, pos, ctx, scope, from_module);
                 }
             }
-            maybe_ref(named_type_to_rust(name, ctx), borrow)
+            maybe_ref(named_type_to_rust(name, ctx, from_module), borrow)
         }
         TypeRef::GenericInstantiation(name, _args) => {
             // TODO (Phase 3): preserve generic type arguments once wasm_bindgen
@@ -506,7 +599,7 @@ pub fn to_syn_type(
                     "generic type arguments on `{name}<...>` are not yet emitted, using bare `{name}`"
                 ));
             }
-            maybe_ref(named_type_to_rust(name, ctx), borrow)
+            maybe_ref(named_type_to_rust(name, ctx, from_module), borrow)
         }
 
         // === Special ===
@@ -543,8 +636,9 @@ fn generic_container(
     pos: TypePosition,
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
+    from_module: &ModuleContext,
 ) -> TokenStream {
-    let arg = to_syn_type(inner, pos.to_inner(), ctx, scope);
+    let arg = to_syn_type(inner, pos.to_inner(), ctx, scope, from_module);
     if is_jsvalue_arg(&arg) {
         base
     } else {
@@ -562,13 +656,30 @@ fn is_jsvalue_arg(tokens: &TokenStream) -> bool {
 /// Emit a type name as Rust tokens.
 ///
 /// Single unified path for ALL type name emission:
-/// 1. Resolve name → TypeId through scope
-/// 2. Get canonical name (last segment for dotted paths)
-/// 3. Local type (in our output)? → emit directly (with js_sys collision rename)
-/// 4. Not local → external map lookup → use alias
-/// 5. Not in external map → js_sys type? → emit directly (glob import covers it)
-/// 6. Nothing? → error + `use JsValue as Foo;`
-fn emit_type_name(name: &str, ctx: &CodegenContext<'_>) -> TokenStream {
+/// 1. Resolve name → TypeId through scope (the resolved declaration tells
+///    us where the referenced type actually lives — its `module_context`).
+/// 2. Get canonical name (last segment for dotted paths).
+/// 3. Resolved to a local type → emit directly, qualified across module
+///    boundaries (with js_sys collision rename).
+/// 4. Resolved-but-non-local with an external mapping → register the use alias.
+/// 5. Unresolved → js_sys glob → name directly.
+/// 6. Otherwise → error + `use JsValue as Foo;`.
+///
+/// `from_module` is the [`ModuleContext`] of the extern block this name is
+/// being emitted into. When the resolved type lives in a different module
+/// context, codegen prepends the necessary path prefix (e.g. `email::` or
+/// `super::email::`) so the reference compiles without any extra `use`.
+///
+/// Going through the scope-resolved `TypeId` (rather than a flat name →
+/// module map) keeps name collisions like a global `interface Foo` and a
+/// module-scoped `class Foo` correctly distinguished: scope-chain
+/// resolution from the use site picks the visible declaration, and that
+/// declaration's `module_context` drives qualification.
+fn emit_type_name(
+    name: &str,
+    ctx: &CodegenContext<'_>,
+    from_module: &ModuleContext,
+) -> TokenStream {
     // Resolve through scope
     let resolved = ctx.file_scopes.iter().find_map(|&scope| {
         if name.contains('.') {
@@ -581,21 +692,72 @@ fn emit_type_name(name: &str, ctx: &CodegenContext<'_>) -> TokenStream {
     // Canonical ident name (last segment for dotted paths)
     let ident_name = name.rsplit('.').next().unwrap_or(name);
 
-    // If resolved to a namespace (not a type), emit JsValue
+    // A namespace name on its own (not as a path prefix) isn't a
+    // bindable type — wasm-bindgen has no way to express "the namespace
+    // value", so erase it to JsValue and warn.
     if let Some(type_id) = resolved {
         if matches!(&ctx.gctx.get_type(type_id).kind, TypeKind::Namespace(_)) {
+            ctx.warn(format!(
+                "type reference `{name}` resolves to a namespace, not a type — erasing to JsValue"
+            ));
             return quote! { JsValue };
         }
     }
 
-    // Local type (defined in our output) → emit directly
-    if ctx.local_types.contains(ident_name) {
-        if let Some(renamed) = ctx.renamed_locals.get(ident_name) {
-            let ident = make_ident(renamed);
+    // A scope-registered builtin (`Error`, `Promise`, `ReadableStream`,
+    // `Headers`, …) is either provided unprefixed by `use js_sys::*` or
+    // expected to land via a `--external` mapping at the top of the
+    // generated file. Either way the right token is the bare ident.
+    if let Some(type_id) = resolved {
+        if ctx.gctx.builtin_type_ids.contains(&type_id) {
+            // Names in the js_sys glob need no use alias.
+            if !JS_SYS_RESERVED.contains(&ident_name) {
+                if let Some(rust_path) = ctx.gctx.external_map.resolve_type(ident_name) {
+                    ctx.register_external(ident_name, &rust_path.path);
+                } else {
+                    ctx.error(format!(
+                        "builtin type `{name}` is not in `js_sys` and has no \
+                         external mapping. Use --external to map this type."
+                    ));
+                    ctx.register_external(ident_name, "JsValue");
+                }
+            }
+            let ident = make_ident(ident_name);
             return quote! { #ident };
         }
-        let ident = make_ident(ident_name);
-        return quote! { #ident };
+    }
+
+    // A type is "local" only if codegen will actually emit it as a
+    // top-level declaration in this output (tracked in `local_type_ids`).
+    // When two declarations share a name (e.g. a global `interface
+    // EmailMessage` and a module-scoped `class EmailMessage`), the
+    // scope-chain resolution picks the visible one at the use site, and
+    // its `module_context` drives qualification across module boundaries.
+    let target_module = resolved
+        .filter(|id| ctx.local_type_ids.contains(id))
+        .map(|type_id| ctx.gctx.get_type(type_id).module_context.clone())
+        .or_else(|| {
+            // Fallback: tests and entry points that don't construct a
+            // full scope chain populate `local_types` by name.
+            if resolved.is_none() {
+                ctx.local_types.get(ident_name).cloned()
+            } else {
+                None
+            }
+        });
+
+    if let Some(target_module) = target_module {
+        let rust_name = ctx
+            .renamed_locals
+            .get(ident_name)
+            .map(String::as_str)
+            .unwrap_or(ident_name);
+        let ident = make_ident(rust_name);
+        let qualifier = ctx.module_qualifier(from_module, &target_module);
+        return match qualifier {
+            Some(prefix) => quote! { #prefix #ident },
+            None => quote! { #ident },
+        };
     }
 
     // External map
@@ -617,13 +779,6 @@ fn emit_type_name(name: &str, ctx: &CodegenContext<'_>) -> TokenStream {
         return quote! { #ident };
     }
 
-    // Type did NOT resolve through scope at all.
-    // js_sys type? (available via `use js_sys::*`)
-    if JS_SYS_RESERVED.contains(&ident_name) {
-        let ident = make_ident(ident_name);
-        return quote! { #ident };
-    }
-
     // Truly unresolved — error + JsValue alias
     ctx.error(format!(
         "Unresolved type `{name}`. Use --external to map this type."
@@ -634,9 +789,13 @@ fn emit_type_name(name: &str, ctx: &CodegenContext<'_>) -> TokenStream {
 }
 
 /// Backward-compatible wrapper: calls `emit_type_name` when ctx is available.
-fn named_type_to_rust(name: &str, ctx: Option<&CodegenContext<'_>>) -> TokenStream {
+fn named_type_to_rust(
+    name: &str,
+    ctx: Option<&CodegenContext<'_>>,
+    from_module: &ModuleContext,
+) -> TokenStream {
     match ctx {
-        Some(ctx) => emit_type_name(name, ctx),
+        Some(ctx) => emit_type_name(name, ctx, from_module),
         None => quote! { JsValue },
     }
 }
@@ -707,11 +866,12 @@ pub fn to_return_type(
     error_ty: Option<&TypeRef>,
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
+    from_module: &ModuleContext,
 ) -> TokenStream {
-    let inner = to_syn_type(ty, TypePosition::RETURN, ctx, scope);
+    let inner = to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module);
     if catch {
         let err = match error_ty {
-            Some(ty) => to_syn_type(ty, TypePosition::RETURN, ctx, scope),
+            Some(ty) => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
             None => quote! { JsValue },
         };
         quote! { Result<#inner, #err> }
@@ -729,15 +889,36 @@ mod tests {
     // Helper to run to_syn_type with ARGUMENT position
     fn arg_type(ty: &TypeRef) -> String {
         // Scope is unused when ctx is None — use a dummy value.
-        to_syn_type(ty, TypePosition::ARGUMENT, None, ScopeId(0)).to_string()
+        to_syn_type(
+            ty,
+            TypePosition::ARGUMENT,
+            None,
+            ScopeId(0),
+            &ModuleContext::Global,
+        )
+        .to_string()
     }
 
     fn ret_type(ty: &TypeRef) -> String {
-        to_syn_type(ty, TypePosition::RETURN, None, ScopeId(0)).to_string()
+        to_syn_type(
+            ty,
+            TypePosition::RETURN,
+            None,
+            ScopeId(0),
+            &ModuleContext::Global,
+        )
+        .to_string()
     }
 
     fn inner_type(ty: &TypeRef) -> String {
-        to_syn_type(ty, TypePosition::RETURN.to_inner(), None, ScopeId(0)).to_string()
+        to_syn_type(
+            ty,
+            TypePosition::RETURN.to_inner(),
+            None,
+            ScopeId(0),
+            &ModuleContext::Global,
+        )
+        .to_string()
     }
 
     #[test]
@@ -920,7 +1101,8 @@ mod tests {
     #[test]
     fn test_return_with_catch() {
         let ty = TypeRef::Promise(Box::new(TypeRef::Void));
-        let result = to_return_type(&ty, true, None, None, ScopeId(0)).to_string();
+        let result =
+            to_return_type(&ty, true, None, None, ScopeId(0), &ModuleContext::Global).to_string();
         assert_eq!(result, "Result < Promise < Undefined > , JsValue >");
     }
 
@@ -942,9 +1124,17 @@ mod tests {
     fn test_local_type_overrides_web_sys() {
         let (gctx, scope) = test_gctx();
         let mut ctx = CodegenContext::empty(&gctx, scope);
-        ctx.local_types.insert("Response".into());
+        ctx.local_types
+            .insert("Response".into(), ModuleContext::Global);
         let ty = TypeRef::Named("Response".into());
-        let result = to_syn_type(&ty, TypePosition::RETURN, Some(&ctx), scope).to_string();
+        let result = to_syn_type(
+            &ty,
+            TypePosition::RETURN,
+            Some(&ctx),
+            scope,
+            &ModuleContext::Global,
+        )
+        .to_string();
         assert_eq!(result, "Response");
     }
 
@@ -968,31 +1158,131 @@ mod tests {
 
         let ctx = CodegenContext::empty(&gctx, scope);
         let ty = TypeRef::Named("BodyInit".into());
-        let result = to_syn_type(&ty, TypePosition::RETURN, Some(&ctx), scope).to_string();
+        let result = to_syn_type(
+            &ty,
+            TypePosition::RETURN,
+            Some(&ctx),
+            scope,
+            &ModuleContext::Global,
+        )
+        .to_string();
         assert_eq!(result, "JsValue");
     }
 
     #[test]
-    fn test_unresolved_with_ctx_registers_jsvalue_alias() {
+    fn test_web_sys_default_resolves_response() {
+        // `Response` is in the web platform default mapping, so even
+        // without an explicit `--external` flag it resolves to
+        // `::web_sys::Response` (rather than erasing to JsValue).
         let (gctx, scope) = test_gctx();
         let ctx = CodegenContext::empty(&gctx, scope);
         let ty = TypeRef::Named("Response".into());
-        let result = to_syn_type(&ty, TypePosition::RETURN, Some(&ctx), scope).to_string();
-        // With ctx, unresolved types emit the name (aliased to JsValue via use statement)
+        let result = to_syn_type(
+            &ty,
+            TypePosition::RETURN,
+            Some(&ctx),
+            scope,
+            &ModuleContext::Global,
+        )
+        .to_string();
         assert_eq!(result, "Response");
-        // Verify the JsValue alias was registered
         let uses = ctx.external_uses.borrow();
-        assert_eq!(uses.get("Response"), Some(&"JsValue".to_string()));
+        assert_eq!(
+            uses.get("Response"),
+            Some(&"::web_sys::Response".to_string())
+        );
+    }
+
+    #[test]
+    fn test_truly_unknown_type_aliases_to_jsvalue() {
+        // A name with no scope hit, no external mapping, and not in
+        // `js_sys::*` or the web_sys defaults falls back to a
+        // `use JsValue as Foo;` alias and an error diagnostic.
+        let (gctx, scope) = test_gctx();
+        let ctx = CodegenContext::empty(&gctx, scope);
+        let ty = TypeRef::Named("MyCustomThing".into());
+        let result = to_syn_type(
+            &ty,
+            TypePosition::RETURN,
+            Some(&ctx),
+            scope,
+            &ModuleContext::Global,
+        )
+        .to_string();
+        assert_eq!(result, "MyCustomThing");
+        let uses = ctx.external_uses.borrow();
+        assert_eq!(uses.get("MyCustomThing"), Some(&"JsValue".to_string()));
     }
 
     #[test]
     fn test_local_type_in_promise() {
         let (gctx, scope) = test_gctx();
         let mut ctx = CodegenContext::empty(&gctx, scope);
-        ctx.local_types.insert("MyThing".into());
+        ctx.local_types
+            .insert("MyThing".into(), ModuleContext::Global);
         let ty = TypeRef::Promise(Box::new(TypeRef::Named("MyThing".into())));
-        let result = to_syn_type(&ty, TypePosition::RETURN, Some(&ctx), scope).to_string();
+        let result = to_syn_type(
+            &ty,
+            TypePosition::RETURN,
+            Some(&ctx),
+            scope,
+            &ModuleContext::Global,
+        )
+        .to_string();
         assert_eq!(result, "Promise < MyThing >");
+    }
+
+    #[test]
+    fn test_qualified_local_from_global_to_module() {
+        // EmailMessage lives inside `pub mod email { ... }` (the
+        // "cloudflare:email" module). A reference from a Global extern
+        // block must qualify with `email::`.
+        let (gctx, scope) = test_gctx();
+        let mut ctx = CodegenContext::empty(&gctx, scope);
+        let module = ModuleContext::Module("cloudflare:email".into());
+        ctx.local_types
+            .insert("EmailMessage".into(), module.clone());
+
+        let ty = TypeRef::Named("EmailMessage".into());
+        let result = to_syn_type(
+            &ty,
+            TypePosition::ARGUMENT,
+            Some(&ctx),
+            scope,
+            &ModuleContext::Global,
+        )
+        .to_string();
+        assert_eq!(result, "& email :: EmailMessage");
+    }
+
+    #[test]
+    fn test_qualified_local_module_to_global_is_bare() {
+        // Inside `pub mod email { use super::*; }`, references to a
+        // Global type don't need a prefix — `super::*` makes them visible.
+        let (gctx, scope) = test_gctx();
+        let mut ctx = CodegenContext::empty(&gctx, scope);
+        ctx.local_types
+            .insert("EmailSendResult".into(), ModuleContext::Global);
+
+        let from = ModuleContext::Module("cloudflare:email".into());
+        let ty = TypeRef::Named("EmailSendResult".into());
+        let result = to_syn_type(&ty, TypePosition::RETURN, Some(&ctx), scope, &from).to_string();
+        assert_eq!(result, "EmailSendResult");
+    }
+
+    #[test]
+    fn test_qualified_local_across_modules() {
+        // A reference from `mod a` to a type in `mod b` must hop up
+        // through the parent: `super::b::Name`.
+        let (gctx, scope) = test_gctx();
+        let mut ctx = CodegenContext::empty(&gctx, scope);
+        ctx.local_types
+            .insert("Sibling".into(), ModuleContext::Module("node:b".into()));
+
+        let from = ModuleContext::Module("node:a".into());
+        let ty = TypeRef::Named("Sibling".into());
+        let result = to_syn_type(&ty, TypePosition::RETURN, Some(&ctx), scope, &from).to_string();
+        assert_eq!(result, "super :: b :: Sibling");
     }
 
     // === New tests for the unified approach ===
@@ -1047,22 +1337,23 @@ mod tests {
     fn test_type_position_all_variants() {
         // Verify TypePosition constants and to_inner() work correctly
         let ty = TypeRef::String;
+        let g = &ModuleContext::Global;
         assert_eq!(
-            to_syn_type(&ty, TypePosition::ARGUMENT, None, ScopeId(0)).to_string(),
+            to_syn_type(&ty, TypePosition::ARGUMENT, None, ScopeId(0), g).to_string(),
             "& str"
         );
         assert_eq!(
-            to_syn_type(&ty, TypePosition::RETURN, None, ScopeId(0)).to_string(),
+            to_syn_type(&ty, TypePosition::RETURN, None, ScopeId(0), g).to_string(),
             "String"
         );
         // to_inner() → inner:true, so should give JsString
         assert_eq!(
-            to_syn_type(&ty, TypePosition::RETURN.to_inner(), None, ScopeId(0)).to_string(),
+            to_syn_type(&ty, TypePosition::RETURN.to_inner(), None, ScopeId(0), g).to_string(),
             "JsString"
         );
         // Argument inner also gives JsString (inner overrides borrowing)
         assert_eq!(
-            to_syn_type(&ty, TypePosition::ARGUMENT.to_inner(), None, ScopeId(0)).to_string(),
+            to_syn_type(&ty, TypePosition::ARGUMENT.to_inner(), None, ScopeId(0), g).to_string(),
             "JsString"
         );
     }

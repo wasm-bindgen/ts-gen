@@ -25,9 +25,11 @@ use std::collections::HashSet;
 use proc_macro2::TokenStream;
 use quote::quote;
 
+use std::collections::HashMap;
+
 use crate::codegen::signatures::{
     build_signatures, dedupe_name, generate_concrete_params, is_void_return, CallableSpec,
-    FunctionSignature, SignatureKind,
+    ConcreteParam, FunctionSignature, SignatureKind,
 };
 use crate::codegen::typemap::{to_return_type, to_syn_type, CodegenContext, TypePosition};
 use crate::ir::{
@@ -67,7 +69,7 @@ impl<'a> ClassConfig<'a> {
         scope: ScopeId,
     ) -> Self {
         let extends = match &decl.extends {
-            Some(e) => vec![extends_tokens(e, cgctx, scope)],
+            Some(e) => vec![extends_tokens(e, cgctx, scope, ctx)],
             None => vec![quote! { Object }],
         };
         let module = match ctx {
@@ -99,7 +101,7 @@ impl<'a> ClassConfig<'a> {
         } else {
             decl.extends
                 .iter()
-                .map(|e| extends_tokens(e, cgctx, scope))
+                .map(|e| extends_tokens(e, cgctx, scope, ctx))
                 .collect()
         };
         let module = match ctx {
@@ -131,6 +133,17 @@ impl<'a> ClassConfig<'a> {
         self.cgctx
             .and_then(|ctx| ctx.renamed_locals.get(&self.rust_name).cloned())
             .unwrap_or_else(|| self.rust_name.clone())
+    }
+
+    /// The `ModuleContext` this extern block lives in. Used as the
+    /// `from_module` argument to type-emit helpers so cross-module
+    /// references get the correct path qualifier.
+    #[allow(clippy::wrong_self_convention)]
+    fn from_module(&self) -> ModuleContext {
+        match &self.module {
+            Some(m) => ModuleContext::Module(m.clone()),
+            None => ModuleContext::Global,
+        }
     }
 }
 
@@ -272,42 +285,34 @@ fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
         })
         .collect();
 
-    // Identify required properties (non-optional getters) and assign bitmask positions
-    let required_props: Vec<(usize, &str)> = getters
-        .iter()
-        .enumerate()
-        .filter(|(_, g)| !g.optional)
-        .take(64) // u64 bitmask supports up to 64 required properties
-        .map(|(i, g)| (i, g.js_name.as_str()))
-        .collect();
-    let has_required = !required_props.is_empty();
-
-    // Build a map: getter index → bitmask bit (only for required props)
-    let mut required_bit: Vec<Option<u64>> = vec![None; getters.len()];
-    for (bit, &(getter_idx, _)) in required_props.iter().enumerate() {
-        required_bit[getter_idx] = Some(bit as u64);
+    // Partition getters: required ones become positional `builder(...)`
+    // arguments, optional ones become fluent setter methods.
+    let mut required_getters: Vec<&crate::ir::GetterMember> = Vec::new();
+    let mut optional_getters: Vec<&crate::ir::GetterMember> = Vec::new();
+    for g in &getters {
+        if g.optional {
+            optional_getters.push(g);
+        } else {
+            required_getters.push(g);
+        }
     }
-    let full_mask: u64 = if required_props.len() >= 64 {
-        u64::MAX
-    } else {
-        (1u64 << required_props.len()) - 1
-    };
 
-    // Generate builder setter methods
-    let mut builder_methods = Vec::new();
-
-    for (getter_idx, g) in getters.iter().enumerate() {
+    // Resolve each getter through the setter pipeline. Multi-overload
+    // setters (e.g. `set_from(&str)` + `set_from_with_email_address(&EmailAddress)`
+    // for `from: string | EmailAddress`) produce multiple sigs — we
+    // cartesian-product across required fields below to expose every
+    // combination as its own `new` / `builder` variant.
+    let resolve_setter_sigs = |g: &crate::ir::GetterMember| -> Vec<FunctionSignature> {
         let setter_param = crate::ir::Param {
             name: "val".to_string(),
             type_ref: g.type_ref.clone(),
             optional: false,
             variadic: false,
         };
-
         let mut setter_used = HashSet::new();
         let setter_overloads = [&[setter_param][..]];
         let void = crate::ir::TypeRef::Void;
-        let setter_sigs = build_signatures(
+        build_signatures(
             &CallableSpec {
                 js_name: &g.js_name,
                 kind: SignatureKind::Setter,
@@ -319,114 +324,397 @@ fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
             &mut setter_used,
             config.cgctx,
             config.scope,
-        );
+        )
+    };
 
-        let bit_clear = required_bit[getter_idx].map(|bit| {
-            let mask = !(1u64 << bit);
-            quote! { self.required &= #mask; }
+    // Per required field, decompose the type ref into a list of
+    // *options*. Each option becomes one cell in the cartesian product
+    // across fields; literal-typed members are special-cased so the
+    // user picks the discriminant via the function name (`new_inline`)
+    // rather than passing the literal as a `&str` argument.
+    enum FieldOption {
+        /// String/number/boolean literal baked into the body. No param
+        /// contributed; the suffix part is the literal value.
+        Literal {
+            /// JS field name (`disposition`) — used for the doc bullet.
+            field_js_name: String,
+            /// JSDoc on the original getter (if any).
+            field_doc: Option<String>,
+            /// TS source form of the literal — `"inline"`, `42`, `true` —
+            /// rendered into the bullet as
+            /// `` `disposition: "inline"` ``.
+            literal_display: String,
+            suffix: String,
+            setter_ident: syn::Ident,
+            literal_expr: TokenStream,
+        },
+        /// Free-form value: contributes a normal positional parameter.
+        Value {
+            field_doc: Option<String>,
+            param: ConcreteParam,
+            setter_ident: syn::Ident,
+        },
+    }
+    struct FieldDim {
+        options: Vec<FieldOption>,
+    }
+
+    // Decompose a getter's `type_ref` into its union members (or the
+    // single member if it isn't a union), with literal types peeled
+    // out for the discriminant collapse.
+    fn split_union(ty: &crate::ir::TypeRef) -> Vec<&crate::ir::TypeRef> {
+        match ty {
+            crate::ir::TypeRef::Union(members) => members.iter().collect(),
+            other => vec![other],
+        }
+    }
+
+    let mut field_dims: Vec<FieldDim> = Vec::new();
+    for g in &required_getters {
+        let param_name = to_snake_case(&g.js_name);
+        let setters = resolve_setter_sigs(g);
+        if setters.is_empty() {
+            continue;
+        }
+
+        // Each member of the union (or the single non-union type) maps
+        // to one option. Literals find their setter by matching the
+        // setter's param type_ref structurally; non-literals get their
+        // own option with an `expand_signatures`-compatible param.
+        let mut options: Vec<FieldOption> = Vec::new();
+        let members = split_union(&g.type_ref);
+        let any_literal = members.iter().any(|m| {
+            matches!(
+                m,
+                crate::ir::TypeRef::StringLiteral(_)
+                    | crate::ir::TypeRef::NumberLiteral(_)
+                    | crate::ir::TypeRef::BooleanLiteral(_)
+            )
         });
+        let value_members: Vec<&crate::ir::TypeRef> = members
+            .iter()
+            .copied()
+            .filter(|m| {
+                !matches!(
+                    m,
+                    crate::ir::TypeRef::StringLiteral(_)
+                        | crate::ir::TypeRef::NumberLiteral(_)
+                        | crate::ir::TypeRef::BooleanLiteral(_)
+                )
+            })
+            .collect();
 
-        for sig in &setter_sigs {
+        let pick_setter = |target: &crate::ir::TypeRef| -> Option<syn::Ident> {
+            setters
+                .iter()
+                .find(|sig| sig.params.first().is_some_and(|p| &p.type_ref == target))
+                .map(|sig| super::typemap::make_ident(&sig.rust_name))
+        };
+        // Fallback for fields without per-member setter granularity: the
+        // first setter handles everything (typical when the IR only
+        // synthesised one setter for the whole union).
+        let default_setter = super::typemap::make_ident(&setters[0].rust_name);
+
+        for m in &members {
+            match m {
+                crate::ir::TypeRef::StringLiteral(s) => {
+                    let setter_ident = pick_setter(m).unwrap_or_else(|| default_setter.clone());
+                    options.push(FieldOption::Literal {
+                        field_js_name: g.js_name.clone(),
+                        field_doc: g.doc.clone(),
+                        literal_display: format!("\"{s}\""),
+                        suffix: format!("_{}", to_snake_case(s)),
+                        setter_ident,
+                        literal_expr: quote! { #s },
+                    });
+                }
+                crate::ir::TypeRef::NumberLiteral(n) => {
+                    let setter_ident = pick_setter(m).unwrap_or_else(|| default_setter.clone());
+                    let lit = syn::LitFloat::new(&n.to_string(), proc_macro2::Span::call_site());
+                    options.push(FieldOption::Literal {
+                        field_js_name: g.js_name.clone(),
+                        field_doc: g.doc.clone(),
+                        literal_display: n.to_string(),
+                        suffix: format!("_{}", n.to_string().replace(['.', '-'], "_")),
+                        setter_ident,
+                        literal_expr: quote! { #lit },
+                    });
+                }
+                crate::ir::TypeRef::BooleanLiteral(b) => {
+                    let setter_ident = pick_setter(m).unwrap_or_else(|| default_setter.clone());
+                    options.push(FieldOption::Literal {
+                        field_js_name: g.js_name.clone(),
+                        field_doc: g.doc.clone(),
+                        literal_display: b.to_string(),
+                        suffix: format!("_{}", b),
+                        setter_ident,
+                        literal_expr: quote! { #b },
+                    });
+                }
+                _ => {}
+            }
+        }
+        // Non-literal members: if the union mixed literals with concrete
+        // types, those concrete types still need their own value options
+        // (e.g. `disposition: "inline" | string` → `new_inline()` plus a
+        // catch-all `new(disposition: &str)`). For purely non-literal
+        // unions we emit one value option per member.
+        let value_targets: Vec<&crate::ir::TypeRef> = if any_literal {
+            value_members
+        } else {
+            members.clone()
+        };
+        for m in value_targets {
+            let setter_ident = pick_setter(m).unwrap_or_else(|| default_setter.clone());
+            let param = ConcreteParam {
+                name: param_name.clone(),
+                type_ref: m.clone(),
+                variadic: false,
+            };
+            options.push(FieldOption::Value {
+                field_doc: g.doc.clone(),
+                param,
+                setter_ident,
+            });
+        }
+        if options.is_empty() {
+            continue;
+        }
+        field_dims.push(FieldDim { options });
+    }
+
+    // Cartesian product across field dimensions → list of combos
+    // (each is a Vec<&FieldOption>).
+    let combos: Vec<Vec<&FieldOption>> = if field_dims.is_empty() {
+        vec![vec![]]
+    } else {
+        let mut acc: Vec<Vec<&FieldOption>> = vec![vec![]];
+        for dim in &field_dims {
+            acc = acc
+                .into_iter()
+                .flat_map(|prefix| {
+                    dim.options.iter().map(move |opt| {
+                        let mut next = prefix.clone();
+                        next.push(opt);
+                        next
+                    })
+                })
+                .collect();
+        }
+        acc
+    };
+
+    // For each combo: collect the value params (literals contribute
+    // only to the suffix, not to the param list) plus the markdown
+    // bullets that document this variant. Literal bullets render the
+    // baked-in value; value bullets read off the original getter's
+    // JSDoc.
+    struct ComboPlan {
+        literal_suffix: String,
+        value_params: Vec<ConcreteParam>,
+        init_calls: Vec<TokenStream>,
+        arg_idents: Vec<syn::Ident>,
+        /// Lines like `` `disposition: "inline"`: <getter doc> `` that
+        /// describe the literal discriminants baked into this variant.
+        literal_doc_bullets: Vec<String>,
+        /// Lines like `` `from`: <getter doc> `` describing the
+        /// caller-provided fields.
+        provided_doc_bullets: Vec<String>,
+    }
+    let mut plans: Vec<ComboPlan> = Vec::with_capacity(combos.len());
+    for combo in &combos {
+        let mut literal_suffix = String::new();
+        let mut value_params: Vec<ConcreteParam> = Vec::new();
+        let mut init_calls: Vec<TokenStream> = Vec::new();
+        let mut arg_idents: Vec<syn::Ident> = Vec::new();
+        let mut literal_doc_bullets: Vec<String> = Vec::new();
+        let mut provided_doc_bullets: Vec<String> = Vec::new();
+        for opt in combo {
+            match opt {
+                FieldOption::Literal {
+                    field_js_name,
+                    field_doc,
+                    literal_display,
+                    suffix,
+                    setter_ident,
+                    literal_expr,
+                } => {
+                    literal_suffix.push_str(suffix);
+                    init_calls.push(quote! { inner.#setter_ident(#literal_expr); });
+                    let bullet_head = format!("`{field_js_name}: {literal_display}`");
+                    literal_doc_bullets.push(match field_doc {
+                        Some(doc) => format!("* {bullet_head}: {}", doc.trim()),
+                        None => format!("* {bullet_head}"),
+                    });
+                }
+                FieldOption::Value {
+                    field_doc,
+                    param,
+                    setter_ident,
+                } => {
+                    let arg_ident = super::typemap::make_ident(&param.name);
+                    arg_idents.push(arg_ident.clone());
+                    init_calls.push(quote! { inner.#setter_ident(#arg_ident); });
+                    value_params.push(param.clone());
+                    let bullet_head = format!("`{}`", param.name);
+                    provided_doc_bullets.push(match field_doc {
+                        Some(doc) => format!("* {bullet_head}: {}", doc.trim()),
+                        None => format!("* {bullet_head}"),
+                    });
+                }
+            }
+        }
+        plans.push(ComboPlan {
+            literal_suffix,
+            value_params,
+            init_calls,
+            arg_idents,
+            literal_doc_bullets,
+            provided_doc_bullets,
+        });
+    }
+
+    // Compute `_with_X[_and_Y]` suffixes ONLY across combos sharing the
+    // same literal prefix. Combos with distinct literal prefixes are
+    // already disambiguated by the prefix, so they shouldn't influence
+    // each other's `_with_*` decisions.
+    let mut value_suffixes: Vec<String> = vec![String::new(); plans.len()];
+    let mut by_prefix: HashMap<String, Vec<usize>> = HashMap::new();
+    for (i, p) in plans.iter().enumerate() {
+        by_prefix
+            .entry(p.literal_suffix.clone())
+            .or_default()
+            .push(i);
+    }
+    for indices in by_prefix.values() {
+        let group_params: Vec<Vec<ConcreteParam>> = indices
+            .iter()
+            .map(|&i| plans[i].value_params.clone())
+            .collect();
+        let group_suffixes = crate::codegen::signatures::compute_suffixes_pub(&group_params);
+        for (suffix, &i) in group_suffixes.iter().zip(indices) {
+            value_suffixes[i] = suffix.clone();
+        }
+    }
+
+    let mut builder_variants: Vec<TokenStream> = Vec::new();
+    let mut new_variants: Vec<TokenStream> = Vec::new();
+    let mut emitted_names: HashSet<String> = HashSet::new();
+    for (plan, value_suffix) in plans.iter().zip(&value_suffixes) {
+        let full_suffix = format!("{}{}", plan.literal_suffix, value_suffix);
+        // Dedup combos that produce the same final name (e.g. when a
+        // discriminator collapse plus a value collapse converge).
+        if !emitted_names.insert(full_suffix.clone()) {
+            continue;
+        }
+        let builder_ident = super::typemap::make_ident(&format!("builder{full_suffix}"));
+        let new_ident = super::typemap::make_ident(&format!("new{full_suffix}"));
+        let params_tokens = generate_concrete_params(
+            &plan.value_params,
+            config.cgctx,
+            config.scope,
+            &config.from_module(),
+        );
+        let init_calls = &plan.init_calls;
+        let arg_idents = &plan.arg_idents;
+
+        // Compose the doc block. Literal bullets come first (they
+        // describe the discriminants baked into this variant), then a
+        // `# Provided fields` heading and the bullets for the
+        // caller-supplied fields. Both sections are skipped when their
+        // bullet list is empty.
+        let mut doc_text = String::new();
+        if !plan.literal_doc_bullets.is_empty() {
+            doc_text.push_str(&plan.literal_doc_bullets.join("\n"));
+        }
+        if !plan.provided_doc_bullets.is_empty() {
+            if !doc_text.is_empty() {
+                doc_text.push_str("\n\n");
+            }
+            doc_text.push_str("# Provided fields\n\n");
+            doc_text.push_str(&plan.provided_doc_bullets.join("\n"));
+        }
+        let doc_attr = if doc_text.is_empty() {
+            quote! {}
+        } else {
+            super::doc_tokens(&Some(doc_text))
+        };
+
+        // No-required case has zero `init_calls`, so we inline the
+        // factory directly into the struct literal where the field type
+        // pins inference. The required-args case keeps a `let inner:
+        // Self` so setter calls type-resolve before construction.
+        let body = if init_calls.is_empty() {
+            quote! {
+                #builder_name {
+                    inner: JsCast::unchecked_into(js_sys::Object::new()),
+                }
+            }
+        } else {
+            quote! {
+                let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+                #(#init_calls)*
+                #builder_name { inner }
+            }
+        };
+        builder_variants.push(quote! {
+            #doc_attr
+            pub fn #builder_ident(#params_tokens) -> #builder_name {
+                #body
+            }
+        });
+        new_variants.push(quote! {
+            #doc_attr
+            pub fn #new_ident(#params_tokens) -> #rust_type {
+                Self::#builder_ident(#(#arg_idents),*).build()
+            }
+        });
+    }
+
+    // Fluent methods on the wrapper for optional fields. Required fields
+    // are intentionally absent — they're only settable through `builder`.
+    let mut builder_methods: Vec<TokenStream> = Vec::new();
+    for g in &optional_getters {
+        for sig in resolve_setter_sigs(g) {
             let builder_method_name = sig.rust_name.strip_prefix("set_").unwrap_or(&sig.rust_name);
             let method_ident = super::typemap::make_ident(builder_method_name);
             let setter_ident = super::typemap::make_ident(&sig.rust_name);
-            let params = generate_concrete_params(&sig.params, config.cgctx, config.scope);
-
+            let params = generate_concrete_params(
+                &sig.params,
+                config.cgctx,
+                config.scope,
+                &config.from_module(),
+            );
             let param_idents: Vec<_> = sig
                 .params
                 .iter()
                 .map(|p| super::typemap::make_ident(&p.name))
                 .collect();
-
             builder_methods.push(quote! {
-                pub fn #method_ident(mut self, #params) -> Self {
+                pub fn #method_ident(self, #params) -> Self {
                     self.inner.#setter_ident(#(#param_idents),*);
-                    #bit_clear
                     self
                 }
             });
         }
     }
 
-    // Build method: infallible if no required props, Result if there are
-    let build_method = if has_required {
-        let missing_checks: Vec<TokenStream> = required_props
-            .iter()
-            .enumerate()
-            .map(|(bit, (_, name))| {
-                let mask = 1u64 << bit;
-                let msg = format!("missing required property `{name}`");
-                quote! {
-                    if self.required & #mask != 0 {
-                        missing.push(#msg);
-                    }
-                }
-            })
-            .collect();
-
-        quote! {
-            pub fn build(self) -> Result<#rust_type, JsValue> {
-                if self.required != 0 {
-                    let mut missing = Vec::new();
-                    #(#missing_checks)*
-                    return Err(JsValue::from_str(&format!(
-                        "{}: {}", stringify!(#rust_type), missing.join(", ")
-                    )));
-                }
-                Ok(self.inner)
-            }
-        }
-    } else {
-        quote! {
-            pub fn build(self) -> #rust_type {
-                self.inner
-            }
-        }
-    };
-
-    // Builder struct: with or without required bitmask
-    let builder_struct = if has_required {
-        quote! {
-            pub struct #builder_name {
-                inner: #rust_type,
-                required: u64,
-            }
-        }
-    } else {
-        quote! {
-            pub struct #builder_name {
-                inner: #rust_type,
-            }
-        }
-    };
-
-    let builder_init = if has_required {
-        quote! { #builder_name { inner: Self::new(), required: #full_mask } }
-    } else {
-        quote! { #builder_name { inner: Self::new() } }
-    };
-
     quote! {
         impl #rust_type {
-            #[allow(clippy::new_without_default)]
-            pub fn new() -> Self {
-                #[allow(unused_imports)]
-                use wasm_bindgen::JsCast;
-                JsCast::unchecked_into(js_sys::Object::new())
-            }
-
-            pub fn builder() -> #builder_name {
-                #builder_init
-            }
+            #(#new_variants)*
+            #(#builder_variants)*
         }
 
-        #builder_struct
+        pub struct #builder_name {
+            inner: #rust_type,
+        }
 
-        #[allow(unused_mut)]
         impl #builder_name {
             #(#builder_methods)*
 
-            #build_method
+            pub fn build(self) -> #rust_type {
+                self.inner
+            }
         }
     }
 }
@@ -697,7 +985,12 @@ fn generate_type_decl(config: &ClassConfig) -> TokenStream {
 /// Generate a constructor binding from a resolved signature.
 fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) -> TokenStream {
     let rust_ident = super::typemap::make_ident(&sig.rust_name);
-    let params = generate_concrete_params(&sig.params, config.cgctx, config.scope);
+    let params = generate_concrete_params(
+        &sig.params,
+        config.cgctx,
+        config.scope,
+        &config.from_module(),
+    );
     let doc = super::doc_tokens(&sig.doc);
 
     // Constructors always return the constructed type, wrapped in Result
@@ -708,6 +1001,7 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
         sig.error_type.as_ref(),
         config.cgctx,
         config.scope,
+        &config.from_module(),
     );
 
     let mut wb_parts = vec![quote! { constructor }];
@@ -732,7 +1026,12 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
 fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> TokenStream {
     let rust_ident = super::typemap::make_ident(&sig.rust_name);
     let this_type = super::typemap::make_ident(&config.effective_rust_name());
-    let params = generate_concrete_params(&sig.params, config.cgctx, config.scope);
+    let params = generate_concrete_params(
+        &sig.params,
+        config.cgctx,
+        config.scope,
+        &config.from_module(),
+    );
     let doc = super::doc_tokens(&sig.doc);
     let has_variadic = sig.params.last().is_some_and(|p| p.variadic);
 
@@ -755,6 +1054,7 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
         sig.error_type.as_ref(),
         config.cgctx,
         config.scope,
+        &config.from_module(),
     );
     let ret = if is_void_return(&sig.return_type) && !sig.catch {
         quote! {}
@@ -779,7 +1079,12 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
 fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature) -> TokenStream {
     let rust_ident = super::typemap::make_ident(&sig.rust_name);
     let class_ident = super::typemap::make_ident(&config.effective_rust_name());
-    let params = generate_concrete_params(&sig.params, config.cgctx, config.scope);
+    let params = generate_concrete_params(
+        &sig.params,
+        config.cgctx,
+        config.scope,
+        &config.from_module(),
+    );
     let doc = super::doc_tokens(&sig.doc);
     let has_variadic = sig.params.last().is_some_and(|p| p.variadic);
 
@@ -801,6 +1106,7 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
         sig.error_type.as_ref(),
         config.cgctx,
         config.scope,
+        &config.from_module(),
     );
     let ret = if is_void_return(&sig.return_type) && !sig.catch {
         quote! {}
@@ -841,7 +1147,13 @@ fn generate_getter(
             TypeRef::Nullable(inner) => inner.as_ref(),
             other => other,
         };
-        let inner = to_syn_type(unwrapped, TypePosition::RETURN, config.cgctx, config.scope);
+        let inner = to_syn_type(
+            unwrapped,
+            TypePosition::RETURN,
+            config.cgctx,
+            config.scope,
+            &config.from_module(),
+        );
         quote! { Option<#inner> }
     } else {
         to_syn_type(
@@ -849,6 +1161,7 @@ fn generate_getter(
             TypePosition::RETURN,
             config.cgctx,
             config.scope,
+            &config.from_module(),
         )
     };
 
@@ -901,7 +1214,12 @@ fn generate_setter(
     sigs.iter()
         .map(|sig| {
             let rust_ident = super::typemap::make_ident(&sig.rust_name);
-            let params = generate_concrete_params(&sig.params, config.cgctx, config.scope);
+            let params = generate_concrete_params(
+                &sig.params,
+                config.cgctx,
+                config.scope,
+                &config.from_module(),
+            );
 
             let mut wb_parts: Vec<TokenStream> = vec![quote! { method }, quote! { setter }];
             if sig.rust_name != format!("set_{}", setter.js_name) {
@@ -937,6 +1255,7 @@ fn generate_static_getter(
         TypePosition::RETURN,
         config.cgctx,
         config.scope,
+        &config.from_module(),
     );
 
     let mut wb_parts: Vec<TokenStream> = vec![
@@ -990,7 +1309,12 @@ fn generate_static_setter(
     sigs.iter()
         .map(|sig| {
             let rust_ident = super::typemap::make_ident(&sig.rust_name);
-            let params = generate_concrete_params(&sig.params, config.cgctx, config.scope);
+            let params = generate_concrete_params(
+                &sig.params,
+                config.cgctx,
+                config.scope,
+                &config.from_module(),
+            );
 
             let mut wb_parts: Vec<TokenStream> = vec![
                 quote! { static_method_of = #class_ident },
@@ -1019,11 +1343,20 @@ fn generate_static_setter(
 ///
 /// Falls back to `Object` for unresolved types — `extends = JsValue` is
 /// never useful (it's implicit and causes conflicting trait impls).
-fn extends_tokens(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId) -> TokenStream {
+fn extends_tokens(
+    ty: &TypeRef,
+    cgctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+) -> TokenStream {
     let tokens = match ty {
-        TypeRef::Named(_) | TypeRef::GenericInstantiation(_, _) => {
-            super::typemap::to_syn_type(ty, TypePosition::ARGUMENT.to_inner(), cgctx, scope)
-        }
+        TypeRef::Named(_) | TypeRef::GenericInstantiation(_, _) => super::typemap::to_syn_type(
+            ty,
+            TypePosition::ARGUMENT.to_inner(),
+            cgctx,
+            scope,
+            from_module,
+        ),
         _ => {
             if let Some(ctx) = cgctx {
                 ctx.warn(format!(

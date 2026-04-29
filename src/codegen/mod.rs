@@ -145,13 +145,8 @@ fn generate_tokens(
     let mod_blocks: Vec<TokenStream> = module_items
         .into_iter()
         .map(|(mod_specifier, items)| {
-            // Strip protocol prefix: "cloudflare:email" → "email", "node:url" → "url"
-            let short_name = mod_specifier
-                .rsplit_once(':')
-                .map(|(_, rest)| rest)
-                .unwrap_or(&mod_specifier);
-            let mod_name = typemap::make_ident(&crate::util::naming::to_snake_case(
-                &short_name.replace('/', "_").replace('*', "star"),
+            let mod_name = typemap::make_ident(&crate::util::naming::module_specifier_to_ident(
+                &mod_specifier,
             ));
             quote! {
                 pub mod #mod_name {
@@ -222,7 +217,12 @@ fn generate_declaration(decl: &TypeDeclaration, cgctx: &CodegenContext) -> Optio
             None,
             decl.scope_id,
         )),
-        TypeKind::TypeAlias(alias) => Some(generate_type_alias(alias, cgctx, decl.scope_id)),
+        TypeKind::TypeAlias(alias) => Some(generate_type_alias(
+            alias,
+            cgctx,
+            decl.scope_id,
+            &decl.module_context,
+        )),
         TypeKind::Namespace(ns) => Some(generate_namespace(ns, &decl.module_context, cgctx)),
     }
 }
@@ -235,6 +235,7 @@ fn generate_type_alias(
     alias: &crate::ir::TypeAliasDecl,
     cgctx: &CodegenContext,
     scope: ScopeId,
+    from_module: &crate::ir::ModuleContext,
 ) -> TokenStream {
     if let Some(ref module) = alias.from_module {
         // External re-export: resolve through external map.
@@ -266,7 +267,7 @@ fn generate_type_alias(
 
     // Local alias — only emit if the target resolves to a known type.
     if let crate::ir::TypeRef::Named(ref target_name) = alias.target {
-        if !cgctx.local_types.contains(target_name)
+        if !cgctx.local_types.contains_key(target_name)
             && !crate::codegen::typemap::JS_SYS_RESERVED.contains(&target_name.as_str())
         {
             cgctx.warn(format!(
@@ -282,6 +283,7 @@ fn generate_type_alias(
         typemap::TypePosition::ARGUMENT.to_inner(),
         Some(cgctx),
         scope,
+        from_module,
     );
     let name = typemap::make_ident(&alias.name);
 

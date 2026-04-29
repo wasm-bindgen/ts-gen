@@ -49,79 +49,63 @@ pub mod console {
         pub fn set_group_indentation_with_null(this: &ConsoleOptions, val: &Null);
     }
     impl ConsoleOptions {
-        #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
-            #[allow(unused_imports)]
-            use wasm_bindgen::JsCast;
-            JsCast::unchecked_into(js_sys::Object::new())
+        #[doc = " # Provided fields"]
+        #[doc = " "]
+        #[doc = " * `stdout`"]
+        pub fn new(stdout: &Object) -> ConsoleOptions {
+            Self::builder(stdout).build()
         }
-        pub fn builder() -> ConsoleOptionsBuilder {
-            ConsoleOptionsBuilder {
-                inner: Self::new(),
-                required: 1u64,
-            }
+        #[doc = " # Provided fields"]
+        #[doc = " "]
+        #[doc = " * `stdout`"]
+        pub fn builder(stdout: &Object) -> ConsoleOptionsBuilder {
+            let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+            inner.set_stdout(stdout);
+            ConsoleOptionsBuilder { inner }
         }
     }
     pub struct ConsoleOptionsBuilder {
         inner: ConsoleOptions,
-        required: u64,
     }
-    #[allow(unused_mut)]
     impl ConsoleOptionsBuilder {
-        pub fn stdout(mut self, val: &Object) -> Self {
-            self.inner.set_stdout(val);
-            self.required &= 18446744073709551614u64;
-            self
-        }
-        pub fn stderr(mut self, val: &Object) -> Self {
+        pub fn stderr(self, val: &Object) -> Self {
             self.inner.set_stderr(val);
             self
         }
-        pub fn stderr_with_null(mut self, val: &Null) -> Self {
+        pub fn stderr_with_null(self, val: &Null) -> Self {
             self.inner.set_stderr_with_null(val);
             self
         }
-        pub fn ignore_errors(mut self, val: bool) -> Self {
+        pub fn ignore_errors(self, val: bool) -> Self {
             self.inner.set_ignore_errors(val);
             self
         }
-        pub fn ignore_errors_with_null(mut self, val: &Null) -> Self {
+        pub fn ignore_errors_with_null(self, val: &Null) -> Self {
             self.inner.set_ignore_errors_with_null(val);
             self
         }
-        pub fn color_mode(mut self, val: bool) -> Self {
+        pub fn color_mode(self, val: bool) -> Self {
             self.inner.set_color_mode(val);
             self
         }
-        pub fn color_mode_with_str(mut self, val: &str) -> Self {
+        pub fn color_mode_with_str(self, val: &str) -> Self {
             self.inner.set_color_mode_with_str(val);
             self
         }
-        pub fn color_mode_with_null(mut self, val: &Null) -> Self {
+        pub fn color_mode_with_null(self, val: &Null) -> Self {
             self.inner.set_color_mode_with_null(val);
             self
         }
-        pub fn group_indentation(mut self, val: f64) -> Self {
+        pub fn group_indentation(self, val: f64) -> Self {
             self.inner.set_group_indentation(val);
             self
         }
-        pub fn group_indentation_with_null(mut self, val: &Null) -> Self {
+        pub fn group_indentation_with_null(self, val: &Null) -> Self {
             self.inner.set_group_indentation_with_null(val);
             self
         }
-        pub fn build(self) -> Result<ConsoleOptions, JsValue> {
-            if self.required != 0 {
-                let mut missing = Vec::new();
-                if self.required & 1u64 != 0 {
-                    missing.push("missing required property `stdout`");
-                }
-                return Err(JsValue::from_str(&format!(
-                    "{}: {}",
-                    stringify!(ConsoleOptions),
-                    missing.join(", ")
-                )));
-            }
-            Ok(self.inner)
+        pub fn build(self) -> ConsoleOptions {
+            self.inner
         }
     }
     #[wasm_bindgen(module = "node:console")]

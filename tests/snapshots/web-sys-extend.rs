@@ -30,30 +30,28 @@ extern "C" {
     pub fn set_priority(this: &FetchOptions, val: &str);
 }
 impl FetchOptions {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        #[allow(unused_imports)]
-        use wasm_bindgen::JsCast;
-        JsCast::unchecked_into(js_sys::Object::new())
+    pub fn new() -> FetchOptions {
+        Self::builder().build()
     }
     pub fn builder() -> FetchOptionsBuilder {
-        FetchOptionsBuilder { inner: Self::new() }
+        FetchOptionsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
     }
 }
 pub struct FetchOptionsBuilder {
     inner: FetchOptions,
 }
-#[allow(unused_mut)]
 impl FetchOptionsBuilder {
-    pub fn retries(mut self, val: f64) -> Self {
+    pub fn retries(self, val: f64) -> Self {
         self.inner.set_retries(val);
         self
     }
-    pub fn timeout(mut self, val: f64) -> Self {
+    pub fn timeout(self, val: f64) -> Self {
         self.inner.set_timeout(val);
         self
     }
-    pub fn priority(mut self, val: &str) -> Self {
+    pub fn priority(self, val: &str) -> Self {
         self.inner.set_priority(val);
         self
     }

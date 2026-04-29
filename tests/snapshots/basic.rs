@@ -1,31 +1,31 @@
+#[allow(dead_code)]
+use ::web_sys::Blob;
+#[allow(dead_code)]
+use ::web_sys::FormData;
+#[allow(dead_code)]
+use ::web_sys::Headers;
+#[allow(dead_code)]
+use ::web_sys::ReadableStream;
+#[allow(dead_code)]
+use ::web_sys::UrlSearchParams as URLSearchParams;
+#[allow(dead_code)]
+use ::web_sys::WebSocket;
+#[allow(dead_code)]
+use ::web_sys::WritableStream;
 #[allow(unused_imports)]
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
 #[allow(dead_code)]
-use JsValue as Blob;
-#[allow(dead_code)]
 use JsValue as DurableObjectState;
 #[allow(dead_code)]
-use JsValue as FormData;
-#[allow(dead_code)]
-use JsValue as Headers;
-#[allow(dead_code)]
 use JsValue as Navigator;
-#[allow(dead_code)]
-use JsValue as ReadableStream;
 #[allow(dead_code)]
 use JsValue as RequestInfo;
 #[allow(dead_code)]
 use JsValue as RequestInit;
 #[allow(dead_code)]
 use JsValue as ServiceWorkerGlobalScope;
-#[allow(dead_code)]
-use JsValue as URLSearchParams;
-#[allow(dead_code)]
-use JsValue as WebSocket;
-#[allow(dead_code)]
-use JsValue as WritableStream;
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -188,38 +188,36 @@ extern "C" {
     pub fn set_headers_with_record(this: &ResponseInit, val: &Object<JsString>);
 }
 impl ResponseInit {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        #[allow(unused_imports)]
-        use wasm_bindgen::JsCast;
-        JsCast::unchecked_into(js_sys::Object::new())
+    pub fn new() -> ResponseInit {
+        Self::builder().build()
     }
     pub fn builder() -> ResponseInitBuilder {
-        ResponseInitBuilder { inner: Self::new() }
+        ResponseInitBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
     }
 }
 pub struct ResponseInitBuilder {
     inner: ResponseInit,
 }
-#[allow(unused_mut)]
 impl ResponseInitBuilder {
-    pub fn status(mut self, val: f64) -> Self {
+    pub fn status(self, val: f64) -> Self {
         self.inner.set_status(val);
         self
     }
-    pub fn status_text(mut self, val: &str) -> Self {
+    pub fn status_text(self, val: &str) -> Self {
         self.inner.set_status_text(val);
         self
     }
-    pub fn headers(mut self, val: &Headers) -> Self {
+    pub fn headers(self, val: &Headers) -> Self {
         self.inner.set_headers(val);
         self
     }
-    pub fn headers_with_array(mut self, val: &Array<Array<JsString>>) -> Self {
+    pub fn headers_with_array(self, val: &Array<Array<JsString>>) -> Self {
         self.inner.set_headers_with_array(val);
         self
     }
-    pub fn headers_with_record(mut self, val: &Object<JsString>) -> Self {
+    pub fn headers_with_record(self, val: &Object<JsString>) -> Self {
         self.inner.set_headers_with_record(val);
         self
     }
@@ -414,26 +412,24 @@ pub mod sockets {
         pub fn set_allow_half_open(this: &SocketOptions, val: bool);
     }
     impl SocketOptions {
-        #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
-            #[allow(unused_imports)]
-            use wasm_bindgen::JsCast;
-            JsCast::unchecked_into(js_sys::Object::new())
+        pub fn new() -> SocketOptions {
+            Self::builder().build()
         }
         pub fn builder() -> SocketOptionsBuilder {
-            SocketOptionsBuilder { inner: Self::new() }
+            SocketOptionsBuilder {
+                inner: JsCast::unchecked_into(js_sys::Object::new()),
+            }
         }
     }
     pub struct SocketOptionsBuilder {
         inner: SocketOptions,
     }
-    #[allow(unused_mut)]
     impl SocketOptionsBuilder {
-        pub fn secure_transport(mut self, val: &str) -> Self {
+        pub fn secure_transport(self, val: &str) -> Self {
             self.inner.set_secure_transport(val);
             self
         }
-        pub fn allow_half_open(mut self, val: bool) -> Self {
+        pub fn allow_half_open(self, val: bool) -> Self {
             self.inner.set_allow_half_open(val);
             self
         }
