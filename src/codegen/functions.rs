@@ -84,6 +84,7 @@ fn generate_expanded_free_function(
     let ret_ty = to_return_type(
         &sig.return_type,
         sig.catch,
+        sig.is_async,
         sig.error_type.as_ref(),
         cgctx,
         scope,

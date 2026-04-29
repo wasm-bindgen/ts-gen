@@ -863,12 +863,27 @@ fn union_lub(
 pub fn to_return_type(
     ty: &TypeRef,
     catch: bool,
+    is_async: bool,
     error_ty: Option<&TypeRef>,
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
     from_module: &ModuleContext,
 ) -> TokenStream {
-    let inner = to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module);
+    // Async returns are `Promise<T>` JS-side. `wasm-bindgen` requires
+    // `T: JsGeneric` for `Promise<T>` / `JsFuture<T>`, which bare Rust
+    // primitives don't satisfy. Routing through `to_inner()` reuses
+    // the inside-generic Canon path in `to_syn_type`: primitives lower
+    // to `js_sys` wrappers (`Boolean` / `Number` / `JsString` /
+    // `Undefined`) and `Nullable<T>` becomes `JsOption<T>`. Callers
+    // recover primitives via `.value_of()` (`Boolean` / `Number`) or
+    // `String::from(_)` (`JsString`).
+    let pos = if is_async {
+        TypePosition::RETURN.to_inner()
+    } else {
+        TypePosition::RETURN
+    };
+    let inner = to_syn_type(ty, pos, ctx, scope, from_module);
+
     if catch {
         let err = match error_ty {
             Some(ty) => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
@@ -1101,8 +1116,16 @@ mod tests {
     #[test]
     fn test_return_with_catch() {
         let ty = TypeRef::Promise(Box::new(TypeRef::Void));
-        let result =
-            to_return_type(&ty, true, None, None, ScopeId(0), &ModuleContext::Global).to_string();
+        let result = to_return_type(
+            &ty,
+            true,
+            false,
+            None,
+            None,
+            ScopeId(0),
+            &ModuleContext::Global,
+        )
+        .to_string();
         assert_eq!(result, "Result < Promise < Undefined > , JsValue >");
     }
 

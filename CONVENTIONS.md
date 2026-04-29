@@ -689,6 +689,29 @@ pub async fn fetch(url: &str) -> Result<Response, JsValue>;
 * `wasm-bindgen` rewraps the `T` as `Promise<T>` on the JS side.
 * Constructors and setters never become async.
 
+### Async return primitives lower to `js_sys` wrappers
+
+Primitive types behave differently in `Promise<T>` than they do in
+sync returns or arguments:
+
+| TypeScript                     | Async return                  |
+| ------------------------------ | ----------------------------- |
+| `Promise<boolean>`             | `Result<Boolean, JsValue>`    |
+| `Promise<number>`              | `Result<Number, JsValue>`     |
+| `Promise<string>`              | `Result<JsString, JsValue>`   |
+| `Promise<void>`                | `Result<Undefined, JsValue>`  |
+| `Promise<T \| null>`           | `Result<JsOption<T>, JsValue>`|
+| `Promise<Foo>` (named JS type) | `Result<Foo, JsValue>`        |
+
+`wasm-bindgen`'s typed `Promise<T>` / `JsFuture<T>` require
+`T: JsGeneric` — an externref-backed type — which bare Rust
+primitives aren't. The `js_sys` wrappers are. Callers recover Rust
+primitives via `value_of()` (for `Boolean` / `Number`) or
+`String::from(_)` / `.into()` (for `JsString`).
+
+Sync returns, arguments, and properties keep the bare-primitive
+lowering.
+
 ## `@throws` JSDoc → typed error
 
 ```ts

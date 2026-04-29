@@ -157,7 +157,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "arrayBuffer")]
     pub async fn array_buffer(this: &Body) -> Result<ArrayBuffer, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn text(this: &Body) -> Result<String, JsValue>;
+    pub async fn text(this: &Body) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn json(this: &Body) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -255,19 +255,19 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_env(this: &DurableObject, val: &Object);
     #[wasm_bindgen(method, catch)]
-    pub async fn alarm(this: &DurableObject) -> Result<(), JsValue>;
+    pub async fn alarm(this: &DurableObject) -> Result<Undefined, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "webSocketMessage")]
     pub async fn web_socket_message(
         this: &DurableObject,
         ws: &WebSocket,
         message: &str,
-    ) -> Result<(), JsValue>;
+    ) -> Result<Undefined, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "webSocketMessage")]
     pub async fn web_socket_message_with_array_buffer(
         this: &DurableObject,
         ws: &WebSocket,
         message: &ArrayBuffer,
-    ) -> Result<(), JsValue>;
+    ) -> Result<Undefined, JsValue>;
 }
 pub mod web_assembly {
     use wasm_bindgen::prelude::*;
@@ -383,7 +383,7 @@ pub mod sockets {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Socket;
         #[wasm_bindgen(method, catch)]
-        pub async fn close(this: &Socket) -> Result<(), JsValue>;
+        pub async fn close(this: &Socket) -> Result<Undefined, JsValue>;
         #[wasm_bindgen(method, getter)]
         pub fn closed(this: &Socket) -> Promise<Undefined>;
         #[wasm_bindgen(method, getter)]
