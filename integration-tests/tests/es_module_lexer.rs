@@ -1,10 +1,9 @@
-//! @ts-gen --lib-name es-module-lexer ../ts-gen/tests/fixtures/es-module-lexer.d.ts
 #![cfg(target_arch = "wasm32")]
 
 use wasm_bindgen_futures::JsFuture;
 use wasm_bindgen_test::*;
 
-use ts_gen_wasm_bindgen_tests::es_module_lexer::*;
+use ts_gen_integration_tests::es_module_lexer::*;
 
 /// Helper: await the init promise before calling parse.
 async fn ensure_init() {

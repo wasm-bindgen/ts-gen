@@ -1,3 +1,5 @@
+//! @ts-gen --lib-name node:console
+
 /**
  * Options for the Console constructor.
  */
