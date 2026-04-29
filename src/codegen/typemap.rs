@@ -863,12 +863,33 @@ fn union_lub(
 pub fn to_return_type(
     ty: &TypeRef,
     catch: bool,
+    is_async: bool,
     error_ty: Option<&TypeRef>,
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
     from_module: &ModuleContext,
 ) -> TokenStream {
-    let inner = to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module);
+    // Async returns are `Promise<T>` JS-side. Some `wasm-bindgen`
+    // flavours (notably the workers-rs fork) require `T: JsGeneric`
+    // (an externref) for `Promise<T>` / `JsFuture<T>`, which Rust
+    // primitives don't satisfy. Lower `bool` / `f64` / `String` to
+    // their `js_sys` wrappers (`Boolean` / `Number` / `JsString`),
+    // which are externref-backed. Caller uses `.value_of()` (or
+    // `String::from`) to recover the Rust primitive.
+    //
+    // Only `bool` / `f64` / `String` are affected. `()` / `Undefined`
+    // stay as `()`; named JS types and `JsValue` already satisfy
+    // `JsGeneric`.
+    let inner = if is_async {
+        match ty {
+            TypeRef::Boolean | TypeRef::BooleanLiteral(_) => quote! { Boolean },
+            TypeRef::Number | TypeRef::NumberLiteral(_) => quote! { Number },
+            TypeRef::String | TypeRef::StringLiteral(_) => quote! { JsString },
+            _ => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
+        }
+    } else {
+        to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module)
+    };
     if catch {
         let err = match error_ty {
             Some(ty) => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
@@ -1102,7 +1123,8 @@ mod tests {
     fn test_return_with_catch() {
         let ty = TypeRef::Promise(Box::new(TypeRef::Void));
         let result =
-            to_return_type(&ty, true, None, None, ScopeId(0), &ModuleContext::Global).to_string();
+            to_return_type(&ty, true, false, None, None, ScopeId(0), &ModuleContext::Global)
+                .to_string();
         assert_eq!(result, "Result < Promise < Undefined > , JsValue >");
     }
 

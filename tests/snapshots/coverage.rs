@@ -212,7 +212,7 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new(config: &Object) -> Result<DefaultProcessor, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn process(this: &DefaultProcessor, input: &str) -> Result<String, JsValue>;
+    pub async fn process(this: &DefaultProcessor, input: &str) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn name(this: &DefaultProcessor) -> String;
 }
@@ -701,7 +701,7 @@ pub mod my_module {
     #[wasm_bindgen(module = "my-module")]
     extern "C" {
         #[wasm_bindgen(catch, js_name = "doWork")]
-        pub async fn do_work(input: &str) -> Result<String, JsValue>;
+        pub async fn do_work(input: &str) -> Result<JsString, JsValue>;
     }
     #[wasm_bindgen(module = "my-module")]
     extern "C" {

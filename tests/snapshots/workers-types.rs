@@ -2652,24 +2652,24 @@ extern "C" {
         options: &DurableObjectPutOptions,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn delete(this: &DurableObjectTransaction, key: &str) -> Result<bool, JsValue>;
+    pub async fn delete(this: &DurableObjectTransaction, key: &str) -> Result<Boolean, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
     pub async fn delete_with_key_and_options(
         this: &DurableObjectTransaction,
         key: &str,
         options: &DurableObjectPutOptions,
-    ) -> Result<bool, JsValue>;
+    ) -> Result<Boolean, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
     pub async fn delete_with_keys(
         this: &DurableObjectTransaction,
         keys: &Array<JsString>,
-    ) -> Result<bool, JsValue>;
+    ) -> Result<Boolean, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
     pub async fn delete_with_keys_and_options(
         this: &DurableObjectTransaction,
         keys: &Array<JsString>,
         options: &DurableObjectPutOptions,
-    ) -> Result<bool, JsValue>;
+    ) -> Result<Boolean, JsValue>;
     #[wasm_bindgen(method)]
     pub fn rollback(this: &DurableObjectTransaction);
     #[wasm_bindgen(method, catch, js_name = "rollback")]
@@ -2763,24 +2763,24 @@ extern "C" {
         options: &DurableObjectPutOptions,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn delete(this: &DurableObjectStorage, key: &str) -> Result<bool, JsValue>;
+    pub async fn delete(this: &DurableObjectStorage, key: &str) -> Result<Boolean, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
     pub async fn delete_with_key_and_options(
         this: &DurableObjectStorage,
         key: &str,
         options: &DurableObjectPutOptions,
-    ) -> Result<bool, JsValue>;
+    ) -> Result<Boolean, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
     pub async fn delete_with_keys(
         this: &DurableObjectStorage,
         keys: &Array<JsString>,
-    ) -> Result<bool, JsValue>;
+    ) -> Result<Boolean, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
     pub async fn delete_with_keys_and_options(
         this: &DurableObjectStorage,
         keys: &Array<JsString>,
         options: &DurableObjectPutOptions,
-    ) -> Result<bool, JsValue>;
+    ) -> Result<Boolean, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "deleteAll")]
     pub async fn delete_all(this: &DurableObjectStorage) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "deleteAll")]
@@ -2845,22 +2845,22 @@ extern "C" {
         closure: &Function<fn() -> T>,
     ) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getCurrentBookmark")]
-    pub async fn get_current_bookmark(this: &DurableObjectStorage) -> Result<String, JsValue>;
+    pub async fn get_current_bookmark(this: &DurableObjectStorage) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getBookmarkForTime")]
     pub async fn get_bookmark_for_time(
         this: &DurableObjectStorage,
         timestamp: f64,
-    ) -> Result<String, JsValue>;
+    ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getBookmarkForTime")]
     pub async fn get_bookmark_for_time_with_date(
         this: &DurableObjectStorage,
         timestamp: &Date,
-    ) -> Result<String, JsValue>;
+    ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "onNextSessionRestoreBookmark")]
     pub async fn on_next_session_restore_bookmark(
         this: &DurableObjectStorage,
         bookmark: &str,
-    ) -> Result<String, JsValue>;
+    ) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -4024,7 +4024,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/text)"]
     #[wasm_bindgen(method, catch)]
-    pub async fn text(this: &Blob) -> Result<String, JsValue>;
+    pub async fn text(this: &Blob) -> Result<JsString, JsValue>;
     #[doc = " The **`stream()`** method of the Blob interface returns a ReadableStream which upon reading returns the data contained within the `Blob`."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/stream)"]
@@ -4183,29 +4183,29 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Cache;
     #[wasm_bindgen(method, catch)]
-    pub async fn delete(this: &Cache, request: &Request) -> Result<bool, JsValue>;
+    pub async fn delete(this: &Cache, request: &Request) -> Result<Boolean, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
-    pub async fn delete_with_str(this: &Cache, request: &str) -> Result<bool, JsValue>;
+    pub async fn delete_with_str(this: &Cache, request: &str) -> Result<Boolean, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
-    pub async fn delete_with_url(this: &Cache, request: &URL) -> Result<bool, JsValue>;
+    pub async fn delete_with_url(this: &Cache, request: &URL) -> Result<Boolean, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
     pub async fn delete_with_js_value_and_options(
         this: &Cache,
         request: &Request,
         options: &CacheQueryOptions,
-    ) -> Result<bool, JsValue>;
+    ) -> Result<Boolean, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
     pub async fn delete_with_str_and_options(
         this: &Cache,
         request: &str,
         options: &CacheQueryOptions,
-    ) -> Result<bool, JsValue>;
+    ) -> Result<Boolean, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
     pub async fn delete_with_url_and_options(
         this: &Cache,
         request: &URL,
         options: &CacheQueryOptions,
-    ) -> Result<bool, JsValue>;
+    ) -> Result<Boolean, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn r#match(this: &Cache, request: &Request) -> Result<Option<Response>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "match")]
@@ -4450,7 +4450,7 @@ extern "C" {
         key: &CryptoKey,
         signature: &ArrayBuffer,
         data: &ArrayBuffer,
-    ) -> Result<bool, JsValue>;
+    ) -> Result<Boolean, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
@@ -4461,7 +4461,7 @@ extern "C" {
         key: &CryptoKey,
         signature: &ArrayBuffer,
         data: &ArrayBuffer,
-    ) -> Result<bool, JsValue>;
+    ) -> Result<Boolean, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
@@ -4472,7 +4472,7 @@ extern "C" {
         key: &CryptoKey,
         signature: &Object,
         data: &ArrayBuffer,
-    ) -> Result<bool, JsValue>;
+    ) -> Result<Boolean, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
@@ -4483,7 +4483,7 @@ extern "C" {
         key: &CryptoKey,
         signature: &Object,
         data: &ArrayBuffer,
-    ) -> Result<bool, JsValue>;
+    ) -> Result<Boolean, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
@@ -4494,7 +4494,7 @@ extern "C" {
         key: &CryptoKey,
         signature: &ArrayBuffer,
         data: &Object,
-    ) -> Result<bool, JsValue>;
+    ) -> Result<Boolean, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
@@ -4505,7 +4505,7 @@ extern "C" {
         key: &CryptoKey,
         signature: &ArrayBuffer,
         data: &Object,
-    ) -> Result<bool, JsValue>;
+    ) -> Result<Boolean, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
@@ -4516,7 +4516,7 @@ extern "C" {
         key: &CryptoKey,
         signature: &Object,
         data: &Object,
-    ) -> Result<bool, JsValue>;
+    ) -> Result<Boolean, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
@@ -4527,7 +4527,7 @@ extern "C" {
         key: &CryptoKey,
         signature: &Object,
         data: &Object,
-    ) -> Result<bool, JsValue>;
+    ) -> Result<Boolean, JsValue>;
     #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
@@ -7708,7 +7708,7 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn bytes(this: &Body) -> Result<Uint8Array, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn text(this: &Body) -> Result<String, JsValue>;
+    pub async fn text(this: &Body) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn json(this: &Body) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "formData")]
@@ -9616,7 +9616,7 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn bytes(this: &R2ObjectBody) -> Result<Uint8Array, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn text(this: &R2ObjectBody) -> Result<String, JsValue>;
+    pub async fn text(this: &R2ObjectBody) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn json(this: &R2ObjectBody) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -59974,14 +59974,14 @@ extern "C" {
         options: &AiGatewayOptions,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getUrl")]
-    pub async fn get_url(this: &AiGateway) -> Result<String, JsValue>;
+    pub async fn get_url(this: &AiGateway) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getUrl")]
     pub async fn get_url_with_ai_gateway_providers(
         this: &AiGateway,
         provider: &AIGatewayProviders,
-    ) -> Result<String, JsValue>;
+    ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getUrl")]
-    pub async fn get_url_with_str(this: &AiGateway, provider: &str) -> Result<String, JsValue>;
+    pub async fn get_url_with_str(this: &AiGateway, provider: &str) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -66245,7 +66245,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " True if deleted, false if not found"]
     #[wasm_bindgen(method, catch)]
-    pub async fn delete(this: &HostedImagesBinding, image_id: &str) -> Result<bool, JsValue>;
+    pub async fn delete(this: &HostedImagesBinding, image_id: &str) -> Result<Boolean, JsValue>;
     #[doc = " List hosted images with pagination"]
     #[doc = ""]
     #[doc = " ## Arguments"]
@@ -66815,7 +66815,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " A promise containing the content type string (e.g., 'image/jpeg', 'video/mp4')"]
     #[wasm_bindgen(method, catch, js_name = "contentType")]
-    pub async fn content_type(this: &MediaTransformationResult) -> Result<String, JsValue>;
+    pub async fn content_type(this: &MediaTransformationResult) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -68091,7 +68091,7 @@ extern "C" {
     #[doc = " Get a secret from the Secrets Store, returning a string of the secret value"]
     #[doc = " if it exists, or throws an error if it does not exist"]
     #[wasm_bindgen(method, catch)]
-    pub async fn get(this: &SecretsStoreSecret) -> Result<String, JsValue>;
+    pub async fn get(this: &SecretsStoreSecret) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -68277,7 +68277,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `InternalError` — if the signing key cannot be retrieved or the token cannot be signed"]
     #[wasm_bindgen(method, catch, js_name = "generateToken")]
-    pub async fn generate_token(this: &StreamVideoHandle) -> Result<String, InternalError>;
+    pub async fn generate_token(this: &StreamVideoHandle) -> Result<JsString, InternalError>;
     #[wasm_bindgen(method, getter)]
     pub fn downloads(this: &StreamVideoHandle) -> StreamScopedDownloads;
     #[wasm_bindgen(method, setter)]

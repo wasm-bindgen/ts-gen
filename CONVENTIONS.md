@@ -689,6 +689,32 @@ pub async fn fetch(url: &str) -> Result<Response, JsValue>;
 * `wasm-bindgen` rewraps the `T` as `Promise<T>` on the JS side.
 * Constructors and setters never become async.
 
+### Primitive `T` lowers to its `js_sys` wrapper
+
+When `T` is `boolean`, `number`, or `string`, the async return uses the
+`js_sys` wrapper type — `Boolean`, `Number`, `JsString` — instead of the
+Rust primitive (`bool`, `f64`, `String`):
+
+```ts
+text(): Promise<string>;
+```
+
+```rust
+#[wasm_bindgen(method, catch)]
+pub async fn text(this: &Body) -> Result<JsString, JsValue>;
+```
+
+Some `wasm-bindgen` flavours (notably the workers-rs fork) require
+`T: JsGeneric` (an externref-backed type) for `Promise<T>` /
+`JsFuture<T>`, which Rust primitives don't satisfy. The `js_sys`
+wrappers are externref-backed, so they work. Callers recover the Rust
+primitive via `value_of()` (for `Boolean` / `Number`) or
+`String::from(_)` / `.into()` (for `JsString`).
+
+This only applies to async return position. Synchronous returns,
+arguments, and properties keep the Rust primitive; the JsGeneric
+constraint is specific to `Promise<T>` / `JsFuture<T>`.
+
 ## `@throws` JSDoc → typed error
 
 ```ts
