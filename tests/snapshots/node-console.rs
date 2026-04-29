@@ -49,13 +49,13 @@ pub mod console {
         pub fn set_group_indentation_with_null(this: &ConsoleOptions, val: &Null);
     }
     impl ConsoleOptions {
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `stdout`"]
         pub fn new(stdout: &Object) -> ConsoleOptions {
             Self::builder(stdout).build()
         }
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `stdout`"]
         pub fn builder(stdout: &Object) -> ConsoleOptionsBuilder {

@@ -206,7 +206,7 @@ extern "C" {
     pub fn set_rejectionhandled(this: &WorkerGlobalScopeEventMap, val: &PromiseRejectionEvent);
 }
 impl WorkerGlobalScopeEventMap {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `fetch`"]
     #[doc = " * `scheduled`"]
@@ -229,7 +229,7 @@ impl WorkerGlobalScopeEventMap {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `fetch`"]
     #[doc = " * `scheduled`"]
@@ -649,13 +649,13 @@ pub mod web_assembly {
         pub fn set_mutable(this: &GlobalDescriptor, val: bool);
     }
     impl GlobalDescriptor {
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `value`"]
         pub fn new(value: &ValueType) -> GlobalDescriptor {
             Self::builder(value).build()
         }
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `value`"]
         pub fn builder(value: &ValueType) -> GlobalDescriptorBuilder {
@@ -729,13 +729,13 @@ pub mod web_assembly {
         pub fn set_shared(this: &MemoryDescriptor, val: bool);
     }
     impl MemoryDescriptor {
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `initial`"]
         pub fn new(initial: f64) -> MemoryDescriptor {
             Self::builder(initial).build()
         }
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `initial`"]
         pub fn builder(initial: f64) -> MemoryDescriptorBuilder {
@@ -801,14 +801,14 @@ pub mod web_assembly {
         pub fn set_name(this: &ModuleExportDescriptor, val: &str);
     }
     impl ModuleExportDescriptor {
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `kind`"]
         #[doc = " * `name`"]
         pub fn new(kind: &ImportExportKind, name: &str) -> ModuleExportDescriptor {
             Self::builder(kind, name).build()
         }
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `kind`"]
         #[doc = " * `name`"]
@@ -846,7 +846,7 @@ pub mod web_assembly {
         pub fn set_name(this: &ModuleImportDescriptor, val: &str);
     }
     impl ModuleImportDescriptor {
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `kind`"]
         #[doc = " * `module`"]
@@ -854,7 +854,7 @@ pub mod web_assembly {
         pub fn new(kind: &ImportExportKind, module: &str, name: &str) -> ModuleImportDescriptor {
             Self::builder(kind, module, name).build()
         }
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `kind`"]
         #[doc = " * `module`"]
@@ -927,14 +927,14 @@ pub mod web_assembly {
         pub fn set_maximum(this: &TableDescriptor, val: f64);
     }
     impl TableDescriptor {
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `element`"]
         #[doc = " * `initial`"]
         pub fn new(element: &TableKind, initial: f64) -> TableDescriptor {
             Self::builder(element, initial).build()
         }
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `element`"]
         #[doc = " * `initial`"]
@@ -3646,7 +3646,7 @@ extern "C" {
     );
 }
 impl EventTargetHandlerObject {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `handle_event`"]
     pub fn new(
@@ -3654,7 +3654,7 @@ impl EventTargetHandlerObject {
     ) -> EventTargetHandlerObject {
         Self::builder(handle_event).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `handle_event`"]
     pub fn builder(
@@ -4991,14 +4991,14 @@ extern "C" {
     pub fn set_private_key(this: &CryptoKeyPair, val: &CryptoKey);
 }
 impl CryptoKeyPair {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `public_key`"]
     #[doc = " * `private_key`"]
     pub fn new(public_key: &CryptoKey, private_key: &CryptoKey) -> CryptoKeyPair {
         Self::builder(public_key, private_key).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `public_key`"]
     #[doc = " * `private_key`"]
@@ -5096,13 +5096,13 @@ extern "C" {
     pub fn set_k(this: &JsonWebKey, val: &str);
 }
 impl JsonWebKey {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `kty`"]
     pub fn new(kty: &str) -> JsonWebKey {
         Self::builder(kty).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `kty`"]
     pub fn builder(kty: &str) -> JsonWebKeyBuilder {
@@ -5275,13 +5275,13 @@ extern "C" {
     pub fn set_info_with_js_value(this: &SubtleCryptoDeriveKeyAlgorithm, val: &Object);
 }
 impl SubtleCryptoDeriveKeyAlgorithm {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     pub fn new(name: &str) -> SubtleCryptoDeriveKeyAlgorithm {
         Self::builder(name).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     pub fn builder(name: &str) -> SubtleCryptoDeriveKeyAlgorithmBuilder {
@@ -5373,13 +5373,13 @@ extern "C" {
     pub fn set_label_with_js_value(this: &SubtleCryptoEncryptAlgorithm, val: &Object);
 }
 impl SubtleCryptoEncryptAlgorithm {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     pub fn new(name: &str) -> SubtleCryptoEncryptAlgorithm {
         Self::builder(name).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     pub fn builder(name: &str) -> SubtleCryptoEncryptAlgorithmBuilder {
@@ -5474,13 +5474,13 @@ extern "C" {
     pub fn set_named_curve(this: &SubtleCryptoGenerateKeyAlgorithm, val: &str);
 }
 impl SubtleCryptoGenerateKeyAlgorithm {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     pub fn new(name: &str) -> SubtleCryptoGenerateKeyAlgorithm {
         Self::builder(name).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     pub fn builder(name: &str) -> SubtleCryptoGenerateKeyAlgorithmBuilder {
@@ -5536,13 +5536,13 @@ extern "C" {
     pub fn set_name(this: &SubtleCryptoHashAlgorithm, val: &str);
 }
 impl SubtleCryptoHashAlgorithm {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     pub fn new(name: &str) -> SubtleCryptoHashAlgorithm {
         Self::builder(name).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     pub fn builder(name: &str) -> SubtleCryptoHashAlgorithmBuilder {
@@ -5591,13 +5591,13 @@ extern "C" {
     pub fn set_compressed(this: &SubtleCryptoImportKeyAlgorithm, val: bool);
 }
 impl SubtleCryptoImportKeyAlgorithm {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     pub fn new(name: &str) -> SubtleCryptoImportKeyAlgorithm {
         Self::builder(name).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     pub fn builder(name: &str) -> SubtleCryptoImportKeyAlgorithmBuilder {
@@ -5662,13 +5662,13 @@ extern "C" {
     pub fn set_salt_length(this: &SubtleCryptoSignAlgorithm, val: f64);
 }
 impl SubtleCryptoSignAlgorithm {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     pub fn new(name: &str) -> SubtleCryptoSignAlgorithm {
         Self::builder(name).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     pub fn builder(name: &str) -> SubtleCryptoSignAlgorithmBuilder {
@@ -5712,13 +5712,13 @@ extern "C" {
     pub fn set_name(this: &CryptoKeyKeyAlgorithm, val: &str);
 }
 impl CryptoKeyKeyAlgorithm {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     pub fn new(name: &str) -> CryptoKeyKeyAlgorithm {
         Self::builder(name).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     pub fn builder(name: &str) -> CryptoKeyKeyAlgorithmBuilder {
@@ -5750,14 +5750,14 @@ extern "C" {
     pub fn set_length(this: &CryptoKeyAesKeyAlgorithm, val: f64);
 }
 impl CryptoKeyAesKeyAlgorithm {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `length`"]
     pub fn new(name: &str, length: f64) -> CryptoKeyAesKeyAlgorithm {
         Self::builder(name, length).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `length`"]
@@ -5795,7 +5795,7 @@ extern "C" {
     pub fn set_length(this: &CryptoKeyHmacKeyAlgorithm, val: f64);
 }
 impl CryptoKeyHmacKeyAlgorithm {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `hash`"]
@@ -5803,7 +5803,7 @@ impl CryptoKeyHmacKeyAlgorithm {
     pub fn new(name: &str, hash: &CryptoKeyKeyAlgorithm, length: f64) -> CryptoKeyHmacKeyAlgorithm {
         Self::builder(name, hash, length).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `hash`"]
@@ -5853,7 +5853,7 @@ extern "C" {
     pub fn set_hash(this: &CryptoKeyRsaKeyAlgorithm, val: &CryptoKeyKeyAlgorithm);
 }
 impl CryptoKeyRsaKeyAlgorithm {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `modulus_length`"]
@@ -5865,7 +5865,7 @@ impl CryptoKeyRsaKeyAlgorithm {
     ) -> CryptoKeyRsaKeyAlgorithm {
         Self::builder(name, modulus_length, public_exponent).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `modulus_length`"]
@@ -5877,7 +5877,7 @@ impl CryptoKeyRsaKeyAlgorithm {
     ) -> CryptoKeyRsaKeyAlgorithm {
         Self::builder_with_js_value(name, modulus_length, public_exponent).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `modulus_length`"]
@@ -5893,7 +5893,7 @@ impl CryptoKeyRsaKeyAlgorithm {
         inner.set_public_exponent(public_exponent);
         CryptoKeyRsaKeyAlgorithmBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `modulus_length`"]
@@ -5937,14 +5937,14 @@ extern "C" {
     pub fn set_named_curve(this: &CryptoKeyEllipticKeyAlgorithm, val: &str);
 }
 impl CryptoKeyEllipticKeyAlgorithm {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `named_curve`"]
     pub fn new(name: &str, named_curve: &str) -> CryptoKeyEllipticKeyAlgorithm {
         Self::builder(name, named_curve).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `named_curve`"]
@@ -5986,13 +5986,13 @@ extern "C" {
     pub fn set_length(this: &CryptoKeyArbitraryKeyAlgorithm, val: f64);
 }
 impl CryptoKeyArbitraryKeyAlgorithm {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     pub fn new(name: &str) -> CryptoKeyArbitraryKeyAlgorithm {
         Self::builder(name).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     pub fn builder(name: &str) -> CryptoKeyArbitraryKeyAlgorithmBuilder {
@@ -6190,14 +6190,14 @@ extern "C" {
     pub fn set_ignore_bom(this: &TextDecoderConstructorOptions, val: bool);
 }
 impl TextDecoderConstructorOptions {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `fatal`"]
     #[doc = " * `ignore_bom`"]
     pub fn new(fatal: bool, ignore_bom: bool) -> TextDecoderConstructorOptions {
         Self::builder(fatal, ignore_bom).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `fatal`"]
     #[doc = " * `ignore_bom`"]
@@ -6227,13 +6227,13 @@ extern "C" {
     pub fn set_stream(this: &TextDecoderDecodeOptions, val: bool);
 }
 impl TextDecoderDecodeOptions {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `stream`"]
     pub fn new(stream: bool) -> TextDecoderDecodeOptions {
         Self::builder(stream).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `stream`"]
     pub fn builder(stream: bool) -> TextDecoderDecodeOptionsBuilder {
@@ -6265,14 +6265,14 @@ extern "C" {
     pub fn set_written(this: &TextEncoderEncodeIntoResult, val: f64);
 }
 impl TextEncoderEncodeIntoResult {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `read`"]
     #[doc = " * `written`"]
     pub fn new(read: f64, written: f64) -> TextEncoderEncodeIntoResult {
         Self::builder(read, written).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `read`"]
     #[doc = " * `written`"]
@@ -6439,19 +6439,19 @@ extern "C" {
     pub fn set_data_with_str(this: &MessageEventInit, val: &str);
 }
 impl MessageEventInit {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `data`"]
     pub fn new(data: &ArrayBuffer) -> MessageEventInit {
         Self::builder(data).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `data`"]
     pub fn new_with_str(data: &str) -> MessageEventInit {
         Self::builder_with_str(data).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `data`"]
     pub fn builder(data: &ArrayBuffer) -> MessageEventInitBuilder {
@@ -6459,7 +6459,7 @@ impl MessageEventInit {
         inner.set_data(data);
         MessageEventInitBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `data`"]
     pub fn builder_with_str(data: &str) -> MessageEventInitBuilder {
@@ -8298,13 +8298,13 @@ extern "C" {
     pub fn set_metadata(this: &KVNamespaceListKey, val: &Metadata);
 }
 impl KVNamespaceListKey {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     pub fn new(name: &Key) -> KVNamespaceListKey {
         Self::builder(name).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     pub fn builder(name: &Key) -> KVNamespaceListKeyBuilder {
@@ -8356,11 +8356,11 @@ extern "C" {
     pub fn set_list_complete_with_js_value(this: &KVNamespaceListResult, val: bool);
 }
 impl KVNamespaceListResult {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `list_complete: false`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cache_status`"]
     #[doc = " * `keys`"]
@@ -8370,11 +8370,11 @@ impl KVNamespaceListResult {
     ) -> KVNamespaceListResult {
         Self::builder_false(cache_status, keys).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `list_complete: true`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cache_status`"]
     #[doc = " * `keys`"]
@@ -8384,11 +8384,11 @@ impl KVNamespaceListResult {
     ) -> KVNamespaceListResult {
         Self::builder_true(cache_status, keys).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `list_complete: false`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cache_status`"]
     #[doc = " * `keys`"]
@@ -8402,11 +8402,11 @@ impl KVNamespaceListResult {
         inner.set_list_complete(false);
         KVNamespaceListResultBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `list_complete: true`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cache_status`"]
     #[doc = " * `keys`"]
@@ -8756,13 +8756,13 @@ extern "C" {
     pub fn set_cache_ttl(this: &KVNamespaceGetOptions, val: f64);
 }
 impl KVNamespaceGetOptions {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `type`"]
     pub fn new(r#type: &Type) -> KVNamespaceGetOptions {
         Self::builder(r#type).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `type`"]
     pub fn builder(r#type: &Type) -> KVNamespaceGetOptionsBuilder {
@@ -8862,7 +8862,7 @@ extern "C" {
     pub fn set_cache_status_with_null(this: &KVNamespaceGetWithMetadataResult, val: &Null);
 }
 impl KVNamespaceGetWithMetadataResult {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `value`"]
     #[doc = " * `metadata`"]
@@ -8874,7 +8874,7 @@ impl KVNamespaceGetWithMetadataResult {
     ) -> KVNamespaceGetWithMetadataResult {
         Self::builder(value, metadata, cache_status).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `value`"]
     #[doc = " * `metadata`"]
@@ -9024,13 +9024,13 @@ extern "C" {
     pub fn set_delay_seconds(this: &MessageSendRequest, val: f64);
 }
 impl MessageSendRequest {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `body`"]
     pub fn new(body: &Body) -> MessageSendRequest {
         Self::builder(body).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `body`"]
     pub fn builder(body: &Body) -> MessageSendRequestBuilder {
@@ -9542,14 +9542,14 @@ extern "C" {
     pub fn set_etag(this: &R2UploadedPart, val: &str);
 }
 impl R2UploadedPart {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `part_number`"]
     #[doc = " * `etag`"]
     pub fn new(part_number: f64, etag: &str) -> R2UploadedPart {
         Self::builder(part_number, etag).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `part_number`"]
     #[doc = " * `etag`"]
@@ -10447,13 +10447,13 @@ extern "C" {
     );
 }
 impl UnderlyingByteSource {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"bytes\"`"]
     pub fn new_bytes() -> UnderlyingByteSource {
         Self::builder_bytes().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"bytes\"`"]
     pub fn builder_bytes() -> UnderlyingByteSourceBuilder {
@@ -10788,19 +10788,19 @@ extern "C" {
     pub fn set_value_with_undefined(this: &ReadableStreamReadResult, val: &Undefined);
 }
 impl ReadableStreamReadResult {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `done: false`"]
     pub fn new_false() -> ReadableStreamReadResult {
         Self::builder_false().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `done: true`"]
     pub fn new_true() -> ReadableStreamReadResult {
         Self::builder_true().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `done: false`"]
     pub fn builder_false() -> ReadableStreamReadResultBuilder {
@@ -10808,7 +10808,7 @@ impl ReadableStreamReadResult {
         inner.set_done(false);
         ReadableStreamReadResultBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `done: true`"]
     pub fn builder_true() -> ReadableStreamReadResultBuilder {
@@ -11077,17 +11077,17 @@ extern "C" {
     pub fn set_mode(this: &ReadableStreamGetReaderOptions, val: &str);
 }
 impl ReadableStreamGetReaderOptions {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `mode: \"byob\"`: Creates a ReadableStreamBYOBReader and locks the stream to the new reader."]
+    #[doc = " * `mode: \"byob\"` - Creates a ReadableStreamBYOBReader and locks the stream to the new reader."]
     #[doc = ""]
     #[doc = " This call behaves the same way as the no-argument variant, except that it only works on readable byte streams, i.e. streams which were constructed specifically with the ability to handle \"bring your own buffer\" reading. The returned BYOB reader provides the ability to directly read individual chunks from the stream via its read() method, into developer-supplied buffers, allowing more precise control over allocation."]
     pub fn new_byob() -> ReadableStreamGetReaderOptions {
         Self::builder_byob().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `mode: \"byob\"`: Creates a ReadableStreamBYOBReader and locks the stream to the new reader."]
+    #[doc = " * `mode: \"byob\"` - Creates a ReadableStreamBYOBReader and locks the stream to the new reader."]
     #[doc = ""]
     #[doc = " This call behaves the same way as the no-argument variant, except that it only works on readable byte streams, i.e. streams which were constructed specifically with the ability to handle \"bring your own buffer\" reading. The returned BYOB reader provides the ability to directly read individual chunks from the stream via its read() method, into developer-supplied buffers, allowing more precise control over allocation."]
     pub fn builder_byob() -> ReadableStreamGetReaderOptionsBuilder {
@@ -11382,19 +11382,19 @@ extern "C" {
     pub fn set_writable(this: &ReadableWritablePair, val: &WritableStream);
 }
 impl ReadableWritablePair {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `readable`"]
-    #[doc = " * `writable`: Provides a convenient, chainable way of piping this readable stream through a transform stream (or any other { writable, readable } pair). It simply pipes the stream into the writable side of the supplied pair, and returns the readable side for further use."]
+    #[doc = " * `writable` - Provides a convenient, chainable way of piping this readable stream through a transform stream (or any other { writable, readable } pair). It simply pipes the stream into the writable side of the supplied pair, and returns the readable side for further use."]
     #[doc = ""]
     #[doc = " Piping a stream will lock it for the duration of the pipe, preventing any other consumer from acquiring a reader."]
     pub fn new(readable: &ReadableStream, writable: &WritableStream) -> ReadableWritablePair {
         Self::builder(readable, writable).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `readable`"]
-    #[doc = " * `writable`: Provides a convenient, chainable way of piping this readable stream through a transform stream (or any other { writable, readable } pair). It simply pipes the stream into the writable side of the supplied pair, and returns the readable side for further use."]
+    #[doc = " * `writable` - Provides a convenient, chainable way of piping this readable stream through a transform stream (or any other { writable, readable } pair). It simply pipes the stream into the writable side of the supplied pair, and returns the readable side for further use."]
     #[doc = ""]
     #[doc = " Piping a stream will lock it for the duration of the pipe, preventing any other consumer from acquiring a reader."]
     pub fn builder(
@@ -11801,17 +11801,17 @@ extern "C" {
     pub fn set_high_water_mark(this: &QueuingStrategyInit, val: f64);
 }
 impl QueuingStrategyInit {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `high_water_mark`: Creates a new ByteLengthQueuingStrategy with the provided high water mark."]
+    #[doc = " * `high_water_mark` - Creates a new ByteLengthQueuingStrategy with the provided high water mark."]
     #[doc = ""]
     #[doc = " Note that the provided high water mark will not be validated ahead of time. Instead, if it is negative, NaN, or not a number, the resulting ByteLengthQueuingStrategy will cause the corresponding stream constructor to throw."]
     pub fn new(high_water_mark: f64) -> QueuingStrategyInit {
         Self::builder(high_water_mark).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `high_water_mark`: Creates a new ByteLengthQueuingStrategy with the provided high water mark."]
+    #[doc = " * `high_water_mark` - Creates a new ByteLengthQueuingStrategy with the provided high water mark."]
     #[doc = ""]
     #[doc = " Note that the provided high water mark will not be validated ahead of time. Instead, if it is negative, NaN, or not a number, the resulting ByteLengthQueuingStrategy will cause the corresponding stream constructor to throw."]
     pub fn builder(high_water_mark: f64) -> QueuingStrategyInitBuilder {
@@ -12920,14 +12920,14 @@ extern "C" {
     pub fn set_groups(this: &URLPatternComponentResult, val: &Object<JsString>);
 }
 impl URLPatternComponentResult {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `input`"]
     #[doc = " * `groups`"]
     pub fn new(input: &str, groups: &Object<JsString>) -> URLPatternComponentResult {
         Self::builder(input, groups).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `input`"]
     #[doc = " * `groups`"]
@@ -12991,7 +12991,7 @@ extern "C" {
     pub fn set_hash(this: &URLPatternResult, val: &URLPatternComponentResult);
 }
 impl URLPatternResult {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `inputs`"]
     #[doc = " * `protocol`"]
@@ -13018,7 +13018,7 @@ impl URLPatternResult {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `inputs`"]
     #[doc = " * `protocol`"]
@@ -13192,7 +13192,7 @@ extern "C" {
     pub fn set_error(this: &WebSocketEventMap, val: &ErrorEvent);
 }
 impl WebSocketEventMap {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `close`"]
     #[doc = " * `message`"]
@@ -13206,7 +13206,7 @@ impl WebSocketEventMap {
     ) -> WebSocketEventMap {
         Self::builder(close, message, open, error).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `close`"]
     #[doc = " * `message`"]
@@ -13544,13 +13544,13 @@ extern "C" {
     pub fn set_high_water_mark_with_big_int(this: &SocketOptions, val: &BigInt);
 }
 impl SocketOptions {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `allow_half_open`"]
     pub fn new(allow_half_open: bool) -> SocketOptions {
         Self::builder(allow_half_open).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `allow_half_open`"]
     pub fn builder(allow_half_open: bool) -> SocketOptionsBuilder {
@@ -13594,14 +13594,14 @@ extern "C" {
     pub fn set_port(this: &SocketAddress, val: f64);
 }
 impl SocketAddress {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `hostname`"]
     #[doc = " * `port`"]
     pub fn new(hostname: &str, port: f64) -> SocketAddress {
         Self::builder(hostname, port).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `hostname`"]
     #[doc = " * `port`"]
@@ -13874,13 +13874,13 @@ extern "C" {
     pub fn set_hard_timeout_with_big_int(this: &ContainerStartupOptions, val: &BigInt);
 }
 impl ContainerStartupOptions {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `enable_internet`"]
     pub fn new(enable_internet: bool) -> ContainerStartupOptions {
         Self::builder(enable_internet).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `enable_internet`"]
     pub fn builder(enable_internet: bool) -> ContainerStartupOptionsBuilder {
@@ -14361,7 +14361,7 @@ extern "C" {
     pub fn set_streaming_tails(this: &WorkerLoaderWorkerCode, val: &Array);
 }
 impl WorkerLoaderWorkerCode {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `compatibility_date`"]
     #[doc = " * `main_module`"]
@@ -14373,7 +14373,7 @@ impl WorkerLoaderWorkerCode {
     ) -> WorkerLoaderWorkerCode {
         Self::builder(compatibility_date, main_module, modules).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `compatibility_date`"]
     #[doc = " * `main_module`"]
@@ -14481,13 +14481,13 @@ extern "C" {
     pub fn set_ai_search_options(this: &AiSearchSearchRequest, val: &Object);
 }
 impl AiSearchSearchRequest {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `messages`"]
     pub fn new(messages: &Array<Object>) -> AiSearchSearchRequest {
         Self::builder(messages).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `messages`"]
     pub fn builder(messages: &Array<Object>) -> AiSearchSearchRequestBuilder {
@@ -14531,13 +14531,13 @@ extern "C" {
     pub fn set_ai_search_options(this: &AiSearchChatCompletionsRequest, val: &Object);
 }
 impl AiSearchChatCompletionsRequest {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `messages`"]
     pub fn new(messages: &Array<Object>) -> AiSearchChatCompletionsRequest {
         Self::builder(messages).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `messages`"]
     pub fn builder(messages: &Array<Object>) -> AiSearchChatCompletionsRequestBuilder {
@@ -14581,14 +14581,14 @@ extern "C" {
     pub fn set_chunks(this: &AiSearchSearchResponse, val: &Array<Object>);
 }
 impl AiSearchSearchResponse {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `search_query`"]
     #[doc = " * `chunks`"]
     pub fn new(search_query: &str, chunks: &Array<Object>) -> AiSearchSearchResponse {
         Self::builder(search_query, chunks).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `search_query`"]
     #[doc = " * `chunks`"]
@@ -14662,35 +14662,35 @@ extern "C" {
     pub fn set_ai_search_model(this: &AiSearchConfig, val: &str);
 }
 impl AiSearchConfig {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"r2\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `id`: Instance ID (1-32 chars, pattern: ^[a-z0-9_]+(?:-[a-z0-9_]+)*$)"]
+    #[doc = " * `id` - Instance ID (1-32 chars, pattern: ^[a-z0-9_]+(?:-[a-z0-9_]+)*$)"]
     #[doc = " * `source`"]
     pub fn new_r_2(id: &str, source: &str) -> AiSearchConfig {
         Self::builder_r_2(id, source).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"web-crawler\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `id`: Instance ID (1-32 chars, pattern: ^[a-z0-9_]+(?:-[a-z0-9_]+)*$)"]
+    #[doc = " * `id` - Instance ID (1-32 chars, pattern: ^[a-z0-9_]+(?:-[a-z0-9_]+)*$)"]
     #[doc = " * `source`"]
     pub fn new_web_crawler(id: &str, source: &str) -> AiSearchConfig {
         Self::builder_web_crawler(id, source).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"r2\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `id`: Instance ID (1-32 chars, pattern: ^[a-z0-9_]+(?:-[a-z0-9_]+)*$)"]
+    #[doc = " * `id` - Instance ID (1-32 chars, pattern: ^[a-z0-9_]+(?:-[a-z0-9_]+)*$)"]
     #[doc = " * `source`"]
     pub fn builder_r_2(id: &str, source: &str) -> AiSearchConfigBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -14699,13 +14699,13 @@ impl AiSearchConfig {
         inner.set_source(source);
         AiSearchConfigBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"web-crawler\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `id`: Instance ID (1-32 chars, pattern: ^[a-z0-9_]+(?:-[a-z0-9_]+)*$)"]
+    #[doc = " * `id` - Instance ID (1-32 chars, pattern: ^[a-z0-9_]+(?:-[a-z0-9_]+)*$)"]
     #[doc = " * `source`"]
     pub fn builder_web_crawler(id: &str, source: &str) -> AiSearchConfigBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
@@ -14776,13 +14776,13 @@ extern "C" {
     pub fn set_source(this: &AiSearchInstance, val: &str);
 }
 impl AiSearchInstance {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     pub fn new(id: &str) -> AiSearchInstance {
         Self::builder(id).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     pub fn builder(id: &str) -> AiSearchInstanceBuilder {
@@ -14915,13 +14915,13 @@ extern "C" {
     pub fn set_image(this: &AiImageClassificationInput, val: &Array<Number>);
 }
 impl AiImageClassificationInput {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `image`"]
     pub fn new(image: &Array<Number>) -> AiImageClassificationInput {
         Self::builder(image).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `image`"]
     pub fn builder(image: &Array<Number>) -> AiImageClassificationInputBuilder {
@@ -15009,13 +15009,13 @@ extern "C" {
     pub fn set_messages(this: &AiImageToTextInput, val: &Array<RoleScopedChatInput>);
 }
 impl AiImageToTextInput {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `image`"]
     pub fn new(image: &Array<Number>) -> AiImageToTextInput {
         Self::builder(image).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `image`"]
     pub fn builder(image: &Array<Number>) -> AiImageToTextInputBuilder {
@@ -15087,13 +15087,13 @@ extern "C" {
     pub fn set_description(this: &AiImageToTextOutput, val: &str);
 }
 impl AiImageToTextOutput {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `description`"]
     pub fn new(description: &str) -> AiImageToTextOutput {
         Self::builder(description).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `description`"]
     pub fn builder(description: &str) -> AiImageToTextOutputBuilder {
@@ -15183,13 +15183,13 @@ extern "C" {
     pub fn set_messages(this: &AiImageTextToTextInput, val: &Array<RoleScopedChatInput>);
 }
 impl AiImageTextToTextInput {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `image`"]
     pub fn new(image: &str) -> AiImageTextToTextInput {
         Self::builder(image).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `image`"]
     pub fn builder(image: &str) -> AiImageTextToTextInputBuilder {
@@ -15265,13 +15265,13 @@ extern "C" {
     pub fn set_description(this: &AiImageTextToTextOutput, val: &str);
 }
 impl AiImageTextToTextOutput {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `description`"]
     pub fn new(description: &str) -> AiImageTextToTextOutput {
         Self::builder(description).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `description`"]
     pub fn builder(description: &str) -> AiImageTextToTextOutputBuilder {
@@ -15317,14 +15317,14 @@ extern "C" {
     pub fn set_text(this: &AiMultimodalEmbeddingsInput, val: &Array<JsString>);
 }
 impl AiMultimodalEmbeddingsInput {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `image`"]
     #[doc = " * `text`"]
     pub fn new(image: &str, text: &Array<JsString>) -> AiMultimodalEmbeddingsInput {
         Self::builder(image, text).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `image`"]
     #[doc = " * `text`"]
@@ -15358,7 +15358,7 @@ extern "C" {
     pub fn set_shape(this: &AiIMultimodalEmbeddingsOutput, val: &Array<Number>);
 }
 impl AiIMultimodalEmbeddingsOutput {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `data`"]
     #[doc = " * `shape`"]
@@ -15368,7 +15368,7 @@ impl AiIMultimodalEmbeddingsOutput {
     ) -> AiIMultimodalEmbeddingsOutput {
         Self::builder(data, shape).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `data`"]
     #[doc = " * `shape`"]
@@ -15418,13 +15418,13 @@ extern "C" {
     pub fn set_image(this: &AiObjectDetectionInput, val: &Array<Number>);
 }
 impl AiObjectDetectionInput {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `image`"]
     pub fn new(image: &Array<Number>) -> AiObjectDetectionInput {
         Self::builder(image).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `image`"]
     pub fn builder(image: &Array<Number>) -> AiObjectDetectionInputBuilder {
@@ -15472,14 +15472,14 @@ extern "C" {
     pub fn set_sentences(this: &AiSentenceSimilarityInput, val: &Array<JsString>);
 }
 impl AiSentenceSimilarityInput {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `source`"]
     #[doc = " * `sentences`"]
     pub fn new(source: &str, sentences: &Array<JsString>) -> AiSentenceSimilarityInput {
         Self::builder(source, sentences).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `source`"]
     #[doc = " * `sentences`"]
@@ -15525,13 +15525,13 @@ extern "C" {
     pub fn set_audio(this: &AiAutomaticSpeechRecognitionInput, val: &Array<Number>);
 }
 impl AiAutomaticSpeechRecognitionInput {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `audio`"]
     pub fn new(audio: &Array<Number>) -> AiAutomaticSpeechRecognitionInput {
         Self::builder(audio).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `audio`"]
     pub fn builder(audio: &Array<Number>) -> AiAutomaticSpeechRecognitionInputBuilder {
@@ -15633,13 +15633,13 @@ extern "C" {
     pub fn set_max_length(this: &AiSummarizationInput, val: f64);
 }
 impl AiSummarizationInput {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `input_text`"]
     pub fn new(input_text: &str) -> AiSummarizationInput {
         Self::builder(input_text).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `input_text`"]
     pub fn builder(input_text: &str) -> AiSummarizationInputBuilder {
@@ -15671,13 +15671,13 @@ extern "C" {
     pub fn set_summary(this: &AiSummarizationOutput, val: &str);
 }
 impl AiSummarizationOutput {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `summary`"]
     pub fn new(summary: &str) -> AiSummarizationOutput {
         Self::builder(summary).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `summary`"]
     pub fn builder(summary: &str) -> AiSummarizationOutputBuilder {
@@ -15719,13 +15719,13 @@ extern "C" {
     pub fn set_text(this: &AiTextClassificationInput, val: &str);
 }
 impl AiTextClassificationInput {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn new(text: &str) -> AiTextClassificationInput {
         Self::builder(text).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder(text: &str) -> AiTextClassificationInputBuilder {
@@ -15771,19 +15771,19 @@ extern "C" {
     pub fn set_text_with_array(this: &AiTextEmbeddingsInput, val: &Array<JsString>);
 }
 impl AiTextEmbeddingsInput {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn new(text: &str) -> AiTextEmbeddingsInput {
         Self::builder(text).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn new_with_array(text: &Array<JsString>) -> AiTextEmbeddingsInput {
         Self::builder_with_array(text).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder(text: &str) -> AiTextEmbeddingsInputBuilder {
@@ -15791,7 +15791,7 @@ impl AiTextEmbeddingsInput {
         inner.set_text(text);
         AiTextEmbeddingsInputBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder_with_array(text: &Array<JsString>) -> AiTextEmbeddingsInputBuilder {
@@ -15823,14 +15823,14 @@ extern "C" {
     pub fn set_data(this: &AiTextEmbeddingsOutput, val: &Array<Array<Number>>);
 }
 impl AiTextEmbeddingsOutput {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `shape`"]
     #[doc = " * `data`"]
     pub fn new(shape: &Array<Number>, data: &Array<Array<Number>>) -> AiTextEmbeddingsOutput {
         Self::builder(shape, data).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `shape`"]
     #[doc = " * `data`"]
@@ -15893,58 +15893,58 @@ extern "C" {
     pub fn set_name(this: &RoleScopedChatInput, val: &str);
 }
 impl RoleScopedChatInput {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_user(content: &str) -> RoleScopedChatInput {
         Self::builder_user(content).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_assistant(content: &str) -> RoleScopedChatInput {
         Self::builder_assistant(content).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_system(content: &str) -> RoleScopedChatInput {
         Self::builder_system(content).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"tool\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_tool(content: &str) -> RoleScopedChatInput {
         Self::builder_tool(content).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `role`"]
     #[doc = " * `content`"]
     pub fn new(role: &JsValue, content: &str) -> RoleScopedChatInput {
         Self::builder(role, content).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_user(content: &str) -> RoleScopedChatInputBuilder {
@@ -15953,11 +15953,11 @@ impl RoleScopedChatInput {
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_assistant(content: &str) -> RoleScopedChatInputBuilder {
@@ -15966,11 +15966,11 @@ impl RoleScopedChatInput {
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_system(content: &str) -> RoleScopedChatInputBuilder {
@@ -15979,11 +15979,11 @@ impl RoleScopedChatInput {
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"tool\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_tool(content: &str) -> RoleScopedChatInputBuilder {
@@ -15992,7 +15992,7 @@ impl RoleScopedChatInput {
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `role`"]
     #[doc = " * `content`"]
@@ -16034,14 +16034,14 @@ extern "C" {
     pub fn set_parameters(this: &AiTextGenerationToolLegacyInput, val: &Object);
 }
 impl AiTextGenerationToolLegacyInput {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `description`"]
     pub fn new(name: &str, description: &str) -> AiTextGenerationToolLegacyInput {
         Self::builder(name, description).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `description`"]
@@ -16081,28 +16081,28 @@ extern "C" {
     pub fn set_function(this: &AiTextGenerationToolInput, val: &Object);
 }
 impl AiTextGenerationToolInput {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `function`"]
     pub fn new_function(function: &Object) -> AiTextGenerationToolInput {
         Self::builder_function(function).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `type`"]
     #[doc = " * `function`"]
     pub fn new(r#type: &JsValue, function: &Object) -> AiTextGenerationToolInput {
         Self::builder(r#type, function).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `function`"]
     pub fn builder_function(function: &Object) -> AiTextGenerationToolInputBuilder {
@@ -16111,7 +16111,7 @@ impl AiTextGenerationToolInput {
         inner.set_function(function);
         AiTextGenerationToolInputBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `type`"]
     #[doc = " * `function`"]
@@ -16145,14 +16145,14 @@ extern "C" {
     pub fn set_code(this: &AiTextGenerationFunctionsInput, val: &str);
 }
 impl AiTextGenerationFunctionsInput {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `code`"]
     pub fn new(name: &str, code: &str) -> AiTextGenerationFunctionsInput {
         Self::builder(name, code).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `code`"]
@@ -16186,13 +16186,13 @@ extern "C" {
     pub fn set_json_schema(this: &AiTextGenerationResponseFormat, val: &JsValue);
 }
 impl AiTextGenerationResponseFormat {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `type`"]
     pub fn new(r#type: &str) -> AiTextGenerationResponseFormat {
         Self::builder(r#type).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `type`"]
     pub fn builder(r#type: &str) -> AiTextGenerationResponseFormatBuilder {
@@ -16388,14 +16388,14 @@ extern "C" {
     pub fn set_arguments(this: &AiTextGenerationToolLegacyOutput, val: &JsValue);
 }
 impl AiTextGenerationToolLegacyOutput {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `arguments`"]
     pub fn new(name: &str, arguments: &JsValue) -> AiTextGenerationToolLegacyOutput {
         Self::builder(name, arguments).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `arguments`"]
@@ -16433,22 +16433,22 @@ extern "C" {
     pub fn set_function(this: &AiTextGenerationToolOutput, val: &Object);
 }
 impl AiTextGenerationToolOutput {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `function`"]
     pub fn new_function(id: &str, function: &Object) -> AiTextGenerationToolOutput {
         Self::builder_function(id, function).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `function`"]
@@ -16487,7 +16487,7 @@ extern "C" {
     pub fn set_total_tokens(this: &UsageTags, val: f64);
 }
 impl UsageTags {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `prompt_tokens`"]
     #[doc = " * `completion_tokens`"]
@@ -16495,7 +16495,7 @@ impl UsageTags {
     pub fn new(prompt_tokens: f64, completion_tokens: f64, total_tokens: f64) -> UsageTags {
         Self::builder(prompt_tokens, completion_tokens, total_tokens).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `prompt_tokens`"]
     #[doc = " * `completion_tokens`"]
@@ -16597,13 +16597,13 @@ extern "C" {
     pub fn set_lang(this: &AiTextToSpeechInput, val: &str);
 }
 impl AiTextToSpeechInput {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `prompt`"]
     pub fn new(prompt: &str) -> AiTextToSpeechInput {
         Self::builder(prompt).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `prompt`"]
     pub fn builder(prompt: &str) -> AiTextToSpeechInputBuilder {
@@ -16693,13 +16693,13 @@ extern "C" {
     pub fn set_seed(this: &AiTextToImageInput, val: f64);
 }
 impl AiTextToImageInput {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `prompt`"]
     pub fn new(prompt: &str) -> AiTextToImageInput {
         Self::builder(prompt).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `prompt`"]
     pub fn builder(prompt: &str) -> AiTextToImageInputBuilder {
@@ -16791,14 +16791,14 @@ extern "C" {
     pub fn set_source_lang(this: &AiTranslationInput, val: &str);
 }
 impl AiTranslationInput {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     #[doc = " * `target_lang`"]
     pub fn new(text: &str, target_lang: &str) -> AiTranslationInput {
         Self::builder(text, target_lang).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     #[doc = " * `target_lang`"]
@@ -17634,61 +17634,61 @@ extern "C" {
     pub fn set_type(this: &EasyInputMessage, val: &str);
 }
 impl EasyInputMessage {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_user(content: &str) -> EasyInputMessage {
         Self::builder_user(content).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_assistant(content: &str) -> EasyInputMessage {
         Self::builder_assistant(content).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_system(content: &str) -> EasyInputMessage {
         Self::builder_system(content).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_developer(content: &str) -> EasyInputMessage {
         Self::builder_developer(content).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_user_with_response_input_message_content_list(content: &Array) -> EasyInputMessage {
         Self::builder_user_with_response_input_message_content_list(content).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_assistant_with_response_input_message_content_list(
@@ -17696,11 +17696,11 @@ impl EasyInputMessage {
     ) -> EasyInputMessage {
         Self::builder_assistant_with_response_input_message_content_list(content).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_system_with_response_input_message_content_list(
@@ -17708,11 +17708,11 @@ impl EasyInputMessage {
     ) -> EasyInputMessage {
         Self::builder_system_with_response_input_message_content_list(content).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_developer_with_response_input_message_content_list(
@@ -17720,11 +17720,11 @@ impl EasyInputMessage {
     ) -> EasyInputMessage {
         Self::builder_developer_with_response_input_message_content_list(content).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_user(content: &str) -> EasyInputMessageBuilder {
@@ -17733,11 +17733,11 @@ impl EasyInputMessage {
         inner.set_role("user");
         EasyInputMessageBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_assistant(content: &str) -> EasyInputMessageBuilder {
@@ -17746,11 +17746,11 @@ impl EasyInputMessage {
         inner.set_role_with_js_value("assistant");
         EasyInputMessageBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_system(content: &str) -> EasyInputMessageBuilder {
@@ -17759,11 +17759,11 @@ impl EasyInputMessage {
         inner.set_role_with_js_value_1("system");
         EasyInputMessageBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_developer(content: &str) -> EasyInputMessageBuilder {
@@ -17772,11 +17772,11 @@ impl EasyInputMessage {
         inner.set_role_with_js_value_2("developer");
         EasyInputMessageBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_user_with_response_input_message_content_list(
@@ -17787,11 +17787,11 @@ impl EasyInputMessage {
         inner.set_role("user");
         EasyInputMessageBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_assistant_with_response_input_message_content_list(
@@ -17802,11 +17802,11 @@ impl EasyInputMessage {
         inner.set_role_with_js_value("assistant");
         EasyInputMessageBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_system_with_response_input_message_content_list(
@@ -17817,11 +17817,11 @@ impl EasyInputMessage {
         inner.set_role_with_js_value_1("system");
         EasyInputMessageBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_developer_with_response_input_message_content_list(
@@ -17878,11 +17878,11 @@ extern "C" {
     pub fn set_description_with_null(this: &ResponsesFunctionTool, val: &Null);
 }
 impl ResponsesFunctionTool {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `parameters`"]
@@ -17894,11 +17894,11 @@ impl ResponsesFunctionTool {
     ) -> ResponsesFunctionTool {
         Self::builder_function(name, parameters, strict).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `parameters`"]
@@ -17993,13 +17993,13 @@ extern "C" {
     pub fn set_version_with_null(this: &ResponsePrompt, val: &Null);
 }
 impl ResponsePrompt {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     pub fn new(id: &str) -> ResponsePrompt {
         Self::builder(id).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     pub fn builder(id: &str) -> ResponsePromptBuilder {
@@ -18157,21 +18157,21 @@ extern "C" {
     pub fn set_type(this: &ResponseContentReasoningText, val: &str);
 }
 impl ResponseContentReasoningText {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"reasoning_text\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn new_reasoning_text(text: &str) -> ResponseContentReasoningText {
         Self::builder_reasoning_text(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"reasoning_text\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder_reasoning_text(text: &str) -> ResponseContentReasoningTextBuilder {
@@ -18200,13 +18200,13 @@ extern "C" {
     pub fn set_id(this: &ResponseConversationParam, val: &str);
 }
 impl ResponseConversationParam {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     pub fn new(id: &str) -> ResponseConversationParam {
         Self::builder(id).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     pub fn builder(id: &str) -> ResponseConversationParamBuilder {
@@ -18242,22 +18242,22 @@ extern "C" {
     pub fn set_type(this: &ResponseCreatedEvent, val: &str);
 }
 impl ResponseCreatedEvent {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.created\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `response`"]
     #[doc = " * `sequence_number`"]
     pub fn new_responsecreated(response: &Response, sequence_number: f64) -> ResponseCreatedEvent {
         Self::builder_responsecreated(response, sequence_number).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.created\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `response`"]
     #[doc = " * `sequence_number`"]
@@ -18313,11 +18313,11 @@ extern "C" {
     pub fn set_id(this: &ResponseCustomToolCallOutput, val: &str);
 }
 impl ResponseCustomToolCallOutput {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `call_id`"]
     #[doc = " * `output`"]
@@ -18327,11 +18327,11 @@ impl ResponseCustomToolCallOutput {
     ) -> ResponseCustomToolCallOutput {
         Self::builder_custom_tool_call_output(call_id, output).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `call_id`"]
     #[doc = " * `output`"]
@@ -18341,11 +18341,11 @@ impl ResponseCustomToolCallOutput {
     ) -> ResponseCustomToolCallOutput {
         Self::builder_custom_tool_call_output_with_array(call_id, output).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `call_id`"]
     #[doc = " * `output`"]
@@ -18359,11 +18359,11 @@ impl ResponseCustomToolCallOutput {
         inner.set_type("custom_tool_call_output");
         ResponseCustomToolCallOutputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `call_id`"]
     #[doc = " * `output`"]
@@ -18439,191 +18439,191 @@ extern "C" {
     pub fn set_message(this: &ResponseError, val: &str);
 }
 impl ResponseError {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"server_error\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_server_error(message: &str) -> ResponseError {
         Self::builder_server_error(message).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"rate_limit_exceeded\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_rate_limit_exceeded(message: &str) -> ResponseError {
         Self::builder_rate_limit_exceeded(message).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"invalid_prompt\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_invalid_prompt(message: &str) -> ResponseError {
         Self::builder_invalid_prompt(message).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"vector_store_timeout\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_vector_store_timeout(message: &str) -> ResponseError {
         Self::builder_vector_store_timeout(message).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"invalid_image\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_invalid_image(message: &str) -> ResponseError {
         Self::builder_invalid_image(message).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"invalid_image_format\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_invalid_image_format(message: &str) -> ResponseError {
         Self::builder_invalid_image_format(message).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"invalid_base64_image\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_invalid_base_64_image(message: &str) -> ResponseError {
         Self::builder_invalid_base_64_image(message).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"invalid_image_url\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_invalid_image_url(message: &str) -> ResponseError {
         Self::builder_invalid_image_url(message).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"image_too_large\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_image_too_large(message: &str) -> ResponseError {
         Self::builder_image_too_large(message).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"image_too_small\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_image_too_small(message: &str) -> ResponseError {
         Self::builder_image_too_small(message).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"image_parse_error\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_image_parse_error(message: &str) -> ResponseError {
         Self::builder_image_parse_error(message).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"image_content_policy_violation\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_image_content_policy_violation(message: &str) -> ResponseError {
         Self::builder_image_content_policy_violation(message).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"invalid_image_mode\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_invalid_image_mode(message: &str) -> ResponseError {
         Self::builder_invalid_image_mode(message).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"image_file_too_large\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_image_file_too_large(message: &str) -> ResponseError {
         Self::builder_image_file_too_large(message).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"unsupported_image_media_type\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_unsupported_image_media_type(message: &str) -> ResponseError {
         Self::builder_unsupported_image_media_type(message).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"empty_image_file\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_empty_image_file(message: &str) -> ResponseError {
         Self::builder_empty_image_file(message).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"failed_to_download_image\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_failed_to_download_image(message: &str) -> ResponseError {
         Self::builder_failed_to_download_image(message).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"image_file_not_found\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn new_image_file_not_found(message: &str) -> ResponseError {
         Self::builder_image_file_not_found(message).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"server_error\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_server_error(message: &str) -> ResponseErrorBuilder {
@@ -18632,11 +18632,11 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"rate_limit_exceeded\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_rate_limit_exceeded(message: &str) -> ResponseErrorBuilder {
@@ -18645,11 +18645,11 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"invalid_prompt\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_invalid_prompt(message: &str) -> ResponseErrorBuilder {
@@ -18658,11 +18658,11 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"vector_store_timeout\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_vector_store_timeout(message: &str) -> ResponseErrorBuilder {
@@ -18671,11 +18671,11 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"invalid_image\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_invalid_image(message: &str) -> ResponseErrorBuilder {
@@ -18684,11 +18684,11 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"invalid_image_format\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_invalid_image_format(message: &str) -> ResponseErrorBuilder {
@@ -18697,11 +18697,11 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"invalid_base64_image\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_invalid_base_64_image(message: &str) -> ResponseErrorBuilder {
@@ -18710,11 +18710,11 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"invalid_image_url\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_invalid_image_url(message: &str) -> ResponseErrorBuilder {
@@ -18723,11 +18723,11 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"image_too_large\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_image_too_large(message: &str) -> ResponseErrorBuilder {
@@ -18736,11 +18736,11 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"image_too_small\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_image_too_small(message: &str) -> ResponseErrorBuilder {
@@ -18749,11 +18749,11 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"image_parse_error\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_image_parse_error(message: &str) -> ResponseErrorBuilder {
@@ -18762,11 +18762,11 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"image_content_policy_violation\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_image_content_policy_violation(message: &str) -> ResponseErrorBuilder {
@@ -18775,11 +18775,11 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"invalid_image_mode\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_invalid_image_mode(message: &str) -> ResponseErrorBuilder {
@@ -18788,11 +18788,11 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"image_file_too_large\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_image_file_too_large(message: &str) -> ResponseErrorBuilder {
@@ -18801,11 +18801,11 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"unsupported_image_media_type\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_unsupported_image_media_type(message: &str) -> ResponseErrorBuilder {
@@ -18814,11 +18814,11 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"empty_image_file\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_empty_image_file(message: &str) -> ResponseErrorBuilder {
@@ -18827,11 +18827,11 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"failed_to_download_image\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_failed_to_download_image(message: &str) -> ResponseErrorBuilder {
@@ -18840,11 +18840,11 @@ impl ResponseError {
         inner.set_message(message);
         ResponseErrorBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `code: \"image_file_not_found\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder_image_file_not_found(message: &str) -> ResponseErrorBuilder {
@@ -18893,11 +18893,11 @@ extern "C" {
     pub fn set_type(this: &ResponseErrorEvent, val: &str);
 }
 impl ResponseErrorEvent {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"error\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `code`"]
     #[doc = " * `message`"]
@@ -18911,11 +18911,11 @@ impl ResponseErrorEvent {
     ) -> ResponseErrorEvent {
         Self::builder_error(code, message, param, sequence_number).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"error\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `code`"]
     #[doc = " * `message`"]
@@ -18963,22 +18963,22 @@ extern "C" {
     pub fn set_type(this: &ResponseFailedEvent, val: &str);
 }
 impl ResponseFailedEvent {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.failed\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `response`"]
     #[doc = " * `sequence_number`"]
     pub fn new_responsefailed(response: &Response, sequence_number: f64) -> ResponseFailedEvent {
         Self::builder_responsefailed(response, sequence_number).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.failed\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `response`"]
     #[doc = " * `sequence_number`"]
@@ -19012,13 +19012,13 @@ extern "C" {
     pub fn set_type(this: &ResponseFormatText, val: &str);
 }
 impl ResponseFormatText {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"text\"`"]
     pub fn new_text() -> ResponseFormatText {
         Self::builder_text().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"text\"`"]
     pub fn builder_text() -> ResponseFormatTextBuilder {
@@ -19046,13 +19046,13 @@ extern "C" {
     pub fn set_type(this: &ResponseFormatJSONObject, val: &str);
 }
 impl ResponseFormatJSONObject {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"json_object\"`"]
     pub fn new_json_object() -> ResponseFormatJSONObject {
         Self::builder_json_object().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"json_object\"`"]
     pub fn builder_json_object() -> ResponseFormatJSONObjectBuilder {
@@ -19100,22 +19100,22 @@ extern "C" {
     pub fn set_strict_with_null(this: &ResponseFormatTextJSONSchemaConfig, val: &Null);
 }
 impl ResponseFormatTextJSONSchemaConfig {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"json_schema\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `schema`"]
     pub fn new_json_schema(name: &str, schema: &Object) -> ResponseFormatTextJSONSchemaConfig {
         Self::builder_json_schema(name, schema).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"json_schema\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `schema`"]
@@ -19177,11 +19177,11 @@ extern "C" {
     pub fn set_type(this: &ResponseFunctionCallArgumentsDeltaEvent, val: &str);
 }
 impl ResponseFunctionCallArgumentsDeltaEvent {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.function_call_arguments.delta\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `delta`"]
     #[doc = " * `item_id`"]
@@ -19201,11 +19201,11 @@ impl ResponseFunctionCallArgumentsDeltaEvent {
         )
         .build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.function_call_arguments.delta\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `delta`"]
     #[doc = " * `item_id`"]
@@ -19265,11 +19265,11 @@ extern "C" {
     pub fn set_type(this: &ResponseFunctionCallArgumentsDoneEvent, val: &str);
 }
 impl ResponseFunctionCallArgumentsDoneEvent {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.function_call_arguments.done\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `arguments`"]
     #[doc = " * `item_id`"]
@@ -19292,11 +19292,11 @@ impl ResponseFunctionCallArgumentsDoneEvent {
         )
         .build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.function_call_arguments.done\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `arguments`"]
     #[doc = " * `item_id`"]
@@ -19367,11 +19367,11 @@ extern "C" {
     pub fn set_status_with_js_value_1(this: &ResponseFunctionToolCall, val: &str);
 }
 impl ResponseFunctionToolCall {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `arguments`"]
     #[doc = " * `call_id`"]
@@ -19383,11 +19383,11 @@ impl ResponseFunctionToolCall {
     ) -> ResponseFunctionToolCall {
         Self::builder_function_call(arguments, call_id, name).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `arguments`"]
     #[doc = " * `call_id`"]
@@ -19440,13 +19440,13 @@ extern "C" {
     pub fn set_id(this: &ResponseFunctionToolCallItem, val: &str);
 }
 impl ResponseFunctionToolCallItem {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     pub fn new(id: &str) -> ResponseFunctionToolCallItem {
         Self::builder(id).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     pub fn builder(id: &str) -> ResponseFunctionToolCallItemBuilder {
@@ -19504,11 +19504,11 @@ extern "C" {
     pub fn set_status_with_js_value_1(this: &ResponseFunctionToolCallOutputItem, val: &str);
 }
 impl ResponseFunctionToolCallOutputItem {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `call_id`"]
@@ -19520,11 +19520,11 @@ impl ResponseFunctionToolCallOutputItem {
     ) -> ResponseFunctionToolCallOutputItem {
         Self::builder_function_call_output(id, call_id, output).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `call_id`"]
@@ -19536,11 +19536,11 @@ impl ResponseFunctionToolCallOutputItem {
     ) -> ResponseFunctionToolCallOutputItem {
         Self::builder_function_call_output_with_array(id, call_id, output).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `call_id`"]
@@ -19557,11 +19557,11 @@ impl ResponseFunctionToolCallOutputItem {
         inner.set_type("function_call_output");
         ResponseFunctionToolCallOutputItemBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `call_id`"]
@@ -19626,11 +19626,11 @@ extern "C" {
     pub fn set_type(this: &ResponseIncompleteEvent, val: &str);
 }
 impl ResponseIncompleteEvent {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.incomplete\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `response`"]
     #[doc = " * `sequence_number`"]
@@ -19640,11 +19640,11 @@ impl ResponseIncompleteEvent {
     ) -> ResponseIncompleteEvent {
         Self::builder_responseincomplete(response, sequence_number).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.incomplete\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `response`"]
     #[doc = " * `sequence_number`"]
@@ -19697,28 +19697,28 @@ extern "C" {
     pub fn set_image_url_with_null(this: &ResponseInputImage, val: &Null);
 }
 impl ResponseInputImage {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `detail: \"low\"`"]
     #[doc = " * `type: \"input_image\"`"]
     pub fn new_low_input_image() -> ResponseInputImage {
         Self::builder_low_input_image().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `detail: \"high\"`"]
     #[doc = " * `type: \"input_image\"`"]
     pub fn new_high_input_image() -> ResponseInputImage {
         Self::builder_high_input_image().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `detail: \"auto\"`"]
     #[doc = " * `type: \"input_image\"`"]
     pub fn new_auto_input_image() -> ResponseInputImage {
         Self::builder_auto_input_image().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `detail: \"low\"`"]
     #[doc = " * `type: \"input_image\"`"]
@@ -19728,7 +19728,7 @@ impl ResponseInputImage {
         inner.set_type("input_image");
         ResponseInputImageBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `detail: \"high\"`"]
     #[doc = " * `type: \"input_image\"`"]
@@ -19738,7 +19738,7 @@ impl ResponseInputImage {
         inner.set_type("input_image");
         ResponseInputImageBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `detail: \"auto\"`"]
     #[doc = " * `type: \"input_image\"`"]
@@ -19793,13 +19793,13 @@ extern "C" {
     pub fn set_image_url_with_null(this: &ResponseInputImageContent, val: &Null);
 }
 impl ResponseInputImageContent {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"input_image\"`"]
     pub fn new_input_image() -> ResponseInputImageContent {
         Self::builder_input_image().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"input_image\"`"]
     pub fn builder_input_image() -> ResponseInputImageContentBuilder {
@@ -19887,11 +19887,11 @@ extern "C" {
     pub fn set_status_with_null(this: &ResponseInputItemFunctionCallOutput, val: &Null);
 }
 impl ResponseInputItemFunctionCallOutput {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `call_id`"]
     #[doc = " * `output`"]
@@ -19901,11 +19901,11 @@ impl ResponseInputItemFunctionCallOutput {
     ) -> ResponseInputItemFunctionCallOutput {
         Self::builder_function_call_output(call_id, output).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `call_id`"]
     #[doc = " * `output`"]
@@ -19918,11 +19918,11 @@ impl ResponseInputItemFunctionCallOutput {
         )
         .build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `call_id`"]
     #[doc = " * `output`"]
@@ -19936,11 +19936,11 @@ impl ResponseInputItemFunctionCallOutput {
         inner.set_type("function_call_output");
         ResponseInputItemFunctionCallOutputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `call_id`"]
     #[doc = " * `output`"]
@@ -20020,41 +20020,41 @@ extern "C" {
     pub fn set_type(this: &ResponseInputItemMessage, val: &str);
 }
 impl ResponseInputItemMessage {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_user(content: &Array) -> ResponseInputItemMessage {
         Self::builder_user(content).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_system(content: &Array) -> ResponseInputItemMessage {
         Self::builder_system(content).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn new_developer(content: &Array) -> ResponseInputItemMessage {
         Self::builder_developer(content).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_user(content: &Array) -> ResponseInputItemMessageBuilder {
@@ -20063,11 +20063,11 @@ impl ResponseInputItemMessage {
         inner.set_role("user");
         ResponseInputItemMessageBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_system(content: &Array) -> ResponseInputItemMessageBuilder {
@@ -20076,11 +20076,11 @@ impl ResponseInputItemMessage {
         inner.set_role_with_js_value("system");
         ResponseInputItemMessageBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     pub fn builder_developer(content: &Array) -> ResponseInputItemMessageBuilder {
@@ -20153,44 +20153,44 @@ extern "C" {
     pub fn set_type(this: &ResponseInputMessageItem, val: &str);
 }
 impl ResponseInputMessageItem {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
     pub fn new_user(id: &str, content: &Array) -> ResponseInputMessageItem {
         Self::builder_user(id, content).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
     pub fn new_system(id: &str, content: &Array) -> ResponseInputMessageItem {
         Self::builder_system(id, content).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
     pub fn new_developer(id: &str, content: &Array) -> ResponseInputMessageItem {
         Self::builder_developer(id, content).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
@@ -20201,11 +20201,11 @@ impl ResponseInputMessageItem {
         inner.set_role("user");
         ResponseInputMessageItemBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
@@ -20216,11 +20216,11 @@ impl ResponseInputMessageItem {
         inner.set_role_with_js_value("system");
         ResponseInputMessageItemBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
@@ -20271,21 +20271,21 @@ extern "C" {
     pub fn set_type(this: &ResponseInputText, val: &str);
 }
 impl ResponseInputText {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"input_text\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn new_input_text(text: &str) -> ResponseInputText {
         Self::builder_input_text(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"input_text\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder_input_text(text: &str) -> ResponseInputTextBuilder {
@@ -20318,21 +20318,21 @@ extern "C" {
     pub fn set_type(this: &ResponseInputTextContent, val: &str);
 }
 impl ResponseInputTextContent {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"input_text\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn new_input_text(text: &str) -> ResponseInputTextContent {
         Self::builder_input_text(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"input_text\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder_input_text(text: &str) -> ResponseInputTextContentBuilder {
@@ -20387,11 +20387,11 @@ extern "C" {
     pub fn set_type(this: &ResponseOutputItemAddedEvent, val: &str);
 }
 impl ResponseOutputItemAddedEvent {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.added\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `item`"]
     #[doc = " * `output_index`"]
@@ -20403,11 +20403,11 @@ impl ResponseOutputItemAddedEvent {
     ) -> ResponseOutputItemAddedEvent {
         Self::builder_responseoutput_itemadded(item, output_index, sequence_number).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.added\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `item`"]
     #[doc = " * `output_index`"]
@@ -20466,11 +20466,11 @@ extern "C" {
     pub fn set_type(this: &ResponseOutputItemDoneEvent, val: &str);
 }
 impl ResponseOutputItemDoneEvent {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.done\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `item`"]
     #[doc = " * `output_index`"]
@@ -20482,11 +20482,11 @@ impl ResponseOutputItemDoneEvent {
     ) -> ResponseOutputItemDoneEvent {
         Self::builder_responseoutput_itemdone(item, output_index, sequence_number).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.done\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `item`"]
     #[doc = " * `output_index`"]
@@ -20545,52 +20545,52 @@ extern "C" {
     pub fn set_type(this: &ResponseOutputMessage, val: &str);
 }
 impl ResponseOutputMessage {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"in_progress\"`"]
     #[doc = " * `type: \"message\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
     pub fn new_assistant_in_progress_message(id: &str, content: &Array) -> ResponseOutputMessage {
         Self::builder_assistant_in_progress_message(id, content).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"completed\"`"]
     #[doc = " * `type: \"message\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
     pub fn new_assistant_completed_message(id: &str, content: &Array) -> ResponseOutputMessage {
         Self::builder_assistant_completed_message(id, content).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"incomplete\"`"]
     #[doc = " * `type: \"message\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
     pub fn new_assistant_incomplete_message(id: &str, content: &Array) -> ResponseOutputMessage {
         Self::builder_assistant_incomplete_message(id, content).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"in_progress\"`"]
     #[doc = " * `type: \"message\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
@@ -20606,13 +20606,13 @@ impl ResponseOutputMessage {
         inner.set_type("message");
         ResponseOutputMessageBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"completed\"`"]
     #[doc = " * `type: \"message\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
@@ -20628,13 +20628,13 @@ impl ResponseOutputMessage {
         inner.set_type("message");
         ResponseOutputMessageBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"incomplete\"`"]
     #[doc = " * `type: \"message\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `content`"]
@@ -20674,21 +20674,21 @@ extern "C" {
     pub fn set_type(this: &ResponseOutputRefusal, val: &str);
 }
 impl ResponseOutputRefusal {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"refusal\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `refusal`"]
     pub fn new_refusal(refusal: &str) -> ResponseOutputRefusal {
         Self::builder_refusal(refusal).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"refusal\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `refusal`"]
     pub fn builder_refusal(refusal: &str) -> ResponseOutputRefusalBuilder {
@@ -20725,21 +20725,21 @@ extern "C" {
     pub fn set_logprobs(this: &ResponseOutputText, val: &Array<Logprob>);
 }
 impl ResponseOutputText {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"output_text\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn new_output_text(text: &str) -> ResponseOutputText {
         Self::builder_output_text(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"output_text\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder_output_text(text: &str) -> ResponseOutputTextBuilder {
@@ -20798,11 +20798,11 @@ extern "C" {
     pub fn set_status_with_js_value_1(this: &ResponseReasoningItem, val: &str);
 }
 impl ResponseReasoningItem {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"reasoning\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `summary`"]
@@ -20812,11 +20812,11 @@ impl ResponseReasoningItem {
     ) -> ResponseReasoningItem {
         Self::builder_reasoning(id, summary).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"reasoning\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `summary`"]
@@ -20878,21 +20878,21 @@ extern "C" {
     pub fn set_type(this: &ResponseReasoningSummaryItem, val: &str);
 }
 impl ResponseReasoningSummaryItem {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"summary_text\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn new_summary_text(text: &str) -> ResponseReasoningSummaryItem {
         Self::builder_summary_text(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"summary_text\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder_summary_text(text: &str) -> ResponseReasoningSummaryItemBuilder {
@@ -20925,21 +20925,21 @@ extern "C" {
     pub fn set_type(this: &ResponseReasoningContentItem, val: &str);
 }
 impl ResponseReasoningContentItem {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"reasoning_text\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn new_reasoning_text(text: &str) -> ResponseReasoningContentItem {
         Self::builder_reasoning_text(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"reasoning_text\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder_reasoning_text(text: &str) -> ResponseReasoningContentItemBuilder {
@@ -20988,11 +20988,11 @@ extern "C" {
     pub fn set_type(this: &ResponseReasoningTextDeltaEvent, val: &str);
 }
 impl ResponseReasoningTextDeltaEvent {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.reasoning_text.delta\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `delta`"]
@@ -21015,11 +21015,11 @@ impl ResponseReasoningTextDeltaEvent {
         )
         .build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.reasoning_text.delta\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `delta`"]
@@ -21082,11 +21082,11 @@ extern "C" {
     pub fn set_type(this: &ResponseReasoningTextDoneEvent, val: &str);
 }
 impl ResponseReasoningTextDoneEvent {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.reasoning_text.done\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `item_id`"]
@@ -21109,11 +21109,11 @@ impl ResponseReasoningTextDoneEvent {
         )
         .build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.reasoning_text.done\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `item_id`"]
@@ -21176,11 +21176,11 @@ extern "C" {
     pub fn set_type(this: &ResponseRefusalDeltaEvent, val: &str);
 }
 impl ResponseRefusalDeltaEvent {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.refusal.delta\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `delta`"]
@@ -21203,11 +21203,11 @@ impl ResponseRefusalDeltaEvent {
         )
         .build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.refusal.delta\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `delta`"]
@@ -21270,11 +21270,11 @@ extern "C" {
     pub fn set_type(this: &ResponseRefusalDoneEvent, val: &str);
 }
 impl ResponseRefusalDoneEvent {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.refusal.done\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `item_id`"]
@@ -21297,11 +21297,11 @@ impl ResponseRefusalDoneEvent {
         )
         .build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.refusal.done\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `item_id`"]
@@ -21370,11 +21370,11 @@ extern "C" {
     pub fn set_type(this: &ResponseCompletedEvent, val: &str);
 }
 impl ResponseCompletedEvent {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.completed\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `response`"]
     #[doc = " * `sequence_number`"]
@@ -21384,11 +21384,11 @@ impl ResponseCompletedEvent {
     ) -> ResponseCompletedEvent {
         Self::builder_responsecompleted(response, sequence_number).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.completed\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `response`"]
     #[doc = " * `sequence_number`"]
@@ -21526,11 +21526,11 @@ extern "C" {
     pub fn set_type(this: &ResponseTextDeltaEvent, val: &str);
 }
 impl ResponseTextDeltaEvent {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_text.delta\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `delta`"]
@@ -21556,11 +21556,11 @@ impl ResponseTextDeltaEvent {
         )
         .build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_text.delta\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `delta`"]
@@ -21630,11 +21630,11 @@ extern "C" {
     pub fn set_type(this: &ResponseTextDoneEvent, val: &str);
 }
 impl ResponseTextDoneEvent {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_text.done\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `item_id`"]
@@ -21660,11 +21660,11 @@ impl ResponseTextDoneEvent {
         )
         .build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_text.done\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content_index`"]
     #[doc = " * `item_id`"]
@@ -21718,14 +21718,14 @@ extern "C" {
     pub fn set_top_logprobs(this: &Logprob, val: &Array<TopLogprob>);
 }
 impl Logprob {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `token`"]
     #[doc = " * `logprob`"]
     pub fn new(token: &str, logprob: f64) -> Logprob {
         Self::builder(token, logprob).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `token`"]
     #[doc = " * `logprob`"]
@@ -21807,7 +21807,7 @@ extern "C" {
     pub fn set_total_tokens(this: &ResponseUsage, val: f64);
 }
 impl ResponseUsage {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `input_tokens`"]
     #[doc = " * `output_tokens`"]
@@ -21815,7 +21815,7 @@ impl ResponseUsage {
     pub fn new(input_tokens: f64, output_tokens: f64, total_tokens: f64) -> ResponseUsage {
         Self::builder(input_tokens, output_tokens, total_tokens).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `input_tokens`"]
     #[doc = " * `output_tokens`"]
@@ -21857,21 +21857,21 @@ extern "C" {
     pub fn set_type(this: &ToolChoiceFunction, val: &str);
 }
 impl ToolChoiceFunction {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     pub fn new_function(name: &str) -> ToolChoiceFunction {
         Self::builder_function(name).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     pub fn builder_function(name: &str) -> ToolChoiceFunctionBuilder {
@@ -22074,15 +22074,15 @@ extern "C" {
     pub fn set_vtt(this: &Ai_Cf_Openai_Whisper_Output, val: &str);
 }
 impl Ai_Cf_Openai_Whisper_Output {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: The transcription"]
+    #[doc = " * `text` - The transcription"]
     pub fn new(text: &str) -> Ai_Cf_Openai_Whisper_Output {
         Self::builder(text).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: The transcription"]
+    #[doc = " * `text` - The transcription"]
     pub fn builder(text: &str) -> Ai_Cf_Openai_Whisper_OutputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
@@ -22561,15 +22561,15 @@ extern "C" {
     pub fn set_vtt(this: &Ai_Cf_Openai_Whisper_Tiny_En_Output, val: &str);
 }
 impl Ai_Cf_Openai_Whisper_Tiny_En_Output {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: The transcription"]
+    #[doc = " * `text` - The transcription"]
     pub fn new(text: &str) -> Ai_Cf_Openai_Whisper_Tiny_En_Output {
         Self::builder(text).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: The transcription"]
+    #[doc = " * `text` - The transcription"]
     pub fn builder(text: &str) -> Ai_Cf_Openai_Whisper_Tiny_En_OutputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
@@ -22654,15 +22654,15 @@ extern "C" {
     pub fn set_prefix(this: &Ai_Cf_Openai_Whisper_Large_V3_Turbo_Input, val: &str);
 }
 impl Ai_Cf_Openai_Whisper_Large_V3_Turbo_Input {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `audio`: Base64 encoded value of the audio data."]
+    #[doc = " * `audio` - Base64 encoded value of the audio data."]
     pub fn new(audio: &str) -> Ai_Cf_Openai_Whisper_Large_V3_Turbo_Input {
         Self::builder(audio).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `audio`: Base64 encoded value of the audio data."]
+    #[doc = " * `audio` - Base64 encoded value of the audio data."]
     pub fn builder(audio: &str) -> Ai_Cf_Openai_Whisper_Large_V3_Turbo_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_audio(audio);
@@ -22727,15 +22727,15 @@ extern "C" {
     pub fn set_vtt(this: &Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output, val: &str);
 }
 impl Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: The complete transcription of the audio."]
+    #[doc = " * `text` - The complete transcription of the audio."]
     pub fn new(text: &str) -> Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output {
         Self::builder(text).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: The complete transcription of the audio."]
+    #[doc = " * `text` - The complete transcription of the audio."]
     pub fn builder(text: &str) -> Ai_Cf_Openai_Whisper_Large_V3_Turbo_OutputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
@@ -22814,15 +22814,15 @@ extern "C" {
     pub fn set_truncate_inputs(this: &Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts, val: bool);
 }
 impl Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `contexts`: List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
+    #[doc = " * `contexts` - List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
     pub fn new(contexts: &Array<Object>) -> Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts {
         Self::builder(contexts).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `contexts`: List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
+    #[doc = " * `contexts` - List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
     pub fn builder(contexts: &Array<Object>) -> Ai_Cf_Baai_Bge_M3_Input_QueryAnd_ContextsBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_contexts(contexts);
@@ -22863,19 +22863,19 @@ extern "C" {
     pub fn set_truncate_inputs(this: &Ai_Cf_Baai_Bge_M3_Input_Embedding, val: bool);
 }
 impl Ai_Cf_Baai_Bge_M3_Input_Embedding {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn new(text: &str) -> Ai_Cf_Baai_Bge_M3_Input_Embedding {
         Self::builder(text).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn new_with_array(text: &Array<JsString>) -> Ai_Cf_Baai_Bge_M3_Input_Embedding {
         Self::builder_with_array(text).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder(text: &str) -> Ai_Cf_Baai_Bge_M3_Input_EmbeddingBuilder {
@@ -22883,7 +22883,7 @@ impl Ai_Cf_Baai_Bge_M3_Input_Embedding {
         inner.set_text(text);
         Ai_Cf_Baai_Bge_M3_Input_EmbeddingBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder_with_array(text: &Array<JsString>) -> Ai_Cf_Baai_Bge_M3_Input_EmbeddingBuilder {
@@ -22926,15 +22926,15 @@ extern "C" {
     pub fn set_truncate_inputs(this: &Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1, val: bool);
 }
 impl Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1 {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `contexts`: List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
+    #[doc = " * `contexts` - List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
     pub fn new(contexts: &Array<Object>) -> Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1 {
         Self::builder(contexts).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `contexts`: List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
+    #[doc = " * `contexts` - List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
     pub fn builder(contexts: &Array<Object>) -> Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1Builder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_contexts(contexts);
@@ -22975,19 +22975,19 @@ extern "C" {
     pub fn set_truncate_inputs(this: &Ai_Cf_Baai_Bge_M3_Input_Embedding_1, val: bool);
 }
 impl Ai_Cf_Baai_Bge_M3_Input_Embedding_1 {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn new(text: &str) -> Ai_Cf_Baai_Bge_M3_Input_Embedding_1 {
         Self::builder(text).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn new_with_array(text: &Array<JsString>) -> Ai_Cf_Baai_Bge_M3_Input_Embedding_1 {
         Self::builder_with_array(text).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder(text: &str) -> Ai_Cf_Baai_Bge_M3_Input_Embedding_1Builder {
@@ -22995,7 +22995,7 @@ impl Ai_Cf_Baai_Bge_M3_Input_Embedding_1 {
         inner.set_text(text);
         Ai_Cf_Baai_Bge_M3_Input_Embedding_1Builder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `text`"]
     pub fn builder_with_array(
@@ -23263,15 +23263,15 @@ extern "C" {
     pub fn set_steps(this: &Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input, val: f64);
 }
 impl Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: A text description of the image you want to generate."]
+    #[doc = " * `prompt` - A text description of the image you want to generate."]
     pub fn new(prompt: &str) -> Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input {
         Self::builder(prompt).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: A text description of the image you want to generate."]
+    #[doc = " * `prompt` - A text description of the image you want to generate."]
     pub fn builder(prompt: &str) -> Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
@@ -23428,15 +23428,15 @@ extern "C" {
     pub fn set_lora(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt, val: &str);
 }
 impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt {
         Self::builder(prompt).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_PromptBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
@@ -23598,15 +23598,15 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages, val: f64);
 }
 impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn new(messages: &Array<Object>) -> Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages {
         Self::builder(messages).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn builder(
         messages: &Array<Object>,
     ) -> Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesBuilder {
@@ -23839,15 +23839,15 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt, val: f64);
 }
 impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt {
         Self::builder(prompt).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_PromptBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
@@ -24073,15 +24073,15 @@ extern "C" {
     );
 }
 impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn new(messages: &Array<Object>) -> Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages {
         Self::builder(messages).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn builder(
         messages: &Array<Object>,
     ) -> Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_MessagesBuilder {
@@ -24409,15 +24409,15 @@ extern "C" {
     pub fn set_response_format(this: &Ai_Cf_Meta_Llama_Guard_3_8B_Input, val: &Object);
 }
 impl Ai_Cf_Meta_Llama_Guard_3_8B_Input {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn new(messages: &Array<Object>) -> Ai_Cf_Meta_Llama_Guard_3_8B_Input {
         Self::builder(messages).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn builder(messages: &Array<Object>) -> Ai_Cf_Meta_Llama_Guard_3_8B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
@@ -24530,15 +24530,15 @@ extern "C" {
     pub fn set_contexts(this: &Ai_Cf_Baai_Bge_Reranker_Base_Input, val: &Array<Object>);
 }
 impl Ai_Cf_Baai_Bge_Reranker_Base_Input {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `contexts`: List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
+    #[doc = " * `contexts` - List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
     pub fn new(contexts: &Array<Object>) -> Ai_Cf_Baai_Bge_Reranker_Base_Input {
         Self::builder(contexts).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `contexts`: List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
+    #[doc = " * `contexts` - List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
     pub fn builder(contexts: &Array<Object>) -> Ai_Cf_Baai_Bge_Reranker_Base_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_contexts(contexts);
@@ -24689,15 +24689,15 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Prompt, val: f64);
 }
 impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Prompt {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Prompt {
         Self::builder(prompt).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_PromptBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
@@ -24895,15 +24895,15 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages, val: f64);
 }
 impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn new(messages: &Array<Object>) -> Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages {
         Self::builder(messages).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn builder(
         messages: &Array<Object>,
     ) -> Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_MessagesBuilder {
@@ -25045,15 +25045,15 @@ extern "C" {
     pub fn set_tool_calls(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output, val: &Array<Object>);
 }
 impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `response`: The generated text response from the model"]
+    #[doc = " * `response` - The generated text response from the model"]
     pub fn new(response: &str) -> Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output {
         Self::builder(response).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `response`: The generated text response from the model"]
+    #[doc = " * `response` - The generated text response from the model"]
     pub fn builder(response: &str) -> Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_OutputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
@@ -25172,15 +25172,15 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Qwen_Qwq_32B_Prompt, val: f64);
 }
 impl Ai_Cf_Qwen_Qwq_32B_Prompt {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Qwen_Qwq_32B_Prompt {
         Self::builder(prompt).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Qwen_Qwq_32B_PromptBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
@@ -25315,15 +25315,15 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Qwen_Qwq_32B_Messages, val: f64);
 }
 impl Ai_Cf_Qwen_Qwq_32B_Messages {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn new(messages: &Array<Object>) -> Ai_Cf_Qwen_Qwq_32B_Messages {
         Self::builder(messages).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn builder(messages: &Array<Object>) -> Ai_Cf_Qwen_Qwq_32B_MessagesBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
@@ -25412,15 +25412,15 @@ extern "C" {
     pub fn set_tool_calls(this: &Ai_Cf_Qwen_Qwq_32B_Output, val: &Array<Object>);
 }
 impl Ai_Cf_Qwen_Qwq_32B_Output {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `response`: The generated text response from the model"]
+    #[doc = " * `response` - The generated text response from the model"]
     pub fn new(response: &str) -> Ai_Cf_Qwen_Qwq_32B_Output {
         Self::builder(response).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `response`: The generated text response from the model"]
+    #[doc = " * `response` - The generated text response from the model"]
     pub fn builder(response: &str) -> Ai_Cf_Qwen_Qwq_32B_OutputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
@@ -25555,15 +25555,15 @@ extern "C" {
     );
 }
 impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Prompt {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Prompt {
         Self::builder(prompt).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_PromptBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
@@ -25738,17 +25738,17 @@ extern "C" {
     );
 }
 impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn new(
         messages: &Array<Object>,
     ) -> Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages {
         Self::builder(messages).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn builder(
         messages: &Array<Object>,
     ) -> Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesBuilder {
@@ -25844,15 +25844,15 @@ extern "C" {
     );
 }
 impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `response`: The generated text response from the model"]
+    #[doc = " * `response` - The generated text response from the model"]
     pub fn new(response: &str) -> Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output {
         Self::builder(response).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `response`: The generated text response from the model"]
+    #[doc = " * `response` - The generated text response from the model"]
     pub fn builder(response: &str) -> Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_OutputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
@@ -25971,15 +25971,15 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Google_Gemma_3_12B_It_Prompt, val: f64);
 }
 impl Ai_Cf_Google_Gemma_3_12B_It_Prompt {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Google_Gemma_3_12B_It_Prompt {
         Self::builder(prompt).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Google_Gemma_3_12B_It_PromptBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
@@ -26114,15 +26114,15 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Google_Gemma_3_12B_It_Messages, val: f64);
 }
 impl Ai_Cf_Google_Gemma_3_12B_It_Messages {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn new(messages: &Array<Object>) -> Ai_Cf_Google_Gemma_3_12B_It_Messages {
         Self::builder(messages).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn builder(messages: &Array<Object>) -> Ai_Cf_Google_Gemma_3_12B_It_MessagesBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
@@ -26211,15 +26211,15 @@ extern "C" {
     pub fn set_tool_calls(this: &Ai_Cf_Google_Gemma_3_12B_It_Output, val: &Array<Object>);
 }
 impl Ai_Cf_Google_Gemma_3_12B_It_Output {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `response`: The generated text response from the model"]
+    #[doc = " * `response` - The generated text response from the model"]
     pub fn new(response: &str) -> Ai_Cf_Google_Gemma_3_12B_It_Output {
         Self::builder(response).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `response`: The generated text response from the model"]
+    #[doc = " * `response` - The generated text response from the model"]
     pub fn builder(response: &str) -> Ai_Cf_Google_Gemma_3_12B_It_OutputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
@@ -26355,15 +26355,15 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt, val: f64);
 }
 impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt {
         Self::builder(prompt).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_PromptBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
@@ -26595,15 +26595,15 @@ extern "C" {
     );
 }
 impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn new(messages: &Array<Object>) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages {
         Self::builder(messages).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn builder(
         messages: &Array<Object>,
     ) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesBuilder {
@@ -26698,13 +26698,13 @@ extern "C" {
     );
 }
 impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `requests`"]
     pub fn new(requests: &Array) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch {
         Self::builder(requests).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `requests`"]
     pub fn builder(
@@ -26822,15 +26822,15 @@ extern "C" {
     );
 }
 impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_Inner {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_Inner {
         Self::builder(prompt).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_InnerBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
@@ -27024,17 +27024,17 @@ extern "C" {
     );
 }
 impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn new(
         messages: &Array<Object>,
     ) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner {
         Self::builder(messages).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn builder(
         messages: &Array<Object>,
     ) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerBuilder {
@@ -27137,15 +27137,15 @@ extern "C" {
     );
 }
 impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `response`: The generated text response from the model"]
+    #[doc = " * `response` - The generated text response from the model"]
     pub fn new(response: &str) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output {
         Self::builder(response).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `response`: The generated text response from the model"]
+    #[doc = " * `response` - The generated text response from the model"]
     pub fn builder(response: &str) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
@@ -27278,15 +27278,15 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt, val: f64);
 }
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt {
         Self::builder(prompt).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_PromptBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
@@ -27475,15 +27475,15 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages, val: f64);
 }
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn new(messages: &Array<Object>) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages {
         Self::builder(messages).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn builder(messages: &Array<Object>) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_MessagesBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
@@ -27615,13 +27615,13 @@ extern "C" {
     );
 }
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `requests`"]
     pub fn new(requests: &Array) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch {
         Self::builder(requests).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `requests`"]
     pub fn builder(requests: &Array) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_BatchBuilder {
@@ -27714,15 +27714,15 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1, val: f64);
 }
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1 {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1 {
         Self::builder(prompt).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1Builder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
@@ -27911,15 +27911,15 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1, val: f64);
 }
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1 {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn new(messages: &Array<Object>) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1 {
         Self::builder(messages).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn builder(messages: &Array<Object>) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1Builder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
@@ -28506,13 +28506,13 @@ extern "C" {
     pub fn set_utterance_end_ms(this: &Ai_Cf_Deepgram_Nova_3_Input, val: bool);
 }
 impl Ai_Cf_Deepgram_Nova_3_Input {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `audio`"]
     pub fn new(audio: &Object) -> Ai_Cf_Deepgram_Nova_3_Input {
         Self::builder(audio).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `audio`"]
     pub fn builder(audio: &Object) -> Ai_Cf_Deepgram_Nova_3_InputBuilder {
@@ -28932,29 +28932,29 @@ extern "C" {
     pub fn set_dtype_with_js_value_1(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input, val: &str);
 }
 impl Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `audio`: readable stream with audio data and content-type specified for that data"]
+    #[doc = " * `audio` - readable stream with audio data and content-type specified for that data"]
     pub fn new(audio: &Object) -> Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input {
         Self::builder(audio).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `audio`: readable stream with audio data and content-type specified for that data"]
+    #[doc = " * `audio` - readable stream with audio data and content-type specified for that data"]
     pub fn new_with_str(audio: &str) -> Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input {
         Self::builder_with_str(audio).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `audio`: readable stream with audio data and content-type specified for that data"]
+    #[doc = " * `audio` - readable stream with audio data and content-type specified for that data"]
     pub fn builder(audio: &Object) -> Ai_Cf_Pipecat_Ai_Smart_Turn_V2_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_audio(audio);
         Ai_Cf_Pipecat_Ai_Smart_Turn_V2_InputBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `audio`: readable stream with audio data and content-type specified for that data"]
+    #[doc = " * `audio` - readable stream with audio data and content-type specified for that data"]
     pub fn builder_with_str(audio: &str) -> Ai_Cf_Pipecat_Ai_Smart_Turn_V2_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_audio_with_str(audio);
@@ -29117,15 +29117,15 @@ extern "C" {
     pub fn set_negative_prompt(this: &Ai_Cf_Leonardo_Phoenix_1_0_Input, val: &str);
 }
 impl Ai_Cf_Leonardo_Phoenix_1_0_Input {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: A text description of the image you want to generate."]
+    #[doc = " * `prompt` - A text description of the image you want to generate."]
     pub fn new(prompt: &str) -> Ai_Cf_Leonardo_Phoenix_1_0_Input {
         Self::builder(prompt).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: A text description of the image you want to generate."]
+    #[doc = " * `prompt` - A text description of the image you want to generate."]
     pub fn builder(prompt: &str) -> Ai_Cf_Leonardo_Phoenix_1_0_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
@@ -29225,15 +29225,15 @@ extern "C" {
     pub fn set_steps(this: &Ai_Cf_Leonardo_Lucid_Origin_Input, val: f64);
 }
 impl Ai_Cf_Leonardo_Lucid_Origin_Input {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: A text description of the image you want to generate."]
+    #[doc = " * `prompt` - A text description of the image you want to generate."]
     pub fn new(prompt: &str) -> Ai_Cf_Leonardo_Lucid_Origin_Input {
         Self::builder(prompt).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: A text description of the image you want to generate."]
+    #[doc = " * `prompt` - A text description of the image you want to generate."]
     pub fn builder(prompt: &str) -> Ai_Cf_Leonardo_Lucid_Origin_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
@@ -29402,15 +29402,15 @@ extern "C" {
     pub fn set_bit_rate(this: &Ai_Cf_Deepgram_Aura_1_Input, val: f64);
 }
 impl Ai_Cf_Deepgram_Aura_1_Input {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: The text content to be converted to speech"]
+    #[doc = " * `text` - The text content to be converted to speech"]
     pub fn new(text: &str) -> Ai_Cf_Deepgram_Aura_1_Input {
         Self::builder(text).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: The text content to be converted to speech"]
+    #[doc = " * `text` - The text content to be converted to speech"]
     pub fn builder(text: &str) -> Ai_Cf_Deepgram_Aura_1_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
@@ -29724,1203 +29724,1203 @@ extern "C" {
     );
 }
 impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"asm_Beng\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"asm_Beng\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_asm_beng(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_asm_beng(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"awa_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"awa_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_awa_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_awa_deva(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"ben_Beng\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"ben_Beng\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_ben_beng(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_ben_beng(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"bho_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"bho_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_bho_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_bho_deva(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"brx_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"brx_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_brx_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_brx_deva(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"doi_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"doi_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_doi_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_doi_deva(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"eng_Latn\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"eng_Latn\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_eng_latn(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_eng_latn(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"gom_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"gom_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_gom_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_gom_deva(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"gon_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"gon_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_gon_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_gon_deva(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"guj_Gujr\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"guj_Gujr\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_guj_gujr(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_guj_gujr(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"hin_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"hin_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_hin_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_hin_deva(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"hne_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"hne_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_hne_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_hne_deva(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"kan_Knda\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"kan_Knda\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_kan_knda(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_kan_knda(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"kas_Arab\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"kas_Arab\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_kas_arab(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_kas_arab(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"kas_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"kas_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_kas_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_kas_deva(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"kha_Latn\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"kha_Latn\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_kha_latn(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_kha_latn(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"lus_Latn\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"lus_Latn\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_lus_latn(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_lus_latn(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mag_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mag_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mag_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mag_deva(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mai_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mai_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mai_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mai_deva(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mal_Mlym\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mal_Mlym\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mal_mlym(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mal_mlym(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mar_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mar_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mar_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mar_deva(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mni_Beng\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mni_Beng\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mni_beng(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mni_beng(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mni_Mtei\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mni_Mtei\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mni_mtei(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mni_mtei(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"npi_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"npi_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_npi_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_npi_deva(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"ory_Orya\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"ory_Orya\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_ory_orya(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_ory_orya(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"pan_Guru\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"pan_Guru\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_pan_guru(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_pan_guru(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"san_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"san_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_san_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_san_deva(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"sat_Olck\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"sat_Olck\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_sat_olck(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_sat_olck(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"snd_Arab\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"snd_Arab\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_snd_arab(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_snd_arab(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"snd_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"snd_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_snd_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_snd_deva(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"tam_Taml\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"tam_Taml\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_tam_taml(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_tam_taml(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"tel_Telu\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"tel_Telu\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_tel_telu(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_tel_telu(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"urd_Arab\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"urd_Arab\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_urd_arab(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_urd_arab(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"unr_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"unr_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_unr_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_unr_deva(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"asm_Beng\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"asm_Beng\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_asm_beng_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_asm_beng_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"awa_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"awa_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_awa_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_awa_deva_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"ben_Beng\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"ben_Beng\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_ben_beng_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_ben_beng_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"bho_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"bho_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_bho_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_bho_deva_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"brx_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"brx_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_brx_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_brx_deva_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"doi_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"doi_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_doi_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_doi_deva_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"eng_Latn\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"eng_Latn\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_eng_latn_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_eng_latn_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"gom_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"gom_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_gom_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_gom_deva_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"gon_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"gon_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_gon_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_gon_deva_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"guj_Gujr\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"guj_Gujr\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_guj_gujr_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_guj_gujr_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"hin_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"hin_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_hin_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_hin_deva_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"hne_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"hne_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_hne_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_hne_deva_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"kan_Knda\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"kan_Knda\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_kan_knda_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_kan_knda_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"kas_Arab\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"kas_Arab\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_kas_arab_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_kas_arab_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"kas_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"kas_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_kas_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_kas_deva_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"kha_Latn\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"kha_Latn\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_kha_latn_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_kha_latn_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"lus_Latn\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"lus_Latn\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_lus_latn_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_lus_latn_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mag_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mag_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mag_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mag_deva_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mai_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mai_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mai_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mai_deva_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mal_Mlym\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mal_Mlym\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mal_mlym_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mal_mlym_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mar_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mar_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mar_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mar_deva_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mni_Beng\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mni_Beng\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mni_beng_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mni_beng_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mni_Mtei\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mni_Mtei\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mni_mtei_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_mni_mtei_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"npi_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"npi_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_npi_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_npi_deva_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"ory_Orya\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"ory_Orya\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_ory_orya_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_ory_orya_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"pan_Guru\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"pan_Guru\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_pan_guru_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_pan_guru_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"san_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"san_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_san_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_san_deva_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"sat_Olck\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"sat_Olck\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_sat_olck_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_sat_olck_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"snd_Arab\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"snd_Arab\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_snd_arab_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_snd_arab_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"snd_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"snd_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_snd_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_snd_deva_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"tam_Taml\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"tam_Taml\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_tam_taml_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_tam_taml_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"tel_Telu\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"tel_Telu\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_tel_telu_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_tel_telu_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"urd_Arab\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"urd_Arab\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_urd_arab_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_urd_arab_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"unr_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"unr_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_unr_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         Self::builder_unr_deva_with_array(text).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"asm_Beng\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"asm_Beng\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_asm_beng(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("asm_Beng");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"awa_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"awa_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_awa_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value("awa_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"ben_Beng\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"ben_Beng\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_ben_beng(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_1("ben_Beng");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"bho_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"bho_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_bho_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_2("bho_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"brx_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"brx_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_brx_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_3("brx_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"doi_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"doi_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_doi_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_4("doi_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"eng_Latn\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"eng_Latn\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_eng_latn(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_5("eng_Latn");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"gom_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"gom_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_gom_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_6("gom_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"gon_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"gon_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_gon_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_7("gon_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"guj_Gujr\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"guj_Gujr\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_guj_gujr(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_8("guj_Gujr");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"hin_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"hin_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_hin_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_9("hin_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"hne_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"hne_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_hne_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_10("hne_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"kan_Knda\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"kan_Knda\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_kan_knda(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_11("kan_Knda");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"kas_Arab\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"kas_Arab\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_kas_arab(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_12("kas_Arab");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"kas_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"kas_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_kas_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_13("kas_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"kha_Latn\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"kha_Latn\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_kha_latn(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_14("kha_Latn");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"lus_Latn\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"lus_Latn\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_lus_latn(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_15("lus_Latn");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mag_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mag_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mag_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_16("mag_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mai_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mai_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mai_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_17("mai_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mal_Mlym\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mal_Mlym\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mal_mlym(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_18("mal_Mlym");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mar_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mar_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mar_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_19("mar_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mni_Beng\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mni_Beng\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mni_beng(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_20("mni_Beng");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mni_Mtei\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mni_Mtei\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mni_mtei(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_21("mni_Mtei");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"npi_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"npi_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_npi_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_22("npi_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"ory_Orya\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"ory_Orya\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_ory_orya(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_23("ory_Orya");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"pan_Guru\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"pan_Guru\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_pan_guru(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_24("pan_Guru");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"san_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"san_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_san_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_25("san_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"sat_Olck\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"sat_Olck\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_sat_olck(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_26("sat_Olck");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"snd_Arab\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"snd_Arab\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_snd_arab(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_27("snd_Arab");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"snd_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"snd_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_snd_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_28("snd_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"tam_Taml\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"tam_Taml\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_tam_taml(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_29("tam_Taml");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"tel_Telu\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"tel_Telu\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_tel_telu(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_30("tel_Telu");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"urd_Arab\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"urd_Arab\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_urd_arab(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_31("urd_Arab");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"unr_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"unr_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_unr_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language_with_js_value_32("unr_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"asm_Beng\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"asm_Beng\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_asm_beng_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -30929,13 +30929,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language("asm_Beng");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"awa_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"awa_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_awa_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -30944,13 +30944,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value("awa_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"ben_Beng\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"ben_Beng\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_ben_beng_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -30959,13 +30959,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_1("ben_Beng");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"bho_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"bho_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_bho_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -30974,13 +30974,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_2("bho_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"brx_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"brx_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_brx_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -30989,13 +30989,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_3("brx_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"doi_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"doi_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_doi_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31004,13 +31004,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_4("doi_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"eng_Latn\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"eng_Latn\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_eng_latn_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31019,13 +31019,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_5("eng_Latn");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"gom_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"gom_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_gom_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31034,13 +31034,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_6("gom_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"gon_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"gon_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_gon_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31049,13 +31049,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_7("gon_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"guj_Gujr\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"guj_Gujr\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_guj_gujr_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31064,13 +31064,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_8("guj_Gujr");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"hin_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"hin_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_hin_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31079,13 +31079,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_9("hin_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"hne_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"hne_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_hne_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31094,13 +31094,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_10("hne_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"kan_Knda\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"kan_Knda\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_kan_knda_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31109,13 +31109,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_11("kan_Knda");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"kas_Arab\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"kas_Arab\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_kas_arab_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31124,13 +31124,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_12("kas_Arab");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"kas_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"kas_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_kas_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31139,13 +31139,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_13("kas_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"kha_Latn\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"kha_Latn\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_kha_latn_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31154,13 +31154,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_14("kha_Latn");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"lus_Latn\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"lus_Latn\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_lus_latn_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31169,13 +31169,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_15("lus_Latn");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mag_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mag_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mag_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31184,13 +31184,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_16("mag_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mai_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mai_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mai_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31199,13 +31199,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_17("mai_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mal_Mlym\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mal_Mlym\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mal_mlym_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31214,13 +31214,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_18("mal_Mlym");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mar_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mar_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mar_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31229,13 +31229,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_19("mar_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mni_Beng\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mni_Beng\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mni_beng_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31244,13 +31244,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_20("mni_Beng");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"mni_Mtei\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"mni_Mtei\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_mni_mtei_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31259,13 +31259,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_21("mni_Mtei");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"npi_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"npi_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_npi_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31274,13 +31274,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_22("npi_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"ory_Orya\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"ory_Orya\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_ory_orya_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31289,13 +31289,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_23("ory_Orya");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"pan_Guru\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"pan_Guru\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_pan_guru_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31304,13 +31304,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_24("pan_Guru");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"san_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"san_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_san_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31319,13 +31319,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_25("san_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"sat_Olck\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"sat_Olck\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_sat_olck_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31334,13 +31334,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_26("sat_Olck");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"snd_Arab\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"snd_Arab\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_snd_arab_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31349,13 +31349,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_27("snd_Arab");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"snd_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"snd_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_snd_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31364,13 +31364,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_28("snd_Deva");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"tam_Taml\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"tam_Taml\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_tam_taml_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31379,13 +31379,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_29("tam_Taml");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"tel_Telu\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"tel_Telu\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_tel_telu_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31394,13 +31394,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_30("tel_Telu");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"urd_Arab\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"urd_Arab\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_urd_arab_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31409,13 +31409,13 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         inner.set_target_language_with_js_value_31("urd_Arab");
         Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `target_language: \"unr_Deva\"`: Target language to translate to"]
+    #[doc = " * `target_language: \"unr_Deva\"` - Target language to translate to"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to translate. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn builder_unr_deva_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_InputBuilder {
@@ -31448,15 +31448,15 @@ extern "C" {
     );
 }
 impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Output {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `translations`: Translated texts"]
+    #[doc = " * `translations` - Translated texts"]
     pub fn new(translations: &Array<JsString>) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Output {
         Self::builder(translations).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `translations`: Translated texts"]
+    #[doc = " * `translations` - Translated texts"]
     pub fn builder(
         translations: &Array<JsString>,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_OutputBuilder {
@@ -31587,15 +31587,15 @@ extern "C" {
     pub fn set_presence_penalty(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt, val: f64);
 }
 impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt {
         Self::builder(prompt).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_PromptBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
@@ -31821,15 +31821,15 @@ extern "C" {
     );
 }
 impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn new(messages: &Array<Object>) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages {
         Self::builder(messages).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn builder(
         messages: &Array<Object>,
     ) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_MessagesBuilder {
@@ -31975,13 +31975,13 @@ extern "C" {
     );
 }
 impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `requests`"]
     pub fn new(requests: &Array) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch {
         Self::builder(requests).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `requests`"]
     pub fn builder(
@@ -32091,15 +32091,15 @@ extern "C" {
     );
 }
 impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1 {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn new(prompt: &str) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1 {
         Self::builder(prompt).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `prompt`: The input text prompt for the model to generate a response."]
+    #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1Builder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
@@ -32327,15 +32327,15 @@ extern "C" {
     );
 }
 impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1 {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn new(messages: &Array<Object>) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1 {
         Self::builder(messages).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `messages`: An array of message objects representing the conversation history."]
+    #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn builder(
         messages: &Array<Object>,
     ) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1Builder {
@@ -32802,29 +32802,29 @@ extern "C" {
     pub fn set_text_with_array(this: &Ai_Cf_Pfnet_Plamo_Embedding_1B_Input, val: &Array<JsString>);
 }
 impl Ai_Cf_Pfnet_Plamo_Embedding_1B_Input {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to embed. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to embed. Can be a single string or a list of strings."]
     pub fn new(text: &str) -> Ai_Cf_Pfnet_Plamo_Embedding_1B_Input {
         Self::builder(text).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to embed. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to embed. Can be a single string or a list of strings."]
     pub fn new_with_array(text: &Array<JsString>) -> Ai_Cf_Pfnet_Plamo_Embedding_1B_Input {
         Self::builder_with_array(text).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to embed. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to embed. Can be a single string or a list of strings."]
     pub fn builder(text: &str) -> Ai_Cf_Pfnet_Plamo_Embedding_1B_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         Ai_Cf_Pfnet_Plamo_Embedding_1B_InputBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: Input text to embed. Can be a single string or a list of strings."]
+    #[doc = " * `text` - Input text to embed. Can be a single string or a list of strings."]
     pub fn builder_with_array(
         text: &Array<JsString>,
     ) -> Ai_Cf_Pfnet_Plamo_Embedding_1B_InputBuilder {
@@ -32864,10 +32864,10 @@ extern "C" {
     );
 }
 impl Ai_Cf_Pfnet_Plamo_Embedding_1B_Output {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `data`: Embedding vectors, where each vector is a list of floats."]
-    #[doc = " * `shape`: Shape of the embedding data as [number_of_embeddings, embedding_dimension]."]
+    #[doc = " * `data` - Embedding vectors, where each vector is a list of floats."]
+    #[doc = " * `shape` - Shape of the embedding data as [number_of_embeddings, embedding_dimension]."]
     #[doc = ""]
     #[doc = " @minItems 2"]
     #[doc = " @maxItems 2"]
@@ -32877,10 +32877,10 @@ impl Ai_Cf_Pfnet_Plamo_Embedding_1B_Output {
     ) -> Ai_Cf_Pfnet_Plamo_Embedding_1B_Output {
         Self::builder(data, shape).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `data`: Embedding vectors, where each vector is a list of floats."]
-    #[doc = " * `shape`: Shape of the embedding data as [number_of_embeddings, embedding_dimension]."]
+    #[doc = " * `data` - Embedding vectors, where each vector is a list of floats."]
+    #[doc = " * `shape` - Shape of the embedding data as [number_of_embeddings, embedding_dimension]."]
     #[doc = ""]
     #[doc = " @minItems 2"]
     #[doc = " @maxItems 2"]
@@ -32975,23 +32975,23 @@ extern "C" {
     pub fn set_tag(this: &Ai_Cf_Deepgram_Flux_Input, val: &str);
 }
 impl Ai_Cf_Deepgram_Flux_Input {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `encoding: \"linear16\"`: Encoding of the audio stream. Currently only supports raw signed little-endian 16-bit PCM."]
+    #[doc = " * `encoding: \"linear16\"` - Encoding of the audio stream. Currently only supports raw signed little-endian 16-bit PCM."]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `sample_rate`: Sample rate of the audio stream in Hz."]
+    #[doc = " * `sample_rate` - Sample rate of the audio stream in Hz."]
     pub fn new_linear_16(sample_rate: &str) -> Ai_Cf_Deepgram_Flux_Input {
         Self::builder_linear_16(sample_rate).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `encoding: \"linear16\"`: Encoding of the audio stream. Currently only supports raw signed little-endian 16-bit PCM."]
+    #[doc = " * `encoding: \"linear16\"` - Encoding of the audio stream. Currently only supports raw signed little-endian 16-bit PCM."]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `sample_rate`: Sample rate of the audio stream in Hz."]
+    #[doc = " * `sample_rate` - Sample rate of the audio stream in Hz."]
     pub fn builder_linear_16(sample_rate: &str) -> Ai_Cf_Deepgram_Flux_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_encoding("linear16");
@@ -33312,15 +33312,15 @@ extern "C" {
     pub fn set_bit_rate(this: &Ai_Cf_Deepgram_Aura_2_En_Input, val: f64);
 }
 impl Ai_Cf_Deepgram_Aura_2_En_Input {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: The text content to be converted to speech"]
+    #[doc = " * `text` - The text content to be converted to speech"]
     pub fn new(text: &str) -> Ai_Cf_Deepgram_Aura_2_En_Input {
         Self::builder(text).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: The text content to be converted to speech"]
+    #[doc = " * `text` - The text content to be converted to speech"]
     pub fn builder(text: &str) -> Ai_Cf_Deepgram_Aura_2_En_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
@@ -33630,15 +33630,15 @@ extern "C" {
     pub fn set_bit_rate(this: &Ai_Cf_Deepgram_Aura_2_Es_Input, val: f64);
 }
 impl Ai_Cf_Deepgram_Aura_2_Es_Input {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: The text content to be converted to speech"]
+    #[doc = " * `text` - The text content to be converted to speech"]
     pub fn new(text: &str) -> Ai_Cf_Deepgram_Aura_2_Es_Input {
         Self::builder(text).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `text`: The text content to be converted to speech"]
+    #[doc = " * `text` - The text content to be converted to speech"]
     pub fn builder(text: &str) -> Ai_Cf_Deepgram_Aura_2_Es_InputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
@@ -34217,7 +34217,7 @@ extern "C" {
     pub fn set_cfdeepgramaura_2_es(this: &AiModels, val: &Base_Ai_Cf_Deepgram_Aura_2_Es);
 }
 impl AiModels {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `@cf/huggingface/distilbert_sst_2_int_8`"]
     #[doc = " * `@cf/stabilityai/stable_diffusion_xl_base_1.0`"]
@@ -34477,7 +34477,7 @@ impl AiModels {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `@cf/huggingface/distilbert_sst_2_int_8`"]
     #[doc = " * `@cf/stabilityai/stable_diffusion_xl_base_1.0`"]
@@ -34962,7 +34962,7 @@ extern "C" {
     pub fn set_properties(this: &AiModelsSearchObject, val: &Array<Object>);
 }
 impl AiModelsSearchObject {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `source`"]
@@ -34982,7 +34982,7 @@ impl AiModelsSearchObject {
     ) -> AiModelsSearchObject {
         Self::builder(id, source, name, description, task, tags, properties).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `source`"]
@@ -35339,13 +35339,13 @@ extern "C" {
     pub fn set_retries(this: &GatewayOptions, val: &GatewayRetries);
 }
 impl GatewayOptions {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     pub fn new(id: &str) -> GatewayOptions {
         Self::builder(id).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     pub fn builder(id: &str) -> GatewayOptionsBuilder {
@@ -35623,7 +35623,7 @@ extern "C" {
     pub fn set_created_at(this: &AiGatewayLog, val: &Date);
 }
 impl AiGatewayLog {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `provider`"]
@@ -35670,7 +35670,7 @@ impl AiGatewayLog {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `provider`"]
@@ -35916,7 +35916,7 @@ extern "C" {
     pub fn set_content_type(this: &AIGatewayHeaders, val: &str);
 }
 impl AIGatewayHeaders {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -35963,7 +35963,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -36010,7 +36010,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -36057,7 +36057,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -36104,7 +36104,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -36151,7 +36151,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -36198,7 +36198,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -36245,7 +36245,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -36292,7 +36292,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -36339,7 +36339,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -36386,7 +36386,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -36433,7 +36433,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -36480,7 +36480,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -36527,7 +36527,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -36574,7 +36574,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -36621,7 +36621,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -36668,7 +36668,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -36715,7 +36715,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -36762,7 +36762,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -36809,7 +36809,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -36856,7 +36856,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -36903,7 +36903,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -36950,7 +36950,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -36997,7 +36997,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -37044,7 +37044,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -37091,7 +37091,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -37138,7 +37138,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -37185,7 +37185,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -37232,7 +37232,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -37279,7 +37279,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -37326,7 +37326,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -37373,7 +37373,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -37420,7 +37420,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -37467,7 +37467,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -37514,7 +37514,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -37561,7 +37561,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -37608,7 +37608,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -37655,7 +37655,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -37702,7 +37702,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -37749,7 +37749,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -37796,7 +37796,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -37843,7 +37843,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -37890,7 +37890,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -37937,7 +37937,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -37984,7 +37984,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -38031,7 +38031,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -38078,7 +38078,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -38125,7 +38125,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -38172,7 +38172,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -38219,7 +38219,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -38266,7 +38266,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -38313,7 +38313,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -38360,7 +38360,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -38407,7 +38407,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -38454,7 +38454,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -38501,7 +38501,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -38548,7 +38548,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -38595,7 +38595,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -38642,7 +38642,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -38689,7 +38689,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -38736,7 +38736,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -38783,7 +38783,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -38830,7 +38830,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -38877,7 +38877,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -38924,7 +38924,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -38971,7 +38971,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -39018,7 +39018,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -39065,7 +39065,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -39112,7 +39112,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -39159,7 +39159,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -39206,7 +39206,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -39253,7 +39253,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -39300,7 +39300,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -39347,7 +39347,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -39394,7 +39394,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -39441,7 +39441,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -39488,7 +39488,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -39535,7 +39535,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -39582,7 +39582,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -39629,7 +39629,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -39676,7 +39676,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -39723,7 +39723,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -39770,7 +39770,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -39817,7 +39817,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -39864,7 +39864,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -39911,7 +39911,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -39958,7 +39958,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -40005,7 +40005,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -40052,7 +40052,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -40099,7 +40099,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -40146,7 +40146,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -40193,7 +40193,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -40240,7 +40240,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -40287,7 +40287,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -40334,7 +40334,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -40381,7 +40381,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -40428,7 +40428,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -40475,7 +40475,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -40522,7 +40522,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -40569,7 +40569,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -40616,7 +40616,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -40663,7 +40663,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -40710,7 +40710,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -40757,7 +40757,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -40804,7 +40804,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -40851,7 +40851,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -40898,7 +40898,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -40945,7 +40945,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -40992,7 +40992,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -41039,7 +41039,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -41086,7 +41086,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -41133,7 +41133,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -41180,7 +41180,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -41227,7 +41227,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -41274,7 +41274,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -41321,7 +41321,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -41368,7 +41368,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -41415,7 +41415,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -41462,7 +41462,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -41509,7 +41509,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -41556,7 +41556,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -41603,7 +41603,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -41650,7 +41650,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -41697,7 +41697,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -41744,7 +41744,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -41791,7 +41791,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -41838,7 +41838,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -41885,7 +41885,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -41932,7 +41932,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -41979,7 +41979,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -42026,7 +42026,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -42073,7 +42073,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -42120,7 +42120,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -42167,7 +42167,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -42214,7 +42214,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -42261,7 +42261,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -42308,7 +42308,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -42355,7 +42355,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -42402,7 +42402,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -42449,7 +42449,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -42496,7 +42496,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -42543,7 +42543,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -42590,7 +42590,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -42637,7 +42637,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -42684,7 +42684,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -42731,7 +42731,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -42778,7 +42778,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -42825,7 +42825,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -42872,7 +42872,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -42919,7 +42919,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -42966,7 +42966,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -43013,7 +43013,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -43060,7 +43060,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -43107,7 +43107,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -43154,7 +43154,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -43201,7 +43201,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -43248,7 +43248,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -43295,7 +43295,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -43342,7 +43342,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -43389,7 +43389,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -43436,7 +43436,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -43483,7 +43483,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -43530,7 +43530,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -43577,7 +43577,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -43624,7 +43624,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -43671,7 +43671,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -43718,7 +43718,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -43765,7 +43765,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -43812,7 +43812,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -43859,7 +43859,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -43906,7 +43906,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -43953,7 +43953,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -44000,7 +44000,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -44047,7 +44047,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -44094,7 +44094,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -44141,7 +44141,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -44188,7 +44188,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -44235,7 +44235,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -44282,7 +44282,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -44329,7 +44329,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -44376,7 +44376,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -44423,7 +44423,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -44470,7 +44470,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -44517,7 +44517,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -44564,7 +44564,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -44611,7 +44611,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -44658,7 +44658,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -44705,7 +44705,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -44752,7 +44752,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -44799,7 +44799,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -44846,7 +44846,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -44893,7 +44893,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -44940,7 +44940,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -44987,7 +44987,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -45034,7 +45034,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -45081,7 +45081,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -45128,7 +45128,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -45175,7 +45175,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -45222,7 +45222,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -45269,7 +45269,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -45316,7 +45316,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -45363,7 +45363,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -45410,7 +45410,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -45457,7 +45457,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -45504,7 +45504,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -45551,7 +45551,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -45598,7 +45598,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -45645,7 +45645,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -45692,7 +45692,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -45739,7 +45739,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -45786,7 +45786,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -45833,7 +45833,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -45880,7 +45880,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -45927,7 +45927,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -45974,7 +45974,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -46021,7 +46021,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -46068,7 +46068,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -46115,7 +46115,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -46162,7 +46162,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -46209,7 +46209,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -46256,7 +46256,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -46303,7 +46303,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -46350,7 +46350,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -46397,7 +46397,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -46444,7 +46444,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -46491,7 +46491,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -46538,7 +46538,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -46585,7 +46585,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -46632,7 +46632,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -46679,7 +46679,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -46726,7 +46726,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -46773,7 +46773,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -46820,7 +46820,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -46867,7 +46867,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -46914,7 +46914,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -46961,7 +46961,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -47008,7 +47008,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -47055,7 +47055,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -47102,7 +47102,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -47149,7 +47149,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -47196,7 +47196,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -47243,7 +47243,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -47290,7 +47290,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -47337,7 +47337,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -47384,7 +47384,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -47431,7 +47431,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -47478,7 +47478,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -47525,7 +47525,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -47572,7 +47572,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -47619,7 +47619,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -47666,7 +47666,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -47713,7 +47713,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -47760,7 +47760,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -47807,7 +47807,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -47854,7 +47854,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -47901,7 +47901,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -47948,7 +47948,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -47995,7 +47995,7 @@ impl AIGatewayHeaders {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -48041,7 +48041,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -48087,7 +48087,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -48133,7 +48133,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -48179,7 +48179,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -48225,7 +48225,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -48271,7 +48271,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -48317,7 +48317,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -48363,7 +48363,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -48409,7 +48409,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -48455,7 +48455,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -48501,7 +48501,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -48547,7 +48547,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -48593,7 +48593,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -48639,7 +48639,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -48685,7 +48685,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -48731,7 +48731,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -48777,7 +48777,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -48823,7 +48823,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -48869,7 +48869,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -48915,7 +48915,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -48961,7 +48961,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -49007,7 +49007,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -49053,7 +49053,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -49099,7 +49099,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -49145,7 +49145,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -49191,7 +49191,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -49237,7 +49237,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -49283,7 +49283,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -49329,7 +49329,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -49375,7 +49375,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -49421,7 +49421,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -49467,7 +49467,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -49513,7 +49513,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -49559,7 +49559,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -49605,7 +49605,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -49651,7 +49651,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -49697,7 +49697,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -49743,7 +49743,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -49789,7 +49789,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -49835,7 +49835,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -49881,7 +49881,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -49927,7 +49927,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -49973,7 +49973,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -50019,7 +50019,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -50065,7 +50065,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -50111,7 +50111,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -50157,7 +50157,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -50203,7 +50203,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -50249,7 +50249,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -50295,7 +50295,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -50341,7 +50341,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -50387,7 +50387,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -50433,7 +50433,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -50479,7 +50479,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -50525,7 +50525,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -50571,7 +50571,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -50617,7 +50617,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -50663,7 +50663,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -50709,7 +50709,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -50755,7 +50755,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -50801,7 +50801,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -50847,7 +50847,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -50893,7 +50893,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -50939,7 +50939,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -50985,7 +50985,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -51031,7 +51031,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -51077,7 +51077,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -51123,7 +51123,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -51169,7 +51169,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -51215,7 +51215,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -51261,7 +51261,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -51307,7 +51307,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -51353,7 +51353,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -51399,7 +51399,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -51445,7 +51445,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -51491,7 +51491,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -51537,7 +51537,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -51583,7 +51583,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -51629,7 +51629,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -51675,7 +51675,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -51721,7 +51721,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -51767,7 +51767,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -51813,7 +51813,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -51859,7 +51859,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -51905,7 +51905,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -51951,7 +51951,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -51997,7 +51997,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -52043,7 +52043,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -52089,7 +52089,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -52135,7 +52135,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -52181,7 +52181,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -52227,7 +52227,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -52273,7 +52273,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -52319,7 +52319,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -52365,7 +52365,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -52411,7 +52411,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -52457,7 +52457,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -52503,7 +52503,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -52549,7 +52549,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -52595,7 +52595,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -52641,7 +52641,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -52687,7 +52687,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -52733,7 +52733,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -52779,7 +52779,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -52825,7 +52825,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -52871,7 +52871,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -52917,7 +52917,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -52963,7 +52963,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -53009,7 +53009,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -53055,7 +53055,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -53101,7 +53101,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -53147,7 +53147,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -53193,7 +53193,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -53239,7 +53239,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -53285,7 +53285,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -53331,7 +53331,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -53377,7 +53377,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -53423,7 +53423,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -53469,7 +53469,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -53515,7 +53515,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -53561,7 +53561,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -53607,7 +53607,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -53653,7 +53653,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -53699,7 +53699,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -53745,7 +53745,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -53791,7 +53791,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -53837,7 +53837,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -53883,7 +53883,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -53929,7 +53929,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -53975,7 +53975,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -54021,7 +54021,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -54067,7 +54067,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -54113,7 +54113,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -54159,7 +54159,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -54205,7 +54205,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -54251,7 +54251,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -54297,7 +54297,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -54343,7 +54343,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -54389,7 +54389,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -54435,7 +54435,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -54481,7 +54481,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -54527,7 +54527,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -54573,7 +54573,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -54619,7 +54619,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -54665,7 +54665,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -54711,7 +54711,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -54757,7 +54757,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -54803,7 +54803,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -54849,7 +54849,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -54895,7 +54895,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -54941,7 +54941,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -54987,7 +54987,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -55033,7 +55033,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -55079,7 +55079,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -55125,7 +55125,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -55171,7 +55171,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -55217,7 +55217,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -55263,7 +55263,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -55309,7 +55309,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -55355,7 +55355,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -55401,7 +55401,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -55447,7 +55447,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -55493,7 +55493,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -55539,7 +55539,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -55585,7 +55585,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -55631,7 +55631,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -55677,7 +55677,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -55723,7 +55723,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -55769,7 +55769,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -55815,7 +55815,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -55861,7 +55861,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -55907,7 +55907,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -55953,7 +55953,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -55999,7 +55999,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -56045,7 +56045,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -56091,7 +56091,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -56137,7 +56137,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -56183,7 +56183,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -56229,7 +56229,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -56275,7 +56275,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -56321,7 +56321,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -56367,7 +56367,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -56413,7 +56413,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -56459,7 +56459,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -56505,7 +56505,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -56551,7 +56551,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -56597,7 +56597,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -56643,7 +56643,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -56689,7 +56689,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -56735,7 +56735,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -56781,7 +56781,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -56827,7 +56827,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -56873,7 +56873,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -56919,7 +56919,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -56965,7 +56965,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -57011,7 +57011,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -57057,7 +57057,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -57103,7 +57103,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -57149,7 +57149,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -57195,7 +57195,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -57241,7 +57241,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -57287,7 +57287,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -57333,7 +57333,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -57379,7 +57379,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -57425,7 +57425,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -57471,7 +57471,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -57517,7 +57517,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -57563,7 +57563,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -57609,7 +57609,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -57655,7 +57655,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -57701,7 +57701,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -57747,7 +57747,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -57793,7 +57793,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -57839,7 +57839,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -57885,7 +57885,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -57931,7 +57931,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -57977,7 +57977,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -58023,7 +58023,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -58069,7 +58069,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -58115,7 +58115,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -58161,7 +58161,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -58207,7 +58207,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -58253,7 +58253,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -58299,7 +58299,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -58345,7 +58345,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -58391,7 +58391,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -58437,7 +58437,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -58483,7 +58483,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -58529,7 +58529,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -58575,7 +58575,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -58621,7 +58621,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -58667,7 +58667,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -58713,7 +58713,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -58759,7 +58759,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -58805,7 +58805,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -58851,7 +58851,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -58897,7 +58897,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -58943,7 +58943,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -58989,7 +58989,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -59035,7 +59035,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -59081,7 +59081,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -59127,7 +59127,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -59173,7 +59173,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -59219,7 +59219,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -59265,7 +59265,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -59311,7 +59311,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -59357,7 +59357,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -59403,7 +59403,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -59449,7 +59449,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -59495,7 +59495,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -59541,7 +59541,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -59587,7 +59587,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -59633,7 +59633,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -59679,7 +59679,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -59725,7 +59725,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -59771,7 +59771,7 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         AIGatewayHeadersBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `cf_aig_metadata`"]
     #[doc = " * `cf_aig_custom_cost`"]
@@ -59851,7 +59851,7 @@ extern "C" {
     pub fn set_query(this: &AIGatewayUniversalRequest, val: &JsValue);
 }
 impl AIGatewayUniversalRequest {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `provider`"]
     #[doc = " * `endpoint`"]
@@ -59865,7 +59865,7 @@ impl AIGatewayUniversalRequest {
     ) -> AIGatewayUniversalRequest {
         Self::builder(provider, endpoint, headers, query).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `provider`"]
     #[doc = " * `endpoint`"]
@@ -59879,7 +59879,7 @@ impl AIGatewayUniversalRequest {
     ) -> AIGatewayUniversalRequest {
         Self::builder_with_str(provider, endpoint, headers, query).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `provider`"]
     #[doc = " * `endpoint`"]
@@ -59898,7 +59898,7 @@ impl AIGatewayUniversalRequest {
         inner.set_query(query);
         AIGatewayUniversalRequestBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `provider`"]
     #[doc = " * `endpoint`"]
@@ -60080,209 +60080,209 @@ extern "C" {
     pub fn set_value_with_bool(this: &ComparisonFilter, val: bool);
 }
 impl ComparisonFilter {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"eq\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_eq(key: &str, value: &str) -> ComparisonFilter {
         Self::builder_eq(key, value).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"eq\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_eq_with_f64(key: &str, value: f64) -> ComparisonFilter {
         Self::builder_eq_with_f64(key, value).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"eq\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_eq_with_bool(key: &str, value: bool) -> ComparisonFilter {
         Self::builder_eq_with_bool(key, value).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"ne\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_ne(key: &str, value: &str) -> ComparisonFilter {
         Self::builder_ne(key, value).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"ne\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_ne_with_f64(key: &str, value: f64) -> ComparisonFilter {
         Self::builder_ne_with_f64(key, value).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"ne\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_ne_with_bool(key: &str, value: bool) -> ComparisonFilter {
         Self::builder_ne_with_bool(key, value).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"gt\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_gt(key: &str, value: &str) -> ComparisonFilter {
         Self::builder_gt(key, value).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"gt\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_gt_with_f64(key: &str, value: f64) -> ComparisonFilter {
         Self::builder_gt_with_f64(key, value).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"gt\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_gt_with_bool(key: &str, value: bool) -> ComparisonFilter {
         Self::builder_gt_with_bool(key, value).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"gte\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_gte(key: &str, value: &str) -> ComparisonFilter {
         Self::builder_gte(key, value).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"gte\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_gte_with_f64(key: &str, value: f64) -> ComparisonFilter {
         Self::builder_gte_with_f64(key, value).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"gte\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_gte_with_bool(key: &str, value: bool) -> ComparisonFilter {
         Self::builder_gte_with_bool(key, value).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"lt\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_lt(key: &str, value: &str) -> ComparisonFilter {
         Self::builder_lt(key, value).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"lt\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_lt_with_f64(key: &str, value: f64) -> ComparisonFilter {
         Self::builder_lt_with_f64(key, value).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"lt\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_lt_with_bool(key: &str, value: bool) -> ComparisonFilter {
         Self::builder_lt_with_bool(key, value).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"lte\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_lte(key: &str, value: &str) -> ComparisonFilter {
         Self::builder_lte(key, value).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"lte\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_lte_with_f64(key: &str, value: f64) -> ComparisonFilter {
         Self::builder_lte_with_f64(key, value).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"lte\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
     pub fn new_lte_with_bool(key: &str, value: bool) -> ComparisonFilter {
         Self::builder_lte_with_bool(key, value).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"eq\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
@@ -60293,11 +60293,11 @@ impl ComparisonFilter {
         inner.set_value(value);
         ComparisonFilterBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"eq\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
@@ -60308,11 +60308,11 @@ impl ComparisonFilter {
         inner.set_value_with_f64(value);
         ComparisonFilterBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"eq\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
@@ -60323,11 +60323,11 @@ impl ComparisonFilter {
         inner.set_value_with_bool(value);
         ComparisonFilterBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"ne\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
@@ -60338,11 +60338,11 @@ impl ComparisonFilter {
         inner.set_value(value);
         ComparisonFilterBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"ne\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
@@ -60353,11 +60353,11 @@ impl ComparisonFilter {
         inner.set_value_with_f64(value);
         ComparisonFilterBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"ne\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
@@ -60368,11 +60368,11 @@ impl ComparisonFilter {
         inner.set_value_with_bool(value);
         ComparisonFilterBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"gt\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
@@ -60383,11 +60383,11 @@ impl ComparisonFilter {
         inner.set_value(value);
         ComparisonFilterBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"gt\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
@@ -60398,11 +60398,11 @@ impl ComparisonFilter {
         inner.set_value_with_f64(value);
         ComparisonFilterBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"gt\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
@@ -60413,11 +60413,11 @@ impl ComparisonFilter {
         inner.set_value_with_bool(value);
         ComparisonFilterBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"gte\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
@@ -60428,11 +60428,11 @@ impl ComparisonFilter {
         inner.set_value(value);
         ComparisonFilterBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"gte\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
@@ -60443,11 +60443,11 @@ impl ComparisonFilter {
         inner.set_value_with_f64(value);
         ComparisonFilterBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"gte\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
@@ -60458,11 +60458,11 @@ impl ComparisonFilter {
         inner.set_value_with_bool(value);
         ComparisonFilterBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"lt\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
@@ -60473,11 +60473,11 @@ impl ComparisonFilter {
         inner.set_value(value);
         ComparisonFilterBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"lt\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
@@ -60488,11 +60488,11 @@ impl ComparisonFilter {
         inner.set_value_with_f64(value);
         ComparisonFilterBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"lt\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
@@ -60503,11 +60503,11 @@ impl ComparisonFilter {
         inner.set_value_with_bool(value);
         ComparisonFilterBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"lte\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
@@ -60518,11 +60518,11 @@ impl ComparisonFilter {
         inner.set_value(value);
         ComparisonFilterBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"lte\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
@@ -60533,11 +60533,11 @@ impl ComparisonFilter {
         inner.set_value_with_f64(value);
         ComparisonFilterBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"lte\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     #[doc = " * `value`"]
@@ -60574,31 +60574,31 @@ extern "C" {
     pub fn set_filters(this: &CompoundFilter, val: &Array<ComparisonFilter>);
 }
 impl CompoundFilter {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"and\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `filters`"]
     pub fn new_and(filters: &Array<ComparisonFilter>) -> CompoundFilter {
         Self::builder_and(filters).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"or\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `filters`"]
     pub fn new_or(filters: &Array<ComparisonFilter>) -> CompoundFilter {
         Self::builder_or(filters).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"and\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `filters`"]
     pub fn builder_and(filters: &Array<ComparisonFilter>) -> CompoundFilterBuilder {
@@ -60607,11 +60607,11 @@ impl CompoundFilter {
         inner.set_filters(filters);
         CompoundFilterBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"or\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `filters`"]
     pub fn builder_or(filters: &Array<ComparisonFilter>) -> CompoundFilterBuilder {
@@ -60662,13 +60662,13 @@ extern "C" {
     pub fn set_rewrite_query(this: &AutoRagSearchRequest, val: bool);
 }
 impl AutoRagSearchRequest {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `query`"]
     pub fn new(query: &str) -> AutoRagSearchRequest {
         Self::builder(query).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `query`"]
     pub fn builder(query: &str) -> AutoRagSearchRequestBuilder {
@@ -60742,11 +60742,11 @@ extern "C" {
     pub fn set_next_page_with_null(this: &AutoRagSearchResponse, val: &Null);
 }
 impl AutoRagSearchResponse {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `object: \"vector_store.search_results.page\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `search_query`"]
     #[doc = " * `data`"]
@@ -60761,11 +60761,11 @@ impl AutoRagSearchResponse {
         Self::builder_vector_storesearch_resultspage(search_query, data, has_more, next_page)
             .build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `object: \"vector_store.search_results.page\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `search_query`"]
     #[doc = " * `data`"]
@@ -61339,17 +61339,17 @@ extern "C" {
     pub fn set_right(this: &RequestInitCfPropertiesImageDraw, val: f64);
 }
 impl RequestInitCfPropertiesImageDraw {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `url`: Absolute URL of the image file to use for the drawing. It can be any of"]
+    #[doc = " * `url` - Absolute URL of the image file to use for the drawing. It can be any of"]
     #[doc = " the supported file formats. For drawing of watermarks or non-rectangular"]
     #[doc = " overlays we recommend using PNG or WebP images."]
     pub fn new(url: &str) -> RequestInitCfPropertiesImageDraw {
         Self::builder(url).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `url`: Absolute URL of the image file to use for the drawing. It can be any of"]
+    #[doc = " * `url` - Absolute URL of the image file to use for the drawing. It can be any of"]
     #[doc = " the supported file formats. For drawing of watermarks or non-rectangular"]
     #[doc = " overlays we recommend using PNG or WebP images."]
     pub fn builder(url: &str) -> RequestInitCfPropertiesImageDrawBuilder {
@@ -61943,33 +61943,33 @@ extern "C" {
     );
 }
 impl IncomingRequestCfPropertiesBase {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `colo`: The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
     #[doc = ""]
     #[doc = " @example \"DFW\""]
-    #[doc = " * `edge_request_keep_alive_status`: Represents the upstream's response to a"]
+    #[doc = " * `edge_request_keep_alive_status` - Represents the upstream's response to a"]
     #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
     #[doc = " from cloudflare."]
     #[doc = ""]
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
-    #[doc = " * `http_protocol`: The HTTP Protocol the request used."]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
     #[doc = ""]
     #[doc = " @example \"HTTP/2\""]
-    #[doc = " * `request_priority`: The browser-requested prioritization information in the request object."]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
     #[doc = ""]
     #[doc = " If no information was set, defaults to the empty string `\"\"`"]
     #[doc = ""]
     #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
     #[doc = " @default \"\""]
-    #[doc = " * `tls_version`: The TLS version of the connection to Cloudflare."]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
     #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
     #[doc = ""]
     #[doc = " @example \"TLSv1.3\""]
-    #[doc = " * `tls_cipher`: The cipher for the connection to Cloudflare."]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
     #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
     #[doc = ""]
     #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
@@ -61991,33 +61991,33 @@ impl IncomingRequestCfPropertiesBase {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `colo`: The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
     #[doc = " airport code of the data center that the request hit."]
     #[doc = ""]
     #[doc = " @example \"DFW\""]
-    #[doc = " * `edge_request_keep_alive_status`: Represents the upstream's response to a"]
+    #[doc = " * `edge_request_keep_alive_status` - Represents the upstream's response to a"]
     #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
     #[doc = " from cloudflare."]
     #[doc = ""]
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
-    #[doc = " * `http_protocol`: The HTTP Protocol the request used."]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
     #[doc = ""]
     #[doc = " @example \"HTTP/2\""]
-    #[doc = " * `request_priority`: The browser-requested prioritization information in the request object."]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
     #[doc = ""]
     #[doc = " If no information was set, defaults to the empty string `\"\"`"]
     #[doc = ""]
     #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
     #[doc = " @default \"\""]
-    #[doc = " * `tls_version`: The TLS version of the connection to Cloudflare."]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
     #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
     #[doc = ""]
     #[doc = " @example \"TLSv1.3\""]
-    #[doc = " * `tls_cipher`: The cipher for the connection to Cloudflare."]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
     #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
     #[doc = ""]
     #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
@@ -62110,18 +62110,18 @@ extern "C" {
     );
 }
 impl IncomingRequestCfPropertiesBotManagementBase {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `score`: Cloudflareâ€™s [level of certainty](https://developers.cloudflare.com/bots/concepts/bot-score/) that a request comes from a bot,"]
+    #[doc = " * `score` - Cloudflareâ€™s [level of certainty](https://developers.cloudflare.com/bots/concepts/bot-score/) that a request comes from a bot,"]
     #[doc = " represented as an integer percentage between `1` (almost certainly a bot) and `99` (almost certainly human)."]
     #[doc = ""]
     #[doc = " @example 54"]
-    #[doc = " * `verified_bot`: A boolean value that is true if the request comes from a good bot, like Google or Bing."]
+    #[doc = " * `verified_bot` - A boolean value that is true if the request comes from a good bot, like Google or Bing."]
     #[doc = " Most customers choose to allow this traffic. For more details, see [Traffic from known bots](https://developers.cloudflare.com/firewall/known-issues-and-faq/#how-does-firewall-rules-handle-traffic-from-known-bots)."]
-    #[doc = " * `corporate_proxy`: A boolean value that is true if the request originates from a"]
+    #[doc = " * `corporate_proxy` - A boolean value that is true if the request originates from a"]
     #[doc = " Cloudflare-verified proxy service."]
-    #[doc = " * `static_resource`: A boolean value that's true if the request matches [file extensions](https://developers.cloudflare.com/bots/reference/static-resources/) for many types of static resources."]
-    #[doc = " * `detection_ids`: List of IDs that correlate to the Bot Management heuristic detections made on a request (you can have multiple heuristic detections on the same request)."]
+    #[doc = " * `static_resource` - A boolean value that's true if the request matches [file extensions](https://developers.cloudflare.com/bots/reference/static-resources/) for many types of static resources."]
+    #[doc = " * `detection_ids` - List of IDs that correlate to the Bot Management heuristic detections made on a request (you can have multiple heuristic detections on the same request)."]
     pub fn new(
         score: f64,
         verified_bot: bool,
@@ -62138,18 +62138,18 @@ impl IncomingRequestCfPropertiesBotManagementBase {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `score`: Cloudflareâ€™s [level of certainty](https://developers.cloudflare.com/bots/concepts/bot-score/) that a request comes from a bot,"]
+    #[doc = " * `score` - Cloudflareâ€™s [level of certainty](https://developers.cloudflare.com/bots/concepts/bot-score/) that a request comes from a bot,"]
     #[doc = " represented as an integer percentage between `1` (almost certainly a bot) and `99` (almost certainly human)."]
     #[doc = ""]
     #[doc = " @example 54"]
-    #[doc = " * `verified_bot`: A boolean value that is true if the request comes from a good bot, like Google or Bing."]
+    #[doc = " * `verified_bot` - A boolean value that is true if the request comes from a good bot, like Google or Bing."]
     #[doc = " Most customers choose to allow this traffic. For more details, see [Traffic from known bots](https://developers.cloudflare.com/firewall/known-issues-and-faq/#how-does-firewall-rules-handle-traffic-from-known-bots)."]
-    #[doc = " * `corporate_proxy`: A boolean value that is true if the request originates from a"]
+    #[doc = " * `corporate_proxy` - A boolean value that is true if the request originates from a"]
     #[doc = " Cloudflare-verified proxy service."]
-    #[doc = " * `static_resource`: A boolean value that's true if the request matches [file extensions](https://developers.cloudflare.com/bots/reference/static-resources/) for many types of static resources."]
-    #[doc = " * `detection_ids`: List of IDs that correlate to the Bot Management heuristic detections made on a request (you can have multiple heuristic detections on the same request)."]
+    #[doc = " * `static_resource` - A boolean value that's true if the request matches [file extensions](https://developers.cloudflare.com/bots/reference/static-resources/) for many types of static resources."]
+    #[doc = " * `detection_ids` - List of IDs that correlate to the Bot Management heuristic detections made on a request (you can have multiple heuristic detections on the same request)."]
     pub fn builder(
         score: f64,
         verified_bot: bool,
@@ -62198,10 +62198,10 @@ extern "C" {
     pub fn set_client_trust_score(this: &IncomingRequestCfPropertiesBotManagement, val: f64);
 }
 impl IncomingRequestCfPropertiesBotManagement {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `bot_management`: Results of Cloudflare's Bot Management analysis"]
-    #[doc = " * `client_trust_score`: Duplicate of `botManagement.score`."]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
     #[doc = ""]
     #[doc = " @deprecated"]
     pub fn new(
@@ -62210,10 +62210,10 @@ impl IncomingRequestCfPropertiesBotManagement {
     ) -> IncomingRequestCfPropertiesBotManagement {
         Self::builder(bot_management, client_trust_score).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `bot_management`: Results of Cloudflare's Bot Management analysis"]
-    #[doc = " * `client_trust_score`: Duplicate of `botManagement.score`."]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `client_trust_score` - Duplicate of `botManagement.score`."]
     #[doc = ""]
     #[doc = " @deprecated"]
     pub fn builder(
@@ -62249,15 +62249,15 @@ extern "C" {
     );
 }
 impl IncomingRequestCfPropertiesBotManagementEnterprise {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `bot_management`: Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
     pub fn new(bot_management: &JsValue) -> IncomingRequestCfPropertiesBotManagementEnterprise {
         Self::builder(bot_management).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `bot_management`: Results of Cloudflare's Bot Management analysis"]
+    #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
     pub fn builder(
         bot_management: &JsValue,
     ) -> IncomingRequestCfPropertiesBotManagementEnterpriseBuilder {
@@ -62348,9 +62348,9 @@ extern "C" {
     );
 }
 impl IncomingRequestCfPropertiesCloudflareAccessOrApiShield {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `tls_client_auth`: Information about the client certificate presented to Cloudflare."]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
     #[doc = ""]
     #[doc = " This is populated when the incoming request is served over TLS using"]
     #[doc = " either Cloudflare Access or API Shield (mTLS)"]
@@ -62367,9 +62367,9 @@ impl IncomingRequestCfPropertiesCloudflareAccessOrApiShield {
     ) -> IncomingRequestCfPropertiesCloudflareAccessOrApiShield {
         Self::builder(tls_client_auth).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `tls_client_auth`: Information about the client certificate presented to Cloudflare."]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
     #[doc = ""]
     #[doc = " This is populated when the incoming request is served over TLS using"]
     #[doc = " either Cloudflare Access or API Shield (mTLS)"]
@@ -62389,9 +62389,9 @@ impl IncomingRequestCfPropertiesCloudflareAccessOrApiShield {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `tls_client_auth`: Information about the client certificate presented to Cloudflare."]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
     #[doc = ""]
     #[doc = " This is populated when the incoming request is served over TLS using"]
     #[doc = " either Cloudflare Access or API Shield (mTLS)"]
@@ -62410,9 +62410,9 @@ impl IncomingRequestCfPropertiesCloudflareAccessOrApiShield {
         inner.set_tls_client_auth(tls_client_auth);
         IncomingRequestCfPropertiesCloudflareAccessOrApiShieldBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `tls_client_auth`: Information about the client certificate presented to Cloudflare."]
+    #[doc = " * `tls_client_auth` - Information about the client certificate presented to Cloudflare."]
     #[doc = ""]
     #[doc = " This is populated when the incoming request is served over TLS using"]
     #[doc = " either Cloudflare Access or API Shield (mTLS)"]
@@ -62497,18 +62497,18 @@ extern "C" {
     );
 }
 impl IncomingRequestCfPropertiesExportedAuthenticatorMetadata {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `client_handshake`: The client's [`HELLO` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.1.2), encoded in hexadecimal"]
-    #[doc = ""]
-    #[doc = " @example \"44372ba35fa1270921d318f34c12f155dc87b682cf36a790cfaa3ba8737a1b5d\""]
-    #[doc = " * `server_handshake`: The server's [`HELLO` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.1.2), encoded in hexadecimal"]
+    #[doc = " * `client_handshake` - The client's [`HELLO` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.1.2), encoded in hexadecimal"]
     #[doc = ""]
     #[doc = " @example \"44372ba35fa1270921d318f34c12f155dc87b682cf36a790cfaa3ba8737a1b5d\""]
-    #[doc = " * `client_finished`: The client's [`FINISHED` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.9), encoded in hexadecimal"]
+    #[doc = " * `server_handshake` - The server's [`HELLO` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.1.2), encoded in hexadecimal"]
+    #[doc = ""]
+    #[doc = " @example \"44372ba35fa1270921d318f34c12f155dc87b682cf36a790cfaa3ba8737a1b5d\""]
+    #[doc = " * `client_finished` - The client's [`FINISHED` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.9), encoded in hexadecimal"]
     #[doc = ""]
     #[doc = " @example \"084ee802fe1348f688220e2a6040a05b2199a761f33cf753abb1b006792d3f8b\""]
-    #[doc = " * `server_finished`: The server's [`FINISHED` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.9), encoded in hexadecimal"]
+    #[doc = " * `server_finished` - The server's [`FINISHED` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.9), encoded in hexadecimal"]
     #[doc = ""]
     #[doc = " @example \"084ee802fe1348f688220e2a6040a05b2199a761f33cf753abb1b006792d3f8b\""]
     pub fn new(
@@ -62525,18 +62525,18 @@ impl IncomingRequestCfPropertiesExportedAuthenticatorMetadata {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `client_handshake`: The client's [`HELLO` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.1.2), encoded in hexadecimal"]
-    #[doc = ""]
-    #[doc = " @example \"44372ba35fa1270921d318f34c12f155dc87b682cf36a790cfaa3ba8737a1b5d\""]
-    #[doc = " * `server_handshake`: The server's [`HELLO` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.1.2), encoded in hexadecimal"]
+    #[doc = " * `client_handshake` - The client's [`HELLO` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.1.2), encoded in hexadecimal"]
     #[doc = ""]
     #[doc = " @example \"44372ba35fa1270921d318f34c12f155dc87b682cf36a790cfaa3ba8737a1b5d\""]
-    #[doc = " * `client_finished`: The client's [`FINISHED` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.9), encoded in hexadecimal"]
+    #[doc = " * `server_handshake` - The server's [`HELLO` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.1.2), encoded in hexadecimal"]
+    #[doc = ""]
+    #[doc = " @example \"44372ba35fa1270921d318f34c12f155dc87b682cf36a790cfaa3ba8737a1b5d\""]
+    #[doc = " * `client_finished` - The client's [`FINISHED` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.9), encoded in hexadecimal"]
     #[doc = ""]
     #[doc = " @example \"084ee802fe1348f688220e2a6040a05b2199a761f33cf753abb1b006792d3f8b\""]
-    #[doc = " * `server_finished`: The server's [`FINISHED` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.9), encoded in hexadecimal"]
+    #[doc = " * `server_finished` - The server's [`FINISHED` message](https://www.rfc-editor.org/rfc/rfc5246#section-7.4.9), encoded in hexadecimal"]
     #[doc = ""]
     #[doc = " @example \"084ee802fe1348f688220e2a6040a05b2199a761f33cf753abb1b006792d3f8b\""]
     pub fn builder(
@@ -62862,55 +62862,55 @@ extern "C" {
     pub fn set_cert_not_after(this: &IncomingRequestCfPropertiesTLSClientAuth, val: &str);
 }
 impl IncomingRequestCfPropertiesTLSClientAuth {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `certPresented: \"1\"`: Always `\"1\"`, indicating that the certificate was presented"]
-    #[doc = " * `certRevoked: \"1\"`: The presented certificate's revokation status."]
+    #[doc = " * `certPresented: \"1\"` - Always `\"1\"`, indicating that the certificate was presented"]
+    #[doc = " * `certRevoked: \"1\"` - The presented certificate's revokation status."]
     #[doc = ""]
     #[doc = " - A value of `\"1\"` indicates the certificate has been revoked"]
     #[doc = " - A value of `\"0\"` indicates the certificate has not been revoked"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `cert_verified`: Result of certificate verification."]
+    #[doc = " * `cert_verified` - Result of certificate verification."]
     #[doc = ""]
     #[doc = " @example \"FAILED:self signed certificate\""]
-    #[doc = " * `cert_issuer_dn`: The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
+    #[doc = " * `cert_issuer_dn` - The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
     #[doc = ""]
     #[doc = " @example \"CN=cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
-    #[doc = " * `cert_subject_dn`: The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
+    #[doc = " * `cert_subject_dn` - The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
     #[doc = ""]
     #[doc = " @example \"CN=*.cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
-    #[doc = " * `cert_issuer_dnrfc_2253`: The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
+    #[doc = " * `cert_issuer_dnrfc_2253` - The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
     #[doc = ""]
     #[doc = " @example \"CN=cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
-    #[doc = " * `cert_subject_dnrfc_2253`: The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
+    #[doc = " * `cert_subject_dnrfc_2253` - The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
     #[doc = ""]
     #[doc = " @example \"CN=*.cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
-    #[doc = " * `cert_issuer_dn_legacy`: The certificate issuer's distinguished name (legacy policies)"]
-    #[doc = " * `cert_subject_dn_legacy`: The certificate subject's distinguished name (legacy policies)"]
-    #[doc = " * `cert_serial`: The certificate's serial number"]
+    #[doc = " * `cert_issuer_dn_legacy` - The certificate issuer's distinguished name (legacy policies)"]
+    #[doc = " * `cert_subject_dn_legacy` - The certificate subject's distinguished name (legacy policies)"]
+    #[doc = " * `cert_serial` - The certificate's serial number"]
     #[doc = ""]
     #[doc = " @example \"00936EACBE07F201DF\""]
-    #[doc = " * `cert_issuer_serial`: The certificate issuer's serial number"]
+    #[doc = " * `cert_issuer_serial` - The certificate issuer's serial number"]
     #[doc = ""]
     #[doc = " @example \"2489002934BDFEA34\""]
-    #[doc = " * `cert_ski`: The certificate's Subject Key Identifier"]
+    #[doc = " * `cert_ski` - The certificate's Subject Key Identifier"]
     #[doc = ""]
     #[doc = " @example \"BB:AF:7E:02:3D:FA:A6:F1:3C:84:8E:AD:EE:38:98:EC:D9:32:32:D4\""]
-    #[doc = " * `cert_issuer_ski`: The certificate issuer's Subject Key Identifier"]
+    #[doc = " * `cert_issuer_ski` - The certificate issuer's Subject Key Identifier"]
     #[doc = ""]
     #[doc = " @example \"BB:AF:7E:02:3D:FA:A6:F1:3C:84:8E:AD:EE:38:98:EC:D9:32:32:D4\""]
-    #[doc = " * `cert_fingerprint_sha_1`: The certificate's SHA-1 fingerprint"]
+    #[doc = " * `cert_fingerprint_sha_1` - The certificate's SHA-1 fingerprint"]
     #[doc = ""]
     #[doc = " @example \"6b9109f323999e52259cda7373ff0b4d26bd232e\""]
-    #[doc = " * `cert_fingerprint_sha_256`: The certificate's SHA-256 fingerprint"]
+    #[doc = " * `cert_fingerprint_sha_256` - The certificate's SHA-256 fingerprint"]
     #[doc = ""]
     #[doc = " @example \"acf77cf37b4156a2708e34c4eb755f9b5dbbe5ebb55adfec8f11493438d19e6ad3f157f81fa3b98278453d5652b0c1fd1d71e5695ae4d709803a4d3f39de9dea\""]
-    #[doc = " * `cert_not_before`: The effective starting date of the certificate"]
+    #[doc = " * `cert_not_before` - The effective starting date of the certificate"]
     #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
-    #[doc = " * `cert_not_after`: The effective expiration date of the certificate"]
+    #[doc = " * `cert_not_after` - The effective expiration date of the certificate"]
     #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
     pub fn new_1_1(
@@ -62949,55 +62949,55 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
         )
         .build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `certPresented: \"1\"`: Always `\"1\"`, indicating that the certificate was presented"]
-    #[doc = " * `certRevoked: \"0\"`: The presented certificate's revokation status."]
+    #[doc = " * `certPresented: \"1\"` - Always `\"1\"`, indicating that the certificate was presented"]
+    #[doc = " * `certRevoked: \"0\"` - The presented certificate's revokation status."]
     #[doc = ""]
     #[doc = " - A value of `\"1\"` indicates the certificate has been revoked"]
     #[doc = " - A value of `\"0\"` indicates the certificate has not been revoked"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `cert_verified`: Result of certificate verification."]
+    #[doc = " * `cert_verified` - Result of certificate verification."]
     #[doc = ""]
     #[doc = " @example \"FAILED:self signed certificate\""]
-    #[doc = " * `cert_issuer_dn`: The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
+    #[doc = " * `cert_issuer_dn` - The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
     #[doc = ""]
     #[doc = " @example \"CN=cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
-    #[doc = " * `cert_subject_dn`: The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
+    #[doc = " * `cert_subject_dn` - The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
     #[doc = ""]
     #[doc = " @example \"CN=*.cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
-    #[doc = " * `cert_issuer_dnrfc_2253`: The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
+    #[doc = " * `cert_issuer_dnrfc_2253` - The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
     #[doc = ""]
     #[doc = " @example \"CN=cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
-    #[doc = " * `cert_subject_dnrfc_2253`: The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
+    #[doc = " * `cert_subject_dnrfc_2253` - The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
     #[doc = ""]
     #[doc = " @example \"CN=*.cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
-    #[doc = " * `cert_issuer_dn_legacy`: The certificate issuer's distinguished name (legacy policies)"]
-    #[doc = " * `cert_subject_dn_legacy`: The certificate subject's distinguished name (legacy policies)"]
-    #[doc = " * `cert_serial`: The certificate's serial number"]
+    #[doc = " * `cert_issuer_dn_legacy` - The certificate issuer's distinguished name (legacy policies)"]
+    #[doc = " * `cert_subject_dn_legacy` - The certificate subject's distinguished name (legacy policies)"]
+    #[doc = " * `cert_serial` - The certificate's serial number"]
     #[doc = ""]
     #[doc = " @example \"00936EACBE07F201DF\""]
-    #[doc = " * `cert_issuer_serial`: The certificate issuer's serial number"]
+    #[doc = " * `cert_issuer_serial` - The certificate issuer's serial number"]
     #[doc = ""]
     #[doc = " @example \"2489002934BDFEA34\""]
-    #[doc = " * `cert_ski`: The certificate's Subject Key Identifier"]
+    #[doc = " * `cert_ski` - The certificate's Subject Key Identifier"]
     #[doc = ""]
     #[doc = " @example \"BB:AF:7E:02:3D:FA:A6:F1:3C:84:8E:AD:EE:38:98:EC:D9:32:32:D4\""]
-    #[doc = " * `cert_issuer_ski`: The certificate issuer's Subject Key Identifier"]
+    #[doc = " * `cert_issuer_ski` - The certificate issuer's Subject Key Identifier"]
     #[doc = ""]
     #[doc = " @example \"BB:AF:7E:02:3D:FA:A6:F1:3C:84:8E:AD:EE:38:98:EC:D9:32:32:D4\""]
-    #[doc = " * `cert_fingerprint_sha_1`: The certificate's SHA-1 fingerprint"]
+    #[doc = " * `cert_fingerprint_sha_1` - The certificate's SHA-1 fingerprint"]
     #[doc = ""]
     #[doc = " @example \"6b9109f323999e52259cda7373ff0b4d26bd232e\""]
-    #[doc = " * `cert_fingerprint_sha_256`: The certificate's SHA-256 fingerprint"]
+    #[doc = " * `cert_fingerprint_sha_256` - The certificate's SHA-256 fingerprint"]
     #[doc = ""]
     #[doc = " @example \"acf77cf37b4156a2708e34c4eb755f9b5dbbe5ebb55adfec8f11493438d19e6ad3f157f81fa3b98278453d5652b0c1fd1d71e5695ae4d709803a4d3f39de9dea\""]
-    #[doc = " * `cert_not_before`: The effective starting date of the certificate"]
+    #[doc = " * `cert_not_before` - The effective starting date of the certificate"]
     #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
-    #[doc = " * `cert_not_after`: The effective expiration date of the certificate"]
+    #[doc = " * `cert_not_after` - The effective expiration date of the certificate"]
     #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
     pub fn new_1_0(
@@ -63036,55 +63036,55 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
         )
         .build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `certPresented: \"1\"`: Always `\"1\"`, indicating that the certificate was presented"]
-    #[doc = " * `certRevoked: \"1\"`: The presented certificate's revokation status."]
+    #[doc = " * `certPresented: \"1\"` - Always `\"1\"`, indicating that the certificate was presented"]
+    #[doc = " * `certRevoked: \"1\"` - The presented certificate's revokation status."]
     #[doc = ""]
     #[doc = " - A value of `\"1\"` indicates the certificate has been revoked"]
     #[doc = " - A value of `\"0\"` indicates the certificate has not been revoked"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `cert_verified`: Result of certificate verification."]
+    #[doc = " * `cert_verified` - Result of certificate verification."]
     #[doc = ""]
     #[doc = " @example \"FAILED:self signed certificate\""]
-    #[doc = " * `cert_issuer_dn`: The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
+    #[doc = " * `cert_issuer_dn` - The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
     #[doc = ""]
     #[doc = " @example \"CN=cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
-    #[doc = " * `cert_subject_dn`: The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
+    #[doc = " * `cert_subject_dn` - The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
     #[doc = ""]
     #[doc = " @example \"CN=*.cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
-    #[doc = " * `cert_issuer_dnrfc_2253`: The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
+    #[doc = " * `cert_issuer_dnrfc_2253` - The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
     #[doc = ""]
     #[doc = " @example \"CN=cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
-    #[doc = " * `cert_subject_dnrfc_2253`: The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
+    #[doc = " * `cert_subject_dnrfc_2253` - The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
     #[doc = ""]
     #[doc = " @example \"CN=*.cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
-    #[doc = " * `cert_issuer_dn_legacy`: The certificate issuer's distinguished name (legacy policies)"]
-    #[doc = " * `cert_subject_dn_legacy`: The certificate subject's distinguished name (legacy policies)"]
-    #[doc = " * `cert_serial`: The certificate's serial number"]
+    #[doc = " * `cert_issuer_dn_legacy` - The certificate issuer's distinguished name (legacy policies)"]
+    #[doc = " * `cert_subject_dn_legacy` - The certificate subject's distinguished name (legacy policies)"]
+    #[doc = " * `cert_serial` - The certificate's serial number"]
     #[doc = ""]
     #[doc = " @example \"00936EACBE07F201DF\""]
-    #[doc = " * `cert_issuer_serial`: The certificate issuer's serial number"]
+    #[doc = " * `cert_issuer_serial` - The certificate issuer's serial number"]
     #[doc = ""]
     #[doc = " @example \"2489002934BDFEA34\""]
-    #[doc = " * `cert_ski`: The certificate's Subject Key Identifier"]
+    #[doc = " * `cert_ski` - The certificate's Subject Key Identifier"]
     #[doc = ""]
     #[doc = " @example \"BB:AF:7E:02:3D:FA:A6:F1:3C:84:8E:AD:EE:38:98:EC:D9:32:32:D4\""]
-    #[doc = " * `cert_issuer_ski`: The certificate issuer's Subject Key Identifier"]
+    #[doc = " * `cert_issuer_ski` - The certificate issuer's Subject Key Identifier"]
     #[doc = ""]
     #[doc = " @example \"BB:AF:7E:02:3D:FA:A6:F1:3C:84:8E:AD:EE:38:98:EC:D9:32:32:D4\""]
-    #[doc = " * `cert_fingerprint_sha_1`: The certificate's SHA-1 fingerprint"]
+    #[doc = " * `cert_fingerprint_sha_1` - The certificate's SHA-1 fingerprint"]
     #[doc = ""]
     #[doc = " @example \"6b9109f323999e52259cda7373ff0b4d26bd232e\""]
-    #[doc = " * `cert_fingerprint_sha_256`: The certificate's SHA-256 fingerprint"]
+    #[doc = " * `cert_fingerprint_sha_256` - The certificate's SHA-256 fingerprint"]
     #[doc = ""]
     #[doc = " @example \"acf77cf37b4156a2708e34c4eb755f9b5dbbe5ebb55adfec8f11493438d19e6ad3f157f81fa3b98278453d5652b0c1fd1d71e5695ae4d709803a4d3f39de9dea\""]
-    #[doc = " * `cert_not_before`: The effective starting date of the certificate"]
+    #[doc = " * `cert_not_before` - The effective starting date of the certificate"]
     #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
-    #[doc = " * `cert_not_after`: The effective expiration date of the certificate"]
+    #[doc = " * `cert_not_after` - The effective expiration date of the certificate"]
     #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
     pub fn builder_1_1(
@@ -63124,55 +63124,55 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
         inner.set_cert_not_after(cert_not_after);
         IncomingRequestCfPropertiesTLSClientAuthBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " * `certPresented: \"1\"`: Always `\"1\"`, indicating that the certificate was presented"]
-    #[doc = " * `certRevoked: \"0\"`: The presented certificate's revokation status."]
+    #[doc = " * `certPresented: \"1\"` - Always `\"1\"`, indicating that the certificate was presented"]
+    #[doc = " * `certRevoked: \"0\"` - The presented certificate's revokation status."]
     #[doc = ""]
     #[doc = " - A value of `\"1\"` indicates the certificate has been revoked"]
     #[doc = " - A value of `\"0\"` indicates the certificate has not been revoked"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `cert_verified`: Result of certificate verification."]
+    #[doc = " * `cert_verified` - Result of certificate verification."]
     #[doc = ""]
     #[doc = " @example \"FAILED:self signed certificate\""]
-    #[doc = " * `cert_issuer_dn`: The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
+    #[doc = " * `cert_issuer_dn` - The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
     #[doc = ""]
     #[doc = " @example \"CN=cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
-    #[doc = " * `cert_subject_dn`: The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
+    #[doc = " * `cert_subject_dn` - The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
     #[doc = ""]
     #[doc = " @example \"CN=*.cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
-    #[doc = " * `cert_issuer_dnrfc_2253`: The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
+    #[doc = " * `cert_issuer_dnrfc_2253` - The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
     #[doc = ""]
     #[doc = " @example \"CN=cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
-    #[doc = " * `cert_subject_dnrfc_2253`: The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
+    #[doc = " * `cert_subject_dnrfc_2253` - The certificate subject's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html) ([RFC 2253](https://www.rfc-editor.org/rfc/rfc2253.html) formatted)"]
     #[doc = ""]
     #[doc = " @example \"CN=*.cloudflareaccess.com, C=US, ST=Texas, L=Austin, O=Cloudflare\""]
-    #[doc = " * `cert_issuer_dn_legacy`: The certificate issuer's distinguished name (legacy policies)"]
-    #[doc = " * `cert_subject_dn_legacy`: The certificate subject's distinguished name (legacy policies)"]
-    #[doc = " * `cert_serial`: The certificate's serial number"]
+    #[doc = " * `cert_issuer_dn_legacy` - The certificate issuer's distinguished name (legacy policies)"]
+    #[doc = " * `cert_subject_dn_legacy` - The certificate subject's distinguished name (legacy policies)"]
+    #[doc = " * `cert_serial` - The certificate's serial number"]
     #[doc = ""]
     #[doc = " @example \"00936EACBE07F201DF\""]
-    #[doc = " * `cert_issuer_serial`: The certificate issuer's serial number"]
+    #[doc = " * `cert_issuer_serial` - The certificate issuer's serial number"]
     #[doc = ""]
     #[doc = " @example \"2489002934BDFEA34\""]
-    #[doc = " * `cert_ski`: The certificate's Subject Key Identifier"]
+    #[doc = " * `cert_ski` - The certificate's Subject Key Identifier"]
     #[doc = ""]
     #[doc = " @example \"BB:AF:7E:02:3D:FA:A6:F1:3C:84:8E:AD:EE:38:98:EC:D9:32:32:D4\""]
-    #[doc = " * `cert_issuer_ski`: The certificate issuer's Subject Key Identifier"]
+    #[doc = " * `cert_issuer_ski` - The certificate issuer's Subject Key Identifier"]
     #[doc = ""]
     #[doc = " @example \"BB:AF:7E:02:3D:FA:A6:F1:3C:84:8E:AD:EE:38:98:EC:D9:32:32:D4\""]
-    #[doc = " * `cert_fingerprint_sha_1`: The certificate's SHA-1 fingerprint"]
+    #[doc = " * `cert_fingerprint_sha_1` - The certificate's SHA-1 fingerprint"]
     #[doc = ""]
     #[doc = " @example \"6b9109f323999e52259cda7373ff0b4d26bd232e\""]
-    #[doc = " * `cert_fingerprint_sha_256`: The certificate's SHA-256 fingerprint"]
+    #[doc = " * `cert_fingerprint_sha_256` - The certificate's SHA-256 fingerprint"]
     #[doc = ""]
     #[doc = " @example \"acf77cf37b4156a2708e34c4eb755f9b5dbbe5ebb55adfec8f11493438d19e6ad3f157f81fa3b98278453d5652b0c1fd1d71e5695ae4d709803a4d3f39de9dea\""]
-    #[doc = " * `cert_not_before`: The effective starting date of the certificate"]
+    #[doc = " * `cert_not_before` - The effective starting date of the certificate"]
     #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
-    #[doc = " * `cert_not_after`: The effective expiration date of the certificate"]
+    #[doc = " * `cert_not_after` - The effective expiration date of the certificate"]
     #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
     pub fn builder_1_0(
@@ -63348,7 +63348,7 @@ extern "C" {
     );
 }
 impl IncomingRequestCfPropertiesTLSClientAuthPlaceholder {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `certPresented: \"0\"`"]
     #[doc = " * `certVerified: \"NONE\"`"]
@@ -63370,7 +63370,7 @@ impl IncomingRequestCfPropertiesTLSClientAuthPlaceholder {
     pub fn new_0_none_0______________() -> IncomingRequestCfPropertiesTLSClientAuthPlaceholder {
         Self::builder_0_none_0______________().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `certPresented: \"0\"`"]
     #[doc = " * `certVerified: \"NONE\"`"]
@@ -64022,7 +64022,7 @@ extern "C" {
     pub fn set_total_attempts(this: &D1Meta, val: f64);
 }
 impl D1Meta {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `duration`"]
     #[doc = " * `size_after`"]
@@ -64051,7 +64051,7 @@ impl D1Meta {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `duration`"]
     #[doc = " * `size_after`"]
@@ -64127,21 +64127,21 @@ extern "C" {
     pub fn set_error(this: &D1Response, val: &JsValue);
 }
 impl D1Response {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `success: true`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `meta`"]
     pub fn new_true(meta: &JsValue) -> D1Response {
         Self::builder_true(meta).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `success: true`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `meta`"]
     pub fn builder_true(meta: &JsValue) -> D1ResponseBuilder {
@@ -64180,14 +64180,14 @@ extern "C" {
     pub fn set_duration(this: &D1ExecResult, val: f64);
 }
 impl D1ExecResult {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `count`"]
     #[doc = " * `duration`"]
     pub fn new(count: f64, duration: f64) -> D1ExecResult {
         Self::builder(count, duration).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `count`"]
     #[doc = " * `duration`"]
@@ -64383,13 +64383,13 @@ extern "C" {
     pub fn set_column_names(this: &D1PreparedStatementOptions, val: bool);
 }
 impl D1PreparedStatementOptions {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `columnNames: true`"]
     pub fn new_true() -> D1PreparedStatementOptions {
         Self::builder_true().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `columnNames: true`"]
     pub fn builder_true() -> D1PreparedStatementOptionsBuilder {
@@ -64456,15 +64456,15 @@ extern "C" {
     pub fn set_message_id(this: &EmailSendResult, val: &str);
 }
 impl EmailSendResult {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `message_id`: The Email Message ID"]
+    #[doc = " * `message_id` - The Email Message ID"]
     pub fn new(message_id: &str) -> EmailSendResult {
         Self::builder(message_id).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `message_id`: The Email Message ID"]
+    #[doc = " * `message_id` - The Email Message ID"]
     pub fn builder(message_id: &str) -> EmailSendResultBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_message_id(message_id);
@@ -64617,11 +64617,11 @@ extern "C" {
     pub fn set_type(this: &EmailAttachment, val: &str);
 }
 impl EmailAttachment {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `disposition: \"inline\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
@@ -64629,11 +64629,11 @@ impl EmailAttachment {
     pub fn new_inline(content: &str, filename: &str, r#type: &str) -> EmailAttachment {
         Self::builder_inline(content, filename, r#type).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `disposition: \"attachment\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
@@ -64641,11 +64641,11 @@ impl EmailAttachment {
     pub fn new_attachment(content: &str, filename: &str, r#type: &str) -> EmailAttachment {
         Self::builder_attachment(content, filename, r#type).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `disposition: \"inline\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
@@ -64657,11 +64657,11 @@ impl EmailAttachment {
     ) -> EmailAttachment {
         Self::builder_inline_with_array_buffer(content, filename, r#type).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `disposition: \"attachment\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
@@ -64673,11 +64673,11 @@ impl EmailAttachment {
     ) -> EmailAttachment {
         Self::builder_attachment_with_array_buffer(content, filename, r#type).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `disposition: \"inline\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
@@ -64689,11 +64689,11 @@ impl EmailAttachment {
     ) -> EmailAttachment {
         Self::builder_inline_with_js_value(content, filename, r#type).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `disposition: \"attachment\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
@@ -64705,11 +64705,11 @@ impl EmailAttachment {
     ) -> EmailAttachment {
         Self::builder_attachment_with_js_value(content, filename, r#type).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `disposition: \"inline\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
@@ -64722,11 +64722,11 @@ impl EmailAttachment {
         inner.set_type(r#type);
         EmailAttachmentBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `disposition: \"attachment\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
@@ -64743,11 +64743,11 @@ impl EmailAttachment {
         inner.set_type(r#type);
         EmailAttachmentBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `disposition: \"inline\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
@@ -64764,11 +64764,11 @@ impl EmailAttachment {
         inner.set_type(r#type);
         EmailAttachmentBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `disposition: \"attachment\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
@@ -64785,11 +64785,11 @@ impl EmailAttachment {
         inner.set_type(r#type);
         EmailAttachmentBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `disposition: \"inline\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
@@ -64806,11 +64806,11 @@ impl EmailAttachment {
         inner.set_type(r#type);
         EmailAttachmentBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `disposition: \"attachment\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `content`"]
     #[doc = " * `filename`"]
@@ -64859,14 +64859,14 @@ extern "C" {
     pub fn set_email(this: &EmailAddress, val: &str);
 }
 impl EmailAddress {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `email`"]
     pub fn new(name: &str, email: &str) -> EmailAddress {
         Self::builder(name, email).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `email`"]
@@ -64958,7 +64958,7 @@ extern "C" {
     pub fn set_attachments(this: &SendEmailBuilder, val: &Array<EmailAttachment>);
 }
 impl SendEmailBuilder {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `from`"]
     #[doc = " * `to`"]
@@ -64966,7 +64966,7 @@ impl SendEmailBuilder {
     pub fn new(from: &str, to: &str, subject: &str) -> SendEmailBuilder {
         Self::builder(from, to, subject).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `from`"]
     #[doc = " * `to`"]
@@ -64978,7 +64978,7 @@ impl SendEmailBuilder {
     ) -> SendEmailBuilder {
         Self::builder_with_str_and_array(from, to, subject).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `from`"]
     #[doc = " * `to`"]
@@ -64990,7 +64990,7 @@ impl SendEmailBuilder {
     ) -> SendEmailBuilder {
         Self::builder_with_email_address_and_str(from, to, subject).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `from`"]
     #[doc = " * `to`"]
@@ -65002,7 +65002,7 @@ impl SendEmailBuilder {
     ) -> SendEmailBuilder {
         Self::builder_with_email_address_and_array(from, to, subject).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `from`"]
     #[doc = " * `to`"]
@@ -65014,7 +65014,7 @@ impl SendEmailBuilder {
         inner.set_subject(subject);
         SendEmailBuilderBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `from`"]
     #[doc = " * `to`"]
@@ -65030,7 +65030,7 @@ impl SendEmailBuilder {
         inner.set_subject(subject);
         SendEmailBuilderBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `from`"]
     #[doc = " * `to`"]
@@ -65046,7 +65046,7 @@ impl SendEmailBuilder {
         inner.set_subject(subject);
         SendEmailBuilderBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `from`"]
     #[doc = " * `to`"]
@@ -65202,19 +65202,19 @@ extern "C" {
     pub fn set_width(this: &ImageInfoResponse, val: f64);
 }
 impl ImageInfoResponse {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"image/svg+xml\"`"]
     pub fn new_imagesvgxml() -> ImageInfoResponse {
         Self::builder_imagesvgxml().build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `format`"]
     pub fn new(format: &str) -> ImageInfoResponse {
         Self::builder(format).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"image/svg+xml\"`"]
     pub fn builder_imagesvgxml() -> ImageInfoResponseBuilder {
@@ -65222,7 +65222,7 @@ impl ImageInfoResponse {
         inner.set_format("image/svg+xml");
         ImageInfoResponseBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `format`"]
     pub fn builder(format: &str) -> ImageInfoResponseBuilder {
@@ -65662,49 +65662,49 @@ extern "C" {
     pub fn set_anim(this: &ImageOutputOptions, val: bool);
 }
 impl ImageOutputOptions {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"image/jpeg\"`"]
     pub fn new_imagejpeg() -> ImageOutputOptions {
         Self::builder_imagejpeg().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"image/png\"`"]
     pub fn new_imagepng() -> ImageOutputOptions {
         Self::builder_imagepng().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"image/gif\"`"]
     pub fn new_imagegif() -> ImageOutputOptions {
         Self::builder_imagegif().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"image/webp\"`"]
     pub fn new_imagewebp() -> ImageOutputOptions {
         Self::builder_imagewebp().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"image/avif\"`"]
     pub fn new_imageavif() -> ImageOutputOptions {
         Self::builder_imageavif().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"rgb\"`"]
     pub fn new_rgb() -> ImageOutputOptions {
         Self::builder_rgb().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"rgba\"`"]
     pub fn new_rgba() -> ImageOutputOptions {
         Self::builder_rgba().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"image/jpeg\"`"]
     pub fn builder_imagejpeg() -> ImageOutputOptionsBuilder {
@@ -65712,7 +65712,7 @@ impl ImageOutputOptions {
         inner.set_format("image/jpeg");
         ImageOutputOptionsBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"image/png\"`"]
     pub fn builder_imagepng() -> ImageOutputOptionsBuilder {
@@ -65720,7 +65720,7 @@ impl ImageOutputOptions {
         inner.set_format_with_js_value("image/png");
         ImageOutputOptionsBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"image/gif\"`"]
     pub fn builder_imagegif() -> ImageOutputOptionsBuilder {
@@ -65728,7 +65728,7 @@ impl ImageOutputOptions {
         inner.set_format_with_js_value_1("image/gif");
         ImageOutputOptionsBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"image/webp\"`"]
     pub fn builder_imagewebp() -> ImageOutputOptionsBuilder {
@@ -65736,7 +65736,7 @@ impl ImageOutputOptions {
         inner.set_format_with_js_value_2("image/webp");
         ImageOutputOptionsBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"image/avif\"`"]
     pub fn builder_imageavif() -> ImageOutputOptionsBuilder {
@@ -65744,7 +65744,7 @@ impl ImageOutputOptions {
         inner.set_format_with_js_value_3("image/avif");
         ImageOutputOptionsBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"rgb\"`"]
     pub fn builder_rgb() -> ImageOutputOptionsBuilder {
@@ -65752,7 +65752,7 @@ impl ImageOutputOptions {
         inner.set_format_with_js_value_4("rgb");
         ImageOutputOptionsBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"rgba\"`"]
     pub fn builder_rgba() -> ImageOutputOptionsBuilder {
@@ -65820,7 +65820,7 @@ extern "C" {
     pub fn set_creator(this: &ImageMetadata, val: &str);
 }
 impl ImageMetadata {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `require_signed_ur_ls`"]
@@ -65828,7 +65828,7 @@ impl ImageMetadata {
     pub fn new(id: &str, require_signed_ur_ls: bool, variants: &Array<JsString>) -> ImageMetadata {
         Self::builder(id, require_signed_ur_ls, variants).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `require_signed_ur_ls`"]
@@ -66074,14 +66074,14 @@ extern "C" {
     pub fn set_list_complete(this: &ImageList, val: bool);
 }
 impl ImageList {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `images`"]
     #[doc = " * `list_complete`"]
     pub fn new(images: &Array<ImageMetadata>, list_complete: bool) -> ImageList {
         Self::builder(images, list_complete).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `images`"]
     #[doc = " * `list_complete`"]
@@ -67053,7 +67053,7 @@ extern "C" {
     pub fn set_data(this: &EventContext, val: &Data);
 }
 impl EventContext {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `request`"]
     #[doc = " * `function_path`"]
@@ -67085,7 +67085,7 @@ impl EventContext {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `request`"]
     #[doc = " * `function_path`"]
@@ -67178,7 +67178,7 @@ extern "C" {
     pub fn set_plugin_args(this: &EventPluginContext, val: &PluginArgs);
 }
 impl EventPluginContext {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `request`"]
     #[doc = " * `function_path`"]
@@ -67213,7 +67213,7 @@ impl EventPluginContext {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `request`"]
     #[doc = " * `function_path`"]
@@ -67323,13 +67323,13 @@ extern "C" {
     pub fn set_key(this: &RateLimitOptions, val: &str);
 }
 impl RateLimitOptions {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     pub fn new(key: &str) -> RateLimitOptions {
         Self::builder(key).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `key`"]
     pub fn builder(key: &str) -> RateLimitOptionsBuilder {
@@ -67357,13 +67357,13 @@ extern "C" {
     pub fn set_success(this: &RateLimitOutcome, val: bool);
 }
 impl RateLimitOutcome {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `success`"]
     pub fn new(success: bool) -> RateLimitOutcome {
         Self::builder(success).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `success`"]
     pub fn builder(success: bool) -> RateLimitOutcomeBuilder {
@@ -67762,7 +67762,7 @@ pub mod cloudflare_workers_module {
         pub fn set_instance_id(this: &WorkflowEvent, val: &str);
     }
     impl WorkflowEvent {
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `payload`"]
         #[doc = " * `timestamp`"]
@@ -67770,7 +67770,7 @@ pub mod cloudflare_workers_module {
         pub fn new(payload: &Readonly, timestamp: &Date, instance_id: &str) -> WorkflowEvent {
             Self::builder(payload, timestamp, instance_id).build()
         }
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `payload`"]
         #[doc = " * `timestamp`"]
@@ -67814,7 +67814,7 @@ pub mod cloudflare_workers_module {
         pub fn set_type(this: &WorkflowStepEvent, val: &str);
     }
     impl WorkflowStepEvent {
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `payload`"]
         #[doc = " * `timestamp`"]
@@ -67822,7 +67822,7 @@ pub mod cloudflare_workers_module {
         pub fn new(payload: &Readonly, timestamp: &Date, r#type: &str) -> WorkflowStepEvent {
             Self::builder(payload, timestamp, r#type).build()
         }
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `payload`"]
         #[doc = " * `timestamp`"]
@@ -67858,13 +67858,13 @@ pub mod cloudflare_workers_module {
         pub fn set_attempt(this: &WorkflowStepContext, val: f64);
     }
     impl WorkflowStepContext {
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `attempt`"]
         pub fn new(attempt: f64) -> WorkflowStepContext {
             Self::builder(attempt).build()
         }
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `attempt`"]
         pub fn builder(attempt: f64) -> WorkflowStepContextBuilder {
@@ -67939,13 +67939,13 @@ pub mod cloudflare_workers_module {
         pub fn set_timeout_with_f64(this: &WorkflowStepOptions, val: f64);
     }
     impl WorkflowStepOptions {
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `type`"]
         pub fn new(r#type: &str) -> WorkflowStepOptions {
             Self::builder(r#type).build()
         }
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `type`"]
         pub fn builder(r#type: &str) -> WorkflowStepOptionsBuilder {
@@ -68452,33 +68452,33 @@ extern "C" {
     pub fn set_public_details_with_null(this: &StreamVideo, val: &Null);
 }
 impl StreamVideo {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `id`: The unique identifier for the video."]
-    #[doc = " * `creator`: A user-defined identifier for the media creator."]
-    #[doc = " * `thumbnail`: The thumbnail URL for the video."]
-    #[doc = " * `thumbnail_timestamp_pct`: The thumbnail timestamp percentage."]
-    #[doc = " * `ready_to_stream`: Indicates whether the video is ready to stream."]
-    #[doc = " * `ready_to_stream_at`: The date and time the video became ready to stream."]
-    #[doc = " * `status`: Processing status information."]
-    #[doc = " * `meta`: A user modifiable key-value store."]
-    #[doc = " * `created`: The date and time the video was created."]
-    #[doc = " * `modified`: The date and time the video was last modified."]
-    #[doc = " * `scheduled_deletion`: The date and time at which the video will be deleted."]
-    #[doc = " * `size`: The size of the video in bytes."]
-    #[doc = " * `allowed_origins`: Origins allowed to display the video."]
-    #[doc = " * `require_signed_ur_ls`: Indicates whether signed URLs are required."]
-    #[doc = " * `uploaded`: The date and time the video was uploaded."]
-    #[doc = " * `upload_expiry`: The date and time when the upload URL expires."]
-    #[doc = " * `max_size_bytes`: The maximum size in bytes for direct uploads."]
-    #[doc = " * `max_duration_seconds`: The maximum duration in seconds for direct uploads."]
-    #[doc = " * `duration`: The video duration in seconds. -1 indicates unknown."]
-    #[doc = " * `input`: Input metadata for the original upload."]
-    #[doc = " * `hls_playback_url`: Playback URLs for the video."]
+    #[doc = " * `id` - The unique identifier for the video."]
+    #[doc = " * `creator` - A user-defined identifier for the media creator."]
+    #[doc = " * `thumbnail` - The thumbnail URL for the video."]
+    #[doc = " * `thumbnail_timestamp_pct` - The thumbnail timestamp percentage."]
+    #[doc = " * `ready_to_stream` - Indicates whether the video is ready to stream."]
+    #[doc = " * `ready_to_stream_at` - The date and time the video became ready to stream."]
+    #[doc = " * `status` - Processing status information."]
+    #[doc = " * `meta` - A user modifiable key-value store."]
+    #[doc = " * `created` - The date and time the video was created."]
+    #[doc = " * `modified` - The date and time the video was last modified."]
+    #[doc = " * `scheduled_deletion` - The date and time at which the video will be deleted."]
+    #[doc = " * `size` - The size of the video in bytes."]
+    #[doc = " * `allowed_origins` - Origins allowed to display the video."]
+    #[doc = " * `require_signed_ur_ls` - Indicates whether signed URLs are required."]
+    #[doc = " * `uploaded` - The date and time the video was uploaded."]
+    #[doc = " * `upload_expiry` - The date and time when the upload URL expires."]
+    #[doc = " * `max_size_bytes` - The maximum size in bytes for direct uploads."]
+    #[doc = " * `max_duration_seconds` - The maximum duration in seconds for direct uploads."]
+    #[doc = " * `duration` - The video duration in seconds. -1 indicates unknown."]
+    #[doc = " * `input` - Input metadata for the original upload."]
+    #[doc = " * `hls_playback_url` - Playback URLs for the video."]
     #[doc = " * `dash_playback_url`"]
-    #[doc = " * `watermark`: The watermark applied to the video, if any."]
-    #[doc = " * `clipped_from_id`: The source video id if this is a clip."]
-    #[doc = " * `public_details`: Public details associated with the video."]
+    #[doc = " * `watermark` - The watermark applied to the video, if any."]
+    #[doc = " * `clipped_from_id` - The source video id if this is a clip."]
+    #[doc = " * `public_details` - Public details associated with the video."]
     pub fn new(
         id: &str,
         creator: Option<&str>,
@@ -68535,33 +68535,33 @@ impl StreamVideo {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `id`: The unique identifier for the video."]
-    #[doc = " * `creator`: A user-defined identifier for the media creator."]
-    #[doc = " * `thumbnail`: The thumbnail URL for the video."]
-    #[doc = " * `thumbnail_timestamp_pct`: The thumbnail timestamp percentage."]
-    #[doc = " * `ready_to_stream`: Indicates whether the video is ready to stream."]
-    #[doc = " * `ready_to_stream_at`: The date and time the video became ready to stream."]
-    #[doc = " * `status`: Processing status information."]
-    #[doc = " * `meta`: A user modifiable key-value store."]
-    #[doc = " * `created`: The date and time the video was created."]
-    #[doc = " * `modified`: The date and time the video was last modified."]
-    #[doc = " * `scheduled_deletion`: The date and time at which the video will be deleted."]
-    #[doc = " * `size`: The size of the video in bytes."]
-    #[doc = " * `allowed_origins`: Origins allowed to display the video."]
-    #[doc = " * `require_signed_ur_ls`: Indicates whether signed URLs are required."]
-    #[doc = " * `uploaded`: The date and time the video was uploaded."]
-    #[doc = " * `upload_expiry`: The date and time when the upload URL expires."]
-    #[doc = " * `max_size_bytes`: The maximum size in bytes for direct uploads."]
-    #[doc = " * `max_duration_seconds`: The maximum duration in seconds for direct uploads."]
-    #[doc = " * `duration`: The video duration in seconds. -1 indicates unknown."]
-    #[doc = " * `input`: Input metadata for the original upload."]
-    #[doc = " * `hls_playback_url`: Playback URLs for the video."]
+    #[doc = " * `id` - The unique identifier for the video."]
+    #[doc = " * `creator` - A user-defined identifier for the media creator."]
+    #[doc = " * `thumbnail` - The thumbnail URL for the video."]
+    #[doc = " * `thumbnail_timestamp_pct` - The thumbnail timestamp percentage."]
+    #[doc = " * `ready_to_stream` - Indicates whether the video is ready to stream."]
+    #[doc = " * `ready_to_stream_at` - The date and time the video became ready to stream."]
+    #[doc = " * `status` - Processing status information."]
+    #[doc = " * `meta` - A user modifiable key-value store."]
+    #[doc = " * `created` - The date and time the video was created."]
+    #[doc = " * `modified` - The date and time the video was last modified."]
+    #[doc = " * `scheduled_deletion` - The date and time at which the video will be deleted."]
+    #[doc = " * `size` - The size of the video in bytes."]
+    #[doc = " * `allowed_origins` - Origins allowed to display the video."]
+    #[doc = " * `require_signed_ur_ls` - Indicates whether signed URLs are required."]
+    #[doc = " * `uploaded` - The date and time the video was uploaded."]
+    #[doc = " * `upload_expiry` - The date and time when the upload URL expires."]
+    #[doc = " * `max_size_bytes` - The maximum size in bytes for direct uploads."]
+    #[doc = " * `max_duration_seconds` - The maximum duration in seconds for direct uploads."]
+    #[doc = " * `duration` - The video duration in seconds. -1 indicates unknown."]
+    #[doc = " * `input` - Input metadata for the original upload."]
+    #[doc = " * `hls_playback_url` - Playback URLs for the video."]
     #[doc = " * `dash_playback_url`"]
-    #[doc = " * `watermark`: The watermark applied to the video, if any."]
-    #[doc = " * `clipped_from_id`: The source video id if this is a clip."]
-    #[doc = " * `public_details`: Public details associated with the video."]
+    #[doc = " * `watermark` - The watermark applied to the video, if any."]
+    #[doc = " * `clipped_from_id` - The source video id if this is a clip."]
+    #[doc = " * `public_details` - Public details associated with the video."]
     pub fn builder(
         id: &str,
         creator: Option<&str>,
@@ -68670,19 +68670,19 @@ extern "C" {
     pub fn set_error_reason_text(this: &StreamVideoStatus, val: &str);
 }
 impl StreamVideoStatus {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `state`: The current processing state."]
-    #[doc = " * `error_reason_code`: An error reason code, if applicable."]
-    #[doc = " * `error_reason_text`: An error reason text, if applicable."]
+    #[doc = " * `state` - The current processing state."]
+    #[doc = " * `error_reason_code` - An error reason code, if applicable."]
+    #[doc = " * `error_reason_text` - An error reason text, if applicable."]
     pub fn new(state: &str, error_reason_code: &str, error_reason_text: &str) -> StreamVideoStatus {
         Self::builder(state, error_reason_code, error_reason_text).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `state`: The current processing state."]
-    #[doc = " * `error_reason_code`: An error reason code, if applicable."]
-    #[doc = " * `error_reason_text`: An error reason text, if applicable."]
+    #[doc = " * `state` - The current processing state."]
+    #[doc = " * `error_reason_code` - An error reason code, if applicable."]
+    #[doc = " * `error_reason_text` - An error reason text, if applicable."]
     pub fn builder(
         state: &str,
         error_reason_code: &str,
@@ -68728,17 +68728,17 @@ extern "C" {
     pub fn set_height(this: &StreamVideoInput, val: f64);
 }
 impl StreamVideoInput {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `width`: The input width in pixels."]
-    #[doc = " * `height`: The input height in pixels."]
+    #[doc = " * `width` - The input width in pixels."]
+    #[doc = " * `height` - The input height in pixels."]
     pub fn new(width: f64, height: f64) -> StreamVideoInput {
         Self::builder(width, height).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `width`: The input width in pixels."]
-    #[doc = " * `height`: The input height in pixels."]
+    #[doc = " * `width` - The input width in pixels."]
+    #[doc = " * `height` - The input height in pixels."]
     pub fn builder(width: f64, height: f64) -> StreamVideoInputBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_width(width);
@@ -68789,12 +68789,12 @@ extern "C" {
     pub fn set_logo_with_null(this: &StreamPublicDetails, val: &Null);
 }
 impl StreamPublicDetails {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `title`: The public title for the video."]
-    #[doc = " * `share_link`: The public share link."]
-    #[doc = " * `channel_link`: The public channel link."]
-    #[doc = " * `logo`: The public logo URL."]
+    #[doc = " * `title` - The public title for the video."]
+    #[doc = " * `share_link` - The public share link."]
+    #[doc = " * `channel_link` - The public channel link."]
+    #[doc = " * `logo` - The public logo URL."]
     pub fn new(
         title: Option<&str>,
         share_link: Option<&str>,
@@ -68803,12 +68803,12 @@ impl StreamPublicDetails {
     ) -> StreamPublicDetails {
         Self::builder(title, share_link, channel_link, logo).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `title`: The public title for the video."]
-    #[doc = " * `share_link`: The public share link."]
-    #[doc = " * `channel_link`: The public channel link."]
-    #[doc = " * `logo`: The public logo URL."]
+    #[doc = " * `title` - The public title for the video."]
+    #[doc = " * `share_link` - The public share link."]
+    #[doc = " * `channel_link` - The public channel link."]
+    #[doc = " * `logo` - The public logo URL."]
     pub fn builder(
         title: Option<&str>,
         share_link: Option<&str>,
@@ -68862,12 +68862,12 @@ extern "C" {
     pub fn set_scheduled_deletion_with_null(this: &StreamDirectUpload, val: &Null);
 }
 impl StreamDirectUpload {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `upload_url`: The URL an unauthenticated upload can use for a single multipart request."]
-    #[doc = " * `id`: A Cloudflare-generated unique identifier for a media item."]
-    #[doc = " * `watermark`: The watermark profile applied to the upload."]
-    #[doc = " * `scheduled_deletion`: The scheduled deletion time, if any."]
+    #[doc = " * `upload_url` - The URL an unauthenticated upload can use for a single multipart request."]
+    #[doc = " * `id` - A Cloudflare-generated unique identifier for a media item."]
+    #[doc = " * `watermark` - The watermark profile applied to the upload."]
+    #[doc = " * `scheduled_deletion` - The scheduled deletion time, if any."]
     pub fn new(
         upload_url: &str,
         id: &str,
@@ -68876,12 +68876,12 @@ impl StreamDirectUpload {
     ) -> StreamDirectUpload {
         Self::builder(upload_url, id, watermark, scheduled_deletion).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `upload_url`: The URL an unauthenticated upload can use for a single multipart request."]
-    #[doc = " * `id`: A Cloudflare-generated unique identifier for a media item."]
-    #[doc = " * `watermark`: The watermark profile applied to the upload."]
-    #[doc = " * `scheduled_deletion`: The scheduled deletion time, if any."]
+    #[doc = " * `upload_url` - The URL an unauthenticated upload can use for a single multipart request."]
+    #[doc = " * `id` - A Cloudflare-generated unique identifier for a media item."]
+    #[doc = " * `watermark` - The watermark profile applied to the upload."]
+    #[doc = " * `scheduled_deletion` - The scheduled deletion time, if any."]
     pub fn builder(
         upload_url: &str,
         id: &str,
@@ -68961,15 +68961,15 @@ extern "C" {
     pub fn set_watermark(this: &StreamDirectUploadCreateParams, val: &StreamDirectUploadWatermark);
 }
 impl StreamDirectUploadCreateParams {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `max_duration_seconds`: The maximum duration in seconds for a video upload."]
+    #[doc = " * `max_duration_seconds` - The maximum duration in seconds for a video upload."]
     pub fn new(max_duration_seconds: f64) -> StreamDirectUploadCreateParams {
         Self::builder(max_duration_seconds).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `max_duration_seconds`: The maximum duration in seconds for a video upload."]
+    #[doc = " * `max_duration_seconds` - The maximum duration in seconds for a video upload."]
     pub fn builder(max_duration_seconds: f64) -> StreamDirectUploadCreateParamsBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_max_duration_seconds(max_duration_seconds);
@@ -69032,15 +69032,15 @@ extern "C" {
     pub fn set_id(this: &StreamDirectUploadWatermark, val: &str);
 }
 impl StreamDirectUploadWatermark {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `id`: The unique identifier for the watermark profile."]
+    #[doc = " * `id` - The unique identifier for the watermark profile."]
     pub fn new(id: &str) -> StreamDirectUploadWatermark {
         Self::builder(id).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `id`: The unique identifier for the watermark profile."]
+    #[doc = " * `id` - The unique identifier for the watermark profile."]
     pub fn builder(id: &str) -> StreamDirectUploadWatermarkBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
@@ -69641,17 +69641,17 @@ extern "C" {
     pub fn set_status_with_js_value_1(this: &StreamCaption, val: &str);
 }
 impl StreamCaption {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `label`: The language label displayed in the native language to users."]
-    #[doc = " * `language`: The language tag in BCP 47 format."]
+    #[doc = " * `label` - The language label displayed in the native language to users."]
+    #[doc = " * `language` - The language tag in BCP 47 format."]
     pub fn new(label: &str, language: &str) -> StreamCaption {
         Self::builder(label, language).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `label`: The language label displayed in the native language to users."]
-    #[doc = " * `language`: The language tag in BCP 47 format."]
+    #[doc = " * `label` - The language label displayed in the native language to users."]
+    #[doc = " * `language` - The language tag in BCP 47 format."]
     pub fn builder(label: &str, language: &str) -> StreamCaptionBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_label(label);
@@ -69723,17 +69723,17 @@ extern "C" {
     pub fn set_url(this: &StreamDownload, val: &str);
 }
 impl StreamDownload {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `percent_complete`: Indicates the progress as a percentage between 0 and 100."]
-    #[doc = " * `status`: The status of a generated download."]
+    #[doc = " * `percent_complete` - Indicates the progress as a percentage between 0 and 100."]
+    #[doc = " * `status` - The status of a generated download."]
     pub fn new(percent_complete: f64, status: &StreamDownloadStatus) -> StreamDownload {
         Self::builder(percent_complete, status).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `percent_complete`: Indicates the progress as a percentage between 0 and 100."]
-    #[doc = " * `status`: The status of a generated download."]
+    #[doc = " * `percent_complete` - Indicates the progress as a percentage between 0 and 100."]
+    #[doc = " * `status` - The status of a generated download."]
     pub fn builder(percent_complete: f64, status: &StreamDownloadStatus) -> StreamDownloadBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_percent_complete(percent_complete);
@@ -69883,27 +69883,27 @@ extern "C" {
     pub fn set_position(this: &StreamWatermark, val: &StreamWatermarkPosition);
 }
 impl StreamWatermark {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `id`: The unique identifier for a watermark profile."]
-    #[doc = " * `size`: The size of the image in bytes."]
-    #[doc = " * `height`: The height of the image in pixels."]
-    #[doc = " * `width`: The width of the image in pixels."]
-    #[doc = " * `created`: The date and a time a watermark profile was created."]
-    #[doc = " * `downloaded_from`: The source URL for a downloaded image. If the watermark profile was created via"]
+    #[doc = " * `id` - The unique identifier for a watermark profile."]
+    #[doc = " * `size` - The size of the image in bytes."]
+    #[doc = " * `height` - The height of the image in pixels."]
+    #[doc = " * `width` - The width of the image in pixels."]
+    #[doc = " * `created` - The date and a time a watermark profile was created."]
+    #[doc = " * `downloaded_from` - The source URL for a downloaded image. If the watermark profile was created via"]
     #[doc = " direct upload, this field is null."]
-    #[doc = " * `name`: A short description of the watermark profile."]
-    #[doc = " * `opacity`: The translucency of the image. A value of `0.0` makes the image completely"]
+    #[doc = " * `name` - A short description of the watermark profile."]
+    #[doc = " * `opacity` - The translucency of the image. A value of `0.0` makes the image completely"]
     #[doc = " transparent, and `1.0` makes the image completely opaque. Note that if the image"]
     #[doc = " is already semi-transparent, setting this to `1.0` will not make the image"]
     #[doc = " completely opaque."]
-    #[doc = " * `padding`: The whitespace between the adjacent edges (determined by position) of the video"]
+    #[doc = " * `padding` - The whitespace between the adjacent edges (determined by position) of the video"]
     #[doc = " and the image. `0.0` indicates no padding, and `1.0` indicates a fully padded"]
     #[doc = " video width or length, as determined by the algorithm."]
-    #[doc = " * `scale`: The size of the image relative to the overall size of the video. This parameter"]
+    #[doc = " * `scale` - The size of the image relative to the overall size of the video. This parameter"]
     #[doc = " will adapt to horizontal and vertical videos automatically. `0.0` indicates no"]
     #[doc = " scaling (use the size of the image as-is), and `1.0 `fills the entire video."]
-    #[doc = " * `position`: The location of the image. Valid positions are: `upperRight`, `upperLeft`,"]
+    #[doc = " * `position` - The location of the image. Valid positions are: `upperRight`, `upperLeft`,"]
     #[doc = " `lowerLeft`, `lowerRight`, and `center`. Note that `center` ignores the"]
     #[doc = " `padding` parameter."]
     pub fn new(
@@ -69934,27 +69934,27 @@ impl StreamWatermark {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `id`: The unique identifier for a watermark profile."]
-    #[doc = " * `size`: The size of the image in bytes."]
-    #[doc = " * `height`: The height of the image in pixels."]
-    #[doc = " * `width`: The width of the image in pixels."]
-    #[doc = " * `created`: The date and a time a watermark profile was created."]
-    #[doc = " * `downloaded_from`: The source URL for a downloaded image. If the watermark profile was created via"]
+    #[doc = " * `id` - The unique identifier for a watermark profile."]
+    #[doc = " * `size` - The size of the image in bytes."]
+    #[doc = " * `height` - The height of the image in pixels."]
+    #[doc = " * `width` - The width of the image in pixels."]
+    #[doc = " * `created` - The date and a time a watermark profile was created."]
+    #[doc = " * `downloaded_from` - The source URL for a downloaded image. If the watermark profile was created via"]
     #[doc = " direct upload, this field is null."]
-    #[doc = " * `name`: A short description of the watermark profile."]
-    #[doc = " * `opacity`: The translucency of the image. A value of `0.0` makes the image completely"]
+    #[doc = " * `name` - A short description of the watermark profile."]
+    #[doc = " * `opacity` - The translucency of the image. A value of `0.0` makes the image completely"]
     #[doc = " transparent, and `1.0` makes the image completely opaque. Note that if the image"]
     #[doc = " is already semi-transparent, setting this to `1.0` will not make the image"]
     #[doc = " completely opaque."]
-    #[doc = " * `padding`: The whitespace between the adjacent edges (determined by position) of the video"]
+    #[doc = " * `padding` - The whitespace between the adjacent edges (determined by position) of the video"]
     #[doc = " and the image. `0.0` indicates no padding, and `1.0` indicates a fully padded"]
     #[doc = " video width or length, as determined by the algorithm."]
-    #[doc = " * `scale`: The size of the image relative to the overall size of the video. This parameter"]
+    #[doc = " * `scale` - The size of the image relative to the overall size of the video. This parameter"]
     #[doc = " will adapt to horizontal and vertical videos automatically. `0.0` indicates no"]
     #[doc = " scaling (use the size of the image as-is), and `1.0 `fills the entire video."]
-    #[doc = " * `position`: The location of the image. Valid positions are: `upperRight`, `upperLeft`,"]
+    #[doc = " * `position` - The location of the image. Valid positions are: `upperRight`, `upperLeft`,"]
     #[doc = " `lowerLeft`, `lowerRight`, and `center`. Note that `center` ignores the"]
     #[doc = " `padding` parameter."]
     pub fn builder(
@@ -70191,13 +70191,13 @@ extern "C" {
     pub fn set_name(this: &InternalError, val: &str);
 }
 impl InternalError {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"InternalError\"`"]
     pub fn new_internal_error() -> InternalError {
         Self::builder_internal_error().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"InternalError\"`"]
     pub fn builder_internal_error() -> InternalErrorBuilder {
@@ -70225,13 +70225,13 @@ extern "C" {
     pub fn set_name(this: &BadRequestError, val: &str);
 }
 impl BadRequestError {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"BadRequestError\"`"]
     pub fn new_bad_request_error() -> BadRequestError {
         Self::builder_bad_request_error().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"BadRequestError\"`"]
     pub fn builder_bad_request_error() -> BadRequestErrorBuilder {
@@ -70259,13 +70259,13 @@ extern "C" {
     pub fn set_name(this: &NotFoundError, val: &str);
 }
 impl NotFoundError {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"NotFoundError\"`"]
     pub fn new_not_found_error() -> NotFoundError {
         Self::builder_not_found_error().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"NotFoundError\"`"]
     pub fn builder_not_found_error() -> NotFoundErrorBuilder {
@@ -70293,13 +70293,13 @@ extern "C" {
     pub fn set_name(this: &ForbiddenError, val: &str);
 }
 impl ForbiddenError {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"ForbiddenError\"`"]
     pub fn new_forbidden_error() -> ForbiddenError {
         Self::builder_forbidden_error().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"ForbiddenError\"`"]
     pub fn builder_forbidden_error() -> ForbiddenErrorBuilder {
@@ -70327,13 +70327,13 @@ extern "C" {
     pub fn set_name(this: &RateLimitedError, val: &str);
 }
 impl RateLimitedError {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"RateLimitedError\"`"]
     pub fn new_rate_limited_error() -> RateLimitedError {
         Self::builder_rate_limited_error().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"RateLimitedError\"`"]
     pub fn builder_rate_limited_error() -> RateLimitedErrorBuilder {
@@ -70361,13 +70361,13 @@ extern "C" {
     pub fn set_name(this: &QuotaReachedError, val: &str);
 }
 impl QuotaReachedError {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"QuotaReachedError\"`"]
     pub fn new_quota_reached_error() -> QuotaReachedError {
         Self::builder_quota_reached_error().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"QuotaReachedError\"`"]
     pub fn builder_quota_reached_error() -> QuotaReachedErrorBuilder {
@@ -70395,13 +70395,13 @@ extern "C" {
     pub fn set_name(this: &MaxFileSizeError, val: &str);
 }
 impl MaxFileSizeError {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"MaxFileSizeError\"`"]
     pub fn new_max_file_size_error() -> MaxFileSizeError {
         Self::builder_max_file_size_error().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"MaxFileSizeError\"`"]
     pub fn builder_max_file_size_error() -> MaxFileSizeErrorBuilder {
@@ -70429,13 +70429,13 @@ extern "C" {
     pub fn set_name(this: &InvalidURLError, val: &str);
 }
 impl InvalidURLError {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"InvalidURLError\"`"]
     pub fn new_invalid_url_error() -> InvalidURLError {
         Self::builder_invalid_url_error().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"InvalidURLError\"`"]
     pub fn builder_invalid_url_error() -> InvalidURLErrorBuilder {
@@ -70463,13 +70463,13 @@ extern "C" {
     pub fn set_name(this: &AlreadyUploadedError, val: &str);
 }
 impl AlreadyUploadedError {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"AlreadyUploadedError\"`"]
     pub fn new_already_uploaded_error() -> AlreadyUploadedError {
         Self::builder_already_uploaded_error().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"AlreadyUploadedError\"`"]
     pub fn builder_already_uploaded_error() -> AlreadyUploadedErrorBuilder {
@@ -70497,13 +70497,13 @@ extern "C" {
     pub fn set_name(this: &TooManyWatermarksError, val: &str);
 }
 impl TooManyWatermarksError {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"TooManyWatermarksError\"`"]
     pub fn new_too_many_watermarks_error() -> TooManyWatermarksError {
         Self::builder_too_many_watermarks_error().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"TooManyWatermarksError\"`"]
     pub fn builder_too_many_watermarks_error() -> TooManyWatermarksErrorBuilder {
@@ -70535,14 +70535,14 @@ extern "C" {
     pub fn set_blob(this: &MarkdownDocument, val: &Blob);
 }
 impl MarkdownDocument {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `blob`"]
     pub fn new(name: &str, blob: &Blob) -> MarkdownDocument {
         Self::builder(name, blob).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `name`"]
     #[doc = " * `blob`"]
@@ -70598,11 +70598,11 @@ extern "C" {
     pub fn set_tokens(this: &ConversionResponse, val: f64);
 }
 impl ConversionResponse {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"markdown\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `mime_type`"]
@@ -70610,11 +70610,11 @@ impl ConversionResponse {
     pub fn new_markdown(id: &str, mime_type: &str, name: &str) -> ConversionResponse {
         Self::builder_markdown(id, mime_type, name).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"error\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `mime_type`"]
@@ -70622,11 +70622,11 @@ impl ConversionResponse {
     pub fn new_error(id: &str, mime_type: &str, name: &str) -> ConversionResponse {
         Self::builder_error(id, mime_type, name).build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"markdown\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `mime_type`"]
@@ -70639,11 +70639,11 @@ impl ConversionResponse {
         inner.set_name(name);
         ConversionResponseBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"error\"`"]
     #[doc = ""]
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `id`"]
     #[doc = " * `mime_type`"]
@@ -70860,14 +70860,14 @@ extern "C" {
     pub fn set_extension(this: &SupportedFileFormat, val: &str);
 }
 impl SupportedFileFormat {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `mime_type`"]
     #[doc = " * `extension`"]
     pub fn new(mime_type: &str, extension: &str) -> SupportedFileFormat {
         Self::builder(mime_type, extension).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `mime_type`"]
     #[doc = " * `extension`"]
@@ -71654,13 +71654,13 @@ extern "C" {
     pub fn set_error(this: &VectorizeError, val: &str);
 }
 impl VectorizeError {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `error`"]
     pub fn new(error: &str) -> VectorizeError {
         Self::builder(error).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `error`"]
     pub fn builder(error: &str) -> VectorizeErrorBuilder {
@@ -71921,12 +71921,12 @@ extern "C" {
     pub fn set_processed_up_to_mutation(this: &VectorizeIndexInfo, val: f64);
 }
 impl VectorizeIndexInfo {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `vector_count`: The number of records containing vectors within the index."]
-    #[doc = " * `dimensions`: Number of dimensions the index has been configured for."]
-    #[doc = " * `processed_up_to_datetime`: ISO 8601 datetime of the last processed mutation on in the index. All changes before this mutation will be reflected in the index state."]
-    #[doc = " * `processed_up_to_mutation`: UUIDv4 of the last mutation processed by the index. All changes before this mutation will be reflected in the index state."]
+    #[doc = " * `vector_count` - The number of records containing vectors within the index."]
+    #[doc = " * `dimensions` - Number of dimensions the index has been configured for."]
+    #[doc = " * `processed_up_to_datetime` - ISO 8601 datetime of the last processed mutation on in the index. All changes before this mutation will be reflected in the index state."]
+    #[doc = " * `processed_up_to_mutation` - UUIDv4 of the last mutation processed by the index. All changes before this mutation will be reflected in the index state."]
     pub fn new(
         vector_count: f64,
         dimensions: f64,
@@ -71941,12 +71941,12 @@ impl VectorizeIndexInfo {
         )
         .build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `vector_count`: The number of records containing vectors within the index."]
-    #[doc = " * `dimensions`: Number of dimensions the index has been configured for."]
-    #[doc = " * `processed_up_to_datetime`: ISO 8601 datetime of the last processed mutation on in the index. All changes before this mutation will be reflected in the index state."]
-    #[doc = " * `processed_up_to_mutation`: UUIDv4 of the last mutation processed by the index. All changes before this mutation will be reflected in the index state."]
+    #[doc = " * `vector_count` - The number of records containing vectors within the index."]
+    #[doc = " * `dimensions` - Number of dimensions the index has been configured for."]
+    #[doc = " * `processed_up_to_datetime` - ISO 8601 datetime of the last processed mutation on in the index. All changes before this mutation will be reflected in the index state."]
+    #[doc = " * `processed_up_to_mutation` - UUIDv4 of the last mutation processed by the index. All changes before this mutation will be reflected in the index state."]
     pub fn builder(
         vector_count: f64,
         dimensions: f64,
@@ -72017,34 +72017,34 @@ extern "C" {
     );
 }
 impl VectorizeVector {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `id`: The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
-    #[doc = " * `values`: The vector values"]
+    #[doc = " * `id` - The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
+    #[doc = " * `values` - The vector values"]
     pub fn new(id: &str, values: &JsValue) -> VectorizeVector {
         Self::builder(id, values).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `id`: The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
-    #[doc = " * `values`: The vector values"]
+    #[doc = " * `id` - The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
+    #[doc = " * `values` - The vector values"]
     pub fn new_with_array(id: &str, values: &Array<Number>) -> VectorizeVector {
         Self::builder_with_array(id, values).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `id`: The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
-    #[doc = " * `values`: The vector values"]
+    #[doc = " * `id` - The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
+    #[doc = " * `values` - The vector values"]
     pub fn builder(id: &str, values: &JsValue) -> VectorizeVectorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_values(values);
         VectorizeVectorBuilder { inner }
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `id`: The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
-    #[doc = " * `values`: The vector values"]
+    #[doc = " * `id` - The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
+    #[doc = " * `values` - The vector values"]
     pub fn builder_with_array(id: &str, values: &Array<Number>) -> VectorizeVectorBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
@@ -72113,14 +72113,14 @@ extern "C" {
     pub fn set_count(this: &VectorizeMatches, val: f64);
 }
 impl VectorizeMatches {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `matches`"]
     #[doc = " * `count`"]
     pub fn new(matches: &Array, count: f64) -> VectorizeMatches {
         Self::builder(matches, count).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `matches`"]
     #[doc = " * `count`"]
@@ -72154,14 +72154,14 @@ extern "C" {
     pub fn set_count(this: &VectorizeVectorMutation, val: f64);
 }
 impl VectorizeVectorMutation {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `ids`"]
     #[doc = " * `count`"]
     pub fn new(ids: &Array<JsString>, count: f64) -> VectorizeVectorMutation {
         Self::builder(ids, count).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `ids`"]
     #[doc = " * `count`"]
@@ -72192,15 +72192,15 @@ extern "C" {
     pub fn set_mutation_id(this: &VectorizeAsyncMutation, val: &str);
 }
 impl VectorizeAsyncMutation {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `mutation_id`: The unique identifier for the async mutation operation containing the changeset."]
+    #[doc = " * `mutation_id` - The unique identifier for the async mutation operation containing the changeset."]
     pub fn new(mutation_id: &str) -> VectorizeAsyncMutation {
         Self::builder(mutation_id).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `mutation_id`: The unique identifier for the async mutation operation containing the changeset."]
+    #[doc = " * `mutation_id` - The unique identifier for the async mutation operation containing the changeset."]
     pub fn builder(mutation_id: &str) -> VectorizeAsyncMutationBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_mutation_id(mutation_id);
@@ -72592,19 +72592,19 @@ extern "C" {
     pub fn set_timestamp(this: &WorkerVersionMetadata, val: &str);
 }
 impl WorkerVersionMetadata {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `id`: The ID of the Worker Version using this binding"]
-    #[doc = " * `tag`: The tag of the Worker Version using this binding"]
-    #[doc = " * `timestamp`: The timestamp of when the Worker Version was uploaded"]
+    #[doc = " * `id` - The ID of the Worker Version using this binding"]
+    #[doc = " * `tag` - The tag of the Worker Version using this binding"]
+    #[doc = " * `timestamp` - The timestamp of when the Worker Version was uploaded"]
     pub fn new(id: &str, tag: &str, timestamp: &str) -> WorkerVersionMetadata {
         Self::builder(id, tag, timestamp).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
-    #[doc = " * `id`: The ID of the Worker Version using this binding"]
-    #[doc = " * `tag`: The tag of the Worker Version using this binding"]
-    #[doc = " * `timestamp`: The timestamp of when the Worker Version was uploaded"]
+    #[doc = " * `id` - The ID of the Worker Version using this binding"]
+    #[doc = " * `tag` - The tag of the Worker Version using this binding"]
+    #[doc = " * `timestamp` - The timestamp of when the Worker Version was uploaded"]
     pub fn builder(id: &str, tag: &str, timestamp: &str) -> WorkerVersionMetadataBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
@@ -72989,61 +72989,61 @@ extern "C" {
     pub fn set_output(this: &InstanceStatus, val: &JsValue);
 }
 impl InstanceStatus {
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `status: \"queued\"`"]
     pub fn new_queued() -> InstanceStatus {
         Self::builder_queued().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `status: \"running\"`"]
     pub fn new_running() -> InstanceStatus {
         Self::builder_running().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `status: \"paused\"`"]
     pub fn new_paused() -> InstanceStatus {
         Self::builder_paused().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `status: \"errored\"`"]
     pub fn new_errored() -> InstanceStatus {
         Self::builder_errored().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `status: \"terminated\"`"]
     pub fn new_terminated() -> InstanceStatus {
         Self::builder_terminated().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `status: \"complete\"`"]
     pub fn new_complete() -> InstanceStatus {
         Self::builder_complete().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `status: \"waiting\"`"]
     pub fn new_waiting() -> InstanceStatus {
         Self::builder_waiting().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `status: \"waitingForPause\"`"]
     pub fn new_waiting_for_pause() -> InstanceStatus {
         Self::builder_waiting_for_pause().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `status: \"unknown\"`"]
     pub fn new_unknown() -> InstanceStatus {
         Self::builder_unknown().build()
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `status: \"queued\"`"]
     pub fn builder_queued() -> InstanceStatusBuilder {
@@ -73051,7 +73051,7 @@ impl InstanceStatus {
         inner.set_status("queued");
         InstanceStatusBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `status: \"running\"`"]
     pub fn builder_running() -> InstanceStatusBuilder {
@@ -73059,7 +73059,7 @@ impl InstanceStatus {
         inner.set_status_with_js_value("running");
         InstanceStatusBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `status: \"paused\"`"]
     pub fn builder_paused() -> InstanceStatusBuilder {
@@ -73067,7 +73067,7 @@ impl InstanceStatus {
         inner.set_status_with_js_value_1("paused");
         InstanceStatusBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `status: \"errored\"`"]
     pub fn builder_errored() -> InstanceStatusBuilder {
@@ -73075,7 +73075,7 @@ impl InstanceStatus {
         inner.set_status_with_js_value_2("errored");
         InstanceStatusBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `status: \"terminated\"`"]
     pub fn builder_terminated() -> InstanceStatusBuilder {
@@ -73083,7 +73083,7 @@ impl InstanceStatus {
         inner.set_status_with_js_value_3("terminated");
         InstanceStatusBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `status: \"complete\"`"]
     pub fn builder_complete() -> InstanceStatusBuilder {
@@ -73091,7 +73091,7 @@ impl InstanceStatus {
         inner.set_status_with_js_value_4("complete");
         InstanceStatusBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `status: \"waiting\"`"]
     pub fn builder_waiting() -> InstanceStatusBuilder {
@@ -73099,7 +73099,7 @@ impl InstanceStatus {
         inner.set_status_with_js_value_5("waiting");
         InstanceStatusBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `status: \"waitingForPause\"`"]
     pub fn builder_waiting_for_pause() -> InstanceStatusBuilder {
@@ -73107,7 +73107,7 @@ impl InstanceStatus {
         inner.set_status_with_js_value_6("waitingForPause");
         InstanceStatusBuilder { inner }
     }
-    #[doc = " # Inlined fields"]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `status: \"unknown\"`"]
     pub fn builder_unknown() -> InstanceStatusBuilder {
@@ -73147,13 +73147,13 @@ extern "C" {
     pub fn set_message(this: &WorkflowError, val: &str);
 }
 impl WorkflowError {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn new(message: &str) -> WorkflowError {
         Self::builder(message).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `message`"]
     pub fn builder(message: &str) -> WorkflowErrorBuilder {
@@ -73220,14 +73220,14 @@ extern "C" {
     pub fn set_payload(this: &WorkflowInstanceSendEvent, val: &JsValue);
 }
 impl WorkflowInstanceSendEvent {
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `type`"]
     #[doc = " * `payload`"]
     pub fn new(r#type: &str, payload: &JsValue) -> WorkflowInstanceSendEvent {
         Self::builder(r#type, payload).build()
     }
-    #[doc = " # Parameters"]
+    #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `type`"]
     #[doc = " * `payload`"]
@@ -73352,14 +73352,14 @@ pub mod pipelines {
         pub fn set_pipeline_name(this: &PipelineBatchMetadata, val: &str);
     }
     impl PipelineBatchMetadata {
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `pipeline_id`"]
         #[doc = " * `pipeline_name`"]
         pub fn new(pipeline_id: &str, pipeline_name: &str) -> PipelineBatchMetadata {
             Self::builder(pipeline_id, pipeline_name).build()
         }
-        #[doc = " # Parameters"]
+        #[doc = " ## Arguments"]
         #[doc = ""]
         #[doc = " * `pipeline_id`"]
         #[doc = " * `pipeline_name`"]

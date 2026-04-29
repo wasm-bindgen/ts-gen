@@ -281,12 +281,14 @@ SendEmailBuilder::new_with_email_address_and_array(from: &EmailAddress, to: &Arr
 ### Generated doc comments
 
 Every `new*` and `builder*` variant ships with a doc block listing
-exactly what it does:
+exactly what it does. Headings use `##` (h2) and bullets use ` - ` to
+separate the field name from its description, matching the format
+used elsewhere when JSDoc is rendered to Rust:
 
-* `# Inlined fields` — bullets `` `field_name: literal_value` `` for
+* `## Inlined fields` — bullets `` `field_name: literal_value` `` for
   each literal discriminant baked into the function name (these don't
   appear as parameters).
-* `# Parameters` — bullets `` `field_name` `` for each caller-supplied
+* `## Arguments` — bullets `` `field_name` `` for each caller-supplied
   field, in signature order.
 
 Both sections pull the field's JSDoc into the bullet when present.
@@ -294,15 +296,15 @@ Both sections pull the field's JSDoc into the bullet when present.
 For example:
 
 ```rust
-/// # Inlined fields
+/// ## Inlined fields
 ///
-/// * `disposition: "inline"`: One of "inline" (default) or "attachment"
+/// * `disposition: "inline"` - One of "inline" (default) or "attachment"
 ///
-/// # Parameters
+/// ## Arguments
 ///
-/// * `content`: A file attachment for an email message
-/// * `filename`: ...
-/// * `type`: ...
+/// * `content` - A file attachment for an email message
+/// * `filename` - ...
+/// * `type` - ...
 pub fn new_inline(content: &str, filename: &str, type_: &str) -> EmailAttachment
 ```
 
