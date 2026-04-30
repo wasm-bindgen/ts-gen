@@ -426,7 +426,7 @@ pub fn to_syn_type(
             TypeRef::Void | TypeRef::Undefined => return quote! { Undefined },
             TypeRef::Nullable(inner) => {
                 let inner_ty = to_syn_type(inner, pos, ctx, scope, from_module);
-                return quote! { JsOption<#inner_ty> };
+                return js_option_or_js_value(inner_ty);
             }
             _ => {}
         }
@@ -506,7 +506,7 @@ pub fn to_syn_type(
         TypeRef::Nullable(inner) => {
             if pos.inner {
                 let inner_ty = to_syn_type(inner, pos, ctx, scope, from_module);
-                quote! { JsOption<#inner_ty> }
+                js_option_or_js_value(inner_ty)
             } else {
                 let inner_ty = to_syn_type(inner, pos, ctx, scope, from_module);
                 quote! { Option<#inner_ty> }
@@ -643,6 +643,14 @@ fn generic_container(
         base
     } else {
         quote! { #base<#arg> }
+    }
+}
+
+fn js_option_or_js_value(inner_ty: TokenStream) -> TokenStream {
+    if is_jsvalue_arg(&inner_ty) {
+        quote! { JsValue }
+    } else {
+        quote! { JsOption<#inner_ty> }
     }
 }
 
@@ -983,6 +991,12 @@ mod tests {
     }
 
     #[test]
+    fn test_nullable_inner_jsvalue_collapses() {
+        let ty = TypeRef::Nullable(Box::new(TypeRef::Any));
+        assert_eq!(inner_type(&ty), "JsValue");
+    }
+
+    #[test]
     fn test_promise_with_string() {
         let ty = TypeRef::Promise(Box::new(TypeRef::String));
         let result = ret_type(&ty);
@@ -1054,11 +1068,30 @@ mod tests {
     }
 
     #[test]
+    fn test_record_nullable_jsvalue_elides_generic() {
+        let ty = TypeRef::Record(
+            Box::new(TypeRef::String),
+            Box::new(TypeRef::Nullable(Box::new(TypeRef::Union(vec![
+                TypeRef::String,
+                TypeRef::Number,
+                TypeRef::Boolean,
+            ])))),
+        );
+        assert_eq!(ret_type(&ty), "Object");
+    }
+
+    #[test]
     fn test_promise_nullable_inner() {
         // Promise<string | null> → Promise<JsOption<JsString>>
         let ty = TypeRef::Promise(Box::new(TypeRef::Nullable(Box::new(TypeRef::String))));
         let result = ret_type(&ty);
         assert_eq!(result, "Promise < JsOption < JsString > >");
+    }
+
+    #[test]
+    fn test_promise_nullable_jsvalue_elides_generic() {
+        let ty = TypeRef::Promise(Box::new(TypeRef::Nullable(Box::new(TypeRef::Any))));
+        assert_eq!(ret_type(&ty), "Promise");
     }
 
     #[test]

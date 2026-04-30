@@ -65,6 +65,9 @@ borrowed by reference; return-position container types are owned.
 * `T | undefined` and `T | null | undefined` → also `Option<T>`. We coalesce
   at parse time; the rendered union has no separate `null`/`undefined`
   arm.
+* Inside generic containers, `T | null` → `JsOption<T>` unless `T` already
+  erases to `JsValue`; `JsOption<JsValue>` collapses to `JsValue` so the
+  container can use its bare default type.
 * `T?` on a property → `Option<T>`. The setter takes `Option<T>` too, so
   callers can clear the property by passing `None`.
 * `f(x?: T)` (optional parameter) → produces an overload pair, *not* an

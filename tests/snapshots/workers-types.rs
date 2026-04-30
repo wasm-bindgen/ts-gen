@@ -3148,17 +3148,17 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AnalyticsEngineDataPoint;
     #[wasm_bindgen(method, getter)]
-    pub fn indexes(this: &AnalyticsEngineDataPoint) -> Option<Array<JsOption<JsValue>>>;
+    pub fn indexes(this: &AnalyticsEngineDataPoint) -> Option<Array>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_indexes(this: &AnalyticsEngineDataPoint, val: &Array<JsOption<JsValue>>);
+    pub fn set_indexes(this: &AnalyticsEngineDataPoint, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn doubles(this: &AnalyticsEngineDataPoint) -> Option<Array<Number>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_doubles(this: &AnalyticsEngineDataPoint, val: &Array<Number>);
     #[wasm_bindgen(method, getter)]
-    pub fn blobs(this: &AnalyticsEngineDataPoint) -> Option<Array<JsOption<JsValue>>>;
+    pub fn blobs(this: &AnalyticsEngineDataPoint) -> Option<Array>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_blobs(this: &AnalyticsEngineDataPoint, val: &Array<JsOption<JsValue>>);
+    pub fn set_blobs(this: &AnalyticsEngineDataPoint, val: &Array);
 }
 impl AnalyticsEngineDataPoint {
     pub fn new() -> AnalyticsEngineDataPoint {
@@ -3174,7 +3174,7 @@ pub struct AnalyticsEngineDataPointBuilder {
     inner: AnalyticsEngineDataPoint,
 }
 impl AnalyticsEngineDataPointBuilder {
-    pub fn indexes(self, val: &Array<JsOption<JsValue>>) -> Self {
+    pub fn indexes(self, val: &Array) -> Self {
         self.inner.set_indexes(val);
         self
     }
@@ -3182,7 +3182,7 @@ impl AnalyticsEngineDataPointBuilder {
         self.inner.set_doubles(val);
         self
     }
-    pub fn blobs(self, val: &Array<JsOption<JsValue>>) -> Self {
+    pub fn blobs(self, val: &Array) -> Self {
         self.inner.set_blobs(val);
         self
     }
@@ -3612,29 +3612,22 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EventTargetHandlerObject;
     #[wasm_bindgen(method, getter, js_name = "handleEvent")]
-    pub fn handle_event(
-        this: &EventTargetHandlerObject,
-    ) -> Function<fn(Event) -> JsOption<JsValue>>;
+    pub fn handle_event(this: &EventTargetHandlerObject) -> Function<fn(Event) -> JsValue>;
     #[wasm_bindgen(method, setter, js_name = "handleEvent")]
-    pub fn set_handle_event(
-        this: &EventTargetHandlerObject,
-        val: &Function<fn(Event) -> JsOption<JsValue>>,
-    );
+    pub fn set_handle_event(this: &EventTargetHandlerObject, val: &Function<fn(Event) -> JsValue>);
 }
 impl EventTargetHandlerObject {
     #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `handle_event`"]
-    pub fn new(
-        handle_event: &Function<fn(Event) -> JsOption<JsValue>>,
-    ) -> EventTargetHandlerObject {
+    pub fn new(handle_event: &Function<fn(Event) -> JsValue>) -> EventTargetHandlerObject {
         Self::builder(handle_event).build()
     }
     #[doc = " ## Arguments"]
     #[doc = ""]
     #[doc = " * `handle_event`"]
     pub fn builder(
-        handle_event: &Function<fn(Event) -> JsOption<JsValue>>,
+        handle_event: &Function<fn(Event) -> JsValue>,
     ) -> EventTargetHandlerObjectBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_handle_event(handle_event);
@@ -13384,7 +13377,7 @@ extern "C" {
     pub type SqlStorageStatement;
 }
 #[allow(dead_code)]
-pub type SqlStorageValue = JsOption<JsValue>;
+pub type SqlStorageValue = JsValue;
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -21692,7 +21685,7 @@ pub enum ToolChoiceOptions {
     None,
 }
 #[allow(dead_code)]
-pub type ReasoningEffort = JsOption<JsValue>;
+pub type ReasoningEffort = JsValue;
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -35064,9 +35057,9 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "skipCache")]
     pub fn set_skip_cache(this: &GatewayOptions, val: bool);
     #[wasm_bindgen(method, getter)]
-    pub fn metadata(this: &GatewayOptions) -> Option<Object<JsOption<JsValue>>>;
+    pub fn metadata(this: &GatewayOptions) -> Option<Object>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_metadata(this: &GatewayOptions, val: &Object<JsOption<JsValue>>);
+    pub fn set_metadata(this: &GatewayOptions, val: &Object);
     #[wasm_bindgen(method, getter, js_name = "collectLog")]
     pub fn collect_log(this: &GatewayOptions) -> Option<bool>;
     #[wasm_bindgen(method, setter, js_name = "collectLog")]
@@ -35116,7 +35109,7 @@ impl GatewayOptionsBuilder {
         self.inner.set_skip_cache(val);
         self
     }
-    pub fn metadata(self, val: &Object<JsOption<JsValue>>) -> Self {
+    pub fn metadata(self, val: &Object) -> Self {
         self.inner.set_metadata(val);
         self
     }
@@ -35162,9 +35155,9 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "feedback")]
     pub fn set_feedback_with_null(this: &AiGatewayPatchLog, val: &Null);
     #[wasm_bindgen(method, getter)]
-    pub fn metadata(this: &AiGatewayPatchLog) -> Option<Object<JsOption<JsValue>>>;
+    pub fn metadata(this: &AiGatewayPatchLog) -> Option<Object>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_metadata(this: &AiGatewayPatchLog, val: &Object<JsOption<JsValue>>);
+    pub fn set_metadata(this: &AiGatewayPatchLog, val: &Object);
     #[wasm_bindgen(method, setter, js_name = "metadata")]
     pub fn set_metadata_with_null(this: &AiGatewayPatchLog, val: &Null);
 }
@@ -35202,7 +35195,7 @@ impl AiGatewayPatchLogBuilder {
         self.inner.set_feedback_with_null(val);
         self
     }
-    pub fn metadata(self, val: &Object<JsOption<JsValue>>) -> Self {
+    pub fn metadata(self, val: &Object) -> Self {
         self.inner.set_metadata(val);
         self
     }
@@ -35276,9 +35269,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_tokens_out(this: &AiGatewayLog, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn metadata(this: &AiGatewayLog) -> Option<Object<JsOption<JsValue>>>;
+    pub fn metadata(this: &AiGatewayLog) -> Option<Object>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_metadata(this: &AiGatewayLog, val: &Object<JsOption<JsValue>>);
+    pub fn set_metadata(this: &AiGatewayLog, val: &Object);
     #[wasm_bindgen(method, getter)]
     pub fn step(this: &AiGatewayLog) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
@@ -35443,7 +35436,7 @@ impl AiGatewayLogBuilder {
         self.inner.set_tokens_out(val);
         self
     }
-    pub fn metadata(self, val: &Object<JsOption<JsValue>>) -> Self {
+    pub fn metadata(self, val: &Object) -> Self {
         self.inner.set_metadata(val);
         self
     }
@@ -35523,7 +35516,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "cf-aig-metadata")]
     pub fn cf_aig_metadata(this: &AIGatewayHeaders) -> JsValue;
     #[wasm_bindgen(method, setter, js_name = "cf-aig-metadata")]
-    pub fn set_cf_aig_metadata(this: &AIGatewayHeaders, val: &Object<JsOption<JsValue>>);
+    pub fn set_cf_aig_metadata(this: &AIGatewayHeaders, val: &Object);
     #[wasm_bindgen(method, setter, js_name = "cf-aig-metadata")]
     pub fn set_cf_aig_metadata_with_str(this: &AIGatewayHeaders, val: &str);
     #[wasm_bindgen(method, getter, js_name = "cf-aig-custom-cost")]
@@ -35606,7 +35599,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -35653,7 +35646,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_bool_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -35700,7 +35693,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_bool_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -35747,7 +35740,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_bool_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -35794,7 +35787,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_bool_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -35841,7 +35834,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_bool_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -35888,7 +35881,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_bool_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -35935,7 +35928,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_bool_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -35982,7 +35975,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_bool_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -36029,7 +36022,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_bool_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -36076,7 +36069,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_bool_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -36123,7 +36116,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_bool_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -36170,7 +36163,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_bool_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -36217,7 +36210,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_bool_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -36264,7 +36257,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_bool_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -36311,7 +36304,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_bool_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -36358,7 +36351,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_str_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -36405,7 +36398,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_str_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -36452,7 +36445,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_str_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -36499,7 +36492,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_str_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -36546,7 +36539,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_str_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -36593,7 +36586,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_str_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -36640,7 +36633,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_str_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -36687,7 +36680,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_str_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -36734,7 +36727,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_str_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -36781,7 +36774,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_str_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -36828,7 +36821,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_str_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -36875,7 +36868,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_str_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -36922,7 +36915,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_str_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -36969,7 +36962,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_str_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -37016,7 +37009,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_str_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -37063,7 +37056,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_str_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -37110,7 +37103,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_bool_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -37157,7 +37150,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_bool_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -37204,7 +37197,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_bool_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -37251,7 +37244,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_bool_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -37298,7 +37291,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_bool_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -37345,7 +37338,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_bool_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -37392,7 +37385,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_bool_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -37439,7 +37432,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_bool_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -37486,7 +37479,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_bool_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -37533,7 +37526,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_bool_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -37580,7 +37573,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_bool_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -37627,7 +37620,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_bool_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -37674,7 +37667,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_bool_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -37721,7 +37714,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_bool_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -37768,7 +37761,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_bool_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -37815,7 +37808,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_bool_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -37862,7 +37855,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_str_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -37909,7 +37902,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_str_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -37956,7 +37949,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_str_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -38003,7 +37996,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_str_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -38050,7 +38043,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_str_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -38097,7 +38090,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_str_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -38144,7 +38137,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_str_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -38191,7 +38184,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_str_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -38238,7 +38231,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_str_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -38285,7 +38278,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_str_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -38332,7 +38325,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_str_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -38379,7 +38372,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_str_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -38426,7 +38419,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_str_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -38473,7 +38466,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_str_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -38520,7 +38513,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_str_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -38567,7 +38560,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_str_and_str_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -38614,7 +38607,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_object_and_f64_and_bool_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -38661,7 +38654,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_bool_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -38708,7 +38701,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_bool_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -38755,7 +38748,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_bool_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -38802,7 +38795,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_bool_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -38849,7 +38842,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_bool_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -38896,7 +38889,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_bool_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -38943,7 +38936,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_bool_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -38990,7 +38983,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_bool_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -39037,7 +39030,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_bool_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -39084,7 +39077,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_bool_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -39131,7 +39124,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_bool_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -39178,7 +39171,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_bool_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -39225,7 +39218,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_bool_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -39272,7 +39265,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_bool_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -39319,7 +39312,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_bool_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -39366,7 +39359,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_bool_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -39413,7 +39406,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_str_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -39460,7 +39453,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_str_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -39507,7 +39500,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_str_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -39554,7 +39547,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_str_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -39601,7 +39594,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_str_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -39648,7 +39641,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_str_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -39695,7 +39688,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_str_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -39742,7 +39735,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_str_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -39789,7 +39782,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_str_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -39836,7 +39829,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_str_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -39883,7 +39876,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_str_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -39930,7 +39923,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_str_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -39977,7 +39970,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_str_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -40024,7 +40017,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_str_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -40071,7 +40064,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_str_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -40118,7 +40111,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_f64_and_str_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -40165,7 +40158,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_bool_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -40212,7 +40205,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_bool_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -40259,7 +40252,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_bool_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -40306,7 +40299,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_bool_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -40353,7 +40346,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_bool_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -40400,7 +40393,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_bool_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -40447,7 +40440,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_bool_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -40494,7 +40487,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_bool_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -40541,7 +40534,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_bool_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -40588,7 +40581,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_bool_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -40635,7 +40628,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_bool_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -40682,7 +40675,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_bool_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -40729,7 +40722,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_bool_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -40776,7 +40769,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_bool_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -40823,7 +40816,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_bool_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -40870,7 +40863,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_bool_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -40917,7 +40910,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_str_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -40964,7 +40957,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_str_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -41011,7 +41004,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_str_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -41058,7 +41051,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_str_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -41105,7 +41098,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_str_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -41152,7 +41145,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_str_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -41199,7 +41192,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_str_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -41246,7 +41239,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_str_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -41293,7 +41286,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_str_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -41340,7 +41333,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_str_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -41387,7 +41380,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_str_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -41434,7 +41427,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_str_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -41481,7 +41474,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_str_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -41528,7 +41521,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_str_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -41575,7 +41568,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_str_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -41622,7 +41615,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn new_with_record_and_str_and_str_and_str_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -47685,7 +47678,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -47731,7 +47724,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_bool_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -47777,7 +47770,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_bool_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -47823,7 +47816,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_bool_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -47869,7 +47862,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_bool_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -47915,7 +47908,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_bool_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -47961,7 +47954,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_bool_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -48007,7 +48000,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_bool_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -48053,7 +48046,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_bool_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -48099,7 +48092,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_bool_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -48145,7 +48138,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_bool_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -48191,7 +48184,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_bool_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -48237,7 +48230,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_bool_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -48283,7 +48276,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_bool_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -48329,7 +48322,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_bool_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -48375,7 +48368,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_bool_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -48421,7 +48414,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_str_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -48467,7 +48460,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_str_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -48513,7 +48506,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_str_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -48559,7 +48552,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_str_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -48605,7 +48598,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_str_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -48651,7 +48644,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_str_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -48697,7 +48690,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_str_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -48743,7 +48736,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_str_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -48789,7 +48782,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_str_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -48835,7 +48828,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_str_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -48881,7 +48874,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_str_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -48927,7 +48920,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_str_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -48973,7 +48966,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_str_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -49019,7 +49012,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_str_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -49065,7 +49058,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_str_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -49111,7 +49104,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_str_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -49157,7 +49150,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_bool_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -49203,7 +49196,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_bool_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -49249,7 +49242,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_bool_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -49295,7 +49288,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_bool_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -49341,7 +49334,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_bool_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -49387,7 +49380,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_bool_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -49433,7 +49426,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_bool_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -49479,7 +49472,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_bool_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -49525,7 +49518,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_bool_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -49571,7 +49564,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_bool_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -49617,7 +49610,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_bool_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -49663,7 +49656,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_bool_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -49709,7 +49702,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_bool_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -49755,7 +49748,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_bool_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -49801,7 +49794,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_bool_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -49847,7 +49840,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_bool_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -49893,7 +49886,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_str_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -49939,7 +49932,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_str_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -49985,7 +49978,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_str_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -50031,7 +50024,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_str_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -50077,7 +50070,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_str_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -50123,7 +50116,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_str_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -50169,7 +50162,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_str_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -50215,7 +50208,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_str_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -50261,7 +50254,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_str_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -50307,7 +50300,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_str_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -50353,7 +50346,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_str_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -50399,7 +50392,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_str_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -50445,7 +50438,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_str_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -50491,7 +50484,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_str_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -50537,7 +50530,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_str_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -50583,7 +50576,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_str_and_str_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -50629,7 +50622,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_object_and_f64_and_bool_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &Object,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -50675,7 +50668,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_bool_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -50721,7 +50714,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_bool_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -50767,7 +50760,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_bool_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -50813,7 +50806,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_bool_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -50859,7 +50852,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_bool_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -50905,7 +50898,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_bool_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -50951,7 +50944,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_bool_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -50997,7 +50990,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_bool_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -51043,7 +51036,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_bool_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -51089,7 +51082,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_bool_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -51135,7 +51128,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_bool_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -51181,7 +51174,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_bool_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -51227,7 +51220,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_bool_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -51273,7 +51266,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_bool_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -51319,7 +51312,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_bool_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -51365,7 +51358,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_bool_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: bool,
@@ -51411,7 +51404,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_str_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -51457,7 +51450,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_str_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -51503,7 +51496,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_str_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -51549,7 +51542,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_str_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -51595,7 +51588,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_str_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -51641,7 +51634,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_str_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -51687,7 +51680,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_str_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -51733,7 +51726,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_str_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -51779,7 +51772,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_str_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -51825,7 +51818,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_str_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -51871,7 +51864,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_str_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -51917,7 +51910,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_str_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -51963,7 +51956,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_str_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -52009,7 +52002,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_str_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -52055,7 +52048,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_str_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -52101,7 +52094,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_f64_and_str_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: f64,
         cf_aig_skip_cache: &str,
@@ -52147,7 +52140,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_bool_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -52193,7 +52186,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_bool_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -52239,7 +52232,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_bool_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -52285,7 +52278,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_bool_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -52331,7 +52324,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_bool_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -52377,7 +52370,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_bool_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -52423,7 +52416,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_bool_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -52469,7 +52462,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_bool_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -52515,7 +52508,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_bool_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -52561,7 +52554,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_bool_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -52607,7 +52600,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_bool_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -52653,7 +52646,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_bool_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -52699,7 +52692,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_bool_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -52745,7 +52738,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_bool_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -52791,7 +52784,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_bool_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -52837,7 +52830,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_bool_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: bool,
@@ -52883,7 +52876,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_str_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -52929,7 +52922,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_str_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -52975,7 +52968,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_str_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -53021,7 +53014,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_str_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -53067,7 +53060,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_str_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -53113,7 +53106,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_str_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -53159,7 +53152,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_str_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -53205,7 +53198,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_str_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -53251,7 +53244,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_str_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -53297,7 +53290,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_str_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -53343,7 +53336,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_str_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -53389,7 +53382,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_str_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -53435,7 +53428,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_str_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -53481,7 +53474,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_str_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -53527,7 +53520,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_str_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
@@ -53573,7 +53566,7 @@ impl AIGatewayHeaders {
     #[doc = " * `authorization`"]
     #[doc = " * `content_type`"]
     pub fn builder_with_record_and_str_and_str_and_str_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object<JsOption<JsValue>>,
+        cf_aig_metadata: &Object,
         cf_aig_custom_cost: &str,
         cf_aig_cache_ttl: &str,
         cf_aig_skip_cache: &str,
