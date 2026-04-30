@@ -41,6 +41,7 @@ pub(crate) fn convert_formal_params_with_synthesis(
     params: &FormalParameters<'_>,
     parent_name: &str,
     member_name: &str,
+    scope: &HashSet<&str>,
     used_type_names: &mut HashSet<String>,
     docs: &DocComments<'_>,
     diag: &mut DiagnosticCollector,
@@ -69,7 +70,7 @@ pub(crate) fn convert_formal_params_with_synthesis(
                 diag,
             ) {
                 Some(synth) => synth,
-                None => convert_ts_type(&ann.type_annotation, diag),
+                None => convert_ts_type_scoped(&ann.type_annotation, scope, diag),
             },
             None => TypeRef::Any,
         };
@@ -88,7 +89,7 @@ pub(crate) fn convert_formal_params_with_synthesis(
         let type_ref = rest
             .type_annotation
             .as_ref()
-            .map(|ann| convert_ts_type(&ann.type_annotation, diag))
+            .map(|ann| convert_ts_type_scoped(&ann.type_annotation, scope, diag))
             .unwrap_or(TypeRef::Array(Box::new(TypeRef::Any)));
         result_params.push(Param {
             name,
@@ -207,6 +208,108 @@ fn try_synthesize_inline_param(
 /// signal for "this is an anonymous-interface union we can merge."
 fn all_type_literals(types: &[TSType<'_>]) -> bool {
     !types.is_empty() && types.iter().all(|t| matches!(t, TSType::TSTypeLiteral(_)))
+}
+
+/// Try to synthesize a wrapper interface for an `Iterable<T>` /
+/// `AsyncIterable<T>` return type.
+///
+/// The TS protocol — `Iterable<T>` exposes `[Symbol.iterator](): Iterator<T>`
+/// — has no direct wasm-bindgen representation, but we can model it as an
+/// extern type with a single symbol-keyed method:
+///
+/// ```ignore
+/// pub type SyncKvStorageListIterable;
+/// #[wasm_bindgen(method, js_name = "Symbol.iterator")]
+/// pub fn iterator(this: &SyncKvStorageListIterable) -> Iterator<...>;
+/// ```
+///
+/// Returns `Some(Named(<synth>))` when `ty` is a top-level
+/// `Iterable`/`AsyncIterable`; `None` otherwise so the caller falls
+/// through to the regular `convert_ts_type` path. Nested occurrences
+/// (inside unions, arrays, etc.) are not hoisted — they erase to
+/// `JsValue` at codegen, matching the existing parameter-synthesis
+/// limitation.
+pub(crate) fn try_synthesize_iterable_return(
+    ty: &TypeRef,
+    parent_name: &str,
+    member_name: &str,
+    used_type_names: &mut HashSet<String>,
+    synth: &mut Vec<InterfaceDecl>,
+) -> Option<TypeRef> {
+    let (is_async, item_type) = match ty {
+        TypeRef::Iterable(inner) => (false, (**inner).clone()),
+        TypeRef::AsyncIterable(inner) => (true, (**inner).clone()),
+        _ => return None,
+    };
+
+    // Type parameters mentioned by the item type bubble up onto the
+    // synthesized wrapper so it can carry them: an `Iterable<[string, T]>`
+    // return becomes `SyncKvStorageList<T>` rather than erasing `T`.
+    let mut tp_names = Vec::new();
+    crate::codegen::signatures::collect_type_params(&item_type, &mut tp_names);
+    let synth_type_params: Vec<TypeParam> = tp_names
+        .into_iter()
+        .map(|name| TypeParam {
+            name,
+            constraint: None,
+            default: None,
+        })
+        .collect();
+
+    let synth_name = unique_type_name(parent_name, member_name, used_type_names);
+    used_type_names.insert(synth_name.clone());
+
+    // wasm-bindgen's `js_name` syntax for symbol-keyed methods is the
+    // bracketed `[Symbol.foo]` form (matching the JS computed-property
+    // syntax), not bare `Symbol.foo`.
+    let (symbol_name, iter_return) = if is_async {
+        (
+            "[Symbol.asyncIterator]",
+            TypeRef::AsyncIterator(Box::new(item_type)),
+        )
+    } else {
+        ("[Symbol.iterator]", TypeRef::Iterator(Box::new(item_type)))
+    };
+
+    let iter_method = Member::Method(MethodMember {
+        name: "iterator".to_string(),
+        js_name: symbol_name.to_string(),
+        type_params: Vec::new(),
+        params: Vec::new(),
+        return_type: iter_return,
+        optional: false,
+        doc: Some(format!(
+            "Conformance to the JS {} protocol — returns the underlying iterator.",
+            if is_async {
+                "async iteration"
+            } else {
+                "iteration"
+            }
+        )),
+        throws: None,
+    });
+
+    synth.push(InterfaceDecl {
+        name: synth_name.clone(),
+        js_name: synth_name.clone(),
+        type_params: synth_type_params.clone(),
+        extends: Vec::new(),
+        members: vec![iter_method],
+        classification: crate::ir::InterfaceClassification::ClassLike,
+    });
+
+    // The return type references the synthesized type with the same
+    // type-param instantiation, so callers see `SyncKvStorageList<T>`
+    // (where `T` is in the parent method's scope).
+    if synth_type_params.is_empty() {
+        Some(TypeRef::Named(synth_name))
+    } else {
+        let args = synth_type_params
+            .into_iter()
+            .map(|tp| TypeRef::TypeParam(tp.name))
+            .collect();
+        Some(TypeRef::GenericInstantiation(synth_name, args))
+    }
 }
 
 /// Convert a `TSSignature` (interface body member) to our IR `Member`(s).
@@ -340,6 +443,7 @@ fn convert_method_signature(
                 &method.params,
                 p,
                 &js_name,
+                &scope,
                 used_type_names,
                 docs,
                 diag,
@@ -349,11 +453,25 @@ fn convert_method_signature(
         }
         None => convert_formal_params(&method.params, diag),
     };
-    let return_type = method
+    let mut return_type = method
         .return_type
         .as_ref()
         .map(|rt| convert_ts_type_scoped(&rt.type_annotation, &scope, diag))
         .unwrap_or(TypeRef::Void);
+
+    // Hoist top-level `Iterable<T>` / `AsyncIterable<T>` returns into
+    // synthesized wrapper interfaces with a `[Symbol.iterator]` method.
+    if let Some(parent_name) = parent {
+        if let Some(rewritten) = try_synthesize_iterable_return(
+            &return_type,
+            parent_name,
+            &js_name,
+            used_type_names,
+            synth,
+        ) {
+            return_type = rewritten;
+        }
+    }
 
     match method.kind {
         TSMethodSignatureKind::Get => vec![Member::Getter(GetterMember {
@@ -420,10 +538,14 @@ fn convert_construct_signature(
     // name segment for the synthesized type.
     let params = match parent {
         Some(p) => {
+            // Constructors don't have their own type parameters in the JS surface;
+            // empty scope is correct here.
+            let scope: HashSet<&str> = HashSet::new();
             let (params, more_synth) = convert_formal_params_with_synthesis(
                 &ctor.params,
                 p,
                 "Constructor",
+                &scope,
                 used_type_names,
                 docs,
                 diag,
@@ -480,6 +602,7 @@ fn convert_class_method(
                 &func.params,
                 p,
                 &member_name,
+                &scope,
                 used_type_names,
                 docs,
                 diag,
@@ -489,13 +612,29 @@ fn convert_class_method(
         }
         None => convert_formal_params(&func.params, diag),
     };
-    let return_type = func
+    let mut return_type = func
         .return_type
         .as_ref()
         .map(|rt| convert_ts_type_scoped(&rt.type_annotation, &scope, diag))
         .unwrap_or(TypeRef::Void);
 
     let is_static = method.r#static;
+
+    // Same iterable hoisting as `convert_method_signature` — see that
+    // function for the rationale and the synthesized shape.
+    if !matches!(method.kind, MethodDefinitionKind::Constructor) {
+        if let Some(parent_name) = parent {
+            if let Some(rewritten) = try_synthesize_iterable_return(
+                &return_type,
+                parent_name,
+                &js_name,
+                used_type_names,
+                synth,
+            ) {
+                return_type = rewritten;
+            }
+        }
+    }
 
     match method.kind {
         MethodDefinitionKind::Constructor => {
@@ -673,5 +812,81 @@ pub fn property_key_name(key: &PropertyKey<'_>) -> Option<String> {
         PropertyKey::StringLiteral(s) => Some(s.value.to_string()),
         PropertyKey::NumericLiteral(n) => Some(n.value.to_string()),
         _ => None,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn member_method(member: &Member) -> &MethodMember {
+        match member {
+            Member::Method(m) => m,
+            other => panic!("expected method member, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn synthesize_iterable_hoists_wrapper_with_symbol_iterator() {
+        let mut used = HashSet::new();
+        used.insert("Foo".to_string());
+        let mut synth = Vec::new();
+
+        let item = TypeRef::String;
+        let ty = TypeRef::Iterable(Box::new(item.clone()));
+
+        let result = try_synthesize_iterable_return(&ty, "Foo", "list", &mut used, &mut synth);
+
+        assert_eq!(result, Some(TypeRef::Named("FooList".to_string())));
+        assert_eq!(synth.len(), 1);
+        let iface = &synth[0];
+        assert_eq!(iface.name, "FooList");
+        assert_eq!(iface.members.len(), 1);
+
+        let method = member_method(&iface.members[0]);
+        assert_eq!(method.js_name, "[Symbol.iterator]");
+        assert_eq!(method.return_type, TypeRef::Iterator(Box::new(item)));
+    }
+
+    #[test]
+    fn synthesize_async_iterable_uses_symbol_async_iterator() {
+        let mut used = HashSet::new();
+        let mut synth = Vec::new();
+        let ty = TypeRef::AsyncIterable(Box::new(TypeRef::Number));
+
+        let result = try_synthesize_iterable_return(&ty, "Stream", "pages", &mut used, &mut synth);
+
+        assert_eq!(result, Some(TypeRef::Named("StreamPages".to_string())));
+        let method = member_method(&synth[0].members[0]);
+        assert_eq!(method.js_name, "[Symbol.asyncIterator]");
+        assert_eq!(
+            method.return_type,
+            TypeRef::AsyncIterator(Box::new(TypeRef::Number))
+        );
+    }
+
+    #[test]
+    fn synthesize_returns_none_for_non_iterable() {
+        let mut used = HashSet::new();
+        let mut synth = Vec::new();
+        let ty = TypeRef::Iterator(Box::new(TypeRef::Number));
+
+        let result = try_synthesize_iterable_return(&ty, "Foo", "iter", &mut used, &mut synth);
+
+        assert!(result.is_none());
+        assert!(synth.is_empty());
+    }
+
+    #[test]
+    fn synthesize_dedupes_against_used_names() {
+        let mut used = HashSet::new();
+        used.insert("FooList".to_string());
+        let mut synth = Vec::new();
+
+        let ty = TypeRef::Iterable(Box::new(TypeRef::Any));
+        let result = try_synthesize_iterable_return(&ty, "Foo", "list", &mut used, &mut synth);
+
+        assert_eq!(result, Some(TypeRef::Named("FooList2".to_string())));
+        assert_eq!(synth[0].name, "FooList2");
     }
 }

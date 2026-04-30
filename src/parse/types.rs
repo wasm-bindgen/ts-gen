@@ -176,9 +176,13 @@ fn convert_type_reference_scoped(
 ) -> TypeRef {
     let name = type_name_to_string(&type_ref.type_name);
 
-    // If the name is an in-scope type parameter, erase to Any
+    // In-scope generic type parameter — preserve so codegen can emit a
+    // generic Rust method (`fn put<T: JsGeneric>(...)`) per the
+    // wasm-bindgen `JsGeneric` pattern used by `js_sys::Iterator<T>`,
+    // `Array<T>`, etc. Erasing to `Any` would lose the relationship
+    // between the parameter and the return type.
     if scope.contains(name.as_str()) {
-        return TypeRef::Any;
+        return TypeRef::TypeParam(name);
     }
 
     // Collect generic type arguments if present (field is `type_arguments` in oxc 0.118)
@@ -198,6 +202,28 @@ fn convert_type_reference_scoped(
         "Promise" | "PromiseLike" => {
             let inner = type_args.into_iter().next().unwrap_or(TypeRef::Any);
             TypeRef::Promise(Box::new(inner))
+        }
+        // `Iterator<T>` and `IterableIterator<T>` are already iterator
+        // objects, so they map straight to `js_sys::Iterator<T>`.
+        "Iterator" | "IterableIterator" => {
+            let inner = type_args.into_iter().next().unwrap_or(TypeRef::Any);
+            TypeRef::Iterator(Box::new(inner))
+        }
+        "AsyncIterator" | "AsyncIterableIterator" => {
+            let inner = type_args.into_iter().next().unwrap_or(TypeRef::Any);
+            TypeRef::AsyncIterator(Box::new(inner))
+        }
+        // `Iterable<T>` is the protocol — an object exposing
+        // `[Symbol.iterator]()`. Held as a distinct IR variant so the
+        // synthesis pass in `parse::members` can hoist a wrapper
+        // interface for top-level occurrences in return positions.
+        "Iterable" => {
+            let inner = type_args.into_iter().next().unwrap_or(TypeRef::Any);
+            TypeRef::Iterable(Box::new(inner))
+        }
+        "AsyncIterable" => {
+            let inner = type_args.into_iter().next().unwrap_or(TypeRef::Any);
+            TypeRef::AsyncIterable(Box::new(inner))
         }
         "Array" | "ReadonlyArray" => {
             let inner = type_args.into_iter().next().unwrap_or(TypeRef::Any);

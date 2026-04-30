@@ -87,13 +87,23 @@ impl SignatureKind {
 
 /// Compute the default Rust name for a callable's primary variant before
 /// any `_with_X` suffix is appended.
+///
+/// Symbol-keyed methods (`js_name = "[Symbol.iterator]"`) drop the
+/// `[Symbol.` prefix and trailing `]` so the Rust name reads naturally
+/// — `[Symbol.iterator]` becomes `iterator`, not `symboliterator`. The
+/// symbol nature is conveyed by `js_name`; the Rust name doesn't need
+/// to repeat it.
 pub fn base_rust_name(js_name: &str, kind: SignatureKind) -> String {
+    let raw = js_name
+        .strip_prefix("[Symbol.")
+        .and_then(|rest| rest.strip_suffix(']'))
+        .unwrap_or(js_name);
     match kind {
         SignatureKind::Constructor => "new".to_string(),
         SignatureKind::Setter | SignatureKind::StaticSetter => {
-            format!("set_{}", to_snake_case(js_name))
+            format!("set_{}", to_snake_case(raw))
         }
-        _ => to_snake_case(js_name),
+        _ => to_snake_case(raw),
     }
 }
 
@@ -153,8 +163,11 @@ pub struct FunctionSignature {
 
 /// Assign a unique name within the extern block.
 ///
-/// If `candidate` is already taken, appends `_1`, `_2`, etc. until a unique
-/// name is found. The chosen name is inserted into `used_names`.
+/// If `candidate` is already taken, appends `_2`, `_3`, etc. until a
+/// unique name is found — the unsuffixed candidate is the implicit
+/// `_1`, so collisions start at `_2` (matching the convention already
+/// used by `parse::members::unique_type_name`). The chosen name is
+/// inserted into `used_names`.
 pub fn dedupe_name(candidate: &str, used_names: &mut HashSet<String>) -> String {
     let mut name = candidate.to_string();
     if !used_names.contains(&name) {
@@ -162,15 +175,14 @@ pub fn dedupe_name(candidate: &str, used_names: &mut HashSet<String>) -> String 
         return name;
     }
     let base = name.clone();
-    let mut counter = 1u32;
-    loop {
+    for counter in 2.. {
         name = format!("{base}_{counter}");
         if !used_names.contains(&name) {
             used_names.insert(name.clone());
             return name;
         }
-        counter += 1;
     }
+    unreachable!("HashSet exhaustion is impossible in practice");
 }
 
 /// Expand all overloads of a single JS callable into concrete Rust parameter
@@ -441,6 +453,83 @@ fn expand_single_overload(
     sigs
 }
 
+/// Recursively collect every `TypeRef::TypeParam` name reachable from `ty`.
+///
+/// Used to determine which generic parameters a method's signature
+/// actually mentions, so codegen can emit the right `<T: JsGeneric, …>`
+/// declaration. Order is the appearance order, deduped.
+pub fn collect_type_params(ty: &TypeRef, out: &mut Vec<String>) {
+    match ty {
+        TypeRef::TypeParam(name) => {
+            if !out.iter().any(|n| n == name) {
+                out.push(name.clone());
+            }
+        }
+        TypeRef::Promise(inner)
+        | TypeRef::Array(inner)
+        | TypeRef::Set(inner)
+        | TypeRef::Iterator(inner)
+        | TypeRef::AsyncIterator(inner)
+        | TypeRef::Iterable(inner)
+        | TypeRef::AsyncIterable(inner)
+        | TypeRef::Nullable(inner) => collect_type_params(inner, out),
+        TypeRef::Record(k, v) | TypeRef::Map(k, v) => {
+            collect_type_params(k, out);
+            collect_type_params(v, out);
+        }
+        TypeRef::Union(members) | TypeRef::Intersection(members) | TypeRef::Tuple(members) => {
+            for m in members {
+                collect_type_params(m, out);
+            }
+        }
+        TypeRef::GenericInstantiation(_, args) => {
+            for a in args {
+                collect_type_params(a, out);
+            }
+        }
+        TypeRef::Function(sig) => {
+            for p in &sig.params {
+                collect_type_params(&p.type_ref, out);
+            }
+            collect_type_params(&sig.return_type, out);
+        }
+        // Leaves with no nested types — no-op.
+        TypeRef::Any
+        | TypeRef::Unknown
+        | TypeRef::Boolean
+        | TypeRef::BigInt
+        | TypeRef::Null
+        | TypeRef::Number
+        | TypeRef::Object
+        | TypeRef::String
+        | TypeRef::Symbol
+        | TypeRef::Undefined
+        | TypeRef::Void
+        | TypeRef::Int8Array
+        | TypeRef::Uint8Array
+        | TypeRef::Uint8ClampedArray
+        | TypeRef::Int16Array
+        | TypeRef::Uint16Array
+        | TypeRef::Int32Array
+        | TypeRef::Uint32Array
+        | TypeRef::Float32Array
+        | TypeRef::Float64Array
+        | TypeRef::BigInt64Array
+        | TypeRef::BigUint64Array
+        | TypeRef::ArrayBuffer
+        | TypeRef::ArrayBufferView
+        | TypeRef::DataView
+        | TypeRef::StringLiteral(_)
+        | TypeRef::NumberLiteral(_)
+        | TypeRef::BooleanLiteral(_)
+        | TypeRef::Named(_)
+        | TypeRef::Date
+        | TypeRef::RegExp
+        | TypeRef::Error
+        | TypeRef::Unresolved(_) => {}
+    }
+}
+
 /// Recursively flatten a type into its concrete alternatives.
 ///
 /// - `Union([A, B])` → flatten(A) ++ flatten(B)
@@ -479,6 +568,7 @@ fn flatten_type(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId
 
         // Generic containers are not distributive: `Array<A | B>` and
         // `Record<K, A | B>` are single parameter shapes, not overloads.
+        // Leaf types: no expansion
         _ => vec![ty.clone()],
     }
 }
@@ -650,6 +740,10 @@ fn type_snake_name(ty: &TypeRef) -> String {
         TypeRef::Float64Array => "float64_array".to_string(),
         TypeRef::Array(_) => "array".to_string(),
         TypeRef::Promise(_) => "promise".to_string(),
+        TypeRef::Iterator(_) => "iterator".to_string(),
+        TypeRef::AsyncIterator(_) => "async_iterator".to_string(),
+        TypeRef::Iterable(_) => "iterable".to_string(),
+        TypeRef::AsyncIterable(_) => "async_iterable".to_string(),
         TypeRef::Nullable(inner) => type_snake_name(inner),
 
         TypeRef::Function(_) => "function".to_string(),
@@ -1119,7 +1213,7 @@ mod tests {
         assert_eq!(sigs.len(), 2);
         assert_eq!(sigs[0].rust_name, "count");
         assert!(!sigs[0].catch);
-        assert_eq!(sigs[1].rust_name, "try_count_1");
+        assert_eq!(sigs[1].rust_name, "try_count_2");
         assert!(sigs[1].catch);
     }
 
@@ -1144,7 +1238,7 @@ mod tests {
             &mut used,
         );
         assert_eq!(sigs1[0].rust_name, "foo");
-        assert_eq!(sigs2[0].rust_name, "foo_1");
+        assert_eq!(sigs2[0].rust_name, "foo_2");
     }
 
     #[test]

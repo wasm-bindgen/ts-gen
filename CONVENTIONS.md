@@ -717,6 +717,79 @@ primitives via `value_of()` (for `Boolean` / `Number`) or
 Sync returns, arguments, and properties keep the bare-primitive
 lowering.
 
+## `Iterator<T>` / `IterableIterator<T>` map to `js_sys::Iterator<T>`
+
+```ts
+interface FormData {
+  entries(): IterableIterator<[string, FormDataEntryValue]>;
+}
+```
+
+emits:
+
+```rust
+#[wasm_bindgen(method)]
+pub fn entries(this: &FormData) -> Iterator<ArrayTuple<(JsString, JsValue)>>;
+```
+
+`Iterator<T>` and `IterableIterator<T>` describe runtime objects that
+*are* iterators (have `.next()`), so they map directly to
+`js_sys::Iterator<T>` with the inner type erased the same way
+`Promise<T>` is — generic `T` parameters become `JsValue` unless they
+resolve to a concrete named type at generation time.
+
+`AsyncIterator<T>` and `AsyncIterableIterator<T>` map to
+`js_sys::AsyncIterator<T>` analogously; wasm-bindgen models the two
+iterator families separately.
+
+## `Iterable<T>` returns synthesize a wrapper with `[Symbol.iterator]()`
+
+```ts
+interface SyncKvStorage {
+  list<T = unknown>(): Iterable<[string, T]>;
+}
+```
+
+emits:
+
+```rust
+#[wasm_bindgen(extends = Object)]
+pub type SyncKvStorageList;
+#[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+pub fn iterator(this: &SyncKvStorageList) -> Iterator<ArrayTuple<(JsString, JsValue)>>;
+
+// And on the original interface:
+#[wasm_bindgen(method)]
+pub fn list(this: &SyncKvStorage) -> SyncKvStorageList;
+```
+
+`Iterable<T>` describes the *protocol* — an object that exposes
+`[Symbol.iterator](): Iterator<T>` — distinct from `Iterator<T>` (the
+iterator object itself). To preserve that distinction at the binding
+layer, ts-gen synthesizes a wrapper interface per top-level
+`Iterable<T>` return:
+
+* The wrapper's name is `<Parent><Method>` PascalCased, deduped
+  against existing names (same convention as anonymous-interface
+  parameter synthesis).
+* The wrapper has a single method `iterator()` keyed on `Symbol.iterator`
+  via `js_name = "[Symbol.iterator]"`, returning the inner
+  `Iterator<T>`. The bracketed form matches wasm-bindgen's
+  computed-property `js_name` syntax.
+* The original method's return type is rewritten to the wrapper's name.
+
+`AsyncIterable<T>` synthesizes the analogous wrapper using
+`[Symbol.asyncIterator]` and `AsyncIterator<T>` for the inner iterator.
+
+Nested occurrences (inside unions, arrays, etc.) are not synthesized —
+they erase to `JsValue` at codegen, matching the existing
+parameter-synthesis limitation. Hoist the type manually if a wrapper is
+needed in those positions.
+
+Symbol-keyed methods drop the `[Symbol.` prefix and trailing `]` when
+computing the Rust name: `[Symbol.iterator]` becomes `iterator`, not
+`symboliterator`.
+
 ## `@throws` JSDoc → typed error
 
 ```ts

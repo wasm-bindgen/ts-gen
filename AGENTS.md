@@ -58,7 +58,11 @@ complex (subtyping LUB across unions).
 
 **When to update `CONVENTIONS.md`:**
 
-* Adding a new TS construct → add a numbered section.
+* Adding a new TS construct → add a section. Sections are not
+  numbered; order them from simplest (primitives) to most obscure
+  (subtyping LUB across unions). Slot the new heading where it
+  naturally falls in that progression — usually next to a related
+  convention of similar complexity.
 * Changing an existing translation rule → update its section.
 * Bug fix that changes user-visible output → update if the fix changes
   the documented behaviour, otherwise just add a snapshot test.
