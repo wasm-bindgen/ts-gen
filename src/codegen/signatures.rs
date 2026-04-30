@@ -441,42 +441,12 @@ fn expand_single_overload(
     sigs
 }
 
-/// Collapse a list of flattened alternatives into a single representative
-/// type, using the same subtyping LUB rule as `TypeRef::Union` lowering.
-///
-/// * 0 or 1 alternatives → pass through.
-/// * Multiple alternatives sharing a `Named` ancestor more specific than
-///   `Object` (per [`crate::codegen::typemap::lub_named`]) → return the
-///   ancestor.
-/// * Otherwise → return `original`. `to_syn_type`'s `is_jsvalue_arg`
-///   elision then lowers e.g. `Record<K, string | number | boolean>` to
-///   bare `&Object` via the JsValue path.
-///
-/// `original` is the unflattened element type — the caller's source of
-/// truth when no LUB applies, avoiding a reconstruction of the union
-/// from the flattened alternatives.
-fn lub_collapse(
-    alts: Vec<TypeRef>,
-    original: &TypeRef,
-    cgctx: Option<&CodegenContext<'_>>,
-    scope: ScopeId,
-) -> TypeRef {
-    match alts.len() {
-        0 => TypeRef::Any,
-        1 => alts.into_iter().next().unwrap(),
-        _ => crate::codegen::typemap::lub_named(&alts, cgctx, scope)
-            .map(TypeRef::Named)
-            .unwrap_or_else(|| original.clone()),
-    }
-}
-
 /// Recursively flatten a type into its concrete alternatives.
 ///
 /// - `Union([A, B])` → flatten(A) ++ flatten(B)
 /// - `Nullable(T)` → flatten(T) wrapped in Nullable
 /// - `Named("Foo")` → resolve alias; if alias is a union, flatten it
-/// - `Promise(T)` → for each flatten(T), wrap in Promise
-/// - `Array(T)` → for each flatten(T), wrap in Array
+/// - Generic container type arguments do not flatten
 /// - Everything else → single leaf
 fn flatten_type(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId) -> Vec<TypeRef> {
     match ty {
@@ -507,53 +477,8 @@ fn flatten_type(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId
             alts
         }
 
-        // Generic containers: flatten the inner type, then collapse the
-        // alternatives via subtyping LUB before wrapping. This keeps one
-        // binding per outer container shape rather than fanning out per
-        // inner-arm phantom — at the wasm-bindgen ABI the phantom `T`
-        // on `Array<T>`, `Object<T>`, etc. is a compile-time tag, so a
-        // union value in element position is pure API-surface noise.
-        // Falls back to the original union when no useful LUB exists,
-        // letting `to_syn_type`'s `is_jsvalue_arg` elision lower it to
-        // the bare base type. See the LUB convention in `CONVENTIONS.md`.
-        TypeRef::Promise(inner) => vec![TypeRef::Promise(Box::new(lub_collapse(
-            flatten_type(inner, cgctx, scope),
-            inner,
-            cgctx,
-            scope,
-        )))],
-        TypeRef::Array(inner) => vec![TypeRef::Array(Box::new(lub_collapse(
-            flatten_type(inner, cgctx, scope),
-            inner,
-            cgctx,
-            scope,
-        )))],
-        TypeRef::Set(inner) => vec![TypeRef::Set(Box::new(lub_collapse(
-            flatten_type(inner, cgctx, scope),
-            inner,
-            cgctx,
-            scope,
-        )))],
-        // Two-arg containers: collapse each side independently via LUB,
-        // then fan out the cartesian product across the (now single-arm)
-        // collapsed sides — `Record<string, string | number | boolean>`
-        // becomes one binding, `Record<string | number, T>` with a key
-        // union (rare in TS) still produces two bindings keyed by the
-        // collapsed key alts.
-        TypeRef::Record(k, v) => {
-            let ks = flatten_type(k, cgctx, scope);
-            let v = lub_collapse(flatten_type(v, cgctx, scope), v, cgctx, scope);
-            ks.into_iter()
-                .map(|k| TypeRef::Record(Box::new(k), Box::new(v.clone())))
-                .collect()
-        }
-        TypeRef::Map(k, v) => {
-            let k = lub_collapse(flatten_type(k, cgctx, scope), k, cgctx, scope);
-            let v = lub_collapse(flatten_type(v, cgctx, scope), v, cgctx, scope);
-            vec![TypeRef::Map(Box::new(k), Box::new(v))]
-        }
-
-        // Leaf types: no expansion
+        // Generic containers are not distributive: `Array<A | B>` and
+        // `Record<K, A | B>` are single parameter shapes, not overloads.
         _ => vec![ty.clone()],
     }
 }
@@ -1321,7 +1246,7 @@ mod tests {
         assert_eq!(non_try[2].params.len(), 2);
     }
 
-    // ─── lub_collapse / generic-container fan-in ────────────────────
+    // Generic containers are opaque to signature flattening.
 
     fn flatten_no_ctx(ty: &TypeRef) -> Vec<TypeRef> {
         let (gctx, scope) = test_ctx();
@@ -1330,10 +1255,7 @@ mod tests {
     }
 
     #[test]
-    fn record_with_mixed_primitive_union_collapses_to_single_alternative() {
-        // Record<string, string | number | boolean> — no useful LUB
-        // across primitives, so collapse to one Record carrying the
-        // original union. Lowering elides the value-side phantom.
+    fn record_with_mixed_primitive_union_does_not_distribute() {
         let union_v = TypeRef::Union(vec![TypeRef::String, TypeRef::Number, TypeRef::Boolean]);
         let ty = TypeRef::Record(Box::new(TypeRef::String), Box::new(union_v.clone()));
         let alts = flatten_no_ctx(&ty);
@@ -1345,8 +1267,19 @@ mod tests {
     }
 
     #[test]
+    fn record_with_union_key_does_not_distribute() {
+        let union_k = TypeRef::Union(vec![TypeRef::String, TypeRef::Number]);
+        let ty = TypeRef::Record(Box::new(union_k.clone()), Box::new(TypeRef::String));
+        let alts = flatten_no_ctx(&ty);
+        assert_eq!(alts.len(), 1);
+        match &alts[0] {
+            TypeRef::Record(k, _) => assert_eq!(**k, union_k),
+            other => panic!("expected Record, got {other:?}"),
+        }
+    }
+
+    #[test]
     fn record_with_single_typed_value_keeps_typed_phantom() {
-        // Record<string, string> — single alternative survives untouched.
         let ty = TypeRef::Record(Box::new(TypeRef::String), Box::new(TypeRef::String));
         let alts = flatten_no_ctx(&ty);
         assert_eq!(alts.len(), 1);
@@ -1357,8 +1290,7 @@ mod tests {
     }
 
     #[test]
-    fn array_with_mixed_primitive_union_collapses_to_single_alternative() {
-        // Array<string | number> — same rule as Record.
+    fn array_with_mixed_primitive_union_does_not_distribute() {
         let union_v = TypeRef::Union(vec![TypeRef::String, TypeRef::Number]);
         let ty = TypeRef::Array(Box::new(union_v.clone()));
         let alts = flatten_no_ctx(&ty);
@@ -1370,9 +1302,7 @@ mod tests {
     }
 
     #[test]
-    fn map_collapses_both_sides_independently() {
-        // Map<string | number, string | boolean> — both sides collapse
-        // to single alternatives, producing one Map binding.
+    fn map_with_union_type_args_does_not_distribute() {
         let k = TypeRef::Union(vec![TypeRef::String, TypeRef::Number]);
         let v = TypeRef::Union(vec![TypeRef::String, TypeRef::Boolean]);
         let ty = TypeRef::Map(Box::new(k.clone()), Box::new(v.clone()));
@@ -1388,8 +1318,7 @@ mod tests {
     }
 
     #[test]
-    fn promise_with_union_collapses() {
-        // Promise<string | number> — collapses to a single Promise.
+    fn promise_with_union_does_not_distribute() {
         let union_v = TypeRef::Union(vec![TypeRef::String, TypeRef::Number]);
         let ty = TypeRef::Promise(Box::new(union_v.clone()));
         let alts = flatten_no_ctx(&ty);
@@ -1398,42 +1327,5 @@ mod tests {
             TypeRef::Promise(inner) => assert_eq!(**inner, union_v),
             other => panic!("expected Promise, got {other:?}"),
         }
-    }
-
-    #[test]
-    fn lub_collapse_picks_meaningful_named_ancestor() {
-        // Two error subtypes share `Error` via the builtin lattice — the
-        // helper should collapse to that ancestor rather than falling
-        // back to the original union.
-        let alts = vec![
-            TypeRef::Named("TypeError".into()),
-            TypeRef::Named("RangeError".into()),
-        ];
-        let original = TypeRef::Union(alts.clone());
-        let (gctx, scope) = test_ctx();
-        let cgctx = CodegenContext::empty(&gctx, scope);
-        let collapsed = lub_collapse(alts, &original, Some(&cgctx), scope);
-        assert_eq!(collapsed, TypeRef::Named("Error".into()));
-    }
-
-    #[test]
-    fn lub_collapse_falls_back_when_only_object_is_shared() {
-        // Mixed primitives have no Named representation, so the helper
-        // skips the LUB attempt and returns the original union.
-        let alts = vec![TypeRef::String, TypeRef::Number];
-        let original = TypeRef::Union(alts.clone());
-        let (gctx, scope) = test_ctx();
-        let cgctx = CodegenContext::empty(&gctx, scope);
-        let collapsed = lub_collapse(alts, &original, Some(&cgctx), scope);
-        assert_eq!(collapsed, original);
-    }
-
-    #[test]
-    fn lub_collapse_passes_through_single_alt() {
-        let alts = vec![TypeRef::String];
-        let (gctx, scope) = test_ctx();
-        let cgctx = CodegenContext::empty(&gctx, scope);
-        let collapsed = lub_collapse(alts, &TypeRef::String, Some(&cgctx), scope);
-        assert_eq!(collapsed, TypeRef::String);
     }
 }

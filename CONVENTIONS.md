@@ -65,9 +65,8 @@ borrowed by reference; return-position container types are owned.
 * `T | undefined` and `T | null | undefined` → also `Option<T>`. We coalesce
   at parse time; the rendered union has no separate `null`/`undefined`
   arm.
-* Inside generic containers, `T | null` → `JsOption<T>` unless `T` already
-  erases to `JsValue`; `JsOption<JsValue>` collapses to `JsValue` so the
-  container can use its bare default type.
+* In inner type positions, `T | null` → `JsOption<T>` unless `T` already
+  erases to `JsValue`; `JsOption<JsValue>` simplifies to `JsValue`.
 * `T?` on a property → `Option<T>`. The setter takes `Option<T>` too, so
   callers can clear the property by passing `None`.
 * `f(x?: T)` (optional parameter) → produces an overload pair, *not* an
@@ -584,6 +583,9 @@ For every JS callable, `ts-gen`:
    variants (one per prefix `[(a), (a, b), (a, b, c)]`); union params
    expand via cartesian product (`(string | ArrayBuffer)` →
    `[(string), (ArrayBuffer)]`); a trailing variadic stays trailing.
+   Unions inside generic type arguments do not distribute:
+   `Array<A | B>` and `Record<K, A | B>` are each one parameter shape,
+   not `Array<A> | Array<B>` or `Record<K, A> | Record<K, B>`.
 2. **Cross-overload dedup**: When multiple overloads expand to the same
    concrete parameter list, drop the duplicates. Two overloads that
    both truncate to `(callback)` produce only one binding.
@@ -736,26 +738,11 @@ When the deepest common ancestor is `Object` (no useful narrowing), the
 union erases to `JsValue` — the existing default. This rule is universal:
 it applies to `@throws` unions and to any TS union return type.
 
-The same LUB rule also runs at flatten-time for the inner type of
-generic containers (`Array<T>`, `Set<T>`, `Promise<T>`, `Map<K, V>`,
-`Record<K, V>`). When the inner type fans out to multiple alternatives,
-they collapse to either:
-
-* their LUB (when every alt is `TypeRef::Named` and they share an
-  ancestor more specific than `Object`) — e.g. `Array<TypeError |
-  RangeError>` emits `Array<Error>` rather than two phantom-sibling
-  `Array<TypeError>` / `Array<RangeError>` bindings; or
-* the original union (otherwise) — `Record<string, string | number |
-  boolean>` lowers to bare `&Object` via the existing `is_jsvalue_arg`
-  elision in `to_syn_type`.
-
-This keeps one binding per outer container shape rather than fanning
-out per inner-arm phantom. The phantom on `Array<T>`, `Object<T>`, etc.
-is a compile-time tag — at runtime every arm is the same JS object, so
-the explosion was pure API-surface noise. Single-typed containers
-(`Record<string, string>` → `&Object<JsString>`) keep their meaningful
-phantom because flatten produces a single alternative and the collapse
-step is a no-op.
+This LUB rule applies when lowering an actual union type. It does not
+make generic containers distributive: `Array<TypeError | RangeError>`
+is still a single `Array<Error>` type, and `Record<string, string |
+number | boolean>` lowers as one `Object` binding rather than separate
+record overloads for each value type.
 
 ## Module declarations and namespace nesting
 
