@@ -97,8 +97,8 @@ impl<'a> DocComments<'a> {
 /// Clean raw JSDoc content (between `/**` and `*/`) and convert to Rust doc conventions.
 ///
 /// - Strips leading `*` and whitespace per line
-/// - Converts `@param name - desc` → `# Arguments` section with `* \`name\` - desc`
-/// - Converts `@returns desc` → `# Returns` section
+/// - Converts `@param name - desc` → `* \`name\` - desc`
+/// - Converts `@returns desc` → `Returns: desc`
 /// - Converts `@example` blocks into fenced ` ```js ` code blocks
 /// - Removes empty leading/trailing lines
 #[cfg(test)]
@@ -206,27 +206,22 @@ fn convert_jsdoc_tags(lines: &[&str]) -> (String, JsDocInfo) {
     // Description
     out.extend(description);
 
-    // Arguments section
+    // Argument bullets
     if !params.is_empty() {
-        // Add blank line separator if we have preceding content
         if !out.is_empty() && !out.last().is_none_or(|l| l.is_empty()) {
             out.push(String::new());
         }
-        out.push("## Arguments".to_string());
-        out.push(String::new());
         for p in &params {
             out.push(p.clone());
         }
     }
 
-    // Returns section
+    // Returns line
     if let Some(ret) = &returns {
         if !out.is_empty() && !out.last().is_none_or(|l| l.is_empty()) {
             out.push(String::new());
         }
-        out.push("## Returns".to_string());
-        out.push(String::new());
-        out.push(ret.clone());
+        out.push(format!("Returns: {ret}"));
     }
 
     // Errors section — surfaces `@throws` lines so the rendered doc still
@@ -392,7 +387,7 @@ mod tests {
         let raw = "\n * Does a thing.\n * @param x - the value\n * @returns the result\n ";
         assert_eq!(
             clean_jsdoc(raw),
-            "Does a thing.\n\n## Arguments\n\n* `x` - the value\n\n## Returns\n\nthe result"
+            "Does a thing.\n\n* `x` - the value\n\nReturns: the result"
         );
     }
 
@@ -401,7 +396,7 @@ mod tests {
         let raw = "\n * Hello.\n * @param source Source code to parse\n ";
         assert_eq!(
             clean_jsdoc(raw),
-            "Hello.\n\n## Arguments\n\n* `source` - Source code to parse"
+            "Hello.\n\n* `source` - Source code to parse"
         );
     }
 
@@ -410,7 +405,7 @@ mod tests {
         let raw = "\n * Parse it.\n * @param source Source code\n * @param name Optional name\n * @returns The parsed result.\n ";
         assert_eq!(
             clean_jsdoc(raw),
-            "Parse it.\n\n## Arguments\n\n* `source` - Source code\n* `name` - Optional name\n\n## Returns\n\nThe parsed result."
+            "Parse it.\n\n* `source` - Source code\n* `name` - Optional name\n\nReturns: The parsed result."
         );
     }
 
@@ -451,7 +446,7 @@ mod tests {
         let raw = "\n * Desc.\n * @example\n * code();\n * @returns result\n ";
         assert_eq!(
             clean_jsdoc(raw),
-            "Desc.\n\n## Returns\n\nresult\n\n## Example\n\n```js\ncode();\n```"
+            "Desc.\n\nReturns: result\n\n## Example\n\n```js\ncode();\n```"
         );
     }
 

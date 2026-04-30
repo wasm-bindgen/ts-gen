@@ -97,6 +97,77 @@ pub fn base_rust_name(js_name: &str, kind: SignatureKind) -> String {
     }
 }
 
+/// Convert a generated public function/method name into the Rust API spelling.
+///
+/// Raw identifiers are valid Rust, but public wasm-bindgen bindings follow the
+/// web-sys convention of suffixing keywords instead: `type` -> `type_`, while
+/// parameter names still go through `make_ident` and can use `r#type`.
+pub fn public_rust_name(name: &str) -> String {
+    if is_rust_keyword_or_path_name(name) {
+        format!("{name}_")
+    } else {
+        name.to_string()
+    }
+}
+
+fn is_rust_keyword_or_path_name(name: &str) -> bool {
+    matches!(
+        name,
+        "Self"
+            | "abstract"
+            | "as"
+            | "async"
+            | "await"
+            | "become"
+            | "box"
+            | "break"
+            | "const"
+            | "continue"
+            | "crate"
+            | "do"
+            | "dyn"
+            | "else"
+            | "enum"
+            | "extern"
+            | "false"
+            | "final"
+            | "fn"
+            | "for"
+            | "if"
+            | "impl"
+            | "in"
+            | "let"
+            | "loop"
+            | "macro"
+            | "match"
+            | "mod"
+            | "move"
+            | "mut"
+            | "override"
+            | "priv"
+            | "pub"
+            | "ref"
+            | "return"
+            | "self"
+            | "static"
+            | "struct"
+            | "super"
+            | "trait"
+            | "true"
+            | "try"
+            | "type"
+            | "typeof"
+            | "union"
+            | "unsafe"
+            | "unsized"
+            | "use"
+            | "virtual"
+            | "where"
+            | "while"
+            | "yield"
+    )
+}
+
 /// A single concrete parameter in an expanded signature.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ConcreteParam {
@@ -193,14 +264,43 @@ pub fn expand_signatures(
         all_sigs.extend(expand_single_overload(params, cgctx, scope));
     }
 
-    // Phase 2: Cross-overload dedup — remove identical expanded signatures.
-    let mut seen: Vec<&Vec<ConcreteParam>> = Vec::new();
+    // Phase 2: Cross-overload dedup — remove signatures that are identical
+    // structurally OR after lowering to Rust type tokens (so `"inline"` and
+    // `"attachment"` literal arms both collapse to a single `&str` overload).
+    let from_module = crate::ir::ModuleContext::Global;
+    let render = |sig: &[ConcreteParam]| -> Vec<String> {
+        sig.iter()
+            .map(|p| {
+                if p.variadic {
+                    format!("{}: &[JsValue]", p.name)
+                } else {
+                    let ty = typemap::to_syn_type(
+                        &p.type_ref,
+                        TypePosition::ARGUMENT,
+                        cgctx,
+                        scope,
+                        &from_module,
+                    );
+                    format!("{}: {}", p.name, ty)
+                }
+            })
+            .collect()
+    };
+
+    let mut seen_concrete: Vec<&Vec<ConcreteParam>> = Vec::new();
+    let mut seen_rendered: Vec<Vec<String>> = Vec::new();
     let mut deduped: Vec<Vec<ConcreteParam>> = Vec::new();
     for sig in &all_sigs {
-        if !seen.iter().any(|s| concrete_params_eq(s, sig)) {
-            seen.push(sig);
-            deduped.push(sig.clone());
+        if seen_concrete.iter().any(|s| concrete_params_eq(s, sig)) {
+            continue;
         }
+        let rendered = render(sig);
+        if seen_rendered.contains(&rendered) {
+            continue;
+        }
+        seen_concrete.push(sig);
+        seen_rendered.push(rendered);
+        deduped.push(sig.clone());
     }
 
     // Phase 3: Suffix — compute `_with_X` disambiguators across the cohort.
@@ -270,7 +370,7 @@ pub fn build_signatures(
     let mut out = Vec::with_capacity(expansions.len() * if allow_try { 2 } else { 1 });
 
     for exp in expansions {
-        let primary_candidate = format!("{base}{}", exp.name_suffix);
+        let primary_candidate = public_rust_name(&format!("{base}{}", exp.name_suffix));
         let primary_name = dedupe_name(&primary_candidate, used_names);
 
         // Primary variant: catches if async (the catch encodes async failure)
@@ -681,6 +781,7 @@ fn type_snake_name(ty: &TypeRef) -> String {
         TypeRef::Object => "object".to_string(),
         TypeRef::Named(n) => to_snake_case(n),
         TypeRef::ArrayBuffer => "array_buffer".to_string(),
+        TypeRef::ArrayBufferView => "typed_array".to_string(),
         TypeRef::Uint8Array => "uint8_array".to_string(),
         TypeRef::Int8Array => "int8_array".to_string(),
         TypeRef::Float32Array => "float32_array".to_string(),
@@ -731,6 +832,71 @@ pub fn generate_concrete_params(
         .collect();
 
     quote! { #(#items),* }
+}
+
+/// Convert dictionary factory params to a (generics, params) token-stream pair.
+///
+/// `ArrayBufferView` switches the helper into a generic signature
+/// `<Tn: js_sys::TypedArray>` and a `&Tn` parameter, so callers can pass any
+/// concrete typed-array (`Uint8Array`, `Int32Array`, etc.) without explicit
+/// casts. All other types pass through `generate_concrete_params`.
+pub fn generate_dictionary_params(
+    params: &[ConcreteParam],
+    cgctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &crate::ir::ModuleContext,
+) -> (TokenStream, TokenStream) {
+    let mut generic_idents: Vec<syn::Ident> = Vec::new();
+    let items: Vec<_> = params
+        .iter()
+        .map(|p| {
+            let name = typemap::make_ident(&p.name);
+            let ty = if p.variadic {
+                quote! { &[JsValue] }
+            } else if matches!(p.type_ref, TypeRef::ArrayBufferView) {
+                let g = syn::Ident::new(
+                    &generic_letter(generic_idents.len()),
+                    proc_macro2::Span::call_site(),
+                );
+                generic_idents.push(g.clone());
+                quote! { &#g }
+            } else {
+                typemap::to_syn_type(
+                    &p.type_ref,
+                    TypePosition::ARGUMENT,
+                    cgctx,
+                    scope,
+                    from_module,
+                )
+            };
+            quote! { #name: #ty }
+        })
+        .collect();
+
+    let generics = if generic_idents.is_empty() {
+        quote! {}
+    } else {
+        let bounds = generic_idents
+            .iter()
+            .map(|g| quote! { #g: ::js_sys::TypedArray });
+        quote! { <#(#bounds),*> }
+    };
+
+    (generics, quote! { #(#items),* })
+}
+
+/// Generic identifier names, walking `T, U, V, W, X, Y, Z, A, B, C, ...`
+/// and primed (`T2`, `U2`, ...) when more than 26 are needed.
+fn generic_letter(index: usize) -> String {
+    // T..Z then A..S — covers all 26 single-letter slots without repeats.
+    const ORDER: &[u8] = b"TUVWXYZABCDEFGHIJKLMNOPQRS";
+    let letter = ORDER[index % ORDER.len()] as char;
+    let primes = index / ORDER.len();
+    if primes == 0 {
+        letter.to_string()
+    } else {
+        format!("{letter}{}", primes + 1)
+    }
 }
 
 /// Returns true if the return type is void (no return value in Rust).
@@ -852,6 +1018,27 @@ mod tests {
             optional: false,
             variadic: true,
         }
+    }
+
+    #[test]
+    fn public_rust_names_suffix_keywords() {
+        assert_eq!(public_rust_name("type"), "type_");
+        assert_eq!(public_rust_name("use"), "use_");
+        assert_eq!(base_rust_name("type", SignatureKind::Setter), "set_type");
+        assert_eq!(public_rust_name("type_with_null"), "type_with_null");
+
+        let mut used = no_used();
+        let sigs = expand(
+            "do",
+            &[param("name"), opt_param("config")],
+            &TypeRef::Void,
+            SignatureKind::Method,
+            &None,
+            &mut used,
+        );
+        let non_try: Vec<_> = sigs.iter().filter(|s| !s.catch).collect();
+        assert_eq!(non_try[0].rust_name, "do_");
+        assert_eq!(non_try[1].rust_name, "do_with_config");
     }
 
     #[test]

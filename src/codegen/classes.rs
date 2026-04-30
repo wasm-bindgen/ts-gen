@@ -28,8 +28,9 @@ use quote::quote;
 use std::collections::HashMap;
 
 use crate::codegen::signatures::{
-    build_signatures, dedupe_name, generate_concrete_params, is_void_return, CallableSpec,
-    ConcreteParam, FunctionSignature, SignatureKind,
+    build_signatures, dedupe_name, generate_concrete_params, generate_dictionary_params,
+    is_void_return, public_rust_name, CallableSpec, ConcreteParam, FunctionSignature,
+    SignatureKind,
 };
 use crate::codegen::typemap::{to_return_type, to_syn_type, CodegenContext, TypePosition};
 use crate::ir::{
@@ -556,11 +557,10 @@ fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
                     arg_idents.push(arg_ident.clone());
                     init_calls.push(quote! { inner.#setter_ident(#arg_ident); });
                     value_params.push(param.clone());
-                    let bullet_head = format!("`{}`", param.name);
-                    provided_doc_bullets.push(match field_doc {
-                        Some(doc) => format!("* {bullet_head} - {}", doc.trim()),
-                        None => format!("* {bullet_head}"),
-                    });
+                    if let Some(doc) = field_doc {
+                        let bullet_head = format!("`{}`", param.name);
+                        provided_doc_bullets.push(format!("* {bullet_head} - {}", doc.trim()));
+                    }
                 }
             }
         }
@@ -609,7 +609,7 @@ fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
         }
         let builder_ident = super::typemap::make_ident(&format!("builder{full_suffix}"));
         let new_ident = super::typemap::make_ident(&format!("new{full_suffix}"));
-        let params_tokens = generate_concrete_params(
+        let (generics, params_tokens) = generate_dictionary_params(
             &plan.value_params,
             config.cgctx,
             config.scope,
@@ -632,7 +632,6 @@ fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
             if !doc_text.is_empty() {
                 doc_text.push_str("\n\n");
             }
-            doc_text.push_str("## Arguments\n\n");
             doc_text.push_str(&plan.provided_doc_bullets.join("\n"));
         }
         let doc_attr = if doc_text.is_empty() {
@@ -660,13 +659,13 @@ fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
         };
         builder_variants.push(quote! {
             #doc_attr
-            pub fn #builder_ident(#params_tokens) -> #builder_name {
+            pub fn #builder_ident #generics (#params_tokens) -> #builder_name {
                 #body
             }
         });
         new_variants.push(quote! {
             #doc_attr
-            pub fn #new_ident(#params_tokens) -> #rust_type {
+            pub fn #new_ident #generics (#params_tokens) -> #rust_type {
                 Self::#builder_ident(#(#arg_idents),*).build()
             }
         });
@@ -678,7 +677,8 @@ fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
     for g in &optional_getters {
         for sig in resolve_setter_sigs(g) {
             let builder_method_name = sig.rust_name.strip_prefix("set_").unwrap_or(&sig.rust_name);
-            let method_ident = super::typemap::make_ident(builder_method_name);
+            let builder_method_name = public_rust_name(builder_method_name);
+            let method_ident = super::typemap::make_ident(&builder_method_name);
             let setter_ident = super::typemap::make_ident(&sig.rust_name);
             let params = generate_concrete_params(
                 &sig.params,
@@ -1137,7 +1137,7 @@ fn generate_getter(
     let this_type = super::typemap::make_ident(&config.effective_rust_name());
     let doc = super::doc_tokens(&getter.doc);
 
-    let candidate = to_snake_case(&getter.js_name);
+    let candidate = public_rust_name(&to_snake_case(&getter.js_name));
     let rust_name = dedupe_name(&candidate, used_names);
     let rust_ident = super::typemap::make_ident(&rust_name);
 
@@ -1215,7 +1215,7 @@ fn generate_setter(
     sigs.iter()
         .map(|sig| {
             let rust_ident = super::typemap::make_ident(&sig.rust_name);
-            let params = generate_concrete_params(
+            let (generics, params) = generate_dictionary_params(
                 &sig.params,
                 config.cgctx,
                 config.scope,
@@ -1232,7 +1232,7 @@ fn generate_setter(
             quote! {
                 #doc
                 #[wasm_bindgen(#(#wb_parts),*)]
-                pub fn #rust_ident(this: &#this_type, #params);
+                pub fn #rust_ident #generics (this: &#this_type, #params);
             }
         })
         .collect()
@@ -1247,7 +1247,7 @@ fn generate_static_getter(
     let class_ident = super::typemap::make_ident(&config.effective_rust_name());
     let doc = super::doc_tokens(&getter.doc);
 
-    let candidate = to_snake_case(&getter.js_name);
+    let candidate = public_rust_name(&to_snake_case(&getter.js_name));
     let rust_name = dedupe_name(&candidate, used_names);
     let rust_ident = super::typemap::make_ident(&rust_name);
 
@@ -1310,7 +1310,7 @@ fn generate_static_setter(
     sigs.iter()
         .map(|sig| {
             let rust_ident = super::typemap::make_ident(&sig.rust_name);
-            let params = generate_concrete_params(
+            let (generics, params) = generate_dictionary_params(
                 &sig.params,
                 config.cgctx,
                 config.scope,
@@ -1330,7 +1330,7 @@ fn generate_static_setter(
             quote! {
                 #doc
                 #[wasm_bindgen(#(#wb_parts),*)]
-                pub fn #rust_ident(#params);
+                pub fn #rust_ident #generics (#params);
             }
         })
         .collect()

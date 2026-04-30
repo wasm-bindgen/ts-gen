@@ -243,15 +243,9 @@ pub mod es_module_lexer {
         pub fn set_idx(this: &ParseError, val: f64);
     }
     impl ParseError {
-        #[doc = " ## Arguments"]
-        #[doc = ""]
-        #[doc = " * `idx`"]
         pub fn new(idx: f64) -> ParseError {
             Self::builder(idx).build()
         }
-        #[doc = " ## Arguments"]
-        #[doc = ""]
-        #[doc = " * `idx`"]
         pub fn builder(idx: f64) -> ParseErrorBuilder {
             let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_idx(idx);
@@ -271,14 +265,10 @@ pub mod es_module_lexer {
         #[doc = " Outputs the list of exports and locations of import specifiers,"]
         #[doc = " including dynamic import and import meta handling."]
         #[doc = ""]
-        #[doc = " ## Arguments"]
-        #[doc = ""]
         #[doc = " * `source` - Source code to parser"]
         #[doc = " * `name` - Optional sourcename"]
         #[doc = ""]
-        #[doc = " ## Returns"]
-        #[doc = ""]
-        #[doc = " Tuple contaning imports list and exports list."]
+        #[doc = " Returns: Tuple contaning imports list and exports list."]
         pub fn parse(
             source: &str,
         ) -> ArrayTuple<(
@@ -293,14 +283,10 @@ pub mod es_module_lexer {
         #[doc = " Outputs the list of exports and locations of import specifiers,"]
         #[doc = " including dynamic import and import meta handling."]
         #[doc = ""]
-        #[doc = " ## Arguments"]
-        #[doc = ""]
         #[doc = " * `source` - Source code to parser"]
         #[doc = " * `name` - Optional sourcename"]
         #[doc = ""]
-        #[doc = " ## Returns"]
-        #[doc = ""]
-        #[doc = " Tuple contaning imports list and exports list."]
+        #[doc = " Returns: Tuple contaning imports list and exports list."]
         #[wasm_bindgen(catch, js_name = "parse")]
         pub fn try_parse(
             source: &str,
@@ -319,14 +305,10 @@ pub mod es_module_lexer {
         #[doc = " Outputs the list of exports and locations of import specifiers,"]
         #[doc = " including dynamic import and import meta handling."]
         #[doc = ""]
-        #[doc = " ## Arguments"]
-        #[doc = ""]
         #[doc = " * `source` - Source code to parser"]
         #[doc = " * `name` - Optional sourcename"]
         #[doc = ""]
-        #[doc = " ## Returns"]
-        #[doc = ""]
-        #[doc = " Tuple contaning imports list and exports list."]
+        #[doc = " Returns: Tuple contaning imports list and exports list."]
         #[wasm_bindgen(js_name = "parse")]
         pub fn parse_with_name(
             source: &str,
@@ -343,14 +325,10 @@ pub mod es_module_lexer {
         #[doc = " Outputs the list of exports and locations of import specifiers,"]
         #[doc = " including dynamic import and import meta handling."]
         #[doc = ""]
-        #[doc = " ## Arguments"]
-        #[doc = ""]
         #[doc = " * `source` - Source code to parser"]
         #[doc = " * `name` - Optional sourcename"]
         #[doc = ""]
-        #[doc = " ## Returns"]
-        #[doc = ""]
-        #[doc = " Tuple contaning imports list and exports list."]
+        #[doc = " Returns: Tuple contaning imports list and exports list."]
         #[wasm_bindgen(catch, js_name = "parse")]
         pub fn try_parse_with_name(
             source: &str,
