@@ -999,6 +999,7 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
     let ret = to_return_type(
         &sig.return_type,
         sig.catch,
+        sig.is_async,
         sig.error_type.as_ref(),
         config.cgctx,
         config.scope,
@@ -1052,6 +1053,7 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
     let ret_ty = to_return_type(
         &sig.return_type,
         sig.catch,
+        sig.is_async,
         sig.error_type.as_ref(),
         config.cgctx,
         config.scope,
@@ -1104,6 +1106,7 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
     let ret_ty = to_return_type(
         &sig.return_type,
         sig.catch,
+        sig.is_async,
         sig.error_type.as_ref(),
         config.cgctx,
         config.scope,

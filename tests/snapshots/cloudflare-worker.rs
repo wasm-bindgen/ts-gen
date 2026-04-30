@@ -103,7 +103,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "arrayBuffer")]
     pub async fn array_buffer(this: &Request) -> Result<ArrayBuffer, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn text(this: &Request) -> Result<String, JsValue>;
+    pub async fn text(this: &Request) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn json(this: &Request) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -314,7 +314,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "arrayBuffer")]
     pub async fn array_buffer(this: &Response) -> Result<ArrayBuffer, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn text(this: &Response) -> Result<String, JsValue>;
+    pub async fn text(this: &Response) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "json")]
     pub async fn json_1(this: &Response) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -423,7 +423,7 @@ extern "C" {
         controller: &ScheduledController,
         env: &E,
         ctx: &ExecutionContext,
-    ) -> Result<(), JsValue>;
+    ) -> Result<Undefined, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
