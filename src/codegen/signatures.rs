@@ -446,8 +446,7 @@ fn expand_single_overload(
 /// - `Union([A, B])` → flatten(A) ++ flatten(B)
 /// - `Nullable(T)` → flatten(T) wrapped in Nullable
 /// - `Named("Foo")` → resolve alias; if alias is a union, flatten it
-/// - `Promise(T)` → for each flatten(T), wrap in Promise
-/// - `Array(T)` → for each flatten(T), wrap in Array
+/// - Generic container type arguments do not flatten
 /// - Everything else → single leaf
 fn flatten_type(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId) -> Vec<TypeRef> {
     match ty {
@@ -478,44 +477,8 @@ fn flatten_type(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId
             alts
         }
 
-        // Generic containers: flatten inner, wrap each
-        TypeRef::Promise(inner) => flatten_type(inner, cgctx, scope)
-            .into_iter()
-            .map(|t| TypeRef::Promise(Box::new(t)))
-            .collect(),
-        TypeRef::Array(inner) => flatten_type(inner, cgctx, scope)
-            .into_iter()
-            .map(|t| TypeRef::Array(Box::new(t)))
-            .collect(),
-        TypeRef::Set(inner) => flatten_type(inner, cgctx, scope)
-            .into_iter()
-            .map(|t| TypeRef::Set(Box::new(t)))
-            .collect(),
-        // Two-arg containers: cartesian product
-        TypeRef::Record(k, v) => {
-            let ks = flatten_type(k, cgctx, scope);
-            let vs = flatten_type(v, cgctx, scope);
-            let mut result = Vec::new();
-            for k in &ks {
-                for v in &vs {
-                    result.push(TypeRef::Record(Box::new(k.clone()), Box::new(v.clone())));
-                }
-            }
-            result
-        }
-        TypeRef::Map(k, v) => {
-            let ks = flatten_type(k, cgctx, scope);
-            let vs = flatten_type(v, cgctx, scope);
-            let mut result = Vec::new();
-            for k in &ks {
-                for v in &vs {
-                    result.push(TypeRef::Map(Box::new(k.clone()), Box::new(v.clone())));
-                }
-            }
-            result
-        }
-
-        // Leaf types: no expansion
+        // Generic containers are not distributive: `Array<A | B>` and
+        // `Record<K, A | B>` are single parameter shapes, not overloads.
         _ => vec![ty.clone()],
     }
 }
@@ -1281,5 +1244,88 @@ mod tests {
         assert_eq!(non_try[1].params.len(), 2);
         assert_eq!(non_try[2].rust_name, "foo_with_c");
         assert_eq!(non_try[2].params.len(), 2);
+    }
+
+    // Generic containers are opaque to signature flattening.
+
+    fn flatten_no_ctx(ty: &TypeRef) -> Vec<TypeRef> {
+        let (gctx, scope) = test_ctx();
+        let cgctx = CodegenContext::empty(&gctx, scope);
+        flatten_type(ty, Some(&cgctx), scope)
+    }
+
+    #[test]
+    fn record_with_mixed_primitive_union_does_not_distribute() {
+        let union_v = TypeRef::Union(vec![TypeRef::String, TypeRef::Number, TypeRef::Boolean]);
+        let ty = TypeRef::Record(Box::new(TypeRef::String), Box::new(union_v.clone()));
+        let alts = flatten_no_ctx(&ty);
+        assert_eq!(alts.len(), 1);
+        match &alts[0] {
+            TypeRef::Record(_, v) => assert_eq!(**v, union_v),
+            other => panic!("expected Record, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn record_with_union_key_does_not_distribute() {
+        let union_k = TypeRef::Union(vec![TypeRef::String, TypeRef::Number]);
+        let ty = TypeRef::Record(Box::new(union_k.clone()), Box::new(TypeRef::String));
+        let alts = flatten_no_ctx(&ty);
+        assert_eq!(alts.len(), 1);
+        match &alts[0] {
+            TypeRef::Record(k, _) => assert_eq!(**k, union_k),
+            other => panic!("expected Record, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn record_with_single_typed_value_keeps_typed_phantom() {
+        let ty = TypeRef::Record(Box::new(TypeRef::String), Box::new(TypeRef::String));
+        let alts = flatten_no_ctx(&ty);
+        assert_eq!(alts.len(), 1);
+        match &alts[0] {
+            TypeRef::Record(_, v) => assert_eq!(**v, TypeRef::String),
+            other => panic!("expected Record, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn array_with_mixed_primitive_union_does_not_distribute() {
+        let union_v = TypeRef::Union(vec![TypeRef::String, TypeRef::Number]);
+        let ty = TypeRef::Array(Box::new(union_v.clone()));
+        let alts = flatten_no_ctx(&ty);
+        assert_eq!(alts.len(), 1);
+        match &alts[0] {
+            TypeRef::Array(inner) => assert_eq!(**inner, union_v),
+            other => panic!("expected Array, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn map_with_union_type_args_does_not_distribute() {
+        let k = TypeRef::Union(vec![TypeRef::String, TypeRef::Number]);
+        let v = TypeRef::Union(vec![TypeRef::String, TypeRef::Boolean]);
+        let ty = TypeRef::Map(Box::new(k.clone()), Box::new(v.clone()));
+        let alts = flatten_no_ctx(&ty);
+        assert_eq!(alts.len(), 1);
+        match &alts[0] {
+            TypeRef::Map(map_k, map_v) => {
+                assert_eq!(**map_k, k);
+                assert_eq!(**map_v, v);
+            }
+            other => panic!("expected Map, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn promise_with_union_does_not_distribute() {
+        let union_v = TypeRef::Union(vec![TypeRef::String, TypeRef::Number]);
+        let ty = TypeRef::Promise(Box::new(union_v.clone()));
+        let alts = flatten_no_ctx(&ty);
+        assert_eq!(alts.len(), 1);
+        match &alts[0] {
+            TypeRef::Promise(inner) => assert_eq!(**inner, union_v),
+            other => panic!("expected Promise, got {other:?}"),
+        }
     }
 }

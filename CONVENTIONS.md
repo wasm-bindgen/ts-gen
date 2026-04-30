@@ -65,6 +65,8 @@ borrowed by reference; return-position container types are owned.
 * `T | undefined` and `T | null | undefined` → also `Option<T>`. We coalesce
   at parse time; the rendered union has no separate `null`/`undefined`
   arm.
+* In inner type positions, `T | null` → `JsOption<T>` unless `T` already
+  erases to `JsValue`; `JsOption<JsValue>` simplifies to `JsValue`.
 * `T?` on a property → `Option<T>`. The setter takes `Option<T>` too, so
   callers can clear the property by passing `None`.
 * `f(x?: T)` (optional parameter) → produces an overload pair, *not* an
@@ -581,6 +583,9 @@ For every JS callable, `ts-gen`:
    variants (one per prefix `[(a), (a, b), (a, b, c)]`); union params
    expand via cartesian product (`(string | ArrayBuffer)` →
    `[(string), (ArrayBuffer)]`); a trailing variadic stays trailing.
+   Unions inside generic type arguments do not distribute:
+   `Array<A | B>` and `Record<K, A | B>` are each one parameter shape,
+   not `Array<A> | Array<B>` or `Record<K, A> | Record<K, B>`.
 2. **Cross-overload dedup**: When multiple overloads expand to the same
    concrete parameter list, drop the duplicates. Two overloads that
    both truncate to `(callback)` produce only one binding.
@@ -755,6 +760,12 @@ The lattice is built from:
 When the deepest common ancestor is `Object` (no useful narrowing), the
 union erases to `JsValue` — the existing default. This rule is universal:
 it applies to `@throws` unions and to any TS union return type.
+
+This LUB rule applies when lowering an actual union type. It does not
+make generic containers distributive: `Array<TypeError | RangeError>`
+is still a single `Array<Error>` type, and `Record<string, string |
+number | boolean>` lowers as one `Object` binding rather than separate
+record overloads for each value type.
 
 ## Module declarations and namespace nesting
 

@@ -426,7 +426,7 @@ pub fn to_syn_type(
             TypeRef::Void | TypeRef::Undefined => return quote! { Undefined },
             TypeRef::Nullable(inner) => {
                 let inner_ty = to_syn_type(inner, pos, ctx, scope, from_module);
-                return quote! { JsOption<#inner_ty> };
+                return js_option_or_js_value(inner_ty);
             }
             _ => {}
         }
@@ -506,7 +506,7 @@ pub fn to_syn_type(
         TypeRef::Nullable(inner) => {
             if pos.inner {
                 let inner_ty = to_syn_type(inner, pos, ctx, scope, from_module);
-                quote! { JsOption<#inner_ty> }
+                js_option_or_js_value(inner_ty)
             } else {
                 let inner_ty = to_syn_type(inner, pos, ctx, scope, from_module);
                 quote! { Option<#inner_ty> }
@@ -518,7 +518,7 @@ pub fn to_syn_type(
             // emit that ancestor instead of erasing to `JsValue`. Falls back
             // to `JsValue` for non-named members or when only `Object` is
             // common (which is no better than `JsValue` in practice).
-            if let Some(lub) = union_lub(members, ctx, scope) {
+            if let Some(lub) = lub_named(members, ctx, scope) {
                 let lub_ty = to_syn_type(&TypeRef::Named(lub), pos, ctx, scope, from_module);
                 return lub_ty;
             }
@@ -643,6 +643,14 @@ fn generic_container(
         base
     } else {
         quote! { #base<#arg> }
+    }
+}
+
+fn js_option_or_js_value(inner_ty: TokenStream) -> TokenStream {
+    if is_jsvalue_arg(&inner_ty) {
+        quote! { JsValue }
+    } else {
+        quote! { JsOption<#inner_ty> }
     }
 }
 
@@ -828,11 +836,19 @@ pub(crate) fn make_ident(name: &str) -> syn::Ident {
     }
 }
 
-/// Try to compute a subtyping LUB across the members of a union. Returns
+/// Try to compute a subtyping LUB across a list of `TypeRef`s. Returns
 /// `Some(name)` only when every member is a `TypeRef::Named` *and* the
 /// resulting LUB is more specific than `Object` (a `Object` LUB is no
 /// better than the default `JsValue` erasure, so we treat it as no LUB).
-fn union_lub(
+///
+/// Used by:
+/// * `TypeRef::Union` lowering — collapses unions of named subtypes to
+///   their shared ancestor instead of erasing to `JsValue`.
+/// * `signatures::flatten_type` — collapses generic-container element
+///   alternatives so e.g. `Array<TypeError | RangeError>` emits one
+///   `Array<Error>` rather than two phantom-sibling `Array<TypeError>`
+///   / `Array<RangeError>` bindings.
+pub(crate) fn lub_named(
     members: &[TypeRef],
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
@@ -990,6 +1006,12 @@ mod tests {
     }
 
     #[test]
+    fn test_nullable_inner_jsvalue_collapses() {
+        let ty = TypeRef::Nullable(Box::new(TypeRef::Any));
+        assert_eq!(inner_type(&ty), "JsValue");
+    }
+
+    #[test]
     fn test_promise_with_string() {
         let ty = TypeRef::Promise(Box::new(TypeRef::String));
         let result = ret_type(&ty);
@@ -1061,11 +1083,30 @@ mod tests {
     }
 
     #[test]
+    fn test_record_nullable_jsvalue_elides_generic() {
+        let ty = TypeRef::Record(
+            Box::new(TypeRef::String),
+            Box::new(TypeRef::Nullable(Box::new(TypeRef::Union(vec![
+                TypeRef::String,
+                TypeRef::Number,
+                TypeRef::Boolean,
+            ])))),
+        );
+        assert_eq!(ret_type(&ty), "Object");
+    }
+
+    #[test]
     fn test_promise_nullable_inner() {
         // Promise<string | null> → Promise<JsOption<JsString>>
         let ty = TypeRef::Promise(Box::new(TypeRef::Nullable(Box::new(TypeRef::String))));
         let result = ret_type(&ty);
         assert_eq!(result, "Promise < JsOption < JsString > >");
+    }
+
+    #[test]
+    fn test_promise_nullable_jsvalue_elides_generic() {
+        let ty = TypeRef::Promise(Box::new(TypeRef::Nullable(Box::new(TypeRef::Any))));
+        assert_eq!(ret_type(&ty), "Promise");
     }
 
     #[test]
