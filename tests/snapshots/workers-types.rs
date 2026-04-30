@@ -2603,27 +2603,24 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObjectTransaction;
     #[wasm_bindgen(method, catch)]
-    pub async fn get(
-        this: &DurableObjectTransaction,
-        key: &str,
-    ) -> Result<JsOption<JsValue>, JsValue>;
+    pub async fn get(this: &DurableObjectTransaction, key: &str) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_key_and_options(
         this: &DurableObjectTransaction,
         key: &str,
         options: &DurableObjectGetOptions,
-    ) -> Result<JsOption<JsValue>, JsValue>;
+    ) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_keys(
         this: &DurableObjectTransaction,
         keys: &Array<JsString>,
-    ) -> Result<JsOption<JsValue>, JsValue>;
+    ) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_keys_and_options(
         this: &DurableObjectTransaction,
         keys: &Array<JsString>,
         options: &DurableObjectGetOptions,
-    ) -> Result<JsOption<JsValue>, JsValue>;
+    ) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn list(this: &DurableObjectTransaction) -> Result<Map<JsString, JsValue>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "list")]
@@ -2721,24 +2718,24 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObjectStorage;
     #[wasm_bindgen(method, catch)]
-    pub async fn get(this: &DurableObjectStorage, key: &str) -> Result<JsOption<JsValue>, JsValue>;
+    pub async fn get(this: &DurableObjectStorage, key: &str) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_key_and_options(
         this: &DurableObjectStorage,
         key: &str,
         options: &DurableObjectGetOptions,
-    ) -> Result<JsOption<JsValue>, JsValue>;
+    ) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_keys(
         this: &DurableObjectStorage,
         keys: &Array<JsString>,
-    ) -> Result<JsOption<JsValue>, JsValue>;
+    ) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_keys_and_options(
         this: &DurableObjectStorage,
         keys: &Array<JsString>,
         options: &DurableObjectGetOptions,
-    ) -> Result<JsOption<JsValue>, JsValue>;
+    ) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn list(this: &DurableObjectStorage) -> Result<Map<JsString, JsValue>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "list")]
@@ -64044,12 +64041,9 @@ extern "C" {
         values: &[JsValue],
     ) -> Result<D1PreparedStatement, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn first(
-        this: &D1PreparedStatement,
-        col_name: &str,
-    ) -> Result<JsOption<JsValue>, JsValue>;
+    pub async fn first(this: &D1PreparedStatement, col_name: &str) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "first")]
-    pub async fn first_1(this: &D1PreparedStatement) -> Result<JsOption<JsValue>, JsValue>;
+    pub async fn first_1(this: &D1PreparedStatement) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn run(this: &D1PreparedStatement) -> Result<D1Result, JsValue>;
     #[wasm_bindgen(method, catch)]
