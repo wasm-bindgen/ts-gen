@@ -732,11 +732,78 @@ JsValue>`. Recognised forms:
 * `@throws {TypeError} when foo` — single type
 * `@throws {TypeError | RangeError} when bar` — inline union
 * `@throws {@link ImagesError} if foo` — `{@link X}` collapses to `X`
+* `@throws {never}` — declares the callable never throws (see below)
 * Multiple `@throws` lines aggregate into one effective union
 * `@throws Sentence describing condition.` — pure prose, no structured
   type extracted
 
 The original prose surfaces in the rendered doc as an `## Errors` section.
+
+### `@throws {never}` — opting out of fallible variants
+
+`@throws {never}` is the explicit "this never throws" annotation. It
+combines TypeScript's bottom type with JSDoc to tell ts-gen to skip
+the fallible variants for the callable:
+
+```ts
+class NeverThrows {
+  /**
+   * @throws {never}
+   */
+  safeOp(x: number): string;
+
+  /**
+   * @throws {never}
+   */
+  loaded(): Promise<Loaded>;
+}
+
+/**
+ * @throws {never}
+ */
+declare function pureCompute(x: number): number;
+```
+
+emits:
+
+```rust
+// Sync methods/functions: no `try_<name>` companion.
+#[wasm_bindgen(method, js_name = "safeOp")]
+pub fn safe_op(this: &NeverThrows, x: f64) -> String;
+
+// Async methods/functions: no `Result` wrapper, no `catch`.
+#[wasm_bindgen(method)]
+pub async fn loaded(this: &NeverThrows) -> Loaded;
+
+#[wasm_bindgen(js_name = "pureCompute")]
+pub fn pure_compute(x: f64) -> f64;
+```
+
+Compare to a plain sync method, which emits both forms:
+
+```rust
+pub fn frobnicate(this: &Foo) -> String;             // panic on throw
+pub fn try_frobnicate(this: &Foo) -> Result<String, JsValue>;
+```
+
+#### Rules
+
+* **Sync callables** with `@throws {never}` get *only* the primary
+  binding — no `try_<name>` companion is emitted.
+* **Async callables** (returning `Promise<T>`) drop the `Result<T, _>`
+  wrapper and the `catch` attribute. The binding becomes
+  `pub async fn foo() -> T`.
+* **Constructors** always catch per JS `new` semantics —
+  `@throws {never}` on a constructor is silently ignored.
+* **Setters** never throw and never get `try_` variants regardless,
+  so the annotation is a no-op there too.
+* **Mixed annotations** like `@throws {never | TypeError}` collapse to
+  `@throws {TypeError}` (since `T | never` is just `T` in TS) — the
+  `never` arm is absorbed and the residual type drives codegen as
+  usual.
+* **Rendered doc**: `@throws {never}` lines do *not* contribute to
+  the `## Errors` section. By definition there are no errors to
+  document.
 
 ## Subtyping LUB across unions
 

@@ -382,7 +382,7 @@ fn convert_method_signature(
             return_type,
             optional: method.optional,
             doc,
-            throws: info.throws_typeref(),
+            throws: info.throws(),
         })],
     }
 }
@@ -437,7 +437,7 @@ fn convert_construct_signature(
     Some(Member::Constructor(ConstructorMember {
         params,
         doc,
-        throws: info.throws_typeref(),
+        throws: info.throws(),
     }))
 }
 
@@ -502,7 +502,7 @@ fn convert_class_method(
             vec![Member::Constructor(ConstructorMember {
                 params,
                 doc,
-                throws: info.throws_typeref(),
+                throws: info.throws(),
             })]
         }
         MethodDefinitionKind::Get => {
@@ -550,7 +550,7 @@ fn convert_class_method(
                     params,
                     return_type,
                     doc,
-                    throws: info.throws_typeref(),
+                    throws: info.throws(),
                 })]
             } else {
                 vec![Member::Method(MethodMember {
@@ -561,7 +561,7 @@ fn convert_class_method(
                     return_type,
                     optional: method.optional,
                     doc,
-                    throws: info.throws_typeref(),
+                    throws: info.throws(),
                 })]
             }
         }

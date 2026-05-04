@@ -319,7 +319,7 @@ fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
                 kind: SignatureKind::Setter,
                 overloads: &setter_overloads,
                 return_type: &void,
-                error_type: None,
+                throws: &crate::ir::Throws::None,
                 doc: &None,
             },
             &mut setter_used,
@@ -789,9 +789,14 @@ fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 // Use the first overload's `@throws` (if any) as the error
                 // type for the constructor — TS overloads conventionally
                 // share semantics, and the first one carries the doc.
+                // Constructors always catch per JS `new` semantics, so
+                // `Throws::Never` here is a no-op — `build_signatures` still
+                // emits `catch` with the default `JsValue` error type.
+                let empty_throws = crate::ir::Throws::None;
                 let throws = constructor_overloads
                     .first()
-                    .and_then(|c| c.throws.as_ref());
+                    .map(|c| &c.throws)
+                    .unwrap_or(&empty_throws);
                 let return_type = TypeRef::Named(config.rust_name.clone());
                 let sigs = build_signatures(
                     &CallableSpec {
@@ -799,7 +804,7 @@ fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         kind: SignatureKind::Constructor,
                         overloads: &overloads,
                         return_type: &return_type,
-                        error_type: throws,
+                        throws,
                         doc: &doc,
                     },
                     &mut used_names,
@@ -820,14 +825,15 @@ fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 let overloads: Vec<&[Param]> = group.iter().map(|m| m.params.as_slice()).collect();
                 let doc = group.first().and_then(|m| m.doc.clone());
                 let return_type = &group[0].return_type;
-                let throws = group.first().and_then(|m| m.throws.as_ref());
+                let empty_throws = crate::ir::Throws::None;
+                let throws = group.first().map(|m| &m.throws).unwrap_or(&empty_throws);
                 let sigs = build_signatures(
                     &CallableSpec {
                         js_name: &m.js_name,
                         kind: SignatureKind::Method,
                         overloads: &overloads,
                         return_type,
-                        error_type: throws,
+                        throws,
                         doc: &doc,
                     },
                     &mut used_names,
@@ -848,14 +854,15 @@ fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 let overloads: Vec<&[Param]> = group.iter().map(|m| m.params.as_slice()).collect();
                 let doc = group.first().and_then(|m| m.doc.clone());
                 let return_type = &group[0].return_type;
-                let throws = group.first().and_then(|m| m.throws.as_ref());
+                let empty_throws = crate::ir::Throws::None;
+                let throws = group.first().map(|m| &m.throws).unwrap_or(&empty_throws);
                 let sigs = build_signatures(
                     &CallableSpec {
                         js_name: &m.js_name,
                         kind: SignatureKind::StaticMethod,
                         overloads: &overloads,
                         return_type,
-                        error_type: throws,
+                        throws,
                         doc: &doc,
                     },
                     &mut used_names,
@@ -1207,7 +1214,7 @@ fn generate_setter(
             kind: SignatureKind::Setter,
             overloads: &overloads,
             return_type: &void,
-            error_type: None,
+            throws: &crate::ir::Throws::None,
             doc: &doc,
         },
         used_names,
@@ -1302,7 +1309,7 @@ fn generate_static_setter(
             kind: SignatureKind::StaticSetter,
             overloads: &overloads,
             return_type: &void,
-            error_type: None,
+            throws: &crate::ir::Throws::None,
             doc: &doc,
         },
         used_names,

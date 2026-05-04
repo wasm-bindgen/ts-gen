@@ -63,7 +63,7 @@ pub fn extract_var_members(
                 constructor = Some(ConstructorMember {
                     params,
                     doc,
-                    throws: info.throws_typeref(),
+                    throws: info.throws(),
                 });
             }
             TSSignature::TSPropertySignature(prop) => {
@@ -117,7 +117,7 @@ pub fn extract_var_members(
                     params,
                     return_type,
                     doc,
-                    throws: info.throws_typeref(),
+                    throws: info.throws(),
                 }));
             }
             TSSignature::TSCallSignatureDeclaration(_) => {

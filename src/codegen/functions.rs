@@ -55,7 +55,7 @@ fn emit_function(
             kind: SignatureKind::Function,
             overloads: &[overloads[0]],
             return_type: &decl.return_type,
-            error_type: decl.throws.as_ref(),
+            throws: &decl.throws,
             doc,
         },
         &mut used_names,

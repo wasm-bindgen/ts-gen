@@ -241,8 +241,8 @@ impl<'a> PopulateCtx<'a> {
                         .info_for_span(export.span.start)
                         .or_else(|| self.docs.info_for_span(func.span.start));
                     let (doc, throws) = match info {
-                        Some((d, i)) => (Some(d), i.throws_typeref()),
-                        None => (None, None),
+                        Some((d, i)) => (Some(d), i.throws()),
+                        None => (None, ir::Throws::None),
                     };
                     if let Some(decl) = convert_function_decl(func, throws, self.diag) {
                         declarations.push(ir::TypeDeclaration {
@@ -622,7 +622,7 @@ impl<'a> PopulateCtx<'a> {
                             overloads: vec![],
                             // Variable-as-function form (`var foo: () => T`) doesn't
                             // typically carry @throws JSDoc; leave empty.
-                            throws: None,
+                            throws: ir::Throws::None,
                         }),
                         doc.clone(),
                     ));
@@ -751,13 +751,13 @@ impl<'a> PopulateCtx<'a> {
         &self,
         export_span_start: Option<u32>,
         inner_span_start: u32,
-    ) -> (Option<String>, Option<ir::TypeRef>) {
+    ) -> (Option<String>, ir::Throws) {
         let info = export_span_start
             .and_then(|s| self.docs.info_for_span(s))
             .or_else(|| self.docs.info_for_span(inner_span_start));
         match info {
-            Some((doc, info)) => (Some(doc), info.throws_typeref()),
-            None => (None, None),
+            Some((doc, info)) => (Some(doc), info.throws()),
+            None => (None, ir::Throws::None),
         }
     }
 

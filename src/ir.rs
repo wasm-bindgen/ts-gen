@@ -270,6 +270,50 @@ pub struct NumericEnumVariant {
 
 // ─── Function ────────────────────────────────────────────────────────
 
+/// What `@throws` JSDoc says about a callable's failure modes.
+///
+/// The three states are mutually exclusive and drive different codegen
+/// decisions:
+///
+/// * [`Throws::None`] — no `@throws` annotation. Sync callables get a
+///   `try_<name>` companion returning `Result<T, JsValue>`; async ones
+///   wrap as `Result<T, JsValue>` directly.
+/// * [`Throws::Type`] — typed throws. Sync gets `try_<name>` returning
+///   `Result<T, ErrTy>`; async wraps as `Result<T, ErrTy>`. The carried
+///   `TypeRef` runs through the regular type pipeline, so subtyping
+///   LUB rules (see `lub_types`) apply when multiple types are listed.
+/// * [`Throws::Never`] — `@throws {never}`. The callable is declared
+///   never to throw. Sync gets *no* `try_` companion; async drops
+///   `catch` and returns `T` directly (no `Result` wrapper).
+///
+/// `Throws::Never` only fires when `never` is the *sole* type listed
+/// across all `@throws` lines — `@throws {never | OtherError}` is
+/// treated as `Throws::Type(OtherError)` (the `never` is ignored).
+#[derive(Clone, Debug, Default, PartialEq)]
+pub enum Throws {
+    #[default]
+    None,
+    Type(TypeRef),
+    Never,
+}
+
+impl Throws {
+    /// Returns the error `TypeRef` for codegen, if any. `Never` and
+    /// `None` both yield `None` here — callers separately consult
+    /// `is_never()` to decide whether to suppress catching entirely.
+    pub fn as_type(&self) -> Option<&TypeRef> {
+        match self {
+            Throws::Type(t) => Some(t),
+            _ => None,
+        }
+    }
+
+    /// Whether this is the explicit "never throws" annotation.
+    pub fn is_never(&self) -> bool {
+        matches!(self, Throws::Never)
+    }
+}
+
 #[derive(Clone, Debug)]
 
 pub struct FunctionDecl {
@@ -279,12 +323,8 @@ pub struct FunctionDecl {
     pub params: Vec<Param>,
     pub return_type: TypeRef,
     pub overloads: Vec<FunctionOverload>,
-    /// Error type captured from `@throws {T}` JSDoc tags, in the same
-    /// representation as any other type — single name as `TypeRef::Named`,
-    /// multiple as `TypeRef::Union(...)`. Codegen runs it through the
-    /// regular type-rendering pipeline, so subtyping LUB rules (see
-    /// `lub_types`) apply uniformly with normal unions.
-    pub throws: Option<TypeRef>,
+    /// Failure-mode info from `@throws` JSDoc. See [`Throws`].
+    pub throws: Throws,
 }
 
 #[derive(Clone, Debug)]
@@ -369,8 +409,8 @@ pub struct MethodMember {
     pub return_type: TypeRef,
     pub optional: bool,
     pub doc: Option<String>,
-    /// Error type from `@throws {T}` — see `FunctionDecl::throws`.
-    pub throws: Option<TypeRef>,
+    /// Failure-mode info from `@throws` — see [`Throws`].
+    pub throws: Throws,
 }
 
 #[derive(Clone, Debug)]
@@ -378,8 +418,12 @@ pub struct MethodMember {
 pub struct ConstructorMember {
     pub params: Vec<Param>,
     pub doc: Option<String>,
-    /// Error type from `@throws {T}` — see `FunctionDecl::throws`.
-    pub throws: Option<TypeRef>,
+    /// Failure-mode info from `@throws` — see [`Throws`].
+    ///
+    /// Note: constructors always emit `catch` per JS `new` semantics, so
+    /// `Throws::Never` here is effectively a no-op for codegen — only
+    /// `Throws::Type` (custom error type) changes behavior.
+    pub throws: Throws,
 }
 
 #[derive(Clone, Debug)]
@@ -423,8 +467,8 @@ pub struct StaticMethodMember {
     pub params: Vec<Param>,
     pub return_type: TypeRef,
     pub doc: Option<String>,
-    /// Error type from `@throws {T}` — see `FunctionDecl::throws`.
-    pub throws: Option<TypeRef>,
+    /// Failure-mode info from `@throws` — see [`Throws`].
+    pub throws: Throws,
 }
 
 // ─── Type Registry (First Pass) ──────────────────────────────────────

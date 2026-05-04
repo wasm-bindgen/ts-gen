@@ -46,7 +46,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 
 use crate::codegen::typemap::{self, CodegenContext, TypePosition};
-use crate::ir::{Param, TypeRef};
+use crate::ir::{Param, Throws, TypeRef};
 use crate::parse::scope::ScopeId;
 use crate::util::naming::to_snake_case;
 
@@ -318,8 +318,8 @@ pub fn expand_signatures(
 /// one or more wasm-bindgen extern signatures. Pairs with [`build_signatures`].
 ///
 /// All decisions about `try_` companions, `async fn` collapse, and `catch`
-/// fall out of the kind + return type + error type once these inputs are
-/// available.
+/// fall out of the kind + return type + throws annotation once these inputs
+/// are available.
 #[derive(Clone, Debug)]
 pub struct CallableSpec<'a> {
     pub js_name: &'a str,
@@ -328,9 +328,19 @@ pub struct CallableSpec<'a> {
     /// allows multiple overloaded declarations.
     pub overloads: &'a [&'a [Param]],
     pub return_type: &'a TypeRef,
-    /// Optional error type from `@throws` — `None` means use the default
-    /// `JsValue` for any catching variant.
-    pub error_type: Option<&'a TypeRef>,
+    /// Failure-mode info from `@throws` JSDoc — see [`Throws`].
+    ///
+    /// Drives three orthogonal decisions:
+    /// * `Throws::None` → catching variants use the default `JsValue`
+    ///   error type. Sync callables get a `try_<name>` companion.
+    /// * `Throws::Type(T)` → catching variants use `Result<_, T>`. Sync
+    ///   callables still get the `try_<name>` companion (with the typed
+    ///   error).
+    /// * `Throws::Never` → caller declares the callable never throws.
+    ///   Sync callables get *no* `try_` companion; async callables drop
+    ///   `catch` and return `T` directly. Constructors ignore this and
+    ///   still catch (per JS `new` semantics).
+    pub throws: &'a Throws,
     /// Doc comment to attach to the primary signature only.
     pub doc: &'a Option<String>,
 }
@@ -348,6 +358,10 @@ pub struct CallableSpec<'a> {
 ///   each primary `name` gets a fallible `try_name` sibling.
 /// * **Constructor catches always**: per JS semantics; the primary signature
 ///   is `catch: true` and there's no `try_` variant.
+/// * **`Throws::Never`**: the caller declared the callable never throws
+///   (`@throws {never}`). Sync callables get *no* `try_` companion; async
+///   callables drop `catch` and return `T` directly. Constructors ignore
+///   this — they always catch per JS `new` semantics.
 /// * **Naming**: each surviving expansion gets `base + suffix` deduped against
 ///   `used_names`; `try_` variants prepend `try_` and dedup again.
 pub fn build_signatures(
@@ -366,16 +380,22 @@ pub fn build_signatures(
         (other, _) => (false, other.clone()),
     };
 
-    let allow_try = !is_async && spec.kind.allows_try_variant();
+    // `Throws::Never` suppresses every fallible form — except for
+    // constructors, which always catch (`new` can always throw in JS).
+    let nothrow = spec.throws.is_never() && !spec.kind.always_catches();
+    let error_type = spec.throws.as_type();
+
+    let allow_try = !is_async && !nothrow && spec.kind.allows_try_variant();
     let mut out = Vec::with_capacity(expansions.len() * if allow_try { 2 } else { 1 });
 
     for exp in expansions {
         let primary_candidate = public_rust_name(&format!("{base}{}", exp.name_suffix));
         let primary_name = dedupe_name(&primary_candidate, used_names);
 
-        // Primary variant: catches if async (the catch encodes async failure)
-        // or if the kind always catches (constructors).
-        let primary_catches = is_async || spec.kind.always_catches();
+        // Primary variant catches when:
+        // * the kind always catches (constructors), OR
+        // * it's async — *unless* `Throws::Never` opts out.
+        let primary_catches = spec.kind.always_catches() || (is_async && !nothrow);
         out.push(FunctionSignature {
             rust_name: primary_name.clone(),
             js_name: spec.js_name.to_string(),
@@ -384,7 +404,7 @@ pub fn build_signatures(
             is_async,
             return_type: return_type.clone(),
             error_type: if primary_catches {
-                spec.error_type.cloned()
+                error_type.cloned()
             } else {
                 None
             },
@@ -400,7 +420,7 @@ pub fn build_signatures(
                 catch: true,
                 is_async: false,
                 return_type: return_type.clone(),
-                error_type: spec.error_type.cloned(),
+                error_type: error_type.cloned(),
                 doc: spec.doc.clone(),
             });
         }
@@ -895,6 +915,19 @@ mod tests {
         doc: &Option<String>,
         used: &mut HashSet<String>,
     ) -> Vec<FunctionSignature> {
+        expand_throws(js, params, ret, kind, &Throws::None, doc, used)
+    }
+
+    /// Like [`expand`] but with an explicit [`Throws`] state.
+    fn expand_throws(
+        js: &str,
+        params: &[Param],
+        ret: &TypeRef,
+        kind: SignatureKind,
+        throws: &Throws,
+        doc: &Option<String>,
+        used: &mut HashSet<String>,
+    ) -> Vec<FunctionSignature> {
         let (gctx, scope) = test_ctx();
         let cgctx = CodegenContext::empty(&gctx, scope);
         build_signatures(
@@ -903,7 +936,7 @@ mod tests {
                 kind,
                 overloads: &[params],
                 return_type: ret,
-                error_type: None,
+                throws,
                 doc,
             },
             used,
@@ -929,7 +962,7 @@ mod tests {
                 kind,
                 overloads,
                 return_type: ret,
-                error_type: None,
+                throws: &Throws::None,
                 doc,
             },
             used,
@@ -1289,6 +1322,153 @@ mod tests {
         assert_eq!(sigs[1].doc, Some("Hello".to_string())); // try_count
         assert_eq!(sigs[2].doc, Some("Hello".to_string())); // count_with_label
         assert_eq!(sigs[3].doc, Some("Hello".to_string())); // try_count_with_label
+    }
+
+    #[test]
+    fn test_throws_never_suppresses_try_variant() {
+        // `@throws {never}` on a sync method: only the primary signature is
+        // emitted — no `try_count` companion. The primary stays non-catching.
+        let mut used = no_used();
+        let sigs = expand_throws(
+            "count",
+            &[],
+            &TypeRef::Void,
+            SignatureKind::Method,
+            &Throws::Never,
+            &None,
+            &mut used,
+        );
+        assert_eq!(sigs.len(), 1, "nothrow methods get no try_ companion");
+        assert_eq!(sigs[0].rust_name, "count");
+        assert!(!sigs[0].catch);
+        assert!(!sigs[0].is_async);
+    }
+
+    #[test]
+    fn test_throws_never_suppresses_try_for_function() {
+        let mut used = no_used();
+        let sigs = expand_throws(
+            "id",
+            &[param("x")],
+            &TypeRef::Any,
+            SignatureKind::Function,
+            &Throws::Never,
+            &None,
+            &mut used,
+        );
+        assert_eq!(sigs.len(), 1);
+        assert_eq!(sigs[0].rust_name, "id");
+        assert!(!sigs[0].catch);
+    }
+
+    #[test]
+    fn test_throws_never_async_drops_catch() {
+        // `@throws {never}` on a Promise-returning method: emit
+        // `async fn -> T` (no `Result`, no `catch`).
+        let mut used = no_used();
+        let sigs = expand_throws(
+            "loaded",
+            &[],
+            &TypeRef::Promise(Box::new(TypeRef::String)),
+            SignatureKind::Method,
+            &Throws::Never,
+            &None,
+            &mut used,
+        );
+        assert_eq!(sigs.len(), 1);
+        assert_eq!(sigs[0].rust_name, "loaded");
+        assert!(sigs[0].is_async);
+        assert!(
+            !sigs[0].catch,
+            "nothrow async drops catch — return type is T directly"
+        );
+        assert!(sigs[0].error_type.is_none());
+        assert_eq!(sigs[0].return_type, TypeRef::String);
+    }
+
+    #[test]
+    fn test_throws_never_optional_method_no_try_pairs() {
+        // Optional params still expand the parameter axis, but each
+        // expansion has no `try_` sibling.
+        let mut used = no_used();
+        let sigs = expand_throws(
+            "count",
+            &[opt_param("label")],
+            &TypeRef::Void,
+            SignatureKind::Method,
+            &Throws::Never,
+            &None,
+            &mut used,
+        );
+        // Two expansions × 1 (no try_) = 2
+        assert_eq!(sigs.len(), 2);
+        assert_eq!(sigs[0].rust_name, "count");
+        assert_eq!(sigs[1].rust_name, "count_with_label");
+        assert!(sigs.iter().all(|s| !s.catch));
+        assert!(sigs.iter().all(|s| !s.rust_name.starts_with("try_")));
+    }
+
+    #[test]
+    fn test_throws_never_constructor_still_catches() {
+        // Constructors always catch per JS `new` semantics — `@throws
+        // {never}` is silently ignored on them. The resulting signature
+        // is the same as for any other constructor.
+        let mut used = no_used();
+        let sigs = expand_throws(
+            "Foo",
+            &[param("x")],
+            &TypeRef::Named("Foo".into()),
+            SignatureKind::Constructor,
+            &Throws::Never,
+            &None,
+            &mut used,
+        );
+        assert_eq!(sigs.len(), 1);
+        assert_eq!(sigs[0].rust_name, "new");
+        assert!(sigs[0].catch, "constructors always catch even with nothrow");
+        assert!(!sigs[0].is_async);
+    }
+
+    #[test]
+    fn test_throws_typed_keeps_try_pair() {
+        // Typed `Throws::Type(...)` behaves like the existing `@throws {T}`
+        // — sync still gets the `try_` companion, with the typed error.
+        let err = TypeRef::Named("ImagesError".into());
+        let mut used = no_used();
+        let sigs = expand_throws(
+            "upload",
+            &[param("file")],
+            &TypeRef::Void,
+            SignatureKind::Method,
+            &Throws::Type(err.clone()),
+            &None,
+            &mut used,
+        );
+        assert_eq!(sigs.len(), 2);
+        assert_eq!(sigs[0].rust_name, "upload");
+        assert!(!sigs[0].catch);
+        assert_eq!(sigs[1].rust_name, "try_upload");
+        assert!(sigs[1].catch);
+        assert_eq!(sigs[1].error_type.as_ref(), Some(&err));
+    }
+
+    #[test]
+    fn test_throws_typed_async_carries_error_type() {
+        let err = TypeRef::Named("ImagesError".into());
+        let mut used = no_used();
+        let sigs = expand_throws(
+            "upload",
+            &[],
+            &TypeRef::Promise(Box::new(TypeRef::String)),
+            SignatureKind::Method,
+            &Throws::Type(err.clone()),
+            &None,
+            &mut used,
+        );
+        assert_eq!(sigs.len(), 1);
+        assert!(sigs[0].is_async);
+        assert!(sigs[0].catch);
+        assert_eq!(sigs[0].error_type.as_ref(), Some(&err));
     }
 
     #[test]

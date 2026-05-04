@@ -139,7 +139,7 @@ pub fn interface_from_signatures(
 
 pub fn convert_function_decl(
     func: &ast::Function<'_>,
-    throws: Option<ir::TypeRef>,
+    throws: ir::Throws,
     diag: &mut DiagnosticCollector,
 ) -> Option<ir::FunctionDecl> {
     let name = func.id.as_ref()?.name.to_string();

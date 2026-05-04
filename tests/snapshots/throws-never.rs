@@ -1,0 +1,73 @@
+#[allow(unused_imports)]
+use js_sys::*;
+#[allow(unused_imports)]
+use wasm_bindgen::prelude::*;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type NeverThrows;
+    #[doc = " Always succeeds — no `try_safe_op` companion."]
+    #[wasm_bindgen(method, js_name = "safeOp")]
+    pub fn safe_op(this: &NeverThrows, x: f64) -> String;
+    #[doc = " Async, declared infallible — emits `async fn -> Loaded` (no Result)."]
+    #[wasm_bindgen(method)]
+    pub async fn loaded(this: &NeverThrows) -> Loaded;
+    #[doc = " Sync method without `@throws {never}` — keeps the `try_normal_op`"]
+    #[doc = " companion as usual."]
+    #[wasm_bindgen(method, js_name = "normalOp")]
+    pub fn normal_op(this: &NeverThrows, x: f64) -> String;
+    #[doc = " Sync method without `@throws {never}` — keeps the `try_normal_op`"]
+    #[doc = " companion as usual."]
+    #[wasm_bindgen(method, catch, js_name = "normalOp")]
+    pub fn try_normal_op(this: &NeverThrows, x: f64) -> Result<String, JsValue>;
+    #[doc = " Sync with a typed throws — keeps `try_typed_op` returning the"]
+    #[doc = " typed error. `Throws::Type` is the existing behavior."]
+    #[doc = ""]
+    #[doc = " ## Errors"]
+    #[doc = ""]
+    #[doc = " * `RangeError`"]
+    #[wasm_bindgen(method, js_name = "typedOp")]
+    pub fn typed_op(this: &NeverThrows, x: f64) -> String;
+    #[doc = " Sync with a typed throws — keeps `try_typed_op` returning the"]
+    #[doc = " typed error. `Throws::Type` is the existing behavior."]
+    #[doc = ""]
+    #[doc = " ## Errors"]
+    #[doc = ""]
+    #[doc = " * `RangeError`"]
+    #[wasm_bindgen(method, catch, js_name = "typedOp")]
+    pub fn try_typed_op(this: &NeverThrows, x: f64) -> Result<String, RangeError>;
+    #[doc = " Constructor with `@throws {never}` is a no-op — JS `new` can"]
+    #[doc = " always throw, so the constructor still catches."]
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new(name: &str) -> Result<NeverThrows, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Loaded;
+    #[wasm_bindgen(method, getter)]
+    pub fn ready(this: &Loaded) -> bool;
+}
+impl Loaded {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        #[allow(unused_unsafe)]
+        unsafe {
+            JsValue::from(js_sys::Object::new()).unchecked_into()
+        }
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    #[doc = " Free function with `@throws {never}` — no `try_pure_compute`."]
+    #[wasm_bindgen(js_name = "pureCompute")]
+    pub fn pure_compute(x: f64) -> f64;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[doc = " Async free function with `@throws {never}` — no Result wrapper."]
+    #[wasm_bindgen(js_name = "infallibleFetch")]
+    pub async fn infallible_fetch(url: &str) -> JsString;
+}
