@@ -298,6 +298,13 @@ fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
         }
     }
 
+    // When every property is required, the builder type is dead weight: it
+    // would carry only `pub fn build(self) -> Foo` with nothing to chain,
+    // so we suppress it. `new(reqs)` still gets emitted but inlines the
+    // construction directly. See the dictionary-builder convention in
+    // `CONVENTIONS.md` for the rule.
+    let emit_builder = !optional_getters.is_empty();
+
     // Resolve each getter through the setter pipeline. Multi-overload
     // setters (e.g. `set_from(&str)` + `set_from_with_email_address(&EmailAddress)`
     // for `from: string | EmailAddress`) produce multiple sigs — we
@@ -607,7 +614,6 @@ fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
         if !emitted_names.insert(full_suffix.clone()) {
             continue;
         }
-        let builder_ident = super::typemap::make_ident(&format!("builder{full_suffix}"));
         let new_ident = super::typemap::make_ident(&format!("new{full_suffix}"));
         let (generics, params_tokens) = generate_dictionary_params(
             &plan.value_params,
@@ -640,39 +646,67 @@ fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
             super::doc_tokens(&Some(doc_text))
         };
 
-        // No-required case has zero `init_calls`, so we inline the
-        // factory directly into the struct literal where the field type
-        // pins inference. The required-args case keeps a `let inner:
-        // Self` so setter calls type-resolve before construction.
-        let body = if init_calls.is_empty() {
-            quote! {
-                #builder_name {
-                    inner: JsCast::unchecked_into(js_sys::Object::new()),
+        if emit_builder {
+            // `builder*` returns the wrapper struct so callers can chain
+            // setters; `new*` is just `Self::builder(reqs).build()`.
+            //
+            // No-required case has zero `init_calls`, so we inline the
+            // factory directly into the struct literal where the field type
+            // pins inference. The required-args case keeps a `let inner:
+            // Self` so setter calls type-resolve before construction.
+            let builder_body = if init_calls.is_empty() {
+                quote! {
+                    #builder_name {
+                        inner: JsCast::unchecked_into(js_sys::Object::new()),
+                    }
                 }
-            }
+            } else {
+                quote! {
+                    let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+                    #(#init_calls)*
+                    #builder_name { inner }
+                }
+            };
+            let builder_ident = super::typemap::make_ident(&format!("builder{full_suffix}"));
+            builder_variants.push(quote! {
+                #doc_attr
+                pub fn #builder_ident #generics (#params_tokens) -> #builder_name {
+                    #builder_body
+                }
+            });
+            new_variants.push(quote! {
+                #doc_attr
+                pub fn #new_ident #generics (#params_tokens) -> #rust_type {
+                    Self::#builder_ident(#(#arg_idents),*).build()
+                }
+            });
         } else {
-            quote! {
-                let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
-                #(#init_calls)*
-                #builder_name { inner }
-            }
-        };
-        builder_variants.push(quote! {
-            #doc_attr
-            pub fn #builder_ident #generics (#params_tokens) -> #builder_name {
-                #body
-            }
-        });
-        new_variants.push(quote! {
-            #doc_attr
-            pub fn #new_ident #generics (#params_tokens) -> #rust_type {
-                Self::#builder_ident(#(#arg_idents),*).build()
-            }
-        });
+            // All-required dictionary: no builder to delegate to, so
+            // construction is inlined directly into `new*`. Returns
+            // `Self` rather than the wrapper struct.
+            let body = if init_calls.is_empty() {
+                quote! {
+                    JsCast::unchecked_into(js_sys::Object::new())
+                }
+            } else {
+                quote! {
+                    let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+                    #(#init_calls)*
+                    inner
+                }
+            };
+            new_variants.push(quote! {
+                #doc_attr
+                pub fn #new_ident #generics (#params_tokens) -> #rust_type {
+                    #body
+                }
+            });
+        }
     }
 
     // Fluent methods on the wrapper for optional fields. Required fields
     // are intentionally absent — they're only settable through `builder`.
+    // (Empty when `!emit_builder`, since there's nothing to chain.)
     let mut builder_methods: Vec<TokenStream> = Vec::new();
     for g in &optional_getters {
         for sig in resolve_setter_sigs(g) {
@@ -700,21 +734,31 @@ fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
         }
     }
 
-    quote! {
-        impl #rust_type {
-            #(#new_variants)*
-            #(#builder_variants)*
+    if emit_builder {
+        quote! {
+            impl #rust_type {
+                #(#new_variants)*
+                #(#builder_variants)*
+            }
+
+            pub struct #builder_name {
+                inner: #rust_type,
+            }
+
+            impl #builder_name {
+                #(#builder_methods)*
+
+                pub fn build(self) -> #rust_type {
+                    self.inner
+                }
+            }
         }
-
-        pub struct #builder_name {
-            inner: #rust_type,
-        }
-
-        impl #builder_name {
-            #(#builder_methods)*
-
-            pub fn build(self) -> #rust_type {
-                self.inner
+    } else {
+        // All-required dictionary: the builder would be empty, so we
+        // emit only `new*` factories on the dictionary type itself.
+        quote! {
+            impl #rust_type {
+                #(#new_variants)*
             }
         }
     }

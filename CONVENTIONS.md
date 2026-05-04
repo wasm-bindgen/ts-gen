@@ -262,6 +262,10 @@ let init = ResponseInit::builder().status(200.0).build();
 let init = ResponseInit::new();  // empty object
 ```
 
+If every property is required (no optionals), the builder would carry
+only `build()` and is suppressed — only `new(reqs)` is emitted, with
+construction inlined.
+
 ### Required-property cartesian product across union types
 
 When a required property has union-typed setter overloads (e.g.

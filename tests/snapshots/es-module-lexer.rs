@@ -244,20 +244,9 @@ pub mod es_module_lexer {
     }
     impl ParseError {
         pub fn new(idx: f64) -> ParseError {
-            Self::builder(idx).build()
-        }
-        pub fn builder(idx: f64) -> ParseErrorBuilder {
             let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_idx(idx);
-            ParseErrorBuilder { inner }
-        }
-    }
-    pub struct ParseErrorBuilder {
-        inner: ParseError,
-    }
-    impl ParseErrorBuilder {
-        pub fn build(self) -> ParseError {
-            self.inner
+            inner
         }
     }
     #[wasm_bindgen(module = "es-module-lexer")]

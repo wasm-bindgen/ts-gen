@@ -24,20 +24,9 @@ extern "C" {
 }
 impl NumberIndexed {
     pub fn new(length: f64) -> NumberIndexed {
-        Self::builder(length).build()
-    }
-    pub fn builder(length: f64) -> NumberIndexedBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_length(length);
-        NumberIndexedBuilder { inner }
-    }
-}
-pub struct NumberIndexedBuilder {
-    inner: NumberIndexed,
-}
-impl NumberIndexedBuilder {
-    pub fn build(self) -> NumberIndexed {
-        self.inner
+        inner
     }
 }
 #[wasm_bindgen]
@@ -52,20 +41,9 @@ extern "C" {
 }
 impl MixedWithIndex {
     pub fn new(name: &str) -> MixedWithIndex {
-        Self::builder(name).build()
-    }
-    pub fn builder(name: &str) -> MixedWithIndexBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
-        MixedWithIndexBuilder { inner }
-    }
-}
-pub struct MixedWithIndexBuilder {
-    inner: MixedWithIndex,
-}
-impl MixedWithIndexBuilder {
-    pub fn build(self) -> MixedWithIndex {
-        self.inner
+        inner
     }
 }
 #[wasm_bindgen]
@@ -80,20 +58,9 @@ extern "C" {
 }
 impl HasName {
     pub fn new(name: &str) -> HasName {
-        Self::builder(name).build()
-    }
-    pub fn builder(name: &str) -> HasNameBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
-        HasNameBuilder { inner }
-    }
-}
-pub struct HasNameBuilder {
-    inner: HasName,
-}
-impl HasNameBuilder {
-    pub fn build(self) -> HasName {
-        self.inner
+        inner
     }
 }
 #[wasm_bindgen]
@@ -108,20 +75,9 @@ extern "C" {
 }
 impl HasAge {
     pub fn new(age: f64) -> HasAge {
-        Self::builder(age).build()
-    }
-    pub fn builder(age: f64) -> HasAgeBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_age(age);
-        HasAgeBuilder { inner }
-    }
-}
-pub struct HasAgeBuilder {
-    inner: HasAge,
-}
-impl HasAgeBuilder {
-    pub fn build(self) -> HasAge {
-        self.inner
+        inner
     }
 }
 #[allow(dead_code)]
@@ -261,21 +217,10 @@ extern "C" {
 }
 impl LinkedList {
     pub fn new(data: &JsValue, next: Option<&LinkedList>) -> LinkedList {
-        Self::builder(data, next).build()
-    }
-    pub fn builder(data: &JsValue, next: Option<&LinkedList>) -> LinkedListBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_data(data);
         inner.set_next(next);
-        LinkedListBuilder { inner }
-    }
-}
-pub struct LinkedListBuilder {
-    inner: LinkedList,
-}
-impl LinkedListBuilder {
-    pub fn build(self) -> LinkedList {
-        self.inner
+        inner
     }
 }
 #[wasm_bindgen]
@@ -333,20 +278,9 @@ extern "C" {
 }
 impl MultiExtend {
     pub fn new(id: &str) -> MultiExtend {
-        Self::builder(id).build()
-    }
-    pub fn builder(id: &str) -> MultiExtendBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
-        MultiExtendBuilder { inner }
-    }
-}
-pub struct MultiExtendBuilder {
-    inner: MultiExtend,
-}
-impl MultiExtendBuilder {
-    pub fn build(self) -> MultiExtend {
-        self.inner
+        inner
     }
 }
 #[wasm_bindgen]
