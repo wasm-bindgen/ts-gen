@@ -61,12 +61,9 @@ impl JsDocInfo {
         match self.throws.len() {
             0 if self.nothrow => Throws::Never,
             0 => Throws::None,
-            1 => Throws::Type(TypeRef::Named(self.throws[0].clone())),
+            1 => Throws::Type(TypeRef::ident(self.throws[0].clone())),
             _ => Throws::Type(TypeRef::Union(
-                self.throws
-                    .iter()
-                    .map(|n| TypeRef::Named(n.clone()))
-                    .collect(),
+                self.throws.iter().map(TypeRef::ident).collect(),
             )),
         }
     }
@@ -644,7 +641,7 @@ mod tests {
         assert!(!info.nothrow);
         assert_eq!(
             info.throws(),
-            crate::ir::Throws::Type(crate::ir::TypeRef::Named("TypeError".into()))
+            crate::ir::Throws::Type(crate::ir::TypeRef::ident("TypeError"))
         );
     }
 

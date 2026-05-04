@@ -394,12 +394,14 @@ extern "C" {
     pub fn method(this: &FetchOptions) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_method(this: &FetchOptions, val: &str);
+    #[doc = " Returns: Headers | Record<string, string>"]
     #[wasm_bindgen(method, getter)]
     pub fn headers(this: &FetchOptions) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_headers(this: &FetchOptions, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_record(this: &FetchOptions, val: &Object<JsString>);
+    #[doc = " Returns: string | ArrayBuffer | null"]
     #[wasm_bindgen(method, getter)]
     pub fn body(this: &FetchOptions) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
@@ -560,6 +562,7 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MutableWidget;
+    #[doc = " Returns: string | number"]
     #[wasm_bindgen(method, getter)]
     pub fn label(this: &MutableWidget) -> JsValue;
     #[wasm_bindgen(method, setter)]

@@ -207,10 +207,14 @@ pub(crate) fn merge_member_branches(branches: &[Vec<Member>]) -> Vec<Member> {
     out
 }
 
-/// Wrap a sequence of types in `TypeRef::Union` unless they're all
-/// identical — in which case the single type is returned directly. The
-/// regular union resolution (subtyping LUB / `JsValue` erasure) then
-/// applies as usual.
+/// Combine per-property branch types into a single `TypeRef`.
+///
+/// Identical branches collapse to a single type. Otherwise we hand
+/// off to the regular [`simplify_union`] from the parse layer so
+/// `null` / `undefined` arms coalesce into `Nullable<T>` (matching
+/// what users get from a hand-written `T | null` union).
+///
+/// [`simplify_union`]: crate::parse::types::simplify_union
 fn union_member_types(types: impl IntoIterator<Item = TypeRef>) -> TypeRef {
     let mut all: Vec<TypeRef> = types.into_iter().collect();
     if all.is_empty() {
@@ -220,5 +224,5 @@ fn union_member_types(types: impl IntoIterator<Item = TypeRef>) -> TypeRef {
     if all.len() == 1 {
         return all.into_iter().next().unwrap();
     }
-    TypeRef::Union(all)
+    crate::parse::types::simplify_union(all)
 }

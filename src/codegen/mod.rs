@@ -13,10 +13,51 @@ pub mod typemap;
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::ir::{InterfaceClassification, Module, TypeDeclaration, TypeKind};
+use crate::ir::{InterfaceClassification, Module, TypeDeclaration, TypeKind, TypeRef};
 use crate::parse::scope::ScopeId;
 
 use typemap::CodegenContext;
+
+/// Augment a doc with a `Returns: <ts-shape>` line when the return
+/// type loses information against its original TypeScript shape.
+///
+/// Fires whenever the return type contains an erasing union — see
+/// [`subtyping::return_type_has_erased_union`]. The static Rust type
+/// can't convey what the runtime values look like in those cases;
+/// surfacing the raw TS shape gives callers somewhere to look.
+///
+/// Idempotent: if the JSDoc already contains a line starting with
+/// `Returns:` we leave the doc untouched, on the assumption that the
+/// human-authored version is already correct.
+pub(crate) fn augment_return_doc(
+    doc: Option<String>,
+    return_type: &TypeRef,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> Option<String> {
+    if !subtyping::return_type_has_erased_union(return_type, ctx, scope) {
+        return doc;
+    }
+    let line = format!("Returns: {}", return_type.format_ts());
+    match doc {
+        None => Some(line),
+        Some(existing) => {
+            if existing
+                .lines()
+                .any(|l| l.trim_start().starts_with("Returns:"))
+            {
+                return Some(existing);
+            }
+            let mut out = existing;
+            if !out.ends_with('\n') {
+                out.push('\n');
+            }
+            out.push('\n');
+            out.push_str(&line);
+            Some(out)
+        }
+    }
+}
 
 /// Convert an optional doc string into `/// ...` doc-comment attributes.
 ///
@@ -246,11 +287,10 @@ fn generate_type_alias(
     from_module: &crate::ir::ModuleContext,
 ) -> TokenStream {
     if let Some(ref module) = alias.from_module {
-        // External re-export: resolve through external map.
-        let type_name = match &alias.target {
-            crate::ir::TypeRef::Named(n) => n.as_str(),
-            _ => &alias.name,
-        };
+        // External re-export: resolve through external map. The
+        // target name is the bare ident from the alias target if
+        // available, otherwise the alias name itself.
+        let type_name = alias.target.as_ident().unwrap_or(alias.name.as_str());
         if let Some(rust_path) = cgctx.resolve_external(type_name, module) {
             let path: syn::Path = syn::parse_str(&rust_path.path).unwrap_or_else(|_| {
                 syn::Path::from(syn::Ident::new("JsValue", proc_macro2::Span::call_site()))
@@ -274,9 +314,11 @@ fn generate_type_alias(
     }
 
     // Local alias — only emit if the target resolves to a known type.
-    if let crate::ir::TypeRef::Named(ref target_name) = alias.target {
+    // We only inspect bare references here; generic instantiations
+    // and qualified paths flow through to `to_syn_type` unchanged.
+    if let Some(target_name) = alias.target.as_ident() {
         if !cgctx.local_types.contains_key(target_name)
-            && !crate::codegen::typemap::JS_SYS_RESERVED.contains(&target_name.as_str())
+            && !crate::codegen::typemap::JS_SYS_RESERVED.contains(&target_name)
         {
             cgctx.warn(format!(
                 "Type alias `{}` targets unknown type `{target_name}`, skipping",

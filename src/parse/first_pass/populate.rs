@@ -190,7 +190,7 @@ impl<'a> PopulateCtx<'a> {
                         kind: ir::TypeKind::TypeAlias(ir::TypeAliasDecl {
                             name: exported_name,
                             type_params: vec![],
-                            target: ir::TypeRef::Named(local),
+                            target: ir::TypeRef::ident(local),
                             from_module,
                         }),
                         module_context: ctx.clone(),

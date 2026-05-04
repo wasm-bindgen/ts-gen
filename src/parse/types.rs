@@ -169,19 +169,36 @@ pub fn convert_ts_type_scoped(
 }
 
 /// Convert a type reference with type parameter scope.
+///
+/// Most named type references — built-in JS classes, user-declared
+/// types, `Promise<T>`, `Map<K,V>`, qualified paths — flow through
+/// `TypeRef::Reference`. Resolution happens at codegen time against
+/// the scope chain (mirroring TypeScript's name lookup), which means
+/// user declarations shadow built-ins exactly the way they do in TS.
+///
+/// A few constructs *are* desugared at parse time because they're
+/// purely TS utility-type sugar with no JS runtime presence:
+///
+/// * `Boolean` / `Number` / `String` / `Object` / `Symbol` (capital-letter
+///   "wrapper" keyword aliases) → primitive variants.
+/// * `Partial` / `Required` / ... `Awaited` (utility types that don't
+///   produce new runtime types) → identity on their first type argument.
+/// * `Function` (the legacy global `Function` type alias) → an
+///   `(args) => any` function type.
 fn convert_type_reference_scoped(
     type_ref: &TSTypeReference<'_>,
     scope: &TypeParamScope<'_>,
     diag: &mut DiagnosticCollector,
 ) -> TypeRef {
-    let name = type_name_to_string(&type_ref.type_name);
+    let (head, segments) = collect_type_name_path(&type_ref.type_name);
 
-    // If the name is an in-scope type parameter, erase to Any
-    if scope.contains(name.as_str()) {
+    // If the head is an in-scope type parameter, erase to Any.
+    // Qualified paths through type parameters aren't supported either.
+    if scope.contains(head.as_str()) {
         return TypeRef::Any;
     }
 
-    // Collect generic type arguments if present (field is `type_arguments` in oxc 0.118)
+    // Collect generic type arguments if present.
     let type_args: Vec<TypeRef> = type_ref
         .type_arguments
         .as_ref()
@@ -193,94 +210,75 @@ fn convert_type_reference_scoped(
         })
         .unwrap_or_default();
 
-    // Handle well-known generic types
-    match name.as_str() {
-        "Promise" | "PromiseLike" => {
-            let inner = type_args.into_iter().next().unwrap_or(TypeRef::Any);
-            TypeRef::Promise(Box::new(inner))
-        }
-        "Array" | "ReadonlyArray" => {
-            let inner = type_args.into_iter().next().unwrap_or(TypeRef::Any);
-            TypeRef::Array(Box::new(inner))
-        }
-        "Record" => {
-            let mut args = type_args.into_iter();
-            let key = args.next().unwrap_or(TypeRef::String);
-            let value = args.next().unwrap_or(TypeRef::Any);
-            TypeRef::Record(Box::new(key), Box::new(value))
-        }
-        "Map" | "ReadonlyMap" => {
-            let mut args = type_args.into_iter();
-            let key = args.next().unwrap_or(TypeRef::Any);
-            let value = args.next().unwrap_or(TypeRef::Any);
-            TypeRef::Map(Box::new(key), Box::new(value))
-        }
-        "Set" | "ReadonlySet" => {
-            let inner = type_args.into_iter().next().unwrap_or(TypeRef::Any);
-            TypeRef::Set(Box::new(inner))
-        }
+    // For unqualified references, intercept TS-only sugar that
+    // doesn't need to flow through name resolution.
+    if segments.is_empty() {
+        match head.as_str() {
+            // `ArrayBufferView` is a TS-only union alias for the
+            // typed-array family + DataView. There is no JS class
+            // with this name, so it lowers specially at codegen time.
+            "ArrayBufferView" => return TypeRef::ArrayBufferView,
+            // Capital-case aliases for primitives — these read as the
+            // primitive itself in TS, never as the boxed JS class.
+            "Boolean" => return TypeRef::Boolean,
+            "Number" => return TypeRef::Number,
+            "String" => return TypeRef::String,
+            "Object" => return TypeRef::Object,
+            "Symbol" => return TypeRef::Symbol,
 
-        "Int8Array" => TypeRef::Int8Array,
-        "Uint8Array" => TypeRef::Uint8Array,
-        "Uint8ClampedArray" => TypeRef::Uint8ClampedArray,
-        "Int16Array" => TypeRef::Int16Array,
-        "Uint16Array" => TypeRef::Uint16Array,
-        "Int32Array" => TypeRef::Int32Array,
-        "Uint32Array" => TypeRef::Uint32Array,
-        "Float32Array" => TypeRef::Float32Array,
-        "Float64Array" => TypeRef::Float64Array,
-        "BigInt64Array" => TypeRef::BigInt64Array,
-        "BigUint64Array" => TypeRef::BigUint64Array,
-        "ArrayBuffer" | "SharedArrayBuffer" => TypeRef::ArrayBuffer,
-        "ArrayBufferView" => TypeRef::ArrayBufferView,
-        "DataView" => TypeRef::DataView,
-        "Date" => TypeRef::Date,
-        "RegExp" => TypeRef::RegExp,
-        "Error" | "TypeError" | "RangeError" | "SyntaxError" | "DOMException" => TypeRef::Error,
-        "Boolean" => TypeRef::Boolean,
-        "Number" => TypeRef::Number,
-        "String" => TypeRef::String,
-        "Object" => TypeRef::Object,
-        "Symbol" => TypeRef::Symbol,
-        "Function" => TypeRef::Function(crate::ir::FunctionSig {
-            params: vec![],
-            return_type: Box::new(TypeRef::Any),
-        }),
-        "Partial"
-        | "Required"
-        | "Pick"
-        | "Omit"
-        | "Exclude"
-        | "Extract"
-        | "NonNullable"
-        | "ReturnType"
-        | "Parameters"
-        | "ConstructorParameters"
-        | "InstanceType"
-        | "ThisParameterType"
-        | "OmitThisParameter"
-        | "ThisType"
-        | "Awaited" => type_args.into_iter().next().unwrap_or(TypeRef::Object),
-        _ => {
-            if type_args.is_empty() {
-                TypeRef::Named(name)
-            } else {
-                TypeRef::GenericInstantiation(name, type_args)
+            // The legacy global `Function` type — TS treats it as
+            // "any callable", with no fixed signature. We model that
+            // as `(args) => any`.
+            "Function" => {
+                return TypeRef::Function(crate::ir::FunctionSig {
+                    params: vec![],
+                    return_type: Box::new(TypeRef::Any),
+                });
             }
+
+            // TS utility types that resolve to the structure of their
+            // first type argument at type-check time. For our
+            // purposes (FFI types) they're identity on the argument,
+            // or `Object` when there's no useful argument to keep.
+            "Partial"
+            | "Required"
+            | "Pick"
+            | "Omit"
+            | "Exclude"
+            | "Extract"
+            | "NonNullable"
+            | "ReturnType"
+            | "Parameters"
+            | "ConstructorParameters"
+            | "InstanceType"
+            | "ThisParameterType"
+            | "OmitThisParameter"
+            | "ThisType"
+            | "Awaited" => {
+                return type_args.into_iter().next().unwrap_or(TypeRef::Object);
+            }
+            _ => {}
         }
+    }
+
+    TypeRef::Reference {
+        head,
+        segments,
+        type_args,
     }
 }
 
-/// Convert a `TSTypeName` to a string.
-fn type_name_to_string(type_name: &TSTypeName<'_>) -> String {
+/// Convert a `TSTypeName` into its head identifier and any qualified
+/// path segments (`A.B.C` → `("A", ["B", "C"])`).
+fn collect_type_name_path(type_name: &TSTypeName<'_>) -> (String, Vec<String>) {
     match type_name {
-        TSTypeName::IdentifierReference(ident) => ident.name.to_string(),
+        TSTypeName::IdentifierReference(ident) => (ident.name.to_string(), Vec::new()),
         TSTypeName::QualifiedName(qualified) => {
-            let left = type_name_to_string(&qualified.left);
-            let right = &qualified.right.name;
-            format!("{left}.{right}")
+            let (head, mut segments) = collect_type_name_path(&qualified.left);
+            segments.push(qualified.right.name.to_string());
+            (head, segments)
         }
-        TSTypeName::ThisExpression(_) => "this".to_string(),
+        TSTypeName::ThisExpression(_) => ("this".to_string(), Vec::new()),
     }
 }
 
@@ -413,8 +411,16 @@ fn convert_literal_type(lit: &TSLiteralType<'_>, _diag: &mut DiagnosticCollector
     }
 }
 
-/// Simplify a union type.
-fn simplify_union(types: Vec<TypeRef>) -> TypeRef {
+/// Simplify a union type at parse time.
+///
+/// Coalesces `null` / `undefined` arms into the standard
+/// `Nullable<T>` wrapper that the rest of the pipeline understands —
+/// `string | null` and `string | undefined` and
+/// `string | null | undefined` all become `Nullable<String>`.
+///
+/// Used by both the regular `TSUnionType` parsing and the
+/// per-property union merge in `literal_union::union_member_types`.
+pub(crate) fn simplify_union(types: Vec<TypeRef>) -> TypeRef {
     let mut non_null_types = Vec::new();
     let mut has_null = false;
     let mut has_undefined = false;

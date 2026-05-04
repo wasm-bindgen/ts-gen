@@ -375,15 +375,25 @@ pub fn build_signatures(
 
     // Promise unwrap is per-callable, not per-overload — every expansion of a
     // given JS callable shares the same return type.
-    let (is_async, return_type) = match (spec.return_type, spec.kind.allows_async()) {
-        (TypeRef::Promise(inner), true) => (true, inner.as_ref().clone()),
-        (other, _) => (false, other.clone()),
+    let (is_async, return_type) = match (
+        spec.return_type.as_promise_inner(),
+        spec.kind.allows_async(),
+    ) {
+        (Some(inner), true) => (true, inner.clone()),
+        _ => (false, spec.return_type.clone()),
     };
 
     // `Throws::Never` suppresses every fallible form — except for
     // constructors, which always catch (`new` can always throw in JS).
     let nothrow = spec.throws.is_never() && !spec.kind.always_catches();
     let error_type = spec.throws.as_type();
+
+    // If any nested union in the return type erases to `JsValue`,
+    // append a `Returns: <ts-shape>` line to the doc so callers can
+    // still see the original TS shape. Operates on the post-Promise
+    // `return_type` since that's what shows up at the call site.
+    let augmented_doc =
+        crate::codegen::augment_return_doc(spec.doc.clone(), &return_type, cgctx, scope);
 
     let allow_try = !is_async && !nothrow && spec.kind.allows_try_variant();
     let mut out = Vec::with_capacity(expansions.len() * if allow_try { 2 } else { 1 });
@@ -408,7 +418,7 @@ pub fn build_signatures(
             } else {
                 None
             },
-            doc: spec.doc.clone(),
+            doc: augmented_doc.clone(),
         });
 
         if allow_try {
@@ -421,7 +431,7 @@ pub fn build_signatures(
                 is_async: false,
                 return_type: return_type.clone(),
                 error_type: error_type.cloned(),
-                doc: spec.doc.clone(),
+                doc: augmented_doc.clone(),
             });
         }
     }
@@ -576,10 +586,16 @@ fn flatten_type(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId
             .flat_map(|m| flatten_type(m, cgctx, scope))
             .collect(),
 
-        // Named types: resolve through aliases, then re-flatten
-        TypeRef::Named(name) => {
+        // Bare references: resolve through aliases, then re-flatten.
+        // Generic instantiations and qualified paths don't follow
+        // aliases (they're already concrete enough at this level).
+        TypeRef::Reference {
+            head,
+            segments,
+            type_args,
+        } if segments.is_empty() && type_args.is_empty() => {
             if let Some(c) = cgctx {
-                if let Some(target) = c.resolve_alias(name, scope) {
+                if let Some(target) = c.resolve_alias(head, scope) {
                     let target = target.clone();
                     return flatten_type(&target, cgctx, scope);
                 }
@@ -752,6 +768,11 @@ fn compute_trim(signatures: &[Vec<ConcreteParam>]) -> (usize, usize) {
 }
 
 /// Get a short snake_case name for a TypeRef, used in `_with_` suffixes.
+///
+/// Named references (built-ins and user types) snake-case the head:
+/// `Uint8Array` → `uint8_array`, `MyType` → `my_type`. Generic
+/// instantiations and qualified paths use just the head segment;
+/// type args don't participate in the suffix.
 fn type_snake_name(ty: &TypeRef) -> String {
     match ty {
         TypeRef::String => "str".to_string(),
@@ -762,24 +783,11 @@ fn type_snake_name(ty: &TypeRef) -> String {
         TypeRef::Null => "null".to_string(),
         TypeRef::Any | TypeRef::Unknown => "js_value".to_string(),
         TypeRef::Object => "object".to_string(),
-        TypeRef::Named(n) => to_snake_case(n),
-        TypeRef::ArrayBuffer => "array_buffer".to_string(),
         TypeRef::ArrayBufferView => "typed_array".to_string(),
-        TypeRef::Uint8Array => "uint8_array".to_string(),
-        TypeRef::Int8Array => "int8_array".to_string(),
-        TypeRef::Float32Array => "float32_array".to_string(),
-        TypeRef::Float64Array => "float64_array".to_string(),
+        TypeRef::Reference { head, .. } => to_snake_case(head),
         TypeRef::Array(_) => "array".to_string(),
-        TypeRef::Promise(_) => "promise".to_string(),
         TypeRef::Nullable(inner) => type_snake_name(inner),
-
         TypeRef::Function(_) => "function".to_string(),
-        TypeRef::Date => "date".to_string(),
-        TypeRef::RegExp => "reg_exp".to_string(),
-        TypeRef::Error => "error".to_string(),
-        TypeRef::Map(_, _) => "map".to_string(),
-        TypeRef::Set(_) => "set".to_string(),
-        TypeRef::Record(_, _) => "record".to_string(),
         _ => "js_value".to_string(),
     }
 }
@@ -1063,7 +1071,7 @@ mod tests {
         let sigs = expand(
             "Console",
             &[param("stdout")],
-            &TypeRef::Named("Console".into()),
+            &TypeRef::ident("Console"),
             SignatureKind::Constructor,
             &None,
             &mut used,
@@ -1084,7 +1092,7 @@ mod tests {
         let sigs = expand(
             "foo",
             &[],
-            &TypeRef::Promise(Box::new(TypeRef::String)),
+            &TypeRef::generic("Promise", vec![TypeRef::String]),
             SignatureKind::Method,
             &None,
             &mut used,
@@ -1104,7 +1112,7 @@ mod tests {
         let sigs = expand(
             "fetch",
             &[param("url")],
-            &TypeRef::Promise(Box::new(TypeRef::Named("Response".into()))),
+            &TypeRef::generic("Promise", vec![TypeRef::ident("Response")]),
             SignatureKind::Function,
             &None,
             &mut used,
@@ -1113,7 +1121,7 @@ mod tests {
         assert_eq!(sigs[0].rust_name, "fetch");
         assert!(sigs[0].is_async);
         assert!(sigs[0].catch);
-        assert_eq!(sigs[0].return_type, TypeRef::Named("Response".into()));
+        assert_eq!(sigs[0].return_type, TypeRef::ident("Response"));
     }
 
     #[test]
@@ -1122,7 +1130,7 @@ mod tests {
         let sigs = expand(
             "all",
             &[param("promises")],
-            &TypeRef::Promise(Box::new(TypeRef::Any)),
+            &TypeRef::generic("Promise", vec![TypeRef::Any]),
             SignatureKind::StaticMethod,
             &None,
             &mut used,
@@ -1164,13 +1172,10 @@ mod tests {
         let sigs = expand_overloads(
             "send",
             &[
-                &[typed_param(
-                    "message",
-                    TypeRef::Named("EmailMessage".into()),
-                )],
+                &[typed_param("message", TypeRef::ident("EmailMessage"))],
                 &[typed_param("builder", TypeRef::Object)],
             ],
-            &TypeRef::Promise(Box::new(TypeRef::Named("EmailSendResult".into()))),
+            &TypeRef::generic("Promise", vec![TypeRef::ident("EmailSendResult")]),
             SignatureKind::Method,
             &None,
             &mut used,
@@ -1199,7 +1204,7 @@ mod tests {
             "value",
             &[typed_param(
                 "val",
-                TypeRef::Promise(Box::new(TypeRef::String)),
+                TypeRef::generic("Promise", vec![TypeRef::String]),
             )],
             &TypeRef::Void,
             SignatureKind::Setter,
@@ -1222,7 +1227,7 @@ mod tests {
                 opt_param("stderr"),
                 opt_param("ignoreErrors"),
             ],
-            &TypeRef::Named("Console".into()),
+            &TypeRef::ident("Console"),
             SignatureKind::Constructor,
             &None,
             &mut used,
@@ -1369,7 +1374,7 @@ mod tests {
         let sigs = expand_throws(
             "loaded",
             &[],
-            &TypeRef::Promise(Box::new(TypeRef::String)),
+            &TypeRef::generic("Promise", vec![TypeRef::String]),
             SignatureKind::Method,
             &Throws::Never,
             &None,
@@ -1417,7 +1422,7 @@ mod tests {
         let sigs = expand_throws(
             "Foo",
             &[param("x")],
-            &TypeRef::Named("Foo".into()),
+            &TypeRef::ident("Foo"),
             SignatureKind::Constructor,
             &Throws::Never,
             &None,
@@ -1433,7 +1438,7 @@ mod tests {
     fn test_throws_typed_keeps_try_pair() {
         // Typed `Throws::Type(...)` behaves like the existing `@throws {T}`
         // — sync still gets the `try_` companion, with the typed error.
-        let err = TypeRef::Named("ImagesError".into());
+        let err = TypeRef::ident("ImagesError");
         let mut used = no_used();
         let sigs = expand_throws(
             "upload",
@@ -1454,12 +1459,12 @@ mod tests {
 
     #[test]
     fn test_throws_typed_async_carries_error_type() {
-        let err = TypeRef::Named("ImagesError".into());
+        let err = TypeRef::ident("ImagesError");
         let mut used = no_used();
         let sigs = expand_throws(
             "upload",
             &[],
-            &TypeRef::Promise(Box::new(TypeRef::String)),
+            &TypeRef::generic("Promise", vec![TypeRef::String]),
             SignatureKind::Method,
             &Throws::Type(err.clone()),
             &None,
@@ -1566,7 +1571,7 @@ mod tests {
         let overload1 = [typed_param("x", TypeRef::String)];
         let overload2 = [typed_param(
             "x",
-            TypeRef::Promise(Box::new(TypeRef::String)),
+            TypeRef::generic("Promise", vec![TypeRef::String]),
         )];
         let sigs = expand_overloads(
             "foo",
@@ -1624,11 +1629,11 @@ mod tests {
     #[test]
     fn record_with_mixed_primitive_union_does_not_distribute() {
         let union_v = TypeRef::Union(vec![TypeRef::String, TypeRef::Number, TypeRef::Boolean]);
-        let ty = TypeRef::Record(Box::new(TypeRef::String), Box::new(union_v.clone()));
+        let ty = TypeRef::generic("Record", vec![TypeRef::String, union_v.clone()]);
         let alts = flatten_no_ctx(&ty);
         assert_eq!(alts.len(), 1);
-        match &alts[0] {
-            TypeRef::Record(_, v) => assert_eq!(**v, union_v),
+        match alts[0].as_generic_head("Record") {
+            Some([_, v]) => assert_eq!(*v, union_v),
             other => panic!("expected Record, got {other:?}"),
         }
     }
@@ -1636,22 +1641,22 @@ mod tests {
     #[test]
     fn record_with_union_key_does_not_distribute() {
         let union_k = TypeRef::Union(vec![TypeRef::String, TypeRef::Number]);
-        let ty = TypeRef::Record(Box::new(union_k.clone()), Box::new(TypeRef::String));
+        let ty = TypeRef::generic("Record", vec![union_k.clone(), TypeRef::String]);
         let alts = flatten_no_ctx(&ty);
         assert_eq!(alts.len(), 1);
-        match &alts[0] {
-            TypeRef::Record(k, _) => assert_eq!(**k, union_k),
+        match alts[0].as_generic_head("Record") {
+            Some([k, _]) => assert_eq!(*k, union_k),
             other => panic!("expected Record, got {other:?}"),
         }
     }
 
     #[test]
     fn record_with_single_typed_value_keeps_typed_phantom() {
-        let ty = TypeRef::Record(Box::new(TypeRef::String), Box::new(TypeRef::String));
+        let ty = TypeRef::generic("Record", vec![TypeRef::String, TypeRef::String]);
         let alts = flatten_no_ctx(&ty);
         assert_eq!(alts.len(), 1);
-        match &alts[0] {
-            TypeRef::Record(_, v) => assert_eq!(**v, TypeRef::String),
+        match alts[0].as_generic_head("Record") {
+            Some([_, v]) => assert_eq!(*v, TypeRef::String),
             other => panic!("expected Record, got {other:?}"),
         }
     }
@@ -1672,13 +1677,13 @@ mod tests {
     fn map_with_union_type_args_does_not_distribute() {
         let k = TypeRef::Union(vec![TypeRef::String, TypeRef::Number]);
         let v = TypeRef::Union(vec![TypeRef::String, TypeRef::Boolean]);
-        let ty = TypeRef::Map(Box::new(k.clone()), Box::new(v.clone()));
+        let ty = TypeRef::generic("Map", vec![k.clone(), v.clone()]);
         let alts = flatten_no_ctx(&ty);
         assert_eq!(alts.len(), 1);
-        match &alts[0] {
-            TypeRef::Map(map_k, map_v) => {
-                assert_eq!(**map_k, k);
-                assert_eq!(**map_v, v);
+        match alts[0].as_generic_head("Map") {
+            Some([map_k, map_v]) => {
+                assert_eq!(*map_k, k);
+                assert_eq!(*map_v, v);
             }
             other => panic!("expected Map, got {other:?}"),
         }
@@ -1687,12 +1692,12 @@ mod tests {
     #[test]
     fn promise_with_union_does_not_distribute() {
         let union_v = TypeRef::Union(vec![TypeRef::String, TypeRef::Number]);
-        let ty = TypeRef::Promise(Box::new(union_v.clone()));
+        let ty = TypeRef::generic("Promise", vec![union_v.clone()]);
         let alts = flatten_no_ctx(&ty);
         assert_eq!(alts.len(), 1);
-        match &alts[0] {
-            TypeRef::Promise(inner) => assert_eq!(**inner, union_v),
-            other => panic!("expected Promise, got {other:?}"),
+        match alts[0].as_promise_inner() {
+            Some(inner) => assert_eq!(*inner, union_v),
+            None => panic!("expected Promise, got {:?}", alts[0]),
         }
     }
 }

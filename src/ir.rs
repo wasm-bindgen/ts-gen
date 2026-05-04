@@ -31,10 +31,27 @@ pub enum ModuleContext {
 // ─── Type References ─────────────────────────────────────────────────
 
 /// A reference to a TypeScript type, resolved from the AST.
+///
+/// The IR mirrors TypeScript's own type system: only the syntactic
+/// constructs from the grammar get dedicated variants. Anything that
+/// would resolve through TS's name lookup (built-in JS classes,
+/// `Promise<T>`, `Map<K,V>`, user-declared types, qualified paths)
+/// flows through [`TypeRef::Reference`] and is resolved at codegen
+/// time against the scope chain. This means user-declared types
+/// shadow built-ins exactly the way they do in TypeScript.
+///
+/// Note that `T[]` and `Array<T>` are **distinct** at the IR level
+/// (matching TS): `T[]` is the syntactic [`TypeRef::Array`] shortcut
+/// that never goes through name resolution, while `Array<T>` is a
+/// `Reference { head: "Array", ... }` that *does* go through the
+/// scope chain and is therefore affected by local shadowing.
 #[derive(Clone, Debug, PartialEq)]
-
 pub enum TypeRef {
     // === Primitives ===
+    //
+    // Lower to a Rust-side type at the FFI boundary, not a JS class —
+    // e.g. `String` → `String`/`&str`, `Number` → `f64`. Each variant
+    // carries its own non-trivial lowering rule.
     Boolean,
     Number,
     String,
@@ -45,36 +62,29 @@ pub enum TypeRef {
     Any,
     Unknown,
     Object,
+    /// JS `symbol` primitive — there is no Rust-side equivalent at the
+    /// FFI boundary, so it lowers to `JsValue`.
     Symbol,
 
-    // === Typed Arrays ===
-    Int8Array,
-    Uint8Array,
-    Uint8ClampedArray,
-    Int16Array,
-    Uint16Array,
-    Int32Array,
-    Uint32Array,
-    Float32Array,
-    Float64Array,
-    BigInt64Array,
-    BigUint64Array,
-    ArrayBuffer,
+    // === TS-only synthetic types ===
+    /// `ArrayBufferView` is a TS-only union alias for the typed-array
+    /// family + `DataView`. There is no JS class with this name, so it
+    /// can't lower to a `js_sys` ident — codegen erases it to `Object`.
     ArrayBufferView,
-    DataView,
 
-    // === Built-in Generic Containers ===
-    Promise(Box<TypeRef>),
+    // === Syntactic constructs ===
+    /// `T[]` — the syntactic array shortcut. Distinct from
+    /// `Array<T>` (which is a [`TypeRef::Reference`] to the global
+    /// `Array` symbol and goes through name resolution). `T[]` is
+    /// unaffected by local shadowing of `Array`.
     Array(Box<TypeRef>),
-    Record(Box<TypeRef>, Box<TypeRef>),
-    Map(Box<TypeRef>, Box<TypeRef>),
-    Set(Box<TypeRef>),
-
-    // === Structural Types ===
+    /// `T | null` / `T | undefined` / `T?` — wraps the inner in
+    /// `Option<T>` at lowering. Coalesces `null`/`undefined` arms.
     Nullable(Box<TypeRef>),
     Union(Vec<TypeRef>),
     Intersection(Vec<TypeRef>),
     Tuple(Vec<TypeRef>),
+    /// `(args) => ret` — function type literal.
     Function(FunctionSig),
 
     // === Literal Types ===
@@ -83,20 +93,196 @@ pub enum TypeRef {
     BooleanLiteral(bool),
 
     // === Named References ===
-    /// Reference to a type by name. Resolved during first pass.
-    Named(String),
-    /// Generic instantiation: `Named<T1, T2, ...>`
-    GenericInstantiation(String, Vec<TypeRef>),
-
-    // === Special ===
-    Date,
-    RegExp,
-    Error,
+    /// Named type reference — possibly qualified (`A.B.C`), possibly
+    /// generic (`Foo<T>`, `A.B.C<T>`), possibly both.
+    ///
+    /// * `head`: leftmost identifier in the path.
+    /// * `segments`: subsequent dotted segments. Empty for a bare
+    ///   identifier.
+    /// * `type_args`: generic instantiation arguments. Empty for a
+    ///   non-generic reference.
+    ///
+    /// All scope-resolved names go through this variant: user-declared
+    /// types, built-in JS classes (`Date`, `Error`, `TypeError`,
+    /// `Uint8Array`, ...), and `Promise`/`Map`/`Set`/`Record`. Codegen
+    /// resolves these at emit time via scope chain → `JS_SYS_RESERVED`
+    /// (built-ins) → external map → `JsValue` fallback. Heads with
+    /// special codegen rules (e.g. `Promise<T>` → `async fn`) are
+    /// recognized by name at the relevant emitter.
+    ///
+    /// Qualified paths (`segments` non-empty) are not yet resolved
+    /// through the scope chain — they fall back to the external map
+    /// or to `JsValue` with a diagnostic. Proper namespace traversal
+    /// is a future extension.
+    Reference {
+        head: String,
+        segments: Vec<String>,
+        type_args: Vec<TypeRef>,
+    },
 
     // === Fallback ===
     /// For TS constructs we can't represent (conditional types, mapped types,
     /// template literals, `keyof`, etc.) — erased to `JsValue`.
     Unresolved(String),
+}
+
+impl TypeRef {
+    /// Construct a bare named reference: `head` with no qualified
+    /// segments and no generic type arguments. Convenience for the
+    /// common case (`MyType`, `Date`, `Foo`).
+    pub fn ident(head: impl Into<String>) -> Self {
+        TypeRef::Reference {
+            head: head.into(),
+            segments: Vec::new(),
+            type_args: Vec::new(),
+        }
+    }
+
+    /// Construct a generic instantiation: `head<T1, T2, ...>` with no
+    /// qualified segments. Convenience for `Promise<T>`, `Map<K, V>`,
+    /// `Array<T>`, etc.
+    pub fn generic(head: impl Into<String>, type_args: Vec<TypeRef>) -> Self {
+        TypeRef::Reference {
+            head: head.into(),
+            segments: Vec::new(),
+            type_args,
+        }
+    }
+
+    /// If `self` is a bare reference (no qualified segments, no
+    /// generic arguments), return the head identifier.
+    pub fn as_ident(&self) -> Option<&str> {
+        match self {
+            TypeRef::Reference {
+                head,
+                segments,
+                type_args,
+            } if segments.is_empty() && type_args.is_empty() => Some(head.as_str()),
+            _ => None,
+        }
+    }
+
+    /// If `self` is a non-qualified reference to the well-known
+    /// generic head `name` (e.g. `"Promise"`, `"Array"`, `"Map"`),
+    /// return its type arguments. Returns `None` for any other shape.
+    ///
+    /// Used by codegen sites that need to recognize `Promise<T>`,
+    /// `Map<K,V>`, etc. without caring whether the head was reached
+    /// via the `T[]` syntactic shortcut, a generic instantiation, or
+    /// any other route.
+    pub fn as_generic_head(&self, name: &str) -> Option<&[TypeRef]> {
+        match self {
+            TypeRef::Reference {
+                head,
+                segments,
+                type_args,
+            } if segments.is_empty() && head == name => Some(type_args),
+            _ => None,
+        }
+    }
+
+    /// `Promise<T>` → `Some(&T)`. Convenience over [`Self::as_generic_head`]
+    /// for the common Promise-unwrap case (signature collapse for
+    /// async returns).
+    pub fn as_promise_inner(&self) -> Option<&TypeRef> {
+        let args = self.as_generic_head("Promise")?;
+        args.first()
+    }
+
+    /// Render this `TypeRef` back into a TypeScript-like string.
+    ///
+    /// Pretty-prints structurally faithful to the source — primitives
+    /// as their lowercase keywords, generics as `Foo<T1, T2>`, unions
+    /// as `A | B`, etc. Used to surface the original TS shape of a
+    /// return type in `Returns:` doc comments when the static Rust
+    /// type loses information (e.g. an erased union).
+    pub fn format_ts(&self) -> String {
+        match self {
+            TypeRef::Boolean => "boolean".into(),
+            TypeRef::Number => "number".into(),
+            TypeRef::String => "string".into(),
+            TypeRef::BigInt => "bigint".into(),
+            TypeRef::Void => "void".into(),
+            TypeRef::Undefined => "undefined".into(),
+            TypeRef::Null => "null".into(),
+            TypeRef::Any => "any".into(),
+            TypeRef::Unknown => "unknown".into(),
+            TypeRef::Object => "object".into(),
+            TypeRef::Symbol => "symbol".into(),
+            TypeRef::ArrayBufferView => "ArrayBufferView".into(),
+            TypeRef::Array(inner) => {
+                // Wrap composite inner types in parens so e.g.
+                // `(A | B)[]` doesn't render as the wrong-precedence
+                // `A | B[]`.
+                let needs_parens = matches!(
+                    inner.as_ref(),
+                    TypeRef::Union(_) | TypeRef::Intersection(_) | TypeRef::Nullable(_)
+                );
+                if needs_parens {
+                    format!("({})[]", inner.format_ts())
+                } else {
+                    format!("{}[]", inner.format_ts())
+                }
+            }
+            TypeRef::Nullable(inner) => format!("{} | null", inner.format_ts()),
+            TypeRef::Union(members) => members
+                .iter()
+                .map(Self::format_ts)
+                .collect::<Vec<_>>()
+                .join(" | "),
+            TypeRef::Intersection(parts) => parts
+                .iter()
+                .map(Self::format_ts)
+                .collect::<Vec<_>>()
+                .join(" & "),
+            TypeRef::Tuple(elems) => format!(
+                "[{}]",
+                elems
+                    .iter()
+                    .map(Self::format_ts)
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            ),
+            TypeRef::Function(sig) => {
+                let params = sig
+                    .params
+                    .iter()
+                    .map(|p| {
+                        let opt = if p.optional { "?" } else { "" };
+                        let dots = if p.variadic { "..." } else { "" };
+                        format!("{dots}{}{opt}: {}", p.name, p.type_ref.format_ts())
+                    })
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                format!("({params}) => {}", sig.return_type.format_ts())
+            }
+            TypeRef::StringLiteral(s) => format!("\"{s}\""),
+            TypeRef::NumberLiteral(n) => n.to_string(),
+            TypeRef::BooleanLiteral(b) => b.to_string(),
+            TypeRef::Reference {
+                head,
+                segments,
+                type_args,
+            } => {
+                let mut name = head.clone();
+                for s in segments {
+                    name.push('.');
+                    name.push_str(s);
+                }
+                if type_args.is_empty() {
+                    name
+                } else {
+                    let args = type_args
+                        .iter()
+                        .map(Self::format_ts)
+                        .collect::<Vec<_>>()
+                        .join(", ");
+                    format!("{name}<{args}>")
+                }
+            }
+            TypeRef::Unresolved(s) => s.clone(),
+        }
+    }
 }
 
 // ─── Function Signatures ─────────────────────────────────────────────
@@ -510,4 +696,90 @@ pub enum RegisteredKind {
     Function,
     Variable,
     Namespace,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn format_ts_primitives_use_lowercase_keywords() {
+        assert_eq!(TypeRef::String.format_ts(), "string");
+        assert_eq!(TypeRef::Number.format_ts(), "number");
+        assert_eq!(TypeRef::Boolean.format_ts(), "boolean");
+        assert_eq!(TypeRef::Null.format_ts(), "null");
+        assert_eq!(TypeRef::Undefined.format_ts(), "undefined");
+    }
+
+    #[test]
+    fn format_ts_literals_use_their_textual_form() {
+        assert_eq!(TypeRef::StringLiteral("foo".into()).format_ts(), "\"foo\"");
+        assert_eq!(TypeRef::NumberLiteral(32.0).format_ts(), "32");
+        assert_eq!(TypeRef::BooleanLiteral(true).format_ts(), "true");
+    }
+
+    #[test]
+    fn format_ts_union_renders_with_pipes() {
+        let ty = TypeRef::Union(vec![
+            TypeRef::String,
+            TypeRef::ident("ArrayBuffer"),
+            TypeRef::ArrayBufferView,
+        ]);
+        assert_eq!(ty.format_ts(), "string | ArrayBuffer | ArrayBufferView");
+    }
+
+    #[test]
+    fn format_ts_array_wraps_composite_inner_in_parens() {
+        // `(string | number)[]` — without parens this would mean
+        // `string | (number[])`, which is wrong precedence.
+        let ty = TypeRef::Array(Box::new(TypeRef::Union(vec![
+            TypeRef::String,
+            TypeRef::Number,
+        ])));
+        assert_eq!(ty.format_ts(), "(string | number)[]");
+    }
+
+    #[test]
+    fn format_ts_array_simple_inner_no_parens() {
+        let ty = TypeRef::Array(Box::new(TypeRef::String));
+        assert_eq!(ty.format_ts(), "string[]");
+    }
+
+    #[test]
+    fn format_ts_generic_with_inner_union() {
+        let ty = TypeRef::generic(
+            "Array",
+            vec![TypeRef::Union(vec![
+                TypeRef::NumberLiteral(32.0),
+                TypeRef::StringLiteral("foo".into()),
+            ])],
+        );
+        assert_eq!(ty.format_ts(), "Array<32 | \"foo\">");
+    }
+
+    #[test]
+    fn format_ts_qualified_path() {
+        let ty = TypeRef::Reference {
+            head: "A".into(),
+            segments: vec!["B".into(), "C".into()],
+            type_args: vec![],
+        };
+        assert_eq!(ty.format_ts(), "A.B.C");
+    }
+
+    #[test]
+    fn format_ts_qualified_generic() {
+        let ty = TypeRef::Reference {
+            head: "Rpc".into(),
+            segments: vec!["Stub".into()],
+            type_args: vec![TypeRef::ident("Foo")],
+        };
+        assert_eq!(ty.format_ts(), "Rpc.Stub<Foo>");
+    }
+
+    #[test]
+    fn format_ts_nullable() {
+        let ty = TypeRef::Nullable(Box::new(TypeRef::String));
+        assert_eq!(ty.format_ts(), "string | null");
+    }
 }

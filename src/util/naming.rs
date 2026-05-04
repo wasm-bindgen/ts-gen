@@ -22,8 +22,55 @@ pub fn module_specifier_to_ident(specifier: &str) -> String {
 /// Does NOT escape Rust keywords — that's handled by `make_ident` at the
 /// codegen boundary using `r#` raw identifiers, so that name composition
 /// (prefixes like `try_`, `set_`, suffixes like `_with_foo`) works correctly.
+/// Convert a JS identifier to Rust `snake_case`.
+///
+/// Departs from `convert_case::Case::Snake` in one place: digits
+/// don't introduce a word boundary when they trail an alphabetic
+/// run. So `Float32Array` → `float32_array` (not `float_32_array`),
+/// `Int8Array` → `int8_array`, `Uint8ClampedArray` →
+/// `uint8_clamped_array`. This matches the historical wasm-bindgen /
+/// `js_sys` naming convention for typed arrays and produces more
+/// readable identifiers in general.
+///
+/// We keep the digit-as-boundary behavior in the *other* direction
+/// — a digit followed by a letter still introduces a boundary
+/// (`HTML5Element` → `html5_element` would still split the `5e`,
+/// matching the standard convention).
 pub fn to_snake_case(name: &str) -> String {
-    name.to_case(Case::Snake)
+    // First pass through `convert_case::Case::Snake` to do the
+    // standard splits (camelCase boundaries, runs of caps, etc.).
+    let standard = name.to_case(Case::Snake);
+
+    // Then merge any `<word>_<digits>(_|$)` back into `<word><digits>`.
+    // The trailing context (`_` or end) ensures we only merge digits
+    // that originally trailed a letter run, not standalone numeric
+    // segments.
+    let bytes = standard.as_bytes();
+    let mut out = String::with_capacity(standard.len());
+    let mut i = 0;
+    while i < bytes.len() {
+        let c = bytes[i] as char;
+        // Look for `<letter>_<digits>` and elide the `_`.
+        if c.is_ascii_alphabetic() && i + 1 < bytes.len() && bytes[i + 1] == b'_' {
+            let mut j = i + 2;
+            while j < bytes.len() && (bytes[j] as char).is_ascii_digit() {
+                j += 1;
+            }
+            // Only merge when the digit run is followed by a word
+            // boundary (`_` or end) — otherwise it's a separate
+            // numeric segment we want to keep separated.
+            let merged_ok = j > i + 2 && (j == bytes.len() || bytes[j] == b'_');
+            if merged_ok {
+                out.push(c);
+                out.push_str(&standard[i + 2..j]);
+                i = j;
+                continue;
+            }
+        }
+        out.push(c);
+        i += 1;
+    }
+    out
 }
 
 /// Convert a JS identifier to a Rust PascalCase name (for types, enums).
@@ -69,6 +116,17 @@ mod tests {
         assert_eq!(to_snake_case("getUserById"), "get_user_by_id");
         assert_eq!(to_snake_case("HTMLElement"), "html_element");
         assert_eq!(to_snake_case("send"), "send");
+    }
+
+    #[test]
+    fn test_snake_case_keeps_trailing_digits_with_word() {
+        // Digits trailing a letter run stay attached. This matches
+        // the historical wasm-bindgen typed-array naming convention.
+        assert_eq!(to_snake_case("Float32Array"), "float32_array");
+        assert_eq!(to_snake_case("Int8Array"), "int8_array");
+        assert_eq!(to_snake_case("Uint8ClampedArray"), "uint8_clamped_array");
+        assert_eq!(to_snake_case("BigInt64Array"), "big_int64_array");
+        assert_eq!(to_snake_case("Float64"), "float64");
     }
 
     #[test]

@@ -30,7 +30,7 @@ pub fn convert_class_decl(
         .super_class
         .as_ref()
         .and_then(|sc| match expression_to_dotted_name(sc) {
-            Some(name) => Some(ir::TypeRef::Named(name)),
+            Some(name) => Some(ir::TypeRef::ident(name)),
             None => {
                 diag.warn("Complex super class expression is not supported");
                 None
@@ -374,37 +374,75 @@ fn convert_ts_type_from_heritage(
     expr: &ast::Expression<'_>,
     diag: &mut DiagnosticCollector,
 ) -> ir::TypeRef {
-    match expression_to_dotted_name(expr) {
-        Some(name) => ir::TypeRef::Named(name),
+    match expression_to_path(expr) {
+        Some((head, segments)) => ir::TypeRef::Reference {
+            head,
+            segments,
+            type_args: Vec::new(),
+        },
         None => {
             diag.warn("Unsupported heritage expression, falling back to Object");
-            ir::TypeRef::Named("Object".to_string())
+            ir::TypeRef::ident("Object")
         }
     }
 }
 
-/// Extract a dotted name from an expression (e.g., `Foo.Bar.Baz` → `"Foo.Bar.Baz"`).
-pub fn expression_to_dotted_name(expr: &ast::Expression<'_>) -> Option<String> {
+/// Extract a path from an expression: `Foo` → `("Foo", [])`,
+/// `Foo.Bar.Baz` → `("Foo", ["Bar", "Baz"])`. Returns `None` for
+/// expressions that don't form a static dotted name.
+pub fn expression_to_path(expr: &ast::Expression<'_>) -> Option<(String, Vec<String>)> {
     match expr {
-        ast::Expression::Identifier(ident) => Some(ident.name.to_string()),
+        ast::Expression::Identifier(ident) => Some((ident.name.to_string(), Vec::new())),
         ast::Expression::StaticMemberExpression(member) => {
-            let left = expression_to_dotted_name(&member.object)?;
-            Some(format!("{left}.{}", member.property.name))
+            let (head, mut segments) = expression_to_path(&member.object)?;
+            segments.push(member.property.name.to_string());
+            Some((head, segments))
         }
         _ => None,
     }
 }
 
+/// Backwards-compatible helper that flattens a path expression to
+/// dotted form. Prefer [`expression_to_path`] for new code.
+pub fn expression_to_dotted_name(expr: &ast::Expression<'_>) -> Option<String> {
+    let (head, segments) = expression_to_path(expr)?;
+    if segments.is_empty() {
+        Some(head)
+    } else {
+        Some(format!("{}.{}", head, segments.join(".")))
+    }
+}
+
 fn convert_ts_type_name_to_ref(type_name: &ast::TSTypeName<'_>) -> ir::TypeRef {
     match type_name {
-        ast::TSTypeName::IdentifierReference(ident) => ir::TypeRef::Named(ident.name.to_string()),
+        ast::TSTypeName::IdentifierReference(ident) => ir::TypeRef::ident(ident.name.to_string()),
         ast::TSTypeName::QualifiedName(qualified) => {
-            let left = convert_ts_type_name_to_string(&qualified.left);
-            let right = &qualified.right.name;
-            ir::TypeRef::Named(format!("{left}.{right}"))
+            let (head, segments) = collect_qualified_path(qualified);
+            ir::TypeRef::Reference {
+                head,
+                segments,
+                type_args: Vec::new(),
+            }
         }
         ast::TSTypeName::ThisExpression(_) => ir::TypeRef::Unresolved("this".to_string()),
     }
+}
+
+fn collect_qualified_path(q: &ast::TSQualifiedName<'_>) -> (String, Vec<String>) {
+    fn walk(name: &ast::TSTypeName<'_>) -> (String, Vec<String>) {
+        match name {
+            ast::TSTypeName::IdentifierReference(ident) => (ident.name.to_string(), Vec::new()),
+            ast::TSTypeName::QualifiedName(qual) => {
+                let (head, mut segments) = walk(&qual.left);
+                segments.push(qual.right.name.to_string());
+                (head, segments)
+            }
+            ast::TSTypeName::ThisExpression(_) => ("this".to_string(), Vec::new()),
+        }
+    }
+    let (head, mut segments) = walk(&q.left);
+    segments.push(q.right.name.to_string());
+    (head, segments)
 }
 
 /// Debug name for an `ExportDefaultDeclarationKind` variant.
@@ -444,16 +482,4 @@ fn f64_to_i64(
         ));
     }
     result
-}
-
-fn convert_ts_type_name_to_string(type_name: &ast::TSTypeName<'_>) -> String {
-    match type_name {
-        ast::TSTypeName::IdentifierReference(ident) => ident.name.to_string(),
-        ast::TSTypeName::QualifiedName(qualified) => {
-            let left = convert_ts_type_name_to_string(&qualified.left);
-            let right = &qualified.right.name;
-            format!("{left}.{right}")
-        }
-        ast::TSTypeName::ThisExpression(_) => "this".to_string(),
-    }
 }

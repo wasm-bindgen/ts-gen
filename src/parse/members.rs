@@ -158,7 +158,7 @@ fn try_synthesize_inline_param(
                 diag,
             );
             synth.push(iface);
-            Some(TypeRef::Named(synth_name))
+            Some(TypeRef::ident(synth_name))
         }
         TSType::TSUnionType(union) if all_type_literals(&union.types) => {
             let synth_name = unique_type_name(parent_name, segment, used_type_names);
@@ -197,7 +197,7 @@ fn try_synthesize_inline_param(
                 members: merged,
                 classification,
             });
-            Some(TypeRef::Named(synth_name))
+            Some(TypeRef::ident(synth_name))
         }
         _ => None,
     }

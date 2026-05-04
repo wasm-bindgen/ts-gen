@@ -261,10 +261,19 @@ impl<'a> CodegenContext<'a> {
         if let Some(type_id) = self.gctx.scopes.resolve(scope, name) {
             let decl = self.gctx.get_type(type_id);
             if let TypeKind::TypeAlias(ref alias) = decl.kind {
-                // If the target is itself a named reference, keep resolving.
-                if let ir::TypeRef::Named(ref inner_name) = alias.target {
-                    if let Some(resolved) = self.resolve_alias_impl(inner_name, scope, visited) {
-                        return Some(resolved);
+                // If the target is itself a bare reference, keep resolving.
+                // Generic instantiations / qualified paths stop here.
+                if let ir::TypeRef::Reference {
+                    head: ref inner_name,
+                    ref segments,
+                    ref type_args,
+                } = alias.target
+                {
+                    if segments.is_empty() && type_args.is_empty() {
+                        if let Some(resolved) = self.resolve_alias_impl(inner_name, scope, visited)
+                        {
+                            return Some(resolved);
+                        }
                     }
                 }
                 return Some(&alias.target);
@@ -457,48 +466,15 @@ pub fn to_syn_type(
         TypeRef::Object => maybe_ref(quote! { Object }, borrow),
         TypeRef::Symbol => maybe_ref(quote! { JsValue }, borrow),
 
-        // === Typed Arrays ===
-        TypeRef::Int8Array => maybe_ref(quote! { Int8Array }, borrow),
-        TypeRef::Uint8Array => maybe_ref(quote! { Uint8Array }, borrow),
-        TypeRef::Uint8ClampedArray => maybe_ref(quote! { Uint8ClampedArray }, borrow),
-        TypeRef::Int16Array => maybe_ref(quote! { Int16Array }, borrow),
-        TypeRef::Uint16Array => maybe_ref(quote! { Uint16Array }, borrow),
-        TypeRef::Int32Array => maybe_ref(quote! { Int32Array }, borrow),
-        TypeRef::Uint32Array => maybe_ref(quote! { Uint32Array }, borrow),
-        TypeRef::Float32Array => maybe_ref(quote! { Float32Array }, borrow),
-        TypeRef::Float64Array => maybe_ref(quote! { Float64Array }, borrow),
-        TypeRef::BigInt64Array => maybe_ref(quote! { BigInt64Array }, borrow),
-        TypeRef::BigUint64Array => maybe_ref(quote! { BigUint64Array }, borrow),
-        TypeRef::ArrayBuffer => maybe_ref(quote! { ArrayBuffer }, borrow),
+        // === TS-only synthetic ===
+        // `ArrayBufferView` is a TS-only union alias (typed-array
+        // family + DataView), not a JS class — codegen erases it to
+        // plain `Object`.
         TypeRef::ArrayBufferView => maybe_ref(quote! { Object }, borrow),
-        TypeRef::DataView => maybe_ref(quote! { DataView }, borrow),
 
-        // === Built-in Generic Containers ===
-        TypeRef::Promise(inner) => maybe_ref(
-            generic_container(quote! { Promise }, inner, pos, ctx, scope, from_module),
-            borrow,
-        ),
+        // === Syntactic constructs ===
         TypeRef::Array(inner) => maybe_ref(
             generic_container(quote! { Array }, inner, pos, ctx, scope, from_module),
-            borrow,
-        ),
-        TypeRef::Record(_k, v) => maybe_ref(
-            generic_container(quote! { Object }, v, pos, ctx, scope, from_module),
-            borrow,
-        ),
-        TypeRef::Map(k, v) => {
-            let inner_pos = pos.to_inner();
-            let k_arg = to_syn_type(k, inner_pos, ctx, scope, from_module);
-            let v_arg = to_syn_type(v, inner_pos, ctx, scope, from_module);
-            let base = if is_jsvalue_arg(&k_arg) && is_jsvalue_arg(&v_arg) {
-                quote! { Map }
-            } else {
-                quote! { Map<#k_arg, #v_arg> }
-            };
-            maybe_ref(base, borrow)
-        }
-        TypeRef::Set(inner) => maybe_ref(
-            generic_container(quote! { Set }, inner, pos, ctx, scope, from_module),
             borrow,
         ),
 
@@ -578,31 +554,21 @@ pub fn to_syn_type(
         TypeRef::BooleanLiteral(_) => quote! { bool },
 
         // === Named References ===
-        TypeRef::Named(name) => {
-            // Resolve through type aliases before falling back to named_type_to_rust.
-            if let Some(c) = ctx {
-                if let Some(target) = c.resolve_alias(name, scope) {
-                    let target = target.clone();
-                    return to_syn_type(&target, pos, ctx, scope, from_module);
-                }
-            }
-            maybe_ref(named_type_to_rust(name, ctx, from_module), borrow)
-        }
-        TypeRef::GenericInstantiation(name, _args) => {
-            // TODO (Phase 3): preserve generic type arguments once wasm_bindgen
-            // generic support is wired through. For now, emit just the base type.
-            if let Some(c) = ctx {
-                c.warn(format!(
-                    "generic type arguments on `{name}<...>` are not yet emitted, using bare `{name}`"
-                ));
-            }
-            maybe_ref(named_type_to_rust(name, ctx, from_module), borrow)
-        }
-
-        // === Special ===
-        TypeRef::Date => maybe_ref(quote! { Date }, borrow),
-        TypeRef::RegExp => maybe_ref(quote! { RegExp }, borrow),
-        TypeRef::Error => maybe_ref(quote! { Error }, borrow),
+        //
+        // Bare ident, generic instantiation, qualified path — all
+        // flow through one arm. Resolution mirrors TypeScript's name
+        // lookup: user scope first (so `interface MyDate {}` shadows
+        // `Date`), then well-known JS heads (`js_sys::*` glob), then
+        // the external map (`web_sys::*` defaults / user mappings),
+        // then `JsValue` fallback with a diagnostic.
+        TypeRef::Reference {
+            head,
+            segments,
+            type_args,
+        } => maybe_ref(
+            lower_reference(head, segments, type_args, pos, ctx, scope, from_module),
+            borrow,
+        ),
 
         // === Fallback ===
         TypeRef::Unresolved(desc) => {
@@ -801,8 +767,111 @@ fn named_type_to_rust(
 ) -> TokenStream {
     match ctx {
         Some(ctx) => emit_type_name(name, ctx, from_module),
+        // Without a codegen context (e.g. unit tests that exercise
+        // type lowering directly) we can still resolve names that
+        // appear in the `js_sys::*` glob — emit them as a bare ident.
+        // Anything else falls back to `JsValue`.
+        None if JS_SYS_RESERVED.contains(&name) => {
+            let ident = make_ident(name);
+            quote! { #ident }
+        }
         None => quote! { JsValue },
     }
+}
+
+/// Lower a `TypeRef::Reference` to its Rust syntax token. Handles
+/// alias resolution, dedicated-codegen heads (`Promise`, `Map`,
+/// `Set`, `Record`, `Array<T>`, ...), and falls through to
+/// `emit_type_name` for everything else.
+fn lower_reference(
+    head: &str,
+    segments: &[String],
+    type_args: &[TypeRef],
+    pos: TypePosition,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+) -> TokenStream {
+    // Qualified paths are not yet resolved through the scope chain —
+    // we keep the dotted form for `emit_type_name` to consult the
+    // external map, then fall back to JsValue with a diagnostic for
+    // anything that doesn't match.
+    if !segments.is_empty() {
+        let dotted = std::iter::once(head)
+            .chain(segments.iter().map(String::as_str))
+            .collect::<Vec<_>>()
+            .join(".");
+        return match ctx {
+            Some(c) => emit_type_name(&dotted, c, from_module),
+            None => quote! { JsValue },
+        };
+    }
+
+    // Chase user-declared aliases for bare references — `type Foo =
+    // string` should lower to `String`, not `Foo`. Skipped when the
+    // reference carries generic type arguments (`EmailExportedHandler<Env, Props>`)
+    // because we don't substitute generic params; instead we emit the
+    // bare alias name and let downstream code see the alias decl.
+    if type_args.is_empty() {
+        if let Some(c) = ctx {
+            if let Some(target) = c.resolve_alias(head, scope) {
+                let target = target.clone();
+                return to_syn_type(&target, pos, ctx, scope, from_module);
+            }
+        }
+    }
+
+    // Heads with dedicated codegen rules. `Promise<T>`, `Map<K,V>`,
+    // `Set<T>`, `Record<K,V>`, and the generic `Array<T>` form (the
+    // syntactic `T[]` is handled separately by `TypeRef::Array`)
+    // share a single dispatch here.
+    match head {
+        "Promise" | "PromiseLike" => {
+            let inner = type_args.first().cloned().unwrap_or(TypeRef::Any);
+            return generic_container(quote! { Promise }, &inner, pos, ctx, scope, from_module);
+        }
+        "Array" | "ReadonlyArray" => {
+            let inner = type_args.first().cloned().unwrap_or(TypeRef::Any);
+            return generic_container(quote! { Array }, &inner, pos, ctx, scope, from_module);
+        }
+        "Set" | "ReadonlySet" => {
+            let inner = type_args.first().cloned().unwrap_or(TypeRef::Any);
+            return generic_container(quote! { Set }, &inner, pos, ctx, scope, from_module);
+        }
+        "Map" | "ReadonlyMap" => {
+            let inner_pos = pos.to_inner();
+            let k = type_args.first().cloned().unwrap_or(TypeRef::Any);
+            let v = type_args.get(1).cloned().unwrap_or(TypeRef::Any);
+            let k_arg = to_syn_type(&k, inner_pos, ctx, scope, from_module);
+            let v_arg = to_syn_type(&v, inner_pos, ctx, scope, from_module);
+            return if is_jsvalue_arg(&k_arg) && is_jsvalue_arg(&v_arg) {
+                quote! { Map }
+            } else {
+                quote! { Map<#k_arg, #v_arg> }
+            };
+        }
+        "Record" => {
+            // `Record<K, V>` desugars to an `Object` with V-typed
+            // values. Drop the key type — wasm-bindgen has no Rust
+            // representation for "object with arbitrary string keys".
+            let v = type_args.get(1).cloned().unwrap_or(TypeRef::Any);
+            return generic_container(quote! { Object }, &v, pos, ctx, scope, from_module);
+        }
+        _ => {}
+    }
+
+    // Generic instantiation of a non-special head — wasm-bindgen
+    // bindings can't express user-defined generics yet, so we emit
+    // just the base ident with a diagnostic. Type args are dropped.
+    if !type_args.is_empty() {
+        if let Some(c) = ctx {
+            c.warn(format!(
+                "generic type arguments on `{head}<...>` are not yet emitted, using bare `{head}`"
+            ));
+        }
+    }
+
+    named_type_to_rust(head, ctx, from_module)
 }
 
 /// Create a `syn::Ident`, sanitizing invalid characters and escaping keywords.
@@ -957,7 +1026,7 @@ mod tests {
     #[test]
     fn test_promise_with_named_type_unresolved() {
         // Without ctx, Foo is unresolved → JsValue, so Promise<JsValue> elides to Promise
-        let ty = TypeRef::Promise(Box::new(TypeRef::Named("Foo".into())));
+        let ty = TypeRef::generic("Promise", vec![TypeRef::ident("Foo")]);
         assert_eq!(ret_type(&ty), "Promise");
     }
 
@@ -977,21 +1046,21 @@ mod tests {
 
     #[test]
     fn test_promise_with_string() {
-        let ty = TypeRef::Promise(Box::new(TypeRef::String));
+        let ty = TypeRef::generic("Promise", vec![TypeRef::String]);
         let result = ret_type(&ty);
         assert_eq!(result, "Promise < JsString >");
     }
 
     #[test]
     fn test_promise_with_any_elides_generic() {
-        let ty = TypeRef::Promise(Box::new(TypeRef::Any));
+        let ty = TypeRef::generic("Promise", vec![TypeRef::Any]);
         let result = ret_type(&ty);
         assert_eq!(result, "Promise");
     }
 
     #[test]
     fn test_promise_with_void() {
-        let ty = TypeRef::Promise(Box::new(TypeRef::Void));
+        let ty = TypeRef::generic("Promise", vec![TypeRef::Void]);
         let result = ret_type(&ty);
         assert_eq!(result, "Promise < Undefined >");
     }
@@ -999,14 +1068,14 @@ mod tests {
     #[test]
     fn test_nullable_named_type_unresolved() {
         // Without ctx, Foo is unresolved → JsValue
-        let ty = TypeRef::Nullable(Box::new(TypeRef::Named("Foo".into())));
+        let ty = TypeRef::Nullable(Box::new(TypeRef::ident("Foo")));
         assert_eq!(arg_type(&ty), "Option < & JsValue >");
         assert_eq!(ret_type(&ty), "Option < JsValue >");
     }
 
     #[test]
     fn test_promise_with_arraybuffer() {
-        let ty = TypeRef::Promise(Box::new(TypeRef::ArrayBuffer));
+        let ty = TypeRef::generic("Promise", vec![TypeRef::ident("ArrayBuffer")]);
         let result = ret_type(&ty);
         assert_eq!(result, "Promise < ArrayBuffer >");
     }
@@ -1027,34 +1096,37 @@ mod tests {
 
     #[test]
     fn test_set_with_type() {
-        let ty = TypeRef::Set(Box::new(TypeRef::String));
+        let ty = TypeRef::generic("Set", vec![TypeRef::String]);
         let result = ret_type(&ty);
         assert_eq!(result, "Set < JsString >");
     }
 
     #[test]
     fn test_map_with_types() {
-        let ty = TypeRef::Map(Box::new(TypeRef::String), Box::new(TypeRef::Number));
+        let ty = TypeRef::generic("Map", vec![TypeRef::String, TypeRef::Number]);
         let result = ret_type(&ty);
         assert_eq!(result, "Map < JsString , Number >");
     }
 
     #[test]
     fn test_record_erases_key() {
-        let ty = TypeRef::Record(Box::new(TypeRef::String), Box::new(TypeRef::Number));
+        let ty = TypeRef::generic("Record", vec![TypeRef::String, TypeRef::Number]);
         let result = ret_type(&ty);
         assert_eq!(result, "Object < Number >");
     }
 
     #[test]
     fn test_record_nullable_jsvalue_elides_generic() {
-        let ty = TypeRef::Record(
-            Box::new(TypeRef::String),
-            Box::new(TypeRef::Nullable(Box::new(TypeRef::Union(vec![
+        let ty = TypeRef::generic(
+            "Record",
+            vec![
                 TypeRef::String,
-                TypeRef::Number,
-                TypeRef::Boolean,
-            ])))),
+                TypeRef::Nullable(Box::new(TypeRef::Union(vec![
+                    TypeRef::String,
+                    TypeRef::Number,
+                    TypeRef::Boolean,
+                ]))),
+            ],
         );
         assert_eq!(ret_type(&ty), "Object");
     }
@@ -1062,14 +1134,17 @@ mod tests {
     #[test]
     fn test_promise_nullable_inner() {
         // Promise<string | null> → Promise<JsOption<JsString>>
-        let ty = TypeRef::Promise(Box::new(TypeRef::Nullable(Box::new(TypeRef::String))));
+        let ty = TypeRef::generic(
+            "Promise",
+            vec![TypeRef::Nullable(Box::new(TypeRef::String))],
+        );
         let result = ret_type(&ty);
         assert_eq!(result, "Promise < JsOption < JsString > >");
     }
 
     #[test]
     fn test_promise_nullable_jsvalue_elides_generic() {
-        let ty = TypeRef::Promise(Box::new(TypeRef::Nullable(Box::new(TypeRef::Any))));
+        let ty = TypeRef::generic("Promise", vec![TypeRef::Nullable(Box::new(TypeRef::Any))]);
         assert_eq!(ret_type(&ty), "Promise");
     }
 
@@ -1108,19 +1183,19 @@ mod tests {
     #[test]
     fn test_named_unresolved_without_ctx() {
         // Without a CodegenContext, unknown types fall back to JsValue
-        let ty = TypeRef::Named("Request".into());
+        let ty = TypeRef::ident("Request");
         assert_eq!(ret_type(&ty), "JsValue");
     }
 
     #[test]
     fn test_named_unknown_without_ctx() {
-        let ty = TypeRef::Named("MyCustomType".into());
+        let ty = TypeRef::ident("MyCustomType");
         assert_eq!(ret_type(&ty), "JsValue");
     }
 
     #[test]
     fn test_return_with_catch() {
-        let ty = TypeRef::Promise(Box::new(TypeRef::Void));
+        let ty = TypeRef::generic("Promise", vec![TypeRef::Void]);
         let result = to_return_type(
             &ty,
             true,
@@ -1154,7 +1229,7 @@ mod tests {
         let mut ctx = CodegenContext::empty(&gctx, scope);
         ctx.local_types
             .insert("Response".into(), ModuleContext::Global);
-        let ty = TypeRef::Named("Response".into());
+        let ty = TypeRef::ident("Response");
         let result = to_syn_type(
             &ty,
             TypePosition::RETURN,
@@ -1174,7 +1249,7 @@ mod tests {
             kind: crate::ir::TypeKind::TypeAlias(crate::ir::TypeAliasDecl {
                 name: "BodyInit".to_string(),
                 type_params: vec![],
-                target: TypeRef::Union(vec![TypeRef::String, TypeRef::ArrayBuffer]),
+                target: TypeRef::Union(vec![TypeRef::String, TypeRef::ident("ArrayBuffer")]),
                 from_module: None,
             }),
             module_context: crate::ir::ModuleContext::Global,
@@ -1185,7 +1260,7 @@ mod tests {
         gctx.scopes.insert(scope, "BodyInit".to_string(), alias_id);
 
         let ctx = CodegenContext::empty(&gctx, scope);
-        let ty = TypeRef::Named("BodyInit".into());
+        let ty = TypeRef::ident("BodyInit");
         let result = to_syn_type(
             &ty,
             TypePosition::RETURN,
@@ -1204,7 +1279,7 @@ mod tests {
         // `::web_sys::Response` (rather than erasing to JsValue).
         let (gctx, scope) = test_gctx();
         let ctx = CodegenContext::empty(&gctx, scope);
-        let ty = TypeRef::Named("Response".into());
+        let ty = TypeRef::ident("Response");
         let result = to_syn_type(
             &ty,
             TypePosition::RETURN,
@@ -1228,7 +1303,7 @@ mod tests {
         // `use JsValue as Foo;` alias and an error diagnostic.
         let (gctx, scope) = test_gctx();
         let ctx = CodegenContext::empty(&gctx, scope);
-        let ty = TypeRef::Named("MyCustomThing".into());
+        let ty = TypeRef::ident("MyCustomThing");
         let result = to_syn_type(
             &ty,
             TypePosition::RETURN,
@@ -1248,7 +1323,7 @@ mod tests {
         let mut ctx = CodegenContext::empty(&gctx, scope);
         ctx.local_types
             .insert("MyThing".into(), ModuleContext::Global);
-        let ty = TypeRef::Promise(Box::new(TypeRef::Named("MyThing".into())));
+        let ty = TypeRef::generic("Promise", vec![TypeRef::ident("MyThing")]);
         let result = to_syn_type(
             &ty,
             TypePosition::RETURN,
@@ -1271,7 +1346,7 @@ mod tests {
         ctx.local_types
             .insert("EmailMessage".into(), module.clone());
 
-        let ty = TypeRef::Named("EmailMessage".into());
+        let ty = TypeRef::ident("EmailMessage");
         let result = to_syn_type(
             &ty,
             TypePosition::ARGUMENT,
@@ -1293,7 +1368,7 @@ mod tests {
             .insert("EmailSendResult".into(), ModuleContext::Global);
 
         let from = ModuleContext::Module("cloudflare:email".into());
-        let ty = TypeRef::Named("EmailSendResult".into());
+        let ty = TypeRef::ident("EmailSendResult");
         let result = to_syn_type(&ty, TypePosition::RETURN, Some(&ctx), scope, &from).to_string();
         assert_eq!(result, "EmailSendResult");
     }
@@ -1308,7 +1383,7 @@ mod tests {
             .insert("Sibling".into(), ModuleContext::Module("node:b".into()));
 
         let from = ModuleContext::Module("node:a".into());
-        let ty = TypeRef::Named("Sibling".into());
+        let ty = TypeRef::ident("Sibling");
         let result = to_syn_type(&ty, TypePosition::RETURN, Some(&ctx), scope, &from).to_string();
         assert_eq!(result, "super :: b :: Sibling");
     }
@@ -1329,7 +1404,7 @@ mod tests {
     #[test]
     fn test_inner_position_named_type_unresolved() {
         // Without ctx, unresolved named types → JsValue
-        let ty = TypeRef::Named("Response".into());
+        let ty = TypeRef::ident("Response");
         assert_eq!(inner_type(&ty), "JsValue");
         assert_eq!(ret_type(&ty), "JsValue");
     }
@@ -1337,7 +1412,7 @@ mod tests {
     #[test]
     fn test_inner_position_typed_array_unchanged() {
         // Typed arrays pass through in inner position
-        let ty = TypeRef::Uint8Array;
+        let ty = TypeRef::ident("Uint8Array");
         assert_eq!(inner_type(&ty), "Uint8Array");
         assert_eq!(ret_type(&ty), "Uint8Array");
     }
@@ -1346,8 +1421,8 @@ mod tests {
     fn test_tuple_generates_array_tuple() {
         // Without ctx, named types are unresolved → JsValue, so Array<JsValue> elides to Array
         let ty = TypeRef::Tuple(vec![
-            TypeRef::Array(Box::new(TypeRef::Named("ImportSpecifier".into()))),
-            TypeRef::Array(Box::new(TypeRef::Named("ExportSpecifier".into()))),
+            TypeRef::Array(Box::new(TypeRef::ident("ImportSpecifier"))),
+            TypeRef::Array(Box::new(TypeRef::ident("ExportSpecifier"))),
             TypeRef::Boolean,
             TypeRef::Boolean,
         ]);

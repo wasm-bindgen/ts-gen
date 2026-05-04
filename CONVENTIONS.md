@@ -842,6 +842,46 @@ is still a single `Array<Error>` type, and `Record<string, string |
 number | boolean>` lowers as one `Object` binding rather than separate
 record overloads for each value type.
 
+### `Returns:` doc augmentation for erased return types
+
+When a return-position type contains a union that erases to `JsValue`
+(no useful LUB), the static Rust type loses information about what
+runtime values the caller actually receives. ts-gen surfaces the
+original TypeScript shape in a `Returns: <ts-shape>` doc line so that
+information isn't lost:
+
+```ts
+interface EmailAttachment {
+  readonly content: string | ArrayBuffer | ArrayBufferView;
+  readonly tags: Array<32 | "foo">;
+}
+
+declare function fetchValue(): Promise<32 | "foo">;
+```
+
+emits:
+
+```rust
+#[doc = " Returns: string | ArrayBuffer | ArrayBufferView"]
+pub fn content(this: &EmailAttachment) -> JsValue;
+
+#[doc = " Returns: Array<32 | \"foo\">"]
+pub fn tags(this: &EmailAttachment) -> Array;
+
+#[doc = " Returns: 32 | \"foo\""]
+pub async fn fetch_value() -> Result<JsValue, JsValue>;
+```
+
+The detector walks the whole return type and fires when *any* nested
+union erases — `Array<32 | "foo">` flags even though the outer
+`Array` is fine. Async return types use the post-Promise-unwrap inner
+(so `Promise<32 | "foo">` documents `32 | "foo"`, since that's what
+the awaiter sees). LUB-narrowed unions (e.g. `TypeError | RangeError`
+→ `Error`) and literal-widened unions (`"a" | "b"` → `string`) don't
+fire — the narrower static type already conveys the necessary info.
+
+If the JSDoc already has a `Returns:` line, it's preserved verbatim.
+
 ## Module declarations and namespace nesting
 
 ```ts

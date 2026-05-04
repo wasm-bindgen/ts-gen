@@ -102,11 +102,15 @@ fn user_parents(name: &str, ctx: &CodegenContext<'_>, scope: ScopeId) -> Vec<Str
 }
 
 /// Pull a name out of an `extends` `TypeRef`, ignoring complex shapes
-/// (generic instantiations, unions, etc.) that don't have a single
-/// representative supertype name.
+/// (generic instantiations, unions, qualified paths, etc.) that don't
+/// have a single representative supertype name.
 fn parent_typeref_to_names(ty: &TypeRef) -> Vec<String> {
     match ty {
-        TypeRef::Named(n) => vec![n.clone()],
+        TypeRef::Reference {
+            head,
+            segments,
+            type_args,
+        } if segments.is_empty() && type_args.is_empty() => vec![head.clone()],
         _ => Vec::new(),
     }
 }
@@ -194,7 +198,7 @@ pub fn lub_types(names: &[&str], ctx: &CodegenContext<'_>, scope: ScopeId) -> Op
 ///    `String` rather than erasing to `JsValue`.
 /// 2. **Named-type LUB**: every member is `TypeRef::Named` and they share
 ///    a common ancestor more specific than `Object` (per [`lub_types`])
-///    → returns `TypeRef::Named(ancestor)`.
+///    → returns `TypeRef::ident(ancestor)`.
 /// 3. **No useful upper bound**: returns `None`. The caller substitutes
 ///    `JsValue`.
 ///
@@ -212,10 +216,17 @@ pub fn lub_union(
         return Some(widened);
     }
     let cgctx = ctx?;
+    // Collect names: only bare references (no generics, no path)
+    // participate in the named-LUB lattice. Generic instantiations
+    // and qualified paths are too coarse to compare structurally.
     let names: Vec<&str> = members
         .iter()
         .map(|m| match m {
-            TypeRef::Named(n) => Some(n.as_str()),
+            TypeRef::Reference {
+                head,
+                segments,
+                type_args,
+            } if segments.is_empty() && type_args.is_empty() => Some(head.as_str()),
             _ => None,
         })
         .collect::<Option<Vec<_>>>()?;
@@ -223,7 +234,58 @@ pub fn lub_union(
     if lub == "Object" {
         return None;
     }
-    Some(TypeRef::Named(lub))
+    Some(TypeRef::Reference {
+        head: lub,
+        segments: Vec::new(),
+        type_args: Vec::new(),
+    })
+}
+
+/// Recursively walk a return-position `TypeRef` and report whether
+/// any nested `Union` erases to `JsValue` (i.e. has no useful LUB).
+///
+/// Used by codegen to decide whether to inject a synthetic
+/// `Returns: <ts-shape>` doc line — when the static Rust return type
+/// loses information against the original TS shape, surfacing the
+/// raw shape lets callers see what runtime values they're actually
+/// dealing with.
+///
+/// Walks into all syntactic containers (`Array<T>`, `Nullable<T>`,
+/// `Tuple`, `Intersection`) so e.g. `Array<32 | "foo">` (the wrapper
+/// is fine, the inner mixed-literal union erases) is correctly
+/// flagged. Generic instantiations also recurse into their type
+/// arguments — `Promise<32 | "foo">` flags too.
+pub fn return_type_has_erased_union(
+    ty: &TypeRef,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> bool {
+    match ty {
+        TypeRef::Union(members) => {
+            if lub_union(members, ctx, scope).is_none() {
+                return true;
+            }
+            members
+                .iter()
+                .any(|m| return_type_has_erased_union(m, ctx, scope))
+        }
+        TypeRef::Array(inner) | TypeRef::Nullable(inner) => {
+            return_type_has_erased_union(inner, ctx, scope)
+        }
+        TypeRef::Tuple(elems) => elems
+            .iter()
+            .any(|e| return_type_has_erased_union(e, ctx, scope)),
+        TypeRef::Intersection(parts) => parts
+            .iter()
+            .any(|p| return_type_has_erased_union(p, ctx, scope)),
+        TypeRef::Reference { type_args, .. } => type_args
+            .iter()
+            .any(|a| return_type_has_erased_union(a, ctx, scope)),
+        // Function types in return position bind at the FFI as
+        // `Function<...>`; their argument-position erasure is a
+        // separate axis we don't follow into here.
+        _ => false,
+    }
 }
 
 /// If every member of `types` belongs to the same primitive family —
@@ -418,14 +480,11 @@ mod tests {
         let (gctx, scope) = ctx();
         let cgctx = CodegenContext::empty(&gctx, scope);
         let lub = lub_union(
-            &[
-                TypeRef::Named("TypeError".into()),
-                TypeRef::Named("RangeError".into()),
-            ],
+            &[TypeRef::ident("TypeError"), TypeRef::ident("RangeError")],
             Some(&cgctx),
             scope,
         );
-        assert_eq!(lub, Some(TypeRef::Named("Error".into())));
+        assert_eq!(lub, Some(TypeRef::ident("Error")));
     }
 
     #[test]
@@ -434,10 +493,7 @@ mod tests {
         let (gctx, scope) = ctx();
         let cgctx = CodegenContext::empty(&gctx, scope);
         let lub = lub_union(
-            &[
-                TypeRef::Named("Array".into()),
-                TypeRef::Named("Uint8Array".into()),
-            ],
+            &[TypeRef::ident("Array"), TypeRef::ident("Uint8Array")],
             Some(&cgctx),
             scope,
         );
@@ -468,10 +524,7 @@ mod tests {
         let (gctx, scope) = ctx();
         let cgctx = CodegenContext::empty(&gctx, scope);
         let lub = lub_union(
-            &[
-                TypeRef::StringLiteral("a".into()),
-                TypeRef::Named("Foo".into()),
-            ],
+            &[TypeRef::StringLiteral("a".into()), TypeRef::ident("Foo")],
             Some(&cgctx),
             scope,
         );
@@ -484,5 +537,86 @@ mod tests {
         let cgctx = CodegenContext::empty(&gctx, scope);
         let lub = lub_union(&[], Some(&cgctx), scope);
         assert_eq!(lub, None);
+    }
+
+    // ── return_type_has_erased_union ───────────────────────────────────
+
+    #[test]
+    fn return_erasure_flat_jsvalue_union() {
+        let (gctx, scope) = ctx();
+        let cgctx = CodegenContext::empty(&gctx, scope);
+        // `string | ArrayBuffer | ArrayBufferView` has no useful LUB.
+        let ty = TypeRef::Union(vec![
+            TypeRef::String,
+            TypeRef::ident("ArrayBuffer"),
+            TypeRef::ArrayBufferView,
+        ]);
+        assert!(return_type_has_erased_union(&ty, Some(&cgctx), scope));
+    }
+
+    #[test]
+    fn return_erasure_inside_array() {
+        let (gctx, scope) = ctx();
+        let cgctx = CodegenContext::empty(&gctx, scope);
+        // `Array<32 | "foo">` — outer is fine, inner erases.
+        let ty = TypeRef::Array(Box::new(TypeRef::Union(vec![
+            TypeRef::NumberLiteral(32.0),
+            TypeRef::StringLiteral("foo".into()),
+        ])));
+        assert!(return_type_has_erased_union(&ty, Some(&cgctx), scope));
+    }
+
+    #[test]
+    fn return_erasure_inside_promise_generic() {
+        let (gctx, scope) = ctx();
+        let cgctx = CodegenContext::empty(&gctx, scope);
+        let ty = TypeRef::generic(
+            "Promise",
+            vec![TypeRef::Union(vec![
+                TypeRef::NumberLiteral(32.0),
+                TypeRef::StringLiteral("foo".into()),
+            ])],
+        );
+        assert!(return_type_has_erased_union(&ty, Some(&cgctx), scope));
+    }
+
+    #[test]
+    fn return_erasure_widened_literal_union_does_not_erase() {
+        // `"a" | "b"` widens to `string` via lub_union, so it doesn't erase.
+        let (gctx, scope) = ctx();
+        let cgctx = CodegenContext::empty(&gctx, scope);
+        let ty = TypeRef::Union(vec![
+            TypeRef::StringLiteral("a".into()),
+            TypeRef::StringLiteral("b".into()),
+        ]);
+        assert!(!return_type_has_erased_union(&ty, Some(&cgctx), scope));
+    }
+
+    #[test]
+    fn return_erasure_named_lub_does_not_erase() {
+        // `TypeError | RangeError` LUBs to `Error`, doesn't erase.
+        let (gctx, scope) = ctx();
+        let cgctx = CodegenContext::empty(&gctx, scope);
+        let ty = TypeRef::Union(vec![
+            TypeRef::ident("TypeError"),
+            TypeRef::ident("RangeError"),
+        ]);
+        assert!(!return_type_has_erased_union(&ty, Some(&cgctx), scope));
+    }
+
+    #[test]
+    fn return_erasure_simple_types_do_not_erase() {
+        let (gctx, scope) = ctx();
+        let cgctx = CodegenContext::empty(&gctx, scope);
+        assert!(!return_type_has_erased_union(
+            &TypeRef::String,
+            Some(&cgctx),
+            scope
+        ));
+        assert!(!return_type_has_erased_union(
+            &TypeRef::ident("Foo"),
+            Some(&cgctx),
+            scope
+        ));
     }
 }

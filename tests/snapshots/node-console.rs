@@ -31,6 +31,8 @@ pub mod console {
         pub fn set_ignore_errors_with_null(this: &ConsoleOptions, val: &Null);
         #[doc = " Set color support for this `Console` instance."]
         #[doc = " @default 'auto'"]
+        #[doc = ""]
+        #[doc = " Returns: boolean | string | null"]
         #[wasm_bindgen(method, getter, js_name = "colorMode")]
         pub fn color_mode(this: &ConsoleOptions) -> Option<JsValue>;
         #[wasm_bindgen(method, setter, js_name = "colorMode")]
