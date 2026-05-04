@@ -147,8 +147,6 @@ extern "C" {
     pub fn set_body_with_url_search_params(this: &RequestInit, val: &URLSearchParams);
     #[wasm_bindgen(method, setter, js_name = "body")]
     pub fn set_body_with_form_data(this: &RequestInit, val: &FormData);
-    #[wasm_bindgen(method, setter, js_name = "body")]
-    pub fn set_body_with_null(this: &RequestInit, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn redirect(this: &RequestInit) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -212,10 +210,6 @@ impl RequestInitBuilder {
         self.inner.set_body_with_form_data(val);
         self
     }
-    pub fn body_with_null(self, val: &Null) -> Self {
-        self.inner.set_body_with_null(val);
-        self
-    }
     pub fn redirect(self, val: &str) -> Self {
         self.inner.set_redirect(val);
         self
@@ -250,8 +244,6 @@ extern "C" {
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_form_data(body: &FormData) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    pub fn new_with_null(body: &Null) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_readable_stream_and_init(
         body: &ReadableStream,
         init: &ResponseInit,
@@ -275,8 +267,6 @@ extern "C" {
         body: &FormData,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    pub fn new_with_null_and_init(body: &Null, init: &ResponseInit) -> Result<Response, JsValue>;
     # [wasm_bindgen (static_method_of = Response)]
     pub fn redirect(url: &str) -> Response;
     # [wasm_bindgen (static_method_of = Response , catch , js_name = "redirect")]

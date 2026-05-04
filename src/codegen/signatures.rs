@@ -600,15 +600,18 @@ fn flatten_type(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId
             vec![ty.clone()]
         }
 
-        // Nullable: flatten inner types unwrapped, then add a Null variant.
-        // This expands `T | null` into separate overload variants for each T
-        // plus an explicit `_with_null` variant, rather than wrapping every
-        // alternative in `Option<T>`.
-        TypeRef::Nullable(inner) => {
-            let mut alts = flatten_type(inner, cgctx, scope);
-            alts.push(TypeRef::Null);
-            alts
-        }
+        // Nullable: flatten the inner type, dropping the Null arm.
+        //
+        // Argument-position `Nullable<T>` carries no information that helps
+        // the caller — a `_with_null(val: &Null)` overload is always
+        // useless: callers either have a value to pass (use the `T` arm)
+        // or they don't (use an optional-truncation overload, or the
+        // setter just isn't called). Forcing them to construct a `Null`
+        // value just to clear a field is API noise.
+        //
+        // Return-position handling (`Option<T>` / `JsOption<T>`) is
+        // independent of this fan-out — it lives in `to_syn_type`.
+        TypeRef::Nullable(inner) => flatten_type(inner, cgctx, scope),
 
         // Generic containers are not distributive: `Array<A | B>` and
         // `Record<K, A | B>` are single parameter shapes, not overloads.

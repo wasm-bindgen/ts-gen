@@ -212,8 +212,6 @@ extern "C" {
     pub fn next(this: &LinkedList) -> Option<LinkedList>;
     #[wasm_bindgen(method, setter)]
     pub fn set_next(this: &LinkedList, val: &LinkedList);
-    #[wasm_bindgen(method, setter, js_name = "next")]
-    pub fn set_next_with_null(this: &LinkedList, val: &Null);
 }
 impl LinkedList {
     pub fn new(data: &JsValue, next: Option<&LinkedList>) -> LinkedList {
@@ -408,8 +406,6 @@ extern "C" {
     pub fn set_body(this: &FetchOptions, val: &str);
     #[wasm_bindgen(method, setter, js_name = "body")]
     pub fn set_body_with_array_buffer(this: &FetchOptions, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "body")]
-    pub fn set_body_with_null(this: &FetchOptions, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn redirect(this: &FetchOptions) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -451,10 +447,6 @@ impl FetchOptionsBuilder {
     }
     pub fn body_with_array_buffer(self, val: &ArrayBuffer) -> Self {
         self.inner.set_body_with_array_buffer(val);
-        self
-    }
-    pub fn body_with_null(self, val: &Null) -> Self {
-        self.inner.set_body_with_null(val);
         self
     }
     pub fn redirect(self, val: &str) -> Self {

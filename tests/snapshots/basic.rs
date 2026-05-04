@@ -65,8 +65,6 @@ extern "C" {
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_form_data(body: &FormData) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    pub fn new_with_null(body: &Null) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_readable_stream_and_init(
         body: &ReadableStream,
         init: &ResponseInit,
@@ -90,8 +88,6 @@ extern "C" {
         body: &FormData,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    pub fn new_with_null_and_init(body: &Null, init: &ResponseInit) -> Result<Response, JsValue>;
     #[doc = " Returns a new Response with a network error."]
     # [wasm_bindgen (static_method_of = Response)]
     pub fn error() -> Response;

@@ -1003,13 +1003,6 @@ extern "C" {
         this: &ServiceWorkerGlobalScope,
         timeout_id: f64,
     ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "clearTimeout")]
-    pub fn clear_timeout_with_null(this: &ServiceWorkerGlobalScope, timeout_id: &Null);
-    #[wasm_bindgen(method, catch, js_name = "clearTimeout")]
-    pub fn try_clear_timeout_with_null(
-        this: &ServiceWorkerGlobalScope,
-        timeout_id: &Null,
-    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "setInterval")]
     pub fn set_interval(
         this: &ServiceWorkerGlobalScope,
@@ -1064,13 +1057,6 @@ extern "C" {
     pub fn try_clear_interval(
         this: &ServiceWorkerGlobalScope,
         timeout_id: f64,
-    ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "clearInterval")]
-    pub fn clear_interval_with_null(this: &ServiceWorkerGlobalScope, timeout_id: &Null);
-    #[wasm_bindgen(method, catch, js_name = "clearInterval")]
-    pub fn try_clear_interval_with_null(
-        this: &ServiceWorkerGlobalScope,
-        timeout_id: &Null,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "queueMicrotask")]
     pub fn queue_microtask(this: &ServiceWorkerGlobalScope, task: &Function);
@@ -1572,16 +1558,6 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(js_name = "clearTimeout")]
-    pub fn clear_timeout_with_null(timeout_id: &Null);
-}
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "clearTimeout")]
-    pub fn try_clear_timeout_with_null(timeout_id: &Null) -> Result<(), JsValue>;
-}
-#[wasm_bindgen]
-extern "C" {
     #[wasm_bindgen(variadic, js_name = "setInterval")]
     pub fn set_interval(callback: &Function<fn(Args) -> Undefined>, args: &[JsValue]) -> f64;
 }
@@ -1620,16 +1596,6 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch, js_name = "clearInterval")]
     pub fn try_clear_interval(timeout_id: f64) -> Result<(), JsValue>;
-}
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(js_name = "clearInterval")]
-    pub fn clear_interval_with_null(timeout_id: &Null);
-}
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "clearInterval")]
-    pub fn try_clear_interval_with_null(timeout_id: &Null) -> Result<(), JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -3630,8 +3596,6 @@ extern "C" {
     pub fn onabort(this: &AbortSignal) -> JsValue;
     #[wasm_bindgen(method, setter)]
     pub fn set_onabort(this: &AbortSignal, val: &JsValue);
-    #[wasm_bindgen(method, setter, js_name = "onabort")]
-    pub fn set_onabort_with_null(this: &AbortSignal, val: &Null);
     #[doc = " The **`throwIfAborted()`** method throws the signal's abort AbortSignal.reason if the signal has been aborted; otherwise it does nothing."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/throwIfAborted)"]
@@ -3920,16 +3884,8 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new(bits: &Array, name: &str) -> Result<File, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "File")]
-    pub fn new_with_null(bits: &Null, name: &str) -> Result<File, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "File")]
-    pub fn new_with_array_and_options(
+    pub fn new_with_options(
         bits: &Array,
-        name: &str,
-        options: &FileOptions,
-    ) -> Result<File, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "File")]
-    pub fn new_with_null_and_options(
-        bits: &Null,
         name: &str,
         options: &FileOptions,
     ) -> Result<File, JsValue>;
@@ -4484,7 +4440,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
     #[wasm_bindgen(method, catch, js_name = "deriveBits")]
-    pub async fn derive_bits_with_str_and_f64(
+    pub async fn derive_bits_with_str_and_length(
         this: &SubtleCrypto,
         algorithm: &str,
         base_key: &CryptoKey,
@@ -4494,31 +4450,11 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
     #[wasm_bindgen(method, catch, js_name = "deriveBits")]
-    pub async fn derive_bits_with_subtle_crypto_derive_key_algorithm_and_f64(
+    pub async fn derive_bits_with_subtle_crypto_derive_key_algorithm_and_length(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
         base_key: &CryptoKey,
         length: f64,
-    ) -> Result<ArrayBuffer, JsValue>;
-    #[doc = " The **`deriveBits()`** method of the key."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
-    #[wasm_bindgen(method, catch, js_name = "deriveBits")]
-    pub async fn derive_bits_with_str_and_null(
-        this: &SubtleCrypto,
-        algorithm: &str,
-        base_key: &CryptoKey,
-        length: &Null,
-    ) -> Result<ArrayBuffer, JsValue>;
-    #[doc = " The **`deriveBits()`** method of the key."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
-    #[wasm_bindgen(method, catch, js_name = "deriveBits")]
-    pub async fn derive_bits_with_subtle_crypto_derive_key_algorithm_and_null(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoDeriveKeyAlgorithm,
-        base_key: &CryptoKey,
-        length: &Null,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
     #[doc = ""]
@@ -7370,8 +7306,6 @@ extern "C" {
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_async_iterable(body: &AsyncIterable) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    pub fn new_with_null(body: &Null) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_readable_stream_and_init(
         body: &ReadableStream,
         init: &ResponseInit,
@@ -7410,8 +7344,6 @@ extern "C" {
         body: &AsyncIterable,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    pub fn new_with_null_and_init(body: &Null, init: &ResponseInit) -> Result<Response, JsValue>;
     # [wasm_bindgen (static_method_of = Response)]
     pub fn error() -> Response;
     # [wasm_bindgen (static_method_of = Response , catch , js_name = "error")]
@@ -7498,14 +7430,10 @@ extern "C" {
     pub fn web_socket(this: &Response) -> Option<WebSocket>;
     #[wasm_bindgen(method, setter, js_name = "webSocket")]
     pub fn set_web_socket(this: &Response, val: &WebSocket);
-    #[wasm_bindgen(method, setter, js_name = "webSocket")]
-    pub fn set_web_socket_with_null(this: &Response, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn cf(this: &Response) -> JsValue;
     #[wasm_bindgen(method, setter)]
     pub fn set_cf(this: &Response, val: &JsValue);
-    #[wasm_bindgen(method, setter, js_name = "cf")]
-    pub fn set_cf_with_null(this: &Response, val: &Null);
     #[doc = " The **`type`** read-only property of the Response interface contains the type of the response."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/type)"]
@@ -7543,8 +7471,6 @@ extern "C" {
     pub fn web_socket(this: &ResponseInit) -> Option<WebSocket>;
     #[wasm_bindgen(method, setter, js_name = "webSocket")]
     pub fn set_web_socket(this: &ResponseInit, val: &WebSocket);
-    #[wasm_bindgen(method, setter, js_name = "webSocket")]
-    pub fn set_web_socket_with_null(this: &ResponseInit, val: &Null);
     #[wasm_bindgen(method, getter, js_name = "encodeBody")]
     pub fn encode_body(this: &ResponseInit) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "encodeBody")]
@@ -7590,10 +7516,6 @@ impl ResponseInitBuilder {
     }
     pub fn web_socket(self, val: &WebSocket) -> Self {
         self.inner.set_web_socket(val);
-        self
-    }
-    pub fn web_socket_with_null(self, val: &Null) -> Self {
-        self.inner.set_web_socket_with_null(val);
         self
     }
     pub fn encode_body(self, val: &str) -> Self {
@@ -7664,8 +7586,6 @@ extern "C" {
     pub fn fetcher(this: &Request) -> JsValue;
     #[wasm_bindgen(method, setter)]
     pub fn set_fetcher(this: &Request, val: &JsValue);
-    #[wasm_bindgen(method, setter, js_name = "fetcher")]
-    pub fn set_fetcher_with_null(this: &Request, val: &Null);
     #[doc = " The read-only **`signal`** property of the Request interface returns the AbortSignal associated with the request."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/signal)"]
@@ -7736,8 +7656,6 @@ extern "C" {
     pub fn set_body_with_iterable(this: &RequestInit, val: &Iterable);
     #[wasm_bindgen(method, setter, js_name = "body")]
     pub fn set_body_with_async_iterable(this: &RequestInit, val: &AsyncIterable);
-    #[wasm_bindgen(method, setter, js_name = "body")]
-    pub fn set_body_with_null(this: &RequestInit, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn redirect(this: &RequestInit) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -7746,8 +7664,6 @@ extern "C" {
     pub fn fetcher(this: &RequestInit) -> JsValue;
     #[wasm_bindgen(method, setter)]
     pub fn set_fetcher(this: &RequestInit, val: &JsValue);
-    #[wasm_bindgen(method, setter, js_name = "fetcher")]
-    pub fn set_fetcher_with_null(this: &RequestInit, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn cf(this: &RequestInit) -> Option<Cf>;
     #[wasm_bindgen(method, setter)]
@@ -7764,8 +7680,6 @@ extern "C" {
     pub fn signal(this: &RequestInit) -> Option<AbortSignal>;
     #[wasm_bindgen(method, setter)]
     pub fn set_signal(this: &RequestInit, val: &AbortSignal);
-    #[wasm_bindgen(method, setter, js_name = "signal")]
-    pub fn set_signal_with_null(this: &RequestInit, val: &Null);
     #[wasm_bindgen(method, getter, js_name = "encodeResponseBody")]
     pub fn encode_response_body(this: &RequestInit) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "encodeResponseBody")]
@@ -7837,20 +7751,12 @@ impl RequestInitBuilder {
         self.inner.set_body_with_async_iterable(val);
         self
     }
-    pub fn body_with_null(self, val: &Null) -> Self {
-        self.inner.set_body_with_null(val);
-        self
-    }
     pub fn redirect(self, val: &str) -> Self {
         self.inner.set_redirect(val);
         self
     }
     pub fn fetcher(self, val: &JsValue) -> Self {
         self.inner.set_fetcher(val);
-        self
-    }
-    pub fn fetcher_with_null(self, val: &Null) -> Self {
-        self.inner.set_fetcher_with_null(val);
         self
     }
     pub fn cf(self, val: &Cf) -> Self {
@@ -7867,10 +7773,6 @@ impl RequestInitBuilder {
     }
     pub fn signal(self, val: &AbortSignal) -> Self {
         self.inner.set_signal(val);
-        self
-    }
-    pub fn signal_with_null(self, val: &Null) -> Self {
-        self.inner.set_signal_with_null(val);
         self
     }
     pub fn encode_response_body(self, val: &str) -> Self {
@@ -7944,8 +7846,6 @@ extern "C" {
     pub fn list_complete(this: &KVNamespaceListResult) -> bool;
     #[wasm_bindgen(method, setter, js_name = "cacheStatus")]
     pub fn set_cache_status(this: &KVNamespaceListResult, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "cacheStatus")]
-    pub fn set_cache_status_with_null(this: &KVNamespaceListResult, val: &Null);
     #[wasm_bindgen(method, setter)]
     pub fn set_cursor(this: &KVNamespaceListResult, val: &str);
     #[wasm_bindgen(method, setter)]
@@ -8152,14 +8052,10 @@ extern "C" {
     pub fn prefix(this: &KVNamespaceListOptions) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_prefix(this: &KVNamespaceListOptions, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "prefix")]
-    pub fn set_prefix_with_null(this: &KVNamespaceListOptions, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn cursor(this: &KVNamespaceListOptions) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_cursor(this: &KVNamespaceListOptions, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "cursor")]
-    pub fn set_cursor_with_null(this: &KVNamespaceListOptions, val: &Null);
 }
 impl KVNamespaceListOptions {
     pub fn new() -> KVNamespaceListOptions {
@@ -8183,16 +8079,8 @@ impl KVNamespaceListOptionsBuilder {
         self.inner.set_prefix(val);
         self
     }
-    pub fn prefix_with_null(self, val: &Null) -> Self {
-        self.inner.set_prefix_with_null(val);
-        self
-    }
     pub fn cursor(self, val: &str) -> Self {
         self.inner.set_cursor(val);
-        self
-    }
-    pub fn cursor_with_null(self, val: &Null) -> Self {
-        self.inner.set_cursor_with_null(val);
         self
     }
     pub fn build(self) -> KVNamespaceListOptions {
@@ -8252,8 +8140,6 @@ extern "C" {
     pub fn metadata(this: &KVNamespacePutOptions) -> JsValue;
     #[wasm_bindgen(method, setter)]
     pub fn set_metadata(this: &KVNamespacePutOptions, val: &JsValue);
-    #[wasm_bindgen(method, setter, js_name = "metadata")]
-    pub fn set_metadata_with_null(this: &KVNamespacePutOptions, val: &Null);
 }
 impl KVNamespacePutOptions {
     pub fn new() -> KVNamespacePutOptions {
@@ -8281,10 +8167,6 @@ impl KVNamespacePutOptionsBuilder {
         self.inner.set_metadata(val);
         self
     }
-    pub fn metadata_with_null(self, val: &Null) -> Self {
-        self.inner.set_metadata_with_null(val);
-        self
-    }
     pub fn build(self) -> KVNamespacePutOptions {
         self.inner
     }
@@ -8298,20 +8180,14 @@ extern "C" {
     pub fn value(this: &KVNamespaceGetWithMetadataResult) -> Option<Value>;
     #[wasm_bindgen(method, setter)]
     pub fn set_value(this: &KVNamespaceGetWithMetadataResult, val: &Value);
-    #[wasm_bindgen(method, setter, js_name = "value")]
-    pub fn set_value_with_null(this: &KVNamespaceGetWithMetadataResult, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn metadata(this: &KVNamespaceGetWithMetadataResult) -> Option<Metadata>;
     #[wasm_bindgen(method, setter)]
     pub fn set_metadata(this: &KVNamespaceGetWithMetadataResult, val: &Metadata);
-    #[wasm_bindgen(method, setter, js_name = "metadata")]
-    pub fn set_metadata_with_null(this: &KVNamespaceGetWithMetadataResult, val: &Null);
     #[wasm_bindgen(method, getter, js_name = "cacheStatus")]
     pub fn cache_status(this: &KVNamespaceGetWithMetadataResult) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "cacheStatus")]
     pub fn set_cache_status(this: &KVNamespaceGetWithMetadataResult, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "cacheStatus")]
-    pub fn set_cache_status_with_null(this: &KVNamespaceGetWithMetadataResult, val: &Null);
 }
 impl KVNamespaceGetWithMetadataResult {
     pub fn new(
@@ -8736,12 +8612,6 @@ extern "C" {
         value: &Blob,
     ) -> Result<JsOption<R2Object>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_null(
-        this: &R2Bucket,
-        key: &str,
-        value: &Null,
-    ) -> Result<JsOption<R2Object>, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
     pub async fn put_with_readable_stream_and_js_value(
         this: &R2Bucket,
         key: &str,
@@ -8777,13 +8647,6 @@ extern "C" {
         options: &JsValue,
     ) -> Result<JsOption<R2Object>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_null_and_js_value(
-        this: &R2Bucket,
-        key: &str,
-        value: &Null,
-        options: &JsValue,
-    ) -> Result<JsOption<R2Object>, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
     pub async fn put_with_readable_stream_and_r2_put_options(
         this: &R2Bucket,
         key: &str,
@@ -8816,13 +8679,6 @@ extern "C" {
         this: &R2Bucket,
         key: &str,
         value: &Blob,
-        options: &R2PutOptions,
-    ) -> Result<JsOption<R2Object>, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_null_and_r2_put_options(
-        this: &R2Bucket,
-        key: &str,
-        value: &Null,
         options: &R2PutOptions,
     ) -> Result<JsOption<R2Object>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "createMultipartUpload")]
@@ -9915,8 +9771,6 @@ extern "C" {
     pub fn type_(this: &UnderlyingSource) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &UnderlyingSource, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "type")]
-    pub fn set_type_with_null(this: &UnderlyingSource, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn start(
         this: &UnderlyingSource,
@@ -9968,10 +9822,6 @@ pub struct UnderlyingSourceBuilder {
 impl UnderlyingSourceBuilder {
     pub fn type_(self, val: &str) -> Self {
         self.inner.set_type(val);
-        self
-    }
-    pub fn type_with_null(self, val: &Null) -> Self {
-        self.inner.set_type_with_null(val);
         self
     }
     pub fn start(
@@ -10197,8 +10047,6 @@ extern "C" {
     pub fn set_done(this: &ReadableStreamReadResult, val: bool);
     #[wasm_bindgen(method, setter)]
     pub fn set_value(this: &ReadableStreamReadResult, val: &R);
-    #[wasm_bindgen(method, setter, js_name = "value")]
-    pub fn set_value_with_null(this: &ReadableStreamReadResult, val: &Null);
 }
 impl ReadableStreamReadResult {
     #[doc = " ## Inlined fields"]
@@ -10236,10 +10084,6 @@ pub struct ReadableStreamReadResultBuilder {
 impl ReadableStreamReadResultBuilder {
     pub fn value(self, val: &R) -> Self {
         self.inner.set_value(val);
-        self
-    }
-    pub fn value_with_null(self, val: &Null) -> Self {
-        self.inner.set_value_with_null(val);
         self
     }
     pub fn build(self) -> ReadableStreamReadResult {
@@ -12620,8 +12464,6 @@ extern "C" {
     pub fn url(this: &WebSocket) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_url(this: &WebSocket, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "url")]
-    pub fn set_url_with_null(this: &WebSocket, val: &Null);
     #[doc = " The **`WebSocket.protocol`** read-only property returns the name of the sub-protocol the server selected; this will be one of the strings specified in the `protocols` parameter when creating the WebSocket object, or the empty string if no connection is established."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/protocol)"]
@@ -12629,8 +12471,6 @@ extern "C" {
     pub fn protocol(this: &WebSocket) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_protocol(this: &WebSocket, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "protocol")]
-    pub fn set_protocol_with_null(this: &WebSocket, val: &Null);
     #[doc = " The **`WebSocket.extensions`** read-only property returns the extensions selected by the server."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/extensions)"]
@@ -12638,8 +12478,6 @@ extern "C" {
     pub fn extensions(this: &WebSocket) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_extensions(this: &WebSocket, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "extensions")]
-    pub fn set_extensions_with_null(this: &WebSocket, val: &Null);
     #[doc = " The **`WebSocket.binaryType`** property controls the type of binary data being received over the WebSocket connection."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/binaryType)"]
@@ -12971,20 +12809,14 @@ extern "C" {
     pub fn onopen(this: &EventSource) -> JsValue;
     #[wasm_bindgen(method, setter)]
     pub fn set_onopen(this: &EventSource, val: &JsValue);
-    #[wasm_bindgen(method, setter, js_name = "onopen")]
-    pub fn set_onopen_with_null(this: &EventSource, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn onmessage(this: &EventSource) -> JsValue;
     #[wasm_bindgen(method, setter)]
     pub fn set_onmessage(this: &EventSource, val: &JsValue);
-    #[wasm_bindgen(method, setter, js_name = "onmessage")]
-    pub fn set_onmessage_with_null(this: &EventSource, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn onerror(this: &EventSource) -> JsValue;
     #[wasm_bindgen(method, setter)]
     pub fn set_onerror(this: &EventSource, val: &JsValue);
-    #[wasm_bindgen(method, setter, js_name = "onerror")]
-    pub fn set_onerror_with_null(this: &EventSource, val: &Null);
     # [wasm_bindgen (static_method_of = EventSource , getter , js_name = "CONNECTING")]
     pub fn connecting() -> f64;
     # [wasm_bindgen (static_method_of = EventSource , getter , js_name = "OPEN")]
@@ -13233,8 +13065,6 @@ extern "C" {
     pub fn onmessage(this: &MessagePort) -> JsValue;
     #[wasm_bindgen(method, setter)]
     pub fn set_onmessage(this: &MessagePort, val: &JsValue);
-    #[wasm_bindgen(method, setter, js_name = "onmessage")]
-    pub fn set_onmessage_with_null(this: &MessagePort, val: &Null);
 }
 #[wasm_bindgen]
 extern "C" {
@@ -13464,14 +13294,6 @@ extern "C" {
         name: &str,
         get_code: &Function,
     ) -> Result<WorkerStub, JsValue>;
-    #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_null(this: &WorkerLoader, name: &Null, get_code: &Function) -> WorkerStub;
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get_with_null(
-        this: &WorkerLoader,
-        name: &Null,
-        get_code: &Function,
-    ) -> Result<WorkerStub, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -13587,8 +13409,6 @@ extern "C" {
     pub fn global_outbound(this: &WorkerLoaderWorkerCode) -> JsValue;
     #[wasm_bindgen(method, setter, js_name = "globalOutbound")]
     pub fn set_global_outbound(this: &WorkerLoaderWorkerCode, val: &JsValue);
-    #[wasm_bindgen(method, setter, js_name = "globalOutbound")]
-    pub fn set_global_outbound_with_null(this: &WorkerLoaderWorkerCode, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn tails(this: &WorkerLoaderWorkerCode) -> Option<Array>;
     #[wasm_bindgen(method, setter)]
@@ -13636,10 +13456,6 @@ impl WorkerLoaderWorkerCodeBuilder {
     }
     pub fn global_outbound(self, val: &JsValue) -> Self {
         self.inner.set_global_outbound(val);
-        self
-    }
-    pub fn global_outbound_with_null(self, val: &Null) -> Self {
-        self.inner.set_global_outbound_with_null(val);
         self
     }
     pub fn tails(self, val: &Array) -> Self {
@@ -15584,8 +15400,6 @@ extern "C" {
     pub fn background(this: &ResponsesInput) -> Option<bool>;
     #[wasm_bindgen(method, setter)]
     pub fn set_background(this: &ResponsesInput, val: bool);
-    #[wasm_bindgen(method, setter, js_name = "background")]
-    pub fn set_background_with_null(this: &ResponsesInput, val: &Null);
     #[doc = " Returns: string | ResponseConversationParam | null"]
     #[wasm_bindgen(method, getter)]
     pub fn conversation(this: &ResponsesInput) -> JsValue;
@@ -15596,14 +15410,10 @@ extern "C" {
         this: &ResponsesInput,
         val: &ResponseConversationParam,
     );
-    #[wasm_bindgen(method, setter, js_name = "conversation")]
-    pub fn set_conversation_with_null(this: &ResponsesInput, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn include(this: &ResponsesInput) -> Option<Array<ResponseIncludable>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_include(this: &ResponsesInput, val: &Array<ResponseIncludable>);
-    #[wasm_bindgen(method, setter, js_name = "include")]
-    pub fn set_include_with_null(this: &ResponsesInput, val: &Null);
     #[doc = " Returns: string | ResponseInput | undefined"]
     #[wasm_bindgen(method, getter)]
     pub fn input(this: &ResponsesInput) -> JsValue;
@@ -15615,26 +15425,18 @@ extern "C" {
     pub fn instructions(this: &ResponsesInput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_instructions(this: &ResponsesInput, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "instructions")]
-    pub fn set_instructions_with_null(this: &ResponsesInput, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn max_output_tokens(this: &ResponsesInput) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_max_output_tokens(this: &ResponsesInput, val: f64);
-    #[wasm_bindgen(method, setter, js_name = "max_output_tokens")]
-    pub fn set_max_output_tokens_with_null(this: &ResponsesInput, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn parallel_tool_calls(this: &ResponsesInput) -> Option<bool>;
     #[wasm_bindgen(method, setter)]
     pub fn set_parallel_tool_calls(this: &ResponsesInput, val: bool);
-    #[wasm_bindgen(method, setter, js_name = "parallel_tool_calls")]
-    pub fn set_parallel_tool_calls_with_null(this: &ResponsesInput, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn previous_response_id(this: &ResponsesInput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_previous_response_id(this: &ResponsesInput, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "previous_response_id")]
-    pub fn set_previous_response_id_with_null(this: &ResponsesInput, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn prompt_cache_key(this: &ResponsesInput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -15643,8 +15445,6 @@ extern "C" {
     pub fn reasoning(this: &ResponsesInput) -> Option<Reasoning>;
     #[wasm_bindgen(method, setter)]
     pub fn set_reasoning(this: &ResponsesInput, val: &Reasoning);
-    #[wasm_bindgen(method, setter, js_name = "reasoning")]
-    pub fn set_reasoning_with_null(this: &ResponsesInput, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn safety_identifier(this: &ResponsesInput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -15653,26 +15453,18 @@ extern "C" {
     pub fn service_tier(this: &ResponsesInput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_service_tier(this: &ResponsesInput, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "service_tier")]
-    pub fn set_service_tier_with_null(this: &ResponsesInput, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn stream(this: &ResponsesInput) -> Option<bool>;
     #[wasm_bindgen(method, setter)]
     pub fn set_stream(this: &ResponsesInput, val: bool);
-    #[wasm_bindgen(method, setter, js_name = "stream")]
-    pub fn set_stream_with_null(this: &ResponsesInput, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn stream_options(this: &ResponsesInput) -> Option<StreamOptions>;
     #[wasm_bindgen(method, setter)]
     pub fn set_stream_options(this: &ResponsesInput, val: &StreamOptions);
-    #[wasm_bindgen(method, setter, js_name = "stream_options")]
-    pub fn set_stream_options_with_null(this: &ResponsesInput, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn temperature(this: &ResponsesInput) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_temperature(this: &ResponsesInput, val: f64);
-    #[wasm_bindgen(method, setter, js_name = "temperature")]
-    pub fn set_temperature_with_null(this: &ResponsesInput, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn text(this: &ResponsesInput) -> Option<ResponseTextConfig>;
     #[wasm_bindgen(method, setter)]
@@ -15695,14 +15487,10 @@ extern "C" {
     pub fn top_p(this: &ResponsesInput) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_top_p(this: &ResponsesInput, val: f64);
-    #[wasm_bindgen(method, setter, js_name = "top_p")]
-    pub fn set_top_p_with_null(this: &ResponsesInput, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn truncation(this: &ResponsesInput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_truncation(this: &ResponsesInput, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "truncation")]
-    pub fn set_truncation_with_null(this: &ResponsesInput, val: &Null);
 }
 impl ResponsesInput {
     pub fn new() -> ResponsesInput {
@@ -15722,10 +15510,6 @@ impl ResponsesInputBuilder {
         self.inner.set_background(val);
         self
     }
-    pub fn background_with_null(self, val: &Null) -> Self {
-        self.inner.set_background_with_null(val);
-        self
-    }
     pub fn conversation(self, val: &str) -> Self {
         self.inner.set_conversation(val);
         self
@@ -15738,16 +15522,8 @@ impl ResponsesInputBuilder {
             .set_conversation_with_response_conversation_param(val);
         self
     }
-    pub fn conversation_with_null(self, val: &Null) -> Self {
-        self.inner.set_conversation_with_null(val);
-        self
-    }
     pub fn include(self, val: &Array<ResponseIncludable>) -> Self {
         self.inner.set_include(val);
-        self
-    }
-    pub fn include_with_null(self, val: &Null) -> Self {
-        self.inner.set_include_with_null(val);
         self
     }
     pub fn input(self, val: &str) -> Self {
@@ -15762,32 +15538,16 @@ impl ResponsesInputBuilder {
         self.inner.set_instructions(val);
         self
     }
-    pub fn instructions_with_null(self, val: &Null) -> Self {
-        self.inner.set_instructions_with_null(val);
-        self
-    }
     pub fn max_output_tokens(self, val: f64) -> Self {
         self.inner.set_max_output_tokens(val);
-        self
-    }
-    pub fn max_output_tokens_with_null(self, val: &Null) -> Self {
-        self.inner.set_max_output_tokens_with_null(val);
         self
     }
     pub fn parallel_tool_calls(self, val: bool) -> Self {
         self.inner.set_parallel_tool_calls(val);
         self
     }
-    pub fn parallel_tool_calls_with_null(self, val: &Null) -> Self {
-        self.inner.set_parallel_tool_calls_with_null(val);
-        self
-    }
     pub fn previous_response_id(self, val: &str) -> Self {
         self.inner.set_previous_response_id(val);
-        self
-    }
-    pub fn previous_response_id_with_null(self, val: &Null) -> Self {
-        self.inner.set_previous_response_id_with_null(val);
         self
     }
     pub fn prompt_cache_key(self, val: &str) -> Self {
@@ -15798,10 +15558,6 @@ impl ResponsesInputBuilder {
         self.inner.set_reasoning(val);
         self
     }
-    pub fn reasoning_with_null(self, val: &Null) -> Self {
-        self.inner.set_reasoning_with_null(val);
-        self
-    }
     pub fn safety_identifier(self, val: &str) -> Self {
         self.inner.set_safety_identifier(val);
         self
@@ -15810,32 +15566,16 @@ impl ResponsesInputBuilder {
         self.inner.set_service_tier(val);
         self
     }
-    pub fn service_tier_with_null(self, val: &Null) -> Self {
-        self.inner.set_service_tier_with_null(val);
-        self
-    }
     pub fn stream(self, val: bool) -> Self {
         self.inner.set_stream(val);
-        self
-    }
-    pub fn stream_with_null(self, val: &Null) -> Self {
-        self.inner.set_stream_with_null(val);
         self
     }
     pub fn stream_options(self, val: &StreamOptions) -> Self {
         self.inner.set_stream_options(val);
         self
     }
-    pub fn stream_options_with_null(self, val: &Null) -> Self {
-        self.inner.set_stream_options_with_null(val);
-        self
-    }
     pub fn temperature(self, val: f64) -> Self {
         self.inner.set_temperature(val);
-        self
-    }
-    pub fn temperature_with_null(self, val: &Null) -> Self {
-        self.inner.set_temperature_with_null(val);
         self
     }
     pub fn text(self, val: &ResponseTextConfig) -> Self {
@@ -15858,16 +15598,8 @@ impl ResponsesInputBuilder {
         self.inner.set_top_p(val);
         self
     }
-    pub fn top_p_with_null(self, val: &Null) -> Self {
-        self.inner.set_top_p_with_null(val);
-        self
-    }
     pub fn truncation(self, val: &str) -> Self {
         self.inner.set_truncation(val);
-        self
-    }
-    pub fn truncation_with_null(self, val: &Null) -> Self {
-        self.inner.set_truncation_with_null(val);
         self
     }
     pub fn build(self) -> ResponsesInput {
@@ -15895,14 +15627,10 @@ extern "C" {
     pub fn error(this: &ResponsesOutput) -> Option<ResponseError>;
     #[wasm_bindgen(method, setter)]
     pub fn set_error(this: &ResponsesOutput, val: &ResponseError);
-    #[wasm_bindgen(method, setter, js_name = "error")]
-    pub fn set_error_with_null(this: &ResponsesOutput, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn incomplete_details(this: &ResponsesOutput) -> Option<ResponseIncompleteDetails>;
     #[wasm_bindgen(method, setter)]
     pub fn set_incomplete_details(this: &ResponsesOutput, val: &ResponseIncompleteDetails);
-    #[wasm_bindgen(method, setter, js_name = "incomplete_details")]
-    pub fn set_incomplete_details_with_null(this: &ResponsesOutput, val: &Null);
     #[doc = " Returns: string | Array<ResponseInputItem> | null"]
     #[wasm_bindgen(method, getter)]
     pub fn instructions(this: &ResponsesOutput) -> JsValue;
@@ -15910,8 +15638,6 @@ extern "C" {
     pub fn set_instructions(this: &ResponsesOutput, val: &str);
     #[wasm_bindgen(method, setter, js_name = "instructions")]
     pub fn set_instructions_with_array(this: &ResponsesOutput, val: &Array);
-    #[wasm_bindgen(method, setter, js_name = "instructions")]
-    pub fn set_instructions_with_null(this: &ResponsesOutput, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn object(this: &ResponsesOutput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -15928,8 +15654,6 @@ extern "C" {
     pub fn temperature(this: &ResponsesOutput) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_temperature(this: &ResponsesOutput, val: f64);
-    #[wasm_bindgen(method, setter, js_name = "temperature")]
-    pub fn set_temperature_with_null(this: &ResponsesOutput, val: &Null);
     #[doc = " Returns: ToolChoiceOptions | ToolChoiceFunction | undefined"]
     #[wasm_bindgen(method, getter)]
     pub fn tool_choice(this: &ResponsesOutput) -> JsValue;
@@ -15948,32 +15672,22 @@ extern "C" {
     pub fn top_p(this: &ResponsesOutput) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_top_p(this: &ResponsesOutput, val: f64);
-    #[wasm_bindgen(method, setter, js_name = "top_p")]
-    pub fn set_top_p_with_null(this: &ResponsesOutput, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn max_output_tokens(this: &ResponsesOutput) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_max_output_tokens(this: &ResponsesOutput, val: f64);
-    #[wasm_bindgen(method, setter, js_name = "max_output_tokens")]
-    pub fn set_max_output_tokens_with_null(this: &ResponsesOutput, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn previous_response_id(this: &ResponsesOutput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_previous_response_id(this: &ResponsesOutput, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "previous_response_id")]
-    pub fn set_previous_response_id_with_null(this: &ResponsesOutput, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn prompt(this: &ResponsesOutput) -> Option<ResponsePrompt>;
     #[wasm_bindgen(method, setter)]
     pub fn set_prompt(this: &ResponsesOutput, val: &ResponsePrompt);
-    #[wasm_bindgen(method, setter, js_name = "prompt")]
-    pub fn set_prompt_with_null(this: &ResponsesOutput, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn reasoning(this: &ResponsesOutput) -> Option<Reasoning>;
     #[wasm_bindgen(method, setter)]
     pub fn set_reasoning(this: &ResponsesOutput, val: &Reasoning);
-    #[wasm_bindgen(method, setter, js_name = "reasoning")]
-    pub fn set_reasoning_with_null(this: &ResponsesOutput, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn safety_identifier(this: &ResponsesOutput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -15982,8 +15696,6 @@ extern "C" {
     pub fn service_tier(this: &ResponsesOutput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_service_tier(this: &ResponsesOutput, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "service_tier")]
-    pub fn set_service_tier_with_null(this: &ResponsesOutput, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn status(this: &ResponsesOutput) -> Option<ResponseStatus>;
     #[wasm_bindgen(method, setter)]
@@ -15996,8 +15708,6 @@ extern "C" {
     pub fn truncation(this: &ResponsesOutput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_truncation(this: &ResponsesOutput, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "truncation")]
-    pub fn set_truncation_with_null(this: &ResponsesOutput, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn usage(this: &ResponsesOutput) -> Option<ResponseUsage>;
     #[wasm_bindgen(method, setter)]
@@ -16033,16 +15743,8 @@ impl ResponsesOutputBuilder {
         self.inner.set_error(val);
         self
     }
-    pub fn error_with_null(self, val: &Null) -> Self {
-        self.inner.set_error_with_null(val);
-        self
-    }
     pub fn incomplete_details(self, val: &ResponseIncompleteDetails) -> Self {
         self.inner.set_incomplete_details(val);
-        self
-    }
-    pub fn incomplete_details_with_null(self, val: &Null) -> Self {
-        self.inner.set_incomplete_details_with_null(val);
         self
     }
     pub fn instructions(self, val: &str) -> Self {
@@ -16051,10 +15753,6 @@ impl ResponsesOutputBuilder {
     }
     pub fn instructions_with_array(self, val: &Array) -> Self {
         self.inner.set_instructions_with_array(val);
-        self
-    }
-    pub fn instructions_with_null(self, val: &Null) -> Self {
-        self.inner.set_instructions_with_null(val);
         self
     }
     pub fn object(self, val: &str) -> Self {
@@ -16073,10 +15771,6 @@ impl ResponsesOutputBuilder {
         self.inner.set_temperature(val);
         self
     }
-    pub fn temperature_with_null(self, val: &Null) -> Self {
-        self.inner.set_temperature_with_null(val);
-        self
-    }
     pub fn tool_choice(self, val: &ToolChoiceOptions) -> Self {
         self.inner.set_tool_choice(val);
         self
@@ -16093,40 +15787,20 @@ impl ResponsesOutputBuilder {
         self.inner.set_top_p(val);
         self
     }
-    pub fn top_p_with_null(self, val: &Null) -> Self {
-        self.inner.set_top_p_with_null(val);
-        self
-    }
     pub fn max_output_tokens(self, val: f64) -> Self {
         self.inner.set_max_output_tokens(val);
-        self
-    }
-    pub fn max_output_tokens_with_null(self, val: &Null) -> Self {
-        self.inner.set_max_output_tokens_with_null(val);
         self
     }
     pub fn previous_response_id(self, val: &str) -> Self {
         self.inner.set_previous_response_id(val);
         self
     }
-    pub fn previous_response_id_with_null(self, val: &Null) -> Self {
-        self.inner.set_previous_response_id_with_null(val);
-        self
-    }
     pub fn prompt(self, val: &ResponsePrompt) -> Self {
         self.inner.set_prompt(val);
         self
     }
-    pub fn prompt_with_null(self, val: &Null) -> Self {
-        self.inner.set_prompt_with_null(val);
-        self
-    }
     pub fn reasoning(self, val: &Reasoning) -> Self {
         self.inner.set_reasoning(val);
-        self
-    }
-    pub fn reasoning_with_null(self, val: &Null) -> Self {
-        self.inner.set_reasoning_with_null(val);
         self
     }
     pub fn safety_identifier(self, val: &str) -> Self {
@@ -16135,10 +15809,6 @@ impl ResponsesOutputBuilder {
     }
     pub fn service_tier(self, val: &str) -> Self {
         self.inner.set_service_tier(val);
-        self
-    }
-    pub fn service_tier_with_null(self, val: &Null) -> Self {
-        self.inner.set_service_tier_with_null(val);
         self
     }
     pub fn status(self, val: &ResponseStatus) -> Self {
@@ -16151,10 +15821,6 @@ impl ResponsesOutputBuilder {
     }
     pub fn truncation(self, val: &str) -> Self {
         self.inner.set_truncation(val);
-        self
-    }
-    pub fn truncation_with_null(self, val: &Null) -> Self {
-        self.inner.set_truncation_with_null(val);
         self
     }
     pub fn usage(self, val: &ResponseUsage) -> Self {
@@ -16347,14 +16013,10 @@ extern "C" {
     pub fn parameters(this: &ResponsesFunctionTool) -> Option<Object>;
     #[wasm_bindgen(method, setter)]
     pub fn set_parameters(this: &ResponsesFunctionTool, val: &Object);
-    #[wasm_bindgen(method, setter, js_name = "parameters")]
-    pub fn set_parameters_with_null(this: &ResponsesFunctionTool, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn strict(this: &ResponsesFunctionTool) -> Option<bool>;
     #[wasm_bindgen(method, setter)]
     pub fn set_strict(this: &ResponsesFunctionTool, val: bool);
-    #[wasm_bindgen(method, setter, js_name = "strict")]
-    pub fn set_strict_with_null(this: &ResponsesFunctionTool, val: &Null);
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponsesFunctionTool) -> String;
     #[wasm_bindgen(method, setter)]
@@ -16363,8 +16025,6 @@ extern "C" {
     pub fn description(this: &ResponsesFunctionTool) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_description(this: &ResponsesFunctionTool, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "description")]
-    pub fn set_description_with_null(this: &ResponsesFunctionTool, val: &Null);
 }
 impl ResponsesFunctionTool {
     #[doc = " ## Inlined fields"]
@@ -16399,10 +16059,6 @@ pub struct ResponsesFunctionToolBuilder {
 impl ResponsesFunctionToolBuilder {
     pub fn description(self, val: &str) -> Self {
         self.inner.set_description(val);
-        self
-    }
-    pub fn description_with_null(self, val: &Null) -> Self {
-        self.inner.set_description_with_null(val);
         self
     }
     pub fn build(self) -> ResponsesFunctionTool {
@@ -16454,14 +16110,10 @@ extern "C" {
     pub fn variables(this: &ResponsePrompt) -> Option<Object>;
     #[wasm_bindgen(method, setter)]
     pub fn set_variables(this: &ResponsePrompt, val: &Object);
-    #[wasm_bindgen(method, setter, js_name = "variables")]
-    pub fn set_variables_with_null(this: &ResponsePrompt, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn version(this: &ResponsePrompt) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_version(this: &ResponsePrompt, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "version")]
-    pub fn set_version_with_null(this: &ResponsePrompt, val: &Null);
 }
 impl ResponsePrompt {
     pub fn new(id: &str) -> ResponsePrompt {
@@ -16481,16 +16133,8 @@ impl ResponsePromptBuilder {
         self.inner.set_variables(val);
         self
     }
-    pub fn variables_with_null(self, val: &Null) -> Self {
-        self.inner.set_variables_with_null(val);
-        self
-    }
     pub fn version(self, val: &str) -> Self {
         self.inner.set_version(val);
-        self
-    }
-    pub fn version_with_null(self, val: &Null) -> Self {
-        self.inner.set_version_with_null(val);
         self
     }
     pub fn build(self) -> ResponsePrompt {
@@ -16506,20 +16150,14 @@ extern "C" {
     pub fn effort(this: &Reasoning) -> Option<Option<String>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_effort(this: &Reasoning, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "effort")]
-    pub fn set_effort_with_null(this: &Reasoning, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn generate_summary(this: &Reasoning) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_generate_summary(this: &Reasoning, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "generate_summary")]
-    pub fn set_generate_summary_with_null(this: &Reasoning, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn summary(this: &Reasoning) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_summary(this: &Reasoning, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "summary")]
-    pub fn set_summary_with_null(this: &Reasoning, val: &Null);
 }
 impl Reasoning {
     pub fn new() -> Reasoning {
@@ -16539,24 +16177,12 @@ impl ReasoningBuilder {
         self.inner.set_effort(val);
         self
     }
-    pub fn effort_with_null(self, val: &Null) -> Self {
-        self.inner.set_effort_with_null(val);
-        self
-    }
     pub fn generate_summary(self, val: &str) -> Self {
         self.inner.set_generate_summary(val);
         self
     }
-    pub fn generate_summary_with_null(self, val: &Null) -> Self {
-        self.inner.set_generate_summary_with_null(val);
-        self
-    }
     pub fn summary(self, val: &str) -> Self {
         self.inner.set_summary(val);
-        self
-    }
-    pub fn summary_with_null(self, val: &Null) -> Self {
-        self.inner.set_summary_with_null(val);
         self
     }
     pub fn build(self) -> Reasoning {
@@ -16907,8 +16533,6 @@ extern "C" {
     pub fn code(this: &ResponseErrorEvent) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_code(this: &ResponseErrorEvent, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "code")]
-    pub fn set_code_with_null(this: &ResponseErrorEvent, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn message(this: &ResponseErrorEvent) -> String;
     #[wasm_bindgen(method, setter)]
@@ -16917,8 +16541,6 @@ extern "C" {
     pub fn param(this: &ResponseErrorEvent) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_param(this: &ResponseErrorEvent, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "param")]
-    pub fn set_param_with_null(this: &ResponseErrorEvent, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn sequence_number(this: &ResponseErrorEvent) -> f64;
     #[wasm_bindgen(method, setter)]
@@ -17044,8 +16666,6 @@ extern "C" {
     pub fn strict(this: &ResponseFormatTextJSONSchemaConfig) -> Option<bool>;
     #[wasm_bindgen(method, setter)]
     pub fn set_strict(this: &ResponseFormatTextJSONSchemaConfig, val: bool);
-    #[wasm_bindgen(method, setter, js_name = "strict")]
-    pub fn set_strict_with_null(this: &ResponseFormatTextJSONSchemaConfig, val: &Null);
 }
 impl ResponseFormatTextJSONSchemaConfig {
     #[doc = " ## Inlined fields"]
@@ -17078,10 +16698,6 @@ impl ResponseFormatTextJSONSchemaConfigBuilder {
     }
     pub fn strict(self, val: bool) -> Self {
         self.inner.set_strict(val);
-        self
-    }
-    pub fn strict_with_null(self, val: &Null) -> Self {
-        self.inner.set_strict_with_null(val);
         self
     }
     pub fn build(self) -> ResponseFormatTextJSONSchemaConfig {
@@ -17434,8 +17050,6 @@ extern "C" {
     pub fn image_url(this: &ResponseInputImage) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_image_url(this: &ResponseInputImage, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "image_url")]
-    pub fn set_image_url_with_null(this: &ResponseInputImage, val: &Null);
 }
 impl ResponseInputImage {
     #[doc = " ## Inlined fields"]
@@ -17498,10 +17112,6 @@ impl ResponseInputImageBuilder {
         self.inner.set_image_url(val);
         self
     }
-    pub fn image_url_with_null(self, val: &Null) -> Self {
-        self.inner.set_image_url_with_null(val);
-        self
-    }
     pub fn build(self) -> ResponseInputImage {
         self.inner
     }
@@ -17519,15 +17129,11 @@ extern "C" {
     pub fn detail(this: &ResponseInputImageContent) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_detail(this: &ResponseInputImageContent, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "detail")]
-    pub fn set_detail_with_null(this: &ResponseInputImageContent, val: &Null);
     #[doc = " Base64 encoded image"]
     #[wasm_bindgen(method, getter)]
     pub fn image_url(this: &ResponseInputImageContent) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_image_url(this: &ResponseInputImageContent, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "image_url")]
-    pub fn set_image_url_with_null(this: &ResponseInputImageContent, val: &Null);
 }
 impl ResponseInputImageContent {
     #[doc = " ## Inlined fields"]
@@ -17553,16 +17159,8 @@ impl ResponseInputImageContentBuilder {
         self.inner.set_detail(val);
         self
     }
-    pub fn detail_with_null(self, val: &Null) -> Self {
-        self.inner.set_detail_with_null(val);
-        self
-    }
     pub fn image_url(self, val: &str) -> Self {
         self.inner.set_image_url(val);
-        self
-    }
-    pub fn image_url_with_null(self, val: &Null) -> Self {
-        self.inner.set_image_url_with_null(val);
         self
     }
     pub fn build(self) -> ResponseInputImageContent {
@@ -17595,14 +17193,10 @@ extern "C" {
     pub fn id(this: &ResponseInputItemFunctionCallOutput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_id(this: &ResponseInputItemFunctionCallOutput, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "id")]
-    pub fn set_id_with_null(this: &ResponseInputItemFunctionCallOutput, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn status(this: &ResponseInputItemFunctionCallOutput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_status(this: &ResponseInputItemFunctionCallOutput, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "status")]
-    pub fn set_status_with_null(this: &ResponseInputItemFunctionCallOutput, val: &Null);
 }
 impl ResponseInputItemFunctionCallOutput {
     #[doc = " ## Inlined fields"]
@@ -17661,16 +17255,8 @@ impl ResponseInputItemFunctionCallOutputBuilder {
         self.inner.set_id(val);
         self
     }
-    pub fn id_with_null(self, val: &Null) -> Self {
-        self.inner.set_id_with_null(val);
-        self
-    }
     pub fn status(self, val: &str) -> Self {
         self.inner.set_status(val);
-        self
-    }
-    pub fn status_with_null(self, val: &Null) -> Self {
-        self.inner.set_status_with_null(val);
         self
     }
     pub fn build(self) -> ResponseInputItemFunctionCallOutput {
@@ -18176,8 +17762,6 @@ extern "C" {
     pub fn encrypted_content(this: &ResponseReasoningItem) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_encrypted_content(this: &ResponseReasoningItem, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "encrypted_content")]
-    pub fn set_encrypted_content_with_null(this: &ResponseReasoningItem, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn status(this: &ResponseReasoningItem) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -18217,10 +17801,6 @@ impl ResponseReasoningItemBuilder {
     }
     pub fn encrypted_content(self, val: &str) -> Self {
         self.inner.set_encrypted_content(val);
-        self
-    }
-    pub fn encrypted_content_with_null(self, val: &Null) -> Self {
-        self.inner.set_encrypted_content_with_null(val);
         self
     }
     pub fn status(self, val: &str) -> Self {
@@ -18559,8 +18139,6 @@ extern "C" {
     pub fn verbosity(this: &ResponseTextConfig) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_verbosity(this: &ResponseTextConfig, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "verbosity")]
-    pub fn set_verbosity_with_null(this: &ResponseTextConfig, val: &Null);
 }
 impl ResponseTextConfig {
     pub fn new() -> ResponseTextConfig {
@@ -18594,10 +18172,6 @@ impl ResponseTextConfigBuilder {
     }
     pub fn verbosity(self, val: &str) -> Self {
         self.inner.set_verbosity(val);
-        self
-    }
-    pub fn verbosity_with_null(self, val: &Null) -> Self {
-        self.inner.set_verbosity_with_null(val);
         self
     }
     pub fn build(self) -> ResponseTextConfig {
@@ -24732,11 +24306,6 @@ extern "C" {
         this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response,
         val: &Object,
     );
-    #[wasm_bindgen(method, setter, js_name = "prompt_logprobs")]
-    pub fn set_prompt_logprobs_with_null(
-        this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response,
-        val: &Null,
-    );
 }
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response {
     pub fn new() -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response {
@@ -24778,10 +24347,6 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_ResponseBuilder {
     }
     pub fn prompt_logprobs(self, val: &Object) -> Self {
         self.inner.set_prompt_logprobs(val);
-        self
-    }
-    pub fn prompt_logprobs_with_null(self, val: &Null) -> Self {
-        self.inner.set_prompt_logprobs_with_null(val);
         self
     }
     pub fn build(self) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response {
@@ -27810,11 +27375,6 @@ extern "C" {
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response,
         val: &Object,
     );
-    #[wasm_bindgen(method, setter, js_name = "prompt_logprobs")]
-    pub fn set_prompt_logprobs_with_null(
-        this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response,
-        val: &Null,
-    );
 }
 impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response {
     pub fn new() -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response {
@@ -27856,10 +27416,6 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_ResponseBuilder 
     }
     pub fn prompt_logprobs(self, val: &Object) -> Self {
         self.inner.set_prompt_logprobs(val);
-        self
-    }
-    pub fn prompt_logprobs_with_null(self, val: &Null) -> Self {
-        self.inner.set_prompt_logprobs_with_null(val);
         self
     }
     pub fn build(self) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response {
@@ -29442,8 +28998,6 @@ extern "C" {
     pub fn ai_gateway_log_id(this: &Ai) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "aiGatewayLogId")]
     pub fn set_ai_gateway_log_id(this: &Ai, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "aiGatewayLogId")]
-    pub fn set_ai_gateway_log_id_with_null(this: &Ai, val: &Null);
     #[wasm_bindgen(method)]
     pub fn gateway(this: &Ai, gateway_id: &str) -> AiGateway;
     #[wasm_bindgen(method, catch, js_name = "gateway")]
@@ -29752,21 +29306,15 @@ extern "C" {
     pub fn score(this: &AiGatewayPatchLog) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_score(this: &AiGatewayPatchLog, val: f64);
-    #[wasm_bindgen(method, setter, js_name = "score")]
-    pub fn set_score_with_null(this: &AiGatewayPatchLog, val: &Null);
     #[wasm_bindgen(method, getter)]
     pub fn feedback(this: &AiGatewayPatchLog) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_feedback(this: &AiGatewayPatchLog, val: f64);
-    #[wasm_bindgen(method, setter, js_name = "feedback")]
-    pub fn set_feedback_with_null(this: &AiGatewayPatchLog, val: &Null);
     #[doc = " Returns: Record<string, number | string | boolean | bigint | null> | null"]
     #[wasm_bindgen(method, getter)]
     pub fn metadata(this: &AiGatewayPatchLog) -> Option<Object>;
     #[wasm_bindgen(method, setter)]
     pub fn set_metadata(this: &AiGatewayPatchLog, val: &Object);
-    #[wasm_bindgen(method, setter, js_name = "metadata")]
-    pub fn set_metadata_with_null(this: &AiGatewayPatchLog, val: &Null);
 }
 impl AiGatewayPatchLog {
     pub fn new() -> AiGatewayPatchLog {
@@ -29786,24 +29334,12 @@ impl AiGatewayPatchLogBuilder {
         self.inner.set_score(val);
         self
     }
-    pub fn score_with_null(self, val: &Null) -> Self {
-        self.inner.set_score_with_null(val);
-        self
-    }
     pub fn feedback(self, val: f64) -> Self {
         self.inner.set_feedback(val);
         self
     }
-    pub fn feedback_with_null(self, val: &Null) -> Self {
-        self.inner.set_feedback_with_null(val);
-        self
-    }
     pub fn metadata(self, val: &Object) -> Self {
         self.inner.set_metadata(val);
-        self
-    }
-    pub fn metadata_with_null(self, val: &Null) -> Self {
-        self.inner.set_metadata_with_null(val);
         self
     }
     pub fn build(self) -> AiGatewayPatchLog {
@@ -38650,8 +38186,6 @@ extern "C" {
     pub fn next_page(this: &AutoRagSearchResponse) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_next_page(this: &AutoRagSearchResponse, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "next_page")]
-    pub fn set_next_page_with_null(this: &AutoRagSearchResponse, val: &Null);
 }
 impl AutoRagSearchResponse {
     #[doc = " ## Inlined fields"]
@@ -41749,8 +41283,6 @@ extern "C" {
     pub fn set_content_with_typed_array<T: ::js_sys::TypedArray>(this: &EmailAttachment, val: &T);
     #[wasm_bindgen(method, setter, js_name = "contentId")]
     pub fn set_content_id(this: &EmailAttachment, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "contentId")]
-    pub fn set_content_id_with_null(this: &EmailAttachment, val: &Null);
     #[wasm_bindgen(method, setter)]
     pub fn set_disposition(this: &EmailAttachment, val: &str);
     #[wasm_bindgen(method, setter)]
@@ -41904,10 +41436,6 @@ pub struct EmailAttachmentBuilder {
 impl EmailAttachmentBuilder {
     pub fn content_id(self, val: &str) -> Self {
         self.inner.set_content_id(val);
-        self
-    }
-    pub fn content_id_with_null(self, val: &Null) -> Self {
-        self.inner.set_content_id_with_null(val);
         self
     }
     pub fn build(self) -> EmailAttachment {
@@ -44752,8 +44280,6 @@ extern "C" {
     pub fn creator(this: &StreamVideo) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_creator(this: &StreamVideo, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "creator")]
-    pub fn set_creator_with_null(this: &StreamVideo, val: &Null);
     #[doc = " The thumbnail URL for the video."]
     #[wasm_bindgen(method, getter)]
     pub fn thumbnail(this: &StreamVideo) -> String;
@@ -44774,8 +44300,6 @@ extern "C" {
     pub fn ready_to_stream_at(this: &StreamVideo) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "readyToStreamAt")]
     pub fn set_ready_to_stream_at(this: &StreamVideo, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "readyToStreamAt")]
-    pub fn set_ready_to_stream_at_with_null(this: &StreamVideo, val: &Null);
     #[doc = " Processing status information."]
     #[wasm_bindgen(method, getter)]
     pub fn status(this: &StreamVideo) -> StreamVideoStatus;
@@ -44801,8 +44325,6 @@ extern "C" {
     pub fn scheduled_deletion(this: &StreamVideo) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
     pub fn set_scheduled_deletion(this: &StreamVideo, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
-    pub fn set_scheduled_deletion_with_null(this: &StreamVideo, val: &Null);
     #[doc = " The size of the video in bytes."]
     #[wasm_bindgen(method, getter)]
     pub fn size(this: &StreamVideo) -> f64;
@@ -44823,36 +44345,26 @@ extern "C" {
     pub fn require_signed_ur_ls(this: &StreamVideo) -> Option<bool>;
     #[wasm_bindgen(method, setter, js_name = "requireSignedURLs")]
     pub fn set_require_signed_ur_ls(this: &StreamVideo, val: bool);
-    #[wasm_bindgen(method, setter, js_name = "requireSignedURLs")]
-    pub fn set_require_signed_ur_ls_with_null(this: &StreamVideo, val: &Null);
     #[doc = " The date and time the video was uploaded."]
     #[wasm_bindgen(method, getter)]
     pub fn uploaded(this: &StreamVideo) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_uploaded(this: &StreamVideo, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "uploaded")]
-    pub fn set_uploaded_with_null(this: &StreamVideo, val: &Null);
     #[doc = " The date and time when the upload URL expires."]
     #[wasm_bindgen(method, getter, js_name = "uploadExpiry")]
     pub fn upload_expiry(this: &StreamVideo) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "uploadExpiry")]
     pub fn set_upload_expiry(this: &StreamVideo, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "uploadExpiry")]
-    pub fn set_upload_expiry_with_null(this: &StreamVideo, val: &Null);
     #[doc = " The maximum size in bytes for direct uploads."]
     #[wasm_bindgen(method, getter, js_name = "maxSizeBytes")]
     pub fn max_size_bytes(this: &StreamVideo) -> Option<f64>;
     #[wasm_bindgen(method, setter, js_name = "maxSizeBytes")]
     pub fn set_max_size_bytes(this: &StreamVideo, val: f64);
-    #[wasm_bindgen(method, setter, js_name = "maxSizeBytes")]
-    pub fn set_max_size_bytes_with_null(this: &StreamVideo, val: &Null);
     #[doc = " The maximum duration in seconds for direct uploads."]
     #[wasm_bindgen(method, getter, js_name = "maxDurationSeconds")]
     pub fn max_duration_seconds(this: &StreamVideo) -> Option<f64>;
     #[wasm_bindgen(method, setter, js_name = "maxDurationSeconds")]
     pub fn set_max_duration_seconds(this: &StreamVideo, val: f64);
-    #[wasm_bindgen(method, setter, js_name = "maxDurationSeconds")]
-    pub fn set_max_duration_seconds_with_null(this: &StreamVideo, val: &Null);
     #[doc = " The video duration in seconds. -1 indicates unknown."]
     #[wasm_bindgen(method, getter)]
     pub fn duration(this: &StreamVideo) -> f64;
@@ -44877,29 +44389,21 @@ extern "C" {
     pub fn watermark(this: &StreamVideo) -> Option<StreamWatermark>;
     #[wasm_bindgen(method, setter)]
     pub fn set_watermark(this: &StreamVideo, val: &StreamWatermark);
-    #[wasm_bindgen(method, setter, js_name = "watermark")]
-    pub fn set_watermark_with_null(this: &StreamVideo, val: &Null);
     #[doc = " The live input id associated with the video, if any."]
     #[wasm_bindgen(method, getter, js_name = "liveInputId")]
     pub fn live_input_id(this: &StreamVideo) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "liveInputId")]
     pub fn set_live_input_id(this: &StreamVideo, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "liveInputId")]
-    pub fn set_live_input_id_with_null(this: &StreamVideo, val: &Null);
     #[doc = " The source video id if this is a clip."]
     #[wasm_bindgen(method, getter, js_name = "clippedFromId")]
     pub fn clipped_from_id(this: &StreamVideo) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "clippedFromId")]
     pub fn set_clipped_from_id(this: &StreamVideo, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "clippedFromId")]
-    pub fn set_clipped_from_id_with_null(this: &StreamVideo, val: &Null);
     #[doc = " Public details associated with the video."]
     #[wasm_bindgen(method, getter, js_name = "publicDetails")]
     pub fn public_details(this: &StreamVideo) -> Option<StreamPublicDetails>;
     #[wasm_bindgen(method, setter, js_name = "publicDetails")]
     pub fn set_public_details(this: &StreamVideo, val: &StreamPublicDetails);
-    #[wasm_bindgen(method, setter, js_name = "publicDetails")]
-    pub fn set_public_details_with_null(this: &StreamVideo, val: &Null);
 }
 impl StreamVideo {
     #[doc = " * `id` - The unique identifier for the video."]
@@ -45074,10 +44578,6 @@ impl StreamVideoBuilder {
         self.inner.set_live_input_id(val);
         self
     }
-    pub fn live_input_id_with_null(self, val: &Null) -> Self {
-        self.inner.set_live_input_id_with_null(val);
-        self
-    }
     pub fn build(self) -> StreamVideo {
         self.inner
     }
@@ -45187,29 +44687,21 @@ extern "C" {
     pub fn title(this: &StreamPublicDetails) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_title(this: &StreamPublicDetails, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "title")]
-    pub fn set_title_with_null(this: &StreamPublicDetails, val: &Null);
     #[doc = " The public share link."]
     #[wasm_bindgen(method, getter)]
     pub fn share_link(this: &StreamPublicDetails) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_share_link(this: &StreamPublicDetails, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "share_link")]
-    pub fn set_share_link_with_null(this: &StreamPublicDetails, val: &Null);
     #[doc = " The public channel link."]
     #[wasm_bindgen(method, getter)]
     pub fn channel_link(this: &StreamPublicDetails) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_channel_link(this: &StreamPublicDetails, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "channel_link")]
-    pub fn set_channel_link_with_null(this: &StreamPublicDetails, val: &Null);
     #[doc = " The public logo URL."]
     #[wasm_bindgen(method, getter)]
     pub fn logo(this: &StreamPublicDetails) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_logo(this: &StreamPublicDetails, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "logo")]
-    pub fn set_logo_with_null(this: &StreamPublicDetails, val: &Null);
 }
 impl StreamPublicDetails {
     #[doc = " * `title` - The public title for the video."]
@@ -45250,15 +44742,11 @@ extern "C" {
     pub fn watermark(this: &StreamDirectUpload) -> Option<StreamWatermark>;
     #[wasm_bindgen(method, setter)]
     pub fn set_watermark(this: &StreamDirectUpload, val: &StreamWatermark);
-    #[wasm_bindgen(method, setter, js_name = "watermark")]
-    pub fn set_watermark_with_null(this: &StreamDirectUpload, val: &Null);
     #[doc = " The scheduled deletion time, if any."]
     #[wasm_bindgen(method, getter, js_name = "scheduledDeletion")]
     pub fn scheduled_deletion(this: &StreamDirectUpload) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
     pub fn set_scheduled_deletion(this: &StreamDirectUpload, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
-    pub fn set_scheduled_deletion_with_null(this: &StreamDirectUpload, val: &Null);
 }
 impl StreamDirectUpload {
     #[doc = " * `upload_url` - The URL an unauthenticated upload can use for a single multipart request."]
@@ -45327,8 +44815,6 @@ extern "C" {
     pub fn scheduled_deletion(this: &StreamDirectUploadCreateParams) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
     pub fn set_scheduled_deletion(this: &StreamDirectUploadCreateParams, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
-    pub fn set_scheduled_deletion_with_null(this: &StreamDirectUploadCreateParams, val: &Null);
     #[doc = " The watermark profile to apply."]
     #[wasm_bindgen(method, getter)]
     pub fn watermark(this: &StreamDirectUploadCreateParams) -> Option<StreamDirectUploadWatermark>;
@@ -45377,10 +44863,6 @@ impl StreamDirectUploadCreateParamsBuilder {
     }
     pub fn scheduled_deletion(self, val: &str) -> Self {
         self.inner.set_scheduled_deletion(val);
-        self
-    }
-    pub fn scheduled_deletion_with_null(self, val: &Null) -> Self {
-        self.inner.set_scheduled_deletion_with_null(val);
         self
     }
     pub fn watermark(self, val: &StreamDirectUploadWatermark) -> Self {
@@ -45448,8 +44930,6 @@ extern "C" {
     pub fn scheduled_deletion(this: &StreamUrlUploadParams) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
     pub fn set_scheduled_deletion(this: &StreamUrlUploadParams, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
-    pub fn set_scheduled_deletion_with_null(this: &StreamUrlUploadParams, val: &Null);
     #[doc = " The timestamp for a thumbnail image calculated as a percentage value"]
     #[doc = " of the video's duration. To convert from a second-wise timestamp to a"]
     #[doc = " percentage, divide the desired timestamp by the total duration of the video. If"]
@@ -45497,10 +44977,6 @@ impl StreamUrlUploadParamsBuilder {
     }
     pub fn scheduled_deletion(self, val: &str) -> Self {
         self.inner.set_scheduled_deletion(val);
-        self
-    }
-    pub fn scheduled_deletion_with_null(self, val: &Null) -> Self {
-        self.inner.set_scheduled_deletion_with_null(val);
         self
     }
     pub fn thumbnail_timestamp_pct(self, val: f64) -> Self {
@@ -45849,8 +45325,6 @@ extern "C" {
     pub fn scheduled_deletion(this: &StreamUpdateVideoParams) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
     pub fn set_scheduled_deletion(this: &StreamUpdateVideoParams, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "scheduledDeletion")]
-    pub fn set_scheduled_deletion_with_null(this: &StreamUpdateVideoParams, val: &Null);
     #[doc = " The timestamp for a thumbnail image calculated as a percentage value"]
     #[doc = " of the video's duration. To convert from a second-wise timestamp to a"]
     #[doc = " percentage, divide the desired timestamp by the total duration of the video. If"]
@@ -45897,10 +45371,6 @@ impl StreamUpdateVideoParamsBuilder {
     }
     pub fn scheduled_deletion(self, val: &str) -> Self {
         self.inner.set_scheduled_deletion(val);
-        self
-    }
-    pub fn scheduled_deletion_with_null(self, val: &Null) -> Self {
-        self.inner.set_scheduled_deletion_with_null(val);
         self
     }
     pub fn thumbnail_timestamp_pct(self, val: f64) -> Self {
@@ -46126,8 +45596,6 @@ extern "C" {
     pub fn downloaded_from(this: &StreamWatermark) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "downloadedFrom")]
     pub fn set_downloaded_from(this: &StreamWatermark, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "downloadedFrom")]
-    pub fn set_downloaded_from_with_null(this: &StreamWatermark, val: &Null);
     #[doc = " A short description of the watermark profile."]
     #[wasm_bindgen(method, getter)]
     pub fn name(this: &StreamWatermark) -> String;

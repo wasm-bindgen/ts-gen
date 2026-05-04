@@ -60,15 +60,18 @@ borrowed by reference; return-position container types are owned.
 
 ## Optional and nullable types
 
-* `T | null` → `Option<T>` in return position, `Option<T>` in argument
-  position. (`null`-only is rare; treated like `undefined`.)
-* `T | undefined` and `T | null | undefined` → also `Option<T>`. We coalesce
-  at parse time; the rendered union has no separate `null`/`undefined`
-  arm.
+* `T | null` → `Option<T>` in return position. In argument position the
+  `null` arm is dropped — the parameter takes `T` directly. A
+  `_with_null(val: &Null)` overload would force callers to construct a
+  `Null` value with no real upside, and the omission case for
+  truly-optional params is already covered by the optional-truncation
+  rule below.
+* `T | undefined` and `T | null | undefined` follow the same rules as
+  `T | null` — coalesced at parse time; the rendered union has no
+  separate `null`/`undefined` arm.
 * In inner type positions, `T | null` → `JsOption<T>` unless `T` already
   erases to `JsValue`; `JsOption<JsValue>` simplifies to `JsValue`.
-* `T?` on a property → `Option<T>`. The setter takes `Option<T>` too, so
-  callers can clear the property by passing `None`.
+* `T?` on a property → getter returns `Option<T>`; setter takes `T`.
 * `f(x?: T)` (optional parameter) → produces an overload pair, *not* an
   `Option<T>` parameter. See [Signature flattening](#signature-flattening).
 
