@@ -819,6 +819,10 @@ TypeError                            -> Error
 TypeError | RangeError               -> Error      (both subclass Error)
 TypeError | string                   -> JsValue    (no shared ancestor below Object)
 BadRequestError | NotFoundError      -> StreamError (when both extend StreamError)
+"inline" | "attachment"              -> string     (literal-type widening)
+1 | 2 | 3                            -> number
+true | false                         -> boolean
+"foo" | string                       -> string     (literal joined with primitive)
 ```
 
 The lattice is built from:

@@ -7466,7 +7466,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/type)"]
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &Response) -> JsValue;
+    pub fn type_(this: &Response) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &Response, val: &str);
 }
@@ -7502,7 +7502,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "webSocket")]
     pub fn set_web_socket_with_null(this: &ResponseInit, val: &Null);
     #[wasm_bindgen(method, getter, js_name = "encodeBody")]
-    pub fn encode_body(this: &ResponseInit) -> Option<JsValue>;
+    pub fn encode_body(this: &ResponseInit) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "encodeBody")]
     pub fn set_encode_body(this: &ResponseInit, val: &str);
 }
@@ -7651,7 +7651,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/cache)"]
     #[wasm_bindgen(method, getter)]
-    pub fn cache(this: &Request) -> Option<JsValue>;
+    pub fn cache(this: &Request) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_cache(this: &Request, val: &str);
 }
@@ -7709,7 +7709,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_cf(this: &RequestInit, val: &Cf);
     #[wasm_bindgen(method, getter)]
-    pub fn cache(this: &RequestInit) -> Option<JsValue>;
+    pub fn cache(this: &RequestInit) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_cache(this: &RequestInit, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -7723,7 +7723,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "signal")]
     pub fn set_signal_with_null(this: &RequestInit, val: &Null);
     #[wasm_bindgen(method, getter, js_name = "encodeResponseBody")]
-    pub fn encode_response_body(this: &RequestInit) -> Option<JsValue>;
+    pub fn encode_response_body(this: &RequestInit) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "encodeResponseBody")]
     pub fn set_encode_response_body(this: &RequestInit, val: &str);
 }
@@ -7897,7 +7897,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn keys(this: &KVNamespaceListResult) -> Array<KVNamespaceListKey>;
     #[wasm_bindgen(method, getter)]
-    pub fn list_complete(this: &KVNamespaceListResult) -> JsValue;
+    pub fn list_complete(this: &KVNamespaceListResult) -> bool;
     #[wasm_bindgen(method, setter, js_name = "cacheStatus")]
     pub fn set_cache_status(this: &KVNamespaceListResult, val: &str);
     #[wasm_bindgen(method, setter, js_name = "cacheStatus")]
@@ -8594,9 +8594,9 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "startAfter")]
     pub fn set_start_after(this: &R2ListOptions, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn include(this: &R2ListOptions) -> Option<Array>;
+    pub fn include(this: &R2ListOptions) -> Option<Array<JsString>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_include(this: &R2ListOptions, val: &Array);
+    pub fn set_include(this: &R2ListOptions, val: &Array<JsString>);
 }
 impl R2ListOptions {
     pub fn new() -> R2ListOptions {
@@ -8632,7 +8632,7 @@ impl R2ListOptionsBuilder {
         self.inner.set_start_after(val);
         self
     }
-    pub fn include(self, val: &Array) -> Self {
+    pub fn include(self, val: &Array<JsString>) -> Self {
         self.inner.set_include(val);
         self
     }
@@ -10130,7 +10130,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ReadableStreamReadResult;
     #[wasm_bindgen(method, getter)]
-    pub fn done(this: &ReadableStreamReadResult) -> JsValue;
+    pub fn done(this: &ReadableStreamReadResult) -> bool;
     #[wasm_bindgen(method, getter)]
     pub fn value(this: &ReadableStreamReadResult) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
@@ -12580,7 +12580,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/binaryType)"]
     #[wasm_bindgen(method, getter, js_name = "binaryType")]
-    pub fn binary_type(this: &WebSocket) -> JsValue;
+    pub fn binary_type(this: &WebSocket) -> String;
     #[wasm_bindgen(method, setter, js_name = "binaryType")]
     pub fn set_binary_type(this: &WebSocket, val: &str);
 }
@@ -12704,7 +12704,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn upgraded(this: &Socket) -> bool;
     #[wasm_bindgen(method, getter, js_name = "secureTransport")]
-    pub fn secure_transport(this: &Socket) -> JsValue;
+    pub fn secure_transport(this: &Socket) -> String;
     #[wasm_bindgen(method, catch)]
     pub async fn close(this: &Socket) -> Result<Undefined, JsValue>;
     #[wasm_bindgen(method, js_name = "startTls")]
@@ -13748,7 +13748,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_id(this: &AiSearchConfig, val: &str);
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &AiSearchConfig) -> JsValue;
+    pub fn type_(this: &AiSearchConfig) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &AiSearchConfig, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -13879,7 +13879,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_enable(this: &AiSearchInstance, val: bool);
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &AiSearchInstance) -> Option<JsValue>;
+    pub fn type_(this: &AiSearchInstance) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &AiSearchInstance, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -15575,7 +15575,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_safety_identifier(this: &ResponsesInput, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn service_tier(this: &ResponsesInput) -> Option<JsValue>;
+    pub fn service_tier(this: &ResponsesInput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_service_tier(this: &ResponsesInput, val: &str);
     #[wasm_bindgen(method, setter, js_name = "service_tier")]
@@ -15622,7 +15622,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "top_p")]
     pub fn set_top_p_with_null(this: &ResponsesInput, val: &Null);
     #[wasm_bindgen(method, getter)]
-    pub fn truncation(this: &ResponsesInput) -> Option<JsValue>;
+    pub fn truncation(this: &ResponsesInput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_truncation(this: &ResponsesInput, val: &str);
     #[wasm_bindgen(method, setter, js_name = "truncation")]
@@ -15901,7 +15901,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_safety_identifier(this: &ResponsesOutput, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn service_tier(this: &ResponsesOutput) -> Option<JsValue>;
+    pub fn service_tier(this: &ResponsesOutput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_service_tier(this: &ResponsesOutput, val: &str);
     #[wasm_bindgen(method, setter, js_name = "service_tier")]
@@ -15915,7 +15915,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_text(this: &ResponsesOutput, val: &ResponseTextConfig);
     #[wasm_bindgen(method, getter)]
-    pub fn truncation(this: &ResponsesOutput) -> Option<JsValue>;
+    pub fn truncation(this: &ResponsesOutput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_truncation(this: &ResponsesOutput, val: &str);
     #[wasm_bindgen(method, setter, js_name = "truncation")]
@@ -16099,7 +16099,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "content")]
     pub fn set_content_with_array(this: &EasyInputMessage, val: &Array);
     #[wasm_bindgen(method, getter)]
-    pub fn role(this: &EasyInputMessage) -> JsValue;
+    pub fn role(this: &EasyInputMessage) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_role(this: &EasyInputMessage, val: &str);
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -16336,7 +16336,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseIncompleteDetails;
     #[wasm_bindgen(method, getter)]
-    pub fn reason(this: &ResponseIncompleteDetails) -> Option<JsValue>;
+    pub fn reason(this: &ResponseIncompleteDetails) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_reason(this: &ResponseIncompleteDetails, val: &str);
 }
@@ -16424,19 +16424,19 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Reasoning;
     #[wasm_bindgen(method, getter)]
-    pub fn effort(this: &Reasoning) -> Option<Option<JsValue>>;
+    pub fn effort(this: &Reasoning) -> Option<Option<String>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_effort(this: &Reasoning, val: &str);
     #[wasm_bindgen(method, setter, js_name = "effort")]
     pub fn set_effort_with_null(this: &Reasoning, val: &Null);
     #[wasm_bindgen(method, getter)]
-    pub fn generate_summary(this: &Reasoning) -> Option<JsValue>;
+    pub fn generate_summary(this: &Reasoning) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_generate_summary(this: &Reasoning, val: &str);
     #[wasm_bindgen(method, setter, js_name = "generate_summary")]
     pub fn set_generate_summary_with_null(this: &Reasoning, val: &Null);
     #[wasm_bindgen(method, getter)]
-    pub fn summary(this: &Reasoning) -> Option<JsValue>;
+    pub fn summary(this: &Reasoning) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_summary(this: &Reasoning, val: &str);
     #[wasm_bindgen(method, setter, js_name = "summary")]
@@ -16646,7 +16646,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseError;
     #[wasm_bindgen(method, getter)]
-    pub fn code(this: &ResponseError) -> JsValue;
+    pub fn code(this: &ResponseError) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_code(this: &ResponseError, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -17134,7 +17134,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_id(this: &ResponseFunctionToolCall, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn status(this: &ResponseFunctionToolCall) -> Option<JsValue>;
+    pub fn status(this: &ResponseFunctionToolCall) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_status(this: &ResponseFunctionToolCall, val: &str);
 }
@@ -17222,7 +17222,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseFunctionToolCallOutputItem, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn status(this: &ResponseFunctionToolCallOutputItem) -> Option<JsValue>;
+    pub fn status(this: &ResponseFunctionToolCallOutputItem) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_status(this: &ResponseFunctionToolCallOutputItem, val: &str);
 }
@@ -17341,7 +17341,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseInputImage;
     #[wasm_bindgen(method, getter)]
-    pub fn detail(this: &ResponseInputImage) -> JsValue;
+    pub fn detail(this: &ResponseInputImage) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_detail(this: &ResponseInputImage, val: &str);
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -17435,7 +17435,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseInputImageContent, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn detail(this: &ResponseInputImageContent) -> Option<JsValue>;
+    pub fn detail(this: &ResponseInputImageContent) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_detail(this: &ResponseInputImageContent, val: &str);
     #[wasm_bindgen(method, setter, js_name = "detail")]
@@ -17516,7 +17516,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "id")]
     pub fn set_id_with_null(this: &ResponseInputItemFunctionCallOutput, val: &Null);
     #[wasm_bindgen(method, getter)]
-    pub fn status(this: &ResponseInputItemFunctionCallOutput) -> Option<JsValue>;
+    pub fn status(this: &ResponseInputItemFunctionCallOutput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_status(this: &ResponseInputItemFunctionCallOutput, val: &str);
     #[wasm_bindgen(method, setter, js_name = "status")]
@@ -17605,11 +17605,11 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_content(this: &ResponseInputItemMessage, val: &Array);
     #[wasm_bindgen(method, getter)]
-    pub fn role(this: &ResponseInputItemMessage) -> JsValue;
+    pub fn role(this: &ResponseInputItemMessage) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_role(this: &ResponseInputItemMessage, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn status(this: &ResponseInputItemMessage) -> Option<JsValue>;
+    pub fn status(this: &ResponseInputItemMessage) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_status(this: &ResponseInputItemMessage, val: &str);
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -17696,11 +17696,11 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_content(this: &ResponseInputMessageItem, val: &Array);
     #[wasm_bindgen(method, getter)]
-    pub fn role(this: &ResponseInputMessageItem) -> JsValue;
+    pub fn role(this: &ResponseInputMessageItem) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_role(this: &ResponseInputMessageItem, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn status(this: &ResponseInputMessageItem) -> Option<JsValue>;
+    pub fn status(this: &ResponseInputMessageItem) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_status(this: &ResponseInputMessageItem, val: &str);
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -17944,7 +17944,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_role(this: &ResponseOutputMessage, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn status(this: &ResponseOutputMessage) -> JsValue;
+    pub fn status(this: &ResponseOutputMessage) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_status(this: &ResponseOutputMessage, val: &str);
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -18096,7 +18096,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "encrypted_content")]
     pub fn set_encrypted_content_with_null(this: &ResponseReasoningItem, val: &Null);
     #[wasm_bindgen(method, getter)]
-    pub fn status(this: &ResponseReasoningItem) -> Option<JsValue>;
+    pub fn status(this: &ResponseReasoningItem) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_status(this: &ResponseReasoningItem, val: &str);
 }
@@ -18473,7 +18473,7 @@ extern "C" {
         val: &ResponseFormatJSONObject,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn verbosity(this: &ResponseTextConfig) -> Option<JsValue>;
+    pub fn verbosity(this: &ResponseTextConfig) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_verbosity(this: &ResponseTextConfig, val: &str);
     #[wasm_bindgen(method, setter, js_name = "verbosity")]
@@ -18777,7 +18777,7 @@ pub enum ToolChoiceOptions {
     None,
 }
 #[allow(dead_code)]
-pub type ReasoningEffort = JsValue;
+pub type ReasoningEffort = JsOption<JsString>;
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -18817,7 +18817,7 @@ extern "C" {
     pub type Ai_Cf_Baai_Bge_Base_En_V1_5_Input;
     #[doc = " The pooling method used in the embedding process. `cls` pooling will generate more accurate embeddings on larger inputs - however, embeddings created with cls pooling are not compatible with embeddings generated with mean pooling. The default pooling method is `mean` in order for this to not be a breaking change, but we highly suggest using the new `cls` pooling for better accuracy."]
     #[wasm_bindgen(method, getter)]
-    pub fn pooling(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input) -> Option<JsValue>;
+    pub fn pooling(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input) -> Option<String>;
     #[doc = " Batch of the embeddings requests to run using async-queue"]
     #[wasm_bindgen(method, getter)]
     pub fn requests(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input) -> Option<Array<Object>>;
@@ -19120,7 +19120,7 @@ extern "C" {
     pub type Ai_Cf_Baai_Bge_Small_En_V1_5_Input;
     #[doc = " The pooling method used in the embedding process. `cls` pooling will generate more accurate embeddings on larger inputs - however, embeddings created with cls pooling are not compatible with embeddings generated with mean pooling. The default pooling method is `mean` in order for this to not be a breaking change, but we highly suggest using the new `cls` pooling for better accuracy."]
     #[wasm_bindgen(method, getter)]
-    pub fn pooling(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input) -> Option<JsValue>;
+    pub fn pooling(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input) -> Option<String>;
     #[doc = " Batch of the embeddings requests to run using async-queue"]
     #[wasm_bindgen(method, getter)]
     pub fn requests(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input) -> Option<Array<Object>>;
@@ -19233,7 +19233,7 @@ extern "C" {
     pub type Ai_Cf_Baai_Bge_Large_En_V1_5_Input;
     #[doc = " The pooling method used in the embedding process. `cls` pooling will generate more accurate embeddings on larger inputs - however, embeddings created with cls pooling are not compatible with embeddings generated with mean pooling. The default pooling method is `mean` in order for this to not be a breaking change, but we highly suggest using the new `cls` pooling for better accuracy."]
     #[wasm_bindgen(method, getter)]
-    pub fn pooling(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input) -> Option<JsValue>;
+    pub fn pooling(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input) -> Option<String>;
     #[doc = " Batch of the embeddings requests to run using async-queue"]
     #[wasm_bindgen(method, getter)]
     pub fn requests(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input) -> Option<Array<Object>>;
@@ -19887,7 +19887,7 @@ extern "C" {
     pub fn set_shape(this: &Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts, val: &Array<Number>);
     #[doc = " The pooling method used in the embedding process."]
     #[wasm_bindgen(method, getter)]
-    pub fn pooling(this: &Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts) -> Option<JsValue>;
+    pub fn pooling(this: &Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_pooling(this: &Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts, val: &str);
 }
@@ -19937,7 +19937,7 @@ extern "C" {
     pub fn set_data(this: &Ai_Cf_Baai_Bge_M3_Ouput_Embedding, val: &Array<Array<Number>>);
     #[doc = " The pooling method used in the embedding process."]
     #[wasm_bindgen(method, getter)]
-    pub fn pooling(this: &Ai_Cf_Baai_Bge_M3_Ouput_Embedding) -> Option<JsValue>;
+    pub fn pooling(this: &Ai_Cf_Baai_Bge_M3_Ouput_Embedding) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_pooling(this: &Ai_Cf_Baai_Bge_M3_Ouput_Embedding, val: &str);
 }
@@ -20703,7 +20703,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode) -> Option<JsValue>;
+    pub fn type_(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -20927,7 +20927,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1) -> Option<JsValue>;
+    pub fn type_(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -21009,7 +21009,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2) -> Option<JsValue>;
+    pub fn type_(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_2, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -21502,7 +21502,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode) -> Option<JsValue>;
+    pub fn type_(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -21701,7 +21701,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1) -> Option<JsValue>;
+    pub fn type_(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -23102,7 +23102,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode) -> Option<JsValue>;
+    pub fn type_(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -23960,7 +23960,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode) -> Option<JsValue>;
+    pub fn type_(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -24151,7 +24151,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1) -> Option<JsValue>;
+    pub fn type_(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -24351,7 +24351,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2) -> Option<JsValue>;
+    pub fn type_(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_2, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -24542,7 +24542,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3) -> Option<JsValue>;
+    pub fn type_(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -24853,7 +24853,7 @@ extern "C" {
     pub fn set_audio(this: &Ai_Cf_Deepgram_Nova_3_Input, val: &Object);
     #[doc = " Sets how the model will interpret strings submitted to the custom_topic param. When strict, the model will only return topics submitted using the custom_topic param. When extended, the model will return its own detected topics in addition to those submitted using the custom_topic param."]
     #[wasm_bindgen(method, getter)]
-    pub fn custom_topic_mode(this: &Ai_Cf_Deepgram_Nova_3_Input) -> Option<JsValue>;
+    pub fn custom_topic_mode(this: &Ai_Cf_Deepgram_Nova_3_Input) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_custom_topic_mode(this: &Ai_Cf_Deepgram_Nova_3_Input, val: &str);
     #[doc = " Custom topics you want the model to detect within your input audio or text if present Submit up to 100"]
@@ -24863,7 +24863,7 @@ extern "C" {
     pub fn set_custom_topic(this: &Ai_Cf_Deepgram_Nova_3_Input, val: &str);
     #[doc = " Sets how the model will interpret intents submitted to the custom_intent param. When strict, the model will only return intents submitted using the custom_intent param. When extended, the model will return its own detected intents in addition those submitted using the custom_intents param"]
     #[wasm_bindgen(method, getter)]
-    pub fn custom_intent_mode(this: &Ai_Cf_Deepgram_Nova_3_Input) -> Option<JsValue>;
+    pub fn custom_intent_mode(this: &Ai_Cf_Deepgram_Nova_3_Input) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_custom_intent_mode(this: &Ai_Cf_Deepgram_Nova_3_Input, val: &str);
     #[doc = " Custom intents you want the model to detect within your input audio if present"]
@@ -24893,7 +24893,7 @@ extern "C" {
     pub fn set_dictation(this: &Ai_Cf_Deepgram_Nova_3_Input, val: bool);
     #[doc = " Specify the expected encoding of your submitted audio"]
     #[wasm_bindgen(method, getter)]
-    pub fn encoding(this: &Ai_Cf_Deepgram_Nova_3_Input) -> Option<JsValue>;
+    pub fn encoding(this: &Ai_Cf_Deepgram_Nova_3_Input) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_encoding(this: &Ai_Cf_Deepgram_Nova_3_Input, val: &str);
     #[doc = " Arbitrary key-value pairs that are attached to the API response for usage in downstream processing"]
@@ -24933,7 +24933,7 @@ extern "C" {
     pub fn set_mip_opt_out(this: &Ai_Cf_Deepgram_Nova_3_Input, val: bool);
     #[doc = " Mode of operation for the model representing broad area of topic that will be talked about in the supplied audio"]
     #[wasm_bindgen(method, getter)]
-    pub fn mode(this: &Ai_Cf_Deepgram_Nova_3_Input) -> Option<JsValue>;
+    pub fn mode(this: &Ai_Cf_Deepgram_Nova_3_Input) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_mode(this: &Ai_Cf_Deepgram_Nova_3_Input, val: &str);
     #[doc = " Transcribe each audio channel independently."]
@@ -25391,7 +25391,7 @@ extern "C" {
     pub fn audio(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input) -> JsValue;
     #[doc = " type of data PCM data that's sent to the inference server as raw array"]
     #[wasm_bindgen(method, getter)]
-    pub fn dtype(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input) -> Option<JsValue>;
+    pub fn dtype(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_audio(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input, val: &Object);
     #[wasm_bindgen(method, setter, js_name = "audio")]
@@ -25778,17 +25778,17 @@ extern "C" {
     pub type Ai_Cf_Deepgram_Aura_1_Input;
     #[doc = " Speaker used to produce the audio."]
     #[wasm_bindgen(method, getter)]
-    pub fn speaker(this: &Ai_Cf_Deepgram_Aura_1_Input) -> Option<JsValue>;
+    pub fn speaker(this: &Ai_Cf_Deepgram_Aura_1_Input) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_speaker(this: &Ai_Cf_Deepgram_Aura_1_Input, val: &str);
     #[doc = " Encoding of the output audio."]
     #[wasm_bindgen(method, getter)]
-    pub fn encoding(this: &Ai_Cf_Deepgram_Aura_1_Input) -> Option<JsValue>;
+    pub fn encoding(this: &Ai_Cf_Deepgram_Aura_1_Input) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_encoding(this: &Ai_Cf_Deepgram_Aura_1_Input, val: &str);
     #[doc = " Container specifies the file format wrapper for the output audio. The available options depend on the encoding type.."]
     #[wasm_bindgen(method, getter)]
-    pub fn container(this: &Ai_Cf_Deepgram_Aura_1_Input) -> Option<JsValue>;
+    pub fn container(this: &Ai_Cf_Deepgram_Aura_1_Input) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_container(this: &Ai_Cf_Deepgram_Aura_1_Input, val: &str);
     #[doc = " The text content to be converted to speech"]
@@ -25880,7 +25880,7 @@ extern "C" {
     );
     #[doc = " Target language to translate to"]
     #[wasm_bindgen(method, getter)]
-    pub fn target_language(this: &Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input) -> JsValue;
+    pub fn target_language(this: &Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_target_language(this: &Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input, val: &str);
 }
@@ -26914,7 +26914,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode) -> Option<JsValue>;
+    pub fn type_(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -27138,7 +27138,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1) -> Option<JsValue>;
+    pub fn type_(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -27361,7 +27361,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2) -> Option<JsValue>;
+    pub fn type_(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_2, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -27586,7 +27586,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3) -> Option<JsValue>;
+    pub fn type_(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -28077,7 +28077,7 @@ extern "C" {
     pub fn set_keyterm(this: &Ai_Cf_Deepgram_Flux_Input, val: &str);
     #[doc = " Opts out requests from the Deepgram Model Improvement Program. Refer to Deepgram Docs for pricing impacts before setting this to true. https://dpgr.am/deepgram-mip"]
     #[wasm_bindgen(method, getter)]
-    pub fn mip_opt_out(this: &Ai_Cf_Deepgram_Flux_Input) -> Option<JsValue>;
+    pub fn mip_opt_out(this: &Ai_Cf_Deepgram_Flux_Input) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_mip_opt_out(this: &Ai_Cf_Deepgram_Flux_Input, val: &str);
     #[doc = " Label your requests for the purpose of identification during usage reporting"]
@@ -28156,7 +28156,7 @@ extern "C" {
     pub fn set_sequence_id(this: &Ai_Cf_Deepgram_Flux_Output, val: f64);
     #[doc = " The type of event being reported."]
     #[wasm_bindgen(method, getter)]
-    pub fn event(this: &Ai_Cf_Deepgram_Flux_Output) -> Option<JsValue>;
+    pub fn event(this: &Ai_Cf_Deepgram_Flux_Output) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_event(this: &Ai_Cf_Deepgram_Flux_Output, val: &str);
     #[doc = " The index of the current turn"]
@@ -28268,17 +28268,17 @@ extern "C" {
     pub type Ai_Cf_Deepgram_Aura_2_En_Input;
     #[doc = " Speaker used to produce the audio."]
     #[wasm_bindgen(method, getter)]
-    pub fn speaker(this: &Ai_Cf_Deepgram_Aura_2_En_Input) -> Option<JsValue>;
+    pub fn speaker(this: &Ai_Cf_Deepgram_Aura_2_En_Input) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_speaker(this: &Ai_Cf_Deepgram_Aura_2_En_Input, val: &str);
     #[doc = " Encoding of the output audio."]
     #[wasm_bindgen(method, getter)]
-    pub fn encoding(this: &Ai_Cf_Deepgram_Aura_2_En_Input) -> Option<JsValue>;
+    pub fn encoding(this: &Ai_Cf_Deepgram_Aura_2_En_Input) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_encoding(this: &Ai_Cf_Deepgram_Aura_2_En_Input, val: &str);
     #[doc = " Container specifies the file format wrapper for the output audio. The available options depend on the encoding type.."]
     #[wasm_bindgen(method, getter)]
-    pub fn container(this: &Ai_Cf_Deepgram_Aura_2_En_Input) -> Option<JsValue>;
+    pub fn container(this: &Ai_Cf_Deepgram_Aura_2_En_Input) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_container(this: &Ai_Cf_Deepgram_Aura_2_En_Input, val: &str);
     #[doc = " The text content to be converted to speech"]
@@ -28360,17 +28360,17 @@ extern "C" {
     pub type Ai_Cf_Deepgram_Aura_2_Es_Input;
     #[doc = " Speaker used to produce the audio."]
     #[wasm_bindgen(method, getter)]
-    pub fn speaker(this: &Ai_Cf_Deepgram_Aura_2_Es_Input) -> Option<JsValue>;
+    pub fn speaker(this: &Ai_Cf_Deepgram_Aura_2_Es_Input) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_speaker(this: &Ai_Cf_Deepgram_Aura_2_Es_Input, val: &str);
     #[doc = " Encoding of the output audio."]
     #[wasm_bindgen(method, getter)]
-    pub fn encoding(this: &Ai_Cf_Deepgram_Aura_2_Es_Input) -> Option<JsValue>;
+    pub fn encoding(this: &Ai_Cf_Deepgram_Aura_2_Es_Input) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_encoding(this: &Ai_Cf_Deepgram_Aura_2_Es_Input, val: &str);
     #[doc = " Container specifies the file format wrapper for the output audio. The available options depend on the encoding type.."]
     #[wasm_bindgen(method, getter)]
-    pub fn container(this: &Ai_Cf_Deepgram_Aura_2_Es_Input) -> Option<JsValue>;
+    pub fn container(this: &Ai_Cf_Deepgram_Aura_2_Es_Input) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_container(this: &Ai_Cf_Deepgram_Aura_2_Es_Input, val: &str);
     #[doc = " The text content to be converted to speech"]
@@ -29503,7 +29503,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type GatewayRetries;
     #[wasm_bindgen(method, getter, js_name = "maxAttempts")]
-    pub fn max_attempts(this: &GatewayRetries) -> Option<JsValue>;
+    pub fn max_attempts(this: &GatewayRetries) -> Option<f64>;
     #[wasm_bindgen(method, setter, js_name = "maxAttempts")]
     pub fn set_max_attempts(this: &GatewayRetries, val: f64);
     #[wasm_bindgen(method, getter, js_name = "retryDelayMs")]
@@ -29511,7 +29511,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "retryDelayMs")]
     pub fn set_retry_delay_ms(this: &GatewayRetries, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn backoff(this: &GatewayRetries) -> Option<JsValue>;
+    pub fn backoff(this: &GatewayRetries) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_backoff(this: &GatewayRetries, val: &str);
 }
@@ -29651,7 +29651,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "score")]
     pub fn set_score_with_null(this: &AiGatewayPatchLog, val: &Null);
     #[wasm_bindgen(method, getter)]
-    pub fn feedback(this: &AiGatewayPatchLog) -> Option<JsValue>;
+    pub fn feedback(this: &AiGatewayPatchLog) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_feedback(this: &AiGatewayPatchLog, val: f64);
     #[wasm_bindgen(method, setter, js_name = "feedback")]
@@ -38202,7 +38202,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_key(this: &ComparisonFilter, val: &str);
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &ComparisonFilter) -> JsValue;
+    pub fn type_(this: &ComparisonFilter) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ComparisonFilter, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -38402,7 +38402,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CompoundFilter;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &CompoundFilter) -> JsValue;
+    pub fn type_(this: &CompoundFilter) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &CompoundFilter, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -38621,7 +38621,7 @@ extern "C" {
     #[doc = "  - squeeze: Stretches and deforms to the width and height given, even if it"]
     #[doc = "    breaks aspect ratio"]
     #[wasm_bindgen(method, getter)]
-    pub fn fit(this: &BasicImageTransformations) -> Option<JsValue>;
+    pub fn fit(this: &BasicImageTransformations) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_fit(this: &BasicImageTransformations, val: &str);
     #[doc = " Image segmentation using artificial intelligence models. Sets pixels not"]
@@ -38660,7 +38660,7 @@ extern "C" {
     #[doc = " Number of degrees (90, 180, 270) to rotate the image by. width and height"]
     #[doc = " options refer to axes after rotation."]
     #[wasm_bindgen(method, getter)]
-    pub fn rotate(this: &BasicImageTransformations) -> Option<JsValue>;
+    pub fn rotate(this: &BasicImageTransformations) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_rotate(this: &BasicImageTransformations, val: f64);
 }
@@ -38732,7 +38732,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_y(this: &BasicImageTransformationsGravityCoordinates, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn mode(this: &BasicImageTransformationsGravityCoordinates) -> Option<JsValue>;
+    pub fn mode(this: &BasicImageTransformationsGravityCoordinates) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_mode(this: &BasicImageTransformationsGravityCoordinates, val: &str);
 }
@@ -38827,7 +38827,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_mirage(this: &RequestInitCfProperties, val: bool);
     #[wasm_bindgen(method, getter)]
-    pub fn polish(this: &RequestInitCfProperties) -> Option<JsValue>;
+    pub fn polish(this: &RequestInitCfProperties) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_polish(this: &RequestInitCfProperties, val: &str);
     #[wasm_bindgen(method, getter, js_name = "r2")]
@@ -39077,7 +39077,7 @@ extern "C" {
     #[doc = " - jpeg: generate images in JPEG format."]
     #[doc = " - png: generate images in PNG format."]
     #[wasm_bindgen(method, getter)]
-    pub fn format(this: &RequestInitCfPropertiesImage) -> Option<JsValue>;
+    pub fn format(this: &RequestInitCfPropertiesImage) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_format(this: &RequestInitCfPropertiesImage, val: &str);
     #[doc = " Whether to preserve animation frames from input files. Default is true."]
@@ -39102,7 +39102,7 @@ extern "C" {
     #[doc = "  - none: Discard all invisible EXIF metadata. Currently WebP and PNG"]
     #[doc = "    output formats always discard metadata."]
     #[wasm_bindgen(method, getter)]
-    pub fn metadata(this: &RequestInitCfPropertiesImage) -> Option<JsValue>;
+    pub fn metadata(this: &RequestInitCfPropertiesImage) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_metadata(this: &RequestInitCfPropertiesImage, val: &str);
     #[doc = " Strength of sharpening filter to apply to the image. Floating-point"]
@@ -39174,7 +39174,7 @@ extern "C" {
     #[doc = " rotation, so if you apply flip=h,rotate=90 then the image will be flipped"]
     #[doc = " horizontally, then rotated by 90 degrees."]
     #[wasm_bindgen(method, getter)]
-    pub fn flip(this: &RequestInitCfPropertiesImage) -> Option<JsValue>;
+    pub fn flip(this: &RequestInitCfPropertiesImage) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_flip(this: &RequestInitCfPropertiesImage, val: &str);
     #[doc = " Slightly reduces latency on a cache miss by selecting a"]
@@ -39414,7 +39414,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " @example 3"]
     #[wasm_bindgen(method, getter, js_name = "edgeRequestKeepAliveStatus")]
-    pub fn edge_request_keep_alive_status(this: &IncomingRequestCfPropertiesBase) -> JsValue;
+    pub fn edge_request_keep_alive_status(this: &IncomingRequestCfPropertiesBase) -> f64;
     #[wasm_bindgen(method, setter, js_name = "edgeRequestKeepAliveStatus")]
     pub fn set_edge_request_keep_alive_status(this: &IncomingRequestCfPropertiesBase, val: f64);
     #[doc = " The HTTP Protocol the request used."]
@@ -39494,7 +39494,7 @@ impl IncomingRequestCfPropertiesBase {
     #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
     pub fn new(
         colo: &str,
-        edge_request_keep_alive_status: &JsValue,
+        edge_request_keep_alive_status: f64,
         http_protocol: &str,
         request_priority: &str,
         tls_version: &str,
@@ -39540,7 +39540,7 @@ impl IncomingRequestCfPropertiesBase {
     #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
     pub fn builder(
         colo: &str,
-        edge_request_keep_alive_status: &JsValue,
+        edge_request_keep_alive_status: f64,
         http_protocol: &str,
         request_priority: &str,
         tls_version: &str,
@@ -40106,7 +40106,7 @@ extern "C" {
     #[doc = " - A value of `\"1\"` indicates the certificate has been revoked"]
     #[doc = " - A value of `\"0\"` indicates the certificate has not been revoked"]
     #[wasm_bindgen(method, getter, js_name = "certRevoked")]
-    pub fn cert_revoked(this: &IncomingRequestCfPropertiesTLSClientAuth) -> JsValue;
+    pub fn cert_revoked(this: &IncomingRequestCfPropertiesTLSClientAuth) -> String;
     #[wasm_bindgen(method, setter, js_name = "certRevoked")]
     pub fn set_cert_revoked(this: &IncomingRequestCfPropertiesTLSClientAuth, val: &str);
     #[doc = " The certificate issuer's [distinguished name](https://knowledge.digicert.com/generalinformation/INFO1745.html)"]
@@ -40565,7 +40565,7 @@ pub enum CertVerificationStatus {
     Failed,
 }
 #[allow(dead_code)]
-pub type IncomingRequestCfPropertiesEdgeRequestKeepAliveStatus = JsValue;
+pub type IncomingRequestCfPropertiesEdgeRequestKeepAliveStatus = Number;
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Iso3166Alpha2Code {
@@ -41604,7 +41604,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "contentId")]
     pub fn content_id(this: &EmailAttachment) -> Option<JsValue>;
     #[wasm_bindgen(method, getter)]
-    pub fn disposition(this: &EmailAttachment) -> JsValue;
+    pub fn disposition(this: &EmailAttachment) -> String;
     #[wasm_bindgen(method, getter)]
     pub fn filename(this: &EmailAttachment) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
@@ -42064,7 +42064,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "fileSize")]
     pub fn file_size(this: &ImageInfoResponse) -> Option<f64>;
     #[wasm_bindgen(method, getter)]
-    pub fn format(this: &ImageInfoResponse) -> JsValue;
+    pub fn format(this: &ImageInfoResponse) -> String;
     #[wasm_bindgen(method, getter)]
     pub fn height(this: &ImageInfoResponse) -> Option<f64>;
     #[wasm_bindgen(method, getter)]
@@ -42156,11 +42156,11 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_contrast(this: &ImageTransform, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn fit(this: &ImageTransform) -> Option<JsValue>;
+    pub fn fit(this: &ImageTransform) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_fit(this: &ImageTransform, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn flip(this: &ImageTransform) -> Option<JsValue>;
+    pub fn flip(this: &ImageTransform) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_flip(this: &ImageTransform, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -42178,7 +42178,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "gravity")]
     pub fn set_gravity_with_object(this: &ImageTransform, val: &Object);
     #[wasm_bindgen(method, getter)]
-    pub fn rotate(this: &ImageTransform) -> Option<JsValue>;
+    pub fn rotate(this: &ImageTransform) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_rotate(this: &ImageTransform, val: f64);
     #[wasm_bindgen(method, getter)]
@@ -42402,7 +42402,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImageOutputOptions;
     #[wasm_bindgen(method, getter)]
-    pub fn format(this: &ImageOutputOptions) -> JsValue;
+    pub fn format(this: &ImageOutputOptions) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_format(this: &ImageOutputOptions, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -42754,7 +42754,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_cursor(this: &ImageListOptions, val: &str);
     #[wasm_bindgen(method, getter, js_name = "sortOrder")]
-    pub fn sort_order(this: &ImageListOptions) -> Option<JsValue>;
+    pub fn sort_order(this: &ImageListOptions) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "sortOrder")]
     pub fn set_sort_order(this: &ImageListOptions, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -43413,7 +43413,7 @@ extern "C" {
     pub type MediaTransformationInputOptions;
     #[doc = " How the media should be resized to fit the specified dimensions"]
     #[wasm_bindgen(method, getter)]
-    pub fn fit(this: &MediaTransformationInputOptions) -> Option<JsValue>;
+    pub fn fit(this: &MediaTransformationInputOptions) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_fit(this: &MediaTransformationInputOptions, val: &str);
     #[doc = " Target width in pixels"]
@@ -43464,7 +43464,7 @@ extern "C" {
     pub type MediaTransformationOutputOptions;
     #[doc = " Output mode determining the type of media to generate"]
     #[wasm_bindgen(method, getter)]
-    pub fn mode(this: &MediaTransformationOutputOptions) -> Option<JsValue>;
+    pub fn mode(this: &MediaTransformationOutputOptions) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_mode(this: &MediaTransformationOutputOptions, val: &str);
     #[doc = " Whether to include audio in the output"]
@@ -43489,7 +43489,7 @@ extern "C" {
     pub fn set_image_count(this: &MediaTransformationOutputOptions, val: f64);
     #[doc = " Output format for the generated media."]
     #[wasm_bindgen(method, getter)]
-    pub fn format(this: &MediaTransformationOutputOptions) -> Option<JsValue>;
+    pub fn format(this: &MediaTransformationOutputOptions) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_format(this: &MediaTransformationOutputOptions, val: &str);
 }
@@ -45783,7 +45783,7 @@ extern "C" {
     pub fn set_language(this: &StreamCaption, val: &str);
     #[doc = " The status of a generated caption."]
     #[wasm_bindgen(method, getter)]
-    pub fn status(this: &StreamCaption) -> Option<JsValue>;
+    pub fn status(this: &StreamCaption) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_status(this: &StreamCaption, val: &str);
 }
@@ -46482,7 +46482,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn error(this: &ConversionResponse) -> Option<String>;
     #[wasm_bindgen(method, getter)]
-    pub fn format(this: &ConversionResponse) -> JsValue;
+    pub fn format(this: &ConversionResponse) -> String;
     #[wasm_bindgen(method, getter)]
     pub fn id(this: &ConversionResponse) -> String;
     #[wasm_bindgen(method, getter, js_name = "mimeType")]
@@ -46568,7 +46568,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ImageConversionOptions;
     #[wasm_bindgen(method, getter, js_name = "descriptionLanguage")]
-    pub fn description_language(this: &ImageConversionOptions) -> Option<JsValue>;
+    pub fn description_language(this: &ImageConversionOptions) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "descriptionLanguage")]
     pub fn set_description_language(this: &ImageConversionOptions, val: &str);
 }
@@ -47228,7 +47228,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &Log) -> String;
         #[wasm_bindgen(method, getter)]
-        pub fn level(this: &Log) -> JsValue;
+        pub fn level(this: &Log) -> String;
         #[wasm_bindgen(method, getter)]
         pub fn message(this: &Log) -> Object;
     }
@@ -48503,7 +48503,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type InstanceStatus;
     #[wasm_bindgen(method, getter)]
-    pub fn status(this: &InstanceStatus) -> JsValue;
+    pub fn status(this: &InstanceStatus) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_status(this: &InstanceStatus, val: &str);
     #[wasm_bindgen(method, getter)]

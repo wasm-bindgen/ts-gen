@@ -182,6 +182,86 @@ pub fn lub_types(names: &[&str], ctx: &CodegenContext<'_>, scope: ScopeId) -> Op
     None
 }
 
+/// Compute the LUB of an arbitrary set of [`TypeRef`]s — the entry point
+/// codegen uses for any `Union` lowering.
+///
+/// Handles three flavours of union, in order:
+///
+/// 1. **Literal-type widening**: every member is in the same primitive
+///    family (`StringLiteral`/`String`, `NumberLiteral`/`Number`,
+///    `BooleanLiteral`/`Boolean`) → returns the primitive. Mirrors TS's
+///    literal-type widening so e.g. `"inline" | "attachment"` lowers to
+///    `String` rather than erasing to `JsValue`.
+/// 2. **Named-type LUB**: every member is `TypeRef::Named` and they share
+///    a common ancestor more specific than `Object` (per [`lub_types`])
+///    → returns `TypeRef::Named(ancestor)`.
+/// 3. **No useful upper bound**: returns `None`. The caller substitutes
+///    `JsValue`.
+///
+/// `None` is also returned for empty input or when the only shared
+/// ancestor is `Object` (which is no better than `JsValue` in practice).
+pub fn lub_union(
+    members: &[TypeRef],
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> Option<TypeRef> {
+    if members.is_empty() {
+        return None;
+    }
+    if let Some(widened) = widen_literal_family(members) {
+        return Some(widened);
+    }
+    let cgctx = ctx?;
+    let names: Vec<&str> = members
+        .iter()
+        .map(|m| match m {
+            TypeRef::Named(n) => Some(n.as_str()),
+            _ => None,
+        })
+        .collect::<Option<Vec<_>>>()?;
+    let lub = lub_types(&names, cgctx, scope)?;
+    if lub == "Object" {
+        return None;
+    }
+    Some(TypeRef::Named(lub))
+}
+
+/// If every member of `types` belongs to the same primitive family —
+/// `StringLiteral`/`String`, `NumberLiteral`/`Number`, or
+/// `BooleanLiteral`/`Boolean` — return the corresponding primitive.
+/// Otherwise return `None` and let the caller try named-LUB or fall back.
+fn widen_literal_family(types: &[TypeRef]) -> Option<TypeRef> {
+    enum Family {
+        Str,
+        Num,
+        Bool,
+    }
+    fn family(t: &TypeRef) -> Option<Family> {
+        match t {
+            TypeRef::StringLiteral(_) | TypeRef::String => Some(Family::Str),
+            TypeRef::NumberLiteral(_) | TypeRef::Number => Some(Family::Num),
+            TypeRef::BooleanLiteral(_) | TypeRef::Boolean => Some(Family::Bool),
+            _ => None,
+        }
+    }
+    let mut iter = types.iter().map(family);
+    let first = iter.next()??;
+    for fam in iter {
+        let fam = fam?;
+        if !matches!(
+            (&first, &fam),
+            (Family::Str, Family::Str) | (Family::Num, Family::Num) | (Family::Bool, Family::Bool)
+        ) {
+            return None;
+        }
+    }
+    Some(match first {
+        Family::Str => TypeRef::String,
+        Family::Num => TypeRef::Number,
+        Family::Bool => TypeRef::Boolean,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -275,5 +355,134 @@ mod tests {
         let cgctx = CodegenContext::empty(&gctx, scope);
         let lub = lub_types(&["TypeError", "TypeError"], &cgctx, scope);
         assert_eq!(lub, Some("TypeError".to_string()));
+    }
+
+    // ── lub_union ──────────────────────────────────────────────────────
+
+    #[test]
+    fn lub_union_widens_string_literals_to_string() {
+        let (gctx, scope) = ctx();
+        let cgctx = CodegenContext::empty(&gctx, scope);
+        let lub = lub_union(
+            &[
+                TypeRef::StringLiteral("inline".into()),
+                TypeRef::StringLiteral("attachment".into()),
+            ],
+            Some(&cgctx),
+            scope,
+        );
+        assert_eq!(lub, Some(TypeRef::String));
+    }
+
+    #[test]
+    fn lub_union_widens_string_literal_with_string() {
+        let (gctx, scope) = ctx();
+        let cgctx = CodegenContext::empty(&gctx, scope);
+        let lub = lub_union(
+            &[TypeRef::StringLiteral("a".into()), TypeRef::String],
+            Some(&cgctx),
+            scope,
+        );
+        assert_eq!(lub, Some(TypeRef::String));
+    }
+
+    #[test]
+    fn lub_union_widens_number_literals_to_number() {
+        let (gctx, scope) = ctx();
+        let cgctx = CodegenContext::empty(&gctx, scope);
+        let lub = lub_union(
+            &[TypeRef::NumberLiteral(1.0), TypeRef::NumberLiteral(2.0)],
+            Some(&cgctx),
+            scope,
+        );
+        assert_eq!(lub, Some(TypeRef::Number));
+    }
+
+    #[test]
+    fn lub_union_widens_boolean_literals_to_boolean() {
+        let (gctx, scope) = ctx();
+        let cgctx = CodegenContext::empty(&gctx, scope);
+        let lub = lub_union(
+            &[
+                TypeRef::BooleanLiteral(true),
+                TypeRef::BooleanLiteral(false),
+            ],
+            Some(&cgctx),
+            scope,
+        );
+        assert_eq!(lub, Some(TypeRef::Boolean));
+    }
+
+    #[test]
+    fn lub_union_named_types_with_common_ancestor() {
+        let (gctx, scope) = ctx();
+        let cgctx = CodegenContext::empty(&gctx, scope);
+        let lub = lub_union(
+            &[
+                TypeRef::Named("TypeError".into()),
+                TypeRef::Named("RangeError".into()),
+            ],
+            Some(&cgctx),
+            scope,
+        );
+        assert_eq!(lub, Some(TypeRef::Named("Error".into())));
+    }
+
+    #[test]
+    fn lub_union_returns_none_for_object_only_ancestor() {
+        // Object isn't a useful narrowing — caller falls back to JsValue.
+        let (gctx, scope) = ctx();
+        let cgctx = CodegenContext::empty(&gctx, scope);
+        let lub = lub_union(
+            &[
+                TypeRef::Named("Array".into()),
+                TypeRef::Named("Uint8Array".into()),
+            ],
+            Some(&cgctx),
+            scope,
+        );
+        assert_eq!(lub, None);
+    }
+
+    #[test]
+    fn lub_union_mixed_literal_kinds_no_widening() {
+        // `"a" | 1` has no common primitive — leave the union unresolved
+        // so the caller erases to JsValue.
+        let (gctx, scope) = ctx();
+        let cgctx = CodegenContext::empty(&gctx, scope);
+        let lub = lub_union(
+            &[
+                TypeRef::StringLiteral("a".into()),
+                TypeRef::NumberLiteral(1.0),
+            ],
+            Some(&cgctx),
+            scope,
+        );
+        assert_eq!(lub, None);
+    }
+
+    #[test]
+    fn lub_union_literal_with_unrelated_named_no_widening() {
+        // `"a" | Foo` has no shared primitive ancestor and Foo isn't a
+        // primitive — no LUB.
+        let (gctx, scope) = ctx();
+        let cgctx = CodegenContext::empty(&gctx, scope);
+        let lub = lub_union(
+            &[
+                TypeRef::StringLiteral("a".into()),
+                TypeRef::Named("Foo".into()),
+            ],
+            Some(&cgctx),
+            scope,
+        );
+        assert_eq!(lub, None);
+    }
+
+    #[test]
+    fn lub_union_empty_returns_none() {
+        let (gctx, scope) = ctx();
+        let cgctx = CodegenContext::empty(&gctx, scope);
+        let lub = lub_union(&[], Some(&cgctx), scope);
+        assert_eq!(lub, None);
     }
 }

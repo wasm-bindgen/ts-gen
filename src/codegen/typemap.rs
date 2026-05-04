@@ -513,14 +513,11 @@ pub fn to_syn_type(
             }
         }
         TypeRef::Union(members) => {
-            // Try the subtyping LUB: if every union member is a named type
-            // and they share a common ancestor more specific than `Object`,
-            // emit that ancestor instead of erasing to `JsValue`. Falls back
-            // to `JsValue` for non-named members or when only `Object` is
-            // common (which is no better than `JsValue` in practice).
-            if let Some(lub) = lub_named(members, ctx, scope) {
-                let lub_ty = to_syn_type(&TypeRef::Named(lub), pos, ctx, scope, from_module);
-                return lub_ty;
+            // Single source of truth for union LUB — handles literal
+            // widening, named-type ancestor walking, and the JsValue
+            // fallback diagnostic uniformly. See `subtyping::lub_union`.
+            if let Some(lub) = crate::codegen::subtyping::lub_union(members, ctx, scope) {
+                return to_syn_type(&lub, pos, ctx, scope, from_module);
             }
             if let Some(c) = ctx {
                 c.warn(format!(
@@ -834,39 +831,6 @@ pub(crate) fn make_ident(name: &str) -> syn::Ident {
         // All other keywords can use r# raw identifiers.
         _ => syn::Ident::new_raw(&sanitized, proc_macro2::Span::call_site()),
     }
-}
-
-/// Try to compute a subtyping LUB across a list of `TypeRef`s. Returns
-/// `Some(name)` only when every member is a `TypeRef::Named` *and* the
-/// resulting LUB is more specific than `Object` (a `Object` LUB is no
-/// better than the default `JsValue` erasure, so we treat it as no LUB).
-///
-/// Used by:
-/// * `TypeRef::Union` lowering — collapses unions of named subtypes to
-///   their shared ancestor instead of erasing to `JsValue`.
-/// * `signatures::flatten_type` — collapses generic-container element
-///   alternatives so e.g. `Array<TypeError | RangeError>` emits one
-///   `Array<Error>` rather than two phantom-sibling `Array<TypeError>`
-///   / `Array<RangeError>` bindings.
-pub(crate) fn lub_named(
-    members: &[TypeRef],
-    ctx: Option<&CodegenContext<'_>>,
-    scope: ScopeId,
-) -> Option<String> {
-    let cgctx = ctx?;
-    let names: Vec<&str> = members
-        .iter()
-        .map(|m| match m {
-            TypeRef::Named(n) => Some(n.as_str()),
-            _ => None,
-        })
-        .collect::<Option<Vec<_>>>()?;
-
-    let lub = crate::codegen::subtyping::lub_types(&names, cgctx, scope)?;
-    if lub == "Object" {
-        return None;
-    }
-    Some(lub)
 }
 
 /// Map an IR `TypeRef` to the type used in a wasm_bindgen return position,
