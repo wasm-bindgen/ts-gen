@@ -394,16 +394,16 @@ extern "C" {
     pub fn method(this: &FetchOptions) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_method(this: &FetchOptions, val: &str);
-    #[doc = " Returns: Headers | Record<string, string>"]
+    #[doc = " Returns: Headers | Record<string, string> | undefined"]
     #[wasm_bindgen(method, getter)]
-    pub fn headers(this: &FetchOptions) -> Option<JsValue>;
+    pub fn headers(this: &FetchOptions) -> JsValue;
     #[wasm_bindgen(method, setter)]
     pub fn set_headers(this: &FetchOptions, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_record(this: &FetchOptions, val: &Object<JsString>);
     #[doc = " Returns: string | ArrayBuffer | null"]
     #[wasm_bindgen(method, getter)]
-    pub fn body(this: &FetchOptions) -> Option<JsValue>;
+    pub fn body(this: &FetchOptions) -> JsValue;
     #[wasm_bindgen(method, setter)]
     pub fn set_body(this: &FetchOptions, val: &str);
     #[wasm_bindgen(method, setter, js_name = "body")]
@@ -519,7 +519,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_tag(this: &NotificationOptions, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn data(this: &NotificationOptions) -> Option<JsValue>;
+    pub fn data(this: &NotificationOptions) -> JsValue;
     #[wasm_bindgen(method, setter)]
     pub fn set_data(this: &NotificationOptions, val: &JsValue);
 }

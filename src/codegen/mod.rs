@@ -26,19 +26,39 @@ use typemap::CodegenContext;
 /// can't convey what the runtime values look like in those cases;
 /// surfacing the raw TS shape gives callers somewhere to look.
 ///
+/// `optional` is for sites where the return type has an outer `?:`
+/// marker that widens it with `| undefined` (e.g. dictionary
+/// property getters declared `replyTo?: string | EmailAddress`).
+/// When set, the rendered shape gets `| undefined` appended. This
+/// only affects the rendered text — erasure detection runs on the
+/// inner type as-written.
+///
 /// Idempotent: if the JSDoc already contains a line starting with
 /// `Returns:` we leave the doc untouched, on the assumption that the
 /// human-authored version is already correct.
 pub(crate) fn augment_return_doc(
     doc: Option<String>,
     return_type: &TypeRef,
+    optional: bool,
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) -> Option<String> {
     if !subtyping::return_type_has_erased_union(return_type, ctx, scope) {
         return doc;
     }
-    let line = format!("Returns: {}", return_type.format_ts());
+    let rendered = if optional {
+        // `T | undefined` — but if `T` is already `Nullable(...)` we
+        // don't want to render `T | null | undefined`. The IR's
+        // `Nullable` covers both null and undefined optionality, so
+        // skip the suffix when one's already present.
+        match return_type {
+            TypeRef::Nullable(_) => return_type.format_ts(),
+            other => format!("{} | undefined", other.format_ts()),
+        }
+    } else {
+        return_type.format_ts()
+    };
+    let line = format!("Returns: {rendered}");
     match doc {
         None => Some(line),
         Some(existing) => {

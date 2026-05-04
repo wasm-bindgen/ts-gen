@@ -393,7 +393,7 @@ pub fn build_signatures(
     // still see the original TS shape. Operates on the post-Promise
     // `return_type` since that's what shows up at the call site.
     let augmented_doc =
-        crate::codegen::augment_return_doc(spec.doc.clone(), &return_type, cgctx, scope);
+        crate::codegen::augment_return_doc(spec.doc.clone(), &return_type, false, cgctx, scope);
 
     let allow_try = !is_async && !nothrow && spec.kind.allows_try_variant();
     let mut out = Vec::with_capacity(expansions.len() * if allow_try { 2 } else { 1 });

@@ -473,11 +473,17 @@ pub fn to_syn_type(
 
         // === Structural Types ===
         TypeRef::Nullable(inner) => {
+            let inner_ty = to_syn_type(inner, pos, ctx, scope, from_module);
             if pos.inner {
-                let inner_ty = to_syn_type(inner, pos, ctx, scope, from_module);
                 js_option_or_js_value(inner_ty)
+            } else if !pos.is_argument() && is_jsvalue_arg(&inner_ty) {
+                // In return position, `Option<JsValue>` is redundant —
+                // `JsValue` already carries `null`/`undefined` in-band,
+                // so collapse to bare `JsValue`. Argument position
+                // keeps `Option<&JsValue>` since the caller may want
+                // to distinguish "no value" from "JsValue::NULL".
+                quote! { JsValue }
             } else {
-                let inner_ty = to_syn_type(inner, pos, ctx, scope, from_module);
                 quote! { Option<#inner_ty> }
             }
         }
@@ -1061,10 +1067,15 @@ mod tests {
 
     #[test]
     fn test_nullable_named_type_unresolved() {
-        // Without ctx, Foo is unresolved → JsValue
+        // Without ctx, `Foo` is unresolved → `JsValue`. In *return*
+        // position the `Option<JsValue>` shape is redundant (JsValue
+        // already carries `null`/`undefined` in-band) and collapses
+        // to bare `JsValue`. In *argument* position we preserve
+        // `Option<&JsValue>` so callers can distinguish "no value"
+        // from passing `JsValue::NULL`.
         let ty = TypeRef::Nullable(Box::new(TypeRef::ident("Foo")));
         assert_eq!(arg_type(&ty), "Option < & JsValue >");
-        assert_eq!(ret_type(&ty), "Option < JsValue >");
+        assert_eq!(ret_type(&ty), "JsValue");
     }
 
     #[test]

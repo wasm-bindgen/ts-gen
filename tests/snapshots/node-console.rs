@@ -34,7 +34,7 @@ pub mod console {
         #[doc = ""]
         #[doc = " Returns: boolean | string | null"]
         #[wasm_bindgen(method, getter, js_name = "colorMode")]
-        pub fn color_mode(this: &ConsoleOptions) -> Option<JsValue>;
+        pub fn color_mode(this: &ConsoleOptions) -> JsValue;
         #[wasm_bindgen(method, setter, js_name = "colorMode")]
         pub fn set_color_mode(this: &ConsoleOptions, val: bool);
         #[wasm_bindgen(method, setter, js_name = "colorMode")]

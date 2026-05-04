@@ -1189,9 +1189,15 @@ fn generate_getter(
     used_names: &mut HashSet<String>,
 ) -> TokenStream {
     let this_type = super::typemap::make_ident(&config.effective_rust_name());
+    // The `?:` marker on the original property widens the rendered
+    // TS shape with `| undefined`; threaded through the augmenter
+    // so the `Returns:` doc matches the static type users see in
+    // their `.d.ts`. Erasure detection runs on the inner type
+    // unchanged.
     let augmented = super::augment_return_doc(
         getter.doc.clone(),
         &getter.type_ref,
+        getter.optional,
         config.cgctx,
         config.scope,
     );
@@ -1201,30 +1207,30 @@ fn generate_getter(
     let rust_name = dedupe_name(&candidate, used_names);
     let rust_ident = super::typemap::make_ident(&rust_name);
 
-    let getter_type = if getter.optional {
-        // Unwrap Nullable to avoid Option<Option<T>> — the optionality from `?`
-        // already provides the outer Option.
-        let unwrapped = match &getter.type_ref {
-            TypeRef::Nullable(inner) => inner.as_ref(),
-            other => other,
-        };
-        let inner = to_syn_type(
-            unwrapped,
-            TypePosition::RETURN,
-            config.cgctx,
-            config.scope,
-            &config.from_module(),
-        );
-        quote! { Option<#inner> }
+    // Optional `?:` properties widen to `T | undefined` at the IR
+    // level. Modeling that as `Nullable<T>` lets the regular
+    // `to_syn_type` lowering handle every collapse rule uniformly —
+    // notably the `Option<JsValue>` → `JsValue` shortcut and the
+    // inner-position `JsOption` switch — without the getter site
+    // open-coding its own `Option<#inner>` wrap.
+    let lowered_ty = if getter.optional {
+        // Avoid `Option<Option<T>>` if the source already had a
+        // Nullable: a `T?` property whose type is `T | null` is just
+        // a single layer of optionality.
+        match &getter.type_ref {
+            TypeRef::Nullable(_) => getter.type_ref.clone(),
+            other => TypeRef::Nullable(Box::new(other.clone())),
+        }
     } else {
-        to_syn_type(
-            &getter.type_ref,
-            TypePosition::RETURN,
-            config.cgctx,
-            config.scope,
-            &config.from_module(),
-        )
+        getter.type_ref.clone()
     };
+    let getter_type = to_syn_type(
+        &lowered_ty,
+        TypePosition::RETURN,
+        config.cgctx,
+        config.scope,
+        &config.from_module(),
+    );
 
     let mut wb_parts: Vec<TokenStream> = vec![quote! { method }, quote! { getter }];
     if rust_name != getter.js_name {
@@ -1305,9 +1311,11 @@ fn generate_static_getter(
     used_names: &mut HashSet<String>,
 ) -> TokenStream {
     let class_ident = super::typemap::make_ident(&config.effective_rust_name());
+    // Static getters don't carry an `optional` marker today.
     let augmented = super::augment_return_doc(
         getter.doc.clone(),
         &getter.type_ref,
+        false,
         config.cgctx,
         config.scope,
     );

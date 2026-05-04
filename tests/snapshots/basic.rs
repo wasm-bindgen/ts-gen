@@ -179,7 +179,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "statusText")]
     pub fn set_status_text(this: &ResponseInit, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn headers(this: &ResponseInit) -> Option<JsValue>;
+    pub fn headers(this: &ResponseInit) -> JsValue;
     #[wasm_bindgen(method, setter)]
     pub fn set_headers(this: &ResponseInit, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
