@@ -589,11 +589,8 @@ fn flatten_type(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId
         // Bare references: resolve through aliases, then re-flatten.
         // Generic instantiations and qualified paths don't follow
         // aliases (they're already concrete enough at this level).
-        TypeRef::Reference {
-            head,
-            segments,
-            type_args,
-        } if segments.is_empty() && type_args.is_empty() => {
+        TypeRef::Reference { .. } if ty.as_ident().is_some() => {
+            let head = ty.as_ident().unwrap();
             if let Some(c) = cgctx {
                 if let Some(target) = c.resolve_alias(head, scope) {
                     let target = target.clone();
@@ -784,7 +781,11 @@ fn type_snake_name(ty: &TypeRef) -> String {
         TypeRef::Any | TypeRef::Unknown => "js_value".to_string(),
         TypeRef::Object => "object".to_string(),
         TypeRef::ArrayBufferView => "typed_array".to_string(),
-        TypeRef::Reference { head, .. } => to_snake_case(head),
+        // Snake-case the leftmost (head) segment of any named
+        // reference. Type args don't participate in `_with_` suffixes.
+        TypeRef::Reference { segments, .. } => {
+            to_snake_case(segments.first().map_or("", |s| s.as_str()))
+        }
         TypeRef::Array(_) => "array".to_string(),
         TypeRef::Nullable(inner) => type_snake_name(inner),
         TypeRef::Function(_) => "function".to_string(),

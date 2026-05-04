@@ -261,19 +261,12 @@ impl<'a> CodegenContext<'a> {
         if let Some(type_id) = self.gctx.scopes.resolve(scope, name) {
             let decl = self.gctx.get_type(type_id);
             if let TypeKind::TypeAlias(ref alias) = decl.kind {
-                // If the target is itself a bare reference, keep resolving.
-                // Generic instantiations / qualified paths stop here.
-                if let ir::TypeRef::Reference {
-                    head: ref inner_name,
-                    ref segments,
-                    ref type_args,
-                } = alias.target
-                {
-                    if segments.is_empty() && type_args.is_empty() {
-                        if let Some(resolved) = self.resolve_alias_impl(inner_name, scope, visited)
-                        {
-                            return Some(resolved);
-                        }
+                // If the target is itself a single-segment path,
+                // keep resolving. Generic instantiations and
+                // qualified paths stop here.
+                if let Some(inner_name) = alias.target.as_ident() {
+                    if let Some(resolved) = self.resolve_alias_impl(inner_name, scope, visited) {
+                        return Some(resolved);
                     }
                 }
                 return Some(&alias.target);
@@ -562,11 +555,10 @@ pub fn to_syn_type(
         // the external map (`web_sys::*` defaults / user mappings),
         // then `JsValue` fallback with a diagnostic.
         TypeRef::Reference {
-            head,
             segments,
-            type_args,
+            generic_args,
         } => maybe_ref(
-            lower_reference(head, segments, type_args, pos, ctx, scope, from_module),
+            lower_reference(segments, generic_args, pos, ctx, scope, from_module),
             borrow,
         ),
 
@@ -783,36 +775,38 @@ fn named_type_to_rust(
 /// alias resolution, dedicated-codegen heads (`Promise`, `Map`,
 /// `Set`, `Record`, `Array<T>`, ...), and falls through to
 /// `emit_type_name` for everything else.
+///
+/// `segments` is the full path (`["Foo"]` or `["A", "B", "C"]`).
+/// `generic_args` is empty for non-generic references and non-empty
+/// for instantiations like `Foo<T>` or `A.B.C<X>`.
 fn lower_reference(
-    head: &str,
     segments: &[String],
-    type_args: &[TypeRef],
+    generic_args: &[TypeRef],
     pos: TypePosition,
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
     from_module: &ModuleContext,
 ) -> TokenStream {
-    // Qualified paths are not yet resolved through the scope chain —
-    // we keep the dotted form for `emit_type_name` to consult the
-    // external map, then fall back to JsValue with a diagnostic for
-    // anything that doesn't match.
-    if !segments.is_empty() {
-        let dotted = std::iter::once(head)
-            .chain(segments.iter().map(String::as_str))
-            .collect::<Vec<_>>()
-            .join(".");
+    // Qualified paths (more than one segment) are not yet resolved
+    // through the scope chain — we keep the dotted form for
+    // `emit_type_name` to consult the external map, then fall back
+    // to `JsValue` with a diagnostic for anything that doesn't match.
+    if segments.len() > 1 {
+        let dotted = segments.join(".");
         return match ctx {
             Some(c) => emit_type_name(&dotted, c, from_module),
             None => quote! { JsValue },
         };
     }
 
+    let head = segments.first().map(String::as_str).unwrap_or("");
+
     // Chase user-declared aliases for bare references — `type Foo =
     // string` should lower to `String`, not `Foo`. Skipped when the
     // reference carries generic type arguments (`EmailExportedHandler<Env, Props>`)
     // because we don't substitute generic params; instead we emit the
     // bare alias name and let downstream code see the alias decl.
-    if type_args.is_empty() {
+    if generic_args.is_empty() {
         if let Some(c) = ctx {
             if let Some(target) = c.resolve_alias(head, scope) {
                 let target = target.clone();
@@ -827,21 +821,21 @@ fn lower_reference(
     // share a single dispatch here.
     match head {
         "Promise" | "PromiseLike" => {
-            let inner = type_args.first().cloned().unwrap_or(TypeRef::Any);
+            let inner = generic_args.first().cloned().unwrap_or(TypeRef::Any);
             return generic_container(quote! { Promise }, &inner, pos, ctx, scope, from_module);
         }
         "Array" | "ReadonlyArray" => {
-            let inner = type_args.first().cloned().unwrap_or(TypeRef::Any);
+            let inner = generic_args.first().cloned().unwrap_or(TypeRef::Any);
             return generic_container(quote! { Array }, &inner, pos, ctx, scope, from_module);
         }
         "Set" | "ReadonlySet" => {
-            let inner = type_args.first().cloned().unwrap_or(TypeRef::Any);
+            let inner = generic_args.first().cloned().unwrap_or(TypeRef::Any);
             return generic_container(quote! { Set }, &inner, pos, ctx, scope, from_module);
         }
         "Map" | "ReadonlyMap" => {
             let inner_pos = pos.to_inner();
-            let k = type_args.first().cloned().unwrap_or(TypeRef::Any);
-            let v = type_args.get(1).cloned().unwrap_or(TypeRef::Any);
+            let k = generic_args.first().cloned().unwrap_or(TypeRef::Any);
+            let v = generic_args.get(1).cloned().unwrap_or(TypeRef::Any);
             let k_arg = to_syn_type(&k, inner_pos, ctx, scope, from_module);
             let v_arg = to_syn_type(&v, inner_pos, ctx, scope, from_module);
             return if is_jsvalue_arg(&k_arg) && is_jsvalue_arg(&v_arg) {
@@ -854,7 +848,7 @@ fn lower_reference(
             // `Record<K, V>` desugars to an `Object` with V-typed
             // values. Drop the key type — wasm-bindgen has no Rust
             // representation for "object with arbitrary string keys".
-            let v = type_args.get(1).cloned().unwrap_or(TypeRef::Any);
+            let v = generic_args.get(1).cloned().unwrap_or(TypeRef::Any);
             return generic_container(quote! { Object }, &v, pos, ctx, scope, from_module);
         }
         _ => {}
@@ -863,7 +857,7 @@ fn lower_reference(
     // Generic instantiation of a non-special head — wasm-bindgen
     // bindings can't express user-defined generics yet, so we emit
     // just the base ident with a diagnostic. Type args are dropped.
-    if !type_args.is_empty() {
+    if !generic_args.is_empty() {
         if let Some(c) = ctx {
             c.warn(format!(
                 "generic type arguments on `{head}<...>` are not yet emitted, using bare `{head}`"

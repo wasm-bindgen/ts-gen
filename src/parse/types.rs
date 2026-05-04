@@ -261,10 +261,11 @@ fn convert_type_reference_scoped(
         }
     }
 
+    let mut path = vec![head];
+    path.extend(segments);
     TypeRef::Reference {
-        head,
-        segments,
-        type_args,
+        segments: path,
+        generic_args: type_args,
     }
 }
 

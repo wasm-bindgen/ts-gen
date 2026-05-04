@@ -93,16 +93,15 @@ pub enum TypeRef {
     BooleanLiteral(bool),
 
     // === Named References ===
-    /// Named type reference — possibly qualified (`A.B.C`), possibly
-    /// generic (`Foo<T>`, `A.B.C<T>`), possibly both.
+    /// Nominal type reference: a (possibly qualified) name with an
+    /// (possibly empty) generic type argument list.
     ///
-    /// * `head`: leftmost identifier in the path.
-    /// * `segments`: subsequent dotted segments. Empty for a bare
-    ///   identifier.
-    /// * `type_args`: generic instantiation arguments. Empty for a
-    ///   non-generic reference.
+    /// * `Foo` → `Reference { segments: vec!["Foo"], generic_args: vec![] }`
+    /// * `Foo<T>` → `Reference { segments: vec!["Foo"], generic_args: vec![T] }`
+    /// * `A.B.C` → `Reference { segments: vec!["A","B","C"], generic_args: vec![] }`
+    /// * `A.B.C<T>` → `Reference { segments: vec!["A","B","C"], generic_args: vec![T] }`
     ///
-    /// All scope-resolved names go through this variant: user-declared
+    /// All scope-resolved names use this variant: user-declared
     /// types, built-in JS classes (`Date`, `Error`, `TypeError`,
     /// `Uint8Array`, ...), and `Promise`/`Map`/`Set`/`Record`. Codegen
     /// resolves these at emit time via scope chain → `JS_SYS_RESERVED`
@@ -110,14 +109,15 @@ pub enum TypeRef {
     /// special codegen rules (e.g. `Promise<T>` → `async fn`) are
     /// recognized by name at the relevant emitter.
     ///
-    /// Qualified paths (`segments` non-empty) are not yet resolved
-    /// through the scope chain — they fall back to the external map
-    /// or to `JsValue` with a diagnostic. Proper namespace traversal
-    /// is a future extension.
+    /// Single-segment references participate in alias chasing and
+    /// shadowing (mirroring TS scope-driven resolution); multi-
+    /// segment references are not yet fully resolved through the
+    /// scope chain — they fall back to the external map or to
+    /// `JsValue` with a diagnostic. Proper namespace traversal is a
+    /// future extension.
     Reference {
-        head: String,
         segments: Vec<String>,
-        type_args: Vec<TypeRef>,
+        generic_args: Vec<TypeRef>,
     },
 
     // === Fallback ===
@@ -127,56 +127,50 @@ pub enum TypeRef {
 }
 
 impl TypeRef {
-    /// Construct a bare named reference: `head` with no qualified
-    /// segments and no generic type arguments. Convenience for the
-    /// common case (`MyType`, `Date`, `Foo`).
-    pub fn ident(head: impl Into<String>) -> Self {
+    /// Construct a single-segment, non-generic reference: `Foo`.
+    /// Convenience for the common case of a bare ident.
+    pub fn ident(name: impl Into<String>) -> Self {
         TypeRef::Reference {
-            head: head.into(),
-            segments: Vec::new(),
-            type_args: Vec::new(),
+            segments: vec![name.into()],
+            generic_args: Vec::new(),
         }
     }
 
-    /// Construct a generic instantiation: `head<T1, T2, ...>` with no
-    /// qualified segments. Convenience for `Promise<T>`, `Map<K, V>`,
-    /// `Array<T>`, etc.
-    pub fn generic(head: impl Into<String>, type_args: Vec<TypeRef>) -> Self {
+    /// Construct a single-segment generic instantiation:
+    /// `head<T1, T2, ...>`. Convenience for `Promise<T>`,
+    /// `Map<K, V>`, `Array<T>`, etc.
+    pub fn generic(head: impl Into<String>, generic_args: Vec<TypeRef>) -> Self {
         TypeRef::Reference {
-            head: head.into(),
-            segments: Vec::new(),
-            type_args,
+            segments: vec![head.into()],
+            generic_args,
         }
     }
 
-    /// If `self` is a bare reference (no qualified segments, no
-    /// generic arguments), return the head identifier.
+    /// If `self` is a bare reference (single-segment, no generic
+    /// arguments), return the ident. `Foo` → `Some("Foo")`,
+    /// `A.B` → `None`, `Foo<T>` → `None`.
     pub fn as_ident(&self) -> Option<&str> {
         match self {
             TypeRef::Reference {
-                head,
                 segments,
-                type_args,
-            } if segments.is_empty() && type_args.is_empty() => Some(head.as_str()),
+                generic_args,
+            } if segments.len() == 1 && generic_args.is_empty() => Some(segments[0].as_str()),
             _ => None,
         }
     }
 
-    /// If `self` is a non-qualified reference to the well-known
-    /// generic head `name` (e.g. `"Promise"`, `"Array"`, `"Map"`),
-    /// return its type arguments. Returns `None` for any other shape.
-    ///
-    /// Used by codegen sites that need to recognize `Promise<T>`,
-    /// `Map<K,V>`, etc. without caring whether the head was reached
-    /// via the `T[]` syntactic shortcut, a generic instantiation, or
-    /// any other route.
+    /// If `self` is a generic instantiation of a single-segment head
+    /// matching `name` (e.g. `"Promise"`, `"Map"`), return its type
+    /// arguments. Used by codegen sites that recognize specific
+    /// generic shapes for dedicated lowering.
     pub fn as_generic_head(&self, name: &str) -> Option<&[TypeRef]> {
         match self {
             TypeRef::Reference {
-                head,
                 segments,
-                type_args,
-            } if segments.is_empty() && head == name => Some(type_args),
+                generic_args,
+            } if segments.len() == 1 && segments[0] == name && !generic_args.is_empty() => {
+                Some(generic_args)
+            }
             _ => None,
         }
     }
@@ -260,19 +254,14 @@ impl TypeRef {
             TypeRef::NumberLiteral(n) => n.to_string(),
             TypeRef::BooleanLiteral(b) => b.to_string(),
             TypeRef::Reference {
-                head,
                 segments,
-                type_args,
+                generic_args,
             } => {
-                let mut name = head.clone();
-                for s in segments {
-                    name.push('.');
-                    name.push_str(s);
-                }
-                if type_args.is_empty() {
+                let name = segments.join(".");
+                if generic_args.is_empty() {
                     name
                 } else {
-                    let args = type_args
+                    let args = generic_args
                         .iter()
                         .map(Self::format_ts)
                         .collect::<Vec<_>>()
@@ -760,9 +749,8 @@ mod tests {
     #[test]
     fn format_ts_qualified_path() {
         let ty = TypeRef::Reference {
-            head: "A".into(),
-            segments: vec!["B".into(), "C".into()],
-            type_args: vec![],
+            segments: vec!["A".into(), "B".into(), "C".into()],
+            generic_args: vec![],
         };
         assert_eq!(ty.format_ts(), "A.B.C");
     }
@@ -770,9 +758,8 @@ mod tests {
     #[test]
     fn format_ts_qualified_generic() {
         let ty = TypeRef::Reference {
-            head: "Rpc".into(),
-            segments: vec!["Stub".into()],
-            type_args: vec![TypeRef::ident("Foo")],
+            segments: vec!["Rpc".into(), "Stub".into()],
+            generic_args: vec![TypeRef::ident("Foo")],
         };
         assert_eq!(ty.format_ts(), "Rpc.Stub<Foo>");
     }

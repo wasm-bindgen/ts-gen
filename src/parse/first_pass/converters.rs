@@ -375,11 +375,13 @@ fn convert_ts_type_from_heritage(
     diag: &mut DiagnosticCollector,
 ) -> ir::TypeRef {
     match expression_to_path(expr) {
-        Some((head, segments)) => ir::TypeRef::Reference {
-            head,
-            segments,
-            type_args: Vec::new(),
-        },
+        Some((head, mut segments)) => {
+            segments.insert(0, head);
+            ir::TypeRef::Reference {
+                segments,
+                generic_args: Vec::new(),
+            }
+        }
         None => {
             diag.warn("Unsupported heritage expression, falling back to Object");
             ir::TypeRef::ident("Object")
@@ -417,11 +419,11 @@ fn convert_ts_type_name_to_ref(type_name: &ast::TSTypeName<'_>) -> ir::TypeRef {
     match type_name {
         ast::TSTypeName::IdentifierReference(ident) => ir::TypeRef::ident(ident.name.to_string()),
         ast::TSTypeName::QualifiedName(qualified) => {
-            let (head, segments) = collect_qualified_path(qualified);
+            let (head, mut segments) = collect_qualified_path(qualified);
+            segments.insert(0, head);
             ir::TypeRef::Reference {
-                head,
                 segments,
-                type_args: Vec::new(),
+                generic_args: Vec::new(),
             }
         }
         ast::TSTypeName::ThisExpression(_) => ir::TypeRef::Unresolved("this".to_string()),

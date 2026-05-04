@@ -105,13 +105,9 @@ fn user_parents(name: &str, ctx: &CodegenContext<'_>, scope: ScopeId) -> Vec<Str
 /// (generic instantiations, unions, qualified paths, etc.) that don't
 /// have a single representative supertype name.
 fn parent_typeref_to_names(ty: &TypeRef) -> Vec<String> {
-    match ty {
-        TypeRef::Reference {
-            head,
-            segments,
-            type_args,
-        } if segments.is_empty() && type_args.is_empty() => vec![head.clone()],
-        _ => Vec::new(),
+    match ty.as_ident() {
+        Some(name) => vec![name.to_string()],
+        None => Vec::new(),
     }
 }
 
@@ -216,29 +212,19 @@ pub fn lub_union(
         return Some(widened);
     }
     let cgctx = ctx?;
-    // Collect names: only bare references (no generics, no path)
-    // participate in the named-LUB lattice. Generic instantiations
-    // and qualified paths are too coarse to compare structurally.
+    // Collect names: only bare references (single-segment, no
+    // generics) participate in the named-LUB lattice. Generic
+    // instantiations and qualified paths are too coarse to compare
+    // structurally.
     let names: Vec<&str> = members
         .iter()
-        .map(|m| match m {
-            TypeRef::Reference {
-                head,
-                segments,
-                type_args,
-            } if segments.is_empty() && type_args.is_empty() => Some(head.as_str()),
-            _ => None,
-        })
+        .map(|m| m.as_ident())
         .collect::<Option<Vec<_>>>()?;
     let lub = lub_types(&names, cgctx, scope)?;
     if lub == "Object" {
         return None;
     }
-    Some(TypeRef::Reference {
-        head: lub,
-        segments: Vec::new(),
-        type_args: Vec::new(),
-    })
+    Some(TypeRef::ident(lub))
 }
 
 /// Recursively walk a return-position `TypeRef` and report whether
@@ -278,7 +264,7 @@ pub fn return_type_has_erased_union(
         TypeRef::Intersection(parts) => parts
             .iter()
             .any(|p| return_type_has_erased_union(p, ctx, scope)),
-        TypeRef::Reference { type_args, .. } => type_args
+        TypeRef::Reference { generic_args, .. } => generic_args
             .iter()
             .any(|a| return_type_has_erased_union(a, ctx, scope)),
         // Function types in return position bind at the FFI as
