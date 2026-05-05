@@ -160,6 +160,17 @@ fn print_declaration(decl: &ts_gen::ir::TypeDeclaration, indent: usize) {
                 print_member(member, indent + 1);
             }
         }
+        ts_gen::ir::TypeKind::DiscriminatedUnion(d) => {
+            eprintln!(
+                "{prefix}[{ctx}] discriminated_union {} ({} branches, discriminators: {:?})",
+                d.name,
+                d.branches.len(),
+                d.discriminators,
+            );
+            for member in &d.members {
+                print_member(member, indent + 1);
+            }
+        }
         ts_gen::ir::TypeKind::TypeAlias(t) => {
             eprintln!("{prefix}[{ctx}] type {} = {:?}", t.name, t.target);
         }

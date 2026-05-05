@@ -4,6 +4,7 @@
 //! and produces formatted Rust source code as a string.
 
 pub mod classes;
+pub mod discriminated_unions;
 pub mod enums;
 pub mod functions;
 pub mod signatures;
@@ -269,6 +270,14 @@ fn generate_declaration(decl: &TypeDeclaration, cgctx: &CodegenContext) -> Optio
                 decl.scope_id,
             )),
         },
+        TypeKind::DiscriminatedUnion(d) => {
+            Some(discriminated_unions::generate_discriminated_union(
+                d,
+                &decl.module_context,
+                Some(cgctx),
+                decl.scope_id,
+            ))
+        }
         TypeKind::StringEnum(e) => Some(enums::generate_string_enum(e)),
         TypeKind::NumericEnum(e) => Some(enums::generate_numeric_enum(e)),
         TypeKind::Function(f) => Some(functions::generate_function(
@@ -425,6 +434,18 @@ fn generate_ns_declaration(
                 decl.scope_id,
             )),
         },
+        TypeKind::DiscriminatedUnion(d) => {
+            // Discriminated unions don't currently support `js_namespace`
+            // (no observed cases in the wild). Emit without the namespace
+            // attribute — if a real case shows up we can thread it
+            // through `ClassConfig::js_namespace` like the others.
+            Some(discriminated_unions::generate_discriminated_union(
+                d,
+                &decl.module_context,
+                Some(cgctx),
+                decl.scope_id,
+            ))
+        }
         TypeKind::Function(f) => Some(functions::generate_function_with_js_namespace(
             f,
             &decl.module_context,

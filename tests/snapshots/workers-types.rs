@@ -7838,18 +7838,18 @@ extern "C" {
     pub type KVNamespaceListResult;
     #[wasm_bindgen(method, getter)]
     pub fn list_complete(this: &KVNamespaceListResult) -> bool;
-    #[wasm_bindgen(method, getter)]
-    pub fn keys(this: &KVNamespaceListResult) -> Array<KVNamespaceListKey>;
-    #[wasm_bindgen(method, getter)]
-    pub fn cursor(this: &KVNamespaceListResult) -> Option<String>;
-    #[wasm_bindgen(method, getter, js_name = "cacheStatus")]
-    pub fn cache_status(this: &KVNamespaceListResult) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_list_complete(this: &KVNamespaceListResult, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn keys(this: &KVNamespaceListResult) -> Array<KVNamespaceListKey>;
     #[wasm_bindgen(method, setter)]
     pub fn set_keys(this: &KVNamespaceListResult, val: &Array<KVNamespaceListKey>);
+    #[wasm_bindgen(method, getter)]
+    pub fn cursor(this: &KVNamespaceListResult) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_cursor(this: &KVNamespaceListResult, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "cacheStatus")]
+    pub fn cache_status(this: &KVNamespaceListResult) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "cacheStatus")]
     pub fn set_cache_status(this: &KVNamespaceListResult, val: &str);
 }
@@ -7859,9 +7859,15 @@ impl KVNamespaceListResult {
     #[doc = " * `list_complete: false`"]
     pub fn new_false(
         keys: &Array<KVNamespaceListKey>,
+        cursor: &str,
         cache_status: Option<&str>,
     ) -> KVNamespaceListResult {
-        Self::builder_false(keys, cache_status).build()
+        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_list_complete(false);
+        inner.set_keys(keys);
+        inner.set_cursor(cursor);
+        inner.set_cache_status(cache_status);
+        inner
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
@@ -7871,19 +7877,6 @@ impl KVNamespaceListResult {
         cache_status: Option<&str>,
     ) -> KVNamespaceListResult {
         Self::builder_true(keys, cache_status).build()
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `list_complete: false`"]
-    pub fn builder_false(
-        keys: &Array<KVNamespaceListKey>,
-        cache_status: Option<&str>,
-    ) -> KVNamespaceListResultBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_list_complete(false);
-        inner.set_keys(keys);
-        inner.set_cache_status(cache_status);
-        KVNamespaceListResultBuilder { inner }
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
@@ -8884,14 +8877,14 @@ extern "C" {
     pub type R2Range;
     #[wasm_bindgen(method, getter)]
     pub fn offset(this: &R2Range) -> Option<f64>;
-    #[wasm_bindgen(method, getter)]
-    pub fn length(this: &R2Range) -> Option<f64>;
-    #[wasm_bindgen(method, getter)]
-    pub fn suffix(this: &R2Range) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_offset(this: &R2Range, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn length(this: &R2Range) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_length(this: &R2Range, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn suffix(this: &R2Range) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_suffix(this: &R2Range, val: f64);
 }
@@ -10041,10 +10034,10 @@ extern "C" {
     pub type ReadableStreamReadResult;
     #[wasm_bindgen(method, getter)]
     pub fn done(this: &ReadableStreamReadResult) -> bool;
-    #[wasm_bindgen(method, getter)]
-    pub fn value(this: &ReadableStreamReadResult) -> Option<R>;
     #[wasm_bindgen(method, setter)]
     pub fn set_done(this: &ReadableStreamReadResult, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn value(this: &ReadableStreamReadResult) -> Option<R>;
     #[wasm_bindgen(method, setter)]
     pub fn set_value(this: &ReadableStreamReadResult, val: &R);
 }
@@ -10052,22 +10045,17 @@ impl ReadableStreamReadResult {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `done: false`"]
-    pub fn new_false() -> ReadableStreamReadResult {
-        Self::builder_false().build()
+    pub fn new_false(value: &R) -> ReadableStreamReadResult {
+        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_done(false);
+        inner.set_value(value);
+        inner
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `done: true`"]
     pub fn new_true() -> ReadableStreamReadResult {
         Self::builder_true().build()
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `done: false`"]
-    pub fn builder_false() -> ReadableStreamReadResultBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_done(false);
-        ReadableStreamReadResultBuilder { inner }
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
@@ -18475,18 +18463,18 @@ extern "C" {
     #[doc = " Returns: string | string[] | undefined"]
     #[wasm_bindgen(method, getter)]
     pub fn text(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input) -> JsValue;
-    #[doc = " The pooling method used in the embedding process. `cls` pooling will generate more accurate embeddings on larger inputs - however, embeddings created with cls pooling are not compatible with embeddings generated with mean pooling. The default pooling method is `mean` in order for this to not be a breaking change, but we highly suggest using the new `cls` pooling for better accuracy."]
-    #[wasm_bindgen(method, getter)]
-    pub fn pooling(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input) -> Option<String>;
-    #[doc = " Batch of the embeddings requests to run using async-queue"]
-    #[wasm_bindgen(method, getter)]
-    pub fn requests(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input) -> Option<Array<Object>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_text(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input, val: &str);
     #[wasm_bindgen(method, setter, js_name = "text")]
     pub fn set_text_with_array(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input, val: &Array<JsString>);
+    #[doc = " The pooling method used in the embedding process. `cls` pooling will generate more accurate embeddings on larger inputs - however, embeddings created with cls pooling are not compatible with embeddings generated with mean pooling. The default pooling method is `mean` in order for this to not be a breaking change, but we highly suggest using the new `cls` pooling for better accuracy."]
+    #[wasm_bindgen(method, getter)]
+    pub fn pooling(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_pooling(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input, val: &str);
+    #[doc = " Batch of the embeddings requests to run using async-queue"]
+    #[wasm_bindgen(method, getter)]
+    pub fn requests(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input) -> Option<Array<Object>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_requests(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input, val: &Array<Object>);
 }
@@ -18665,21 +18653,21 @@ extern "C" {
     #[doc = " The text to be translated"]
     #[wasm_bindgen(method, getter)]
     pub fn text(this: &Ai_Cf_Meta_M2M100_1_2B_Input) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_text(this: &Ai_Cf_Meta_M2M100_1_2B_Input, val: &str);
     #[doc = " The language code of the source text (e.g., 'en' for English). Defaults to 'en' if not specified"]
     #[wasm_bindgen(method, getter)]
     pub fn source_lang(this: &Ai_Cf_Meta_M2M100_1_2B_Input) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_source_lang(this: &Ai_Cf_Meta_M2M100_1_2B_Input, val: &str);
     #[doc = " The language code to translate the text into (e.g., 'es' for Spanish)"]
     #[wasm_bindgen(method, getter)]
     pub fn target_lang(this: &Ai_Cf_Meta_M2M100_1_2B_Input) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_target_lang(this: &Ai_Cf_Meta_M2M100_1_2B_Input, val: &str);
     #[doc = " Batch of the embeddings requests to run using async-queue"]
     #[wasm_bindgen(method, getter)]
     pub fn requests(this: &Ai_Cf_Meta_M2M100_1_2B_Input) -> Option<Array<Object>>;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_text(this: &Ai_Cf_Meta_M2M100_1_2B_Input, val: &str);
-    #[wasm_bindgen(method, setter)]
-    pub fn set_source_lang(this: &Ai_Cf_Meta_M2M100_1_2B_Input, val: &str);
-    #[wasm_bindgen(method, setter)]
-    pub fn set_target_lang(this: &Ai_Cf_Meta_M2M100_1_2B_Input, val: &str);
     #[wasm_bindgen(method, setter)]
     pub fn set_requests(this: &Ai_Cf_Meta_M2M100_1_2B_Input, val: &Array<Object>);
 }
@@ -18779,18 +18767,18 @@ extern "C" {
     #[doc = " Returns: string | string[] | undefined"]
     #[wasm_bindgen(method, getter)]
     pub fn text(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input) -> JsValue;
-    #[doc = " The pooling method used in the embedding process. `cls` pooling will generate more accurate embeddings on larger inputs - however, embeddings created with cls pooling are not compatible with embeddings generated with mean pooling. The default pooling method is `mean` in order for this to not be a breaking change, but we highly suggest using the new `cls` pooling for better accuracy."]
-    #[wasm_bindgen(method, getter)]
-    pub fn pooling(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input) -> Option<String>;
-    #[doc = " Batch of the embeddings requests to run using async-queue"]
-    #[wasm_bindgen(method, getter)]
-    pub fn requests(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input) -> Option<Array<Object>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_text(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input, val: &str);
     #[wasm_bindgen(method, setter, js_name = "text")]
     pub fn set_text_with_array(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input, val: &Array<JsString>);
+    #[doc = " The pooling method used in the embedding process. `cls` pooling will generate more accurate embeddings on larger inputs - however, embeddings created with cls pooling are not compatible with embeddings generated with mean pooling. The default pooling method is `mean` in order for this to not be a breaking change, but we highly suggest using the new `cls` pooling for better accuracy."]
+    #[wasm_bindgen(method, getter)]
+    pub fn pooling(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_pooling(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input, val: &str);
+    #[doc = " Batch of the embeddings requests to run using async-queue"]
+    #[wasm_bindgen(method, getter)]
+    pub fn requests(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input) -> Option<Array<Object>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_requests(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input, val: &Array<Object>);
 }
@@ -18893,18 +18881,18 @@ extern "C" {
     #[doc = " Returns: string | string[] | undefined"]
     #[wasm_bindgen(method, getter)]
     pub fn text(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input) -> JsValue;
-    #[doc = " The pooling method used in the embedding process. `cls` pooling will generate more accurate embeddings on larger inputs - however, embeddings created with cls pooling are not compatible with embeddings generated with mean pooling. The default pooling method is `mean` in order for this to not be a breaking change, but we highly suggest using the new `cls` pooling for better accuracy."]
-    #[wasm_bindgen(method, getter)]
-    pub fn pooling(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input) -> Option<String>;
-    #[doc = " Batch of the embeddings requests to run using async-queue"]
-    #[wasm_bindgen(method, getter)]
-    pub fn requests(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input) -> Option<Array<Object>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_text(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input, val: &str);
     #[wasm_bindgen(method, setter, js_name = "text")]
     pub fn set_text_with_array(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input, val: &Array<JsString>);
+    #[doc = " The pooling method used in the embedding process. `cls` pooling will generate more accurate embeddings on larger inputs - however, embeddings created with cls pooling are not compatible with embeddings generated with mean pooling. The default pooling method is `mean` in order for this to not be a breaking change, but we highly suggest using the new `cls` pooling for better accuracy."]
+    #[wasm_bindgen(method, getter)]
+    pub fn pooling(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_pooling(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input, val: &str);
+    #[doc = " Batch of the embeddings requests to run using async-queue"]
+    #[wasm_bindgen(method, getter)]
+    pub fn requests(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input) -> Option<Array<Object>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_requests(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input, val: &Array<Object>);
 }
@@ -25063,13 +25051,13 @@ extern "C" {
     #[doc = " Returns: object | string"]
     #[wasm_bindgen(method, getter)]
     pub fn audio(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input) -> JsValue;
-    #[doc = " type of data PCM data that's sent to the inference server as raw array"]
-    #[wasm_bindgen(method, getter)]
-    pub fn dtype(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_audio(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input, val: &Object);
     #[wasm_bindgen(method, setter, js_name = "audio")]
     pub fn set_audio_with_str(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input, val: &str);
+    #[doc = " type of data PCM data that's sent to the inference server as raw array"]
+    #[wasm_bindgen(method, getter)]
+    pub fn dtype(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_dtype(this: &Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input, val: &str);
 }
@@ -41266,23 +41254,23 @@ extern "C" {
     pub type EmailAttachment;
     #[wasm_bindgen(method, getter)]
     pub fn disposition(this: &EmailAttachment) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_disposition(this: &EmailAttachment, val: &str);
     #[wasm_bindgen(method, getter, js_name = "contentId")]
     pub fn content_id(this: &EmailAttachment) -> Option<String>;
+    #[wasm_bindgen(method, setter, js_name = "contentId")]
+    pub fn set_content_id(this: &EmailAttachment, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn filename(this: &EmailAttachment) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_filename(this: &EmailAttachment, val: &str);
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &EmailAttachment) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &EmailAttachment, val: &str);
     #[doc = " Returns: string | ArrayBuffer | ArrayBufferView"]
     #[wasm_bindgen(method, getter)]
     pub fn content(this: &EmailAttachment) -> JsValue;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_disposition(this: &EmailAttachment, val: &str);
-    #[wasm_bindgen(method, setter, js_name = "contentId")]
-    pub fn set_content_id(this: &EmailAttachment, val: &str);
-    #[wasm_bindgen(method, setter)]
-    pub fn set_filename(this: &EmailAttachment, val: &str);
-    #[wasm_bindgen(method, setter)]
-    pub fn set_type(this: &EmailAttachment, val: &str);
     #[wasm_bindgen(method, setter)]
     pub fn set_content(this: &EmailAttachment, val: &str);
     #[wasm_bindgen(method, setter, js_name = "content")]
@@ -41294,28 +41282,53 @@ impl EmailAttachment {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `disposition: \"inline\"`"]
-    pub fn new_inline(filename: &str, r#type: &str, content: &str) -> EmailAttachment {
-        Self::builder_inline(filename, r#type, content).build()
+    pub fn new_inline(
+        content_id: &str,
+        filename: &str,
+        r#type: &str,
+        content: &str,
+    ) -> EmailAttachment {
+        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition("inline");
+        inner.set_content_id(content_id);
+        inner.set_filename(filename);
+        inner.set_type(r#type);
+        inner.set_content(content);
+        inner
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `disposition: \"inline\"`"]
     pub fn new_inline_with_array_buffer(
+        content_id: &str,
         filename: &str,
         r#type: &str,
         content: &ArrayBuffer,
     ) -> EmailAttachment {
-        Self::builder_inline_with_array_buffer(filename, r#type, content).build()
+        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition("inline");
+        inner.set_content_id(content_id);
+        inner.set_filename(filename);
+        inner.set_type(r#type);
+        inner.set_content_with_array_buffer(content);
+        inner
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `disposition: \"inline\"`"]
     pub fn new_inline_with_typed_array<T: ::js_sys::TypedArray>(
+        content_id: &str,
         filename: &str,
         r#type: &str,
         content: &T,
     ) -> EmailAttachment {
-        Self::builder_inline_with_typed_array(filename, r#type, content).build()
+        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_disposition("inline");
+        inner.set_content_id(content_id);
+        inner.set_filename(filename);
+        inner.set_type(r#type);
+        inner.set_content_with_typed_array(content);
+        inner
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
@@ -41342,47 +41355,6 @@ impl EmailAttachment {
         content: &T,
     ) -> EmailAttachment {
         Self::builder_attachment_with_typed_array(filename, r#type, content).build()
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `disposition: \"inline\"`"]
-    pub fn builder_inline(filename: &str, r#type: &str, content: &str) -> EmailAttachmentBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition("inline");
-        inner.set_filename(filename);
-        inner.set_type(r#type);
-        inner.set_content(content);
-        EmailAttachmentBuilder { inner }
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `disposition: \"inline\"`"]
-    pub fn builder_inline_with_array_buffer(
-        filename: &str,
-        r#type: &str,
-        content: &ArrayBuffer,
-    ) -> EmailAttachmentBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition("inline");
-        inner.set_filename(filename);
-        inner.set_type(r#type);
-        inner.set_content_with_array_buffer(content);
-        EmailAttachmentBuilder { inner }
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `disposition: \"inline\"`"]
-    pub fn builder_inline_with_typed_array<T: ::js_sys::TypedArray>(
-        filename: &str,
-        r#type: &str,
-        content: &T,
-    ) -> EmailAttachmentBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition("inline");
-        inner.set_filename(filename);
-        inner.set_type(r#type);
-        inner.set_content_with_typed_array(content);
-        EmailAttachmentBuilder { inner }
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
@@ -41728,18 +41700,18 @@ extern "C" {
     pub type ImageInfoResponse;
     #[wasm_bindgen(method, getter)]
     pub fn format(this: &ImageInfoResponse) -> String;
-    #[wasm_bindgen(method, getter, js_name = "fileSize")]
-    pub fn file_size(this: &ImageInfoResponse) -> Option<f64>;
-    #[wasm_bindgen(method, getter)]
-    pub fn width(this: &ImageInfoResponse) -> Option<f64>;
-    #[wasm_bindgen(method, getter)]
-    pub fn height(this: &ImageInfoResponse) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_format(this: &ImageInfoResponse, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "fileSize")]
+    pub fn file_size(this: &ImageInfoResponse) -> Option<f64>;
     #[wasm_bindgen(method, setter, js_name = "fileSize")]
     pub fn set_file_size(this: &ImageInfoResponse, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn width(this: &ImageInfoResponse) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_width(this: &ImageInfoResponse, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn height(this: &ImageInfoResponse) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_height(this: &ImageInfoResponse, val: f64);
 }
@@ -46097,30 +46069,30 @@ extern "C" {
     pub type ConversionResponse;
     #[wasm_bindgen(method, getter)]
     pub fn id(this: &ConversionResponse) -> String;
-    #[wasm_bindgen(method, getter)]
-    pub fn name(this: &ConversionResponse) -> String;
-    #[wasm_bindgen(method, getter, js_name = "mimeType")]
-    pub fn mime_type(this: &ConversionResponse) -> String;
-    #[wasm_bindgen(method, getter)]
-    pub fn format(this: &ConversionResponse) -> String;
-    #[wasm_bindgen(method, getter)]
-    pub fn tokens(this: &ConversionResponse) -> Option<f64>;
-    #[wasm_bindgen(method, getter)]
-    pub fn data(this: &ConversionResponse) -> Option<String>;
-    #[wasm_bindgen(method, getter)]
-    pub fn error(this: &ConversionResponse) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_id(this: &ConversionResponse, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn name(this: &ConversionResponse) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_name(this: &ConversionResponse, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "mimeType")]
+    pub fn mime_type(this: &ConversionResponse) -> String;
     #[wasm_bindgen(method, setter, js_name = "mimeType")]
     pub fn set_mime_type(this: &ConversionResponse, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn format(this: &ConversionResponse) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_format(this: &ConversionResponse, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn tokens(this: &ConversionResponse) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_tokens(this: &ConversionResponse, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn data(this: &ConversionResponse) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_data(this: &ConversionResponse, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn error(this: &ConversionResponse) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_error(this: &ConversionResponse, val: &str);
 }
@@ -46128,35 +46100,55 @@ impl ConversionResponse {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"markdown\"`"]
-    pub fn new_markdown(id: &str, name: &str, mime_type: &str) -> ConversionResponse {
-        Self::builder_markdown(id, name, mime_type).build()
+    pub fn new_markdown(
+        id: &str,
+        name: &str,
+        mime_type: &str,
+        tokens: f64,
+        data: &str,
+    ) -> ConversionResponse {
+        Self::builder_markdown(id, name, mime_type, tokens, data).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"error\"`"]
-    pub fn new_error(id: &str, name: &str, mime_type: &str) -> ConversionResponse {
-        Self::builder_error(id, name, mime_type).build()
+    pub fn new_error(id: &str, name: &str, mime_type: &str, error: &str) -> ConversionResponse {
+        Self::builder_error(id, name, mime_type, error).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"markdown\"`"]
-    pub fn builder_markdown(id: &str, name: &str, mime_type: &str) -> ConversionResponseBuilder {
+    pub fn builder_markdown(
+        id: &str,
+        name: &str,
+        mime_type: &str,
+        tokens: f64,
+        data: &str,
+    ) -> ConversionResponseBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_name(name);
         inner.set_mime_type(mime_type);
         inner.set_format("markdown");
+        inner.set_tokens(tokens);
+        inner.set_data(data);
         ConversionResponseBuilder { inner }
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `format: \"error\"`"]
-    pub fn builder_error(id: &str, name: &str, mime_type: &str) -> ConversionResponseBuilder {
+    pub fn builder_error(
+        id: &str,
+        name: &str,
+        mime_type: &str,
+        error: &str,
+    ) -> ConversionResponseBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_name(name);
         inner.set_mime_type(mime_type);
         inner.set_format("error");
+        inner.set_error(error);
         ConversionResponseBuilder { inner }
     }
 }
@@ -47268,14 +47260,14 @@ extern "C" {
     pub type VectorizeIndexConfig;
     #[wasm_bindgen(method, getter)]
     pub fn dimensions(this: &VectorizeIndexConfig) -> Option<f64>;
-    #[wasm_bindgen(method, getter)]
-    pub fn metric(this: &VectorizeIndexConfig) -> Option<VectorizeDistanceMetric>;
-    #[wasm_bindgen(method, getter)]
-    pub fn preset(this: &VectorizeIndexConfig) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_dimensions(this: &VectorizeIndexConfig, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn metric(this: &VectorizeIndexConfig) -> Option<VectorizeDistanceMetric>;
     #[wasm_bindgen(method, setter)]
     pub fn set_metric(this: &VectorizeIndexConfig, val: &VectorizeDistanceMetric);
+    #[wasm_bindgen(method, getter)]
+    pub fn preset(this: &VectorizeIndexConfig) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_preset(this: &VectorizeIndexConfig, val: &str);
 }

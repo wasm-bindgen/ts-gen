@@ -41,7 +41,7 @@ use crate::parse::scope::ScopeId;
 use crate::util::naming::to_snake_case;
 
 /// Configuration for generating a class-like extern block.
-struct ClassConfig<'a> {
+pub(crate) struct ClassConfig<'a> {
     /// Rust type name.
     rust_name: String,
     /// JS class name (for `js_name` / `js_class` attributes).
@@ -114,6 +114,34 @@ impl<'a> ClassConfig<'a> {
             rust_name: decl.name.clone(),
             js_name: decl.js_name.clone(),
             extends,
+            module,
+            js_namespace: None,
+            is_abstract: false,
+            members: decl.members.clone(),
+            cgctx,
+            scope,
+        }
+    }
+
+    /// Build a `ClassConfig` from a [`DiscriminatedUnionDecl`]. Members
+    /// are the merged shape — used for the extern block (one getter /
+    /// setter set covering every property across branches). Per-branch
+    /// information is passed alongside through
+    /// [`generate_dictionary_factory_with_passes`] in the caller.
+    pub(crate) fn from_discriminated_union(
+        decl: &crate::ir::DiscriminatedUnionDecl,
+        ctx: &ModuleContext,
+        cgctx: Option<&'a CodegenContext>,
+        scope: ScopeId,
+    ) -> Self {
+        let module = match ctx {
+            ModuleContext::Module(m) => Some(m.clone()),
+            ModuleContext::Global => None,
+        };
+        ClassConfig {
+            rust_name: decl.name.clone(),
+            js_name: decl.js_name.clone(),
+            extends: vec![quote! { Object }],
             module,
             js_namespace: None,
             is_abstract: false,
@@ -237,6 +265,29 @@ pub fn generate_dictionary_extern(
 /// }
 /// ```
 fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
+    generate_dictionary_factory_with_passes(config, None)
+}
+
+/// Same as [`generate_dictionary_factory`] but lets the caller override
+/// the **required-field passes** that drive `new_*` / `builder_*`
+/// generation.
+///
+/// * `None` — single pass over the merged required-getter set. This is
+///   the regular-interface and dictionary path.
+/// * `Some(passes)` — one pass per entry; each entry's getters drive
+///   one cohort of `new_*` / `builder_*` variants. Used for
+///   discriminated unions, where each branch contributes a distinct
+///   required-field pass and produces its own per-discriminant
+///   factories.
+///
+/// The wrapper struct's fluent setters (the
+/// `optional`-fields-on-the-merged-shape side) are unchanged across
+/// passes — they always reflect the merged optional set, which is the
+/// runtime-permissive view callers can always tweak.
+pub(crate) fn generate_dictionary_factory_with_passes(
+    config: &ClassConfig,
+    factory_required_overrides: Option<Vec<Vec<&crate::ir::GetterMember>>>,
+) -> TokenStream {
     let rust_type = super::typemap::make_ident(&config.effective_rust_name());
     let builder_name = super::typemap::make_ident(&format!("{}Builder", config.rust_name));
 
@@ -286,8 +337,10 @@ fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
         })
         .collect();
 
-    // Partition getters: required ones become positional `builder(...)`
-    // arguments, optional ones become fluent setter methods.
+    // Partition getters by the merged-shape `optional` flag. This
+    // partition drives the wrapper's fluent setters (optional set) and
+    // is the default required-field pass when no per-branch override is
+    // supplied.
     let mut required_getters: Vec<&crate::ir::GetterMember> = Vec::new();
     let mut optional_getters: Vec<&crate::ir::GetterMember> = Vec::new();
     for g in &getters {
@@ -298,11 +351,25 @@ fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
         }
     }
 
+    // The list of required-field passes drives `new_*` / `builder_*`
+    // generation. Plain interfaces / dictionaries get a single pass
+    // (the merged required set). Discriminated unions thread one pass
+    // per branch via `factory_required_overrides` so that each
+    // branch's required fields surface as positional args in its own
+    // `new_<discriminator>(...)` variant — see
+    // [`generate_dictionary_factory_with_passes`].
+    let required_passes: Vec<Vec<&crate::ir::GetterMember>> =
+        factory_required_overrides.unwrap_or_else(|| vec![required_getters.clone()]);
+
     // When every property is required, the builder type is dead weight: it
     // would carry only `pub fn build(self) -> Foo` with nothing to chain,
     // so we suppress it. `new(reqs)` still gets emitted but inlines the
     // construction directly. See the dictionary-builder convention in
     // `CONVENTIONS.md` for the rule.
+    //
+    // For discriminated unions the merged-shape optional set is what
+    // populates the wrapper's setters, so the decision keys off
+    // `optional_getters` regardless of the per-branch `required_passes`.
     let emit_builder = !optional_getters.is_empty();
 
     // Resolve each getter through the setter pipeline. Multi-overload
@@ -377,139 +444,125 @@ fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
         }
     }
 
-    let mut field_dims: Vec<FieldDim> = Vec::new();
-    for g in &required_getters {
-        let param_name = to_snake_case(&g.js_name);
-        let setters = resolve_setter_sigs(g);
-        if setters.is_empty() {
-            continue;
-        }
+    // Helper that turns one required-getter list into a list of
+    // `FieldDim`s — the cartesian product axes for that pass.
+    let build_field_dims = |required: &[&crate::ir::GetterMember]| -> Vec<FieldDim> {
+        let mut field_dims: Vec<FieldDim> = Vec::new();
+        for g in required {
+            let param_name = to_snake_case(&g.js_name);
+            let setters = resolve_setter_sigs(g);
+            if setters.is_empty() {
+                continue;
+            }
 
-        // Each member of the union (or the single non-union type) maps
-        // to one option. Literals find their setter by matching the
-        // setter's param type_ref structurally; non-literals get their
-        // own option with an `expand_signatures`-compatible param.
-        let mut options: Vec<FieldOption> = Vec::new();
-        let members = split_union(&g.type_ref);
-        let any_literal = members.iter().any(|m| {
-            matches!(
-                m,
-                crate::ir::TypeRef::StringLiteral(_)
-                    | crate::ir::TypeRef::NumberLiteral(_)
-                    | crate::ir::TypeRef::BooleanLiteral(_)
-            )
-        });
-        let value_members: Vec<&crate::ir::TypeRef> = members
-            .iter()
-            .copied()
-            .filter(|m| {
-                !matches!(
+            // Each member of the union (or the single non-union type) maps
+            // to one option. Literals find their setter by matching the
+            // setter's param type_ref structurally; non-literals get their
+            // own option with an `expand_signatures`-compatible param.
+            let mut options: Vec<FieldOption> = Vec::new();
+            let members = split_union(&g.type_ref);
+            let any_literal = members.iter().any(|m| {
+                matches!(
                     m,
                     crate::ir::TypeRef::StringLiteral(_)
                         | crate::ir::TypeRef::NumberLiteral(_)
                         | crate::ir::TypeRef::BooleanLiteral(_)
                 )
-            })
-            .collect();
-
-        let pick_setter = |target: &crate::ir::TypeRef| -> Option<syn::Ident> {
-            setters
-                .iter()
-                .find(|sig| sig.params.first().is_some_and(|p| &p.type_ref == target))
-                .map(|sig| super::typemap::make_ident(&sig.rust_name))
-        };
-        // Fallback for fields without per-member setter granularity: the
-        // first setter handles everything (typical when the IR only
-        // synthesised one setter for the whole union).
-        let default_setter = super::typemap::make_ident(&setters[0].rust_name);
-
-        for m in &members {
-            match m {
-                crate::ir::TypeRef::StringLiteral(s) => {
-                    let setter_ident = pick_setter(m).unwrap_or_else(|| default_setter.clone());
-                    options.push(FieldOption::Literal {
-                        field_js_name: g.js_name.clone(),
-                        field_doc: g.doc.clone(),
-                        literal_display: format!("\"{s}\""),
-                        suffix: format!("_{}", to_snake_case(s)),
-                        setter_ident,
-                        literal_expr: quote! { #s },
-                    });
-                }
-                crate::ir::TypeRef::NumberLiteral(n) => {
-                    let setter_ident = pick_setter(m).unwrap_or_else(|| default_setter.clone());
-                    let lit = syn::LitFloat::new(&n.to_string(), proc_macro2::Span::call_site());
-                    options.push(FieldOption::Literal {
-                        field_js_name: g.js_name.clone(),
-                        field_doc: g.doc.clone(),
-                        literal_display: n.to_string(),
-                        suffix: format!("_{}", n.to_string().replace(['.', '-'], "_")),
-                        setter_ident,
-                        literal_expr: quote! { #lit },
-                    });
-                }
-                crate::ir::TypeRef::BooleanLiteral(b) => {
-                    let setter_ident = pick_setter(m).unwrap_or_else(|| default_setter.clone());
-                    options.push(FieldOption::Literal {
-                        field_js_name: g.js_name.clone(),
-                        field_doc: g.doc.clone(),
-                        literal_display: b.to_string(),
-                        suffix: format!("_{}", b),
-                        setter_ident,
-                        literal_expr: quote! { #b },
-                    });
-                }
-                _ => {}
-            }
-        }
-        // Non-literal members: if the union mixed literals with concrete
-        // types, those concrete types still need their own value options
-        // (e.g. `disposition: "inline" | string` → `new_inline()` plus a
-        // catch-all `new(disposition: &str)`). For purely non-literal
-        // unions we emit one value option per member.
-        let value_targets: Vec<&crate::ir::TypeRef> = if any_literal {
-            value_members
-        } else {
-            members.clone()
-        };
-        for m in value_targets {
-            let setter_ident = pick_setter(m).unwrap_or_else(|| default_setter.clone());
-            let param = ConcreteParam {
-                name: param_name.clone(),
-                type_ref: m.clone(),
-                variadic: false,
-            };
-            options.push(FieldOption::Value {
-                field_doc: g.doc.clone(),
-                param,
-                setter_ident,
             });
-        }
-        if options.is_empty() {
-            continue;
-        }
-        field_dims.push(FieldDim { options });
-    }
-
-    // Cartesian product across field dimensions → list of combos
-    // (each is a Vec<&FieldOption>).
-    let combos: Vec<Vec<&FieldOption>> = if field_dims.is_empty() {
-        vec![vec![]]
-    } else {
-        let mut acc: Vec<Vec<&FieldOption>> = vec![vec![]];
-        for dim in &field_dims {
-            acc = acc
-                .into_iter()
-                .flat_map(|prefix| {
-                    dim.options.iter().map(move |opt| {
-                        let mut next = prefix.clone();
-                        next.push(opt);
-                        next
-                    })
+            let value_members: Vec<&crate::ir::TypeRef> = members
+                .iter()
+                .copied()
+                .filter(|m| {
+                    !matches!(
+                        m,
+                        crate::ir::TypeRef::StringLiteral(_)
+                            | crate::ir::TypeRef::NumberLiteral(_)
+                            | crate::ir::TypeRef::BooleanLiteral(_)
+                    )
                 })
                 .collect();
+
+            let pick_setter = |target: &crate::ir::TypeRef| -> Option<syn::Ident> {
+                setters
+                    .iter()
+                    .find(|sig| sig.params.first().is_some_and(|p| &p.type_ref == target))
+                    .map(|sig| super::typemap::make_ident(&sig.rust_name))
+            };
+            // Fallback for fields without per-member setter granularity:
+            // the first setter handles everything (typical when the IR
+            // only synthesised one setter for the whole union).
+            let default_setter = super::typemap::make_ident(&setters[0].rust_name);
+
+            for m in &members {
+                match m {
+                    crate::ir::TypeRef::StringLiteral(s) => {
+                        let setter_ident = pick_setter(m).unwrap_or_else(|| default_setter.clone());
+                        options.push(FieldOption::Literal {
+                            field_js_name: g.js_name.clone(),
+                            field_doc: g.doc.clone(),
+                            literal_display: format!("\"{s}\""),
+                            suffix: format!("_{}", to_snake_case(s)),
+                            setter_ident,
+                            literal_expr: quote! { #s },
+                        });
+                    }
+                    crate::ir::TypeRef::NumberLiteral(n) => {
+                        let setter_ident = pick_setter(m).unwrap_or_else(|| default_setter.clone());
+                        let lit =
+                            syn::LitFloat::new(&n.to_string(), proc_macro2::Span::call_site());
+                        options.push(FieldOption::Literal {
+                            field_js_name: g.js_name.clone(),
+                            field_doc: g.doc.clone(),
+                            literal_display: n.to_string(),
+                            suffix: format!("_{}", n.to_string().replace(['.', '-'], "_")),
+                            setter_ident,
+                            literal_expr: quote! { #lit },
+                        });
+                    }
+                    crate::ir::TypeRef::BooleanLiteral(b) => {
+                        let setter_ident = pick_setter(m).unwrap_or_else(|| default_setter.clone());
+                        options.push(FieldOption::Literal {
+                            field_js_name: g.js_name.clone(),
+                            field_doc: g.doc.clone(),
+                            literal_display: b.to_string(),
+                            suffix: format!("_{}", b),
+                            setter_ident,
+                            literal_expr: quote! { #b },
+                        });
+                    }
+                    _ => {}
+                }
+            }
+            // Non-literal members: if the union mixed literals with
+            // concrete types, those concrete types still need their own
+            // value options (e.g. `disposition: "inline" | string` →
+            // `new_inline()` plus a catch-all `new(disposition: &str)`).
+            // For purely non-literal unions we emit one value option
+            // per member.
+            let value_targets: Vec<&crate::ir::TypeRef> = if any_literal {
+                value_members
+            } else {
+                members.clone()
+            };
+            for m in value_targets {
+                let setter_ident = pick_setter(m).unwrap_or_else(|| default_setter.clone());
+                let param = ConcreteParam {
+                    name: param_name.clone(),
+                    type_ref: m.clone(),
+                    variadic: false,
+                };
+                options.push(FieldOption::Value {
+                    field_doc: g.doc.clone(),
+                    param,
+                    setter_ident,
+                });
+            }
+            if options.is_empty() {
+                continue;
+            }
+            field_dims.push(FieldDim { options });
         }
-        acc
+        field_dims
     };
 
     // For each combo: collect the value params (literals contribute
@@ -529,178 +582,230 @@ fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
         /// caller-provided fields.
         provided_doc_bullets: Vec<String>,
     }
-    let mut plans: Vec<ComboPlan> = Vec::with_capacity(combos.len());
-    for combo in &combos {
-        let mut literal_suffix = String::new();
-        let mut value_params: Vec<ConcreteParam> = Vec::new();
-        let mut init_calls: Vec<TokenStream> = Vec::new();
-        let mut arg_idents: Vec<syn::Ident> = Vec::new();
-        let mut literal_doc_bullets: Vec<String> = Vec::new();
-        let mut provided_doc_bullets: Vec<String> = Vec::new();
-        for opt in combo {
-            match opt {
-                FieldOption::Literal {
-                    field_js_name,
-                    field_doc,
-                    literal_display,
-                    suffix,
-                    setter_ident,
-                    literal_expr,
-                } => {
-                    literal_suffix.push_str(suffix);
-                    init_calls.push(quote! { inner.#setter_ident(#literal_expr); });
-                    let bullet_head = format!("`{field_js_name}: {literal_display}`");
-                    literal_doc_bullets.push(match field_doc {
-                        Some(doc) => format!("* {bullet_head} - {}", doc.trim()),
-                        None => format!("* {bullet_head}"),
-                    });
-                }
-                FieldOption::Value {
-                    field_doc,
-                    param,
-                    setter_ident,
-                } => {
-                    let arg_ident = super::typemap::make_ident(&param.name);
-                    arg_idents.push(arg_ident.clone());
-                    init_calls.push(quote! { inner.#setter_ident(#arg_ident); });
-                    value_params.push(param.clone());
-                    if let Some(doc) = field_doc {
-                        let bullet_head = format!("`{}`", param.name);
-                        provided_doc_bullets.push(format!("* {bullet_head} - {}", doc.trim()));
-                    }
-                }
-            }
-        }
-        plans.push(ComboPlan {
-            literal_suffix,
-            value_params,
-            init_calls,
-            arg_idents,
-            literal_doc_bullets,
-            provided_doc_bullets,
-        });
-    }
-
-    // Compute `_with_X[_and_Y]` suffixes ONLY across combos sharing the
-    // same literal prefix. Combos with distinct literal prefixes are
-    // already disambiguated by the prefix, so they shouldn't influence
-    // each other's `_with_*` decisions.
-    let mut value_suffixes: Vec<String> = vec![String::new(); plans.len()];
-    let mut by_prefix: HashMap<String, Vec<usize>> = HashMap::new();
-    for (i, p) in plans.iter().enumerate() {
-        by_prefix
-            .entry(p.literal_suffix.clone())
-            .or_default()
-            .push(i);
-    }
-    for indices in by_prefix.values() {
-        let group_params: Vec<Vec<ConcreteParam>> = indices
-            .iter()
-            .map(|&i| plans[i].value_params.clone())
-            .collect();
-        let group_suffixes = crate::codegen::signatures::compute_suffixes_pub(&group_params);
-        for (suffix, &i) in group_suffixes.iter().zip(indices) {
-            value_suffixes[i] = suffix.clone();
-        }
-    }
 
     let mut builder_variants: Vec<TokenStream> = Vec::new();
     let mut new_variants: Vec<TokenStream> = Vec::new();
+    // Shared across passes so a discriminator combo emitted by branch A
+    // doesn't get re-emitted under the same name by branch B.
     let mut emitted_names: HashSet<String> = HashSet::new();
-    for (plan, value_suffix) in plans.iter().zip(&value_suffixes) {
-        let full_suffix = format!("{}{}", plan.literal_suffix, value_suffix);
-        // Dedup combos that produce the same final name (e.g. when a
-        // discriminator collapse plus a value collapse converge).
-        if !emitted_names.insert(full_suffix.clone()) {
-            continue;
-        }
-        let new_ident = super::typemap::make_ident(&format!("new{full_suffix}"));
-        let (generics, params_tokens) = generate_dictionary_params(
-            &plan.value_params,
-            config.cgctx,
-            config.scope,
-            &config.from_module(),
-        );
-        let init_calls = &plan.init_calls;
-        let arg_idents = &plan.arg_idents;
 
-        // Compose the doc block. `# Inlined fields` lists the literal
-        // discriminants baked into the function name (no parameter on
-        // the call). `# Parameters` lists the caller-supplied fields
-        // that show up in the actual signature. Either section is
-        // skipped when its bullet list is empty.
-        let mut doc_text = String::new();
-        if !plan.literal_doc_bullets.is_empty() {
-            doc_text.push_str("## Inlined fields\n\n");
-            doc_text.push_str(&plan.literal_doc_bullets.join("\n"));
-        }
-        if !plan.provided_doc_bullets.is_empty() {
-            if !doc_text.is_empty() {
-                doc_text.push_str("\n\n");
-            }
-            doc_text.push_str(&plan.provided_doc_bullets.join("\n"));
-        }
-        let doc_attr = if doc_text.is_empty() {
-            quote! {}
+    for required_pass in &required_passes {
+        // A pass that covers every merged-optional field doesn't need
+        // a `builder_<suffix>` companion — going through it would
+        // immediately call `.build()` since there are no fluent
+        // setters left to chain. Inline the construction into `new_*`
+        // and skip the builder variant for that pass.
+        //
+        // For plain interfaces (single pass over the merged required
+        // set) this collapses to the existing `!emit_builder` rule:
+        // when no merged optional exists at all, `pass_covers_optionals`
+        // is trivially true and we fall through the inlined-body path.
+        let pass_covers_optionals = optional_getters
+            .iter()
+            .all(|opt| required_pass.iter().any(|req| req.js_name == opt.js_name));
+        let pass_emit_builder = emit_builder && !pass_covers_optionals;
+
+        let field_dims = build_field_dims(required_pass);
+
+        // Cartesian product across field dimensions → list of combos
+        // (each is a Vec<&FieldOption>).
+        let combos: Vec<Vec<&FieldOption>> = if field_dims.is_empty() {
+            vec![vec![]]
         } else {
-            super::doc_tokens(&Some(doc_text))
+            let mut acc: Vec<Vec<&FieldOption>> = vec![vec![]];
+            for dim in &field_dims {
+                acc = acc
+                    .into_iter()
+                    .flat_map(|prefix| {
+                        dim.options.iter().map(move |opt| {
+                            let mut next = prefix.clone();
+                            next.push(opt);
+                            next
+                        })
+                    })
+                    .collect();
+            }
+            acc
         };
 
-        if emit_builder {
-            // `builder*` returns the wrapper struct so callers can chain
-            // setters; `new*` is just `Self::builder(reqs).build()`.
-            //
-            // No-required case has zero `init_calls`, so we inline the
-            // factory directly into the struct literal where the field type
-            // pins inference. The required-args case keeps a `let inner:
-            // Self` so setter calls type-resolve before construction.
-            let builder_body = if init_calls.is_empty() {
-                quote! {
-                    #builder_name {
-                        inner: JsCast::unchecked_into(js_sys::Object::new()),
+        let mut plans: Vec<ComboPlan> = Vec::with_capacity(combos.len());
+        for combo in &combos {
+            let mut literal_suffix = String::new();
+            let mut value_params: Vec<ConcreteParam> = Vec::new();
+            let mut init_calls: Vec<TokenStream> = Vec::new();
+            let mut arg_idents: Vec<syn::Ident> = Vec::new();
+            let mut literal_doc_bullets: Vec<String> = Vec::new();
+            let mut provided_doc_bullets: Vec<String> = Vec::new();
+            for opt in combo {
+                match opt {
+                    FieldOption::Literal {
+                        field_js_name,
+                        field_doc,
+                        literal_display,
+                        suffix,
+                        setter_ident,
+                        literal_expr,
+                    } => {
+                        literal_suffix.push_str(suffix);
+                        init_calls.push(quote! { inner.#setter_ident(#literal_expr); });
+                        let bullet_head = format!("`{field_js_name}: {literal_display}`");
+                        literal_doc_bullets.push(match field_doc {
+                            Some(doc) => format!("* {bullet_head} - {}", doc.trim()),
+                            None => format!("* {bullet_head}"),
+                        });
+                    }
+                    FieldOption::Value {
+                        field_doc,
+                        param,
+                        setter_ident,
+                    } => {
+                        let arg_ident = super::typemap::make_ident(&param.name);
+                        arg_idents.push(arg_ident.clone());
+                        init_calls.push(quote! { inner.#setter_ident(#arg_ident); });
+                        value_params.push(param.clone());
+                        if let Some(doc) = field_doc {
+                            let bullet_head = format!("`{}`", param.name);
+                            provided_doc_bullets.push(format!("* {bullet_head} - {}", doc.trim()));
+                        }
                     }
                 }
+            }
+            plans.push(ComboPlan {
+                literal_suffix,
+                value_params,
+                init_calls,
+                arg_idents,
+                literal_doc_bullets,
+                provided_doc_bullets,
+            });
+        }
+
+        // Compute `_with_X[_and_Y]` suffixes ONLY across combos sharing
+        // the same literal prefix within this pass. Combos with
+        // distinct literal prefixes are already disambiguated by the
+        // prefix; combos in different passes can collide on prefix but
+        // are deduped via `emitted_names` below.
+        let mut value_suffixes: Vec<String> = vec![String::new(); plans.len()];
+        let mut by_prefix: HashMap<String, Vec<usize>> = HashMap::new();
+        for (i, p) in plans.iter().enumerate() {
+            by_prefix
+                .entry(p.literal_suffix.clone())
+                .or_default()
+                .push(i);
+        }
+        for indices in by_prefix.values() {
+            let group_params: Vec<Vec<ConcreteParam>> = indices
+                .iter()
+                .map(|&i| plans[i].value_params.clone())
+                .collect();
+            let group_suffixes = crate::codegen::signatures::compute_suffixes_pub(&group_params);
+            for (suffix, &i) in group_suffixes.iter().zip(indices) {
+                value_suffixes[i] = suffix.clone();
+            }
+        }
+
+        for (plan, value_suffix) in plans.iter().zip(&value_suffixes) {
+            let full_suffix = format!("{}{}", plan.literal_suffix, value_suffix);
+            // Dedup combos that produce the same final name (e.g. when
+            // a discriminator collapse plus a value collapse converge,
+            // or when two passes happen to compute the same combo).
+            if !emitted_names.insert(full_suffix.clone()) {
+                continue;
+            }
+            let new_ident = super::typemap::make_ident(&format!("new{full_suffix}"));
+            let (generics, params_tokens) = generate_dictionary_params(
+                &plan.value_params,
+                config.cgctx,
+                config.scope,
+                &config.from_module(),
+            );
+            let init_calls = &plan.init_calls;
+            let arg_idents = &plan.arg_idents;
+
+            // Compose the doc block. `# Inlined fields` lists the
+            // literal discriminants baked into the function name (no
+            // parameter on the call). `# Parameters` lists the
+            // caller-supplied fields that show up in the actual
+            // signature. Either section is skipped when its bullet
+            // list is empty.
+            let mut doc_text = String::new();
+            if !plan.literal_doc_bullets.is_empty() {
+                doc_text.push_str("## Inlined fields\n\n");
+                doc_text.push_str(&plan.literal_doc_bullets.join("\n"));
+            }
+            if !plan.provided_doc_bullets.is_empty() {
+                if !doc_text.is_empty() {
+                    doc_text.push_str("\n\n");
+                }
+                doc_text.push_str(&plan.provided_doc_bullets.join("\n"));
+            }
+            let doc_attr = if doc_text.is_empty() {
+                quote! {}
             } else {
-                quote! {
-                    let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
-                    #(#init_calls)*
-                    #builder_name { inner }
-                }
+                super::doc_tokens(&Some(doc_text))
             };
-            let builder_ident = super::typemap::make_ident(&format!("builder{full_suffix}"));
-            builder_variants.push(quote! {
-                #doc_attr
-                pub fn #builder_ident #generics (#params_tokens) -> #builder_name {
-                    #builder_body
-                }
-            });
-            new_variants.push(quote! {
-                #doc_attr
-                pub fn #new_ident #generics (#params_tokens) -> #rust_type {
-                    Self::#builder_ident(#(#arg_idents),*).build()
-                }
-            });
-        } else {
-            // All-required dictionary: no builder to delegate to, so
-            // construction is inlined directly into `new*`. Returns
-            // `Self` rather than the wrapper struct.
-            let body = if init_calls.is_empty() {
-                quote! {
-                    JsCast::unchecked_into(js_sys::Object::new())
-                }
+
+            if pass_emit_builder {
+                // `builder*` returns the wrapper struct so callers can
+                // chain setters; `new*` is just
+                // `Self::builder(reqs).build()`.
+                //
+                // No-required case has zero `init_calls`, so we inline
+                // the factory directly into the struct literal where
+                // the field type pins inference. The required-args
+                // case keeps a `let inner: Self` so setter calls
+                // type-resolve before construction.
+                let builder_body = if init_calls.is_empty() {
+                    quote! {
+                        #builder_name {
+                            inner: JsCast::unchecked_into(js_sys::Object::new()),
+                        }
+                    }
+                } else {
+                    quote! {
+                        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+                        #(#init_calls)*
+                        #builder_name { inner }
+                    }
+                };
+                let builder_ident = super::typemap::make_ident(&format!("builder{full_suffix}"));
+                builder_variants.push(quote! {
+                    #doc_attr
+                    pub fn #builder_ident #generics (#params_tokens) -> #builder_name {
+                        #builder_body
+                    }
+                });
+                new_variants.push(quote! {
+                    #doc_attr
+                    pub fn #new_ident #generics (#params_tokens) -> #rust_type {
+                        Self::#builder_ident(#(#arg_idents),*).build()
+                    }
+                });
             } else {
-                quote! {
-                    let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
-                    #(#init_calls)*
-                    inner
-                }
-            };
-            new_variants.push(quote! {
-                #doc_attr
-                pub fn #new_ident #generics (#params_tokens) -> #rust_type {
-                    #body
-                }
-            });
+                // No useful builder for this pass: either the type has
+                // no optional fields at all (plain dictionary,
+                // `!emit_builder`) or this branch's required set
+                // already covers every merged-optional field
+                // (`pass_covers_optionals`). Inline the construction
+                // into `new_*` and skip the redundant `builder_*`.
+                let body = if init_calls.is_empty() {
+                    quote! {
+                        JsCast::unchecked_into(js_sys::Object::new())
+                    }
+                } else {
+                    quote! {
+                        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+                        #(#init_calls)*
+                        inner
+                    }
+                };
+                new_variants.push(quote! {
+                    #doc_attr
+                    pub fn #new_ident #generics (#params_tokens) -> #rust_type {
+                        #body
+                    }
+                });
+            }
         }
     }
 
@@ -774,7 +879,7 @@ fn generate_dictionary_factory(config: &ClassConfig) -> TokenStream {
 ///
 /// Each name — including `try_` variants — is assigned via `dedupe_name`, which
 /// guarantees uniqueness by appending numeric suffixes on collision.
-fn generate_extern_block(config: &ClassConfig) -> TokenStream {
+pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
     use crate::ir::{ConstructorMember, MethodMember, Param, StaticMethodMember};
     use std::collections::HashMap;
 

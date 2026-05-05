@@ -130,11 +130,20 @@ pub(crate) fn merge_member_branches(branches: &[Vec<Member>]) -> Vec<Member> {
 
     let mut out = Vec::new();
 
-    // Getters: optional if missing in any branch or optional in any branch.
-    for (name, slots) in &getters {
+    // Walk properties in source order, emitting each property's getter
+    // and (when applicable) setter together. The non-merged interface
+    // path already produces getter-then-setter per property, so this
+    // keeps the literal-union output consistent with the rest of the
+    // pipeline rather than emitting all getters then all setters.
+    //
+    // Drives off the getter ordering since every writable property has
+    // a matching getter in the merged shape; setter-only properties
+    // (extremely rare in TS) are picked up in a tail loop below.
+    let getter_emitted = |name: &str| -> Option<Member> {
+        let slots = getters.get(name)?;
         let present: Vec<&GetterMember> = slots.iter().filter_map(|s| *s).collect();
         if present.is_empty() {
-            continue;
+            return None;
         }
         let absent_in_any = slots.iter().any(|s| s.is_none());
         let optional_in_any = present.iter().any(|g| g.optional);
@@ -143,41 +152,59 @@ pub(crate) fn merge_member_branches(branches: &[Vec<Member>]) -> Vec<Member> {
         let type_ref = union_member_types(present.iter().map(|g| g.type_ref.clone()));
         let doc = present.iter().find_map(|g| g.doc.clone());
 
-        out.push(Member::Getter(GetterMember {
-            js_name: name.clone(),
+        Some(Member::Getter(GetterMember {
+            js_name: name.to_string(),
             type_ref,
             optional,
             doc,
-        }));
-    }
+        }))
+    };
 
-    // Setters: emit only when at least one branch had a setter for this
-    // name — a `readonly` branch suppresses the setter merge-wide.
-    for (name, slots) in &setters {
+    // Emit a setter when one exists and isn't suppressed by a `readonly`
+    // branch. A getter-without-setter in any branch downgrades the
+    // merged property to read-only, since writing through the merged
+    // setter would be invalid for the readonly branch.
+    let setter_emitted = |name: &str| -> Option<Member> {
+        let slots = setters.get(name)?;
         let present: Vec<&SetterMember> = slots.iter().filter_map(|s| *s).collect();
         if present.is_empty() {
-            continue;
+            return None;
         }
-        // If a branch had a getter for this name but no setter, treat the
-        // merged property as readonly (drop the setter). This keeps
-        // soundness — writing through the merged setter would be invalid
-        // for the readonly branch.
         if let Some(getter_slots) = getters.get(name) {
             let any_branch_readonly = getter_slots
                 .iter()
                 .zip(slots.iter())
                 .any(|(g, s)| g.is_some() && s.is_none());
             if any_branch_readonly {
-                continue;
+                return None;
             }
         }
         let type_ref = union_member_types(present.iter().map(|s| s.type_ref.clone()));
         let doc = present.iter().find_map(|s| s.doc.clone());
-        out.push(Member::Setter(SetterMember {
-            js_name: name.clone(),
+        Some(Member::Setter(SetterMember {
+            js_name: name.to_string(),
             type_ref,
             doc,
-        }));
+        }))
+    };
+
+    for name in getters.keys() {
+        if let Some(g) = getter_emitted(name) {
+            out.push(g);
+        }
+        if let Some(s) = setter_emitted(name) {
+            out.push(s);
+        }
+    }
+    // Setter-only properties (no matching getter in any branch). The
+    // earlier loop didn't visit these since it keys off getter names.
+    for name in setters.keys() {
+        if getters.contains_key(name) {
+            continue;
+        }
+        if let Some(s) = setter_emitted(name) {
+            out.push(s);
+        }
     }
 
     // Methods: keep every signature. The flattening pipeline downstream
@@ -227,4 +254,68 @@ fn union_member_types(types: impl IntoIterator<Item = TypeRef>) -> TypeRef {
         return all.into_iter().next().unwrap();
     }
     crate::parse::types::simplify_union(all)
+}
+
+/// Identify discriminator properties across a set of branches.
+///
+/// A property qualifies as a discriminator when:
+///
+/// * It appears as a **required** (non-optional) getter in **every**
+///   branch.
+/// * Its type in every branch is a string, number, or boolean literal.
+///
+/// TypeScript narrows on all three literal kinds (e.g. `disposition:
+/// "inline"`, `done: false`, `status: 200`), so the codegen rule
+/// matches.
+///
+/// Returns the JS names of qualifying properties in source order
+/// (first-appearance across branches).
+pub(crate) fn detect_discriminators(branches: &[Vec<Member>]) -> Vec<String> {
+    if branches.len() < 2 {
+        return Vec::new();
+    }
+    // Collect every property name with its per-branch (optional?, type)
+    // pair, in first-appearance order.
+    let mut order: Vec<String> = Vec::new();
+    let mut per_branch: indexmap::IndexMap<String, Vec<Option<&GetterMember>>> =
+        indexmap::IndexMap::new();
+    for branch in branches {
+        for m in branch {
+            if let Member::Getter(g) = m {
+                if !per_branch.contains_key(&g.js_name) {
+                    order.push(g.js_name.clone());
+                }
+                per_branch.entry(g.js_name.clone()).or_default();
+            }
+        }
+    }
+    for branch in branches {
+        for slot_name in per_branch.keys().cloned().collect::<Vec<_>>() {
+            let found = branch.iter().find_map(|m| match m {
+                Member::Getter(g) if g.js_name == slot_name => Some(g),
+                _ => None,
+            });
+            per_branch.get_mut(&slot_name).unwrap().push(found);
+        }
+    }
+
+    order
+        .into_iter()
+        .filter(|name| {
+            let slots = &per_branch[name];
+            // Must be present, required, and literal-typed in every
+            // branch.
+            slots.iter().all(|slot| {
+                slot.is_some_and(|g| {
+                    !g.optional
+                        && matches!(
+                            g.type_ref,
+                            TypeRef::StringLiteral(_)
+                                | TypeRef::NumberLiteral(_)
+                                | TypeRef::BooleanLiteral(_)
+                        )
+                })
+            })
+        })
+        .collect()
 }

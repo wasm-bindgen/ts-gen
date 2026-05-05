@@ -339,6 +339,9 @@ pub struct TypeDeclaration {
 pub enum TypeKind {
     Class(ClassDecl),
     Interface(InterfaceDecl),
+    /// A `type X = A | B | ...` whose branches share a string-literal
+    /// discriminant property — see [`DiscriminatedUnionDecl`].
+    DiscriminatedUnion(DiscriminatedUnionDecl),
     TypeAlias(TypeAliasDecl),
     StringEnum(StringEnumDecl),
     NumericEnum(NumericEnumDecl),
@@ -388,6 +391,46 @@ pub enum InterfaceClassification {
     Dictionary,
     /// Mixed or unclear — treat as class-like.
     Unclassified,
+}
+
+// ─── Discriminated Union ─────────────────────────────────────────────
+
+/// A type alias `type Foo = A | B | ...` whose branches share at least
+/// one **required** property typed as a string literal — that property
+/// is the discriminator.
+///
+/// Modeled as its own kind (separate from `Interface`) because a
+/// faithful binding must respect per-branch shape rather than the
+/// merged-shape required-vs-optional split. For example
+///
+/// ```ts
+/// type EmailAttachment =
+///   | { disposition: "inline";     contentId: string;     filename: string; ... }
+///   | { disposition: "attachment"; contentId?: undefined; filename: string; ... };
+/// ```
+///
+/// requires `contentId` in the `inline` branch but not in `attachment`.
+/// Treating the merge as a flat interface erases that distinction —
+/// codegen would mark `contentId` optional everywhere, then `new_inline`
+/// wouldn't take it as a parameter even though the source contract
+/// requires it.
+#[derive(Clone, Debug)]
+
+pub struct DiscriminatedUnionDecl {
+    pub name: String,
+    pub js_name: String,
+    pub type_params: Vec<TypeParam>,
+    /// Pre-merge per-branch member sets. Order matches source order;
+    /// every branch contributes a (possibly empty) set of members.
+    pub branches: Vec<Vec<Member>>,
+    /// Merged member view — useful for the regular extern-block
+    /// emission (one `pub type Foo;` plus a getter/setter per property
+    /// across all branches). The branch-specific factories use
+    /// [`branches`] instead.
+    pub members: Vec<Member>,
+    /// JS names of properties that act as discriminators — present and
+    /// required in every branch with a string-literal type.
+    pub discriminators: Vec<String>,
 }
 
 // ─── Type Alias ──────────────────────────────────────────────────────

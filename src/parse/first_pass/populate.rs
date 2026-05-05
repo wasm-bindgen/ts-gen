@@ -425,11 +425,13 @@ impl<'a> PopulateCtx<'a> {
         }
 
         // `type Foo = { ... }` / `type Foo = { ... } | { ... }` are
-        // structurally interfaces — promote them so consumers get the
-        // dictionary-builder treatment instead of an opaque type alias to
-        // `Object`. The alias's own name becomes the synthesized type.
-        if let Some(iface) = self.try_synthesize_alias_interface(&name, &alias.type_annotation) {
-            declarations.push(dcx.decl(ir::TypeKind::Interface(iface), doc));
+        // structurally interfaces (or discriminated unions, if the
+        // branches share a string-literal discriminator) — promote them
+        // so consumers get the dictionary-builder / variant-factory
+        // treatment instead of an opaque type alias to `Object`. The
+        // alias's own name becomes the synthesized type.
+        if let Some(kind) = self.try_synthesize_alias_decl(&name, &alias.type_annotation) {
+            declarations.push(dcx.decl(kind, doc));
             return;
         }
 
@@ -447,14 +449,20 @@ impl<'a> PopulateCtx<'a> {
     }
 
     /// Promote `type Foo = { ... }` or `type Foo = { ... } | { ... }`
-    /// into a named `InterfaceDecl`, going through the same merge rules
-    /// as anonymous-parameter union synthesis. Returns `None` if the
-    /// target shape doesn't match either form.
-    fn try_synthesize_alias_interface(
+    /// into either a named `InterfaceDecl` or a `DiscriminatedUnionDecl`,
+    /// going through the same merge rules as anonymous-parameter union
+    /// synthesis. Returns `None` if the target shape matches neither
+    /// form.
+    ///
+    /// Discriminated-union promotion happens when every branch is a
+    /// type literal AND there's a shared required string-literal-typed
+    /// property — see [`literal_union::detect_discriminators`].
+    /// Otherwise the merge produces a plain `InterfaceDecl` as before.
+    fn try_synthesize_alias_decl(
         &mut self,
         alias_name: &str,
         target: &ast::TSType<'_>,
-    ) -> Option<ir::InterfaceDecl> {
+    ) -> Option<ir::TypeKind> {
         match target {
             ast::TSType::TSTypeLiteral(literal) => {
                 let mut synth: Vec<ir::InterfaceDecl> = Vec::new();
@@ -482,7 +490,7 @@ impl<'a> PopulateCtx<'a> {
                     // doesn't carry methods that hoist.
                     let _ = inner;
                 }
-                Some(iface)
+                Some(ir::TypeKind::Interface(iface))
             }
             ast::TSType::TSUnionType(union)
                 if union
@@ -514,16 +522,34 @@ impl<'a> PopulateCtx<'a> {
                     })
                     .collect();
                 let merged = crate::parse::literal_union::merge_member_branches(&branches);
-                let classification = crate::parse::classify::classify_interface(&merged);
                 self.used_type_names.insert(alias_name.to_string());
-                Some(ir::InterfaceDecl {
-                    name: alias_name.to_string(),
-                    js_name: alias_name.to_string(),
-                    type_params: Vec::new(),
-                    extends: Vec::new(),
-                    members: merged,
-                    classification,
-                })
+
+                // Promote to a discriminated union when the branches
+                // share a string-literal discriminator. Otherwise fall
+                // back to the plain merged interface.
+                let discriminators = crate::parse::literal_union::detect_discriminators(&branches);
+                if !discriminators.is_empty() {
+                    Some(ir::TypeKind::DiscriminatedUnion(
+                        ir::DiscriminatedUnionDecl {
+                            name: alias_name.to_string(),
+                            js_name: alias_name.to_string(),
+                            type_params: Vec::new(),
+                            branches,
+                            members: merged,
+                            discriminators,
+                        },
+                    ))
+                } else {
+                    let classification = crate::parse::classify::classify_interface(&merged);
+                    Some(ir::TypeKind::Interface(ir::InterfaceDecl {
+                        name: alias_name.to_string(),
+                        js_name: alias_name.to_string(),
+                        type_params: Vec::new(),
+                        extends: Vec::new(),
+                        members: merged,
+                        classification,
+                    }))
+                }
             }
             _ => None,
         }

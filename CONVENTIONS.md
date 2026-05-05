@@ -24,6 +24,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [Interfaces (class-like vs dictionary)](#interfaces-class-like-vs-dictionary)
 * [Dictionary builders](#dictionary-builders)
 * [Anonymous interface synthesis](#anonymous-interface-synthesis)
+* [Discriminated unions](#discriminated-unions)
 * [`var X: { new(...): T }` patterns](#var-x--new-t-patterns)
 * [Module-scoped constructor variables](#module-scoped-constructor-variables)
 * [Signature flattening](#signature-flattening)
@@ -349,6 +350,35 @@ EmailAttachment::new_inline(content, filename, type_)        // disposition bake
 EmailAttachment::new(disposition: &str, content, filename, type_)  // catch-all
 ```
 
+### Per-branch required fields in discriminated unions
+
+When a union qualifies as a [discriminated union](#discriminated-unions),
+each `new_<discriminator>` / `builder_<discriminator>` factory derives
+its required-field set from **its own branch**, not from the merged
+shape. For
+
+```ts
+type EmailAttachment =
+  | { disposition: "inline";     contentId: string;     filename: string; type: string; content: string | ArrayBuffer; }
+  | { disposition: "attachment"; contentId?: undefined; filename: string; type: string; content: string | ArrayBuffer; };
+```
+
+`contentId` is required in the `inline` branch and absent (`?:
+undefined`) in the `attachment` branch. The factory pair reflects
+that:
+
+```rust
+EmailAttachment::new_inline(content_id: &str, filename: &str, type_: &str, content: &str)
+EmailAttachment::new_attachment(filename: &str, type_: &str, content: &str)
+```
+
+The builder wrapper (`EmailAttachmentBuilder`) still exposes a fluent
+`content_id(self, val)` setter — it reflects the merged-shape view
+that the field is optional on the type as a whole, so callers going
+through `builder_attachment(...).content_id(x).build()` aren't
+prevented from setting it. The branch invariant is enforced at the
+`new_<discriminator>` boundary, not inside the builder.
+
 ### Has any `readonly` property → `new()` only, no builder
 
 A dictionary that exposes a `readonly` property can't be fully
@@ -436,7 +466,7 @@ to anything else (named types, primitives, function types, generics,
 ### Union of inline literals
 
 When every branch of a union is itself an inline literal, the branches
-are **structurally merged** into a single interface body. The merge
+are **structurally merged** into a single member set. The merge
 covers both positions above:
 
 ```ts
@@ -445,11 +475,7 @@ type EmailAttachment =
   | { disposition: "attachment"; contentId?: undefined; filename: string; … };
 ```
 
-becomes a single `interface EmailAttachment { … }` whose members are
-the union of every branch's properties, with optionality and types
-adjusted so the merged shape is valid against every branch.
-
-The merge rules:
+The merge rules apply to the unified shape:
 
 * **Property optionality**: a property is required iff it is present
   and non-optional in **every** branch. If any branch declares it
@@ -467,14 +493,18 @@ The merge rules:
 * **Index signatures**: dedup by structural equality; the first one
   wins on conflict.
 
-The synthesized type then inherits every other rule that applies to
-interfaces: dictionary-vs-class-like classification (see
-[Interfaces](#interfaces-class-like-vs-dictionary)), the dictionary-
-builder treatment for property-only shapes (see
-[Dictionary builders](#dictionary-builders)), and the union-typed
-setter expansion (see [Signature flattening](#signature-flattening))
-that turns `from: string | EmailAddress` into separate setter and
-builder methods.
+The synthesized type lands in one of two kinds depending on whether a
+discriminator is detected (see [Discriminated unions](#discriminated-unions)):
+
+* **`InterfaceDecl`** when no shared literal-typed required field
+  exists — falls through the regular dictionary-vs-class-like
+  pipeline, the dictionary-builder treatment for property-only
+  shapes, and the union-typed setter expansion that turns
+  `from: string | EmailAddress` into separate setter and builder
+  methods.
+* **`DiscriminatedUnionDecl`** when at least one shared literal-typed
+  required field exists — gets the per-branch factory rules described
+  in the next section.
 
 ### Naming
 
@@ -504,6 +534,101 @@ synthesized. Anonymous types nested inside a generic, an array,
 — they follow the regular type-mapping rules and erase to `Object`.
 Inline literals inside the *body* of a hoisted interface are themselves
 hoisted recursively, using the synthesized parent's name.
+
+## Discriminated unions
+
+A type alias `type Foo = A | B | …` whose branches share at least one
+**required, literal-typed** property is promoted to a
+`DiscriminatedUnionDecl` rather than a plain `InterfaceDecl`.
+
+A property qualifies as a discriminator when, in **every** branch, it
+is present, required (no `?:` marker), and typed as a string, number,
+or boolean literal. TypeScript's narrowing accepts all three; the
+codegen rule matches.
+
+```ts
+// String discriminator
+type EmailAttachment =
+  | { disposition: "inline";     contentId: string;     … }
+  | { disposition: "attachment"; contentId?: undefined; … };
+
+// Boolean discriminator
+type ReadableStreamReadResult<R = any> =
+  | { done: false; value: R }
+  | { done: true;  value?: undefined };
+
+// Number discriminator
+type Status =
+  | { code: 200; body: string }
+  | { code: 404; reason: string };
+```
+
+### Codegen shape
+
+The extern block is the same as for any other dictionary — a single
+`pub type Foo;` plus getter/setter bindings for the merged shape.
+
+The `impl Foo` block emits **per-branch** `new_*` and (when useful)
+`builder_*` factories. Each variant's required positional parameters
+are derived from **its own branch**, not from the merged shape — so
+the `EmailAttachment` `inline` branch's `contentId: string` shows up
+as a required argument in `new_inline(...)` even though the merged
+shape marks `contentId` optional.
+
+```rust
+EmailAttachment::new_inline(content_id: &str, filename: &str, type_: &str, content: &str)
+EmailAttachment::new_inline_with_array_buffer(content_id: &str, filename: &str, type_: &str, content: &ArrayBuffer)
+
+EmailAttachment::new_attachment(filename: &str, type_: &str, content: &str)
+EmailAttachment::new_attachment_with_array_buffer(filename: &str, type_: &str, content: &ArrayBuffer)
+```
+
+The literal-collapse, value-union expansion, and `_with_<type>`
+suffixing rules described in [Dictionary builders](#dictionary-builders)
+all apply *within each branch* — branches don't influence each
+other's suffix decisions.
+
+### Wrapper builder remains merged
+
+The wrapper struct (`EmailAttachmentBuilder`) and its fluent setters
+are computed from the **merged-shape optional set**, not per branch.
+For `EmailAttachment` this means
+`EmailAttachmentBuilder::content_id(self, val)` is always available,
+even after `builder_attachment(...)`. The branch invariant is enforced
+at the `new_<discriminator>` boundary; once you're past that, the
+wrapper exposes the runtime-permissive view of the type. Calling
+`.content_id(x)` after `builder_attachment(...)` writes through to
+the JS object exactly as `set_content_id` would on the bare type —
+no special branch enforcement.
+
+### `builder_<branch>` suppression
+
+A `builder_<branch>` is only emitted when **at least one merged-optional
+field isn't already required by that branch**. If a branch's required
+set covers every merged-optional field, going through the wrapper
+would have nothing to chain — so the `new_<branch>` body is inlined
+directly:
+
+```rust
+// inline branch covers `contentId` (the only merged-optional), so no builder_inline:
+EmailAttachment::new_inline(content_id, filename, type_, content) {
+    let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+    inner.set_disposition("inline");
+    inner.set_content_id(content_id);
+    // …
+    inner
+}
+
+// attachment branch leaves `contentId` to the wrapper, so builder_attachment exists:
+EmailAttachment::new_attachment(filename, type_, content) {
+    Self::builder_attachment(filename, type_, content).build()
+}
+```
+
+This collapses to the existing all-required dictionary rule (see
+[Dictionary builders](#dictionary-builders)) when the type has no
+optional fields at all — there's nothing to chain, so `new(reqs)` is
+emitted with an inlined body and no builder type is generated.
 
 ## `var X: { new(...): T }` patterns
 

@@ -502,6 +502,7 @@ fn declaration_name(kind: &crate::ir::TypeKind) -> Option<String> {
     match kind {
         TypeKind::Class(c) => Some(c.name.clone()),
         TypeKind::Interface(i) => Some(i.name.clone()),
+        TypeKind::DiscriminatedUnion(d) => Some(d.name.clone()),
         TypeKind::TypeAlias(a) => Some(a.name.clone()),
         TypeKind::StringEnum(e) => Some(e.name.clone()),
         TypeKind::NumericEnum(e) => Some(e.name.clone()),

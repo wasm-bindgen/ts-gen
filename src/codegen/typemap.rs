@@ -319,6 +319,10 @@ impl<'a> CodegenContext<'a> {
                 self.local_types.insert(i.name.clone(), mctx.clone());
                 self.local_type_ids.insert(type_id);
             }
+            ir::TypeKind::DiscriminatedUnion(d) => {
+                self.local_types.insert(d.name.clone(), mctx.clone());
+                self.local_type_ids.insert(type_id);
+            }
             ir::TypeKind::StringEnum(e) => {
                 self.local_types.insert(e.name.clone(), mctx.clone());
                 self.local_type_ids.insert(type_id);
@@ -355,6 +359,9 @@ impl<'a> CodegenContext<'a> {
             }
             ir::TypeKind::Interface(i) => {
                 self.local_types.insert(i.name.clone(), mctx.clone());
+            }
+            ir::TypeKind::DiscriminatedUnion(d) => {
+                self.local_types.insert(d.name.clone(), mctx.clone());
             }
             ir::TypeKind::StringEnum(e) => {
                 self.local_types.insert(e.name.clone(), mctx.clone());
