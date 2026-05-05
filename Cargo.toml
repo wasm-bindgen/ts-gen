@@ -43,6 +43,7 @@ path = "src/lib.rs"
 anyhow = "1"
 clap = { version = "4", features = ["derive"], optional = true }
 convert_case = "0.6"
+indexmap = "2"
 oxc_allocator = "0.118"
 oxc_ast = "0.118"
 oxc_parser = "0.118"

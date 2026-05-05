@@ -1222,6 +1222,7 @@ dependencies = [
  "anyhow",
  "clap",
  "convert_case",
+ "indexmap",
  "oxc_allocator",
  "oxc_ast",
  "oxc_parser",

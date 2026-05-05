@@ -45,7 +45,7 @@ use crate::ir::{
     GetterMember, IndexSigMember, Member, MethodMember, SetterMember, StaticGetterMember,
     StaticMethodMember, StaticSetterMember, TypeRef,
 };
-use std::collections::BTreeMap;
+use indexmap::IndexMap;
 
 /// Merge a list of type-literal branches (each as a `Vec<Member>` produced
 /// by the regular `convert_ts_signature` pipeline) into a single combined
@@ -61,17 +61,19 @@ pub(crate) fn merge_member_branches(branches: &[Vec<Member>]) -> Vec<Member> {
     // Collect every property name that appears in any branch, plus the
     // matching getter/setter per branch (or `None` for "absent").
     //
-    // BTreeMap keeps output order deterministic across runs.
-    let mut getters: BTreeMap<String, Vec<Option<&GetterMember>>> = BTreeMap::new();
-    let mut setters: BTreeMap<String, Vec<Option<&SetterMember>>> = BTreeMap::new();
-    let mut methods: BTreeMap<String, Vec<&MethodMember>> = BTreeMap::new();
+    // `IndexMap` preserves first-appearance order across branches so the
+    // merged interface keeps the user's source order — important because
+    // it carries through to constructor / builder parameter order.
+    let mut getters: IndexMap<String, Vec<Option<&GetterMember>>> = IndexMap::new();
+    let mut setters: IndexMap<String, Vec<Option<&SetterMember>>> = IndexMap::new();
+    let mut methods: IndexMap<String, Vec<&MethodMember>> = IndexMap::new();
     let mut index_sigs: Vec<&IndexSigMember> = Vec::new();
 
     // Statics are not expected in inline literals; if present, we pass
     // them through unmerged from the first branch that has them.
-    let mut static_getters: BTreeMap<String, &StaticGetterMember> = BTreeMap::new();
-    let mut static_setters: BTreeMap<String, &StaticSetterMember> = BTreeMap::new();
-    let mut static_methods: BTreeMap<String, Vec<&StaticMethodMember>> = BTreeMap::new();
+    let mut static_getters: IndexMap<String, &StaticGetterMember> = IndexMap::new();
+    let mut static_setters: IndexMap<String, &StaticSetterMember> = IndexMap::new();
+    let mut static_methods: IndexMap<String, Vec<&StaticMethodMember>> = IndexMap::new();
 
     // Walk each branch once collecting names, then in a second pass align
     // per-branch slots so missing members surface as `None`.
