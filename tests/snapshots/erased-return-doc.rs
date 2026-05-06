@@ -16,7 +16,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " Returns: Array<32 | \"foo\">"]
     #[wasm_bindgen(method, getter)]
-    pub fn tags(this: &Erased) -> Array;
+    pub fn tags(this: &Erased) -> Vec<JsValue>;
 }
 impl Erased {
     #[allow(clippy::new_without_default)]

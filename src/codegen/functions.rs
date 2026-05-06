@@ -100,6 +100,9 @@ fn generate_expanded_free_function(
     if sig.catch {
         wb_parts.push(quote! { catch });
     }
+    if super::typemap::needs_slice_to_array(&sig.params) {
+        wb_parts.push(quote! { slice_to_array });
+    }
     // Emit js_name when the JS name differs from the Rust name.
     // wasm-bindgen uses the Rust fn name as the JS name by default,
     // so we need js_name for any camelCase → snake_case conversion.

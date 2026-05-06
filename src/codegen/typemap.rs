@@ -473,10 +473,47 @@ pub fn to_syn_type(
         TypeRef::ArrayBufferView => maybe_ref(quote! { Object }, borrow),
 
         // === Syntactic constructs ===
-        TypeRef::Array(inner) => maybe_ref(
-            generic_container(quote! { Array }, inner, pos, ctx, scope, from_module),
-            borrow,
-        ),
+        //
+        // Top-level `Array<T>` (or `T[]`) lowers to a Rust-idiomatic
+        // sequence:
+        //
+        // * Argument position → `&[T]` (a slice — wasm-bindgen
+        //   handles the JS-side conversion to/from a typed-array view
+        //   or a plain `Array` depending on the element kind).
+        // * Return position → `Vec<T>` (owned).
+        //
+        // The element uses **return-position** lowering regardless of
+        // direction. wasm-bindgen treats the slice / `Vec<T>` wrapper
+        // as the FFI boundary, so primitives stay bare (`&[f64]`,
+        // `Vec<f64>` — not `&[Number]` / `Vec<Number>`) and named
+        // types stay unborrowed (`&[EmailAttachment]`, not
+        // `&[&EmailAttachment]`). Strings stay owned (`&[String]`,
+        // `Vec<String>`); `&[&str]` would needlessly thread a borrow
+        // lifetime through the slice.
+        //
+        // For non-primitive element kinds the binding also gets
+        // `#[wasm_bindgen(slice_to_array)]` so JS receives a plain
+        // `Array<T>` rather than the default zero-copy view that
+        // wasm-bindgen synthesises for primitive slices. The
+        // attribute is emitted by the per-callable generators in
+        // `classes.rs` / `functions.rs` based on
+        // [`needs_slice_to_array`].
+        //
+        // Inside an actual generic (`pos.inner == true`) we keep the
+        // legacy `Array<T'>` form for callers nested in
+        // `Promise<Array<T>>`, `Map<K, Array<V>>`, etc.
+        TypeRef::Array(inner) => {
+            if pos.inner {
+                generic_container(quote! { Array }, inner, pos, ctx, scope, from_module)
+            } else {
+                let elem = to_syn_type(inner, TypePosition::RETURN, ctx, scope, from_module);
+                if pos.is_argument() {
+                    quote! { &[#elem] }
+                } else {
+                    quote! { Vec<#elem> }
+                }
+            }
+        }
 
         // === Structural Types ===
         TypeRef::Nullable(inner) => {
@@ -567,13 +604,45 @@ pub fn to_syn_type(
         // `Date`), then well-known JS heads (`js_sys::*` glob), then
         // the external map (`web_sys::*` defaults / user mappings),
         // then `JsValue` fallback with a diagnostic.
+        //
+        // Two cases short-circuit straight to a recursive
+        // `to_syn_type`, bypassing the outer `maybe_ref` wrap so the
+        // already-borrowed slice / `Vec<T>` shape isn't double-borrowed:
+        //
+        // * `Array<T>` / `ReadonlyArray<T>` — re-routed through the
+        //   syntactic `T[]` arm.
+        // * Bare references that resolve to a type alias whose target
+        //   carries its own borrow shape (e.g. `string`, `T[]`,
+        //   `Array<U>`) — recursing into the target re-runs
+        //   `to_syn_type` with the same `pos`, which already does the
+        //   right thing.
         TypeRef::Reference {
             segments,
             generic_args,
-        } => maybe_ref(
-            lower_reference(segments, generic_args, pos, ctx, scope, from_module),
-            borrow,
-        ),
+        } => {
+            if segments.len() == 1 && (segments[0] == "Array" || segments[0] == "ReadonlyArray") {
+                let inner = generic_args.first().cloned().unwrap_or(TypeRef::Any);
+                return to_syn_type(
+                    &TypeRef::Array(Box::new(inner)),
+                    pos,
+                    ctx,
+                    scope,
+                    from_module,
+                );
+            }
+            if segments.len() == 1 && generic_args.is_empty() {
+                if let Some(c) = ctx {
+                    if let Some(target) = c.resolve_alias(&segments[0], scope) {
+                        let target = target.clone();
+                        return to_syn_type(&target, pos, ctx, scope, from_module);
+                    }
+                }
+            }
+            maybe_ref(
+                lower_reference(segments, generic_args, pos, ctx, scope, from_module),
+                borrow,
+            )
+        }
 
         // === Fallback ===
         TypeRef::Unresolved(desc) => {
@@ -819,14 +888,11 @@ fn lower_reference(
     // reference carries generic type arguments (`EmailExportedHandler<Env, Props>`)
     // because we don't substitute generic params; instead we emit the
     // bare alias name and let downstream code see the alias decl.
-    if generic_args.is_empty() {
-        if let Some(c) = ctx {
-            if let Some(target) = c.resolve_alias(head, scope) {
-                let target = target.clone();
-                return to_syn_type(&target, pos, ctx, scope, from_module);
-            }
-        }
-    }
+    // Alias resolution for bare identifiers is handled by the caller
+    // (the `TypeRef::Reference` arm in `to_syn_type`) so the recursive
+    // `to_syn_type(target, ...)` skips the outer `maybe_ref` wrap that
+    // would otherwise double-borrow types whose lowering already
+    // carries its own borrow shape (e.g. `&[T]`, `&str`).
 
     // Heads with dedicated codegen rules. `Promise<T>`, `Map<K,V>`,
     // `Set<T>`, `Record<K,V>`, and the generic `Array<T>` form (the
@@ -837,10 +903,10 @@ fn lower_reference(
             let inner = generic_args.first().cloned().unwrap_or(TypeRef::Any);
             return generic_container(quote! { Promise }, &inner, pos, ctx, scope, from_module);
         }
-        "Array" | "ReadonlyArray" => {
-            let inner = generic_args.first().cloned().unwrap_or(TypeRef::Any);
-            return generic_container(quote! { Array }, &inner, pos, ctx, scope, from_module);
-        }
+        // `Array` / `ReadonlyArray` are handled directly in
+        // `to_syn_type`'s `TypeRef::Reference` arm so the outer
+        // `maybe_ref` doesn't double-borrow the already-correct
+        // slice form. This match arm is intentionally absent here.
         "Set" | "ReadonlySet" => {
             let inner = generic_args.first().cloned().unwrap_or(TypeRef::Any);
             return generic_container(quote! { Set }, &inner, pos, ctx, scope, from_module);
@@ -949,6 +1015,77 @@ pub fn to_return_type(
     } else {
         inner
     }
+}
+
+/// Whether a function with these parameter types should be tagged
+/// `#[wasm_bindgen(slice_to_array)]`.
+///
+/// `&[T]` arguments default to a zero-copy typed-array view when `T`
+/// is a primitive numeric (`u8`, `i32`, `f64`, ...) and to a freshly-
+/// materialised plain JS `Array` otherwise. ts-gen's job is the
+/// latter: a TypeScript `Array<string>` / `Array<Foo>` parameter
+/// should arrive as a plain `Array` on the JS side, not a typed-array
+/// view of externref handles.
+///
+/// Returns `true` when **any** parameter is a top-level
+/// `TypeRef::Array(inner)` whose `inner` lowers to something other
+/// than a primitive numeric — i.e. anything that would need the
+/// attribute. The check is structural; we don't need `to_syn_type` to
+/// run.
+///
+/// Numeric primitives are `Number` and `BigInt` (TS `number` and
+/// `bigint`). Boolean is *not* primitive for this purpose: `&[bool]`
+/// already needs a JS `Array` because wasm-bindgen has no typed-array
+/// for booleans, but the attribute is still required to opt out of
+/// the default view-based wire format.
+pub fn needs_slice_to_array(params: &[crate::codegen::signatures::ConcreteParam]) -> bool {
+    params
+        .iter()
+        .any(|p| param_needs_slice_to_array(&p.type_ref))
+}
+
+/// `&[T]` argument helper that consults the bare `TypeRef`. The
+/// outer attribute decision applies whenever **any** parameter
+/// satisfies this — see [`needs_slice_to_array`].
+///
+/// Recognises three IR shapes that all lower to a top-level slice:
+///
+/// * `TypeRef::Array(inner)` — the syntactic `T[]` form.
+/// * `TypeRef::Reference { segments: ["Array" | "ReadonlyArray"],
+///   generic_args: [inner] }` — the named generic form.
+/// * `TypeRef::Nullable(inner)` wrapping either of the above.
+///
+/// Each is checked recursively for a non-primitive element.
+fn param_needs_slice_to_array(ty: &TypeRef) -> bool {
+    fn array_element(ty: &TypeRef) -> Option<&TypeRef> {
+        match ty {
+            TypeRef::Array(inner) => Some(inner),
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            } if segments.len() == 1
+                && (segments[0] == "Array" || segments[0] == "ReadonlyArray") =>
+            {
+                generic_args.first()
+            }
+            _ => None,
+        }
+    }
+
+    match ty {
+        // `Nullable<&[T]>` (i.e. `Option<&[T]>`) participates too —
+        // `slice_to_array` covers `Option<&[T]>` per the upstream
+        // wasm-bindgen feature.
+        TypeRef::Nullable(inner) => array_element(inner).is_some_and(|e| !is_numeric_primitive(e)),
+        other => array_element(other).is_some_and(|e| !is_numeric_primitive(e)),
+    }
+}
+
+fn is_numeric_primitive(ty: &TypeRef) -> bool {
+    matches!(
+        ty,
+        TypeRef::Number | TypeRef::NumberLiteral(_) | TypeRef::BigInt
+    )
 }
 
 #[cfg(test)]
@@ -1094,16 +1231,114 @@ mod tests {
 
     #[test]
     fn test_array_with_type() {
+        // Top-level `Array<T>` lowers to `Vec<T>` in return position
+        // and `&[T]` in argument position. The element uses
+        // return-position lowering so primitives stay bare and named
+        // types are unborrowed — see the `TypeRef::Array` arm in
+        // `to_syn_type`.
         let ty = TypeRef::Array(Box::new(TypeRef::Number));
-        let result = ret_type(&ty);
-        assert_eq!(result, "Array < Number >");
+        assert_eq!(ret_type(&ty), "Vec < f64 >");
+        assert_eq!(arg_type(&ty), "& [f64]");
     }
 
     #[test]
-    fn test_array_with_any_elides() {
+    fn test_array_with_any() {
+        // `Array<any>` no longer elides — the slice / `Vec<T>` form
+        // always carries the element type.
         let ty = TypeRef::Array(Box::new(TypeRef::Any));
-        let result = ret_type(&ty);
-        assert_eq!(result, "Array");
+        assert_eq!(ret_type(&ty), "Vec < JsValue >");
+        assert_eq!(arg_type(&ty), "& [JsValue]");
+    }
+
+    #[test]
+    fn test_array_with_string() {
+        // Strings are owned inside the slice / Vec — `&str` would
+        // need a borrow lifetime, and `str` itself is unsized.
+        let ty = TypeRef::Array(Box::new(TypeRef::String));
+        assert_eq!(ret_type(&ty), "Vec < String >");
+        assert_eq!(arg_type(&ty), "& [String]");
+    }
+
+    #[test]
+    fn test_array_inside_generic_keeps_array() {
+        // Nested inside a generic (`pos.inner == true`) we keep the
+        // legacy `Array<T'>` form because callers like
+        // `Promise<Array<T>>` need the in-band JS-wrapper element.
+        let ty = TypeRef::Array(Box::new(TypeRef::Number));
+        assert_eq!(inner_type(&ty), "Array < Number >");
+    }
+
+    fn cp(name: &str, ty: TypeRef) -> crate::codegen::signatures::ConcreteParam {
+        crate::codegen::signatures::ConcreteParam {
+            name: name.to_string(),
+            type_ref: ty,
+            variadic: false,
+        }
+    }
+
+    #[test]
+    fn test_needs_slice_to_array_primitives_skip() {
+        // `&[f64]` / `&[i64]` use the default zero-copy typed-array
+        // wire — no `slice_to_array` needed.
+        let params = vec![cp("xs", TypeRef::Array(Box::new(TypeRef::Number)))];
+        assert!(!needs_slice_to_array(&params));
+
+        let params = vec![cp("xs", TypeRef::Array(Box::new(TypeRef::BigInt)))];
+        assert!(!needs_slice_to_array(&params));
+    }
+
+    #[test]
+    fn test_needs_slice_to_array_strings_named_jsvalue() {
+        // `&[String]`, `&[Foo]`, `&[JsValue]` all need the attribute
+        // to materialise a plain JS `Array` rather than a typed-array
+        // view of externref handles.
+        for inner in [
+            TypeRef::String,
+            TypeRef::ident("EmailAttachment"),
+            TypeRef::Any,
+            TypeRef::Boolean,
+        ] {
+            let params = vec![cp("xs", TypeRef::Array(Box::new(inner.clone())))];
+            assert!(
+                needs_slice_to_array(&params),
+                "expected slice_to_array for {inner:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn test_needs_slice_to_array_optional_slice() {
+        // `Option<&[String]>` follows the same rule as `&[String]`.
+        let params = vec![cp(
+            "xs",
+            TypeRef::Nullable(Box::new(TypeRef::Array(Box::new(TypeRef::String)))),
+        )];
+        assert!(needs_slice_to_array(&params));
+
+        // `Option<&[f64]>` still skips it.
+        let params = vec![cp(
+            "xs",
+            TypeRef::Nullable(Box::new(TypeRef::Array(Box::new(TypeRef::Number)))),
+        )];
+        assert!(!needs_slice_to_array(&params));
+    }
+
+    #[test]
+    fn test_needs_slice_to_array_any_param_triggers() {
+        // The attribute is per-function, so a single non-numeric
+        // slice param flips the whole function on.
+        let params = vec![
+            cp("first", TypeRef::String),
+            cp("xs", TypeRef::Array(Box::new(TypeRef::Number))),
+            cp("ys", TypeRef::Array(Box::new(TypeRef::String))),
+        ];
+        assert!(needs_slice_to_array(&params));
+    }
+
+    #[test]
+    fn test_needs_slice_to_array_no_array_params() {
+        let params = vec![cp("x", TypeRef::String), cp("y", TypeRef::Number)];
+        assert!(!needs_slice_to_array(&params));
     }
 
     #[test]

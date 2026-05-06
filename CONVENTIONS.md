@@ -17,6 +17,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 
 * [Primitive types](#primitive-types)
 * [Optional and nullable types](#optional-and-nullable-types)
+* [Array and slice types](#array-and-slice-types)
 * [Property accessors](#property-accessors)
 * [Naming conversion](#naming-conversion)
 * [JS-name collisions with `js_sys` glob imports](#js-name-collisions-with-js_sys-glob-imports)
@@ -75,6 +76,63 @@ borrowed by reference; return-position container types are owned.
 * `T?` on a property → getter returns `Option<T>`; setter takes `T`.
 * `f(x?: T)` (optional parameter) → produces an overload pair, *not* an
   `Option<T>` parameter. See [Signature flattening](#signature-flattening).
+
+## Array and slice types
+
+Top-level `Array<T>` and the syntactic `T[]` lower to Rust-idiomatic
+sequences:
+
+* **Argument position** → `&[T]`. wasm-bindgen handles the JS-side
+  conversion; for primitive numeric `T` the slice arrives as a
+  zero-copy typed-array view, otherwise it's materialised as a plain
+  JS `Array`.
+* **Return position** → `Vec<T>`.
+
+Element type lowering inside the slice / `Vec<T>` follows
+**return-position** rules regardless of the outer direction:
+
+| TypeScript element        | Slice / Vec element    |
+| ------------------------- | ---------------------- |
+| `number`                  | `f64`                  |
+| `bigint`                  | `i64`                  |
+| `boolean`                 | `bool`                 |
+| `string`                  | `String`               |
+| `Foo` (named JS / Rust type) | `Foo`               |
+| `any` / `unknown`         | `JsValue`              |
+
+Strings stay owned (`Vec<String>`, not `Vec<&str>`); JS-imported
+classes stay unborrowed (`&[EmailAttachment]`, not
+`&[&EmailAttachment]`); primitives stay bare (`&[f64]`, not
+`&[Number]`).
+
+Inside an actual generic (`Promise<Array<T>>`, `Map<K, Array<V>>`,
+…) the legacy `Array<T'>` form is preserved — `Promise<T>` /
+`Map<K,V>` etc. require their generic argument to satisfy
+`T: JsGeneric`, which Rust's `Vec<T>` doesn't.
+
+### `slice_to_array` attribute
+
+By default, `&[T]` arguments to imported JS functions arrive as a
+zero-copy typed-array view when `T` is a primitive numeric (`u8`,
+`i32`, `f64`, …) and as a plain JS `Array` otherwise. ts-gen wants
+the `Array` representation (a TS `Array<string>` or `Array<Foo>` is
+a plain JS Array, not a typed view), so it tags every binding whose
+parameters include a non-numeric `&[T]` (or `Option<&[T]>`) with
+`#[wasm_bindgen(slice_to_array)]`:
+
+```rs
+#[wasm_bindgen(method, slice_to_array, js_name = "acceptWebSocket")]
+pub fn accept_web_socket_with_tags(this: &DurableObjectState, ws: &WebSocket, tags: &[String]);
+```
+
+The user-facing Rust signature is unchanged — `&[T]` stays `&[T]`.
+Only the JS-side wire format (and the JS-visible type) changes.
+
+ts-gen emits the attribute per-function (not per-block) — every
+imported callable that has at least one qualifying parameter gets
+its own `slice_to_array`. Functions whose only slice params are
+numeric (`&[f64]`, `&[i64]`) keep the default typed-array
+representation and do not get the attribute.
 
 ## Property accessors
 

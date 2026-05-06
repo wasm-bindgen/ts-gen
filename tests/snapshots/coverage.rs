@@ -168,19 +168,19 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_value(this: &TreeNode, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn children(this: &TreeNode) -> Array<TreeNode>;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_children(this: &TreeNode, val: &Array<TreeNode>);
+    pub fn children(this: &TreeNode) -> Vec<TreeNode>;
+    #[wasm_bindgen(method, setter, slice_to_array)]
+    pub fn set_children(this: &TreeNode, val: &[TreeNode]);
     #[wasm_bindgen(method, getter)]
     pub fn parent(this: &TreeNode) -> Option<TreeNode>;
     #[wasm_bindgen(method, setter)]
     pub fn set_parent(this: &TreeNode, val: &TreeNode);
 }
 impl TreeNode {
-    pub fn new(value: &str, children: &Array<TreeNode>) -> TreeNode {
+    pub fn new(value: &str, children: &[TreeNode]) -> TreeNode {
         Self::builder(value, children).build()
     }
-    pub fn builder(value: &str, children: &Array<TreeNode>) -> TreeNodeBuilder {
+    pub fn builder(value: &str, children: &[TreeNode]) -> TreeNodeBuilder {
         let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_value(value);
         inner.set_children(children);
@@ -326,9 +326,9 @@ extern "C" {
         event: &str,
         listener: &Function,
     ) -> Result<JsValue, JsValue>;
-    #[wasm_bindgen(method, variadic)]
+    #[wasm_bindgen(method, variadic, slice_to_array)]
     pub fn emit(this: &EventEmitter, event: &str, args: &[JsValue]) -> bool;
-    #[wasm_bindgen(method, variadic, catch, js_name = "emit")]
+    #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "emit")]
     pub fn try_emit(this: &EventEmitter, event: &str, args: &[JsValue]) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "removeAllListeners")]
     pub fn remove_all_listeners(this: &EventEmitter) -> JsValue;

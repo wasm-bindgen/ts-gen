@@ -121,28 +121,28 @@ pub mod console {
         #[doc = ""]
         #[doc = " * `condition` - The condition to test"]
         #[doc = " * `data` - Optional message or data"]
-        #[wasm_bindgen(method, variadic)]
+        #[wasm_bindgen(method, variadic, slice_to_array)]
         pub fn assert(this: &Console, data: &[JsValue]);
         #[doc = " A simple assertion test. If `condition` is falsy, an `AssertionError` is"]
         #[doc = " written with an optional message."]
         #[doc = ""]
         #[doc = " * `condition` - The condition to test"]
         #[doc = " * `data` - Optional message or data"]
-        #[wasm_bindgen(method, variadic, catch, js_name = "assert")]
+        #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "assert")]
         pub fn try_assert(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
         #[doc = " A simple assertion test. If `condition` is falsy, an `AssertionError` is"]
         #[doc = " written with an optional message."]
         #[doc = ""]
         #[doc = " * `condition` - The condition to test"]
         #[doc = " * `data` - Optional message or data"]
-        #[wasm_bindgen(method, variadic, js_name = "assert")]
+        #[wasm_bindgen(method, variadic, slice_to_array, js_name = "assert")]
         pub fn assert_with_condition(this: &Console, condition: bool, data: &[JsValue]);
         #[doc = " A simple assertion test. If `condition` is falsy, an `AssertionError` is"]
         #[doc = " written with an optional message."]
         #[doc = ""]
         #[doc = " * `condition` - The condition to test"]
         #[doc = " * `data` - Optional message or data"]
-        #[wasm_bindgen(method, variadic, catch, js_name = "assert")]
+        #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "assert")]
         pub fn try_assert_with_condition(
             this: &Console,
             condition: bool,
@@ -201,42 +201,42 @@ pub mod console {
         #[doc = " Prints to `stderr` with newline. Multiple arguments can be passed."]
         #[doc = ""]
         #[doc = " * `data` - Values to output"]
-        #[wasm_bindgen(method, variadic)]
+        #[wasm_bindgen(method, variadic, slice_to_array)]
         pub fn debug(this: &Console, data: &[JsValue]);
         #[doc = " Prints to `stderr` with newline. Multiple arguments can be passed."]
         #[doc = ""]
         #[doc = " * `data` - Values to output"]
-        #[wasm_bindgen(method, variadic, catch, js_name = "debug")]
+        #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "debug")]
         pub fn try_debug(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
         #[doc = " Prints to `stderr` with newline. Multiple arguments can be passed."]
         #[doc = ""]
         #[doc = " * `data` - Values to output"]
-        #[wasm_bindgen(method, variadic)]
+        #[wasm_bindgen(method, variadic, slice_to_array)]
         pub fn error(this: &Console, data: &[JsValue]);
         #[doc = " Prints to `stderr` with newline. Multiple arguments can be passed."]
         #[doc = ""]
         #[doc = " * `data` - Values to output"]
-        #[wasm_bindgen(method, variadic, catch, js_name = "error")]
+        #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "error")]
         pub fn try_error(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
         #[doc = " Increases indentation of subsequent lines by spaces for `groupIndentation` length."]
         #[doc = ""]
         #[doc = " * `data` - Optional label for the group"]
-        #[wasm_bindgen(method, variadic)]
+        #[wasm_bindgen(method, variadic, slice_to_array)]
         pub fn group(this: &Console, data: &[JsValue]);
         #[doc = " Increases indentation of subsequent lines by spaces for `groupIndentation` length."]
         #[doc = ""]
         #[doc = " * `data` - Optional label for the group"]
-        #[wasm_bindgen(method, variadic, catch, js_name = "group")]
+        #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "group")]
         pub fn try_group(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
         #[doc = " An alias for `group()`."]
         #[doc = ""]
         #[doc = " * `data` - Optional label for the group"]
-        #[wasm_bindgen(method, variadic, js_name = "groupCollapsed")]
+        #[wasm_bindgen(method, variadic, slice_to_array, js_name = "groupCollapsed")]
         pub fn group_collapsed(this: &Console, data: &[JsValue]);
         #[doc = " An alias for `group()`."]
         #[doc = ""]
         #[doc = " * `data` - Optional label for the group"]
-        #[wasm_bindgen(method, variadic, catch, js_name = "groupCollapsed")]
+        #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "groupCollapsed")]
         pub fn try_group_collapsed(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
         #[doc = " Decreases indentation of subsequent lines."]
         #[wasm_bindgen(method, js_name = "groupEnd")]
@@ -247,26 +247,26 @@ pub mod console {
         #[doc = " Prints to `stdout` with newline. Multiple arguments can be passed."]
         #[doc = ""]
         #[doc = " * `data` - Values to output"]
-        #[wasm_bindgen(method, variadic)]
+        #[wasm_bindgen(method, variadic, slice_to_array)]
         pub fn info(this: &Console, data: &[JsValue]);
         #[doc = " Prints to `stdout` with newline. Multiple arguments can be passed."]
         #[doc = ""]
         #[doc = " * `data` - Values to output"]
-        #[wasm_bindgen(method, variadic, catch, js_name = "info")]
+        #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "info")]
         pub fn try_info(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
         #[doc = " Prints to `stdout` with newline. Multiple arguments can be passed."]
         #[doc = " First argument is used as the primary message and additional arguments"]
         #[doc = " are used as substitution values similar to `printf(3)`."]
         #[doc = ""]
         #[doc = " * `data` - Values to output"]
-        #[wasm_bindgen(method, variadic)]
+        #[wasm_bindgen(method, variadic, slice_to_array)]
         pub fn log(this: &Console, data: &[JsValue]);
         #[doc = " Prints to `stdout` with newline. Multiple arguments can be passed."]
         #[doc = " First argument is used as the primary message and additional arguments"]
         #[doc = " are used as substitution values similar to `printf(3)`."]
         #[doc = ""]
         #[doc = " * `data` - Values to output"]
-        #[wasm_bindgen(method, variadic, catch, js_name = "log")]
+        #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "log")]
         pub fn try_log(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
         #[doc = " Try to construct a table with the columns of the properties of"]
         #[doc = " `tabularData` (or use `properties`) and rows of `tabularData`."]
@@ -304,22 +304,22 @@ pub mod console {
         #[doc = ""]
         #[doc = " * `tabularData` - Data to display as a table"]
         #[doc = " * `properties` - Column headers to display"]
-        #[wasm_bindgen(method, js_name = "table")]
+        #[wasm_bindgen(method, slice_to_array, js_name = "table")]
         pub fn table_with_tabular_data_and_properties(
             this: &Console,
             tabular_data: &JsValue,
-            properties: &Array<JsString>,
+            properties: &[String],
         );
         #[doc = " Try to construct a table with the columns of the properties of"]
         #[doc = " `tabularData` (or use `properties`) and rows of `tabularData`."]
         #[doc = ""]
         #[doc = " * `tabularData` - Data to display as a table"]
         #[doc = " * `properties` - Column headers to display"]
-        #[wasm_bindgen(method, catch, js_name = "table")]
+        #[wasm_bindgen(method, catch, slice_to_array, js_name = "table")]
         pub fn try_table_with_tabular_data_and_properties(
             this: &Console,
             tabular_data: &JsValue,
-            properties: &Array<JsString>,
+            properties: &[String],
         ) -> Result<(), JsValue>;
         #[doc = " Starts a timer identified by the given `label`."]
         #[doc = ""]
@@ -366,28 +366,28 @@ pub mod console {
         #[doc = ""]
         #[doc = " * `label` - The timer label"]
         #[doc = " * `data` - Additional values to output"]
-        #[wasm_bindgen(method, variadic, js_name = "timeLog")]
+        #[wasm_bindgen(method, variadic, slice_to_array, js_name = "timeLog")]
         pub fn time_log(this: &Console, data: &[JsValue]);
         #[doc = " For a timer previously started with `time()`, prints the elapsed time"]
         #[doc = " and other `data` arguments."]
         #[doc = ""]
         #[doc = " * `label` - The timer label"]
         #[doc = " * `data` - Additional values to output"]
-        #[wasm_bindgen(method, variadic, catch, js_name = "timeLog")]
+        #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "timeLog")]
         pub fn try_time_log(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
         #[doc = " For a timer previously started with `time()`, prints the elapsed time"]
         #[doc = " and other `data` arguments."]
         #[doc = ""]
         #[doc = " * `label` - The timer label"]
         #[doc = " * `data` - Additional values to output"]
-        #[wasm_bindgen(method, variadic, js_name = "timeLog")]
+        #[wasm_bindgen(method, variadic, slice_to_array, js_name = "timeLog")]
         pub fn time_log_with_label(this: &Console, label: &str, data: &[JsValue]);
         #[doc = " For a timer previously started with `time()`, prints the elapsed time"]
         #[doc = " and other `data` arguments."]
         #[doc = ""]
         #[doc = " * `label` - The timer label"]
         #[doc = " * `data` - Additional values to output"]
-        #[wasm_bindgen(method, variadic, catch, js_name = "timeLog")]
+        #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "timeLog")]
         pub fn try_time_log_with_label(
             this: &Console,
             label: &str,
@@ -397,23 +397,23 @@ pub mod console {
         #[doc = " output of the message and current stack trace."]
         #[doc = ""]
         #[doc = " * `data` - Values to output alongside the trace"]
-        #[wasm_bindgen(method, variadic)]
+        #[wasm_bindgen(method, variadic, slice_to_array)]
         pub fn trace(this: &Console, data: &[JsValue]);
         #[doc = " Prints to `stderr` the string `'Trace: '`, followed by `util.format()`"]
         #[doc = " output of the message and current stack trace."]
         #[doc = ""]
         #[doc = " * `data` - Values to output alongside the trace"]
-        #[wasm_bindgen(method, variadic, catch, js_name = "trace")]
+        #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "trace")]
         pub fn try_trace(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
         #[doc = " Prints to `stderr` with newline. Multiple arguments can be passed."]
         #[doc = ""]
         #[doc = " * `data` - Values to output"]
-        #[wasm_bindgen(method, variadic)]
+        #[wasm_bindgen(method, variadic, slice_to_array)]
         pub fn warn(this: &Console, data: &[JsValue]);
         #[doc = " Prints to `stderr` with newline. Multiple arguments can be passed."]
         #[doc = ""]
         #[doc = " * `data` - Values to output"]
-        #[wasm_bindgen(method, variadic, catch, js_name = "warn")]
+        #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "warn")]
         pub fn try_warn(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
         #[doc = " Starts a JavaScript CPU profile with an optional label."]
         #[doc = ""]

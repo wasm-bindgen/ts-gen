@@ -1166,6 +1166,9 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
     if sig.catch {
         wb_parts.push(quote! { catch });
     }
+    if super::typemap::needs_slice_to_array(&sig.params) {
+        wb_parts.push(quote! { slice_to_array });
+    }
     // For non-"new" overloads, we need js_name so wasm_bindgen maps them
     // to the same JS constructor.
     if sig.rust_name != "new" {
@@ -1199,6 +1202,9 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
     }
     if sig.catch {
         wb_parts.push(quote! { catch });
+    }
+    if super::typemap::needs_slice_to_array(&sig.params) {
+        wb_parts.push(quote! { slice_to_array });
     }
     // Emit js_name when the JS name differs from the Rust name.
     if sig.rust_name != sig.js_name {
@@ -1253,6 +1259,9 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
     }
     if sig.catch {
         wb_parts.push(quote! { catch });
+    }
+    if super::typemap::needs_slice_to_array(&sig.params) {
+        wb_parts.push(quote! { slice_to_array });
     }
     if sig.rust_name != sig.js_name {
         let js_name = &sig.js_name;
@@ -1394,6 +1403,9 @@ fn generate_setter(
             );
 
             let mut wb_parts: Vec<TokenStream> = vec![quote! { method }, quote! { setter }];
+            if super::typemap::needs_slice_to_array(&sig.params) {
+                wb_parts.push(quote! { slice_to_array });
+            }
             if sig.rust_name != format!("set_{}", setter.js_name) {
                 let js_name = &setter.js_name;
                 wb_parts.push(quote! { js_name = #js_name });
@@ -1500,6 +1512,9 @@ fn generate_static_setter(
                 quote! { static_method_of = #class_ident },
                 quote! { setter },
             ];
+            if super::typemap::needs_slice_to_array(&sig.params) {
+                wb_parts.push(quote! { slice_to_array });
+            }
             if sig.rust_name != format!("set_{}", setter.js_name) {
                 let js_name = &setter.js_name;
                 wb_parts.push(quote! { js_name = #js_name });
