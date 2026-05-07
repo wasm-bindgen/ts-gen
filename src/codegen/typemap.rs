@@ -147,6 +147,12 @@ pub struct CodegenContext<'a> {
 
     /// Local types that collide with js_sys reserved names — maps original name → renamed name.
     pub renamed_locals: HashMap<String, String>,
+    /// How many type parameters each *locally emitted* type accepts.
+    /// `Reference` lowering consults this to decide whether to keep
+    /// generic args (`Foo<T>`) or strip them — non-generic externals
+    /// (e.g. `web_sys::ReadableStream`) would emit `Type<Arg>` and
+    /// fail to compile.
+    pub local_type_param_counts: HashMap<String, usize>,
     /// Builtin (root) scope id.
     pub root_scope: ScopeId,
     /// Per-file scopes (children of root, contain imports + local types).
@@ -165,6 +171,7 @@ impl<'a> CodegenContext<'a> {
             local_types: HashMap::new(),
             local_type_ids: HashSet::new(),
             renamed_locals: HashMap::new(),
+            local_type_param_counts: HashMap::new(),
             root_scope: module.builtin_scope,
             file_scopes: module.file_scopes.clone(),
             external_uses: RefCell::new(HashMap::new()),
@@ -185,6 +192,7 @@ impl<'a> CodegenContext<'a> {
             local_types: HashMap::new(),
             local_type_ids: HashSet::new(),
             renamed_locals: HashMap::new(),
+            local_type_param_counts: HashMap::new(),
             root_scope,
             file_scopes: vec![],
             external_uses: RefCell::new(HashMap::new()),
@@ -314,14 +322,20 @@ impl<'a> CodegenContext<'a> {
             ir::TypeKind::Class(c) => {
                 self.local_types.insert(c.name.clone(), mctx.clone());
                 self.local_type_ids.insert(type_id);
+                self.local_type_param_counts
+                    .insert(c.name.clone(), c.type_params.len());
             }
             ir::TypeKind::Interface(i) => {
                 self.local_types.insert(i.name.clone(), mctx.clone());
                 self.local_type_ids.insert(type_id);
+                self.local_type_param_counts
+                    .insert(i.name.clone(), i.type_params.len());
             }
             ir::TypeKind::DiscriminatedUnion(d) => {
                 self.local_types.insert(d.name.clone(), mctx.clone());
                 self.local_type_ids.insert(type_id);
+                self.local_type_param_counts
+                    .insert(d.name.clone(), d.type_params.len());
             }
             ir::TypeKind::StringEnum(e) => {
                 self.local_types.insert(e.name.clone(), mctx.clone());
@@ -331,9 +345,12 @@ impl<'a> CodegenContext<'a> {
                 self.local_types.insert(e.name.clone(), mctx.clone());
                 self.local_type_ids.insert(type_id);
             }
-            ir::TypeKind::TypeAlias(_) => {
-                // Type aliases are resolved through the scope during codegen.
-                // No special collection needed.
+            ir::TypeKind::TypeAlias(a) => {
+                // Type aliases resolve through the scope during codegen,
+                // but record their arity so `Reference` lowering can
+                // preserve generic args on alias references.
+                self.local_type_param_counts
+                    .insert(a.name.clone(), a.type_params.len());
             }
             ir::TypeKind::Namespace(ns) => {
                 // Namespaces don't have an Id-of-themselves to chase here —
@@ -855,8 +872,9 @@ fn named_type_to_rust(
 
 /// Lower a `TypeRef::Reference` to its Rust syntax token. Handles
 /// alias resolution, dedicated-codegen heads (`Promise`, `Map`,
-/// `Set`, `Record`, `Array<T>`, ...), and falls through to
-/// `emit_type_name` for everything else.
+/// `Set`, `Record`, `Iterator`, ...), in-scope generic type
+/// parameters, and falls through to `emit_type_name` for everything
+/// else.
 ///
 /// `segments` is the full path (`["Foo"]` or `["A", "B", "C"]`).
 /// `generic_args` is empty for non-generic references and non-empty
@@ -883,30 +901,16 @@ fn lower_reference(
 
     let head = segments.first().map(String::as_str).unwrap_or("");
 
-    // Chase user-declared aliases for bare references — `type Foo =
-    // string` should lower to `String`, not `Foo`. Skipped when the
-    // reference carries generic type arguments (`EmailExportedHandler<Env, Props>`)
-    // because we don't substitute generic params; instead we emit the
-    // bare alias name and let downstream code see the alias decl.
-    // Alias resolution for bare identifiers is handled by the caller
-    // (the `TypeRef::Reference` arm in `to_syn_type`) so the recursive
-    // `to_syn_type(target, ...)` skips the outer `maybe_ref` wrap that
-    // would otherwise double-borrow types whose lowering already
-    // carries its own borrow shape (e.g. `&[T]`, `&str`).
-
     // Heads with dedicated codegen rules. `Promise<T>`, `Map<K,V>`,
-    // `Set<T>`, `Record<K,V>`, and the generic `Array<T>` form (the
-    // syntactic `T[]` is handled separately by `TypeRef::Array`)
-    // share a single dispatch here.
+    // `Set<T>`, `Record<K,V>`, and the iteration protocols share a
+    // single dispatch here. The syntactic `T[]` form is handled
+    // separately by `TypeRef::Array`; `Array<T>` / `ReadonlyArray<T>`
+    // get re-routed through that arm by the caller.
     match head {
         "Promise" | "PromiseLike" => {
             let inner = generic_args.first().cloned().unwrap_or(TypeRef::Any);
             return generic_container(quote! { Promise }, &inner, pos, ctx, scope, from_module);
         }
-        // `Array` / `ReadonlyArray` are handled directly in
-        // `to_syn_type`'s `TypeRef::Reference` arm so the outer
-        // `maybe_ref` doesn't double-borrow the already-correct
-        // slice form. This match arm is intentionally absent here.
         "Set" | "ReadonlySet" => {
             let inner = generic_args.first().cloned().unwrap_or(TypeRef::Any);
             return generic_container(quote! { Set }, &inner, pos, ctx, scope, from_module);
@@ -930,21 +934,80 @@ fn lower_reference(
             let v = generic_args.get(1).cloned().unwrap_or(TypeRef::Any);
             return generic_container(quote! { Object }, &v, pos, ctx, scope, from_module);
         }
+        // Already-iterator types: `Iterator<T>` and `IterableIterator<T>`
+        // both map straight to `js_sys::Iterator<T>`. The async pair
+        // maps to `js_sys::AsyncIterator<T>`.
+        "Iterator" | "IterableIterator" => {
+            let inner = generic_args.first().cloned().unwrap_or(TypeRef::Any);
+            return generic_container(quote! { Iterator }, &inner, pos, ctx, scope, from_module);
+        }
+        "AsyncIterator" | "AsyncIterableIterator" => {
+            let inner = generic_args.first().cloned().unwrap_or(TypeRef::Any);
+            return generic_container(
+                quote! { AsyncIterator },
+                &inner,
+                pos,
+                ctx,
+                scope,
+                from_module,
+            );
+        }
+        // The iterability protocol — `Iterable<T>` exposes
+        // `[Symbol.iterator](): Iterator<T>` rather than being an
+        // iterator itself. Top-level occurrences are hoisted by
+        // `parse::members` synthesis into a dedicated wrapper before
+        // reaching codegen; un-hoisted (nested) occurrences erase to
+        // `JsValue` since we can't express the protocol inline.
+        "Iterable" | "AsyncIterable" => {
+            return quote! { JsValue };
+        }
         _ => {}
     }
 
-    // Generic instantiation of a non-special head — wasm-bindgen
-    // bindings can't express user-defined generics yet, so we emit
-    // just the base ident with a diagnostic. Type args are dropped.
-    if !generic_args.is_empty() {
+    // In-scope generic type parameter — lower to a bare Rust ident.
+    // The surrounding method/type carries the `<T: JsGeneric>` bound.
+    if generic_args.is_empty() {
         if let Some(c) = ctx {
-            c.warn(format!(
-                "generic type arguments on `{head}<...>` are not yet emitted, using bare `{head}`"
-            ));
+            if matches!(
+                c.gctx.scopes.resolve_binding(scope, head),
+                Some(crate::parse::scope::Binding::TypeParam),
+            ) {
+                let ident = make_ident(head);
+                return quote! { #ident };
+            }
         }
     }
 
-    named_type_to_rust(head, ctx, from_module)
+    let base = named_type_to_rust(head, ctx, from_module);
+
+    // Generic instantiation: keep the args only when the target
+    // accepts them. Locally-emitted types record their arity in
+    // `local_type_param_counts`; everything else (web_sys
+    // externals, builtins) is treated as non-generic and the args
+    // are dropped to keep the output compiling.
+    if generic_args.is_empty() {
+        return base;
+    }
+    let accepts_generics = ctx
+        .and_then(|c| c.local_type_param_counts.get(head))
+        .copied()
+        .unwrap_or(0)
+        > 0;
+    if !accepts_generics {
+        if let Some(c) = ctx {
+            c.warn(format!(
+                "generic type arguments on `{head}<...>` are not emitted (target is not a \
+                 locally-declared generic type), using bare `{head}`"
+            ));
+        }
+        return base;
+    }
+    let inner_pos = pos.to_inner();
+    let arg_tokens: Vec<TokenStream> = generic_args
+        .iter()
+        .map(|a| to_syn_type(a, inner_pos, ctx, scope, from_module))
+        .collect();
+    quote! { #base<#(#arg_tokens),*> }
 }
 
 /// Create a `syn::Ident`, sanitizing invalid characters and escaping keywords.
@@ -1498,6 +1561,7 @@ mod tests {
                 type_params: vec![],
                 target: TypeRef::Union(vec![TypeRef::String, TypeRef::ident("ArrayBuffer")]),
                 from_module: None,
+                body_scope: scope,
             }),
             module_context: crate::ir::ModuleContext::Global,
             doc: None,

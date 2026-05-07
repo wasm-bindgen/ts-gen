@@ -1,35 +1,69 @@
 //! Convert oxc TypeScript type AST nodes to our IR `TypeRef`.
-
-use std::collections::HashSet;
+//!
+//! Type conversion is purely syntactic: it walks the AST and produces
+//! a `TypeRef`. Name resolution — figuring out whether `T` refers to a
+//! declared type or to an in-scope generic parameter — is deferred to
+//! codegen, which consults the scope chain at the relevant use site.
+//!
+//! However, the converter still needs to understand *some* lexical
+//! scope, for one reason: function type literals (`(x: T) => U`)
+//! introduce their own type-parameter scope. Each such literal
+//! allocates a fresh child scope on the arena so its `T` shadows any
+//! outer `T` for the duration of the conversion. Child scopes are
+//! appended to the arena and their IDs stay stable.
 
 use oxc_ast::ast::*;
 
 use crate::ir::TypeRef;
+use crate::parse::ctx::ParseCtx;
+use crate::parse::scope::{ScopeArena, ScopeId};
 use crate::util::diagnostics::DiagnosticCollector;
 use crate::util::naming::to_snake_case;
 
-/// Set of in-scope generic type parameter names.
-/// Names in this set resolve to `TypeRef::Any` instead of `TypeRef::Named`.
-pub type TypeParamScope<'a> = HashSet<&'a str>;
-
-/// Convert an oxc `TSType` to our IR `TypeRef`.
+/// Convert an oxc `TSType` to our IR `TypeRef` with no enclosing
+/// type-parameter scope. Use [`convert_ts_type_scoped`] when the
+/// surrounding context (a class body, method, type alias, ...)
+/// introduces type parameters that should be visible to nested types.
 ///
-/// If the type appears inside a generic declaration (class, method, function),
-/// pass the in-scope type parameter names via `convert_ts_type_scoped` instead.
+/// Internally allocates a throwaway scope arena. Suitable for sites
+/// that genuinely have no surrounding scope (top-level type-param
+/// declarations' constraints / defaults, isolated helpers in tests).
+/// Production parse paths should prefer [`convert_ts_type_scoped`]
+/// with a real `ParseCtx`.
 pub fn convert_ts_type(ts_type: &TSType<'_>, diag: &mut DiagnosticCollector) -> TypeRef {
-    convert_ts_type_scoped(ts_type, &HashSet::new(), diag)
+    let mut scratch = ScopeArena::new();
+    let root = scratch.create_root();
+    convert_ts_type_with_arena(ts_type, root, &mut scratch, diag)
 }
 
-/// Convert an oxc `TSType` to our IR `TypeRef`, with type parameter scope.
+/// Convert an oxc `TSType` to our IR `TypeRef`, with a lexical scope
+/// rooted at `scope`.
 ///
-/// Type parameters in `scope` are erased to `TypeRef::Any` since they can't
-/// be represented at the wasm_bindgen FFI boundary.
+/// Every named reference becomes a [`TypeRef::Reference`]; codegen
+/// disambiguates declared types from in-scope generic parameters via
+/// `scopes.resolve_binding`. The scope is consulted only to manage
+/// nested function-type literals that declare their own type
+/// parameters — those allocate child scopes so the inner parameter
+/// shadows any outer one (TypeScript's standard rules).
 pub fn convert_ts_type_scoped(
     ts_type: &TSType<'_>,
-    scope: &TypeParamScope<'_>,
+    scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
+) -> TypeRef {
+    convert_ts_type_with_arena(ts_type, scope, ctx.scopes, ctx.diag)
+}
+
+/// Internal: walk a `TSType` against a raw scope-arena handle.
+///
+/// Public converters route through this so they can be called either
+/// with a full `ParseCtx` (production paths) or with a throwaway
+/// arena (the bare `convert_ts_type` helper).
+fn convert_ts_type_with_arena(
+    ts_type: &TSType<'_>,
+    scope: ScopeId,
+    scopes: &mut ScopeArena,
     diag: &mut DiagnosticCollector,
 ) -> TypeRef {
-    // Unwrap parenthesized types
     let ts_type = ts_type.without_parenthesized();
 
     match ts_type {
@@ -49,11 +83,11 @@ pub fn convert_ts_type_scoped(
         TSType::TSIntrinsicKeyword(_) => TypeRef::Any,
 
         // === Type reference (named type, generic instantiation) ===
-        TSType::TSTypeReference(type_ref) => convert_type_reference_scoped(type_ref, scope, diag),
+        TSType::TSTypeReference(type_ref) => convert_type_reference(type_ref, scope, scopes, diag),
 
         // === Array types ===
         TSType::TSArrayType(arr) => {
-            let inner = convert_ts_type_scoped(&arr.element_type, scope, diag);
+            let inner = convert_ts_type_with_arena(&arr.element_type, scope, scopes, diag);
             TypeRef::Array(Box::new(inner))
         }
 
@@ -62,7 +96,7 @@ pub fn convert_ts_type_scoped(
             let types: Vec<TypeRef> = union_type
                 .types
                 .iter()
-                .map(|t| convert_ts_type_scoped(t, scope, diag))
+                .map(|t| convert_ts_type_with_arena(t, scope, scopes, diag))
                 .collect();
             simplify_union(types)
         }
@@ -72,7 +106,7 @@ pub fn convert_ts_type_scoped(
             let types: Vec<TypeRef> = inter
                 .types
                 .iter()
-                .map(|t| convert_ts_type_scoped(t, scope, diag))
+                .map(|t| convert_ts_type_with_arena(t, scope, scopes, diag))
                 .collect();
             TypeRef::Intersection(types)
         }
@@ -82,14 +116,14 @@ pub fn convert_ts_type_scoped(
             let types: Vec<TypeRef> = tuple
                 .element_types
                 .iter()
-                .map(|elem| convert_tuple_element_scoped(elem, scope, diag))
+                .map(|elem| convert_tuple_element(elem, scope, scopes, diag))
                 .collect();
             TypeRef::Tuple(types)
         }
 
         // === Function types ===
         TSType::TSFunctionType(func) => {
-            let sig = convert_function_type_scoped(func, scope, diag);
+            let sig = convert_function_type(func, scope, scopes, diag);
             TypeRef::Function(sig)
         }
 
@@ -125,7 +159,7 @@ pub fn convert_ts_type_scoped(
         }
         TSType::TSTypeOperatorType(op) => match op.operator {
             TSTypeOperatorOperator::Readonly => {
-                convert_ts_type_scoped(&op.type_annotation, scope, diag)
+                convert_ts_type_with_arena(&op.type_annotation, scope, scopes, diag)
             }
             _ => {
                 diag.warn_with_source(
@@ -148,87 +182,74 @@ pub fn convert_ts_type_scoped(
 
         // TSNamedTupleMember is also a direct variant of TSType via inherit_variants
         TSType::TSNamedTupleMember(member) => {
-            // member.element_type is a TSTupleElement, convert it
-            convert_tuple_element_scoped(&member.element_type, scope, diag)
+            convert_tuple_element(&member.element_type, scope, scopes, diag)
         }
 
         TSType::TSParenthesizedType(paren) => {
-            convert_ts_type_scoped(&paren.type_annotation, scope, diag)
+            convert_ts_type_with_arena(&paren.type_annotation, scope, scopes, diag)
         }
 
         // JSDoc types
         TSType::JSDocNullableType(nullable) => {
-            let inner = convert_ts_type_scoped(&nullable.type_annotation, scope, diag);
+            let inner = convert_ts_type_with_arena(&nullable.type_annotation, scope, scopes, diag);
             TypeRef::Nullable(Box::new(inner))
         }
         TSType::JSDocNonNullableType(non_nullable) => {
-            convert_ts_type_scoped(&non_nullable.type_annotation, scope, diag)
+            convert_ts_type_with_arena(&non_nullable.type_annotation, scope, scopes, diag)
         }
         TSType::JSDocUnknownType(_) => TypeRef::Any,
     }
 }
 
-/// Convert a type reference with type parameter scope.
+/// Convert a type reference.
 ///
 /// Most named type references — built-in JS classes, user-declared
-/// types, `Promise<T>`, `Map<K,V>`, qualified paths — flow through
-/// `TypeRef::Reference`. Resolution happens at codegen time against
-/// the scope chain (mirroring TypeScript's name lookup), which means
-/// user declarations shadow built-ins exactly the way they do in TS.
+/// types, in-scope generic parameters, `Promise<T>`, qualified paths
+/// — flow through `TypeRef::Reference`. Resolution happens at codegen
+/// time against the scope chain (mirroring TypeScript's name lookup):
+/// user declarations shadow built-ins, and in-scope generic
+/// parameters (recorded as `Binding::TypeParam` in the scope chain)
+/// lower to bare Rust idents while declared types lower through the
+/// type arena.
 ///
 /// A few constructs *are* desugared at parse time because they're
 /// purely TS utility-type sugar with no JS runtime presence:
 ///
-/// * `Boolean` / `Number` / `String` / `Object` / `Symbol` (capital-letter
-///   "wrapper" keyword aliases) → primitive variants.
+/// * `Boolean` / `Number` / `String` / `Object` / `Symbol` (capital-
+///   letter "wrapper" keyword aliases) → primitive variants.
 /// * `Partial` / `Required` / ... `Awaited` (utility types that don't
-///   produce new runtime types) → identity on their first type argument.
+///   produce new runtime types) → identity on their first type
+///   argument.
 /// * `Function` (the legacy global `Function` type alias) → an
 ///   `(args) => any` function type.
-fn convert_type_reference_scoped(
+fn convert_type_reference(
     type_ref: &TSTypeReference<'_>,
-    scope: &TypeParamScope<'_>,
+    scope: ScopeId,
+    scopes: &mut ScopeArena,
     diag: &mut DiagnosticCollector,
 ) -> TypeRef {
     let (head, segments) = collect_type_name_path(&type_ref.type_name);
 
-    // If the head is an in-scope type parameter, erase to Any.
-    // Qualified paths through type parameters aren't supported either.
-    if scope.contains(head.as_str()) {
-        return TypeRef::Any;
-    }
-
-    // Collect generic type arguments if present.
     let type_args: Vec<TypeRef> = type_ref
         .type_arguments
         .as_ref()
         .map(|args| {
             args.params
                 .iter()
-                .map(|t| convert_ts_type_scoped(t, scope, diag))
+                .map(|t| convert_ts_type_with_arena(t, scope, scopes, diag))
                 .collect()
         })
         .unwrap_or_default();
 
-    // For unqualified references, intercept TS-only sugar that
-    // doesn't need to flow through name resolution.
     if segments.is_empty() {
         match head.as_str() {
-            // `ArrayBufferView` is a TS-only union alias for the
-            // typed-array family + DataView. There is no JS class
-            // with this name, so it lowers specially at codegen time.
             "ArrayBufferView" => return TypeRef::ArrayBufferView,
-            // Capital-case aliases for primitives — these read as the
-            // primitive itself in TS, never as the boxed JS class.
             "Boolean" => return TypeRef::Boolean,
             "Number" => return TypeRef::Number,
             "String" => return TypeRef::String,
             "Object" => return TypeRef::Object,
             "Symbol" => return TypeRef::Symbol,
 
-            // The legacy global `Function` type — TS treats it as
-            // "any callable", with no fixed signature. We model that
-            // as `(args) => any`.
             "Function" => {
                 return TypeRef::Function(crate::ir::FunctionSig {
                     params: vec![],
@@ -236,10 +257,6 @@ fn convert_type_reference_scoped(
                 });
             }
 
-            // TS utility types that resolve to the structure of their
-            // first type argument at type-check time. For our
-            // purposes (FFI types) they're identity on the argument,
-            // or `Object` when there's no useful argument to keep.
             "Partial"
             | "Required"
             | "Pick"
@@ -261,6 +278,9 @@ fn convert_type_reference_scoped(
         }
     }
 
+    // The lexical scope is not consulted here — codegen disambiguates
+    // declared types from in-scope generic parameters at emit time.
+    let _ = scope;
     let mut path = vec![head];
     path.extend(segments);
     TypeRef::Reference {
@@ -283,58 +303,61 @@ fn collect_type_name_path(type_name: &TSTypeName<'_>) -> (String, Vec<String>) {
     }
 }
 
-/// Convert a tuple element to a `TypeRef`, with type parameter scope.
-fn convert_tuple_element_scoped(
+/// Convert a tuple element to a `TypeRef`.
+fn convert_tuple_element(
     elem: &TSTupleElement<'_>,
-    scope: &TypeParamScope<'_>,
+    scope: ScopeId,
+    scopes: &mut ScopeArena,
     diag: &mut DiagnosticCollector,
 ) -> TypeRef {
     match elem {
         TSTupleElement::TSNamedTupleMember(member) => {
-            convert_tuple_element_scoped(&member.element_type, scope, diag)
+            convert_tuple_element(&member.element_type, scope, scopes, diag)
         }
         TSTupleElement::TSRestType(rest) => {
-            convert_ts_type_scoped(&rest.type_annotation, scope, diag)
+            convert_ts_type_with_arena(&rest.type_annotation, scope, scopes, diag)
         }
         TSTupleElement::TSOptionalType(opt) => {
-            let inner = convert_ts_type_scoped(&opt.type_annotation, scope, diag);
+            let inner = convert_ts_type_with_arena(&opt.type_annotation, scope, scopes, diag);
             TypeRef::Nullable(Box::new(inner))
         }
         // All remaining variants are TSType variants flattened by inherit_variants!
-        other => {
-            if let Some(ts_type) = tuple_element_as_ts_type(other) {
-                convert_ts_type_scoped(ts_type, scope, diag)
-            } else {
+        other => match other.as_ts_type() {
+            Some(ts_type) => convert_ts_type_with_arena(ts_type, scope, scopes, diag),
+            None => {
                 diag.warn("Unsupported tuple element type");
                 TypeRef::Any
             }
-        }
+        },
     }
 }
 
-/// Try to get a reference to the inner TSType from a TSTupleElement.
-/// TSTupleElement inherits all TSType variants via `inherit_variants!`,
-/// and provides `as_ts_type()` to access the underlying TSType.
-fn tuple_element_as_ts_type<'a>(elem: &'a TSTupleElement<'a>) -> Option<&'a TSType<'a>> {
-    elem.as_ts_type()
-}
-
-/// Convert a `TSFunctionType` to our IR `FunctionSig`, with type parameter scope.
-fn convert_function_type_scoped(
+/// Convert a `TSFunctionType` to our IR `FunctionSig`.
+///
+/// Function-type literals may declare their own type parameters
+/// (`<T>(x: T) => T`); those go into a fresh child scope so the
+/// inner `T` shadows any outer one for the duration of the
+/// conversion. The child scope is purely transient — function-type
+/// literals have no IR node to attach a `body_scope` to.
+fn convert_function_type(
     func: &TSFunctionType<'_>,
-    scope: &TypeParamScope<'_>,
+    scope: ScopeId,
+    scopes: &mut ScopeArena,
     diag: &mut DiagnosticCollector,
 ) -> crate::ir::FunctionSig {
-    // Extend scope with this function's own type parameters
-    let mut inner_scope = scope.clone();
-    if let Some(tp) = &func.type_parameters {
+    let inner_scope = if let Some(tp) = &func.type_parameters {
+        let child = scopes.create_child(scope);
         for p in &tp.params {
-            inner_scope.insert(p.name.name.as_str());
+            scopes.insert_type_param(child, p.name.name.to_string());
         }
-    }
+        child
+    } else {
+        scope
+    };
 
-    let params = convert_formal_params(&func.params, diag);
-    let return_type = convert_ts_type_scoped(&func.return_type.type_annotation, &inner_scope, diag);
+    let params = convert_formal_params_with_arena(&func.params, inner_scope, scopes, diag);
+    let return_type =
+        convert_ts_type_with_arena(&func.return_type.type_annotation, inner_scope, scopes, diag);
 
     crate::ir::FunctionSig {
         params,
@@ -342,9 +365,32 @@ fn convert_function_type_scoped(
     }
 }
 
-/// Convert oxc `FormalParameters` to our IR `Param` list.
+/// Convert oxc `FormalParameters` to our IR `Param` list, with no
+/// enclosing scope. Use [`convert_formal_params_scoped`] for parsing
+/// paths that already have a `ParseCtx` to thread.
 pub fn convert_formal_params(
     params: &FormalParameters<'_>,
+    diag: &mut DiagnosticCollector,
+) -> Vec<crate::ir::Param> {
+    let mut scratch = ScopeArena::new();
+    let root = scratch.create_root();
+    convert_formal_params_with_arena(params, root, &mut scratch, diag)
+}
+
+/// Convert oxc `FormalParameters` to our IR `Param` list, scoped at
+/// the given `ScopeId` for nested type resolution.
+pub fn convert_formal_params_scoped(
+    params: &FormalParameters<'_>,
+    scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
+) -> Vec<crate::ir::Param> {
+    convert_formal_params_with_arena(params, scope, ctx.scopes, ctx.diag)
+}
+
+fn convert_formal_params_with_arena(
+    params: &FormalParameters<'_>,
+    scope: ScopeId,
+    scopes: &mut ScopeArena,
     diag: &mut DiagnosticCollector,
 ) -> Vec<crate::ir::Param> {
     let mut result = Vec::new();
@@ -353,31 +399,27 @@ pub fn convert_formal_params(
             .map(|n| to_snake_case(&n))
             .unwrap_or_else(|| format!("arg{i}"));
 
-        // In oxc 0.118, type_annotation and optional are on FormalParameter directly
         let type_ref = param
             .type_annotation
             .as_ref()
-            .map(|ann| convert_ts_type(&ann.type_annotation, diag))
+            .map(|ann| convert_ts_type_with_arena(&ann.type_annotation, scope, scopes, diag))
             .unwrap_or(TypeRef::Any);
-
-        let optional = param.optional;
 
         result.push(crate::ir::Param {
             name,
             type_ref,
-            optional,
+            optional: param.optional,
             variadic: false,
         });
     }
 
-    // Handle rest parameter
     if let Some(rest) = &params.rest {
         let name = binding_pattern_name(&rest.rest.argument).unwrap_or_else(|| "rest".to_string());
 
         let type_ref = rest
             .type_annotation
             .as_ref()
-            .map(|ann| convert_ts_type(&ann.type_annotation, diag))
+            .map(|ann| convert_ts_type_with_arena(&ann.type_annotation, scope, scopes, diag))
             .unwrap_or(TypeRef::Array(Box::new(TypeRef::Any)));
 
         result.push(crate::ir::Param {
@@ -392,7 +434,6 @@ pub fn convert_formal_params(
 }
 
 /// Extract a name from a binding pattern (only handles simple identifier patterns).
-/// In oxc 0.118, BindingPattern is an enum directly.
 pub(crate) fn binding_pattern_name(pattern: &BindingPattern<'_>) -> Option<String> {
     match pattern {
         BindingPattern::BindingIdentifier(ident) => Some(ident.name.to_string()),
@@ -418,9 +459,6 @@ fn convert_literal_type(lit: &TSLiteralType<'_>, _diag: &mut DiagnosticCollector
 /// `Nullable<T>` wrapper that the rest of the pipeline understands —
 /// `string | null` and `string | undefined` and
 /// `string | null | undefined` all become `Nullable<String>`.
-///
-/// Used by both the regular `TSUnionType` parsing and the
-/// per-property union merge in `literal_union::union_member_types`.
 pub(crate) fn simplify_union(types: Vec<TypeRef>) -> TypeRef {
     let mut non_null_types = Vec::new();
     let mut has_null = false;

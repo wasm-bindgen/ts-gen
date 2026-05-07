@@ -71,6 +71,10 @@ fn register_type(
     );
 
     // Create a placeholder TypeDeclaration based on the registered kind.
+    // Phase 2 (`populate_declarations`) overwrites these with the
+    // fully-populated IR — including a proper body_scope holding the
+    // declaration's type-parameter bindings — so the placeholder
+    // body_scope is just the enclosing scope. It's never observed.
     let name_str = name.to_string();
     let placeholder_kind = match kind {
         ir::RegisteredKind::Class | ir::RegisteredKind::MergedClassLike => {
@@ -83,6 +87,7 @@ fn register_type(
                 is_abstract: false,
                 members: vec![],
                 type_module_context: ctx.clone(),
+                body_scope: scope,
             })
         }
         ir::RegisteredKind::Interface => ir::TypeKind::Interface(ir::InterfaceDecl {
@@ -92,6 +97,7 @@ fn register_type(
             extends: vec![],
             members: vec![],
             classification: ir::InterfaceClassification::Unclassified,
+            body_scope: scope,
         }),
         ir::RegisteredKind::StringEnum => ir::TypeKind::StringEnum(ir::StringEnumDecl {
             name: name_str.clone(),
@@ -106,6 +112,7 @@ fn register_type(
             type_params: vec![],
             target: ir::TypeRef::Any,
             from_module: None,
+            body_scope: scope,
         }),
         ir::RegisteredKind::Function => ir::TypeKind::Function(ir::FunctionDecl {
             name: name_str.clone(),
@@ -115,6 +122,7 @@ fn register_type(
             return_type: ir::TypeRef::Any,
             overloads: vec![],
             throws: ir::Throws::None,
+            body_scope: scope,
         }),
         ir::RegisteredKind::Variable => ir::TypeKind::Variable(ir::VariableDecl {
             name: name_str.clone(),

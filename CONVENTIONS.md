@@ -907,6 +907,98 @@ primitives via `value_of()` (for `Boolean` / `Number`) or
 Sync returns, arguments, and properties keep the bare-primitive
 lowering.
 
+## `Iterator<T>` / `IterableIterator<T>` map to `js_sys::Iterator<T>`
+
+Already-iterator types — anything that exposes the `next()` /
+`{value, done}` protocol directly — map straight to the
+`wasm-bindgen` typed iterator wrappers. Both the sync and async
+families share a single dispatch:
+
+| TypeScript               | Rust                            |
+| ------------------------ | ------------------------------- |
+| `Iterator<T>`            | `js_sys::Iterator<T>`           |
+| `IterableIterator<T>`    | `js_sys::Iterator<T>`           |
+| `AsyncIterator<T>`       | `js_sys::AsyncIterator<T>`      |
+| `AsyncIterableIterator<T>` | `js_sys::AsyncIterator<T>`    |
+
+The inner `T` lowers like any other generic argument: type
+parameters lower to a bare ident (with the surrounding method or
+type carrying a `<T: ::wasm_bindgen::JsGeneric>` bound), tuples
+become `ArrayTuple<…>`, primitives become their JS wrapper forms.
+
+## `Iterable<T>` returns synthesize a wrapper with `[Symbol.iterator]()`
+
+`Iterable<T>` is the **protocol** — an object exposing
+`[Symbol.iterator](): Iterator<T>`, distinct from the iterator
+itself. wasm-bindgen has no inline way to express this, so top-level
+occurrences in return position are hoisted into a synthesized extern
+type:
+
+```ts
+interface SyncKvStorage {
+  list<T>(): Iterable<[string, T]>;
+}
+```
+
+becomes:
+
+```rust
+pub type SyncKvStorageList<T: ::wasm_bindgen::JsGeneric>;
+
+#[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+pub fn iterator<T: ::wasm_bindgen::JsGeneric>(
+    this: &SyncKvStorageList<T>,
+) -> Iterator<ArrayTuple<(JsString, T)>>;
+
+#[wasm_bindgen(method)]
+pub fn list<T: ::wasm_bindgen::JsGeneric>(this: &SyncKvStorage) -> SyncKvStorageList<T>;
+```
+
+The wrapper's name follows the existing `<Parent><Member>`
+convention (with dedup on collision), mirroring anonymous-interface
+parameter synthesis. `AsyncIterable<T>` synthesizes the analogous
+wrapper keyed on `[Symbol.asyncIterator]`. The bracketed `js_name`
+form matches wasm-bindgen's computed-property syntax for symbol-keyed
+methods. Nested occurrences (inside unions, arrays, etc.) are not
+synthesized — they erase to `JsValue`, matching the existing
+parameter-synthesis limitation.
+
+Type parameters mentioned by the iteration item bubble up onto the
+synthesized wrapper, so `Iterable<[string, T]>` produces
+`<Parent>List<T>` rather than erasing `T`.
+
+## In-scope generic type parameters
+
+Bare type-parameter references (`T` in `put<T>(value: T)`) survive
+codegen as `<T: ::wasm_bindgen::JsGeneric>` declarations rather than
+being erased:
+
+```ts
+interface KeyValueStore {
+  put<T>(key: string, value: T): void;
+  get<T = unknown>(key: string): T | undefined;
+}
+```
+
+becomes:
+
+```rust
+pub fn put<T: ::wasm_bindgen::JsGeneric>(this: &KeyValueStore, key: &str, value: &T);
+pub fn get<T: ::wasm_bindgen::JsGeneric>(this: &KeyValueStore, key: &str) -> Option<T>;
+```
+
+Parse-time, every type-parameter-bearing declaration (class,
+interface, type alias, method, function, namespace) creates a child
+**body scope** with its `<T, ...>` bound as
+`Binding::TypeParam`. Codegen consults `scopes.resolve_binding` at
+each name-emission site — when a name resolves to a type parameter,
+it lowers to a bare Rust ident; otherwise it goes through the
+regular declared-type / external-map / `JsValue` fallback path.
+
+Methods redeclare every type parameter mentioned in their signature,
+even those inherited from the surrounding type. `js_sys` follows the
+same convention (see `js_sys::Array::for_each<T: JsGeneric>`).
+
 ## `@throws` JSDoc → typed error
 
 ```ts

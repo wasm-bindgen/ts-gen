@@ -56,9 +56,15 @@ pub(crate) struct ClassConfig<'a> {
     is_abstract: bool,
     /// Members to generate.
     members: Vec<Member>,
+    /// Type parameters declared on the type itself (`<T, U, …>`).
+    /// Rendered as `<T: JsGeneric, …>` on the `pub type` decl and
+    /// propagated to every `this: &Type<T, …>` reference inside the
+    /// extern block.
+    type_params: Vec<crate::ir::TypeParam>,
     /// Codegen context for type resolution.
     cgctx: Option<&'a CodegenContext<'a>>,
-    /// Scope for type reference resolution.
+    /// Scope for type reference resolution. For class-like configs
+    /// this is the type's body scope (holds its `<T, …>`).
     scope: ScopeId,
 }
 
@@ -67,8 +73,12 @@ impl<'a> ClassConfig<'a> {
         decl: &ClassDecl,
         ctx: &ModuleContext,
         cgctx: Option<&'a CodegenContext>,
-        scope: ScopeId,
+        _enclosing_scope: ScopeId,
     ) -> Self {
+        // The class's body scope (holding its `<T, …>`) is the right
+        // scope to thread through name resolution everywhere inside
+        // its extern block.
+        let scope = decl.body_scope;
         let extends = match &decl.extends {
             Some(e) => vec![extends_tokens(e, cgctx, scope, ctx)],
             None => vec![quote! { Object }],
@@ -86,6 +96,7 @@ impl<'a> ClassConfig<'a> {
             js_namespace: None,
             is_abstract: decl.is_abstract,
             members: decl.members.clone(),
+            type_params: decl.type_params.clone(),
             cgctx,
             scope,
         }
@@ -95,8 +106,9 @@ impl<'a> ClassConfig<'a> {
         decl: &InterfaceDecl,
         ctx: &ModuleContext,
         cgctx: Option<&'a CodegenContext>,
-        scope: ScopeId,
+        _enclosing_scope: ScopeId,
     ) -> Self {
+        let scope = decl.body_scope;
         let extends = if decl.extends.is_empty() {
             vec![quote! { Object }]
         } else {
@@ -118,6 +130,7 @@ impl<'a> ClassConfig<'a> {
             js_namespace: None,
             is_abstract: false,
             members: decl.members.clone(),
+            type_params: decl.type_params.clone(),
             cgctx,
             scope,
         }
@@ -132,8 +145,9 @@ impl<'a> ClassConfig<'a> {
         decl: &crate::ir::DiscriminatedUnionDecl,
         ctx: &ModuleContext,
         cgctx: Option<&'a CodegenContext>,
-        scope: ScopeId,
+        _enclosing_scope: ScopeId,
     ) -> Self {
+        let scope = decl.body_scope;
         let module = match ctx {
             ModuleContext::Module(m) => Some(m.clone()),
             ModuleContext::Global => None,
@@ -146,9 +160,40 @@ impl<'a> ClassConfig<'a> {
             js_namespace: None,
             is_abstract: false,
             members: decl.members.clone(),
+            type_params: decl.type_params.clone(),
             cgctx,
             scope,
         }
+    }
+
+    /// Tokens for the type-level generic declaration
+    /// (`<T: ::wasm_bindgen::JsGeneric, …>`) or empty when the type
+    /// has no parameters.
+    fn type_generics_decl(&self) -> TokenStream {
+        if self.type_params.is_empty() {
+            return quote! {};
+        }
+        let idents = self
+            .type_params
+            .iter()
+            .map(|tp| super::typemap::make_ident(&tp.name))
+            .collect::<Vec<_>>();
+        quote! { <#(#idents: ::wasm_bindgen::JsGeneric),*> }
+    }
+
+    /// Tokens for the type's generic-argument list (`<T, …>`) used in
+    /// `this: &Type<T, …>` references inside the extern block. Empty
+    /// when there are no parameters.
+    fn type_generics_args(&self) -> TokenStream {
+        if self.type_params.is_empty() {
+            return quote! {};
+        }
+        let idents = self
+            .type_params
+            .iter()
+            .map(|tp| super::typemap::make_ident(&tp.name))
+            .collect::<Vec<_>>();
+        quote! { <#(#idents),*> }
     }
 
     /// Rust name to use everywhere the class identifier appears in generated
@@ -395,6 +440,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 return_type: &void,
                 throws: &crate::ir::Throws::None,
                 doc: &None,
+                body_scope: config.scope,
             },
             &mut setter_used,
             config.cgctx,
@@ -955,6 +1001,10 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         return_type: &return_type,
                         throws,
                         doc: &doc,
+                        // Constructors don't have their own type
+                        // parameter scope — they instantiate the
+                        // class's. `config.scope` is the class body.
+                        body_scope: config.scope,
                     },
                     &mut used_names,
                     config.cgctx,
@@ -976,6 +1026,8 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 let return_type = &group[0].return_type;
                 let empty_throws = crate::ir::Throws::None;
                 let throws = group.first().map(|m| &m.throws).unwrap_or(&empty_throws);
+                // The method's own body scope holds its `<T, ...>`.
+                let method_scope = group[0].body_scope;
                 let sigs = build_signatures(
                     &CallableSpec {
                         js_name: &m.js_name,
@@ -984,10 +1036,11 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         return_type,
                         throws,
                         doc: &doc,
+                        body_scope: method_scope,
                     },
                     &mut used_names,
                     config.cgctx,
-                    config.scope,
+                    method_scope,
                 );
                 for sig in &sigs {
                     items.push(generate_expanded_method(config, sig));
@@ -1005,6 +1058,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 let return_type = &group[0].return_type;
                 let empty_throws = crate::ir::Throws::None;
                 let throws = group.first().map(|m| &m.throws).unwrap_or(&empty_throws);
+                let method_scope = group[0].body_scope;
                 let sigs = build_signatures(
                     &CallableSpec {
                         js_name: &m.js_name,
@@ -1013,10 +1067,11 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         return_type,
                         throws,
                         doc: &doc,
+                        body_scope: method_scope,
                     },
                     &mut used_names,
                     config.cgctx,
-                    config.scope,
+                    method_scope,
                 );
                 for sig in &sigs {
                     items.push(generate_expanded_static_method(config, sig));
@@ -1132,22 +1187,50 @@ fn generate_type_decl(config: &ClassConfig) -> TokenStream {
         quote! { #[wasm_bindgen(#(#wb_parts),*)] }
     };
 
+    let generics_decl = config.type_generics_decl();
+
     quote! {
         #wb_attr
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type #rust_ident;
+        pub type #rust_ident #generics_decl;
     }
+}
+
+/// Generic-parameter declaration for a method, covering both the
+/// type-level parameters referenced in `this: &Foo<T, …>` and any
+/// method-only parameters mentioned in arguments or the return type.
+/// wasm-bindgen requires the redeclaration even for type-level
+/// params (see `js_sys::Array::for_each<T: JsGeneric>` for the
+/// canonical pattern).
+fn generic_params_for_method(config: &ClassConfig, sig: &FunctionSignature) -> TokenStream {
+    // Type-level params come first, in declaration order, so
+    // `<T: JsGeneric, U: JsGeneric>` aligns with `this: &Foo<T, U>`.
+    let mut names: Vec<String> = config
+        .type_params
+        .iter()
+        .map(|tp| tp.name.clone())
+        .collect();
+    if let Some(cgctx) = config.cgctx {
+        for p in &sig.params {
+            super::signatures::collect_type_params(&p.type_ref, cgctx, sig.body_scope, &mut names);
+        }
+        super::signatures::collect_type_params(&sig.return_type, cgctx, sig.body_scope, &mut names);
+    }
+    if names.is_empty() {
+        return quote! {};
+    }
+    let idents = names
+        .iter()
+        .map(|n| super::typemap::make_ident(n))
+        .collect::<Vec<_>>();
+    quote! { <#(#idents: ::wasm_bindgen::JsGeneric),*> }
 }
 
 /// Generate a constructor binding from a resolved signature.
 fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) -> TokenStream {
     let rust_ident = super::typemap::make_ident(&sig.rust_name);
-    let params = generate_concrete_params(
-        &sig.params,
-        config.cgctx,
-        config.scope,
-        &config.from_module(),
-    );
+    let scope = sig.body_scope;
+    let params = generate_concrete_params(&sig.params, config.cgctx, scope, &config.from_module());
     let doc = super::doc_tokens(&sig.doc);
 
     // Constructors always return the constructed type, wrapped in Result
@@ -1158,7 +1241,7 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
         sig.is_async,
         sig.error_type.as_ref(),
         config.cgctx,
-        config.scope,
+        scope,
         &config.from_module(),
     );
 
@@ -1187,10 +1270,14 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
 fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> TokenStream {
     let rust_ident = super::typemap::make_ident(&sig.rust_name);
     let this_type = super::typemap::make_ident(&config.effective_rust_name());
+    // Method-local type parameters live in `sig.body_scope`; resolve
+    // names through that scope so `T` (etc.) lowers to a bare ident
+    // rather than slipping through to `emit_type_name`.
+    let method_scope = sig.body_scope;
     let params = generate_concrete_params(
         &sig.params,
         config.cgctx,
-        config.scope,
+        method_scope,
         &config.from_module(),
     );
     let doc = super::doc_tokens(&sig.doc);
@@ -1218,7 +1305,7 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
         sig.is_async,
         sig.error_type.as_ref(),
         config.cgctx,
-        config.scope,
+        method_scope,
         &config.from_module(),
     );
     let ret = if is_void_return(&sig.return_type) && !sig.catch {
@@ -1233,10 +1320,13 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
         quote! {}
     };
 
+    let method_generics = generic_params_for_method(config, sig);
+    let this_generics = config.type_generics_args();
+
     quote! {
         #doc
         #[wasm_bindgen(#(#wb_parts),*)]
-        pub #async_kw fn #rust_ident(this: &#this_type, #params) #ret;
+        pub #async_kw fn #rust_ident #method_generics (this: &#this_type #this_generics, #params) #ret;
     }
 }
 
@@ -1244,12 +1334,8 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
 fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature) -> TokenStream {
     let rust_ident = super::typemap::make_ident(&sig.rust_name);
     let class_ident = super::typemap::make_ident(&config.effective_rust_name());
-    let params = generate_concrete_params(
-        &sig.params,
-        config.cgctx,
-        config.scope,
-        &config.from_module(),
-    );
+    let scope = sig.body_scope;
+    let params = generate_concrete_params(&sig.params, config.cgctx, scope, &config.from_module());
     let doc = super::doc_tokens(&sig.doc);
     let has_variadic = sig.params.last().is_some_and(|p| p.variadic);
 
@@ -1274,7 +1360,7 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
         sig.is_async,
         sig.error_type.as_ref(),
         config.cgctx,
-        config.scope,
+        scope,
         &config.from_module(),
     );
     let ret = if is_void_return(&sig.return_type) && !sig.catch {
@@ -1289,10 +1375,12 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
         quote! {}
     };
 
+    let generics = generic_params_for_method(config, sig);
+
     quote! {
         #doc
         #[wasm_bindgen(#(#wb_parts),*)]
-        pub #async_kw fn #rust_ident(#params) #ret;
+        pub #async_kw fn #rust_ident #generics (#params) #ret;
     }
 }
 
@@ -1386,6 +1474,7 @@ fn generate_setter(
             return_type: &void,
             throws: &crate::ir::Throws::None,
             doc: &doc,
+            body_scope: config.scope,
         },
         used_names,
         config.cgctx,
@@ -1492,6 +1581,7 @@ fn generate_static_setter(
             return_type: &void,
             throws: &crate::ir::Throws::None,
             doc: &doc,
+            body_scope: config.scope,
         },
         used_names,
         config.cgctx,

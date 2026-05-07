@@ -366,6 +366,11 @@ pub struct ClassDecl {
     pub members: Vec<Member>,
     /// Where the type declaration itself should live.
     pub type_module_context: ModuleContext,
+    /// Scope inside this class's body — child of the enclosing scope,
+    /// holding [`Binding::TypeParam`] entries for the class's own
+    /// `<T, ...>`. Methods chain off this scope; codegen resolves
+    /// names against it.
+    pub body_scope: crate::parse::scope::ScopeId,
 }
 
 // ─── Interface ───────────────────────────────────────────────────────
@@ -380,6 +385,9 @@ pub struct InterfaceDecl {
     pub members: Vec<Member>,
     /// Classification determined during assembly.
     pub classification: InterfaceClassification,
+    /// Scope inside this interface's body — see
+    /// [`ClassDecl::body_scope`] for the contract.
+    pub body_scope: crate::parse::scope::ScopeId,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -431,6 +439,9 @@ pub struct DiscriminatedUnionDecl {
     /// JS names of properties that act as discriminators — present and
     /// required in every branch with a string-literal type.
     pub discriminators: Vec<String>,
+    /// Scope inside this declaration's body — see
+    /// [`ClassDecl::body_scope`] for the contract.
+    pub body_scope: crate::parse::scope::ScopeId,
 }
 
 // ─── Type Alias ──────────────────────────────────────────────────────
@@ -444,6 +455,8 @@ pub struct TypeAliasDecl {
     /// If this alias is a re-export from an external module, the module specifier.
     /// Used by codegen to emit `pub use <external>::Foo;` instead of `pub type`.
     pub from_module: Option<String>,
+    /// Scope inside this alias's body — see [`ClassDecl::body_scope`].
+    pub body_scope: crate::parse::scope::ScopeId,
 }
 
 // ─── String Enum ─────────────────────────────────────────────────────
@@ -543,6 +556,8 @@ pub struct FunctionDecl {
     pub overloads: Vec<FunctionOverload>,
     /// Failure-mode info from `@throws` JSDoc. See [`Throws`].
     pub throws: Throws,
+    /// Scope inside this function's body — see [`ClassDecl::body_scope`].
+    pub body_scope: crate::parse::scope::ScopeId,
 }
 
 #[derive(Clone, Debug)]
@@ -629,6 +644,10 @@ pub struct MethodMember {
     pub doc: Option<String>,
     /// Failure-mode info from `@throws` — see [`Throws`].
     pub throws: Throws,
+    /// Scope inside this method's body — child of the enclosing
+    /// type's body scope, holding [`Binding::TypeParam`] entries for
+    /// the method's own `<T, ...>`. See [`ClassDecl::body_scope`].
+    pub body_scope: crate::parse::scope::ScopeId,
 }
 
 #[derive(Clone, Debug)]
@@ -687,6 +706,9 @@ pub struct StaticMethodMember {
     pub doc: Option<String>,
     /// Failure-mode info from `@throws` — see [`Throws`].
     pub throws: Throws,
+    /// Scope inside this static method's body — see
+    /// [`MethodMember::body_scope`].
+    pub body_scope: crate::parse::scope::ScopeId,
 }
 
 // ─── Type Registry (First Pass) ──────────────────────────────────────

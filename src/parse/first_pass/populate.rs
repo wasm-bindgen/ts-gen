@@ -7,10 +7,11 @@
 use oxc_ast::ast;
 
 use crate::ir;
+use crate::parse::ctx::ParseCtx;
 use crate::parse::docs::DocComments;
 use crate::parse::merge::{extract_var_members, is_class_constructor_var, var_declarator_name};
 use crate::parse::scope::{ScopeArena, ScopeId};
-use crate::parse::types::{convert_ts_type, convert_type_params};
+use crate::parse::types::{convert_ts_type_scoped, convert_type_params};
 use crate::util::diagnostics::DiagnosticCollector;
 use crate::util::naming::to_snake_case;
 
@@ -20,31 +21,75 @@ use super::converters::{
 };
 
 /// Shared context for Phase 2 declaration population.
-struct PopulateCtx<'a> {
+///
+/// Holds the registry + lib name + read-only type arena alongside an
+/// owned `ParseCtx` (which itself is the bag of mutable parse state:
+/// scopes, diagnostics, used type names, synthesized interfaces).
+/// Member converters take `&mut ParseCtx` directly; this struct
+/// handles the per-statement orchestration.
+struct PopulateCtx<'a, 'docs> {
     registry: &'a ir::TypeRegistry,
     lib_name: Option<&'a str>,
-    docs: &'a DocComments<'a>,
-    diag: &'a mut DiagnosticCollector,
-    scopes: &'a ScopeArena,
     /// Read-only Phase 1 declarations (for looking up namespace child scopes).
     type_arena: &'a [ir::TypeDeclaration],
-    /// Type names already in use across this run — seeded from the
-    /// registry and grown as anonymous interfaces get synthesized.
-    /// Used to dedup candidate names for hoisted parameter types so each
-    /// synthesized type ends up with a unique Rust ident.
+    /// Used-type-names set, owned by Phase 2 and lent to `ParseCtx`.
     used_type_names: std::collections::HashSet<String>,
+    /// Synthesized-interface sink threaded through member conversion;
+    /// the per-statement orchestration drains this between
+    /// declarations.
+    synth: Vec<ir::InterfaceDecl>,
+    /// Borrows of the scope arena, diagnostic collector, and doc
+    /// table. Held here so that callers like `populate_statement` can
+    /// build a `ParseCtx` reborrow on demand.
+    scopes: &'a mut ScopeArena,
+    diag: &'a mut DiagnosticCollector,
+    docs: &'a DocComments<'docs>,
+}
+
+impl<'a, 'docs> PopulateCtx<'a, 'docs> {
+    /// Build a fresh `ParseCtx` reborrowing this struct's mutable
+    /// fields. Use within a method to thread through to converters.
+    fn parse_ctx<'b>(&'b mut self) -> ParseCtx<'b, 'docs> {
+        ParseCtx {
+            scopes: self.scopes,
+            diag: self.diag,
+            docs: self.docs,
+            used_type_names: &mut self.used_type_names,
+            synth: &mut self.synth,
+        }
+    }
+
+    /// Drain any synthesized interfaces accumulated during a single
+    /// declaration's conversion, wrapping each as a [`TypeDeclaration`]
+    /// in the same module context as the parent declaration.
+    fn drain_synth(
+        &mut self,
+        module_context: &ir::ModuleContext,
+        scope: ScopeId,
+    ) -> Vec<ir::TypeDeclaration> {
+        self.synth
+            .drain(..)
+            .map(|iface| ir::TypeDeclaration {
+                kind: ir::TypeKind::Interface(iface),
+                module_context: module_context.clone(),
+                doc: None,
+                scope_id: scope,
+                exported: true,
+            })
+            .collect()
+    }
 }
 
 /// Walk the AST again and fully populate the IR declarations.
 #[allow(clippy::too_many_arguments)]
-pub fn populate_declarations(
+pub fn populate_declarations<'a, 'docs>(
     program: &ast::Program<'_>,
-    registry: &ir::TypeRegistry,
-    lib_name: Option<&str>,
-    docs: &DocComments<'_>,
-    diag: &mut DiagnosticCollector,
-    scopes: &ScopeArena,
-    type_arena: &[ir::TypeDeclaration],
+    registry: &'a ir::TypeRegistry,
+    lib_name: Option<&'a str>,
+    docs: &'a DocComments<'docs>,
+    diag: &'a mut DiagnosticCollector,
+    scopes: &'a mut ScopeArena,
+    type_arena: &'a [ir::TypeDeclaration],
     scope: ScopeId,
 ) -> Vec<ir::TypeDeclaration> {
     let mut declarations = Vec::new();
@@ -53,11 +98,12 @@ pub fn populate_declarations(
     let mut pcx = PopulateCtx {
         registry,
         lib_name,
-        docs,
-        diag,
-        scopes,
         type_arena,
         used_type_names,
+        synth: Vec::new(),
+        scopes,
+        diag,
+        docs,
     };
 
     for stmt in &program.body {
@@ -94,7 +140,7 @@ impl<'a> DeclCtx<'a> {
     }
 }
 
-impl<'a> PopulateCtx<'a> {
+impl<'a, 'docs> PopulateCtx<'a, 'docs> {
     /// Populate from a top-level statement.
     fn populate_statement(
         &mut self,
@@ -192,6 +238,9 @@ impl<'a> PopulateCtx<'a> {
                             type_params: vec![],
                             target: ir::TypeRef::ident(local),
                             from_module,
+                            // Re-export aliases have no body — pin to the
+                            // enclosing scope.
+                            body_scope: scope,
                         }),
                         module_context: ctx.clone(),
                         doc: None,
@@ -206,15 +255,8 @@ impl<'a> PopulateCtx<'a> {
                         .docs
                         .for_span(export.span.start)
                         .or_else(|| self.docs.for_span(class.span.start));
-                    let mut synth: Vec<ir::InterfaceDecl> = Vec::new();
-                    if let Some(decl) = convert_class_decl(
-                        class,
-                        ctx,
-                        &mut self.used_type_names,
-                        &mut synth,
-                        self.docs,
-                        self.diag,
-                    ) {
+                    let class_decl = convert_class_decl(class, ctx, scope, &mut self.parse_ctx());
+                    if let Some(decl) = class_decl {
                         declarations.push(ir::TypeDeclaration {
                             kind: ir::TypeKind::Class(decl),
                             module_context: ctx.clone(),
@@ -222,15 +264,7 @@ impl<'a> PopulateCtx<'a> {
                             scope_id: scope,
                             exported: true,
                         });
-                        for iface in synth {
-                            declarations.push(ir::TypeDeclaration {
-                                kind: ir::TypeKind::Interface(iface),
-                                module_context: ctx.clone(),
-                                doc: None,
-                                scope_id: scope,
-                                exported: true,
-                            });
-                        }
+                        declarations.extend(self.drain_synth(ctx, scope));
                     }
                 }
                 ast::ExportDefaultDeclarationKind::FunctionDeclaration(func) => {
@@ -244,7 +278,9 @@ impl<'a> PopulateCtx<'a> {
                         Some((d, i)) => (Some(d), i.throws()),
                         None => (None, ir::Throws::None),
                     };
-                    if let Some(decl) = convert_function_decl(func, throws, self.diag) {
+                    if let Some(decl) =
+                        convert_function_decl(func, throws, scope, &mut self.parse_ctx())
+                    {
                         declarations.push(ir::TypeDeclaration {
                             kind: ir::TypeKind::Function(decl),
                             module_context: ctx.clone(),
@@ -347,17 +383,12 @@ impl<'a> PopulateCtx<'a> {
         declarations: &mut Vec<ir::TypeDeclaration>,
     ) {
         let doc = self.lookup_doc(dcx.export_span_start, class.span.start);
-        let mut synth: Vec<ir::InterfaceDecl> = Vec::new();
-        if let Some(d) = convert_class_decl(
-            class,
-            dcx.module_context,
-            &mut self.used_type_names,
-            &mut synth,
-            self.docs,
-            self.diag,
-        ) {
+        let module_context = dcx.module_context.clone();
+        let scope = dcx.scope;
+        let class_decl = convert_class_decl(class, &module_context, scope, &mut self.parse_ctx());
+        if let Some(d) = class_decl {
             declarations.push(dcx.decl(ir::TypeKind::Class(d), doc));
-            self.append_synthesized(&mut synth, dcx, declarations);
+            declarations.extend(self.drain_synth(&module_context, scope));
         }
     }
 
@@ -368,38 +399,11 @@ impl<'a> PopulateCtx<'a> {
         declarations: &mut Vec<ir::TypeDeclaration>,
     ) {
         let doc = self.lookup_doc(dcx.export_span_start, iface.span.start);
-        let mut synth: Vec<ir::InterfaceDecl> = Vec::new();
-        let iface_decl = convert_interface_decl(
-            iface,
-            &mut self.used_type_names,
-            &mut synth,
-            self.docs,
-            self.diag,
-        );
+        let module_context = dcx.module_context.clone();
+        let scope = dcx.scope;
+        let iface_decl = convert_interface_decl(iface, scope, &mut self.parse_ctx());
         declarations.push(dcx.decl(ir::TypeKind::Interface(iface_decl), doc));
-        self.append_synthesized(&mut synth, dcx, declarations);
-    }
-
-    /// Lift a batch of synthesized anonymous interfaces (hoisted from
-    /// `{ ... }` parameter types inside a class/interface declaration)
-    /// into the top-level declarations stream, sharing the parent's
-    /// module context and scope but always exported (the parent's
-    /// methods reference them by name).
-    fn append_synthesized(
-        &mut self,
-        synth: &mut Vec<ir::InterfaceDecl>,
-        dcx: &DeclCtx<'_>,
-        declarations: &mut Vec<ir::TypeDeclaration>,
-    ) {
-        for iface in synth.drain(..) {
-            declarations.push(ir::TypeDeclaration {
-                kind: ir::TypeKind::Interface(iface),
-                module_context: dcx.module_context.clone(),
-                doc: None,
-                scope_id: dcx.scope,
-                exported: true,
-            });
-        }
+        declarations.extend(self.drain_synth(&module_context, scope));
     }
 
     fn populate_type_alias(
@@ -430,19 +434,34 @@ impl<'a> PopulateCtx<'a> {
         // so consumers get the dictionary-builder / variant-factory
         // treatment instead of an opaque type alias to `Object`. The
         // alias's own name becomes the synthesized type.
-        if let Some(kind) = self.try_synthesize_alias_decl(&name, &alias.type_annotation) {
+        if let Some(kind) = self.try_synthesize_alias_decl(&name, &alias.type_annotation, dcx.scope)
+        {
             declarations.push(dcx.decl(kind, doc));
+            // Hoisted nested interfaces accumulated in `self.synth` —
+            // drain them alongside the promoted alias declaration.
+            let module_context = dcx.module_context.clone();
+            let scope = dcx.scope;
+            declarations.extend(self.drain_synth(&module_context, scope));
             return;
         }
 
         let type_params = convert_type_params(alias.type_parameters.as_ref(), self.diag);
-        let target = convert_ts_type(&alias.type_annotation, self.diag);
+        // The alias's body scope holds its own type parameters so the
+        // target type can resolve them lexically.
+        let body_scope = crate::parse::members::create_body_scope(
+            &type_params,
+            dcx.scope,
+            &mut self.parse_ctx(),
+        );
+        let target =
+            convert_ts_type_scoped(&alias.type_annotation, body_scope, &mut self.parse_ctx());
         declarations.push(dcx.decl(
             ir::TypeKind::TypeAlias(ir::TypeAliasDecl {
                 name,
                 type_params,
                 target,
                 from_module: None,
+                body_scope,
             }),
             doc,
         ));
@@ -462,34 +481,23 @@ impl<'a> PopulateCtx<'a> {
         &mut self,
         alias_name: &str,
         target: &ast::TSType<'_>,
+        parent_scope: ScopeId,
     ) -> Option<ir::TypeKind> {
         match target {
             ast::TSType::TSTypeLiteral(literal) => {
-                let mut synth: Vec<ir::InterfaceDecl> = Vec::new();
                 let iface = crate::parse::first_pass::converters::interface_from_signatures(
                     alias_name.to_string(),
                     Vec::new(),
                     Vec::new(),
                     &literal.members,
-                    &mut self.used_type_names,
-                    &mut synth,
-                    self.docs,
-                    self.diag,
+                    parent_scope,
+                    &mut self.parse_ctx(),
                 );
-                // Any nested anonymous interfaces hoisted from method
-                // params inside `iface` get synthesized too. They're
-                // siblings of the alias-promoted interface, so push them
-                // first; the caller appends `iface` itself.
                 self.used_type_names.insert(alias_name.to_string());
-                for inner in synth {
-                    // Late binding through self isn't directly possible
-                    // here without restructuring; the alias path has no
-                    // method parameter context that recurses, so this
-                    // path will rarely produce nested synth in practice.
-                    // If it does, drop them — the alias type literal
-                    // doesn't carry methods that hoist.
-                    let _ = inner;
-                }
+                // Any nested anonymous interfaces hoisted from member
+                // params during `interface_from_signatures` accumulate
+                // in `self.synth` — the caller drains them alongside
+                // the alias-promoted interface.
                 Some(ir::TypeKind::Interface(iface))
             }
             ast::TSType::TSUnionType(union)
@@ -498,7 +506,10 @@ impl<'a> PopulateCtx<'a> {
                     .iter()
                     .all(|t| matches!(t, ast::TSType::TSTypeLiteral(_))) =>
             {
-                let mut synth: Vec<ir::InterfaceDecl> = Vec::new();
+                // Hoisted alias-union has no surface type parameters,
+                // so the body scope is the parent scope directly.
+                let body_scope = parent_scope;
+                let alias_owned = alias_name.to_string();
                 let branches: Vec<Vec<ir::Member>> = union
                     .types
                     .iter()
@@ -509,11 +520,9 @@ impl<'a> PopulateCtx<'a> {
                                 .flat_map(|sig| {
                                     crate::parse::members::convert_ts_signature(
                                         sig,
-                                        Some(alias_name),
-                                        &mut self.used_type_names,
-                                        &mut synth,
-                                        self.docs,
-                                        self.diag,
+                                        Some(&alias_owned),
+                                        body_scope,
+                                        &mut self.parse_ctx(),
                                     )
                                 })
                                 .collect(),
@@ -524,9 +533,6 @@ impl<'a> PopulateCtx<'a> {
                 let merged = crate::parse::literal_union::merge_member_branches(&branches);
                 self.used_type_names.insert(alias_name.to_string());
 
-                // Promote to a discriminated union when the branches
-                // share a string-literal discriminator. Otherwise fall
-                // back to the plain merged interface.
                 let discriminators = crate::parse::literal_union::detect_discriminators(&branches);
                 if !discriminators.is_empty() {
                     Some(ir::TypeKind::DiscriminatedUnion(
@@ -537,6 +543,7 @@ impl<'a> PopulateCtx<'a> {
                             branches,
                             members: merged,
                             discriminators,
+                            body_scope,
                         },
                     ))
                 } else {
@@ -548,6 +555,7 @@ impl<'a> PopulateCtx<'a> {
                         extends: Vec::new(),
                         members: merged,
                         classification,
+                        body_scope,
                     }))
                 }
             }
@@ -562,7 +570,7 @@ impl<'a> PopulateCtx<'a> {
         declarations: &mut Vec<ir::TypeDeclaration>,
     ) {
         let (doc, throws) = self.lookup_callable_doc(dcx.export_span_start, func.span.start);
-        if let Some(d) = convert_function_decl(func, throws, self.diag) {
+        if let Some(d) = convert_function_decl(func, throws, dcx.scope, &mut self.parse_ctx()) {
             declarations.push(dcx.decl(ir::TypeKind::Function(d), doc));
         }
     }
@@ -595,7 +603,7 @@ impl<'a> PopulateCtx<'a> {
                     if let Some(type_ann) = &declarator.type_annotation {
                         if let ast::TSType::TSTypeLiteral(lit) = &type_ann.type_annotation {
                             let (ctor, static_members) =
-                                extract_var_members(lit, self.docs, self.diag);
+                                extract_var_members(lit, dcx.scope, &mut self.parse_ctx());
 
                             let mut members = Vec::new();
                             if let Some(c) = ctor {
@@ -613,6 +621,9 @@ impl<'a> PopulateCtx<'a> {
                                 .cloned()
                                 .unwrap_or_else(|| name.clone());
 
+                            // Var-promoted classes have no surface
+                            // type parameters; body scope = enclosing.
+                            let body_scope = dcx.scope;
                             declarations.push(dcx.decl(
                                 ir::TypeKind::Class(ir::ClassDecl {
                                     name: public_name.clone(),
@@ -623,6 +634,7 @@ impl<'a> PopulateCtx<'a> {
                                     is_abstract: false,
                                     members,
                                     type_module_context: dcx.module_context.clone(),
+                                    body_scope,
                                 }),
                                 doc.clone(),
                             ));
@@ -634,10 +646,19 @@ impl<'a> PopulateCtx<'a> {
                 let type_ref = declarator
                     .type_annotation
                     .as_ref()
-                    .map(|ann| convert_ts_type(&ann.type_annotation, self.diag))
+                    .map(|ann| {
+                        convert_ts_type_scoped(
+                            &ann.type_annotation,
+                            dcx.scope,
+                            &mut self.parse_ctx(),
+                        )
+                    })
                     .unwrap_or(ir::TypeRef::Any);
 
                 if let ir::TypeRef::Function(sig) = type_ref {
+                    // Var-as-function bindings have no surface type
+                    // parameters; their body scope is the enclosing.
+                    let body_scope = dcx.scope;
                     declarations.push(dcx.decl(
                         ir::TypeKind::Function(ir::FunctionDecl {
                             name: to_snake_case(&name),
@@ -649,6 +670,7 @@ impl<'a> PopulateCtx<'a> {
                             // Variable-as-function form (`var foo: () => T`) doesn't
                             // typically carry @throws JSDoc; leave empty.
                             throws: ir::Throws::None,
+                            body_scope,
                         }),
                         doc.clone(),
                     ));

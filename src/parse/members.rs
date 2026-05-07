@@ -1,21 +1,25 @@
 //! Convert oxc class/interface member AST nodes to our IR `Member`.
+//!
+//! Member converters take an enclosing `parent_scope: ScopeId` plus a
+//! `&mut ParseCtx`. Methods (and any other type-parameter-bearing
+//! member) create a fresh child scope on the arena, insert their type
+//! parameters as `Binding::TypeParam`, and store the resulting
+//! `body_scope` on the IR node so codegen can resolve names lexically.
 
 use oxc_ast::ast::*;
 
-use std::collections::HashSet;
-
 use crate::ir::*;
-use crate::parse::docs::{DocComments, JsDocInfo};
+use crate::parse::ctx::ParseCtx;
+use crate::parse::docs::JsDocInfo;
 use crate::parse::first_pass::converters::interface_from_signatures;
+use crate::parse::scope::ScopeId;
 use crate::parse::types::{
-    binding_pattern_name, convert_formal_params, convert_ts_type, convert_ts_type_scoped,
-    convert_type_params,
+    binding_pattern_name, convert_formal_params_scoped, convert_ts_type_scoped, convert_type_params,
 };
-use crate::util::diagnostics::DiagnosticCollector;
 use crate::util::naming::{to_pascal_case, to_snake_case};
 
-/// Split the result of [`DocComments::info_for_span`] into a `(doc, info)`
-/// pair, defaulting to empty info when no JSDoc is attached.
+/// Split the result of `info_for_span` into a `(doc, info)` pair,
+/// defaulting to empty info when no JSDoc is attached.
 fn split_info(opt: Option<(String, JsDocInfo)>) -> (Option<String>, JsDocInfo) {
     match opt {
         Some((doc, info)) => (Some(doc), info),
@@ -23,30 +27,218 @@ fn split_info(opt: Option<(String, JsDocInfo)>) -> (Option<String>, JsDocInfo) {
     }
 }
 
+/// Push the given type parameters into a fresh child of `parent_scope`
+/// and return the new scope. Used by every member converter that
+/// declares its own `<T, U, ...>` — methods, free functions, hoisted
+/// interfaces, type aliases. The resulting scope ID is what the IR
+/// node stores as its `body_scope`, so codegen can resolve `T`
+/// against the same chain.
+pub(crate) fn create_body_scope(
+    type_params: &[TypeParam],
+    parent_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
+) -> ScopeId {
+    let body_scope = ctx.scopes.create_child(parent_scope);
+    for tp in type_params {
+        ctx.scopes.insert_type_param(body_scope, tp.name.clone());
+    }
+    body_scope
+}
+
+/// Walk a [`TypeRef`] and collect every bare reference whose name
+/// resolves to a [`crate::parse::scope::Binding::TypeParam`] in the
+/// given scope chain, in source-appearance order, deduped.
+///
+/// Mirror of `codegen::signatures::collect_type_params` but operating
+/// on the parse-time scope arena. Used by iterable-wrapper synthesis
+/// to figure out which type parameters need to bubble up onto the
+/// synthesized wrapper.
+fn collect_in_scope_type_params(
+    ty: &TypeRef,
+    scope: ScopeId,
+    scopes: &crate::parse::scope::ScopeArena,
+    out: &mut Vec<String>,
+) {
+    use crate::parse::scope::Binding;
+    match ty {
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } => {
+            if segments.len() == 1 && generic_args.is_empty() {
+                let name = &segments[0];
+                if matches!(
+                    scopes.resolve_binding(scope, name),
+                    Some(Binding::TypeParam),
+                ) {
+                    if !out.iter().any(|n| n == name) {
+                        out.push(name.clone());
+                    }
+                    return;
+                }
+            }
+            for a in generic_args {
+                collect_in_scope_type_params(a, scope, scopes, out);
+            }
+        }
+        TypeRef::Array(inner) | TypeRef::Nullable(inner) => {
+            collect_in_scope_type_params(inner, scope, scopes, out);
+        }
+        TypeRef::Union(members) | TypeRef::Intersection(members) | TypeRef::Tuple(members) => {
+            for m in members {
+                collect_in_scope_type_params(m, scope, scopes, out);
+            }
+        }
+        TypeRef::Function(sig) => {
+            for p in &sig.params {
+                collect_in_scope_type_params(&p.type_ref, scope, scopes, out);
+            }
+            collect_in_scope_type_params(&sig.return_type, scope, scopes, out);
+        }
+        _ => {}
+    }
+}
+
+/// If `ty` is a top-level `Iterable<T>` or `AsyncIterable<T>` return,
+/// synthesize a wrapper interface exposing `[Symbol.iterator]()` (or
+/// `[Symbol.asyncIterator]()`) and rewrite the return to reference
+/// the wrapper. Returns the new return type, or `None` when no
+/// rewriting was needed (the caller falls back to the original type).
+///
+/// The synthesized wrapper:
+///
+/// * Lives next to the parent declaration, pushed onto `ctx.synth`.
+/// * Inherits any in-scope type parameters mentioned by the item
+///   type (so `list<T>(): Iterable<[string, T]>` produces
+///   `KeyValueStoreList<T>` rather than erasing `T`). The wrapper's
+///   own body scope binds those parameters as [`Binding::TypeParam`].
+/// * Has a single method `iterator` (or `async_iterator`) returning
+///   `Iterator<T>` / `AsyncIterator<T>` — codegen recognises those
+///   heads and lowers them to `js_sys::Iterator` / `AsyncIterator`.
+///
+/// Nested occurrences (inside a union, array, etc.) are not
+/// synthesized; they erase to `JsValue` at codegen time.
+pub(crate) fn try_synthesize_iterable_return(
+    ty: &TypeRef,
+    parent_name: &str,
+    member_name: &str,
+    enclosing_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
+) -> Option<TypeRef> {
+    let (is_async, item_type) = match ty {
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } if segments.len() == 1 && !generic_args.is_empty() => match segments[0].as_str() {
+            "Iterable" => (false, generic_args[0].clone()),
+            "AsyncIterable" => (true, generic_args[0].clone()),
+            _ => return None,
+        },
+        _ => return None,
+    };
+
+    // Type parameters mentioned by the item type bubble up onto the
+    // synthesized wrapper so it can carry them: an `Iterable<[string, T]>`
+    // return becomes `<Parent><member><T>` rather than erasing `T`.
+    let mut tp_names = Vec::new();
+    collect_in_scope_type_params(&item_type, enclosing_scope, ctx.scopes, &mut tp_names);
+    let synth_type_params: Vec<TypeParam> = tp_names
+        .into_iter()
+        .map(|name| TypeParam {
+            name,
+            constraint: None,
+            default: None,
+        })
+        .collect();
+
+    let synth_name = unique_type_name(parent_name, member_name, ctx.used_type_names);
+    ctx.used_type_names.insert(synth_name.clone());
+
+    // Body scope of the synthesized wrapper inherits the parent
+    // method's scope and binds the wrapper's own type parameters.
+    let body_scope = create_body_scope(&synth_type_params, enclosing_scope, ctx);
+
+    // wasm-bindgen's `js_name` syntax for symbol-keyed methods is the
+    // bracketed `[Symbol.foo]` form (matching JS computed-property
+    // syntax), not bare `Symbol.foo`.
+    let (symbol_name, iter_head) = if is_async {
+        ("[Symbol.asyncIterator]", "AsyncIterator")
+    } else {
+        ("[Symbol.iterator]", "Iterator")
+    };
+    let iter_return = TypeRef::generic(iter_head, vec![item_type]);
+
+    // The iterator method's body scope is the wrapper's body scope —
+    // it has no type parameters of its own, but should resolve the
+    // wrapper's `<T, ...>` lexically.
+    let iter_method_body = ctx.scopes.create_child(body_scope);
+    let iter_method = Member::Method(MethodMember {
+        name: if is_async {
+            "async_iterator".to_string()
+        } else {
+            "iterator".to_string()
+        },
+        js_name: symbol_name.to_string(),
+        type_params: Vec::new(),
+        params: Vec::new(),
+        return_type: iter_return,
+        optional: false,
+        doc: Some(format!(
+            "Conformance to the JS {} protocol — returns the underlying iterator.",
+            if is_async {
+                "async iteration"
+            } else {
+                "iteration"
+            }
+        )),
+        throws: Throws::None,
+        body_scope: iter_method_body,
+    });
+
+    ctx.synth.push(InterfaceDecl {
+        name: synth_name.clone(),
+        js_name: synth_name.clone(),
+        type_params: synth_type_params.clone(),
+        extends: Vec::new(),
+        members: vec![iter_method],
+        classification: crate::ir::InterfaceClassification::ClassLike,
+        body_scope,
+    });
+
+    // The return type references the synthesized type with the same
+    // type-param instantiation, so callers see `<Parent><member><T>`
+    // (where `T` is in the parent method's scope).
+    let generic_args: Vec<TypeRef> = synth_type_params
+        .into_iter()
+        .map(|tp| TypeRef::ident(tp.name))
+        .collect();
+    Some(TypeRef::Reference {
+        segments: vec![synth_name],
+        generic_args,
+    })
+}
+
 /// Like `convert_formal_params`, but additionally hoists any directly-
 /// inline `TSTypeLiteral` parameter types into named `InterfaceDecl`s
-/// using the existing interface-building pipeline (`interface_from_signatures`).
+/// using the existing interface-building pipeline.
 ///
 /// The synthesized name is `<Parent><Member>` PascalCased, deduped
-/// against `used_type_names` with a numeric suffix on collision. The
-/// resulting `InterfaceDecl`s are returned alongside the params for the
-/// caller to append to its declarations sink.
+/// against `ctx.used_type_names` with a numeric suffix on collision.
+/// Hoisted interfaces are appended to `ctx.synth`.
 ///
 /// Anonymous types nested inside generics, unions, etc. (rather than
-/// flat at the top of the parameter type) are not hoisted — those still
-/// erase to `Object` per the existing `convert_ts_type` semantics. Real-
-/// world `.d.ts` patterns put the literal at the top level (e.g.
-/// `send(builder: { ... })`); deeper hoisting is a follow-up.
+/// flat at the top of the parameter type) are not hoisted — those
+/// still erase to `Object`. Real-world `.d.ts` patterns put the
+/// literal at the top level (e.g. `send(builder: { ... })`); deeper
+/// hoisting is a follow-up.
 pub(crate) fn convert_formal_params_with_synthesis(
     params: &FormalParameters<'_>,
     parent_name: &str,
     member_name: &str,
-    used_type_names: &mut HashSet<String>,
-    docs: &DocComments<'_>,
-    diag: &mut DiagnosticCollector,
-) -> (Vec<Param>, Vec<InterfaceDecl>) {
+    scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
+) -> Vec<Param> {
     let mut result_params = Vec::new();
-    let mut synthesized = Vec::new();
 
     for (i, param) in params.items.iter().enumerate() {
         // Capture the original (un-snake_cased) parameter name first so we
@@ -63,13 +255,11 @@ pub(crate) fn convert_formal_params_with_synthesis(
                 &ann.type_annotation,
                 parent_name,
                 raw_param_name.as_deref().unwrap_or(member_name),
-                used_type_names,
-                &mut synthesized,
-                docs,
-                diag,
+                scope,
+                ctx,
             ) {
                 Some(synth) => synth,
-                None => convert_ts_type(&ann.type_annotation, diag),
+                None => convert_ts_type_scoped(&ann.type_annotation, scope, ctx),
             },
             None => TypeRef::Any,
         };
@@ -88,7 +278,7 @@ pub(crate) fn convert_formal_params_with_synthesis(
         let type_ref = rest
             .type_annotation
             .as_ref()
-            .map(|ann| convert_ts_type(&ann.type_annotation, diag))
+            .map(|ann| convert_ts_type_scoped(&ann.type_annotation, scope, ctx))
             .unwrap_or(TypeRef::Array(Box::new(TypeRef::Any)));
         result_params.push(Param {
             name,
@@ -98,13 +288,17 @@ pub(crate) fn convert_formal_params_with_synthesis(
         });
     }
 
-    (result_params, synthesized)
+    result_params
 }
 
 /// Compute a unique synthesized type name for an anonymous interface
-/// hoisted from `<Parent>.<member>(...)`. Falls back to numeric suffixes
-/// on collision (`Foo`, `Foo2`, `Foo3`, …).
-fn unique_type_name(parent: &str, member: &str, used: &HashSet<String>) -> String {
+/// hoisted from `<Parent>.<member>(...)`. Falls back to numeric
+/// suffixes on collision (`Foo`, `Foo2`, `Foo3`, ...).
+fn unique_type_name(
+    parent: &str,
+    member: &str,
+    used: &std::collections::HashSet<String>,
+) -> String {
     let base = format!("{}{}", parent, to_pascal_case(member));
     if !used.contains(&base) {
         return base;
@@ -124,45 +318,40 @@ fn unique_type_name(parent: &str, member: &str, used: &HashSet<String>) -> Strin
 ///
 /// * Bare `{ ... }` — directly hoisted into a single interface whose
 ///   members are the literal's members.
-/// * `{ ... } | { ... } | …` where every union branch is itself a type
-///   literal — structurally merged into a single interface (see
+/// * `{ ... } | { ... } | …` where every union branch is itself a
+///   type literal — structurally merged into a single interface (see
 ///   [`merge_member_branches`]).
 ///
-/// Anything else returns `None` so the caller falls back to the regular
-/// type-mapping rules.
-#[allow(clippy::too_many_arguments)]
+/// Anything else returns `None` so the caller falls back to the
+/// regular type-mapping rules.
 fn try_synthesize_inline_param(
     ts_type: &TSType<'_>,
     parent_name: &str,
     segment: &str,
-    used_type_names: &mut HashSet<String>,
-    synth: &mut Vec<InterfaceDecl>,
-    docs: &DocComments<'_>,
-    diag: &mut DiagnosticCollector,
+    scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
 ) -> Option<TypeRef> {
     match ts_type {
         TSType::TSTypeLiteral(literal) => {
-            let synth_name = unique_type_name(parent_name, segment, used_type_names);
-            used_type_names.insert(synth_name.clone());
+            let synth_name = unique_type_name(parent_name, segment, ctx.used_type_names);
+            ctx.used_type_names.insert(synth_name.clone());
             // Methods inside the hoisted interface may carry their own
             // anonymous parameter types — recurse and let those land in
-            // `synth` alongside the parent.
+            // `ctx.synth` alongside the parent.
             let iface = interface_from_signatures(
                 synth_name.clone(),
                 Vec::new(),
                 Vec::new(),
                 &literal.members,
-                used_type_names,
-                synth,
-                docs,
-                diag,
+                scope,
+                ctx,
             );
-            synth.push(iface);
+            ctx.synth.push(iface);
             Some(TypeRef::ident(synth_name))
         }
         TSType::TSUnionType(union) if all_type_literals(&union.types) => {
-            let synth_name = unique_type_name(parent_name, segment, used_type_names);
-            used_type_names.insert(synth_name.clone());
+            let synth_name = unique_type_name(parent_name, segment, ctx.used_type_names);
+            ctx.used_type_names.insert(synth_name.clone());
             // Convert each branch through the regular signature pipeline
             // first, then structurally merge at the IR level.
             let branches: Vec<Vec<Member>> = union
@@ -173,14 +362,7 @@ fn try_synthesize_inline_param(
                         lit.members
                             .iter()
                             .flat_map(|sig| {
-                                convert_ts_signature(
-                                    sig,
-                                    Some(&synth_name),
-                                    used_type_names,
-                                    synth,
-                                    docs,
-                                    diag,
-                                )
+                                convert_ts_signature(sig, Some(&synth_name), scope, ctx)
                             })
                             .collect(),
                     ),
@@ -189,13 +371,18 @@ fn try_synthesize_inline_param(
                 .collect();
             let merged = crate::parse::literal_union::merge_member_branches(&branches);
             let classification = crate::parse::classify::classify_interface(&merged);
-            synth.push(InterfaceDecl {
+            // Hoisted union-merge interfaces have no type parameters of
+            // their own, so the body scope is just the parent scope —
+            // no need to create an extra child.
+            let body_scope = scope;
+            ctx.synth.push(InterfaceDecl {
                 name: synth_name.clone(),
                 js_name: synth_name.clone(),
                 type_params: Vec::new(),
                 extends: Vec::new(),
                 members: merged,
                 classification,
+                body_scope,
             });
             Some(TypeRef::ident(synth_name))
         }
@@ -209,62 +396,59 @@ fn all_type_literals(types: &[TSType<'_>]) -> bool {
     !types.is_empty() && types.iter().all(|t| matches!(t, TSType::TSTypeLiteral(_)))
 }
 
-/// Convert a `TSSignature` (interface body member) to our IR `Member`(s).
+/// Convert a `TSSignature` (interface body member) to our IR
+/// `Member`(s).
 ///
 /// `parent` is the surrounding type's Rust name when one is available
 /// — passed down so that anonymous parameter types inside method
-/// signatures can be hoisted into named interfaces (see
-/// [`convert_formal_params_with_synthesis`]). `synth` is the sink those
-/// hoisted interfaces are appended to. Pass `None` / a throwaway sink
-/// when you don't have parent context (no synthesis happens).
+/// signatures can be hoisted into named interfaces. `parent_scope` is
+/// the surrounding type's body scope: methods create their own child
+/// of this scope to hold their type parameters.
 pub fn convert_ts_signature(
     sig: &TSSignature<'_>,
     parent: Option<&str>,
-    used_type_names: &mut HashSet<String>,
-    synth: &mut Vec<InterfaceDecl>,
-    docs: &DocComments<'_>,
-    diag: &mut DiagnosticCollector,
+    parent_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
 ) -> Vec<Member> {
     match sig {
-        TSSignature::TSPropertySignature(prop) => convert_property_signature(prop, docs, diag),
+        TSSignature::TSPropertySignature(prop) => {
+            convert_property_signature(prop, parent_scope, ctx)
+        }
         TSSignature::TSMethodSignature(method) => {
-            convert_method_signature(method, parent, used_type_names, synth, docs, diag)
+            convert_method_signature(method, parent, parent_scope, ctx)
         }
-        TSSignature::TSIndexSignature(idx) => {
-            convert_index_signature(idx, diag).into_iter().collect()
-        }
+        TSSignature::TSIndexSignature(idx) => convert_index_signature(idx, parent_scope, ctx)
+            .into_iter()
+            .collect(),
         TSSignature::TSConstructSignatureDeclaration(ctor) => {
-            convert_construct_signature(ctor, parent, used_type_names, synth, docs, diag)
+            convert_construct_signature(ctor, parent, parent_scope, ctx)
                 .into_iter()
                 .collect()
         }
         TSSignature::TSCallSignatureDeclaration(_) => {
-            diag.warn("Call signatures on interfaces are not supported, skipping");
+            ctx.diag
+                .warn("Call signatures on interfaces are not supported, skipping");
             vec![]
         }
     }
 }
 
 /// Convert a `ClassElement` (class body member) to our IR `Member`(s).
-///
-/// See [`convert_ts_signature`] for the meaning of `parent` / `synth`.
 pub fn convert_class_element(
     elem: &ClassElement<'_>,
     parent: Option<&str>,
-    used_type_names: &mut HashSet<String>,
-    synth: &mut Vec<InterfaceDecl>,
-    docs: &DocComments<'_>,
-    diag: &mut DiagnosticCollector,
+    parent_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
 ) -> Vec<Member> {
     match elem {
         ClassElement::MethodDefinition(method) => {
-            convert_class_method(method, parent, used_type_names, synth, docs, diag)
+            convert_class_method(method, parent, parent_scope, ctx)
         }
-        ClassElement::PropertyDefinition(prop) => convert_class_property(prop, docs, diag),
-        ClassElement::AccessorProperty(acc) => convert_accessor_property(acc, docs, diag),
-        ClassElement::TSIndexSignature(idx) => {
-            convert_index_signature(idx, diag).into_iter().collect()
-        }
+        ClassElement::PropertyDefinition(prop) => convert_class_property(prop, parent_scope, ctx),
+        ClassElement::AccessorProperty(acc) => convert_accessor_property(acc, parent_scope, ctx),
+        ClassElement::TSIndexSignature(idx) => convert_index_signature(idx, parent_scope, ctx)
+            .into_iter()
+            .collect(),
         ClassElement::StaticBlock(_) => vec![],
     }
 }
@@ -273,19 +457,19 @@ pub fn convert_class_element(
 
 fn convert_property_signature(
     prop: &TSPropertySignature<'_>,
-    docs: &DocComments<'_>,
-    diag: &mut DiagnosticCollector,
+    parent_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
 ) -> Vec<Member> {
     let js_name = match property_key_name(&prop.key) {
         Some(n) => n,
         None => return vec![],
     };
-    let doc = docs.for_span(prop.span.start);
+    let doc = ctx.docs.for_span(prop.span.start);
 
     let type_ref = prop
         .type_annotation
         .as_ref()
-        .map(|ann| convert_ts_type(&ann.type_annotation, diag))
+        .map(|ann| convert_ts_type_scoped(&ann.type_annotation, parent_scope, ctx))
         .unwrap_or(TypeRef::Any);
 
     let mut members = vec![Member::Getter(GetterMember {
@@ -309,51 +493,48 @@ fn convert_property_signature(
 fn convert_method_signature(
     method: &TSMethodSignature<'_>,
     parent: Option<&str>,
-    used_type_names: &mut HashSet<String>,
-    synth: &mut Vec<InterfaceDecl>,
-    docs: &DocComments<'_>,
-    diag: &mut DiagnosticCollector,
+    parent_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
 ) -> Vec<Member> {
     let js_name = match property_key_name(&method.key) {
         Some(n) => n,
         None => return vec![],
     };
-    let (doc, info) = split_info(docs.info_for_span(method.span.start));
+    let (doc, info) = split_info(ctx.docs.info_for_span(method.span.start));
 
-    let type_params = convert_type_params(method.type_parameters.as_ref(), diag);
+    let type_params = convert_type_params(method.type_parameters.as_ref(), ctx.diag);
 
-    // Build scope from method type parameters so references like `T` in
-    // `json<T>(): Promise<T>` get erased to Any instead of Named("T")
-    let scope: HashSet<&str> = method
-        .type_parameters
-        .as_ref()
-        .map(|tp| tp.params.iter().map(|p| p.name.name.as_str()).collect())
-        .unwrap_or_default();
+    // The method's own type parameters live in a child scope of the
+    // enclosing type's body. Type conversion below resolves names
+    // against this scope so `T` and friends bind to the local
+    // declaration first.
+    let body_scope = create_body_scope(&type_params, parent_scope, ctx);
 
-    // Hoist anonymous `{ ... }` parameter types into named interfaces when
-    // we know the surrounding parent name. Without `parent` we can't
-    // generate a sensible name, so fall back to the regular path that
-    // erases inline objects to `Object`.
+    // Hoist anonymous `{ ... }` parameter types into named interfaces
+    // when we know the surrounding parent name. Without `parent` we
+    // can't generate a sensible name, so fall back to the regular
+    // path that erases inline objects to `Object`.
     let params = match parent {
         Some(p) => {
-            let (params, more_synth) = convert_formal_params_with_synthesis(
-                &method.params,
-                p,
-                &js_name,
-                used_type_names,
-                docs,
-                diag,
-            );
-            synth.extend(more_synth);
-            params
+            convert_formal_params_with_synthesis(&method.params, p, &js_name, body_scope, ctx)
         }
-        None => convert_formal_params(&method.params, diag),
+        None => convert_formal_params_scoped(&method.params, body_scope, ctx),
     };
-    let return_type = method
+    let mut return_type = method
         .return_type
         .as_ref()
-        .map(|rt| convert_ts_type_scoped(&rt.type_annotation, &scope, diag))
+        .map(|rt| convert_ts_type_scoped(&rt.type_annotation, body_scope, ctx))
         .unwrap_or(TypeRef::Void);
+
+    // Hoist top-level `Iterable<T>` / `AsyncIterable<T>` returns into
+    // synthesized wrapper interfaces with a `[Symbol.iterator]` method.
+    if let Some(parent_name) = parent {
+        if let Some(rewritten) =
+            try_synthesize_iterable_return(&return_type, parent_name, &js_name, body_scope, ctx)
+        {
+            return_type = rewritten;
+        }
+    }
 
     match method.kind {
         TSMethodSignatureKind::Get => vec![Member::Getter(GetterMember {
@@ -375,7 +556,7 @@ fn convert_method_signature(
             })]
         }
         TSMethodSignatureKind::Method => vec![Member::Method(MethodMember {
-            name: crate::util::naming::to_snake_case(&js_name),
+            name: to_snake_case(&js_name),
             js_name,
             type_params,
             params,
@@ -383,22 +564,24 @@ fn convert_method_signature(
             optional: method.optional,
             doc,
             throws: info.throws(),
+            body_scope,
         })],
     }
 }
 
 fn convert_index_signature(
     idx: &TSIndexSignature<'_>,
-    diag: &mut DiagnosticCollector,
+    parent_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
 ) -> Option<Member> {
     let key_type = idx
         .parameters
         .first()
-        .map(|p| convert_ts_type(&p.type_annotation.type_annotation, diag))
+        .map(|p| convert_ts_type_scoped(&p.type_annotation.type_annotation, parent_scope, ctx))
         .unwrap_or(TypeRef::String);
 
-    // type_annotation is Box<TSTypeAnnotation> (not Option) in oxc 0.118
-    let value_type = convert_ts_type(&idx.type_annotation.type_annotation, diag);
+    let value_type =
+        convert_ts_type_scoped(&idx.type_annotation.type_annotation, parent_scope, ctx);
 
     Some(Member::IndexSignature(IndexSigMember {
         key_type,
@@ -410,30 +593,19 @@ fn convert_index_signature(
 fn convert_construct_signature(
     ctor: &TSConstructSignatureDeclaration<'_>,
     parent: Option<&str>,
-    used_type_names: &mut HashSet<String>,
-    synth: &mut Vec<InterfaceDecl>,
-    docs: &DocComments<'_>,
-    diag: &mut DiagnosticCollector,
+    parent_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
 ) -> Option<Member> {
-    // Constructors hoist anonymous parameter types under `<Parent>Constructor`
-    // when a parent is known — matches the convention of using a method-like
-    // name segment for the synthesized type.
+    // Constructors have no surface-level type parameters of their own
+    // — they instantiate the parent type's parameters. Use the parent
+    // scope directly.
     let params = match parent {
         Some(p) => {
-            let (params, more_synth) = convert_formal_params_with_synthesis(
-                &ctor.params,
-                p,
-                "Constructor",
-                used_type_names,
-                docs,
-                diag,
-            );
-            synth.extend(more_synth);
-            params
+            convert_formal_params_with_synthesis(&ctor.params, p, "Constructor", parent_scope, ctx)
         }
-        None => convert_formal_params(&ctor.params, diag),
+        None => convert_formal_params_scoped(&ctor.params, parent_scope, ctx),
     };
-    let (doc, info) = split_info(docs.info_for_span(ctor.span.start));
+    let (doc, info) = split_info(ctx.docs.info_for_span(ctor.span.start));
     Some(Member::Constructor(ConstructorMember {
         params,
         doc,
@@ -446,54 +618,56 @@ fn convert_construct_signature(
 fn convert_class_method(
     method: &MethodDefinition<'_>,
     parent: Option<&str>,
-    used_type_names: &mut HashSet<String>,
-    synth: &mut Vec<InterfaceDecl>,
-    docs: &DocComments<'_>,
-    diag: &mut DiagnosticCollector,
+    parent_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
 ) -> Vec<Member> {
     let js_name = match property_key_name(&method.key) {
         Some(n) => n,
         None => return vec![],
     };
-    let (doc, info) = split_info(docs.info_for_span(method.span.start));
+    let (doc, info) = split_info(ctx.docs.info_for_span(method.span.start));
 
     let func = &method.value;
-    let type_params = convert_type_params(func.type_parameters.as_ref(), diag);
+    let type_params = convert_type_params(func.type_parameters.as_ref(), ctx.diag);
 
-    // Build scope from method type parameters
-    let scope: HashSet<&str> = func
-        .type_parameters
-        .as_ref()
-        .map(|tp| tp.params.iter().map(|p| p.name.name.as_str()).collect())
-        .unwrap_or_default();
+    // Constructors don't introduce their own type parameter scope —
+    // they use the class body scope directly. Other class methods do.
+    let body_scope = match method.kind {
+        MethodDefinitionKind::Constructor => parent_scope,
+        _ => create_body_scope(&type_params, parent_scope, ctx),
+    };
 
     let params = match parent {
         Some(p) => {
             // Constructors use a special "Constructor" segment so the
-            // synthesized type reads `<Parent>Constructor*` rather than
-            // `<Parent>` alone (which would clash with the parent itself).
+            // synthesized type reads `<Parent>Constructor*` rather
+            // than `<Parent>` alone (which would clash with the
+            // parent itself).
             let member_name = match method.kind {
                 MethodDefinitionKind::Constructor => "Constructor".to_string(),
                 _ => js_name.clone(),
             };
-            let (params, more_synth) = convert_formal_params_with_synthesis(
-                &func.params,
-                p,
-                &member_name,
-                used_type_names,
-                docs,
-                diag,
-            );
-            synth.extend(more_synth);
-            params
+            convert_formal_params_with_synthesis(&func.params, p, &member_name, body_scope, ctx)
         }
-        None => convert_formal_params(&func.params, diag),
+        None => convert_formal_params_scoped(&func.params, body_scope, ctx),
     };
-    let return_type = func
+    let mut return_type = func
         .return_type
         .as_ref()
-        .map(|rt| convert_ts_type_scoped(&rt.type_annotation, &scope, diag))
+        .map(|rt| convert_ts_type_scoped(&rt.type_annotation, body_scope, ctx))
         .unwrap_or(TypeRef::Void);
+
+    // Same iterable hoisting as `convert_method_signature`. Skip for
+    // constructors — they don't have a meaningful return type.
+    if !matches!(method.kind, MethodDefinitionKind::Constructor) {
+        if let Some(parent_name) = parent {
+            if let Some(rewritten) =
+                try_synthesize_iterable_return(&return_type, parent_name, &js_name, body_scope, ctx)
+            {
+                return_type = rewritten;
+            }
+        }
+    }
 
     let is_static = method.r#static;
 
@@ -544,17 +718,18 @@ fn convert_class_method(
         MethodDefinitionKind::Method => {
             if is_static {
                 vec![Member::StaticMethod(StaticMethodMember {
-                    name: crate::util::naming::to_snake_case(&js_name),
+                    name: to_snake_case(&js_name),
                     js_name,
                     type_params,
                     params,
                     return_type,
                     doc,
                     throws: info.throws(),
+                    body_scope,
                 })]
             } else {
                 vec![Member::Method(MethodMember {
-                    name: crate::util::naming::to_snake_case(&js_name),
+                    name: to_snake_case(&js_name),
                     js_name,
                     type_params,
                     params,
@@ -562,6 +737,7 @@ fn convert_class_method(
                     optional: method.optional,
                     doc,
                     throws: info.throws(),
+                    body_scope,
                 })]
             }
         }
@@ -570,19 +746,19 @@ fn convert_class_method(
 
 fn convert_class_property(
     prop: &PropertyDefinition<'_>,
-    docs: &DocComments<'_>,
-    diag: &mut DiagnosticCollector,
+    parent_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
 ) -> Vec<Member> {
     let js_name = match property_key_name(&prop.key) {
         Some(n) => n,
         None => return vec![],
     };
-    let doc = docs.for_span(prop.span.start);
+    let doc = ctx.docs.for_span(prop.span.start);
 
     let type_ref = prop
         .type_annotation
         .as_ref()
-        .map(|ann| convert_ts_type(&ann.type_annotation, diag))
+        .map(|ann| convert_ts_type_scoped(&ann.type_annotation, parent_scope, ctx))
         .unwrap_or(TypeRef::Any);
 
     if prop.r#static {
@@ -619,19 +795,19 @@ fn convert_class_property(
 
 fn convert_accessor_property(
     acc: &AccessorProperty<'_>,
-    docs: &DocComments<'_>,
-    diag: &mut DiagnosticCollector,
+    parent_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
 ) -> Vec<Member> {
     let js_name = match property_key_name(&acc.key) {
         Some(n) => n,
         None => return vec![],
     };
-    let doc = docs.for_span(acc.span.start);
+    let doc = ctx.docs.for_span(acc.span.start);
 
     let type_ref = acc
         .type_annotation
         .as_ref()
-        .map(|ann| convert_ts_type(&ann.type_annotation, diag))
+        .map(|ann| convert_ts_type_scoped(&ann.type_annotation, parent_scope, ctx))
         .unwrap_or(TypeRef::Any);
 
     if acc.r#static {

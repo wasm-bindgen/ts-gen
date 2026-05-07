@@ -57,10 +57,11 @@ fn emit_function(
             return_type: &decl.return_type,
             throws: &decl.throws,
             doc,
+            body_scope: decl.body_scope,
         },
         &mut used_names,
         cgctx,
-        scope,
+        decl.body_scope,
     );
 
     let items: Vec<TokenStream> = sigs
@@ -77,8 +78,11 @@ fn generate_expanded_free_function(
     ctx: &ModuleContext,
     cgctx: Option<&CodegenContext<'_>>,
     js_namespace: Option<&str>,
-    scope: ScopeId,
+    _enclosing_scope: ScopeId,
 ) -> TokenStream {
+    // Free-function type parameters live in `sig.body_scope`; use it
+    // directly so `T` references lower to a bare ident.
+    let scope = sig.body_scope;
     let rust_ident = super::typemap::make_ident(&sig.rust_name);
     let params = generate_concrete_params(&sig.params, cgctx, scope, ctx);
     let ret_ty = to_return_type(
@@ -137,14 +141,43 @@ fn generate_expanded_free_function(
         ModuleContext::Global => quote! { #[wasm_bindgen] },
     };
 
+    let generics = generic_params_for_function(sig, cgctx);
+
     quote! {
         #wb_extern_attr
         extern "C" {
             #doc
             #wb_attr
-            pub #async_kw fn #rust_ident(#params) #ret;
+            pub #async_kw fn #rust_ident #generics (#params) #ret;
         }
     }
+}
+
+/// Generic-parameter declaration (`<T: ::wasm_bindgen::JsGeneric, …>`)
+/// for a free function, or empty when no type parameters are
+/// referenced. Walks the params + return type and consults the
+/// signature's `body_scope` to pick out names that bind as
+/// [`crate::parse::scope::Binding::TypeParam`].
+fn generic_params_for_function(
+    sig: &FunctionSignature,
+    cgctx: Option<&CodegenContext<'_>>,
+) -> TokenStream {
+    let Some(cgctx) = cgctx else {
+        return quote! {};
+    };
+    let mut names: Vec<String> = Vec::new();
+    for p in &sig.params {
+        super::signatures::collect_type_params(&p.type_ref, cgctx, sig.body_scope, &mut names);
+    }
+    super::signatures::collect_type_params(&sig.return_type, cgctx, sig.body_scope, &mut names);
+    if names.is_empty() {
+        return quote! {};
+    }
+    let idents = names
+        .iter()
+        .map(|n| super::typemap::make_ident(n))
+        .collect::<Vec<_>>();
+    quote! { <#(#idents: ::wasm_bindgen::JsGeneric),*> }
 }
 
 /// Generate a wasm_bindgen extern block for a global constant/variable.

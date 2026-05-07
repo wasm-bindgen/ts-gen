@@ -87,13 +87,23 @@ impl SignatureKind {
 
 /// Compute the default Rust name for a callable's primary variant before
 /// any `_with_X` suffix is appended.
+///
+/// Symbol-keyed methods (`js_name = "[Symbol.iterator]"`) drop the
+/// `[Symbol.` prefix and trailing `]` so the Rust name reads
+/// naturally — `[Symbol.iterator]` becomes `iterator`, not
+/// `symboliterator`. The symbol nature is conveyed by `js_name`; the
+/// Rust name doesn't need to repeat it.
 pub fn base_rust_name(js_name: &str, kind: SignatureKind) -> String {
+    let raw = js_name
+        .strip_prefix("[Symbol.")
+        .and_then(|rest| rest.strip_suffix(']'))
+        .unwrap_or(js_name);
     match kind {
         SignatureKind::Constructor => "new".to_string(),
         SignatureKind::Setter | SignatureKind::StaticSetter => {
-            format!("set_{}", to_snake_case(js_name))
+            format!("set_{}", to_snake_case(raw))
         }
-        _ => to_snake_case(js_name),
+        _ => to_snake_case(raw),
     }
 }
 
@@ -220,12 +230,19 @@ pub struct FunctionSignature {
     pub error_type: Option<TypeRef>,
     /// Doc comment — copied to every signature in the cohort.
     pub doc: Option<String>,
+    /// Lexical body scope of the source-side method or function, used
+    /// by codegen to resolve type-parameter references during emit.
+    /// For non-generic callables this is just the enclosing scope.
+    pub body_scope: ScopeId,
 }
 
 /// Assign a unique name within the extern block.
 ///
-/// If `candidate` is already taken, appends `_1`, `_2`, etc. until a unique
-/// name is found. The chosen name is inserted into `used_names`.
+/// If `candidate` is already taken, appends `_2`, `_3`, ... until a
+/// unique name is found — the unsuffixed candidate is the implicit
+/// `_1`, so collisions start at `_2` (matching the convention used
+/// by `parse::members::unique_type_name`). The chosen name is
+/// inserted into `used_names`.
 pub fn dedupe_name(candidate: &str, used_names: &mut HashSet<String>) -> String {
     let mut name = candidate.to_string();
     if !used_names.contains(&name) {
@@ -233,14 +250,85 @@ pub fn dedupe_name(candidate: &str, used_names: &mut HashSet<String>) -> String 
         return name;
     }
     let base = name.clone();
-    let mut counter = 1u32;
-    loop {
+    for counter in 2.. {
         name = format!("{base}_{counter}");
         if !used_names.contains(&name) {
             used_names.insert(name.clone());
             return name;
         }
-        counter += 1;
+    }
+    unreachable!("HashSet exhaustion is impossible in practice");
+}
+
+/// Recursively collect every in-scope type-parameter name reachable
+/// from `ty`, in source-appearance order, deduped.
+///
+/// A name in `ty` is treated as a type parameter when the scope chain
+/// resolves it to [`crate::parse::scope::Binding::TypeParam`]. Used
+/// by `classes.rs` / `functions.rs` to compute the `<T: JsGeneric, …>`
+/// declaration for each emitted method or type.
+pub fn collect_type_params(
+    ty: &TypeRef,
+    cgctx: &CodegenContext<'_>,
+    scope: ScopeId,
+    out: &mut Vec<String>,
+) {
+    use crate::parse::scope::Binding;
+    match ty {
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } => {
+            // Bare single-segment refs may resolve to a type parameter.
+            if segments.len() == 1 && generic_args.is_empty() {
+                let name = &segments[0];
+                if matches!(
+                    cgctx.gctx.scopes.resolve_binding(scope, name),
+                    Some(Binding::TypeParam)
+                ) {
+                    if !out.iter().any(|n| n == name) {
+                        out.push(name.clone());
+                    }
+                    return;
+                }
+            }
+            // Walk into generic args even when the head is a real type
+            // (e.g. `Iterator<T>` — `T` may be a type param).
+            for a in generic_args {
+                collect_type_params(a, cgctx, scope, out);
+            }
+        }
+        TypeRef::Array(inner) | TypeRef::Nullable(inner) => {
+            collect_type_params(inner, cgctx, scope, out);
+        }
+        TypeRef::Union(members) | TypeRef::Intersection(members) | TypeRef::Tuple(members) => {
+            for m in members {
+                collect_type_params(m, cgctx, scope, out);
+            }
+        }
+        TypeRef::Function(sig) => {
+            for p in &sig.params {
+                collect_type_params(&p.type_ref, cgctx, scope, out);
+            }
+            collect_type_params(&sig.return_type, cgctx, scope, out);
+        }
+        // Leaves with no nested types — no-op.
+        TypeRef::Boolean
+        | TypeRef::Number
+        | TypeRef::String
+        | TypeRef::BigInt
+        | TypeRef::Void
+        | TypeRef::Undefined
+        | TypeRef::Null
+        | TypeRef::Any
+        | TypeRef::Unknown
+        | TypeRef::Object
+        | TypeRef::Symbol
+        | TypeRef::ArrayBufferView
+        | TypeRef::StringLiteral(_)
+        | TypeRef::NumberLiteral(_)
+        | TypeRef::BooleanLiteral(_)
+        | TypeRef::Unresolved(_) => {}
     }
 }
 
@@ -343,6 +431,12 @@ pub struct CallableSpec<'a> {
     pub throws: &'a Throws,
     /// Doc comment to attach to the primary signature only.
     pub doc: &'a Option<String>,
+    /// Source-side body scope of the underlying method/function — the
+    /// scope chain that holds its `<T, ...>` type-parameter bindings.
+    /// Threaded onto each emitted [`FunctionSignature`] so codegen can
+    /// resolve type-parameter references during emit. For non-generic
+    /// callables this is just the enclosing scope.
+    pub body_scope: ScopeId,
 }
 
 /// Resolve a [`CallableSpec`] into the full set of [`FunctionSignature`]s
@@ -419,6 +513,7 @@ pub fn build_signatures(
                 None
             },
             doc: augmented_doc.clone(),
+            body_scope: spec.body_scope,
         });
 
         if allow_try {
@@ -432,6 +527,7 @@ pub fn build_signatures(
                 return_type: return_type.clone(),
                 error_type: error_type.cloned(),
                 doc: augmented_doc.clone(),
+                body_scope: spec.body_scope,
             });
         }
     }
@@ -950,6 +1046,7 @@ mod tests {
                 return_type: ret,
                 throws,
                 doc,
+                body_scope: scope,
             },
             used,
             Some(&cgctx),
@@ -976,6 +1073,7 @@ mod tests {
                 return_type: ret,
                 throws: &Throws::None,
                 doc,
+                body_scope: scope,
             },
             used,
             Some(&cgctx),
@@ -1495,7 +1593,7 @@ mod tests {
         assert_eq!(sigs.len(), 2);
         assert_eq!(sigs[0].rust_name, "count");
         assert!(!sigs[0].catch);
-        assert_eq!(sigs[1].rust_name, "try_count_1");
+        assert_eq!(sigs[1].rust_name, "try_count_2");
         assert!(sigs[1].catch);
     }
 
@@ -1520,7 +1618,7 @@ mod tests {
             &mut used,
         );
         assert_eq!(sigs1[0].rust_name, "foo");
-        assert_eq!(sigs2[0].rust_name, "foo_1");
+        assert_eq!(sigs2[0].rust_name, "foo_2");
     }
 
     #[test]

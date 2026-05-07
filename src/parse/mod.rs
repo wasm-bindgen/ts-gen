@@ -1,6 +1,7 @@
 //! Parser orchestration: parse `.d.ts` files into IR.
 
 pub mod classify;
+pub mod ctx;
 pub mod docs;
 pub mod first_pass;
 pub mod literal_union;
@@ -154,20 +155,28 @@ fn parse_single_file(
         gctx.info(msg);
     }
 
-    // Phase 2: Populate declarations
-    // Take immutable snapshots before the mutable borrow on diagnostics.
-    let scopes_snapshot = gctx.scopes.clone();
+    // Phase 2: Populate declarations.
+    //
+    // Move `scopes` and `diagnostics` out of `gctx` for the duration
+    // of the populate pass — both need exclusive `&mut` access (the
+    // populate pass appends body scopes for type-parameter-bearing
+    // declarations) and we still want a `&` to the type arena. The
+    // updated scope arena is moved back into `gctx` afterward.
+    let mut scopes = std::mem::take(&mut gctx.scopes);
+    let mut diag = std::mem::take(&mut gctx.diagnostics);
     let type_arena_snapshot = gctx.type_arena().to_vec();
     let declarations = first_pass::populate_declarations(
         program,
         &registry,
         lib_name,
         &doc_comments,
-        &mut gctx.diagnostics,
-        &scopes_snapshot,
+        &mut diag,
+        &mut scopes,
         &type_arena_snapshot,
         file_scope,
     );
+    gctx.scopes = scopes;
+    gctx.diagnostics = diag;
 
     // Post-processing: merge, dedup, then insert into the global type arena
     let merged = merge_class_pairs(declarations);
@@ -408,6 +417,7 @@ fn populate_builtin_scope(gctx: &mut GlobalContext, scope: ScopeId) {
                 extends: vec![],
                 members: vec![],
                 classification: crate::ir::InterfaceClassification::ClassLike,
+                body_scope: scope,
             }),
             module_context: crate::ir::ModuleContext::Global,
             doc: None,
@@ -453,6 +463,7 @@ fn populate_builtin_scope(gctx: &mut GlobalContext, scope: ScopeId) {
                 extends: vec![],
                 members: vec![],
                 classification: crate::ir::InterfaceClassification::ClassLike,
+                body_scope: scope,
             }),
             module_context: crate::ir::ModuleContext::Global,
             doc: None,
@@ -688,6 +699,7 @@ mod tests {
             optional: false,
             doc: None,
             throws: crate::ir::Throws::None,
+            body_scope: ScopeId::DUMMY,
         })
     }
 
@@ -721,6 +733,7 @@ mod tests {
             extends: vec![],
             members,
             classification: InterfaceClassification::ClassLike,
+            body_scope: ScopeId::DUMMY,
         }
     }
 
@@ -734,6 +747,7 @@ mod tests {
             is_abstract: false,
             members,
             type_module_context: ctx,
+            body_scope: ScopeId::DUMMY,
         }
     }
 

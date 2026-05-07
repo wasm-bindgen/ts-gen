@@ -3,10 +3,12 @@
 use oxc_ast::ast::*;
 
 use crate::ir::*;
-use crate::parse::docs::DocComments;
-use crate::parse::members::property_key_name;
-use crate::parse::types::{convert_formal_params, convert_ts_type, convert_type_params};
-use crate::util::diagnostics::DiagnosticCollector;
+use crate::parse::ctx::ParseCtx;
+use crate::parse::members::{create_body_scope, property_key_name};
+use crate::parse::scope::ScopeId;
+use crate::parse::types::{
+    convert_formal_params_scoped, convert_ts_type_scoped, convert_type_params,
+};
 use crate::util::naming::to_snake_case;
 
 /// Check if a variable declarator looks like a class constructor pattern.
@@ -46,8 +48,8 @@ pub fn var_declarator_name(declarator: &VariableDeclarator<'_>) -> Option<String
 /// Extract constructor, static methods, and static properties from a type literal.
 pub fn extract_var_members(
     type_literal: &TSTypeLiteral<'_>,
-    docs: &DocComments<'_>,
-    diag: &mut DiagnosticCollector,
+    parent_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
 ) -> (Option<ConstructorMember>, Vec<Member>) {
     let mut constructor = None;
     let mut static_members = Vec::new();
@@ -55,8 +57,8 @@ pub fn extract_var_members(
     for member in &type_literal.members {
         match member {
             TSSignature::TSConstructSignatureDeclaration(ctor) => {
-                let params = convert_formal_params(&ctor.params, diag);
-                let (doc, info) = match docs.info_for_span(ctor.span.start) {
+                let params = convert_formal_params_scoped(&ctor.params, parent_scope, ctx);
+                let (doc, info) = match ctx.docs.info_for_span(ctor.span.start) {
                     Some((d, i)) => (Some(d), i),
                     None => (None, crate::parse::docs::JsDocInfo::default()),
                 };
@@ -74,11 +76,11 @@ pub fn extract_var_members(
                 if js_name == "prototype" {
                     continue;
                 }
-                let doc = docs.for_span(prop.span.start);
+                let doc = ctx.docs.for_span(prop.span.start);
                 let type_ref = prop
                     .type_annotation
                     .as_ref()
-                    .map(|ann| convert_ts_type(&ann.type_annotation, diag))
+                    .map(|ann| convert_ts_type_scoped(&ann.type_annotation, parent_scope, ctx))
                     .unwrap_or(TypeRef::Any);
                 static_members.push(Member::StaticGetter(StaticGetterMember {
                     js_name: js_name.clone(),
@@ -98,17 +100,18 @@ pub fn extract_var_members(
                     Some(name) => name,
                     None => continue,
                 };
-                let (doc, info) = match docs.info_for_span(method.span.start) {
+                let (doc, info) = match ctx.docs.info_for_span(method.span.start) {
                     Some((d, i)) => (Some(d), i),
                     None => (None, crate::parse::docs::JsDocInfo::default()),
                 };
                 let name = to_snake_case(&js_name);
-                let type_params = convert_type_params(method.type_parameters.as_ref(), diag);
-                let params = convert_formal_params(&method.params, diag);
+                let type_params = convert_type_params(method.type_parameters.as_ref(), ctx.diag);
+                let body_scope = create_body_scope(&type_params, parent_scope, ctx);
+                let params = convert_formal_params_scoped(&method.params, body_scope, ctx);
                 let return_type = method
                     .return_type
                     .as_ref()
-                    .map(|rt| convert_ts_type(&rt.type_annotation, diag))
+                    .map(|rt| convert_ts_type_scoped(&rt.type_annotation, body_scope, ctx))
                     .unwrap_or(TypeRef::Void);
                 static_members.push(Member::StaticMethod(StaticMethodMember {
                     name,
@@ -118,13 +121,16 @@ pub fn extract_var_members(
                     return_type,
                     doc,
                     throws: info.throws(),
+                    body_scope,
                 }));
             }
             TSSignature::TSCallSignatureDeclaration(_) => {
-                diag.warn("Call signatures in declare var type literal are not supported");
+                ctx.diag
+                    .warn("Call signatures in declare var type literal are not supported");
             }
             TSSignature::TSIndexSignature(_) => {
-                diag.warn("Index signatures in declare var type literal are not supported");
+                ctx.diag
+                    .warn("Index signatures in declare var type literal are not supported");
             }
         }
     }

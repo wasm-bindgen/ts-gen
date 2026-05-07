@@ -75,6 +75,7 @@ mod tests {
             optional: false,
             doc: None,
             throws: crate::ir::Throws::None,
+            body_scope: crate::parse::scope::ScopeId::DUMMY,
         })
     }
 

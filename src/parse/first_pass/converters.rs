@@ -7,24 +7,26 @@ use oxc_ast::ast;
 
 use crate::ir;
 use crate::parse::classify::classify_interface;
+use crate::parse::ctx::ParseCtx;
 use crate::parse::docs::DocComments;
-use crate::parse::members::{convert_class_element, convert_ts_signature};
-use crate::parse::types::{convert_formal_params, convert_type_params};
+use crate::parse::members::{convert_class_element, convert_ts_signature, create_body_scope};
+use crate::parse::scope::ScopeId;
+use crate::parse::types::{
+    convert_formal_params_scoped, convert_ts_type_scoped, convert_type_params,
+};
 use crate::util::diagnostics::DiagnosticCollector;
 use crate::util::naming::to_snake_case;
 
 pub fn convert_class_decl(
     class: &ast::Class<'_>,
-    ctx: &ir::ModuleContext,
-    used_type_names: &mut std::collections::HashSet<String>,
-    synth: &mut Vec<ir::InterfaceDecl>,
-    docs: &DocComments<'_>,
-    diag: &mut DiagnosticCollector,
+    module_ctx: &ir::ModuleContext,
+    parent_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
 ) -> Option<ir::ClassDecl> {
     let name = class.id.as_ref()?.name.to_string();
     let js_name = name.clone();
 
-    let type_params = convert_type_params(class.type_parameters.as_ref(), diag);
+    let type_params = convert_type_params(class.type_parameters.as_ref(), ctx.diag);
 
     let extends = class
         .super_class
@@ -32,7 +34,8 @@ pub fn convert_class_decl(
         .and_then(|sc| match expression_to_dotted_name(sc) {
             Some(name) => Some(ir::TypeRef::ident(name)),
             None => {
-                diag.warn("Complex super class expression is not supported");
+                ctx.diag
+                    .warn("Complex super class expression is not supported");
                 None
             }
         });
@@ -45,13 +48,14 @@ pub fn convert_class_decl(
 
     let is_abstract = class.r#abstract;
 
+    // Class body scope holds the class's own `<T, ...>` parameters.
+    let body_scope = create_body_scope(&type_params, parent_scope, ctx);
+
     let members: Vec<ir::Member> = class
         .body
         .body
         .iter()
-        .flat_map(|elem| {
-            convert_class_element(elem, Some(&name), used_type_names, synth, docs, diag)
-        })
+        .flat_map(|elem| convert_class_element(elem, Some(&name), body_scope, ctx))
         .collect();
 
     Some(ir::ClassDecl {
@@ -62,33 +66,30 @@ pub fn convert_class_decl(
         implements,
         is_abstract,
         members,
-        type_module_context: ctx.clone(),
+        type_module_context: module_ctx.clone(),
+        body_scope,
     })
 }
 
 pub fn convert_interface_decl(
     iface: &ast::TSInterfaceDeclaration<'_>,
-    used_type_names: &mut std::collections::HashSet<String>,
-    synth: &mut Vec<ir::InterfaceDecl>,
-    docs: &DocComments<'_>,
-    diag: &mut DiagnosticCollector,
+    parent_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
 ) -> ir::InterfaceDecl {
     let name = iface.id.name.to_string();
-    let type_params = convert_type_params(iface.type_parameters.as_ref(), diag);
+    let type_params = convert_type_params(iface.type_parameters.as_ref(), ctx.diag);
     let extends: Vec<ir::TypeRef> = iface
         .extends
         .iter()
-        .map(|ext| convert_ts_type_from_heritage(&ext.expression, diag))
+        .map(|ext| convert_ts_type_from_heritage(&ext.expression, ctx.diag))
         .collect();
     interface_from_signatures(
         name,
         type_params,
         extends,
         &iface.body.body,
-        used_type_names,
-        synth,
-        docs,
-        diag,
+        parent_scope,
+        ctx,
     )
 }
 
@@ -97,34 +98,25 @@ pub fn convert_interface_decl(
 /// factored so that synthesized anonymous interfaces (lifted from
 /// `{ ... }` parameter types) take the identical path.
 ///
-/// `used_type_names` and `synth` thread through to anonymous-interface
-/// hoisting inside member methods — when this interface's own methods
-/// have inline `{ ... }` parameter types, those get hoisted recursively
-/// using this interface's name as the parent.
-///
 /// This is the single point of truth for "given a name and a list of
 /// signature members, produce an interface IR node." Member conversion
 /// goes through `convert_ts_signature` (the same function real
 /// declarations use), classification goes through `classify_interface`,
 /// nothing diverges.
-#[allow(clippy::too_many_arguments)]
 pub fn interface_from_signatures(
     name: String,
     type_params: Vec<ir::TypeParam>,
     extends: Vec<ir::TypeRef>,
     signatures: &[ast::TSSignature<'_>],
-    used_type_names: &mut std::collections::HashSet<String>,
-    synth: &mut Vec<ir::InterfaceDecl>,
-    docs: &DocComments<'_>,
-    diag: &mut DiagnosticCollector,
+    parent_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
 ) -> ir::InterfaceDecl {
     let js_name = name.clone();
     let parent = name.clone();
+    let body_scope = create_body_scope(&type_params, parent_scope, ctx);
     let members: Vec<ir::Member> = signatures
         .iter()
-        .flat_map(|sig| {
-            convert_ts_signature(sig, Some(&parent), used_type_names, synth, docs, diag)
-        })
+        .flat_map(|sig| convert_ts_signature(sig, Some(&parent), body_scope, ctx))
         .collect();
     let classification = classify_interface(&members);
     ir::InterfaceDecl {
@@ -134,32 +126,28 @@ pub fn interface_from_signatures(
         extends,
         members,
         classification,
+        body_scope,
     }
 }
 
 pub fn convert_function_decl(
     func: &ast::Function<'_>,
     throws: ir::Throws,
-    diag: &mut DiagnosticCollector,
+    parent_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
 ) -> Option<ir::FunctionDecl> {
     let name = func.id.as_ref()?.name.to_string();
     let js_name = name.clone();
     let rust_name = to_snake_case(&name);
 
-    let type_params = convert_type_params(func.type_parameters.as_ref(), diag);
+    let type_params = convert_type_params(func.type_parameters.as_ref(), ctx.diag);
+    let body_scope = create_body_scope(&type_params, parent_scope, ctx);
 
-    // Build scope from function type parameters so generic references get erased
-    let scope: std::collections::HashSet<&str> = func
-        .type_parameters
-        .as_ref()
-        .map(|tp| tp.params.iter().map(|p| p.name.name.as_str()).collect())
-        .unwrap_or_default();
-
-    let params = convert_formal_params(&func.params, diag);
+    let params = convert_formal_params_scoped(&func.params, body_scope, ctx);
     let return_type = func
         .return_type
         .as_ref()
-        .map(|rt| crate::parse::types::convert_ts_type_scoped(&rt.type_annotation, &scope, diag))
+        .map(|rt| convert_ts_type_scoped(&rt.type_annotation, body_scope, ctx))
         .unwrap_or(ir::TypeRef::Void);
 
     Some(ir::FunctionDecl {
@@ -170,6 +158,7 @@ pub fn convert_function_decl(
         return_type,
         overloads: vec![],
         throws,
+        body_scope,
     })
 }
 
