@@ -47,6 +47,18 @@ struct Cli {
     /// Print the parsed IR for debugging.
     #[arg(short, long)]
     verbose: bool,
+
+    /// Use `js_sys::Error` as the default error type for fallible
+    /// bindings instead of `JsValue`.
+    ///
+    /// Applies only when a binding has no `@throws` annotation;
+    /// `@throws {SomeError}` still emits the typed error. Useful in
+    /// environments that prefer the typed `Error` API (`message`,
+    /// `name`, `cause`, …). Note: JS code that throws a non-Error
+    /// value (e.g. `throw "oops"`) will produce a runtime conversion
+    /// error rather than passing through silently.
+    #[arg(long = "errors-as-error")]
+    errors_as_error: bool,
 }
 
 fn main() -> Result<()> {
@@ -83,7 +95,10 @@ fn main() -> Result<()> {
     }
 
     // Generate Rust code
-    let rust_source = ts_gen::codegen::generate(&module, &gctx)?;
+    let options = ts_gen::codegen::GenerateOptions {
+        errors_as_error: cli.errors_as_error,
+    };
+    let rust_source = ts_gen::codegen::generate_with_options(&module, &gctx, &options)?;
 
     // Write output file, creating parent directories if needed
     if let Some(parent) = cli.output.parent() {

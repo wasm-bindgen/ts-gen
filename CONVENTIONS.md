@@ -1046,6 +1046,33 @@ JsValue>`. Recognised forms:
 
 The original prose surfaces in the rendered doc as an `## Errors` section.
 
+### `--errors-as-error` — typed default error
+
+Without `@throws`, fallible bindings default to `Result<T, JsValue>`.
+The `--errors-as-error` flag (or `GenerateOptions::errors_as_error`
+for library callers) flips that default to `Result<T, Error>`
+(`js_sys::Error`). Bindings whose `@throws` JSDoc names a specific
+type still use that type — the flag is purely about the *default*.
+
+```ts
+upload(file: File): Promise<void>;
+```
+
+emits
+
+```rust
+// default
+pub async fn upload(this: &Foo, file: &File) -> Result<Undefined, JsValue>;
+// with --errors-as-error
+pub async fn upload(this: &Foo, file: &File) -> Result<Undefined, Error>;
+```
+
+Useful in environments that prefer the typed `Error` API
+(`message`, `name`, `cause`, …) over raw `JsValue`. The trade-off
+is that JS code throwing a non-Error value (`throw "oops"`) now
+fails the conversion at the FFI boundary; if you can't audit your
+sources for that, stay with `JsValue`.
+
 ### `@throws {never}` — opting out of fallible variants
 
 `@throws {never}` is the explicit "this never throws" annotation. It

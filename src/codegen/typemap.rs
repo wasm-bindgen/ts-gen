@@ -169,6 +169,10 @@ pub struct CodegenContext<'a> {
     /// members share a single enum. Callers reach into this through
     /// [`CodegenContext::synthesise_dynamic_union`].
     pub dynamic_unions: RefCell<DynamicUnionRegistry>,
+    /// When `true`, the default error type for fallible bindings is
+    /// `Error` rather than `JsValue`. See
+    /// [`crate::codegen::GenerateOptions::errors_as_error`].
+    pub errors_as_error: bool,
 }
 
 /// Registry of synthesised dynamic-union enums, plus the bookkeeping
@@ -349,6 +353,15 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
 impl<'a> CodegenContext<'a> {
     /// Build a `CodegenContext` from a parsed IR module + global context.
     pub fn from_module(module: &ir::Module, gctx: &'a GlobalContext) -> Self {
+        Self::from_module_with_options(module, gctx, false)
+    }
+
+    /// Build a `CodegenContext` with explicit per-codegen options.
+    pub fn from_module_with_options(
+        module: &ir::Module,
+        gctx: &'a GlobalContext,
+        errors_as_error: bool,
+    ) -> Self {
         let mut ctx = CodegenContext {
             gctx,
             local_types: HashMap::new(),
@@ -360,6 +373,7 @@ impl<'a> CodegenContext<'a> {
             external_uses: RefCell::new(HashMap::new()),
             diagnostics: RefCell::new(DiagnosticCollector::new()),
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
+            errors_as_error,
         };
         for &type_id in &module.types {
             let decl = gctx.get_type(type_id);
@@ -390,6 +404,7 @@ impl<'a> CodegenContext<'a> {
             external_uses: RefCell::new(HashMap::new()),
             diagnostics: RefCell::new(DiagnosticCollector::new()),
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
+            errors_as_error: false,
         }
     }
 
@@ -1325,11 +1340,28 @@ pub fn to_return_type(
     if catch {
         let err = match error_ty {
             Some(ty) => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
-            None => quote! { JsValue },
+            None => default_error_type(ctx),
         };
         quote! { Result<#inner, #err> }
     } else {
         inner
+    }
+}
+
+/// The default error type used when a fallible binding has no
+/// `@throws` annotation. Either `JsValue` (the wasm-bindgen default)
+/// or `Error` (when [`GenerateOptions::errors_as_error`][1] is set).
+///
+/// `Error` is the `js_sys::Error` re-export — already in scope via
+/// the codegen preamble's `use js_sys::*` glob, so no extra alias
+/// is needed.
+///
+/// [1]: crate::codegen::GenerateOptions::errors_as_error
+fn default_error_type(ctx: Option<&CodegenContext<'_>>) -> TokenStream {
+    if ctx.is_some_and(|c| c.errors_as_error) {
+        quote! { Error }
+    } else {
+        quote! { JsValue }
     }
 }
 

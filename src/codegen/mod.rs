@@ -47,12 +47,20 @@ pub(crate) fn doc_tokens(doc: &Option<String>) -> TokenStream {
 }
 
 /// Options for controlling code generation output.
-///
-/// Currently empty — kept as the carrier for future per-invocation flags so
-/// the `generate` / `generate_with_options` split doesn't have to be
-/// reintroduced when one is added.
 #[derive(Debug, Clone, Default)]
-pub struct GenerateOptions {}
+pub struct GenerateOptions {
+    /// When `true`, the default error type for fallible bindings
+    /// (`@throws`-less callables that catch JS exceptions) is
+    /// `js_sys::Error` rather than `JsValue`. Bindings whose
+    /// `@throws` JSDoc names a specific type still use that type.
+    ///
+    /// Useful in environments that prefer the typed `Error` API
+    /// (`message`, `name`, `cause`, …) over raw `JsValue`. The
+    /// trade-off is that JS code returning a non-Error throwable
+    /// (e.g. `throw "oops"`) now produces a runtime conversion
+    /// error rather than the silent `JsValue` pass-through.
+    pub errors_as_error: bool,
+}
 
 /// Generate Rust source code from a parsed IR module + global context.
 ///
@@ -122,9 +130,9 @@ fn rustfmt(code: &str) -> anyhow::Result<String> {
 fn generate_tokens(
     module: &Module,
     gctx: &crate::context::GlobalContext,
-    _options: &GenerateOptions,
+    options: &GenerateOptions,
 ) -> TokenStream {
-    let cgctx = CodegenContext::from_module(module, gctx);
+    let cgctx = CodegenContext::from_module_with_options(module, gctx, options.errors_as_error);
 
     let preamble = quote! {
         #[allow(unused_imports)]
