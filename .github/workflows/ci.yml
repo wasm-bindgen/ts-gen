@@ -66,5 +66,5 @@ jobs:
     # so the schema matches the wasm-bindgen crate version.
     - uses: taiki-e/install-action@v2
       with:
-        tool: wasm-bindgen-cli@0.2.120
+        tool: wasm-bindgen-cli@0.2.121
     - run: just test-integration

@@ -466,7 +466,7 @@ interface ResponseInit {
 }
 ```
 
-emits builder methods `headers`, `headers_with_array`,
+emits builder methods `headers`, `headers_with_slice`,
 `headers_with_record`.
 
 ## Anonymous interface synthesis
@@ -838,6 +838,31 @@ pub fn show_with_value_a_and_opts(value: f64, opts: &ShowOpts);
 disambiguation, including readability adjustments when the same
 parameter name appears in multiple alternatives.
 
+### `_with_<type>` suffix vocabulary
+
+When a union expansion drives the suffix (same parameter name,
+different types), the suffix mirrors the **Rust** lowering rather
+than the TypeScript spelling, so the resulting binding name lines
+up with what callers see in the function signature:
+
+| TypeScript      | Rust (arg)       | Suffix          |
+| --------------- | ---------------- | --------------- |
+| `string`        | `&str`           | `_with_str`     |
+| `number`        | `f64`            | `_with_f64`     |
+| `boolean`       | `bool`           | `_with_bool`    |
+| `bigint`        | `BigInt`         | `_with_big_int` |
+| `Array<T>` / `T[]` | `&[T]`        | `_with_slice`   |
+| `Uint8Array`    | `&Uint8Array`    | `_with_uint8_array` |
+| `Foo` (named)   | `&Foo`           | `_with_foo`     |
+| `null`          | (dropped — see [Optional and nullable types](#optional-and-nullable-types)) | – |
+| `undefined`     | (dropped, same)  | – |
+| `any` / `unknown` | `&JsValue`     | `_with_js_value`|
+
+For named JS types the snake-cased head doubles as the Rust
+identifier (`Uint8Array` → `uint8_array`, also `&Uint8Array` in
+the rendered type), so there's no separate translation table —
+the same convention works in both directions.
+
 ### Why a single pipeline
 
 Treating optional, union, overload, and variadic as one parameter-axis
@@ -1120,45 +1145,132 @@ is still a single `Array<Error>` type, and `Record<string, string |
 number | boolean>` lowers as one `Object` binding rather than separate
 record overloads for each value type.
 
-### `Returns:` doc augmentation for erased return types
+### Erased return-position unions become dynamic-union enums
 
-When a return-position type contains a union that erases to `JsValue`
-(no useful LUB), the static Rust type loses information about what
-runtime values the caller actually receives. ts-gen surfaces the
-original TypeScript shape in a `Returns: <ts-shape>` doc line so that
-information isn't lost:
+When a top-level return-position type is a union that would
+otherwise erase to `JsValue` (no useful LUB), ts-gen synthesises a
+`#[wasm_bindgen]` enum and uses it as the return type. The enum's
+variants are tuple variants — one per TS union member — whose
+payload type is the regular return-position lowering of that
+member. wasm-bindgen handles dispatch at the JS↔Rust boundary by
+trying the variants in source order; see [Dynamic Unions in the
+wasm-bindgen guide](https://rustwasm.github.io/wasm-bindgen/reference/types/enums.html#dynamic-unions).
 
 ```ts
 interface EmailAttachment {
   readonly content: string | ArrayBuffer | ArrayBufferView;
-  readonly tags: Array<32 | "foo">;
 }
-
-declare function fetchValue(): Promise<32 | "foo">;
 ```
 
 emits:
 
 ```rust
-#[doc = " Returns: string | ArrayBuffer | ArrayBufferView"]
-pub fn content(this: &EmailAttachment) -> JsValue;
+#[wasm_bindgen]
+pub enum EmailAttachmentContentKind {
+    String(String),
+    ArrayBuffer(ArrayBuffer),
+    ArrayBufferView(Uint8Array),
+}
 
-#[doc = " Returns: Array<32 | \"foo\">"]
-pub fn tags(this: &EmailAttachment) -> Array;
-
-#[doc = " Returns: 32 | \"foo\""]
-pub async fn fetch_value() -> Result<JsValue, JsValue>;
+// inside the extern block:
+pub fn content(this: &EmailAttachment) -> EmailAttachmentContentKind;
 ```
 
-The detector walks the whole return type and fires when *any* nested
-union erases — `Array<32 | "foo">` flags even though the outer
-`Array` is fine. Async return types use the post-Promise-unwrap inner
-(so `Promise<32 | "foo">` documents `32 | "foo"`, since that's what
-the awaiter sees). LUB-narrowed unions (e.g. `TypeError | RangeError`
-→ `Error`) and literal-widened unions (`"a" | "b"` → `string`) don't
-fire — the narrower static type already conveys the necessary info.
+#### Naming
 
-If the JSDoc already has a `Returns:` line, it's preserved verbatim.
+The enum gets a `Kind` suffix (Rust idiom for discriminated-enum
+types). The base name is built from:
+
+* **Getters** — the property's JS name. `content` → `ContentKind`.
+* **Methods / functions** — `<FnName>Return`. `fetch()` →
+  `FetchReturnKind` (the `Return` infix disambiguates from the
+  callable's own name).
+
+Identity is the **ordered member list**, so two erasing unions with
+the same member set in the same order share a single synthesised
+enum (and hence a single name). Order matters at runtime — the
+wasm-bindgen dispatch tries variants in source order, so two unions
+that differ in order are distinct types.
+
+Collisions resolve in three steps, most-simple to most-qualified:
+
+1. Bare anchor (`ContentKind`).
+2. Parent-prefixed (`EmailAttachmentContentKind`) — when a different
+   identity already claimed the bare anchor.
+3. Numeric suffix (`ContentKind2`, `EmailAttachmentContentKind2`) —
+   when both bare and parent-prefixed are taken.
+
+First-seen wins on the bare anchor; subsequent distinct unions get
+parent-prefixed (or numeric-suffixed if that also collides).
+
+#### When synthesis fires
+
+Three layered rules decide whether a return-position union becomes
+a synthesised enum:
+
+1. **Pure-boolean-literal unions** (`true | false`, `true`, `false`)
+   keep `bool` — every member round-trips through it without loss.
+2. **Any literal member** (string / number) ⇒ synthesise. Pure
+   string-literal unions (`"a" | "b"`) become string-discriminant
+   enums; mixed `"a" | string` becomes a dynamic union with literal
+   variants + a fallback tuple. Same for `number` / `bigint`.
+3. **Otherwise**, fall back to the named LUB lattice — synthesise
+   only when there's no useful narrowing. Unions like
+   `TypeError | RangeError` keep the `Error` ancestor; mixed
+   `string | ArrayBuffer | ArrayBufferView` synthesises.
+
+Nested unions inside generics (e.g. `Promise<32 | "foo">`,
+`Array<32 | "foo">`) still go through the inner-position lowering —
+the synthesised-enum path doesn't reach into generic containers
+because wasm-bindgen requires `T: JsGeneric` for `Promise<T>` /
+`Map<K, V>` / etc. and a synthesised enum doesn't qualify.
+
+#### Variant kinds and naming
+
+A synthesised enum can mix two variant forms in the same body:
+
+* **Literal-discriminant variants** for string / number / boolean
+  literal members. The variant name is PascalCased from the
+  literal value; the discriminant is the literal itself, which
+  wasm-bindgen routes as the literal value at the FFI boundary.
+  ```rs
+  pub enum RoleKind {
+      User = "user",
+      Assistant = "assistant",
+      System = "system",
+  }
+  ```
+* **Tuple variants** for everything else. The variant name is the
+  Rust payload type; the payload is the regular return-position
+  lowering of the TS type:
+
+  | TypeScript        | Rust (return)   | Variant         |
+  | ----------------- | --------------- | --------------- |
+  | `string`          | `String`        | `String(String)` |
+  | `number`          | `f64`           | `F64(f64)`      |
+  | `bigint`          | `BigInt`        | `BigInt(BigInt)` |
+  | `boolean`         | `bool`          | `Bool(bool)`    |
+  | `ArrayBuffer`     | `ArrayBuffer`   | `ArrayBuffer(ArrayBuffer)` |
+  | `ArrayBufferView` | `Uint8Array`    | `Uint8Array(Uint8Array)` |
+  | `Array<Foo>`      | `Vec<Foo>`      | `VecOfFoo(Vec<Foo>)` |
+  | `Foo` (named)     | `Foo`           | `Foo(Foo)`      |
+
+Mixed unions like `"user" | "system" | (string & NonNullable<unknown>)`
+emit literal variants for each named string + a tuple
+`JsValue(JsValue)` fallback for the residual — wasm-bindgen tries
+the literal arms first, and falls back through the tuple chain in
+declaration order.
+
+`ArrayBufferView` is a TS-only union alias for the typed-array
+family + `DataView`, so there's no single Rust type that captures
+the shape. We specialise:
+
+* Return position (including dynamic-union variants) →
+  `Uint8Array`. The most useful concrete typed-array; callers can
+  re-cast to a different typed-array via `JsCast::dyn_into` if
+  needed.
+* Argument position → `&Object`, with the dictionary-builder path
+  switching to a generic `<T: TypedArray>` when applicable.
 
 ## Module declarations and namespace nesting
 

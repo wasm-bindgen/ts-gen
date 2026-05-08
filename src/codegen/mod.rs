@@ -19,67 +19,6 @@ use crate::parse::scope::ScopeId;
 
 use typemap::CodegenContext;
 
-/// Augment a doc with a `Returns: <ts-shape>` line when the return
-/// type loses information against its original TypeScript shape.
-///
-/// Fires whenever the return type contains an erasing union — see
-/// [`subtyping::return_type_has_erased_union`]. The static Rust type
-/// can't convey what the runtime values look like in those cases;
-/// surfacing the raw TS shape gives callers somewhere to look.
-///
-/// `optional` is for sites where the return type has an outer `?:`
-/// marker that widens it with `| undefined` (e.g. dictionary
-/// property getters declared `replyTo?: string | EmailAddress`).
-/// When set, the rendered shape gets `| undefined` appended. This
-/// only affects the rendered text — erasure detection runs on the
-/// inner type as-written.
-///
-/// Idempotent: if the JSDoc already contains a line starting with
-/// `Returns:` we leave the doc untouched, on the assumption that the
-/// human-authored version is already correct.
-pub(crate) fn augment_return_doc(
-    doc: Option<String>,
-    return_type: &TypeRef,
-    optional: bool,
-    ctx: Option<&CodegenContext<'_>>,
-    scope: ScopeId,
-) -> Option<String> {
-    if !subtyping::return_type_has_erased_union(return_type, ctx, scope) {
-        return doc;
-    }
-    let rendered = if optional {
-        // `T | undefined` — but if `T` is already `Nullable(...)` we
-        // don't want to render `T | null | undefined`. The IR's
-        // `Nullable` covers both null and undefined optionality, so
-        // skip the suffix when one's already present.
-        match return_type {
-            TypeRef::Nullable(_) => return_type.format_ts(),
-            other => format!("{} | undefined", other.format_ts()),
-        }
-    } else {
-        return_type.format_ts()
-    };
-    let line = format!("Returns: {rendered}");
-    match doc {
-        None => Some(line),
-        Some(existing) => {
-            if existing
-                .lines()
-                .any(|l| l.trim_start().starts_with("Returns:"))
-            {
-                return Some(existing);
-            }
-            let mut out = existing;
-            if !out.ends_with('\n') {
-                out.push('\n');
-            }
-            out.push('\n');
-            out.push_str(&line);
-            Some(out)
-        }
-    }
-}
-
 /// Convert an optional doc string into `/// ...` doc-comment attributes.
 ///
 /// Returns an empty `TokenStream` if `doc` is `None`.
@@ -236,6 +175,13 @@ fn generate_tokens(
     // External type use aliases (collected during codegen above)
     let external_uses = cgctx.external_use_tokens();
 
+    // Dynamic-union enums synthesised during the per-declaration
+    // emit pass. Emitted at the global scope; references inside
+    // each enum already resolve through the regular `to_syn_type`
+    // lowering, so cross-module member types are emitted with the
+    // appropriate path qualifier (`module_name::TypeName`).
+    let dynamic_unions = generate_dynamic_unions(&cgctx);
+
     // Emit codegen diagnostics
     cgctx.take_diagnostics().emit();
 
@@ -244,6 +190,170 @@ fn generate_tokens(
         #external_uses
         #(#global_items)*
         #(#mod_blocks)*
+        #dynamic_unions
+    }
+}
+
+/// Emit the synthesised dynamic-union enums collected on `cgctx`
+/// during the per-declaration pass. Each enum lowers each member
+/// type via the regular return-position path, so cross-module
+/// references get the correct path qualifier.
+fn generate_dynamic_unions(cgctx: &CodegenContext) -> TokenStream {
+    use crate::ir::ModuleContext;
+    use crate::ir::TypeRef as T;
+    let registry = cgctx.dynamic_unions.borrow();
+    if registry.by_key.is_empty() {
+        return quote! {};
+    }
+    let from_module = ModuleContext::Global;
+    let enums: Vec<TokenStream> = registry
+        .by_key
+        .values()
+        .map(|info| {
+            let enum_ident = typemap::make_ident(&info.rust_name);
+            // Track variant names within a single enum so that a
+            // `string` arm doesn't collide with another arm whose
+            // payload also lowers to `String`. First-seen wins; the
+            // second is numbered.
+            let mut used_variants: std::collections::HashSet<String> =
+                std::collections::HashSet::new();
+            let mut alloc_variant = |base: &str| -> String {
+                if used_variants.insert(base.to_string()) {
+                    return base.to_string();
+                }
+                let mut i: u32 = 2;
+                loop {
+                    let candidate = format!("{base}{i}");
+                    if used_variants.insert(candidate.clone()) {
+                        return candidate;
+                    }
+                    i += 1;
+                }
+            };
+            let variants: Vec<TokenStream> = info
+                .members
+                .iter()
+                .map(|m| {
+                    match m {
+                        // String / number / boolean literal members
+                        // become string-discriminant / numeric-discriminant
+                        // / boolean-discriminant variants — wasm-bindgen
+                        // routes these as the literal value at the FFI
+                        // boundary, exactly matching TS narrowing.
+                        T::StringLiteral(s) => {
+                            let variant_name =
+                                alloc_variant(&crate::util::naming::to_pascal_case(s));
+                            let variant_ident = typemap::make_ident(&variant_name);
+                            quote! { #variant_ident = #s }
+                        }
+                        T::NumberLiteral(n) => {
+                            let variant_name = alloc_variant(&format!(
+                                "N{}",
+                                n.to_string().replace(['.', '-'], "_")
+                            ));
+                            let variant_ident = typemap::make_ident(&variant_name);
+                            // wasm-bindgen accepts integer literals on
+                            // numeric-discriminant variants.
+                            let lit = syn::LitInt::new(
+                                &(*n as i64).to_string(),
+                                proc_macro2::Span::call_site(),
+                            );
+                            quote! { #variant_ident = #lit }
+                        }
+                        T::BooleanLiteral(b) => {
+                            let variant_name = alloc_variant(if *b { "True" } else { "False" });
+                            let variant_ident = typemap::make_ident(&variant_name);
+                            // Boolean literals don't have a syntactic
+                            // discriminant form in Rust enums, so we
+                            // fall back to the `1` / `0` numeric
+                            // form that wasm-bindgen also recognises.
+                            let lit = syn::LitInt::new(
+                                if *b { "1" } else { "0" },
+                                proc_macro2::Span::call_site(),
+                            );
+                            quote! { #variant_ident = #lit }
+                        }
+                        _ => {
+                            let variant_name = alloc_variant(&dynamic_union_variant_name(m));
+                            let variant_ident = typemap::make_ident(&variant_name);
+                            let payload = typemap::to_syn_type(
+                                m,
+                                typemap::TypePosition::RETURN,
+                                Some(cgctx),
+                                cgctx.root_scope,
+                                &from_module,
+                            );
+                            quote! { #variant_ident(#payload) }
+                        }
+                    }
+                })
+                .collect();
+            quote! {
+                #[wasm_bindgen]
+                pub enum #enum_ident {
+                    #(#variants),*
+                }
+            }
+        })
+        .collect();
+    quote! { #(#enums)* }
+}
+
+/// Pick a Rust variant name for a `TypeRef` member of a synthesised
+/// dynamic union.
+///
+/// Variants are named after the **Rust payload type** rather than
+/// the TypeScript spelling, so the rendered enum reads consistently:
+///
+/// ```rust,ignore
+/// pub enum ContentKind {
+///     String(String),
+///     F64(f64),
+///     Bool(bool),
+///     ArrayBuffer(ArrayBuffer),
+///     Uint8Array(Uint8Array),    // not `ArrayBufferView` — that's the TS spelling
+/// }
+/// ```
+///
+/// The mapping mirrors `to_syn_type` at return position:
+///
+/// | TypeScript        | Rust (return)   | Variant name    |
+/// | ----------------- | --------------- | --------------- |
+/// | `string`          | `String`        | `String`        |
+/// | `number`          | `f64`           | `F64`           |
+/// | `bigint`          | `BigInt`        | `BigInt`        |
+/// | `boolean`         | `bool`          | `Bool`          |
+/// | `ArrayBufferView` | `Uint8Array`    | `Uint8Array`    |
+/// | `Foo` (named)     | `Foo`           | `Foo`           |
+fn dynamic_union_variant_name(ty: &TypeRef) -> String {
+    use crate::ir::TypeRef as T;
+    use crate::util::naming::to_pascal_case;
+    match ty {
+        T::Boolean | T::BooleanLiteral(_) => "Bool".to_string(),
+        T::Number | T::NumberLiteral(_) => "F64".to_string(),
+        T::String | T::StringLiteral(_) => "String".to_string(),
+        T::BigInt => "BigInt".to_string(),
+        T::Void | T::Undefined => "Undefined".to_string(),
+        T::Null => "Null".to_string(),
+        T::Any | T::Unknown => "JsValue".to_string(),
+        T::Object => "Object".to_string(),
+        T::Symbol => "JsValue".to_string(),
+        // Return-position lowering specialises `ArrayBufferView` to
+        // `Uint8Array` (see `to_syn_type`), so the variant name
+        // matches the payload.
+        T::ArrayBufferView => "Uint8Array".to_string(),
+        // `Array<T>` / `T[]` lowers to `Vec<T>` in return position.
+        T::Array(inner) => format!("VecOf{}", dynamic_union_variant_name(inner)),
+        T::Nullable(inner) => format!("Optional{}", dynamic_union_variant_name(inner)),
+        T::Reference { segments, .. } => {
+            // Use the last segment for qualified paths.
+            to_pascal_case(segments.last().map(|s| s.as_str()).unwrap_or("Unknown"))
+        }
+        T::Tuple(_) => "Tuple".to_string(),
+        T::Union(_) => "JsValue".to_string(),
+        T::Intersection(_) => "JsValue".to_string(),
+        T::Function(_) => "Function".to_string(),
+        T::Unresolved(_) => "JsValue".to_string(),
     }
 }
 

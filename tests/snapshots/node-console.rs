@@ -29,10 +29,8 @@ pub mod console {
         pub fn set_ignore_errors(this: &ConsoleOptions, val: bool);
         #[doc = " Set color support for this `Console` instance."]
         #[doc = " @default 'auto'"]
-        #[doc = ""]
-        #[doc = " Returns: boolean | string | null"]
         #[wasm_bindgen(method, getter, js_name = "colorMode")]
-        pub fn color_mode(this: &ConsoleOptions) -> JsValue;
+        pub fn color_mode(this: &ConsoleOptions) -> Option<ColorModeKind>;
         #[wasm_bindgen(method, setter, js_name = "colorMode")]
         pub fn set_color_mode(this: &ConsoleOptions, val: bool);
         #[wasm_bindgen(method, setter, js_name = "colorMode")]
@@ -478,4 +476,9 @@ pub mod console {
         #[wasm_bindgen(method, catch, js_name = "timeStamp")]
         pub fn try_time_stamp_with_label(this: &Console, label: &str) -> Result<(), JsValue>;
     }
+}
+#[wasm_bindgen]
+pub enum ColorModeKind {
+    Bool(bool),
+    String(String),
 }

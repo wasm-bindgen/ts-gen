@@ -482,12 +482,7 @@ pub fn build_signatures(
     let nothrow = spec.throws.is_never() && !spec.kind.always_catches();
     let error_type = spec.throws.as_type();
 
-    // If any nested union in the return type erases to `JsValue`,
-    // append a `Returns: <ts-shape>` line to the doc so callers can
-    // still see the original TS shape. Operates on the post-Promise
-    // `return_type` since that's what shows up at the call site.
-    let augmented_doc =
-        crate::codegen::augment_return_doc(spec.doc.clone(), &return_type, false, cgctx, scope);
+    let augmented_doc = spec.doc.clone();
 
     let allow_try = !is_async && !nothrow && spec.kind.allows_try_variant();
     let mut out = Vec::with_capacity(expansions.len() * if allow_try { 2 } else { 1 });
@@ -865,10 +860,29 @@ fn compute_trim(signatures: &[Vec<ConcreteParam>]) -> (usize, usize) {
 
 /// Get a short snake_case name for a TypeRef, used in `_with_` suffixes.
 ///
-/// Named references (built-ins and user types) snake-case the head:
-/// `Uint8Array` → `uint8_array`, `MyType` → `my_type`. Generic
-/// instantiations and qualified paths use just the head segment;
-/// type args don't participate in the suffix.
+/// Names mirror the **Rust** lowering of the type rather than the
+/// TypeScript spelling, so the resulting suffix matches what callers
+/// see in their function signatures:
+///
+/// | TypeScript      | Rust (arg)      | Suffix          |
+/// | --------------- | --------------- | --------------- |
+/// | `string`        | `&str`          | `str`           |
+/// | `number`        | `f64`           | `f64`           |
+/// | `boolean`       | `bool`          | `bool`          |
+/// | `Array<T>`      | `&[T]`          | `slice`         |
+/// | `T[]`           | `&[T]`          | `slice`         |
+/// | `Uint8Array`    | `&Uint8Array`   | `uint8_array`   |
+/// | `MyType`        | `&MyType`       | `my_type`       |
+///
+/// Named references (built-ins and user types) snake-case the head
+/// segment — type args don't participate in the suffix. The named
+/// JS types (`Uint8Array`, `Headers`, …) double as Rust types in
+/// the generated bindings, so the snake-cased JS name *is* the
+/// Rust spelling.
+///
+/// `ArrayBufferView` is a synthetic union that lowers to `&Object` /
+/// `Uint8Array` depending on position; `typed_array` is short for
+/// "any concrete typed-array" which captures both arms.
 fn type_snake_name(ty: &TypeRef) -> String {
     match ty {
         TypeRef::String => "str".to_string(),
@@ -882,10 +896,17 @@ fn type_snake_name(ty: &TypeRef) -> String {
         TypeRef::ArrayBufferView => "typed_array".to_string(),
         // Snake-case the leftmost (head) segment of any named
         // reference. Type args don't participate in `_with_` suffixes.
+        // `Array<T>` and `ReadonlyArray<T>` lower to `&[T]` /
+        // `Vec<T>` so they're named after the Rust slice form,
+        // not the JS class.
         TypeRef::Reference { segments, .. } => {
-            to_snake_case(segments.first().map_or("", |s| s.as_str()))
+            let head = segments.first().map_or("", |s| s.as_str());
+            if head == "Array" || head == "ReadonlyArray" {
+                return "slice".to_string();
+            }
+            to_snake_case(head)
         }
-        TypeRef::Array(_) => "array".to_string(),
+        TypeRef::Array(_) => "slice".to_string(),
         TypeRef::Nullable(inner) => type_snake_name(inner),
         TypeRef::Function(_) => "function".to_string(),
         _ => "js_value".to_string(),

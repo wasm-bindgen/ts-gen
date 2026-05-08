@@ -161,6 +161,189 @@ pub struct CodegenContext<'a> {
     pub external_uses: RefCell<HashMap<String, String>>,
     /// Diagnostics collected during code generation.
     pub diagnostics: RefCell<DiagnosticCollector>,
+    /// Dynamic-union enums synthesised at codegen time for top-level
+    /// return-position unions that would otherwise erase to `JsValue`.
+    ///
+    /// Identity is keyed by the member set (TS source-order list of
+    /// type-ref representations) so two erasing unions with the same
+    /// members share a single enum. Callers reach into this through
+    /// [`CodegenContext::synthesise_dynamic_union`].
+    pub dynamic_unions: RefCell<DynamicUnionRegistry>,
+}
+
+/// Registry of synthesised dynamic-union enums, plus the bookkeeping
+/// for first-seen-wins anchor-name allocation.
+#[derive(Debug, Default)]
+pub struct DynamicUnionRegistry {
+    /// Identity (member-set key) → assigned Rust enum name.
+    pub by_key: indexmap::IndexMap<DynamicUnionKey, DynamicUnionInfo>,
+    /// Names already in use in the codegen unit. Includes
+    /// declared types plus all previously-allocated dynamic-union
+    /// enum names.
+    pub used_names: HashSet<String>,
+}
+
+/// Stable identity key for a dynamic union — the ordered list of
+/// member type representations.
+///
+/// Order matches TS source order so two unions with the same members
+/// in different orders are *not* equal. (Order matters at runtime —
+/// dispatch tries variants in source order, so reordering changes
+/// behaviour.)
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DynamicUnionKey(pub Vec<String>);
+
+/// Bookkeeping for a single synthesised dynamic-union enum.
+#[derive(Debug, Clone)]
+pub struct DynamicUnionInfo {
+    /// Final Rust enum name.
+    pub rust_name: String,
+    /// Members of the union in TS source order — kept here so the
+    /// emit pass can render variants without re-running the
+    /// member-set computation.
+    pub members: Vec<TypeRef>,
+}
+
+impl DynamicUnionRegistry {
+    /// Pick a fresh Rust enum name for a synthesised dynamic union.
+    ///
+    /// Preference order: bare anchor → parent-prefixed → numeric
+    /// suffix on whichever form was tried first. The first call with
+    /// a given anchor wins the bare form.
+    ///
+    /// The trailing suffix is `Kind` (rather than `Union`) — Rust
+    /// idiom is to name discriminated-enum types `<Concept>Kind`,
+    /// e.g. `EmailAttachmentContentKind`.
+    fn allocate_name(&self, anchor: &str, parent: Option<&str>) -> String {
+        let bare = format!("{anchor}Kind");
+        if !self.used_names.contains(&bare) {
+            return bare;
+        }
+        if let Some(p) = parent {
+            let qualified = format!("{p}{anchor}Kind");
+            if !self.used_names.contains(&qualified) {
+                return qualified;
+            }
+            // Both bare and qualified taken — number-suffix the qualified.
+            return numeric_dedup(&qualified, &self.used_names);
+        }
+        numeric_dedup(&bare, &self.used_names)
+    }
+}
+
+fn numeric_dedup(base: &str, used: &HashSet<String>) -> String {
+    let mut n: u32 = 2;
+    loop {
+        let candidate = format!("{base}{n}");
+        if !used.contains(&candidate) {
+            return candidate;
+        }
+        n += 1;
+    }
+}
+
+/// Stable, hash-friendly representation of a `TypeRef` used as the
+/// identity component for [`DynamicUnionKey`].
+///
+/// Walks the structure rather than relying on `Debug` so cosmetic
+/// changes to `TypeRef`'s `Debug` impl don't perturb dedup. Generic
+/// args, tuple elements, and union members all recurse.
+fn format_type_ref_key(ty: &TypeRef) -> String {
+    let mut buf = String::new();
+    write_type_ref_key(&mut buf, ty);
+    buf
+}
+
+fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
+    use std::fmt::Write;
+    match ty {
+        TypeRef::Boolean => buf.push_str("bool"),
+        TypeRef::Number => buf.push_str("num"),
+        TypeRef::BigInt => buf.push_str("bigint"),
+        TypeRef::String => buf.push_str("str"),
+        TypeRef::Void => buf.push_str("void"),
+        TypeRef::Undefined => buf.push_str("undef"),
+        TypeRef::Null => buf.push_str("null"),
+        TypeRef::Any => buf.push_str("any"),
+        TypeRef::Unknown => buf.push_str("unknown"),
+        TypeRef::Object => buf.push_str("Object"),
+        TypeRef::Symbol => buf.push_str("Symbol"),
+        TypeRef::ArrayBufferView => buf.push_str("ArrayBufferView"),
+        TypeRef::StringLiteral(s) => write!(buf, "lit:{s:?}").unwrap(),
+        TypeRef::NumberLiteral(n) => write!(buf, "lit:{n}").unwrap(),
+        TypeRef::BooleanLiteral(b) => write!(buf, "lit:{b}").unwrap(),
+        TypeRef::Array(inner) => {
+            buf.push_str("Array<");
+            write_type_ref_key(buf, inner);
+            buf.push('>');
+        }
+        TypeRef::Nullable(inner) => {
+            buf.push_str("Nullable<");
+            write_type_ref_key(buf, inner);
+            buf.push('>');
+        }
+        TypeRef::Tuple(parts) => {
+            buf.push_str("Tuple<");
+            for (i, p) in parts.iter().enumerate() {
+                if i > 0 {
+                    buf.push(',');
+                }
+                write_type_ref_key(buf, p);
+            }
+            buf.push('>');
+        }
+        TypeRef::Union(members) => {
+            buf.push_str("Union<");
+            for (i, m) in members.iter().enumerate() {
+                if i > 0 {
+                    buf.push('|');
+                }
+                write_type_ref_key(buf, m);
+            }
+            buf.push('>');
+        }
+        TypeRef::Intersection(parts) => {
+            buf.push_str("Intersection<");
+            for (i, p) in parts.iter().enumerate() {
+                if i > 0 {
+                    buf.push('&');
+                }
+                write_type_ref_key(buf, p);
+            }
+            buf.push('>');
+        }
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } => {
+            buf.push_str(&segments.join("."));
+            if !generic_args.is_empty() {
+                buf.push('<');
+                for (i, a) in generic_args.iter().enumerate() {
+                    if i > 0 {
+                        buf.push(',');
+                    }
+                    write_type_ref_key(buf, a);
+                }
+                buf.push('>');
+            }
+        }
+        TypeRef::Function(sig) => {
+            buf.push_str("fn(");
+            for (i, p) in sig.params.iter().enumerate() {
+                if i > 0 {
+                    buf.push(',');
+                }
+                write_type_ref_key(buf, &p.type_ref);
+            }
+            buf.push_str(")->");
+            write_type_ref_key(buf, &sig.return_type);
+        }
+        TypeRef::Unresolved(s) => {
+            buf.push('?');
+            buf.push_str(s);
+        }
+    }
 }
 
 impl<'a> CodegenContext<'a> {
@@ -176,12 +359,21 @@ impl<'a> CodegenContext<'a> {
             file_scopes: module.file_scopes.clone(),
             external_uses: RefCell::new(HashMap::new()),
             diagnostics: RefCell::new(DiagnosticCollector::new()),
+            dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
         };
         for &type_id in &module.types {
             let decl = gctx.get_type(type_id);
             ctx.collect_declaration(type_id, &decl.kind, &decl.module_context);
         }
         ctx.resolve_collisions();
+        // Seed the dynamic-union registry's used-name set with every
+        // declared type so synthesised enums never collide with the
+        // user's source.
+        {
+            let mut reg = ctx.dynamic_unions.borrow_mut();
+            reg.used_names.extend(ctx.local_types.keys().cloned());
+            reg.used_names.extend(ctx.renamed_locals.values().cloned());
+        }
         ctx
     }
 
@@ -197,6 +389,7 @@ impl<'a> CodegenContext<'a> {
             file_scopes: vec![],
             external_uses: RefCell::new(HashMap::new()),
             diagnostics: RefCell::new(DiagnosticCollector::new()),
+            dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
         }
     }
 
@@ -206,6 +399,46 @@ impl<'a> CodegenContext<'a> {
         self.external_uses
             .borrow_mut()
             .insert(local_name.to_string(), rust_path.to_string());
+    }
+
+    /// Look up or synthesise a dynamic-union enum for a top-level
+    /// return-position union that would otherwise erase to `JsValue`.
+    ///
+    /// Identity is the ordered member list (TS source order matters
+    /// at runtime — dynamic-union dispatch tries variants in source
+    /// order). Two erasing unions with the same member sequence
+    /// share a single synthesised enum.
+    ///
+    /// Naming preference, most-simple to most-qualified:
+    ///
+    /// 1. The bare anchor (e.g. `ContentKind`).
+    /// 2. Parent-prefixed (`EmailAttachmentContentKind`).
+    /// 3. Numeric-suffixed (`ContentKind2`, `EmailAttachmentContentKind2`).
+    ///
+    /// First-seen wins on the bare anchor: subsequent distinct
+    /// unions with the same anchor get parent-prefixed (or
+    /// numeric-suffixed if that also collides).
+    pub fn synthesise_dynamic_union(
+        &self,
+        members: &[TypeRef],
+        anchor: &str,
+        parent: Option<&str>,
+    ) -> String {
+        let key = DynamicUnionKey(members.iter().map(format_type_ref_key).collect());
+        if let Some(info) = self.dynamic_unions.borrow().by_key.get(&key) {
+            return info.rust_name.clone();
+        }
+        let mut reg = self.dynamic_unions.borrow_mut();
+        let chosen = reg.allocate_name(anchor, parent);
+        reg.used_names.insert(chosen.clone());
+        reg.by_key.insert(
+            key,
+            DynamicUnionInfo {
+                rust_name: chosen.clone(),
+                members: members.to_vec(),
+            },
+        );
+        chosen
     }
 
     /// Generate `use` statements for all external type aliases.
@@ -485,9 +718,22 @@ pub fn to_syn_type(
 
         // === TS-only synthetic ===
         // `ArrayBufferView` is a TS-only union alias (typed-array
-        // family + DataView), not a JS class — codegen erases it to
-        // plain `Object`.
-        TypeRef::ArrayBufferView => maybe_ref(quote! { Object }, borrow),
+        // family + DataView), not a JS class. There's no single Rust
+        // type that captures the union; we specialise by position:
+        //
+        // * Return position → `Uint8Array`. The most useful concrete
+        //   typed-array view; callers can re-cast to a different
+        //   typed-array via `JsCast::dyn_into` if needed.
+        // * Argument position → `&Object`. The dictionary-builder
+        //   path overrides this with a generic `<T: TypedArray>`
+        //   so callers can pass any concrete typed-array.
+        TypeRef::ArrayBufferView => {
+            if pos.is_argument() {
+                maybe_ref(quote! { Object }, borrow)
+            } else {
+                quote! { Uint8Array }
+            }
+        }
 
         // === Syntactic constructs ===
         //
@@ -1045,6 +1291,7 @@ pub(crate) fn make_ident(name: &str) -> syn::Ident {
 /// callers pass the simplified throws union here. Resolution goes through
 /// the same `to_syn_type` path as any other type, so e.g. `js_sys::TypeError`
 /// vs an external mapping is handled uniformly.
+#[allow(clippy::too_many_arguments)]
 pub fn to_return_type(
     ty: &TypeRef,
     catch: bool,
@@ -1053,6 +1300,7 @@ pub fn to_return_type(
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
     from_module: &ModuleContext,
+    anchor: ReturnAnchor<'_>,
 ) -> TokenStream {
     // Async returns are `Promise<T>` JS-side. `wasm-bindgen` requires
     // `T: JsGeneric` for `Promise<T>` / `JsFuture<T>`, which bare Rust
@@ -1062,12 +1310,17 @@ pub fn to_return_type(
     // `Undefined`) and `Nullable<T>` becomes `JsOption<T>`. Callers
     // recover primitives via `.value_of()` (`Boolean` / `Number`) or
     // `String::from(_)` (`JsString`).
-    let pos = if is_async {
-        TypePosition::RETURN.to_inner()
+    //
+    // Top-level (non-`is_async`) returns also participate in
+    // dynamic-union synthesis — see [`maybe_synthesise_return_union`].
+    let inner = if !is_async {
+        match maybe_synthesise_return_union(ty, ctx, scope, anchor) {
+            Some(tokens) => tokens,
+            None => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
+        }
     } else {
-        TypePosition::RETURN
+        to_syn_type(ty, TypePosition::RETURN.to_inner(), ctx, scope, from_module)
     };
-    let inner = to_syn_type(ty, pos, ctx, scope, from_module);
 
     if catch {
         let err = match error_ty {
@@ -1078,6 +1331,150 @@ pub fn to_return_type(
     } else {
         inner
     }
+}
+
+/// Lower a getter's return type, going through dynamic-union
+/// synthesis when the type is a top-level erasing union.
+///
+/// Getters never go through the async / catch / Result wrapping that
+/// callable returns do, so this helper is a thin wrapper around
+/// `maybe_synthesise_return_union` + `to_syn_type` rather than
+/// piggy-backing on `to_return_type`.
+pub fn to_getter_return_type(
+    ty: &TypeRef,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+    anchor: ReturnAnchor<'_>,
+) -> TokenStream {
+    if let Some(tokens) = maybe_synthesise_return_union(ty, ctx, scope, anchor) {
+        return tokens;
+    }
+    // For optional getters the IR widens to `Nullable<T>`. If the
+    // inner `T` is itself a top-level erasing union, we still want
+    // the synthesised enum — but wrapped in `Option<…>`.
+    if let TypeRef::Nullable(inner) = ty {
+        if let Some(inner_tokens) = maybe_synthesise_return_union(inner, ctx, scope, anchor) {
+            return quote! { Option<#inner_tokens> };
+        }
+    }
+    to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module)
+}
+
+/// Anchor for naming a synthesised dynamic-union enum. Carries the
+/// member/function name and its enclosing parent (used as a fallback
+/// prefix on name collisions).
+///
+/// The anchor governs the **base** name only — the trailing `Kind`
+/// suffix and any numeric dedup suffix come from the registry side
+/// (see [`CodegenContext::synthesise_dynamic_union`]).
+#[derive(Clone, Copy, Debug)]
+pub struct ReturnAnchor<'a> {
+    /// Plain anchor source — getter name (`content`), method name
+    /// (`bar`), function name (`fetch`). Will be PascalCased before
+    /// being used as the enum-name base.
+    pub base: &'a str,
+    /// Whether the anchor refers to a getter (where the base is used
+    /// as-is) or a callable return (where `Return` is appended before
+    /// `Kind`).
+    pub kind: ReturnAnchorKind,
+    /// Enclosing type / namespace name, used as the prefix on
+    /// collision (`EmailAttachmentContentKind`).
+    pub parent: Option<&'a str>,
+}
+
+/// Distinguishes anchors that already refer to a property (no extra
+/// suffix) from those that refer to a callable's return position
+/// (which gets a `Return` infix to disambiguate from the callable's
+/// own name).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ReturnAnchorKind {
+    Getter,
+    Callable,
+}
+
+impl<'a> ReturnAnchor<'a> {
+    /// PascalCased base for the enum name, with the `Return` infix
+    /// appended for callables.
+    fn enum_anchor(self) -> String {
+        let pc = crate::util::naming::to_pascal_case(self.base);
+        match self.kind {
+            ReturnAnchorKind::Getter => pc,
+            ReturnAnchorKind::Callable => format!("{pc}Return"),
+        }
+    }
+}
+
+/// If `ty` is a top-level union that would otherwise erase to
+/// `JsValue`, synthesise (or reuse) a dynamic-union enum and return
+/// the enum's name as a token stream.
+///
+/// Only fires for the *outer* return position. Inner unions (inside
+/// `Promise<T>`, `Map<K, V>`, etc.) keep going through the regular
+/// LUB → `JsValue` path because they live inside generic containers
+/// where wasm-bindgen needs a `JsGeneric` type and a synthesised
+/// enum doesn't qualify.
+///
+/// Unions with a useful named LUB (`TypeError | RangeError` →
+/// `Error`) keep the narrower static type and do not synthesise.
+/// Pure-boolean-literal unions (`true | false`) keep `bool` since
+/// every member round-trips through it without loss.
+fn maybe_synthesise_return_union(
+    ty: &TypeRef,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    anchor: ReturnAnchor<'_>,
+) -> Option<TokenStream> {
+    let members = match ty {
+        TypeRef::Union(members) => members,
+        _ => return None,
+    };
+    let cgctx = ctx?;
+
+    if !should_synthesise_union(members, ctx, scope) {
+        return None;
+    }
+
+    let name = cgctx.synthesise_dynamic_union(members, &anchor.enum_anchor(), anchor.parent);
+    let ident = make_ident(&name);
+    Some(quote! { #ident })
+}
+
+/// Decide whether a return-position union should produce a synthesised
+/// `<Anchor>Kind` enum.
+///
+/// Three layered rules:
+///
+/// 1. **Pure-boolean-literal unions** (`true | false`, `true`, `false`)
+///    keep `bool` — every member round-trips through it without loss.
+/// 2. **Any literal member** (string / number) ⇒ synthesise. Pure
+///    string-literal unions (`"a" | "b"`) become string-discriminant
+///    enums; mixed `"a" | string` becomes a dynamic union with
+///    literal variants + a fallback tuple. The numeric case mirrors
+///    this for `number` / `bigint`.
+/// 3. **Otherwise**, fall back to the named LUB lattice — synthesise
+///    only when there's no useful narrowing.
+fn should_synthesise_union(
+    members: &[TypeRef],
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> bool {
+    if members.is_empty() {
+        return false;
+    }
+    if members
+        .iter()
+        .all(|m| matches!(m, TypeRef::BooleanLiteral(_) | TypeRef::Boolean))
+    {
+        return false;
+    }
+    let has_literal = members
+        .iter()
+        .any(|m| matches!(m, TypeRef::StringLiteral(_) | TypeRef::NumberLiteral(_)));
+    if has_literal {
+        return true;
+    }
+    crate::codegen::subtyping::lub_union(members, ctx, scope).is_none()
 }
 
 /// Whether a function with these parameter types should be tagged
@@ -1514,6 +1911,11 @@ mod tests {
             None,
             ScopeId(0),
             &ModuleContext::Global,
+            ReturnAnchor {
+                base: "test",
+                kind: ReturnAnchorKind::Callable,
+                parent: None,
+            },
         )
         .to_string();
         assert_eq!(result, "Result < Promise < Undefined > , JsValue >");

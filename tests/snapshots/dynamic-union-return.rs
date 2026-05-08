@@ -9,14 +9,10 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Erased;
-    #[doc = " Mixed primitives + objects — no LUB, erases to JsValue."]
-    #[doc = ""]
-    #[doc = " Returns: string | ArrayBuffer | ArrayBufferView"]
+    #[doc = " Mixed primitives + objects — no LUB, becomes a dynamic union."]
     #[wasm_bindgen(method, getter)]
-    pub fn content(this: &Erased) -> JsValue;
-    #[doc = " Inner-erased generic."]
-    #[doc = ""]
-    #[doc = " Returns: Array<32 | \"foo\">"]
+    pub fn content(this: &Erased) -> ContentKind;
+    #[doc = " Inner-erased generic — outer Array stays as `Vec<JsValue>`."]
     #[wasm_bindgen(method, getter)]
     pub fn tags(this: &Erased) -> Vec<JsValue>;
 }
@@ -34,10 +30,10 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type NoErasure;
-    #[doc = " Literal widening — lowers to `string`, no Returns: line."]
+    #[doc = " Literal widening — lowers to `string`, no enum synthesised."]
     #[wasm_bindgen(method, getter)]
-    pub fn variant(this: &NoErasure) -> String;
-    #[doc = " Plain type — no Returns: line."]
+    pub fn variant(this: &NoErasure) -> VariantKind;
+    #[doc = " Plain type — no enum synthesised."]
     #[wasm_bindgen(method, getter)]
     pub fn name(this: &NoErasure) -> String;
 }
@@ -52,9 +48,18 @@ impl NoErasure {
 }
 #[wasm_bindgen]
 extern "C" {
-    #[doc = " Async function returning erased inner union."]
-    #[doc = ""]
-    #[doc = " Returns: 32 | \"foo\""]
+    #[doc = " Async function with an inner-erased Promise — no enum synthesis."]
     #[wasm_bindgen(catch, js_name = "fetchValue")]
     pub async fn fetch_value() -> Result<JsValue, JsValue>;
+}
+#[wasm_bindgen]
+pub enum ContentKind {
+    String(String),
+    ArrayBuffer(ArrayBuffer),
+    Uint8Array(Uint8Array),
+}
+#[wasm_bindgen]
+pub enum VariantKind {
+    A = "a",
+    B = "b",
 }

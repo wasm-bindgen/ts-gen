@@ -394,16 +394,14 @@ extern "C" {
     pub fn method(this: &FetchOptions) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_method(this: &FetchOptions, val: &str);
-    #[doc = " Returns: Headers | Record<string, string> | undefined"]
     #[wasm_bindgen(method, getter)]
-    pub fn headers(this: &FetchOptions) -> JsValue;
+    pub fn headers(this: &FetchOptions) -> Option<HeadersKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_headers(this: &FetchOptions, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_record(this: &FetchOptions, val: &Object<JsString>);
-    #[doc = " Returns: string | ArrayBuffer | null"]
     #[wasm_bindgen(method, getter)]
-    pub fn body(this: &FetchOptions) -> JsValue;
+    pub fn body(this: &FetchOptions) -> Option<BodyKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_body(this: &FetchOptions, val: &str);
     #[wasm_bindgen(method, setter, js_name = "body")]
@@ -556,9 +554,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MutableWidget;
-    #[doc = " Returns: string | number"]
     #[wasm_bindgen(method, getter)]
-    pub fn label(this: &MutableWidget) -> JsValue;
+    pub fn label(this: &MutableWidget) -> LabelKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_label(this: &MutableWidget, val: &str);
     #[wasm_bindgen(method, setter, js_name = "label")]
@@ -624,4 +621,19 @@ pub mod my_module {
             self.inner
         }
     }
+}
+#[wasm_bindgen]
+pub enum HeadersKind {
+    Headers(Headers),
+    Record(Object<JsString>),
+}
+#[wasm_bindgen]
+pub enum BodyKind {
+    String(String),
+    ArrayBuffer(ArrayBuffer),
+}
+#[wasm_bindgen]
+pub enum LabelKind {
+    String(String),
+    F64(f64),
 }

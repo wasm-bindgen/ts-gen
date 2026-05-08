@@ -32,7 +32,7 @@ use crate::codegen::signatures::{
     is_void_return, public_rust_name, CallableSpec, ConcreteParam, FunctionSignature,
     SignatureKind,
 };
-use crate::codegen::typemap::{to_return_type, to_syn_type, CodegenContext, TypePosition};
+use crate::codegen::typemap::{to_return_type, CodegenContext, TypePosition};
 use crate::ir::{
     ClassDecl, GetterMember, InterfaceClassification, InterfaceDecl, Member, ModuleContext,
     SetterMember, StaticGetterMember, StaticSetterMember, TypeRef,
@@ -1243,6 +1243,11 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
         config.cgctx,
         scope,
         &config.from_module(),
+        super::typemap::ReturnAnchor {
+            base: &sig.rust_name,
+            kind: super::typemap::ReturnAnchorKind::Callable,
+            parent: Some(&config.rust_name),
+        },
     );
 
     let mut wb_parts = vec![quote! { constructor }];
@@ -1307,6 +1312,11 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
         config.cgctx,
         method_scope,
         &config.from_module(),
+        super::typemap::ReturnAnchor {
+            base: &sig.rust_name,
+            kind: super::typemap::ReturnAnchorKind::Callable,
+            parent: Some(&config.rust_name),
+        },
     );
     let ret = if is_void_return(&sig.return_type) && !sig.catch {
         quote! {}
@@ -1362,6 +1372,11 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
         config.cgctx,
         scope,
         &config.from_module(),
+        super::typemap::ReturnAnchor {
+            base: &sig.rust_name,
+            kind: super::typemap::ReturnAnchorKind::Callable,
+            parent: Some(&config.rust_name),
+        },
     );
     let ret = if is_void_return(&sig.return_type) && !sig.catch {
         quote! {}
@@ -1391,19 +1406,7 @@ fn generate_getter(
     used_names: &mut HashSet<String>,
 ) -> TokenStream {
     let this_type = super::typemap::make_ident(&config.effective_rust_name());
-    // The `?:` marker on the original property widens the rendered
-    // TS shape with `| undefined`; threaded through the augmenter
-    // so the `Returns:` doc matches the static type users see in
-    // their `.d.ts`. Erasure detection runs on the inner type
-    // unchanged.
-    let augmented = super::augment_return_doc(
-        getter.doc.clone(),
-        &getter.type_ref,
-        getter.optional,
-        config.cgctx,
-        config.scope,
-    );
-    let doc = super::doc_tokens(&augmented);
+    let doc = super::doc_tokens(&getter.doc);
 
     let candidate = public_rust_name(&to_snake_case(&getter.js_name));
     let rust_name = dedupe_name(&candidate, used_names);
@@ -1426,12 +1429,20 @@ fn generate_getter(
     } else {
         getter.type_ref.clone()
     };
-    let getter_type = to_syn_type(
+    // Top-level erasing-union return synthesises a dynamic-union
+    // enum (see [`ReturnAnchor`]). For getters the anchor is the
+    // property name itself — no `Return` infix.
+    let anchor = super::typemap::ReturnAnchor {
+        base: &getter.js_name,
+        kind: super::typemap::ReturnAnchorKind::Getter,
+        parent: Some(&config.rust_name),
+    };
+    let getter_type = super::typemap::to_getter_return_type(
         &lowered_ty,
-        TypePosition::RETURN,
         config.cgctx,
         config.scope,
         &config.from_module(),
+        anchor,
     );
 
     let mut wb_parts: Vec<TokenStream> = vec![quote! { method }, quote! { getter }];
@@ -1517,26 +1528,22 @@ fn generate_static_getter(
     used_names: &mut HashSet<String>,
 ) -> TokenStream {
     let class_ident = super::typemap::make_ident(&config.effective_rust_name());
-    // Static getters don't carry an `optional` marker today.
-    let augmented = super::augment_return_doc(
-        getter.doc.clone(),
-        &getter.type_ref,
-        false,
-        config.cgctx,
-        config.scope,
-    );
-    let doc = super::doc_tokens(&augmented);
+    let doc = super::doc_tokens(&getter.doc);
 
     let candidate = public_rust_name(&to_snake_case(&getter.js_name));
     let rust_name = dedupe_name(&candidate, used_names);
     let rust_ident = super::typemap::make_ident(&rust_name);
 
-    let getter_type = to_syn_type(
+    let getter_type = super::typemap::to_getter_return_type(
         &getter.type_ref,
-        TypePosition::RETURN,
         config.cgctx,
         config.scope,
         &config.from_module(),
+        super::typemap::ReturnAnchor {
+            base: &getter.js_name,
+            kind: super::typemap::ReturnAnchorKind::Getter,
+            parent: Some(&config.rust_name),
+        },
     );
 
     let mut wb_parts: Vec<TokenStream> = vec![

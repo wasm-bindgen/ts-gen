@@ -93,6 +93,11 @@ fn generate_expanded_free_function(
         cgctx,
         scope,
         ctx,
+        super::typemap::ReturnAnchor {
+            base: &sig.rust_name,
+            kind: super::typemap::ReturnAnchorKind::Callable,
+            parent: None,
+        },
     );
     let doc = super::doc_tokens(&sig.doc);
     let has_variadic = sig.params.last().is_some_and(|p| p.variadic);
