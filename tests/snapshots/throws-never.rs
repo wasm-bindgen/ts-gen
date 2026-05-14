@@ -54,7 +54,7 @@ extern "C" {
 }
 impl Loaded {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> Loaded {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()

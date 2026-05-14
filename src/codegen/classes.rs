@@ -29,8 +29,8 @@ use std::collections::HashMap;
 
 use crate::codegen::signatures::{
     build_signatures, dedupe_name, generate_concrete_params, generate_dictionary_params,
-    is_void_return, public_rust_name, CallableSpec, ConcreteParam, FunctionSignature,
-    SignatureKind,
+    is_void_return, public_rust_name, render_generic_bounds, CallableSpec, ConcreteParam,
+    FunctionSignature, SignatureKind,
 };
 use crate::codegen::typemap::{to_return_type, CodegenContext, TypePosition};
 use crate::ir::{
@@ -170,15 +170,7 @@ impl<'a> ClassConfig<'a> {
     /// (`<T: ::wasm_bindgen::JsGeneric, …>`) or empty when the type
     /// has no parameters.
     fn type_generics_decl(&self) -> TokenStream {
-        if self.type_params.is_empty() {
-            return quote! {};
-        }
-        let idents = self
-            .type_params
-            .iter()
-            .map(|tp| super::typemap::make_ident(&tp.name))
-            .collect::<Vec<_>>();
-        quote! { <#(#idents: ::wasm_bindgen::JsGeneric),*> }
+        render_generic_bounds(&self.type_param_bounds())
     }
 
     /// Tokens for the type's generic-argument list (`<T, …>`) used in
@@ -194,6 +186,50 @@ impl<'a> ClassConfig<'a> {
             .map(|tp| super::typemap::make_ident(&tp.name))
             .collect::<Vec<_>>();
         quote! { <#(#idents),*> }
+    }
+
+    /// One `T: ::wasm_bindgen::JsGeneric` token stream per type-level
+    /// parameter. Used by per-callable emitters to merge type-level
+    /// bounds with method-local bounds (`<T, ...>` collected from
+    /// signature types) and ABV widening bounds (`<Tn: TypedArray>`)
+    /// into a single `<...>` declaration on each emitted `fn`.
+    fn type_param_bounds(&self) -> Vec<TokenStream> {
+        self.type_params
+            .iter()
+            .map(|tp| {
+                let ident = super::typemap::make_ident(&tp.name);
+                quote! { #ident: ::wasm_bindgen::JsGeneric }
+            })
+            .collect()
+    }
+
+    /// Bounds for type params that appear in any of the supplied
+    /// `TypeRef`s but are **not** type-level — i.e. method/getter/setter
+    /// -local generics introduced by signature types. Each appears as
+    /// `T: ::wasm_bindgen::JsGeneric`, matching the type-level form so
+    /// the two lists can be concatenated by [`render_generic_bounds`].
+    ///
+    /// Names already covered by `self.type_params` are skipped — the
+    /// caller composes the two lists in order (type-level first).
+    fn local_generic_bounds(&self, scope: ScopeId, tys: &[&TypeRef]) -> Vec<TokenStream> {
+        let cgctx = match self.cgctx {
+            Some(c) => c,
+            None => return Vec::new(),
+        };
+        let mut names: Vec<String> = Vec::new();
+        for ty in tys {
+            super::signatures::collect_type_params(ty, cgctx, scope, &mut names);
+        }
+        let type_level: std::collections::HashSet<&str> =
+            self.type_params.iter().map(|tp| tp.name.as_str()).collect();
+        names
+            .into_iter()
+            .filter(|n| !type_level.contains(n.as_str()))
+            .map(|n| {
+                let ident = super::typemap::make_ident(&n);
+                quote! { #ident: ::wasm_bindgen::JsGeneric }
+            })
+            .collect()
     }
 
     /// Rust name to use everywhere the class identifier appears in generated
@@ -333,8 +369,16 @@ pub(crate) fn generate_dictionary_factory_with_passes(
     config: &ClassConfig,
     factory_required_overrides: Option<Vec<Vec<&crate::ir::GetterMember>>>,
 ) -> TokenStream {
-    let rust_type = super::typemap::make_ident(&config.effective_rust_name());
-    let builder_name = super::typemap::make_ident(&format!("{}Builder", config.rust_name));
+    let rust_type_ident = super::typemap::make_ident(&config.effective_rust_name());
+    let builder_name_ident = super::typemap::make_ident(&format!("{}Builder", config.rust_name));
+    // The type's generic-arg list (`<T, …>`) — applied to every
+    // mention of `rust_type` / `builder_name` as a *type*. Empty
+    // for non-generic dictionaries, in which case `quote!`
+    // interpolation leaves the bare identifier intact.
+    let type_args = config.type_generics_args();
+    let type_decl = config.type_generics_decl();
+    let rust_type = quote! { #rust_type_ident #type_args };
+    let builder_name = quote! { #builder_name_ident #type_args };
 
     // If any getter lacks a corresponding setter the type has readonly
     // properties, which means it is not constructible via setters — skip
@@ -359,9 +403,9 @@ pub(crate) fn generate_dictionary_factory_with_passes(
     });
     if has_readonly {
         return quote! {
-            impl #rust_type {
+            impl #type_decl #rust_type {
                 #[allow(clippy::new_without_default)]
-                pub fn new() -> Self {
+                pub fn new() -> #rust_type {
                     #[allow(unused_unsafe)]
                     unsafe { JsValue::from(js_sys::Object::new()).unchecked_into() }
                 }
@@ -759,12 +803,26 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 continue;
             }
             let new_ident = super::typemap::make_ident(&format!("new{full_suffix}"));
-            let (generics, params_tokens) = generate_dictionary_params(
+            let (abv_bounds, params_tokens) = generate_dictionary_params(
                 &plan.value_params,
                 config.cgctx,
                 config.scope,
                 &config.from_module(),
             );
+            // Factory functions live inside `impl<T: ...> Foo<T>`,
+            // which already declares the type-level bounds — Rust
+            // forbids redeclaring them on the `fn`. Only the
+            // method-local bounds (collected from this combo's
+            // value params) and ABV widening bounds belong on the
+            // `fn`'s `<...>`. The extern block, by contrast,
+            // redeclares all bounds because each `pub fn` there is
+            // independent (see `generic_params_for_method`).
+            let mut combo_bounds: Vec<TokenStream> = Vec::new();
+            let combo_param_tys: Vec<&TypeRef> =
+                plan.value_params.iter().map(|p| &p.type_ref).collect();
+            combo_bounds.extend(config.local_generic_bounds(config.scope, &combo_param_tys));
+            combo_bounds.extend(abv_bounds);
+            let generics = render_generic_bounds(&combo_bounds);
             let init_calls = &plan.init_calls;
             let arg_idents = &plan.arg_idents;
 
@@ -794,24 +852,31 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             if pass_emit_builder {
                 // `builder*` returns the wrapper struct so callers can
                 // chain setters; `new*` is just
-                // `Self::builder(reqs).build()`.
+                // `<Type>::<builder>(reqs).build()`.
                 //
                 // No-required case has zero `init_calls`, so we inline
                 // the factory directly into the struct literal where
                 // the field type pins inference. The required-args
-                // case keeps a `let inner: Self` so setter calls
+                // case keeps a `let inner: <Type>` so setter calls
                 // type-resolve before construction.
+                //
+                // Returns are spelled out as `Foo<T>` /
+                // `FooBuilder<T>` rather than `Self`, so the
+                // generic and non-generic cases produce identical
+                // structure and no `Self` substitution is needed
+                // when the body is composed inside an
+                // `impl<T> Foo<T>` block.
                 let builder_body = if init_calls.is_empty() {
                     quote! {
-                        #builder_name {
+                        #builder_name_ident {
                             inner: JsCast::unchecked_into(js_sys::Object::new()),
                         }
                     }
                 } else {
                     quote! {
-                        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+                        let inner: #rust_type = JsCast::unchecked_into(js_sys::Object::new());
                         #(#init_calls)*
-                        #builder_name { inner }
+                        #builder_name_ident { inner }
                     }
                 };
                 let builder_ident = super::typemap::make_ident(&format!("builder{full_suffix}"));
@@ -840,7 +905,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                     }
                 } else {
                     quote! {
-                        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+                        let inner: #rust_type = JsCast::unchecked_into(js_sys::Object::new());
                         #(#init_calls)*
                         inner
                     }
@@ -887,16 +952,16 @@ pub(crate) fn generate_dictionary_factory_with_passes(
 
     if emit_builder {
         quote! {
-            impl #rust_type {
+            impl #type_decl #rust_type {
                 #(#new_variants)*
                 #(#builder_variants)*
             }
 
-            pub struct #builder_name {
+            pub struct #builder_name_ident #type_decl {
                 inner: #rust_type,
             }
 
-            impl #builder_name {
+            impl #type_decl #builder_name {
                 #(#builder_methods)*
 
                 pub fn build(self) -> #rust_type {
@@ -908,7 +973,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         // All-required dictionary: the builder would be empty, so we
         // emit only `new*` factories on the dictionary type itself.
         quote! {
-            impl #rust_type {
+            impl #type_decl #rust_type {
                 #(#new_variants)*
             }
         }
@@ -1202,28 +1267,22 @@ fn generate_type_decl(config: &ClassConfig) -> TokenStream {
 /// wasm-bindgen requires the redeclaration even for type-level
 /// params (see `js_sys::Array::for_each<T: JsGeneric>` for the
 /// canonical pattern).
+///
+/// Bounds are composed in a fixed order: type-level first
+/// (declaration order), then method-local. ABV widening generics
+/// (`<Tn: TypedArray>`) don't apply to methods — they're emitted
+/// only at the dictionary-factory / setter sites that use
+/// [`generate_dictionary_params`].
 fn generic_params_for_method(config: &ClassConfig, sig: &FunctionSignature) -> TokenStream {
-    // Type-level params come first, in declaration order, so
-    // `<T: JsGeneric, U: JsGeneric>` aligns with `this: &Foo<T, U>`.
-    let mut names: Vec<String> = config
-        .type_params
+    let mut bounds = config.type_param_bounds();
+    let sig_tys: Vec<&TypeRef> = sig
+        .params
         .iter()
-        .map(|tp| tp.name.clone())
+        .map(|p| &p.type_ref)
+        .chain(std::iter::once(&sig.return_type))
         .collect();
-    if let Some(cgctx) = config.cgctx {
-        for p in &sig.params {
-            super::signatures::collect_type_params(&p.type_ref, cgctx, sig.body_scope, &mut names);
-        }
-        super::signatures::collect_type_params(&sig.return_type, cgctx, sig.body_scope, &mut names);
-    }
-    if names.is_empty() {
-        return quote! {};
-    }
-    let idents = names
-        .iter()
-        .map(|n| super::typemap::make_ident(n))
-        .collect::<Vec<_>>();
-    quote! { <#(#idents: ::wasm_bindgen::JsGeneric),*> }
+    bounds.extend(config.local_generic_bounds(sig.body_scope, &sig_tys));
+    render_generic_bounds(&bounds)
 }
 
 /// Generate a constructor binding from a resolved signature.
@@ -1451,10 +1510,20 @@ fn generate_getter(
         wb_parts.push(quote! { js_name = #js_name });
     }
 
+    // Thread the type's generic parameters through the binding so a
+    // generic dictionary's getter (e.g. `value(): T` on
+    // `Foo<T>`) compiles. The getter's own return type may also
+    // mention bare type params — fold those in alongside type-level
+    // ones via `local_generic_bounds`.
+    let mut bounds = config.type_param_bounds();
+    bounds.extend(config.local_generic_bounds(config.scope, &[&getter.type_ref]));
+    let fn_generics = render_generic_bounds(&bounds);
+    let this_generics = config.type_generics_args();
+
     quote! {
         #doc
         #[wasm_bindgen(#(#wb_parts),*)]
-        pub fn #rust_ident(this: &#this_type) -> #getter_type;
+        pub fn #rust_ident #fn_generics (this: &#this_type #this_generics) -> #getter_type;
     }
 }
 
@@ -1492,15 +1561,27 @@ fn generate_setter(
         config.scope,
     );
 
+    let this_generics = config.type_generics_args();
     sigs.iter()
         .map(|sig| {
             let rust_ident = super::typemap::make_ident(&sig.rust_name);
-            let (generics, params) = generate_dictionary_params(
+            let (abv_bounds, params) = generate_dictionary_params(
                 &sig.params,
                 config.cgctx,
                 config.scope,
                 &config.from_module(),
             );
+
+            // Type-level first, then method-local (collected from
+            // setter param types), then ABV widening bounds. The
+            // first two share a JsGeneric bound; the third uses
+            // `js_sys::TypedArray`. Composing them in this order
+            // keeps method/getter/setter generics aligned.
+            let mut bounds = config.type_param_bounds();
+            let sig_tys: Vec<&TypeRef> = sig.params.iter().map(|p| &p.type_ref).collect();
+            bounds.extend(config.local_generic_bounds(config.scope, &sig_tys));
+            bounds.extend(abv_bounds);
+            let fn_generics = render_generic_bounds(&bounds);
 
             let mut wb_parts: Vec<TokenStream> = vec![quote! { method }, quote! { setter }];
             if super::typemap::needs_slice_to_array(&sig.params) {
@@ -1515,7 +1596,7 @@ fn generate_setter(
             quote! {
                 #doc
                 #[wasm_bindgen(#(#wb_parts),*)]
-                pub fn #rust_ident #generics (this: &#this_type, #params);
+                pub fn #rust_ident #fn_generics (this: &#this_type #this_generics, #params);
             }
         })
         .collect()
@@ -1555,10 +1636,17 @@ fn generate_static_getter(
         wb_parts.push(quote! { js_name = #js_name });
     }
 
+    // Static getters take no receiver, so no `this` generic args
+    // need plumbing — but the bounds still need redeclaring on the
+    // `fn` for any type params mentioned by the return type.
+    let mut bounds = config.type_param_bounds();
+    bounds.extend(config.local_generic_bounds(config.scope, &[&getter.type_ref]));
+    let fn_generics = render_generic_bounds(&bounds);
+
     quote! {
         #doc
         #[wasm_bindgen(#(#wb_parts),*)]
-        pub fn #rust_ident() -> #getter_type;
+        pub fn #rust_ident #fn_generics () -> #getter_type;
     }
 }
 
@@ -1598,12 +1686,23 @@ fn generate_static_setter(
     sigs.iter()
         .map(|sig| {
             let rust_ident = super::typemap::make_ident(&sig.rust_name);
-            let (generics, params) = generate_dictionary_params(
+            let (abv_bounds, params) = generate_dictionary_params(
                 &sig.params,
                 config.cgctx,
                 config.scope,
                 &config.from_module(),
             );
+
+            // Static setters don't take a `this` receiver, so the
+            // type's generic args don't propagate into the parameter
+            // list, but the bounds must still be redeclared on the
+            // `fn` when the setter param mentions them. ABV bounds
+            // last (see [`generate_setter`]).
+            let mut bounds = config.type_param_bounds();
+            let sig_tys: Vec<&TypeRef> = sig.params.iter().map(|p| &p.type_ref).collect();
+            bounds.extend(config.local_generic_bounds(config.scope, &sig_tys));
+            bounds.extend(abv_bounds);
+            let fn_generics = render_generic_bounds(&bounds);
 
             let mut wb_parts: Vec<TokenStream> = vec![
                 quote! { static_method_of = #class_ident },
@@ -1621,7 +1720,7 @@ fn generate_static_setter(
             quote! {
                 #doc
                 #[wasm_bindgen(#(#wb_parts),*)]
-                pub fn #rust_ident #generics (#params);
+                pub fn #rust_ident #fn_generics (#params);
             }
         })
         .collect()

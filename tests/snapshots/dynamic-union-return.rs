@@ -18,7 +18,7 @@ extern "C" {
 }
 impl Erased {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> Erased {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -39,7 +39,7 @@ extern "C" {
 }
 impl NoErasure {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> NoErasure {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()

@@ -129,7 +129,7 @@ pub mod es_module_lexer {
     }
     impl ImportSpecifier {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> ImportSpecifier {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -227,7 +227,7 @@ pub mod es_module_lexer {
     }
     impl ExportSpecifier {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> ExportSpecifier {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -246,7 +246,7 @@ pub mod es_module_lexer {
     }
     impl ParseError {
         pub fn new(idx: f64) -> ParseError {
-            let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+            let inner: ParseError = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_idx(idx);
             inner
         }

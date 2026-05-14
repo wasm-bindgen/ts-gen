@@ -47,7 +47,7 @@ pub mod console {
             Self::builder(stdout).build()
         }
         pub fn builder(stdout: &Object) -> ConsoleOptionsBuilder {
-            let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+            let inner: ConsoleOptions = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_stdout(stdout);
             ConsoleOptionsBuilder { inner }
         }

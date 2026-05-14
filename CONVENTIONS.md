@@ -1024,6 +1024,84 @@ Methods redeclare every type parameter mentioned in their signature,
 even those inherited from the surrounding type. `js_sys` follows the
 same convention (see `js_sys::Array::for_each<T: JsGeneric>`).
 
+### Type-level generics propagate to every binding site
+
+When the surrounding *type* declares parameters
+(`interface Foo<T> { … }` / `declare class Foo<T> { … }`), those
+parameters thread through every site that mentions `Foo`:
+
+* The `pub type` declaration in the extern block —
+  `pub type Foo<T: ::wasm_bindgen::JsGeneric>;`.
+* Every getter / setter / method `fn` — redeclares
+  `<T: ::wasm_bindgen::JsGeneric>` on the `fn` and uses
+  `this: &Foo<T>`. The redeclaration is mandatory because each
+  `extern "C"` `pub fn` is independent — the bound on `pub type`
+  doesn't propagate to its sibling functions.
+* For dictionaries: the factory `impl<T: ::wasm_bindgen::JsGeneric>
+  Foo<T>` block, the wrapper struct
+  `pub struct FooBuilder<T: ::wasm_bindgen::JsGeneric>`, and the
+  builder `impl<T: ::wasm_bindgen::JsGeneric> FooBuilder<T>`.
+
+Bounds are composed in a fixed order so the output is stable across
+binding sites:
+
+1. **Type-level params** (declared on `Foo<T, …>`), in declaration
+   order. These come first so `<T: JsGeneric, U: JsGeneric>` aligns
+   with `this: &Foo<T, U>`.
+2. **Method-local params** collected from the callable's signature
+   types (return type and parameters). A method's own
+   `method<U>(…)` `U` lands here, behind any type-level params.
+3. **ABV widening synthetics** (`<Tn: TypedArray>`) emitted by
+   `generate_dictionary_params` for `ArrayBufferView` arguments.
+   Always last.
+
+`impl<T: …> Foo<T>` blocks (factories, builders) carry the type-level
+bounds on the `impl` header; methods inside the impl do **not**
+redeclare them (Rust forbids the duplicate). Only method-local
+collected bounds and ABV synthetics appear on `fn`s inside an `impl`.
+
+Return types are spelled out as `Foo<T>` / `FooBuilder<T>` rather than
+`Self`, so the generic and non-generic factory paths emit the same
+structural shape. The factory bodies use `Self::builder(…)` to
+short-hand the static-method call (path position, not type position),
+which works inside both kinds of `impl` blocks.
+
+```ts
+interface EvaluationDetails<T> {
+  flagKey: string;
+  value: T;
+  variant?: string | undefined;
+}
+```
+
+becomes
+
+```rust
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(extends = Object)]
+    pub type EvaluationDetails<T: ::wasm_bindgen::JsGeneric>;
+    #[wasm_bindgen(method, getter, js_name = "flagKey")]
+    pub fn flag_key<T: ::wasm_bindgen::JsGeneric>(this: &EvaluationDetails<T>) -> String;
+    #[wasm_bindgen(method, getter)]
+    pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &EvaluationDetails<T>) -> T;
+    // … setters mirror the getters …
+}
+impl<T: ::wasm_bindgen::JsGeneric> EvaluationDetails<T> {
+    pub fn new(flag_key: &str, value: &T) -> EvaluationDetails<T> {
+        Self::builder(flag_key, value).build()
+    }
+    pub fn builder(flag_key: &str, value: &T) -> EvaluationDetailsBuilder<T> { … }
+}
+pub struct EvaluationDetailsBuilder<T: ::wasm_bindgen::JsGeneric> {
+    inner: EvaluationDetails<T>,
+}
+impl<T: ::wasm_bindgen::JsGeneric> EvaluationDetailsBuilder<T> {
+    pub fn variant(self, val: &str) -> Self { … }
+    pub fn build(self) -> EvaluationDetails<T> { self.inner }
+}
+```
+
 ## `@throws` JSDoc → typed error
 
 ```ts

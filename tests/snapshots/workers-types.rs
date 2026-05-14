@@ -183,7 +183,7 @@ impl WorkerGlobalScopeEventMap {
         unhandledrejection: &PromiseRejectionEvent,
         rejectionhandled: &PromiseRejectionEvent,
     ) -> WorkerGlobalScopeEventMap {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: WorkerGlobalScopeEventMap = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_fetch(fetch);
         inner.set_scheduled(scheduled);
         inner.set_queue(queue);
@@ -585,7 +585,7 @@ pub mod web_assembly {
             Self::builder(value).build()
         }
         pub fn builder(value: &ValueType) -> GlobalDescriptorBuilder {
-            let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+            let inner: GlobalDescriptor = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_value(value);
             GlobalDescriptorBuilder { inner }
         }
@@ -659,7 +659,7 @@ pub mod web_assembly {
             Self::builder(initial).build()
         }
         pub fn builder(initial: f64) -> MemoryDescriptorBuilder {
-            let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+            let inner: MemoryDescriptor = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_initial(initial);
             MemoryDescriptorBuilder { inner }
         }
@@ -722,7 +722,7 @@ pub mod web_assembly {
     }
     impl ModuleExportDescriptor {
         pub fn new(kind: &ImportExportKind, name: &str) -> ModuleExportDescriptor {
-            let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+            let inner: ModuleExportDescriptor = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_kind(kind);
             inner.set_name(name);
             inner
@@ -748,7 +748,7 @@ pub mod web_assembly {
     }
     impl ModuleImportDescriptor {
         pub fn new(kind: &ImportExportKind, module: &str, name: &str) -> ModuleImportDescriptor {
-            let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+            let inner: ModuleImportDescriptor = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_kind(kind);
             inner.set_module(module);
             inner.set_name(name);
@@ -807,7 +807,7 @@ pub mod web_assembly {
             Self::builder(element, initial).build()
         }
         pub fn builder(element: &TableKind, initial: f64) -> TableDescriptorBuilder {
-            let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+            let inner: TableDescriptor = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_element(element);
             inner.set_initial(initial);
             TableDescriptorBuilder { inner }
@@ -1760,9 +1760,9 @@ extern "C" {
         this: &ExecutionContext<Props>,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, getter)]
-    pub fn exports(this: &ExecutionContext) -> Exports;
+    pub fn exports<Props: ::wasm_bindgen::JsGeneric>(this: &ExecutionContext<Props>) -> Exports;
     #[wasm_bindgen(method, getter)]
-    pub fn props(this: &ExecutionContext) -> Props;
+    pub fn props<Props: ::wasm_bindgen::JsGeneric>(this: &ExecutionContext<Props>) -> Props;
 }
 #[allow(dead_code)]
 pub type ExportedHandlerFetchHandler<Env, CfHostMetadata, Props> = Function<
@@ -1802,68 +1802,189 @@ extern "C" {
         Props: ::wasm_bindgen::JsGeneric,
     >;
     #[wasm_bindgen(method, getter)]
-    pub fn fetch(
-        this: &ExportedHandler,
+    pub fn fetch<
+        Env: ::wasm_bindgen::JsGeneric,
+        QueueHandlerMessage: ::wasm_bindgen::JsGeneric,
+        CfHostMetadata: ::wasm_bindgen::JsGeneric,
+        Props: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>,
     ) -> Option<ExportedHandlerFetchHandler<Env, CfHostMetadata, Props>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_fetch(
-        this: &ExportedHandler,
+    pub fn set_fetch<
+        Env: ::wasm_bindgen::JsGeneric,
+        QueueHandlerMessage: ::wasm_bindgen::JsGeneric,
+        CfHostMetadata: ::wasm_bindgen::JsGeneric,
+        Props: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>,
         val: &ExportedHandlerFetchHandler<Env, CfHostMetadata, Props>,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn tail(this: &ExportedHandler) -> Option<ExportedHandlerTailHandler<Env, Props>>;
+    pub fn tail<
+        Env: ::wasm_bindgen::JsGeneric,
+        QueueHandlerMessage: ::wasm_bindgen::JsGeneric,
+        CfHostMetadata: ::wasm_bindgen::JsGeneric,
+        Props: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>,
+    ) -> Option<ExportedHandlerTailHandler<Env, Props>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tail(this: &ExportedHandler, val: &ExportedHandlerTailHandler<Env, Props>);
+    pub fn set_tail<
+        Env: ::wasm_bindgen::JsGeneric,
+        QueueHandlerMessage: ::wasm_bindgen::JsGeneric,
+        CfHostMetadata: ::wasm_bindgen::JsGeneric,
+        Props: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>,
+        val: &ExportedHandlerTailHandler<Env, Props>,
+    );
     #[wasm_bindgen(method, getter)]
-    pub fn trace(this: &ExportedHandler) -> Option<ExportedHandlerTraceHandler<Env, Props>>;
+    pub fn trace<
+        Env: ::wasm_bindgen::JsGeneric,
+        QueueHandlerMessage: ::wasm_bindgen::JsGeneric,
+        CfHostMetadata: ::wasm_bindgen::JsGeneric,
+        Props: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>,
+    ) -> Option<ExportedHandlerTraceHandler<Env, Props>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_trace(this: &ExportedHandler, val: &ExportedHandlerTraceHandler<Env, Props>);
+    pub fn set_trace<
+        Env: ::wasm_bindgen::JsGeneric,
+        QueueHandlerMessage: ::wasm_bindgen::JsGeneric,
+        CfHostMetadata: ::wasm_bindgen::JsGeneric,
+        Props: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>,
+        val: &ExportedHandlerTraceHandler<Env, Props>,
+    );
     #[wasm_bindgen(method, getter, js_name = "tailStream")]
-    pub fn tail_stream(
-        this: &ExportedHandler,
+    pub fn tail_stream<
+        Env: ::wasm_bindgen::JsGeneric,
+        QueueHandlerMessage: ::wasm_bindgen::JsGeneric,
+        CfHostMetadata: ::wasm_bindgen::JsGeneric,
+        Props: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>,
     ) -> Option<ExportedHandlerTailStreamHandler<Env, Props>>;
     #[wasm_bindgen(method, setter, js_name = "tailStream")]
-    pub fn set_tail_stream(
-        this: &ExportedHandler,
+    pub fn set_tail_stream<
+        Env: ::wasm_bindgen::JsGeneric,
+        QueueHandlerMessage: ::wasm_bindgen::JsGeneric,
+        CfHostMetadata: ::wasm_bindgen::JsGeneric,
+        Props: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>,
         val: &ExportedHandlerTailStreamHandler<Env, Props>,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn scheduled(this: &ExportedHandler)
-        -> Option<ExportedHandlerScheduledHandler<Env, Props>>;
+    pub fn scheduled<
+        Env: ::wasm_bindgen::JsGeneric,
+        QueueHandlerMessage: ::wasm_bindgen::JsGeneric,
+        CfHostMetadata: ::wasm_bindgen::JsGeneric,
+        Props: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>,
+    ) -> Option<ExportedHandlerScheduledHandler<Env, Props>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_scheduled(this: &ExportedHandler, val: &ExportedHandlerScheduledHandler<Env, Props>);
+    pub fn set_scheduled<
+        Env: ::wasm_bindgen::JsGeneric,
+        QueueHandlerMessage: ::wasm_bindgen::JsGeneric,
+        CfHostMetadata: ::wasm_bindgen::JsGeneric,
+        Props: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>,
+        val: &ExportedHandlerScheduledHandler<Env, Props>,
+    );
     #[wasm_bindgen(method, getter)]
-    pub fn test(this: &ExportedHandler) -> Option<ExportedHandlerTestHandler<Env, Props>>;
+    pub fn test<
+        Env: ::wasm_bindgen::JsGeneric,
+        QueueHandlerMessage: ::wasm_bindgen::JsGeneric,
+        CfHostMetadata: ::wasm_bindgen::JsGeneric,
+        Props: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>,
+    ) -> Option<ExportedHandlerTestHandler<Env, Props>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_test(this: &ExportedHandler, val: &ExportedHandlerTestHandler<Env, Props>);
+    pub fn set_test<
+        Env: ::wasm_bindgen::JsGeneric,
+        QueueHandlerMessage: ::wasm_bindgen::JsGeneric,
+        CfHostMetadata: ::wasm_bindgen::JsGeneric,
+        Props: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>,
+        val: &ExportedHandlerTestHandler<Env, Props>,
+    );
     #[wasm_bindgen(method, getter)]
-    pub fn email(this: &ExportedHandler) -> Option<EmailExportedHandler<Env, Props>>;
+    pub fn email<
+        Env: ::wasm_bindgen::JsGeneric,
+        QueueHandlerMessage: ::wasm_bindgen::JsGeneric,
+        CfHostMetadata: ::wasm_bindgen::JsGeneric,
+        Props: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>,
+    ) -> Option<EmailExportedHandler<Env, Props>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_email(this: &ExportedHandler, val: &EmailExportedHandler<Env, Props>);
+    pub fn set_email<
+        Env: ::wasm_bindgen::JsGeneric,
+        QueueHandlerMessage: ::wasm_bindgen::JsGeneric,
+        CfHostMetadata: ::wasm_bindgen::JsGeneric,
+        Props: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>,
+        val: &EmailExportedHandler<Env, Props>,
+    );
     #[wasm_bindgen(method, getter)]
-    pub fn queue(
-        this: &ExportedHandler,
+    pub fn queue<
+        Env: ::wasm_bindgen::JsGeneric,
+        QueueHandlerMessage: ::wasm_bindgen::JsGeneric,
+        CfHostMetadata: ::wasm_bindgen::JsGeneric,
+        Props: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>,
     ) -> Option<ExportedHandlerQueueHandler<Env, QueueHandlerMessage, Props>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_queue(
-        this: &ExportedHandler,
+    pub fn set_queue<
+        Env: ::wasm_bindgen::JsGeneric,
+        QueueHandlerMessage: ::wasm_bindgen::JsGeneric,
+        CfHostMetadata: ::wasm_bindgen::JsGeneric,
+        Props: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>,
         val: &ExportedHandlerQueueHandler<Env, QueueHandlerMessage, Props>,
     );
 }
-impl ExportedHandler {
-    pub fn new() -> ExportedHandler {
+impl<
+        Env: ::wasm_bindgen::JsGeneric,
+        QueueHandlerMessage: ::wasm_bindgen::JsGeneric,
+        CfHostMetadata: ::wasm_bindgen::JsGeneric,
+        Props: ::wasm_bindgen::JsGeneric,
+    > ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>
+{
+    pub fn new() -> ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props> {
         Self::builder().build()
     }
-    pub fn builder() -> ExportedHandlerBuilder {
+    pub fn builder() -> ExportedHandlerBuilder<Env, QueueHandlerMessage, CfHostMetadata, Props> {
         ExportedHandlerBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
-pub struct ExportedHandlerBuilder {
-    inner: ExportedHandler,
+pub struct ExportedHandlerBuilder<
+    Env: ::wasm_bindgen::JsGeneric,
+    QueueHandlerMessage: ::wasm_bindgen::JsGeneric,
+    CfHostMetadata: ::wasm_bindgen::JsGeneric,
+    Props: ::wasm_bindgen::JsGeneric,
+> {
+    inner: ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props>,
 }
-impl ExportedHandlerBuilder {
+impl<
+        Env: ::wasm_bindgen::JsGeneric,
+        QueueHandlerMessage: ::wasm_bindgen::JsGeneric,
+        CfHostMetadata: ::wasm_bindgen::JsGeneric,
+        Props: ::wasm_bindgen::JsGeneric,
+    > ExportedHandlerBuilder<Env, QueueHandlerMessage, CfHostMetadata, Props>
+{
     pub fn fetch(self, val: &ExportedHandlerFetchHandler<Env, CfHostMetadata, Props>) -> Self {
         self.inner.set_fetch(val);
         self
@@ -1896,7 +2017,7 @@ impl ExportedHandlerBuilder {
         self.inner.set_queue(val);
         self
     }
-    pub fn build(self) -> ExportedHandler {
+    pub fn build(self) -> ExportedHandler<Env, QueueHandlerMessage, CfHostMetadata, Props> {
         self.inner
     }
 }
@@ -2034,7 +2155,7 @@ extern "C" {
 }
 impl AlarmInvocationInfo {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> AlarmInvocationInfo {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -2051,7 +2172,7 @@ extern "C" {
 }
 impl Cloudflare {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> Cloudflare {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -2397,17 +2518,26 @@ extern "C" {
         promise: &Promise,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, getter)]
-    pub fn exports(this: &DurableObjectState) -> Exports;
+    pub fn exports<Props: ::wasm_bindgen::JsGeneric>(this: &DurableObjectState<Props>) -> Exports;
     #[wasm_bindgen(method, getter)]
-    pub fn props(this: &DurableObjectState) -> Props;
+    pub fn props<Props: ::wasm_bindgen::JsGeneric>(this: &DurableObjectState<Props>) -> Props;
     #[wasm_bindgen(method, getter)]
-    pub fn id(this: &DurableObjectState) -> DurableObjectId;
+    pub fn id<Props: ::wasm_bindgen::JsGeneric>(
+        this: &DurableObjectState<Props>,
+    ) -> DurableObjectId;
     #[wasm_bindgen(method, getter)]
-    pub fn storage(this: &DurableObjectState) -> DurableObjectStorage;
+    pub fn storage<Props: ::wasm_bindgen::JsGeneric>(
+        this: &DurableObjectState<Props>,
+    ) -> DurableObjectStorage;
     #[wasm_bindgen(method, getter)]
-    pub fn container(this: &DurableObjectState) -> Option<Container>;
+    pub fn container<Props: ::wasm_bindgen::JsGeneric>(
+        this: &DurableObjectState<Props>,
+    ) -> Option<Container>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_container(this: &DurableObjectState, val: &Container);
+    pub fn set_container<Props: ::wasm_bindgen::JsGeneric>(
+        this: &DurableObjectState<Props>,
+        val: &Container,
+    );
     #[wasm_bindgen(method, catch, js_name = "blockConcurrencyWhile")]
     pub async fn block_concurrency_while<
         Props: ::wasm_bindgen::JsGeneric,
@@ -3638,7 +3768,7 @@ extern "C" {
 }
 impl EventTargetHandlerObject {
     pub fn new(handle_event: &Function<fn(Event) -> JsValue>) -> EventTargetHandlerObject {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: EventTargetHandlerObject = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_handle_event(handle_event);
         inner
     }
@@ -3824,7 +3954,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/CustomEvent/detail)"]
     #[wasm_bindgen(method, getter)]
-    pub fn detail(this: &CustomEvent) -> T;
+    pub fn detail<T: ::wasm_bindgen::JsGeneric>(this: &CustomEvent<T>) -> T;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -4902,7 +5032,7 @@ extern "C" {
 }
 impl CryptoKeyPair {
     pub fn new(public_key: &CryptoKey, private_key: &CryptoKey) -> CryptoKeyPair {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: CryptoKeyPair = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_public_key(public_key);
         inner.set_private_key(private_key);
         inner
@@ -4991,7 +5121,7 @@ impl JsonWebKey {
         Self::builder(kty).build()
     }
     pub fn builder(kty: &str) -> JsonWebKeyBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: JsonWebKey = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_kty(kty);
         JsonWebKeyBuilder { inner }
     }
@@ -5170,7 +5300,7 @@ impl SubtleCryptoDeriveKeyAlgorithm {
         Self::builder(name).build()
     }
     pub fn builder(name: &str) -> SubtleCryptoDeriveKeyAlgorithmBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: SubtleCryptoDeriveKeyAlgorithm = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         SubtleCryptoDeriveKeyAlgorithmBuilder { inner }
     }
@@ -5274,7 +5404,7 @@ impl SubtleCryptoEncryptAlgorithm {
         Self::builder(name).build()
     }
     pub fn builder(name: &str) -> SubtleCryptoEncryptAlgorithmBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: SubtleCryptoEncryptAlgorithm = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         SubtleCryptoEncryptAlgorithmBuilder { inner }
     }
@@ -5372,7 +5502,7 @@ impl SubtleCryptoGenerateKeyAlgorithm {
         Self::builder(name).build()
     }
     pub fn builder(name: &str) -> SubtleCryptoGenerateKeyAlgorithmBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: SubtleCryptoGenerateKeyAlgorithm = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         SubtleCryptoGenerateKeyAlgorithmBuilder { inner }
     }
@@ -5425,7 +5555,7 @@ extern "C" {
 }
 impl SubtleCryptoHashAlgorithm {
     pub fn new(name: &str) -> SubtleCryptoHashAlgorithm {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: SubtleCryptoHashAlgorithm = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         inner
     }
@@ -5466,7 +5596,7 @@ impl SubtleCryptoImportKeyAlgorithm {
         Self::builder(name).build()
     }
     pub fn builder(name: &str) -> SubtleCryptoImportKeyAlgorithmBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: SubtleCryptoImportKeyAlgorithm = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         SubtleCryptoImportKeyAlgorithmBuilder { inner }
     }
@@ -5531,7 +5661,7 @@ impl SubtleCryptoSignAlgorithm {
         Self::builder(name).build()
     }
     pub fn builder(name: &str) -> SubtleCryptoSignAlgorithmBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: SubtleCryptoSignAlgorithm = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         SubtleCryptoSignAlgorithmBuilder { inner }
     }
@@ -5572,7 +5702,7 @@ extern "C" {
 }
 impl CryptoKeyKeyAlgorithm {
     pub fn new(name: &str) -> CryptoKeyKeyAlgorithm {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: CryptoKeyKeyAlgorithm = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         inner
     }
@@ -5593,7 +5723,7 @@ extern "C" {
 }
 impl CryptoKeyAesKeyAlgorithm {
     pub fn new(name: &str, length: f64) -> CryptoKeyAesKeyAlgorithm {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: CryptoKeyAesKeyAlgorithm = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         inner.set_length(length);
         inner
@@ -5619,7 +5749,7 @@ extern "C" {
 }
 impl CryptoKeyHmacKeyAlgorithm {
     pub fn new(name: &str, hash: &CryptoKeyKeyAlgorithm, length: f64) -> CryptoKeyHmacKeyAlgorithm {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: CryptoKeyHmacKeyAlgorithm = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         inner.set_hash(hash);
         inner.set_length(length);
@@ -5673,7 +5803,7 @@ impl CryptoKeyRsaKeyAlgorithm {
         modulus_length: f64,
         public_exponent: &ArrayBuffer,
     ) -> CryptoKeyRsaKeyAlgorithmBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: CryptoKeyRsaKeyAlgorithm = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         inner.set_modulus_length(modulus_length);
         inner.set_public_exponent(public_exponent);
@@ -5684,7 +5814,7 @@ impl CryptoKeyRsaKeyAlgorithm {
         modulus_length: f64,
         public_exponent: &T,
     ) -> CryptoKeyRsaKeyAlgorithmBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: CryptoKeyRsaKeyAlgorithm = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         inner.set_modulus_length(modulus_length);
         inner.set_public_exponent_with_typed_array(public_exponent);
@@ -5719,7 +5849,7 @@ extern "C" {
 }
 impl CryptoKeyEllipticKeyAlgorithm {
     pub fn new(name: &str, named_curve: &str) -> CryptoKeyEllipticKeyAlgorithm {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: CryptoKeyEllipticKeyAlgorithm = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         inner.set_named_curve(named_curve);
         inner
@@ -5752,7 +5882,7 @@ impl CryptoKeyArbitraryKeyAlgorithm {
         Self::builder(name).build()
     }
     pub fn builder(name: &str) -> CryptoKeyArbitraryKeyAlgorithmBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: CryptoKeyArbitraryKeyAlgorithm = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         CryptoKeyArbitraryKeyAlgorithmBuilder { inner }
     }
@@ -5950,7 +6080,7 @@ extern "C" {
 }
 impl TextDecoderConstructorOptions {
     pub fn new(fatal: bool, ignore_bom: bool) -> TextDecoderConstructorOptions {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: TextDecoderConstructorOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_fatal(fatal);
         inner.set_ignore_bom(ignore_bom);
         inner
@@ -5968,7 +6098,7 @@ extern "C" {
 }
 impl TextDecoderDecodeOptions {
     pub fn new(stream: bool) -> TextDecoderDecodeOptions {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: TextDecoderDecodeOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_stream(stream);
         inner
     }
@@ -5989,7 +6119,7 @@ extern "C" {
 }
 impl TextEncoderEncodeIntoResult {
     pub fn new(read: f64, written: f64) -> TextEncoderEncodeIntoResult {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: TextEncoderEncodeIntoResult = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_read(read);
         inner.set_written(written);
         inner
@@ -6144,12 +6274,12 @@ extern "C" {
 }
 impl MessageEventInit {
     pub fn new(data: &ArrayBuffer) -> MessageEventInit {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: MessageEventInit = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_data(data);
         inner
     }
     pub fn new_with_str(data: &str) -> MessageEventInit {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: MessageEventInit = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_data_with_str(data);
         inner
     }
@@ -6486,7 +6616,7 @@ extern "C" {
 }
 impl Doctype {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> Doctype {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -7674,66 +7804,116 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/method)"]
     #[wasm_bindgen(method, getter)]
-    pub fn method(this: &Request) -> String;
+    pub fn method<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
+        this: &Request<CfHostMetadata, Cf>,
+    ) -> String;
     #[wasm_bindgen(method, setter)]
-    pub fn set_method(this: &Request, val: &str);
+    pub fn set_method<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
+        this: &Request<CfHostMetadata, Cf>,
+        val: &str,
+    );
     #[doc = " The **`url`** read-only property of the Request interface contains the URL of the request."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/url)"]
     #[wasm_bindgen(method, getter)]
-    pub fn url(this: &Request) -> String;
+    pub fn url<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
+        this: &Request<CfHostMetadata, Cf>,
+    ) -> String;
     #[wasm_bindgen(method, setter)]
-    pub fn set_url(this: &Request, val: &str);
+    pub fn set_url<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
+        this: &Request<CfHostMetadata, Cf>,
+        val: &str,
+    );
     #[doc = " The **`headers`** read-only property of the with the request."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/headers)"]
     #[wasm_bindgen(method, getter)]
-    pub fn headers(this: &Request) -> Headers;
+    pub fn headers<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
+        this: &Request<CfHostMetadata, Cf>,
+    ) -> Headers;
     #[wasm_bindgen(method, setter)]
-    pub fn set_headers(this: &Request, val: &Headers);
+    pub fn set_headers<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
+        this: &Request<CfHostMetadata, Cf>,
+        val: &Headers,
+    );
     #[doc = " The **`redirect`** read-only property of the Request interface contains the mode for how redirects are handled."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/redirect)"]
     #[wasm_bindgen(method, getter)]
-    pub fn redirect(this: &Request) -> String;
+    pub fn redirect<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
+        this: &Request<CfHostMetadata, Cf>,
+    ) -> String;
     #[wasm_bindgen(method, setter)]
-    pub fn set_redirect(this: &Request, val: &str);
+    pub fn set_redirect<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
+        this: &Request<CfHostMetadata, Cf>,
+        val: &str,
+    );
     #[wasm_bindgen(method, getter)]
-    pub fn fetcher(this: &Request) -> JsValue;
+    pub fn fetcher<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
+        this: &Request<CfHostMetadata, Cf>,
+    ) -> JsValue;
     #[wasm_bindgen(method, setter)]
-    pub fn set_fetcher(this: &Request, val: &JsValue);
+    pub fn set_fetcher<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
+        this: &Request<CfHostMetadata, Cf>,
+        val: &JsValue,
+    );
     #[doc = " The read-only **`signal`** property of the Request interface returns the AbortSignal associated with the request."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/signal)"]
     #[wasm_bindgen(method, getter)]
-    pub fn signal(this: &Request) -> AbortSignal;
+    pub fn signal<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
+        this: &Request<CfHostMetadata, Cf>,
+    ) -> AbortSignal;
     #[wasm_bindgen(method, setter)]
-    pub fn set_signal(this: &Request, val: &AbortSignal);
+    pub fn set_signal<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
+        this: &Request<CfHostMetadata, Cf>,
+        val: &AbortSignal,
+    );
     #[wasm_bindgen(method, getter)]
-    pub fn cf(this: &Request) -> Option<Cf>;
+    pub fn cf<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
+        this: &Request<CfHostMetadata, Cf>,
+    ) -> Option<Cf>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_cf(this: &Request, val: &Cf);
+    pub fn set_cf<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
+        this: &Request<CfHostMetadata, Cf>,
+        val: &Cf,
+    );
     #[doc = " The **`integrity`** read-only property of the Request interface contains the subresource integrity value of the request."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/integrity)"]
     #[wasm_bindgen(method, getter)]
-    pub fn integrity(this: &Request) -> String;
+    pub fn integrity<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
+        this: &Request<CfHostMetadata, Cf>,
+    ) -> String;
     #[wasm_bindgen(method, setter)]
-    pub fn set_integrity(this: &Request, val: &str);
+    pub fn set_integrity<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
+        this: &Request<CfHostMetadata, Cf>,
+        val: &str,
+    );
     #[doc = " The **`keepalive`** read-only property of the Request interface contains the request's `keepalive` setting (`true` or `false`), which indicates whether the browser will keep the associated request alive if the page that initiated it is unloaded before the request is complete."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/keepalive)"]
     #[wasm_bindgen(method, getter)]
-    pub fn keepalive(this: &Request) -> bool;
+    pub fn keepalive<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
+        this: &Request<CfHostMetadata, Cf>,
+    ) -> bool;
     #[wasm_bindgen(method, setter)]
-    pub fn set_keepalive(this: &Request, val: bool);
+    pub fn set_keepalive<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
+        this: &Request<CfHostMetadata, Cf>,
+        val: bool,
+    );
     #[doc = " The **`cache`** read-only property of the Request interface contains the cache mode of the request."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/cache)"]
     #[wasm_bindgen(method, getter)]
-    pub fn cache(this: &Request) -> Option<CacheKind>;
+    pub fn cache<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
+        this: &Request<CfHostMetadata, Cf>,
+    ) -> Option<CacheKind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_cache(this: &Request, val: &str);
+    pub fn set_cache<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
+        this: &Request<CfHostMetadata, Cf>,
+        val: &str,
+    );
 }
 #[wasm_bindgen]
 extern "C" {
@@ -7741,78 +7921,107 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type RequestInit<Cf: ::wasm_bindgen::JsGeneric>;
     #[wasm_bindgen(method, getter)]
-    pub fn method(this: &RequestInit) -> Option<String>;
+    pub fn method<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>) -> Option<String>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_method(this: &RequestInit, val: &str);
+    pub fn set_method<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn headers(this: &RequestInit) -> JsValue;
+    pub fn headers<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>) -> JsValue;
     #[wasm_bindgen(method, setter)]
-    pub fn set_headers(this: &RequestInit, val: &Headers);
+    pub fn set_headers<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
-    pub fn set_headers_with_iterable(this: &RequestInit, val: &JsValue);
+    pub fn set_headers_with_iterable<Cf: ::wasm_bindgen::JsGeneric>(
+        this: &RequestInit<Cf>,
+        val: &JsValue,
+    );
     #[wasm_bindgen(method, setter, js_name = "headers")]
-    pub fn set_headers_with_record(this: &RequestInit, val: &Object<JsString>);
+    pub fn set_headers_with_record<Cf: ::wasm_bindgen::JsGeneric>(
+        this: &RequestInit<Cf>,
+        val: &Object<JsString>,
+    );
     #[wasm_bindgen(method, getter)]
-    pub fn body(this: &RequestInit) -> JsValue;
+    pub fn body<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>) -> JsValue;
     #[wasm_bindgen(method, setter)]
-    pub fn set_body(this: &RequestInit, val: &ReadableStream<Uint8Array>);
+    pub fn set_body<Cf: ::wasm_bindgen::JsGeneric>(
+        this: &RequestInit<Cf>,
+        val: &ReadableStream<Uint8Array>,
+    );
     #[wasm_bindgen(method, setter, js_name = "body")]
-    pub fn set_body_with_str(this: &RequestInit, val: &str);
+    pub fn set_body_with_str<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>, val: &str);
     #[wasm_bindgen(method, setter, js_name = "body")]
-    pub fn set_body_with_array_buffer(this: &RequestInit, val: &ArrayBuffer);
+    pub fn set_body_with_array_buffer<Cf: ::wasm_bindgen::JsGeneric>(
+        this: &RequestInit<Cf>,
+        val: &ArrayBuffer,
+    );
     #[wasm_bindgen(method, setter, js_name = "body")]
-    pub fn set_body_with_typed_array<T: ::js_sys::TypedArray>(this: &RequestInit, val: &T);
+    pub fn set_body_with_typed_array<Cf: ::wasm_bindgen::JsGeneric, T: ::js_sys::TypedArray>(
+        this: &RequestInit<Cf>,
+        val: &T,
+    );
     #[wasm_bindgen(method, setter, js_name = "body")]
-    pub fn set_body_with_blob(this: &RequestInit, val: &Blob);
+    pub fn set_body_with_blob<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>, val: &Blob);
     #[wasm_bindgen(method, setter, js_name = "body")]
-    pub fn set_body_with_url_search_params(this: &RequestInit, val: &URLSearchParams);
+    pub fn set_body_with_url_search_params<Cf: ::wasm_bindgen::JsGeneric>(
+        this: &RequestInit<Cf>,
+        val: &URLSearchParams,
+    );
     #[wasm_bindgen(method, setter, js_name = "body")]
-    pub fn set_body_with_form_data(this: &RequestInit, val: &FormData);
+    pub fn set_body_with_form_data<Cf: ::wasm_bindgen::JsGeneric>(
+        this: &RequestInit<Cf>,
+        val: &FormData,
+    );
     #[wasm_bindgen(method, setter, js_name = "body")]
-    pub fn set_body_with_iterable(this: &RequestInit, val: &JsValue);
+    pub fn set_body_with_iterable<Cf: ::wasm_bindgen::JsGeneric>(
+        this: &RequestInit<Cf>,
+        val: &JsValue,
+    );
     #[wasm_bindgen(method, getter)]
-    pub fn redirect(this: &RequestInit) -> Option<String>;
+    pub fn redirect<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>) -> Option<String>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_redirect(this: &RequestInit, val: &str);
+    pub fn set_redirect<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn fetcher(this: &RequestInit) -> JsValue;
+    pub fn fetcher<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>) -> JsValue;
     #[wasm_bindgen(method, setter)]
-    pub fn set_fetcher(this: &RequestInit, val: &JsValue);
+    pub fn set_fetcher<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>, val: &JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn cf(this: &RequestInit) -> Option<Cf>;
+    pub fn cf<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>) -> Option<Cf>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_cf(this: &RequestInit, val: &Cf);
+    pub fn set_cf<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>, val: &Cf);
     #[wasm_bindgen(method, getter)]
-    pub fn cache(this: &RequestInit) -> Option<CacheKind>;
+    pub fn cache<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>) -> Option<CacheKind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_cache(this: &RequestInit, val: &str);
+    pub fn set_cache<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn integrity(this: &RequestInit) -> Option<String>;
+    pub fn integrity<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>) -> Option<String>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_integrity(this: &RequestInit, val: &str);
+    pub fn set_integrity<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn signal(this: &RequestInit) -> Option<AbortSignal>;
+    pub fn signal<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>) -> Option<AbortSignal>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_signal(this: &RequestInit, val: &AbortSignal);
+    pub fn set_signal<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>, val: &AbortSignal);
     #[wasm_bindgen(method, getter, js_name = "encodeResponseBody")]
-    pub fn encode_response_body(this: &RequestInit) -> Option<EncodeBodyKind>;
+    pub fn encode_response_body<Cf: ::wasm_bindgen::JsGeneric>(
+        this: &RequestInit<Cf>,
+    ) -> Option<EncodeBodyKind>;
     #[wasm_bindgen(method, setter, js_name = "encodeResponseBody")]
-    pub fn set_encode_response_body(this: &RequestInit, val: &str);
+    pub fn set_encode_response_body<Cf: ::wasm_bindgen::JsGeneric>(
+        this: &RequestInit<Cf>,
+        val: &str,
+    );
 }
-impl RequestInit {
-    pub fn new() -> RequestInit {
+impl<Cf: ::wasm_bindgen::JsGeneric> RequestInit<Cf> {
+    pub fn new() -> RequestInit<Cf> {
         Self::builder().build()
     }
-    pub fn builder() -> RequestInitBuilder {
+    pub fn builder() -> RequestInitBuilder<Cf> {
         RequestInitBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
-pub struct RequestInitBuilder {
-    inner: RequestInit,
+pub struct RequestInitBuilder<Cf: ::wasm_bindgen::JsGeneric> {
+    inner: RequestInit<Cf>,
 }
-impl RequestInitBuilder {
+impl<Cf: ::wasm_bindgen::JsGeneric> RequestInitBuilder<Cf> {
     pub fn method(self, val: &str) -> Self {
         self.inner.set_method(val);
         self
@@ -7889,7 +8098,7 @@ impl RequestInitBuilder {
         self.inner.set_encode_response_body(val);
         self
     }
-    pub fn build(self) -> RequestInit {
+    pub fn build(self) -> RequestInit<Cf> {
         self.inner
     }
 }
@@ -7906,32 +8115,55 @@ extern "C" {
         Key: ::wasm_bindgen::JsGeneric,
     >;
     #[wasm_bindgen(method, getter)]
-    pub fn name(this: &KVNamespaceListKey) -> Key;
+    pub fn name<Metadata: ::wasm_bindgen::JsGeneric, Key: ::wasm_bindgen::JsGeneric>(
+        this: &KVNamespaceListKey<Metadata, Key>,
+    ) -> Key;
     #[wasm_bindgen(method, setter)]
-    pub fn set_name(this: &KVNamespaceListKey, val: &Key);
+    pub fn set_name<Metadata: ::wasm_bindgen::JsGeneric, Key: ::wasm_bindgen::JsGeneric>(
+        this: &KVNamespaceListKey<Metadata, Key>,
+        val: &Key,
+    );
     #[wasm_bindgen(method, getter)]
-    pub fn expiration(this: &KVNamespaceListKey) -> Option<f64>;
+    pub fn expiration<Metadata: ::wasm_bindgen::JsGeneric, Key: ::wasm_bindgen::JsGeneric>(
+        this: &KVNamespaceListKey<Metadata, Key>,
+    ) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_expiration(this: &KVNamespaceListKey, val: f64);
+    pub fn set_expiration<Metadata: ::wasm_bindgen::JsGeneric, Key: ::wasm_bindgen::JsGeneric>(
+        this: &KVNamespaceListKey<Metadata, Key>,
+        val: f64,
+    );
     #[wasm_bindgen(method, getter)]
-    pub fn metadata(this: &KVNamespaceListKey) -> Option<Metadata>;
+    pub fn metadata<Metadata: ::wasm_bindgen::JsGeneric, Key: ::wasm_bindgen::JsGeneric>(
+        this: &KVNamespaceListKey<Metadata, Key>,
+    ) -> Option<Metadata>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_metadata(this: &KVNamespaceListKey, val: &Metadata);
+    pub fn set_metadata<Metadata: ::wasm_bindgen::JsGeneric, Key: ::wasm_bindgen::JsGeneric>(
+        this: &KVNamespaceListKey<Metadata, Key>,
+        val: &Metadata,
+    );
 }
-impl KVNamespaceListKey {
-    pub fn new(name: &Key) -> KVNamespaceListKey {
+impl<Metadata: ::wasm_bindgen::JsGeneric, Key: ::wasm_bindgen::JsGeneric>
+    KVNamespaceListKey<Metadata, Key>
+{
+    pub fn new(name: &Key) -> KVNamespaceListKey<Metadata, Key> {
         Self::builder(name).build()
     }
-    pub fn builder(name: &Key) -> KVNamespaceListKeyBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+    pub fn builder(name: &Key) -> KVNamespaceListKeyBuilder<Metadata, Key> {
+        let inner: KVNamespaceListKey<Metadata, Key> =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         KVNamespaceListKeyBuilder { inner }
     }
 }
-pub struct KVNamespaceListKeyBuilder {
-    inner: KVNamespaceListKey,
+pub struct KVNamespaceListKeyBuilder<
+    Metadata: ::wasm_bindgen::JsGeneric,
+    Key: ::wasm_bindgen::JsGeneric,
+> {
+    inner: KVNamespaceListKey<Metadata, Key>,
 }
-impl KVNamespaceListKeyBuilder {
+impl<Metadata: ::wasm_bindgen::JsGeneric, Key: ::wasm_bindgen::JsGeneric>
+    KVNamespaceListKeyBuilder<Metadata, Key>
+{
     pub fn expiration(self, val: f64) -> Self {
         self.inner.set_expiration(val);
         self
@@ -7940,7 +8172,7 @@ impl KVNamespaceListKeyBuilder {
         self.inner.set_metadata(val);
         self
     }
-    pub fn build(self) -> KVNamespaceListKey {
+    pub fn build(self) -> KVNamespaceListKey<Metadata, Key> {
         self.inner
     }
 }
@@ -7975,7 +8207,7 @@ impl KVNamespaceListResult {
         cursor: &str,
         cache_status: Option<&str>,
     ) -> KVNamespaceListResult {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: KVNamespaceListResult = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_list_complete(false);
         inner.set_keys(keys);
         inner.set_cursor(cursor);
@@ -7998,7 +8230,7 @@ impl KVNamespaceListResult {
         keys: &[KVNamespaceListKey<Metadata, Key>],
         cache_status: Option<&str>,
     ) -> KVNamespaceListResultBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: KVNamespaceListResult = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_list_complete(true);
         inner.set_keys(keys);
         inner.set_cache_status(cache_status);
@@ -8262,33 +8494,41 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KVNamespaceGetOptions<Type: ::wasm_bindgen::JsGeneric>;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &KVNamespaceGetOptions) -> Type;
+    pub fn type_<Type: ::wasm_bindgen::JsGeneric>(this: &KVNamespaceGetOptions<Type>) -> Type;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type(this: &KVNamespaceGetOptions, val: &Type);
+    pub fn set_type<Type: ::wasm_bindgen::JsGeneric>(
+        this: &KVNamespaceGetOptions<Type>,
+        val: &Type,
+    );
     #[wasm_bindgen(method, getter, js_name = "cacheTtl")]
-    pub fn cache_ttl(this: &KVNamespaceGetOptions) -> Option<f64>;
+    pub fn cache_ttl<Type: ::wasm_bindgen::JsGeneric>(
+        this: &KVNamespaceGetOptions<Type>,
+    ) -> Option<f64>;
     #[wasm_bindgen(method, setter, js_name = "cacheTtl")]
-    pub fn set_cache_ttl(this: &KVNamespaceGetOptions, val: f64);
+    pub fn set_cache_ttl<Type: ::wasm_bindgen::JsGeneric>(
+        this: &KVNamespaceGetOptions<Type>,
+        val: f64,
+    );
 }
-impl KVNamespaceGetOptions {
-    pub fn new(r#type: &Type) -> KVNamespaceGetOptions {
+impl<Type: ::wasm_bindgen::JsGeneric> KVNamespaceGetOptions<Type> {
+    pub fn new(r#type: &Type) -> KVNamespaceGetOptions<Type> {
         Self::builder(r#type).build()
     }
-    pub fn builder(r#type: &Type) -> KVNamespaceGetOptionsBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+    pub fn builder(r#type: &Type) -> KVNamespaceGetOptionsBuilder<Type> {
+        let inner: KVNamespaceGetOptions<Type> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type(r#type);
         KVNamespaceGetOptionsBuilder { inner }
     }
 }
-pub struct KVNamespaceGetOptionsBuilder {
-    inner: KVNamespaceGetOptions,
+pub struct KVNamespaceGetOptionsBuilder<Type: ::wasm_bindgen::JsGeneric> {
+    inner: KVNamespaceGetOptions<Type>,
 }
-impl KVNamespaceGetOptionsBuilder {
+impl<Type: ::wasm_bindgen::JsGeneric> KVNamespaceGetOptionsBuilder<Type> {
     pub fn cache_ttl(self, val: f64) -> Self {
         self.inner.set_cache_ttl(val);
         self
     }
-    pub fn build(self) -> KVNamespaceGetOptions {
+    pub fn build(self) -> KVNamespaceGetOptions<Type> {
         self.inner
     }
 }
@@ -8349,25 +8589,43 @@ extern "C" {
         Metadata: ::wasm_bindgen::JsGeneric,
     >;
     #[wasm_bindgen(method, getter)]
-    pub fn value(this: &KVNamespaceGetWithMetadataResult) -> Option<Value>;
+    pub fn value<Value: ::wasm_bindgen::JsGeneric, Metadata: ::wasm_bindgen::JsGeneric>(
+        this: &KVNamespaceGetWithMetadataResult<Value, Metadata>,
+    ) -> Option<Value>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value(this: &KVNamespaceGetWithMetadataResult, val: &Value);
+    pub fn set_value<Value: ::wasm_bindgen::JsGeneric, Metadata: ::wasm_bindgen::JsGeneric>(
+        this: &KVNamespaceGetWithMetadataResult<Value, Metadata>,
+        val: &Value,
+    );
     #[wasm_bindgen(method, getter)]
-    pub fn metadata(this: &KVNamespaceGetWithMetadataResult) -> Option<Metadata>;
+    pub fn metadata<Value: ::wasm_bindgen::JsGeneric, Metadata: ::wasm_bindgen::JsGeneric>(
+        this: &KVNamespaceGetWithMetadataResult<Value, Metadata>,
+    ) -> Option<Metadata>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_metadata(this: &KVNamespaceGetWithMetadataResult, val: &Metadata);
+    pub fn set_metadata<Value: ::wasm_bindgen::JsGeneric, Metadata: ::wasm_bindgen::JsGeneric>(
+        this: &KVNamespaceGetWithMetadataResult<Value, Metadata>,
+        val: &Metadata,
+    );
     #[wasm_bindgen(method, getter, js_name = "cacheStatus")]
-    pub fn cache_status(this: &KVNamespaceGetWithMetadataResult) -> Option<String>;
+    pub fn cache_status<Value: ::wasm_bindgen::JsGeneric, Metadata: ::wasm_bindgen::JsGeneric>(
+        this: &KVNamespaceGetWithMetadataResult<Value, Metadata>,
+    ) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "cacheStatus")]
-    pub fn set_cache_status(this: &KVNamespaceGetWithMetadataResult, val: &str);
+    pub fn set_cache_status<Value: ::wasm_bindgen::JsGeneric, Metadata: ::wasm_bindgen::JsGeneric>(
+        this: &KVNamespaceGetWithMetadataResult<Value, Metadata>,
+        val: &str,
+    );
 }
-impl KVNamespaceGetWithMetadataResult {
+impl<Value: ::wasm_bindgen::JsGeneric, Metadata: ::wasm_bindgen::JsGeneric>
+    KVNamespaceGetWithMetadataResult<Value, Metadata>
+{
     pub fn new(
         value: Option<&Value>,
         metadata: Option<&Metadata>,
         cache_status: Option<&str>,
-    ) -> KVNamespaceGetWithMetadataResult {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+    ) -> KVNamespaceGetWithMetadataResult<Value, Metadata> {
+        let inner: KVNamespaceGetWithMetadataResult<Value, Metadata> =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_value(value);
         inner.set_metadata(metadata);
         inner.set_cache_status(cache_status);
@@ -8492,32 +8750,42 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MessageSendRequest<Body: ::wasm_bindgen::JsGeneric>;
     #[wasm_bindgen(method, getter)]
-    pub fn body(this: &MessageSendRequest) -> Body;
+    pub fn body<Body: ::wasm_bindgen::JsGeneric>(this: &MessageSendRequest<Body>) -> Body;
     #[wasm_bindgen(method, setter)]
-    pub fn set_body(this: &MessageSendRequest, val: &Body);
+    pub fn set_body<Body: ::wasm_bindgen::JsGeneric>(this: &MessageSendRequest<Body>, val: &Body);
     #[wasm_bindgen(method, getter, js_name = "contentType")]
-    pub fn content_type(this: &MessageSendRequest) -> Option<QueueContentType>;
+    pub fn content_type<Body: ::wasm_bindgen::JsGeneric>(
+        this: &MessageSendRequest<Body>,
+    ) -> Option<QueueContentType>;
     #[wasm_bindgen(method, setter, js_name = "contentType")]
-    pub fn set_content_type(this: &MessageSendRequest, val: &QueueContentType);
+    pub fn set_content_type<Body: ::wasm_bindgen::JsGeneric>(
+        this: &MessageSendRequest<Body>,
+        val: &QueueContentType,
+    );
     #[wasm_bindgen(method, getter, js_name = "delaySeconds")]
-    pub fn delay_seconds(this: &MessageSendRequest) -> Option<f64>;
+    pub fn delay_seconds<Body: ::wasm_bindgen::JsGeneric>(
+        this: &MessageSendRequest<Body>,
+    ) -> Option<f64>;
     #[wasm_bindgen(method, setter, js_name = "delaySeconds")]
-    pub fn set_delay_seconds(this: &MessageSendRequest, val: f64);
+    pub fn set_delay_seconds<Body: ::wasm_bindgen::JsGeneric>(
+        this: &MessageSendRequest<Body>,
+        val: f64,
+    );
 }
-impl MessageSendRequest {
-    pub fn new(body: &Body) -> MessageSendRequest {
+impl<Body: ::wasm_bindgen::JsGeneric> MessageSendRequest<Body> {
+    pub fn new(body: &Body) -> MessageSendRequest<Body> {
         Self::builder(body).build()
     }
-    pub fn builder(body: &Body) -> MessageSendRequestBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+    pub fn builder(body: &Body) -> MessageSendRequestBuilder<Body> {
+        let inner: MessageSendRequest<Body> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_body(body);
         MessageSendRequestBuilder { inner }
     }
 }
-pub struct MessageSendRequestBuilder {
-    inner: MessageSendRequest,
+pub struct MessageSendRequestBuilder<Body: ::wasm_bindgen::JsGeneric> {
+    inner: MessageSendRequest<Body>,
 }
-impl MessageSendRequestBuilder {
+impl<Body: ::wasm_bindgen::JsGeneric> MessageSendRequestBuilder<Body> {
     pub fn content_type(self, val: &QueueContentType) -> Self {
         self.inner.set_content_type(val);
         self
@@ -8526,7 +8794,7 @@ impl MessageSendRequestBuilder {
         self.inner.set_delay_seconds(val);
         self
     }
-    pub fn build(self) -> MessageSendRequest {
+    pub fn build(self) -> MessageSendRequest<Body> {
         self.inner
     }
 }
@@ -8568,13 +8836,13 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Message<Body: ::wasm_bindgen::JsGeneric>;
     #[wasm_bindgen(method, getter)]
-    pub fn id(this: &Message) -> String;
+    pub fn id<Body: ::wasm_bindgen::JsGeneric>(this: &Message<Body>) -> String;
     #[wasm_bindgen(method, getter)]
-    pub fn timestamp(this: &Message) -> Date;
+    pub fn timestamp<Body: ::wasm_bindgen::JsGeneric>(this: &Message<Body>) -> Date;
     #[wasm_bindgen(method, getter)]
-    pub fn body(this: &Message) -> Body;
+    pub fn body<Body: ::wasm_bindgen::JsGeneric>(this: &Message<Body>) -> Body;
     #[wasm_bindgen(method, getter)]
-    pub fn attempts(this: &Message) -> f64;
+    pub fn attempts<Body: ::wasm_bindgen::JsGeneric>(this: &Message<Body>) -> f64;
     #[wasm_bindgen(method)]
     pub fn retry<Body: ::wasm_bindgen::JsGeneric>(this: &Message<Body>);
     #[wasm_bindgen(method, catch, js_name = "retry")]
@@ -8600,9 +8868,10 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type QueueEvent<Body: ::wasm_bindgen::JsGeneric>;
     #[wasm_bindgen(method, getter)]
-    pub fn messages(this: &QueueEvent) -> Vec<Message<Body>>;
+    pub fn messages<Body: ::wasm_bindgen::JsGeneric>(this: &QueueEvent<Body>)
+        -> Vec<Message<Body>>;
     #[wasm_bindgen(method, getter)]
-    pub fn queue(this: &QueueEvent) -> String;
+    pub fn queue<Body: ::wasm_bindgen::JsGeneric>(this: &QueueEvent<Body>) -> String;
     #[wasm_bindgen(method, js_name = "retryAll")]
     pub fn retry_all<Body: ::wasm_bindgen::JsGeneric>(this: &QueueEvent<Body>);
     #[wasm_bindgen(method, catch, js_name = "retryAll")]
@@ -8632,9 +8901,11 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MessageBatch<Body: ::wasm_bindgen::JsGeneric>;
     #[wasm_bindgen(method, getter)]
-    pub fn messages(this: &MessageBatch) -> Vec<Message<Body>>;
+    pub fn messages<Body: ::wasm_bindgen::JsGeneric>(
+        this: &MessageBatch<Body>,
+    ) -> Vec<Message<Body>>;
     #[wasm_bindgen(method, getter)]
-    pub fn queue(this: &MessageBatch) -> String;
+    pub fn queue<Body: ::wasm_bindgen::JsGeneric>(this: &MessageBatch<Body>) -> String;
     #[wasm_bindgen(method, js_name = "retryAll")]
     pub fn retry_all<Body: ::wasm_bindgen::JsGeneric>(this: &MessageBatch<Body>);
     #[wasm_bindgen(method, catch, js_name = "retryAll")]
@@ -8676,7 +8947,7 @@ extern "C" {
 }
 impl R2Error {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> R2Error {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -9009,7 +9280,7 @@ extern "C" {
 }
 impl R2UploadedPart {
     pub fn new(part_number: f64, etag: &str) -> R2UploadedPart {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: R2UploadedPart = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_part_number(part_number);
         inner.set_etag(etag);
         inner
@@ -9727,30 +9998,40 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type QueuingStrategy<T: ::wasm_bindgen::JsGeneric>;
     #[wasm_bindgen(method, getter, js_name = "highWaterMark")]
-    pub fn high_water_mark(this: &QueuingStrategy) -> Option<BytesWrittenKind>;
+    pub fn high_water_mark<T: ::wasm_bindgen::JsGeneric>(
+        this: &QueuingStrategy<T>,
+    ) -> Option<BytesWrittenKind>;
     #[wasm_bindgen(method, setter, js_name = "highWaterMark")]
-    pub fn set_high_water_mark(this: &QueuingStrategy, val: f64);
+    pub fn set_high_water_mark<T: ::wasm_bindgen::JsGeneric>(this: &QueuingStrategy<T>, val: f64);
     #[wasm_bindgen(method, setter, js_name = "highWaterMark")]
-    pub fn set_high_water_mark_with_big_int(this: &QueuingStrategy, val: &BigInt);
+    pub fn set_high_water_mark_with_big_int<T: ::wasm_bindgen::JsGeneric>(
+        this: &QueuingStrategy<T>,
+        val: &BigInt,
+    );
     #[wasm_bindgen(method, getter)]
-    pub fn size(this: &QueuingStrategy) -> Option<Function<fn(T) -> JsValue>>;
+    pub fn size<T: ::wasm_bindgen::JsGeneric>(
+        this: &QueuingStrategy<T>,
+    ) -> Option<Function<fn(T) -> JsValue>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_size(this: &QueuingStrategy, val: &Function<fn(T) -> JsValue>);
+    pub fn set_size<T: ::wasm_bindgen::JsGeneric>(
+        this: &QueuingStrategy<T>,
+        val: &Function<fn(T) -> JsValue>,
+    );
 }
-impl QueuingStrategy {
-    pub fn new() -> QueuingStrategy {
+impl<T: ::wasm_bindgen::JsGeneric> QueuingStrategy<T> {
+    pub fn new() -> QueuingStrategy<T> {
         Self::builder().build()
     }
-    pub fn builder() -> QueuingStrategyBuilder {
+    pub fn builder() -> QueuingStrategyBuilder<T> {
         QueuingStrategyBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
-pub struct QueuingStrategyBuilder {
-    inner: QueuingStrategy,
+pub struct QueuingStrategyBuilder<T: ::wasm_bindgen::JsGeneric> {
+    inner: QueuingStrategy<T>,
 }
-impl QueuingStrategyBuilder {
+impl<T: ::wasm_bindgen::JsGeneric> QueuingStrategyBuilder<T> {
     pub fn high_water_mark(self, val: f64) -> Self {
         self.inner.set_high_water_mark(val);
         self
@@ -9763,7 +10044,7 @@ impl QueuingStrategyBuilder {
         self.inner.set_size(val);
         self
     }
-    pub fn build(self) -> QueuingStrategy {
+    pub fn build(self) -> QueuingStrategy<T> {
         self.inner
     }
 }
@@ -9773,55 +10054,60 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type UnderlyingSink<W: ::wasm_bindgen::JsGeneric>;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &UnderlyingSink) -> Option<String>;
+    pub fn type_<W: ::wasm_bindgen::JsGeneric>(this: &UnderlyingSink<W>) -> Option<String>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type(this: &UnderlyingSink, val: &str);
+    pub fn set_type<W: ::wasm_bindgen::JsGeneric>(this: &UnderlyingSink<W>, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn start(
-        this: &UnderlyingSink,
+    pub fn start<W: ::wasm_bindgen::JsGeneric>(
+        this: &UnderlyingSink<W>,
     ) -> Option<Function<fn(WritableStreamDefaultController) -> JsOption<Promise<Undefined>>>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_start(
-        this: &UnderlyingSink,
+    pub fn set_start<W: ::wasm_bindgen::JsGeneric>(
+        this: &UnderlyingSink<W>,
         val: &Function<fn(WritableStreamDefaultController) -> JsOption<Promise<Undefined>>>,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn write(
-        this: &UnderlyingSink,
+    pub fn write<W: ::wasm_bindgen::JsGeneric>(
+        this: &UnderlyingSink<W>,
     ) -> Option<Function<fn(W, WritableStreamDefaultController) -> JsOption<Promise<Undefined>>>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_write(
-        this: &UnderlyingSink,
+    pub fn set_write<W: ::wasm_bindgen::JsGeneric>(
+        this: &UnderlyingSink<W>,
         val: &Function<fn(W, WritableStreamDefaultController) -> JsOption<Promise<Undefined>>>,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn abort(
-        this: &UnderlyingSink,
+    pub fn abort<W: ::wasm_bindgen::JsGeneric>(
+        this: &UnderlyingSink<W>,
     ) -> Option<Function<fn(JsValue) -> JsOption<Promise<Undefined>>>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_abort(
-        this: &UnderlyingSink,
+    pub fn set_abort<W: ::wasm_bindgen::JsGeneric>(
+        this: &UnderlyingSink<W>,
         val: &Function<fn(JsValue) -> JsOption<Promise<Undefined>>>,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn close(this: &UnderlyingSink) -> Option<Function<fn() -> JsOption<Promise<Undefined>>>>;
+    pub fn close<W: ::wasm_bindgen::JsGeneric>(
+        this: &UnderlyingSink<W>,
+    ) -> Option<Function<fn() -> JsOption<Promise<Undefined>>>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_close(this: &UnderlyingSink, val: &Function<fn() -> JsOption<Promise<Undefined>>>);
+    pub fn set_close<W: ::wasm_bindgen::JsGeneric>(
+        this: &UnderlyingSink<W>,
+        val: &Function<fn() -> JsOption<Promise<Undefined>>>,
+    );
 }
-impl UnderlyingSink {
-    pub fn new() -> UnderlyingSink {
+impl<W: ::wasm_bindgen::JsGeneric> UnderlyingSink<W> {
+    pub fn new() -> UnderlyingSink<W> {
         Self::builder().build()
     }
-    pub fn builder() -> UnderlyingSinkBuilder {
+    pub fn builder() -> UnderlyingSinkBuilder<W> {
         UnderlyingSinkBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
-pub struct UnderlyingSinkBuilder {
-    inner: UnderlyingSink,
+pub struct UnderlyingSinkBuilder<W: ::wasm_bindgen::JsGeneric> {
+    inner: UnderlyingSink<W>,
 }
-impl UnderlyingSinkBuilder {
+impl<W: ::wasm_bindgen::JsGeneric> UnderlyingSinkBuilder<W> {
     pub fn type_(self, val: &str) -> Self {
         self.inner.set_type(val);
         self
@@ -9848,7 +10134,7 @@ impl UnderlyingSinkBuilder {
         self.inner.set_close(val);
         self
     }
-    pub fn build(self) -> UnderlyingSink {
+    pub fn build(self) -> UnderlyingSink<W> {
         self.inner
     }
 }
@@ -9904,7 +10190,7 @@ impl UnderlyingByteSource {
     #[doc = ""]
     #[doc = " * `type: \"bytes\"`"]
     pub fn builder_bytes() -> UnderlyingByteSourceBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: UnderlyingByteSource = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("bytes");
         UnderlyingByteSourceBuilder { inner }
     }
@@ -9945,57 +10231,62 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type UnderlyingSource<R: ::wasm_bindgen::JsGeneric>;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &UnderlyingSource) -> Option<String>;
+    pub fn type_<R: ::wasm_bindgen::JsGeneric>(this: &UnderlyingSource<R>) -> Option<String>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type(this: &UnderlyingSource, val: &str);
+    pub fn set_type<R: ::wasm_bindgen::JsGeneric>(this: &UnderlyingSource<R>, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn start(
-        this: &UnderlyingSource,
+    pub fn start<R: ::wasm_bindgen::JsGeneric>(
+        this: &UnderlyingSource<R>,
     ) -> Option<Function<fn(ReadableStreamDefaultController<R>) -> JsOption<Promise<Undefined>>>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_start(
-        this: &UnderlyingSource,
+    pub fn set_start<R: ::wasm_bindgen::JsGeneric>(
+        this: &UnderlyingSource<R>,
         val: &Function<fn(ReadableStreamDefaultController<R>) -> JsOption<Promise<Undefined>>>,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn pull(
-        this: &UnderlyingSource,
+    pub fn pull<R: ::wasm_bindgen::JsGeneric>(
+        this: &UnderlyingSource<R>,
     ) -> Option<Function<fn(ReadableStreamDefaultController<R>) -> JsOption<Promise<Undefined>>>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_pull(
-        this: &UnderlyingSource,
+    pub fn set_pull<R: ::wasm_bindgen::JsGeneric>(
+        this: &UnderlyingSource<R>,
         val: &Function<fn(ReadableStreamDefaultController<R>) -> JsOption<Promise<Undefined>>>,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn cancel(
-        this: &UnderlyingSource,
+    pub fn cancel<R: ::wasm_bindgen::JsGeneric>(
+        this: &UnderlyingSource<R>,
     ) -> Option<Function<fn(JsValue) -> JsOption<Promise<Undefined>>>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_cancel(
-        this: &UnderlyingSource,
+    pub fn set_cancel<R: ::wasm_bindgen::JsGeneric>(
+        this: &UnderlyingSource<R>,
         val: &Function<fn(JsValue) -> JsOption<Promise<Undefined>>>,
     );
     #[wasm_bindgen(method, getter, js_name = "expectedLength")]
-    pub fn expected_length(this: &UnderlyingSource) -> Option<BytesWrittenKind>;
+    pub fn expected_length<R: ::wasm_bindgen::JsGeneric>(
+        this: &UnderlyingSource<R>,
+    ) -> Option<BytesWrittenKind>;
     #[wasm_bindgen(method, setter, js_name = "expectedLength")]
-    pub fn set_expected_length(this: &UnderlyingSource, val: f64);
+    pub fn set_expected_length<R: ::wasm_bindgen::JsGeneric>(this: &UnderlyingSource<R>, val: f64);
     #[wasm_bindgen(method, setter, js_name = "expectedLength")]
-    pub fn set_expected_length_with_big_int(this: &UnderlyingSource, val: &BigInt);
+    pub fn set_expected_length_with_big_int<R: ::wasm_bindgen::JsGeneric>(
+        this: &UnderlyingSource<R>,
+        val: &BigInt,
+    );
 }
-impl UnderlyingSource {
-    pub fn new() -> UnderlyingSource {
+impl<R: ::wasm_bindgen::JsGeneric> UnderlyingSource<R> {
+    pub fn new() -> UnderlyingSource<R> {
         Self::builder().build()
     }
-    pub fn builder() -> UnderlyingSourceBuilder {
+    pub fn builder() -> UnderlyingSourceBuilder<R> {
         UnderlyingSourceBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
-pub struct UnderlyingSourceBuilder {
-    inner: UnderlyingSource,
+pub struct UnderlyingSourceBuilder<R: ::wasm_bindgen::JsGeneric> {
+    inner: UnderlyingSource<R>,
 }
-impl UnderlyingSourceBuilder {
+impl<R: ::wasm_bindgen::JsGeneric> UnderlyingSourceBuilder<R> {
     pub fn type_(self, val: &str) -> Self {
         self.inner.set_type(val);
         self
@@ -10026,7 +10317,7 @@ impl UnderlyingSourceBuilder {
         self.inner.set_expected_length_with_big_int(val);
         self
     }
-    pub fn build(self) -> UnderlyingSource {
+    pub fn build(self) -> UnderlyingSource<R> {
         self.inner
     }
 }
@@ -10036,68 +10327,83 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Transformer<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>;
     #[wasm_bindgen(method, getter, js_name = "readableType")]
-    pub fn readable_type(this: &Transformer) -> Option<String>;
+    pub fn readable_type<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
+        this: &Transformer<I, O>,
+    ) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "readableType")]
-    pub fn set_readable_type(this: &Transformer, val: &str);
+    pub fn set_readable_type<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
+        this: &Transformer<I, O>,
+        val: &str,
+    );
     #[wasm_bindgen(method, getter, js_name = "writableType")]
-    pub fn writable_type(this: &Transformer) -> Option<String>;
+    pub fn writable_type<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
+        this: &Transformer<I, O>,
+    ) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "writableType")]
-    pub fn set_writable_type(this: &Transformer, val: &str);
+    pub fn set_writable_type<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
+        this: &Transformer<I, O>,
+        val: &str,
+    );
     #[wasm_bindgen(method, getter)]
-    pub fn start(
-        this: &Transformer,
+    pub fn start<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
+        this: &Transformer<I, O>,
     ) -> Option<Function<fn(TransformStreamDefaultController<O>) -> JsOption<Promise<Undefined>>>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_start(
-        this: &Transformer,
+    pub fn set_start<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
+        this: &Transformer<I, O>,
         val: &Function<fn(TransformStreamDefaultController<O>) -> JsOption<Promise<Undefined>>>,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn transform(
-        this: &Transformer,
+    pub fn transform<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
+        this: &Transformer<I, O>,
     ) -> Option<Function<fn(I, TransformStreamDefaultController<O>) -> JsOption<Promise<Undefined>>>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_transform(
-        this: &Transformer,
+    pub fn set_transform<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
+        this: &Transformer<I, O>,
         val: &Function<fn(I, TransformStreamDefaultController<O>) -> JsOption<Promise<Undefined>>>,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn flush(
-        this: &Transformer,
+    pub fn flush<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
+        this: &Transformer<I, O>,
     ) -> Option<Function<fn(TransformStreamDefaultController<O>) -> JsOption<Promise<Undefined>>>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_flush(
-        this: &Transformer,
+    pub fn set_flush<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
+        this: &Transformer<I, O>,
         val: &Function<fn(TransformStreamDefaultController<O>) -> JsOption<Promise<Undefined>>>,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn cancel(
-        this: &Transformer,
+    pub fn cancel<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
+        this: &Transformer<I, O>,
     ) -> Option<Function<fn(JsValue) -> JsOption<Promise<Undefined>>>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_cancel(
-        this: &Transformer,
+    pub fn set_cancel<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
+        this: &Transformer<I, O>,
         val: &Function<fn(JsValue) -> JsOption<Promise<Undefined>>>,
     );
     #[wasm_bindgen(method, getter, js_name = "expectedLength")]
-    pub fn expected_length(this: &Transformer) -> Option<f64>;
+    pub fn expected_length<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
+        this: &Transformer<I, O>,
+    ) -> Option<f64>;
     #[wasm_bindgen(method, setter, js_name = "expectedLength")]
-    pub fn set_expected_length(this: &Transformer, val: f64);
+    pub fn set_expected_length<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
+        this: &Transformer<I, O>,
+        val: f64,
+    );
 }
-impl Transformer {
-    pub fn new() -> Transformer {
+impl<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric> Transformer<I, O> {
+    pub fn new() -> Transformer<I, O> {
         Self::builder().build()
     }
-    pub fn builder() -> TransformerBuilder {
+    pub fn builder() -> TransformerBuilder<I, O> {
         TransformerBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
-pub struct TransformerBuilder {
-    inner: Transformer,
+pub struct TransformerBuilder<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric> {
+    inner: Transformer<I, O>,
 }
-impl TransformerBuilder {
+impl<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric> TransformerBuilder<I, O> {
     pub fn readable_type(self, val: &str) -> Self {
         self.inner.set_readable_type(val);
         self
@@ -10135,7 +10441,7 @@ impl TransformerBuilder {
         self.inner.set_expected_length(val);
         self
     }
-    pub fn build(self) -> Transformer {
+    pub fn build(self) -> Transformer<I, O> {
         self.inner
     }
 }
@@ -10229,7 +10535,7 @@ impl ReadableStreamReadResult {
     #[doc = ""]
     #[doc = " * `done: false`"]
     pub fn new_false(value: &R) -> ReadableStreamReadResult {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ReadableStreamReadResult = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_done(false);
         inner.set_value(value);
         inner
@@ -10244,7 +10550,7 @@ impl ReadableStreamReadResult {
     #[doc = ""]
     #[doc = " * `done: true`"]
     pub fn builder_true() -> ReadableStreamReadResultBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ReadableStreamReadResult = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_done(true);
         ReadableStreamReadResultBuilder { inner }
     }
@@ -10281,7 +10587,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/locked)"]
     #[wasm_bindgen(method, getter)]
-    pub fn locked(this: &ReadableStream) -> bool;
+    pub fn locked<R: ::wasm_bindgen::JsGeneric>(this: &ReadableStream<R>) -> bool;
     #[doc = " The **`cancel()`** method of the ReadableStream interface returns a Promise that resolves when the stream is canceled."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/cancel)"]
@@ -10406,7 +10712,9 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new(stream: &ReadableStream) -> Result<ReadableStreamDefaultReader, JsValue>;
     #[wasm_bindgen(method, getter)]
-    pub fn closed(this: &ReadableStreamDefaultReader) -> Promise<Undefined>;
+    pub fn closed<R: ::wasm_bindgen::JsGeneric>(
+        this: &ReadableStreamDefaultReader<R>,
+    ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch)]
     pub async fn cancel<R: ::wasm_bindgen::JsGeneric>(
         this: &ReadableStreamDefaultReader<R>,
@@ -10529,7 +10837,7 @@ impl ReadableStreamGetReaderOptions {
     #[doc = ""]
     #[doc = " This call behaves the same way as the no-argument variant, except that it only works on readable byte streams, i.e. streams which were constructed specifically with the ability to handle \"bring your own buffer\" reading. The returned BYOB reader provides the ability to directly read individual chunks from the stream via its read() method, into developer-supplied buffers, allowing more precise control over allocation."]
     pub fn new_byob() -> ReadableStreamGetReaderOptions {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ReadableStreamGetReaderOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_mode("byob");
         inner
     }
@@ -10593,7 +10901,9 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController/desiredSize)"]
     #[wasm_bindgen(method, getter, js_name = "desiredSize")]
-    pub fn desired_size(this: &ReadableStreamDefaultController) -> Option<f64>;
+    pub fn desired_size<R: ::wasm_bindgen::JsGeneric>(
+        this: &ReadableStreamDefaultController<R>,
+    ) -> Option<f64>;
     #[doc = " The **`close()`** method of the ReadableStreamDefaultController interface closes the associated stream."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultController/close)"]
@@ -10756,7 +11066,9 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/desiredSize)"]
     #[wasm_bindgen(method, getter, js_name = "desiredSize")]
-    pub fn desired_size(this: &TransformStreamDefaultController) -> Option<f64>;
+    pub fn desired_size<O: ::wasm_bindgen::JsGeneric>(
+        this: &TransformStreamDefaultController<O>,
+    ) -> Option<f64>;
     #[doc = " The **`enqueue()`** method of the TransformStreamDefaultController interface enqueues the given chunk in the readable side of the stream."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController/enqueue)"]
@@ -10820,23 +11132,36 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ReadableWritablePair<R: ::wasm_bindgen::JsGeneric, W: ::wasm_bindgen::JsGeneric>;
     #[wasm_bindgen(method, getter)]
-    pub fn readable(this: &ReadableWritablePair) -> ReadableStream<R>;
+    pub fn readable<R: ::wasm_bindgen::JsGeneric, W: ::wasm_bindgen::JsGeneric>(
+        this: &ReadableWritablePair<R, W>,
+    ) -> ReadableStream<R>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_readable(this: &ReadableWritablePair, val: &ReadableStream<R>);
+    pub fn set_readable<R: ::wasm_bindgen::JsGeneric, W: ::wasm_bindgen::JsGeneric>(
+        this: &ReadableWritablePair<R, W>,
+        val: &ReadableStream<R>,
+    );
     #[doc = " Provides a convenient, chainable way of piping this readable stream through a transform stream (or any other { writable, readable } pair). It simply pipes the stream into the writable side of the supplied pair, and returns the readable side for further use."]
     #[doc = ""]
     #[doc = " Piping a stream will lock it for the duration of the pipe, preventing any other consumer from acquiring a reader."]
     #[wasm_bindgen(method, getter)]
-    pub fn writable(this: &ReadableWritablePair) -> WritableStream<W>;
+    pub fn writable<R: ::wasm_bindgen::JsGeneric, W: ::wasm_bindgen::JsGeneric>(
+        this: &ReadableWritablePair<R, W>,
+    ) -> WritableStream<W>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_writable(this: &ReadableWritablePair, val: &WritableStream<W>);
+    pub fn set_writable<R: ::wasm_bindgen::JsGeneric, W: ::wasm_bindgen::JsGeneric>(
+        this: &ReadableWritablePair<R, W>,
+        val: &WritableStream<W>,
+    );
 }
-impl ReadableWritablePair {
+impl<R: ::wasm_bindgen::JsGeneric, W: ::wasm_bindgen::JsGeneric> ReadableWritablePair<R, W> {
     #[doc = " * `writable` - Provides a convenient, chainable way of piping this readable stream through a transform stream (or any other { writable, readable } pair). It simply pipes the stream into the writable side of the supplied pair, and returns the readable side for further use."]
     #[doc = ""]
     #[doc = " Piping a stream will lock it for the duration of the pipe, preventing any other consumer from acquiring a reader."]
-    pub fn new(readable: &ReadableStream<R>, writable: &WritableStream<W>) -> ReadableWritablePair {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+    pub fn new(
+        readable: &ReadableStream<R>,
+        writable: &WritableStream<W>,
+    ) -> ReadableWritablePair<R, W> {
+        let inner: ReadableWritablePair<R, W> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_readable(readable);
         inner.set_writable(writable);
         inner
@@ -10862,7 +11187,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/locked)"]
     #[wasm_bindgen(method, getter)]
-    pub fn locked(this: &WritableStream) -> bool;
+    pub fn locked<W: ::wasm_bindgen::JsGeneric>(this: &WritableStream<W>) -> bool;
     #[doc = " The **`abort()`** method of the WritableStream interface aborts the stream, signaling that the producer can no longer successfully write to the stream and it is to be immediately moved to an error state, with any queued writes discarded."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/abort)"]
@@ -10911,17 +11236,23 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/closed)"]
     #[wasm_bindgen(method, getter)]
-    pub fn closed(this: &WritableStreamDefaultWriter) -> Promise<Undefined>;
+    pub fn closed<W: ::wasm_bindgen::JsGeneric>(
+        this: &WritableStreamDefaultWriter<W>,
+    ) -> Promise<Undefined>;
     #[doc = " The **`ready`** read-only property of the that resolves when the desired size of the stream's internal queue transitions from non-positive to positive, signaling that it is no longer applying backpressure."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/ready)"]
     #[wasm_bindgen(method, getter)]
-    pub fn ready(this: &WritableStreamDefaultWriter) -> Promise<Undefined>;
+    pub fn ready<W: ::wasm_bindgen::JsGeneric>(
+        this: &WritableStreamDefaultWriter<W>,
+    ) -> Promise<Undefined>;
     #[doc = " The **`desiredSize`** read-only property of the to fill the stream's internal queue."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/desiredSize)"]
     #[wasm_bindgen(method, getter, js_name = "desiredSize")]
-    pub fn desired_size(this: &WritableStreamDefaultWriter) -> Option<f64>;
+    pub fn desired_size<W: ::wasm_bindgen::JsGeneric>(
+        this: &WritableStreamDefaultWriter<W>,
+    ) -> Option<f64>;
     #[doc = " The **`abort()`** method of the the producer can no longer successfully write to the stream and it is to be immediately moved to an error state, with any queued writes discarded."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/abort)"]
@@ -10998,12 +11329,16 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStream/readable)"]
     #[wasm_bindgen(method, getter)]
-    pub fn readable(this: &TransformStream) -> ReadableStream<O>;
+    pub fn readable<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
+        this: &TransformStream<I, O>,
+    ) -> ReadableStream<O>;
     #[doc = " The **`writable`** read-only property of the TransformStream interface returns the WritableStream instance controlled by this `TransformStream`."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStream/writable)"]
     #[wasm_bindgen(method, getter)]
-    pub fn writable(this: &TransformStream) -> WritableStream<I>;
+    pub fn writable<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
+        this: &TransformStream<I, O>,
+    ) -> WritableStream<I>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -11247,7 +11582,7 @@ impl QueuingStrategyInit {
     #[doc = ""]
     #[doc = " Note that the provided high water mark will not be validated ahead of time. Instead, if it is negative, NaN, or not a number, the resulting ByteLengthQueuingStrategy will cause the corresponding stream constructor to throw."]
     pub fn new(high_water_mark: f64) -> QueuingStrategyInit {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: QueuingStrategyInit = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_high_water_mark(high_water_mark);
         inner
     }
@@ -11350,7 +11685,7 @@ extern "C" {
 }
 impl TraceItem {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> TraceItem {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -11367,7 +11702,7 @@ extern "C" {
 }
 impl TraceItemAlarmEventInfo {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> TraceItemAlarmEventInfo {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -11392,7 +11727,7 @@ extern "C" {
 }
 impl TraceItemScheduledEventInfo {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> TraceItemScheduledEventInfo {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -11411,7 +11746,7 @@ extern "C" {
 }
 impl TraceItemQueueEventInfo {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> TraceItemQueueEventInfo {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -11432,7 +11767,7 @@ extern "C" {
 }
 impl TraceItemEmailEventInfo {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> TraceItemEmailEventInfo {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -11449,7 +11784,7 @@ extern "C" {
 }
 impl TraceItemTailEventInfo {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> TraceItemTailEventInfo {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -11466,7 +11801,7 @@ extern "C" {
 }
 impl TraceItemTailEventInfoTailItem {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> TraceItemTailEventInfoTailItem {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -11485,7 +11820,7 @@ extern "C" {
 }
 impl TraceItemFetchEventInfo {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> TraceItemFetchEventInfo {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -11522,7 +11857,7 @@ extern "C" {
 }
 impl TraceItemFetchEventInfoResponse {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> TraceItemFetchEventInfoResponse {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -11539,7 +11874,7 @@ extern "C" {
 }
 impl TraceItemJsRpcEventInfo {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> TraceItemJsRpcEventInfo {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -11558,7 +11893,7 @@ extern "C" {
 }
 impl TraceItemHibernatableWebSocketEventInfo {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> TraceItemHibernatableWebSocketEventInfo {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -11575,7 +11910,7 @@ extern "C" {
 }
 impl TraceItemHibernatableWebSocketEventInfoMessage {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> TraceItemHibernatableWebSocketEventInfoMessage {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -11596,7 +11931,7 @@ extern "C" {
 }
 impl TraceItemHibernatableWebSocketEventInfoClose {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> TraceItemHibernatableWebSocketEventInfoClose {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -11613,7 +11948,7 @@ extern "C" {
 }
 impl TraceItemHibernatableWebSocketEventInfoError {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> TraceItemHibernatableWebSocketEventInfoError {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -11634,7 +11969,7 @@ extern "C" {
 }
 impl TraceLog {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> TraceLog {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -11657,7 +11992,7 @@ extern "C" {
 }
 impl TraceException {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> TraceException {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -11678,7 +12013,7 @@ extern "C" {
 }
 impl TraceDiagnosticChannelEvent {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> TraceDiagnosticChannelEvent {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -11697,7 +12032,7 @@ extern "C" {
 }
 impl TraceMetrics {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> TraceMetrics {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -12349,7 +12684,7 @@ extern "C" {
 }
 impl URLPatternComponentResult {
     pub fn new(input: &str, groups: &Object<JsString>) -> URLPatternComponentResult {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: URLPatternComponentResult = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_input(input);
         inner.set_groups(groups);
         inner
@@ -12409,7 +12744,7 @@ impl URLPatternResult {
         search: &URLPatternComponentResult,
         hash: &URLPatternComponentResult,
     ) -> URLPatternResult {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: URLPatternResult = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_inputs(inputs);
         inner.set_protocol(protocol);
         inner.set_username(username);
@@ -12559,7 +12894,7 @@ impl WebSocketEventMap {
         open: &Event,
         error: &ErrorEvent,
     ) -> WebSocketEventMap {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: WebSocketEventMap = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_close(close);
         inner.set_message(message);
         inner.set_open(open);
@@ -12821,13 +13156,16 @@ extern "C" {
         this: &SqlStorageCursor<T>,
     ) -> Result<Iterator<U>, JsValue>;
     #[wasm_bindgen(method, getter, js_name = "columnNames")]
-    pub fn column_names(this: &SqlStorageCursor) -> Vec<String>;
+    pub fn column_names<T: ::wasm_bindgen::JsGeneric>(this: &SqlStorageCursor<T>) -> Vec<String>;
     #[wasm_bindgen(method, setter, slice_to_array, js_name = "columnNames")]
-    pub fn set_column_names(this: &SqlStorageCursor, val: &[String]);
+    pub fn set_column_names<T: ::wasm_bindgen::JsGeneric>(
+        this: &SqlStorageCursor<T>,
+        val: &[String],
+    );
     #[wasm_bindgen(method, getter, js_name = "rowsRead")]
-    pub fn rows_read(this: &SqlStorageCursor) -> f64;
+    pub fn rows_read<T: ::wasm_bindgen::JsGeneric>(this: &SqlStorageCursor<T>) -> f64;
     #[wasm_bindgen(method, getter, js_name = "rowsWritten")]
-    pub fn rows_written(this: &SqlStorageCursor) -> f64;
+    pub fn rows_written<T: ::wasm_bindgen::JsGeneric>(this: &SqlStorageCursor<T>) -> f64;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -12885,7 +13223,7 @@ impl SocketOptions {
         Self::builder(allow_half_open).build()
     }
     pub fn builder(allow_half_open: bool) -> SocketOptionsBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: SocketOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_allow_half_open(allow_half_open);
         SocketOptionsBuilder { inner }
     }
@@ -12926,7 +13264,7 @@ extern "C" {
 }
 impl SocketAddress {
     pub fn new(hostname: &str, port: f64) -> SocketAddress {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: SocketAddress = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_hostname(hostname);
         inner.set_port(port);
         inner
@@ -13190,7 +13528,7 @@ impl ContainerStartupOptions {
         Self::builder(enable_internet).build()
     }
     pub fn builder(enable_internet: bool) -> ContainerStartupOptionsBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ContainerStartupOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_enable_internet(enable_internet);
         ContainerStartupOptionsBuilder { inner }
     }
@@ -13705,7 +14043,7 @@ impl WorkerLoaderWorkerCode {
         main_module: &str,
         modules: &Object,
     ) -> WorkerLoaderWorkerCodeBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: WorkerLoaderWorkerCode = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_compatibility_date(compatibility_date);
         inner.set_main_module(main_module);
         inner.set_modules(modules);
@@ -13803,7 +14141,7 @@ impl AiSearchSearchRequest {
         Self::builder(messages).build()
     }
     pub fn builder(messages: &[Object]) -> AiSearchSearchRequestBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiSearchSearchRequest = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
         AiSearchSearchRequestBuilder { inner }
     }
@@ -13847,7 +14185,7 @@ impl AiSearchChatCompletionsRequest {
         Self::builder(messages).build()
     }
     pub fn builder(messages: &[Object]) -> AiSearchChatCompletionsRequestBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiSearchChatCompletionsRequest = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
         AiSearchChatCompletionsRequestBuilder { inner }
     }
@@ -13888,7 +14226,7 @@ extern "C" {
 }
 impl AiSearchSearchResponse {
     pub fn new(search_query: &str, chunks: &[Object]) -> AiSearchSearchResponse {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiSearchSearchResponse = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_search_query(search_query);
         inner.set_chunks(chunks);
         inner
@@ -13969,7 +14307,7 @@ impl AiSearchConfig {
     #[doc = ""]
     #[doc = " * `id` - Instance ID (1-32 chars, pattern: ^[a-z0-9_]+(?:-[a-z0-9_]+)*$)"]
     pub fn builder_r2(id: &str, source: &str) -> AiSearchConfigBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiSearchConfig = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_type("r2");
         inner.set_source(source);
@@ -13981,7 +14319,7 @@ impl AiSearchConfig {
     #[doc = ""]
     #[doc = " * `id` - Instance ID (1-32 chars, pattern: ^[a-z0-9_]+(?:-[a-z0-9_]+)*$)"]
     pub fn builder_web_crawler(id: &str, source: &str) -> AiSearchConfigBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiSearchConfig = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_type("web-crawler");
         inner.set_source(source);
@@ -14051,7 +14389,7 @@ impl AiSearchInstance {
         Self::builder(id).build()
     }
     pub fn builder(id: &str) -> AiSearchInstanceBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiSearchInstance = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         AiSearchInstanceBuilder { inner }
     }
@@ -14155,7 +14493,7 @@ extern "C" {
 }
 impl AiImageClassificationInput {
     pub fn new(image: &[f64]) -> AiImageClassificationInput {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiImageClassificationInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_image(image);
         inner
     }
@@ -14235,7 +14573,7 @@ impl AiImageToTextInput {
         Self::builder(image).build()
     }
     pub fn builder(image: &[f64]) -> AiImageToTextInputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiImageToTextInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_image(image);
         AiImageToTextInputBuilder { inner }
     }
@@ -14304,7 +14642,7 @@ extern "C" {
 }
 impl AiImageToTextOutput {
     pub fn new(description: &str) -> AiImageToTextOutput {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiImageToTextOutput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_description(description);
         inner
     }
@@ -14386,7 +14724,7 @@ impl AiImageTextToTextInput {
         Self::builder(image).build()
     }
     pub fn builder(image: &str) -> AiImageTextToTextInputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiImageTextToTextInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_image(image);
         AiImageTextToTextInputBuilder { inner }
     }
@@ -14459,7 +14797,7 @@ extern "C" {
 }
 impl AiImageTextToTextOutput {
     pub fn new(description: &str) -> AiImageTextToTextOutput {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiImageTextToTextOutput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_description(description);
         inner
     }
@@ -14494,7 +14832,7 @@ extern "C" {
 }
 impl AiMultimodalEmbeddingsInput {
     pub fn new(image: &str, text: &[String]) -> AiMultimodalEmbeddingsInput {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiMultimodalEmbeddingsInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_image(image);
         inner.set_text(text);
         inner
@@ -14516,7 +14854,7 @@ extern "C" {
 }
 impl AiIMultimodalEmbeddingsOutput {
     pub fn new(data: &[Vec<f64>], shape: &[f64]) -> AiIMultimodalEmbeddingsOutput {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiIMultimodalEmbeddingsOutput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_data(data);
         inner.set_shape(shape);
         inner
@@ -14551,7 +14889,7 @@ extern "C" {
 }
 impl AiObjectDetectionInput {
     pub fn new(image: &[f64]) -> AiObjectDetectionInput {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiObjectDetectionInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_image(image);
         inner
     }
@@ -14588,7 +14926,7 @@ extern "C" {
 }
 impl AiSentenceSimilarityInput {
     pub fn new(source: &str, sentences: &[String]) -> AiSentenceSimilarityInput {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiSentenceSimilarityInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_source(source);
         inner.set_sentences(sentences);
         inner
@@ -14622,7 +14960,8 @@ extern "C" {
 }
 impl AiAutomaticSpeechRecognitionInput {
     pub fn new(audio: &[f64]) -> AiAutomaticSpeechRecognitionInput {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiAutomaticSpeechRecognitionInput =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_audio(audio);
         inner
     }
@@ -14716,7 +15055,7 @@ impl AiSummarizationInput {
         Self::builder(input_text).build()
     }
     pub fn builder(input_text: &str) -> AiSummarizationInputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiSummarizationInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_input_text(input_text);
         AiSummarizationInputBuilder { inner }
     }
@@ -14745,7 +15084,7 @@ extern "C" {
 }
 impl AiSummarizationOutput {
     pub fn new(summary: &str) -> AiSummarizationOutput {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiSummarizationOutput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_summary(summary);
         inner
     }
@@ -14776,7 +15115,7 @@ extern "C" {
 }
 impl AiTextClassificationInput {
     pub fn new(text: &str) -> AiTextClassificationInput {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiTextClassificationInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner
     }
@@ -14811,12 +15150,12 @@ extern "C" {
 }
 impl AiTextEmbeddingsInput {
     pub fn new(text: &str) -> AiTextEmbeddingsInput {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiTextEmbeddingsInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner
     }
     pub fn new_with_slice(text: &[String]) -> AiTextEmbeddingsInput {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiTextEmbeddingsInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner
     }
@@ -14837,7 +15176,7 @@ extern "C" {
 }
 impl AiTextEmbeddingsOutput {
     pub fn new(shape: &[f64], data: &[Vec<f64>]) -> AiTextEmbeddingsOutput {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiTextEmbeddingsOutput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_shape(shape);
         inner.set_data(data);
         inner
@@ -14909,7 +15248,7 @@ impl RoleScopedChatInput {
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
     pub fn builder_user(content: &str) -> RoleScopedChatInputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: RoleScopedChatInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_role("user");
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
@@ -14918,7 +15257,7 @@ impl RoleScopedChatInput {
     #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
     pub fn builder_assistant(content: &str) -> RoleScopedChatInputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: RoleScopedChatInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_role("assistant");
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
@@ -14927,7 +15266,7 @@ impl RoleScopedChatInput {
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
     pub fn builder_system(content: &str) -> RoleScopedChatInputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: RoleScopedChatInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_role("system");
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
@@ -14936,13 +15275,13 @@ impl RoleScopedChatInput {
     #[doc = ""]
     #[doc = " * `role: \"tool\"`"]
     pub fn builder_tool(content: &str) -> RoleScopedChatInputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: RoleScopedChatInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_role("tool");
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
     }
     pub fn builder(role: &JsValue, content: &str) -> RoleScopedChatInputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: RoleScopedChatInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_role_with_js_value(role);
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
@@ -14983,7 +15322,7 @@ impl AiTextGenerationToolLegacyInput {
         Self::builder(name, description).build()
     }
     pub fn builder(name: &str, description: &str) -> AiTextGenerationToolLegacyInputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiTextGenerationToolLegacyInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         inner.set_description(description);
         AiTextGenerationToolLegacyInputBuilder { inner }
@@ -15022,13 +15361,13 @@ impl AiTextGenerationToolInput {
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
     pub fn new_function(function: &Object) -> AiTextGenerationToolInput {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiTextGenerationToolInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("function");
         inner.set_function(function);
         inner
     }
     pub fn new(r#type: &JsValue, function: &Object) -> AiTextGenerationToolInput {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiTextGenerationToolInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type_with_js_value(r#type);
         inner.set_function(function);
         inner
@@ -15050,7 +15389,7 @@ extern "C" {
 }
 impl AiTextGenerationFunctionsInput {
     pub fn new(name: &str, code: &str) -> AiTextGenerationFunctionsInput {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiTextGenerationFunctionsInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         inner.set_code(code);
         inner
@@ -15075,7 +15414,7 @@ impl AiTextGenerationResponseFormat {
         Self::builder(r#type).build()
     }
     pub fn builder(r#type: &str) -> AiTextGenerationResponseFormatBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiTextGenerationResponseFormat = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type(r#type);
         AiTextGenerationResponseFormatBuilder { inner }
     }
@@ -15267,7 +15606,7 @@ extern "C" {
 }
 impl AiTextGenerationToolLegacyOutput {
     pub fn new(name: &str, arguments: &JsValue) -> AiTextGenerationToolLegacyOutput {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiTextGenerationToolLegacyOutput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         inner.set_arguments(arguments);
         inner
@@ -15296,7 +15635,7 @@ impl AiTextGenerationToolOutput {
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
     pub fn new_function(id: &str, function: &Object) -> AiTextGenerationToolOutput {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiTextGenerationToolOutput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_type("function");
         inner.set_function(function);
@@ -15323,7 +15662,7 @@ extern "C" {
 }
 impl UsageTags {
     pub fn new(prompt_tokens: f64, completion_tokens: f64, total_tokens: f64) -> UsageTags {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: UsageTags = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt_tokens(prompt_tokens);
         inner.set_completion_tokens(completion_tokens);
         inner.set_total_tokens(total_tokens);
@@ -15411,7 +15750,7 @@ impl AiTextToSpeechInput {
         Self::builder(prompt).build()
     }
     pub fn builder(prompt: &str) -> AiTextToSpeechInputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiTextToSpeechInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
         AiTextToSpeechInputBuilder { inner }
     }
@@ -15501,7 +15840,7 @@ impl AiTextToImageInput {
         Self::builder(prompt).build()
     }
     pub fn builder(prompt: &str) -> AiTextToImageInputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiTextToImageInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
         AiTextToImageInputBuilder { inner }
     }
@@ -15593,7 +15932,7 @@ impl AiTranslationInput {
         Self::builder(text, target_lang).build()
     }
     pub fn builder(text: &str, target_lang: &str) -> AiTranslationInputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiTranslationInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_lang(target_lang);
         AiTranslationInputBuilder { inner }
@@ -16173,7 +16512,7 @@ impl EasyInputMessage {
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
     pub fn builder_user(content: &str) -> EasyInputMessageBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
         inner.set_role("user");
         EasyInputMessageBuilder { inner }
@@ -16182,7 +16521,7 @@ impl EasyInputMessage {
     #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
     pub fn builder_assistant(content: &str) -> EasyInputMessageBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
         inner.set_role("assistant");
         EasyInputMessageBuilder { inner }
@@ -16191,7 +16530,7 @@ impl EasyInputMessage {
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
     pub fn builder_system(content: &str) -> EasyInputMessageBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
         inner.set_role("system");
         EasyInputMessageBuilder { inner }
@@ -16200,7 +16539,7 @@ impl EasyInputMessage {
     #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
     pub fn builder_developer(content: &str) -> EasyInputMessageBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
         inner.set_role("developer");
         EasyInputMessageBuilder { inner }
@@ -16211,7 +16550,7 @@ impl EasyInputMessage {
     pub fn builder_user_with_response_input_message_content_list(
         content: &[JsValue],
     ) -> EasyInputMessageBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
         inner.set_role("user");
         EasyInputMessageBuilder { inner }
@@ -16222,7 +16561,7 @@ impl EasyInputMessage {
     pub fn builder_assistant_with_response_input_message_content_list(
         content: &[JsValue],
     ) -> EasyInputMessageBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
         inner.set_role("assistant");
         EasyInputMessageBuilder { inner }
@@ -16233,7 +16572,7 @@ impl EasyInputMessage {
     pub fn builder_system_with_response_input_message_content_list(
         content: &[JsValue],
     ) -> EasyInputMessageBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
         inner.set_role("system");
         EasyInputMessageBuilder { inner }
@@ -16244,7 +16583,7 @@ impl EasyInputMessage {
     pub fn builder_developer_with_response_input_message_content_list(
         content: &[JsValue],
     ) -> EasyInputMessageBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
         inner.set_role("developer");
         EasyInputMessageBuilder { inner }
@@ -16307,7 +16646,7 @@ impl ResponsesFunctionTool {
         parameters: Option<&Object>,
         strict: Option<bool>,
     ) -> ResponsesFunctionToolBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponsesFunctionTool = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         inner.set_parameters(parameters);
         inner.set_strict(strict);
@@ -16382,7 +16721,7 @@ impl ResponsePrompt {
         Self::builder(id).build()
     }
     pub fn builder(id: &str) -> ResponsePromptBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponsePrompt = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         ResponsePromptBuilder { inner }
     }
@@ -16472,7 +16811,7 @@ impl ResponseContentReasoningText {
     #[doc = ""]
     #[doc = " * `type: \"reasoning_text\"`"]
     pub fn new_reasoning_text(text: &str) -> ResponseContentReasoningText {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseContentReasoningText = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("reasoning_text");
         inner
@@ -16490,7 +16829,7 @@ extern "C" {
 }
 impl ResponseConversationParam {
     pub fn new(id: &str) -> ResponseConversationParam {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseConversationParam = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner
     }
@@ -16518,7 +16857,7 @@ impl ResponseCreatedEvent {
     #[doc = ""]
     #[doc = " * `type: \"response.created\"`"]
     pub fn new_responsecreated(response: &Response, sequence_number: f64) -> ResponseCreatedEvent {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseCreatedEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
         inner.set_sequence_number(sequence_number);
         inner.set_type("response.created");
@@ -16575,7 +16914,7 @@ impl ResponseCustomToolCallOutput {
         call_id: &str,
         output: &str,
     ) -> ResponseCustomToolCallOutputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseCustomToolCallOutput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_call_id(call_id);
         inner.set_output(output);
         inner.set_type("custom_tool_call_output");
@@ -16588,7 +16927,7 @@ impl ResponseCustomToolCallOutput {
         call_id: &str,
         output: &[JsValue],
     ) -> ResponseCustomToolCallOutputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseCustomToolCallOutput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_call_id(call_id);
         inner.set_output_with_slice(output);
         inner.set_type("custom_tool_call_output");
@@ -16626,7 +16965,7 @@ impl ResponseError {
     #[doc = ""]
     #[doc = " * `code: \"server_error\"`"]
     pub fn new_server_error(message: &str) -> ResponseError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_code("server_error");
         inner.set_message(message);
         inner
@@ -16635,7 +16974,7 @@ impl ResponseError {
     #[doc = ""]
     #[doc = " * `code: \"rate_limit_exceeded\"`"]
     pub fn new_rate_limit_exceeded(message: &str) -> ResponseError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_code("rate_limit_exceeded");
         inner.set_message(message);
         inner
@@ -16644,7 +16983,7 @@ impl ResponseError {
     #[doc = ""]
     #[doc = " * `code: \"invalid_prompt\"`"]
     pub fn new_invalid_prompt(message: &str) -> ResponseError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_code("invalid_prompt");
         inner.set_message(message);
         inner
@@ -16653,7 +16992,7 @@ impl ResponseError {
     #[doc = ""]
     #[doc = " * `code: \"vector_store_timeout\"`"]
     pub fn new_vector_store_timeout(message: &str) -> ResponseError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_code("vector_store_timeout");
         inner.set_message(message);
         inner
@@ -16662,7 +17001,7 @@ impl ResponseError {
     #[doc = ""]
     #[doc = " * `code: \"invalid_image\"`"]
     pub fn new_invalid_image(message: &str) -> ResponseError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_code("invalid_image");
         inner.set_message(message);
         inner
@@ -16671,7 +17010,7 @@ impl ResponseError {
     #[doc = ""]
     #[doc = " * `code: \"invalid_image_format\"`"]
     pub fn new_invalid_image_format(message: &str) -> ResponseError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_code("invalid_image_format");
         inner.set_message(message);
         inner
@@ -16680,7 +17019,7 @@ impl ResponseError {
     #[doc = ""]
     #[doc = " * `code: \"invalid_base64_image\"`"]
     pub fn new_invalid_base64_image(message: &str) -> ResponseError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_code("invalid_base64_image");
         inner.set_message(message);
         inner
@@ -16689,7 +17028,7 @@ impl ResponseError {
     #[doc = ""]
     #[doc = " * `code: \"invalid_image_url\"`"]
     pub fn new_invalid_image_url(message: &str) -> ResponseError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_code("invalid_image_url");
         inner.set_message(message);
         inner
@@ -16698,7 +17037,7 @@ impl ResponseError {
     #[doc = ""]
     #[doc = " * `code: \"image_too_large\"`"]
     pub fn new_image_too_large(message: &str) -> ResponseError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_code("image_too_large");
         inner.set_message(message);
         inner
@@ -16707,7 +17046,7 @@ impl ResponseError {
     #[doc = ""]
     #[doc = " * `code: \"image_too_small\"`"]
     pub fn new_image_too_small(message: &str) -> ResponseError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_code("image_too_small");
         inner.set_message(message);
         inner
@@ -16716,7 +17055,7 @@ impl ResponseError {
     #[doc = ""]
     #[doc = " * `code: \"image_parse_error\"`"]
     pub fn new_image_parse_error(message: &str) -> ResponseError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_code("image_parse_error");
         inner.set_message(message);
         inner
@@ -16725,7 +17064,7 @@ impl ResponseError {
     #[doc = ""]
     #[doc = " * `code: \"image_content_policy_violation\"`"]
     pub fn new_image_content_policy_violation(message: &str) -> ResponseError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_code("image_content_policy_violation");
         inner.set_message(message);
         inner
@@ -16734,7 +17073,7 @@ impl ResponseError {
     #[doc = ""]
     #[doc = " * `code: \"invalid_image_mode\"`"]
     pub fn new_invalid_image_mode(message: &str) -> ResponseError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_code("invalid_image_mode");
         inner.set_message(message);
         inner
@@ -16743,7 +17082,7 @@ impl ResponseError {
     #[doc = ""]
     #[doc = " * `code: \"image_file_too_large\"`"]
     pub fn new_image_file_too_large(message: &str) -> ResponseError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_code("image_file_too_large");
         inner.set_message(message);
         inner
@@ -16752,7 +17091,7 @@ impl ResponseError {
     #[doc = ""]
     #[doc = " * `code: \"unsupported_image_media_type\"`"]
     pub fn new_unsupported_image_media_type(message: &str) -> ResponseError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_code("unsupported_image_media_type");
         inner.set_message(message);
         inner
@@ -16761,7 +17100,7 @@ impl ResponseError {
     #[doc = ""]
     #[doc = " * `code: \"empty_image_file\"`"]
     pub fn new_empty_image_file(message: &str) -> ResponseError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_code("empty_image_file");
         inner.set_message(message);
         inner
@@ -16770,7 +17109,7 @@ impl ResponseError {
     #[doc = ""]
     #[doc = " * `code: \"failed_to_download_image\"`"]
     pub fn new_failed_to_download_image(message: &str) -> ResponseError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_code("failed_to_download_image");
         inner.set_message(message);
         inner
@@ -16779,7 +17118,7 @@ impl ResponseError {
     #[doc = ""]
     #[doc = " * `code: \"image_file_not_found\"`"]
     pub fn new_image_file_not_found(message: &str) -> ResponseError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_code("image_file_not_found");
         inner.set_message(message);
         inner
@@ -16821,7 +17160,7 @@ impl ResponseErrorEvent {
         param: Option<&str>,
         sequence_number: f64,
     ) -> ResponseErrorEvent {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseErrorEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_code(code);
         inner.set_message(message);
         inner.set_param(param);
@@ -16853,7 +17192,7 @@ impl ResponseFailedEvent {
     #[doc = ""]
     #[doc = " * `type: \"response.failed\"`"]
     pub fn new_responsefailed(response: &Response, sequence_number: f64) -> ResponseFailedEvent {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseFailedEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
         inner.set_sequence_number(sequence_number);
         inner.set_type("response.failed");
@@ -16875,7 +17214,7 @@ impl ResponseFormatText {
     #[doc = ""]
     #[doc = " * `type: \"text\"`"]
     pub fn new_text() -> ResponseFormatText {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseFormatText = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("text");
         inner
     }
@@ -16895,7 +17234,7 @@ impl ResponseFormatJSONObject {
     #[doc = ""]
     #[doc = " * `type: \"json_object\"`"]
     pub fn new_json_object() -> ResponseFormatJSONObject {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseFormatJSONObject = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("json_object");
         inner
     }
@@ -16942,7 +17281,8 @@ impl ResponseFormatTextJSONSchemaConfig {
         name: &str,
         schema: &Object,
     ) -> ResponseFormatTextJSONSchemaConfigBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseFormatTextJSONSchemaConfig =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         inner.set_schema(schema);
         inner.set_type("json_schema");
@@ -17001,7 +17341,8 @@ impl ResponseFunctionCallArgumentsDeltaEvent {
         output_index: f64,
         sequence_number: f64,
     ) -> ResponseFunctionCallArgumentsDeltaEvent {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseFunctionCallArgumentsDeltaEvent =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_delta(delta);
         inner.set_item_id(item_id);
         inner.set_output_index(output_index);
@@ -17051,7 +17392,8 @@ impl ResponseFunctionCallArgumentsDoneEvent {
         output_index: f64,
         sequence_number: f64,
     ) -> ResponseFunctionCallArgumentsDoneEvent {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseFunctionCallArgumentsDoneEvent =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_arguments(arguments);
         inner.set_item_id(item_id);
         inner.set_name(name);
@@ -17114,7 +17456,7 @@ impl ResponseFunctionToolCall {
         call_id: &str,
         name: &str,
     ) -> ResponseFunctionToolCallBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseFunctionToolCall = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_arguments(arguments);
         inner.set_call_id(call_id);
         inner.set_name(name);
@@ -17150,7 +17492,7 @@ extern "C" {
 }
 impl ResponseFunctionToolCallItem {
     pub fn new(id: &str) -> ResponseFunctionToolCallItem {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseFunctionToolCallItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner
     }
@@ -17212,7 +17554,8 @@ impl ResponseFunctionToolCallOutputItem {
         call_id: &str,
         output: &str,
     ) -> ResponseFunctionToolCallOutputItemBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseFunctionToolCallOutputItem =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_call_id(call_id);
         inner.set_output(output);
@@ -17227,7 +17570,8 @@ impl ResponseFunctionToolCallOutputItem {
         call_id: &str,
         output: &[JsValue],
     ) -> ResponseFunctionToolCallOutputItemBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseFunctionToolCallOutputItem =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_call_id(call_id);
         inner.set_output_with_slice(output);
@@ -17281,7 +17625,7 @@ impl ResponseIncompleteEvent {
         response: &Response,
         sequence_number: f64,
     ) -> ResponseIncompleteEvent {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseIncompleteEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
         inner.set_sequence_number(sequence_number);
         inner.set_type("response.incomplete");
@@ -17338,7 +17682,7 @@ impl ResponseInputImage {
     #[doc = " * `detail: \"low\"`"]
     #[doc = " * `type: \"input_image\"`"]
     pub fn builder_low_input_image() -> ResponseInputImageBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseInputImage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_detail("low");
         inner.set_type("input_image");
         ResponseInputImageBuilder { inner }
@@ -17348,7 +17692,7 @@ impl ResponseInputImage {
     #[doc = " * `detail: \"high\"`"]
     #[doc = " * `type: \"input_image\"`"]
     pub fn builder_high_input_image() -> ResponseInputImageBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseInputImage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_detail("high");
         inner.set_type("input_image");
         ResponseInputImageBuilder { inner }
@@ -17358,7 +17702,7 @@ impl ResponseInputImage {
     #[doc = " * `detail: \"auto\"`"]
     #[doc = " * `type: \"input_image\"`"]
     pub fn builder_auto_input_image() -> ResponseInputImageBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseInputImage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_detail("auto");
         inner.set_type("input_image");
         ResponseInputImageBuilder { inner }
@@ -17406,7 +17750,7 @@ impl ResponseInputImageContent {
     #[doc = ""]
     #[doc = " * `type: \"input_image\"`"]
     pub fn builder_input_image() -> ResponseInputImageContentBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseInputImageContent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("input_image");
         ResponseInputImageContentBuilder { inner }
     }
@@ -17488,7 +17832,8 @@ impl ResponseInputItemFunctionCallOutput {
         call_id: &str,
         output: &str,
     ) -> ResponseInputItemFunctionCallOutputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseInputItemFunctionCallOutput =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_call_id(call_id);
         inner.set_output(output);
         inner.set_type("function_call_output");
@@ -17501,7 +17846,8 @@ impl ResponseInputItemFunctionCallOutput {
         call_id: &str,
         output: &[JsValue],
     ) -> ResponseInputItemFunctionCallOutputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseInputItemFunctionCallOutput =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_call_id(call_id);
         inner.set_output(output);
         inner.set_type("function_call_output");
@@ -17569,7 +17915,7 @@ impl ResponseInputItemMessage {
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
     pub fn builder_user(content: &[JsValue]) -> ResponseInputItemMessageBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseInputItemMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
         inner.set_role("user");
         ResponseInputItemMessageBuilder { inner }
@@ -17578,7 +17924,7 @@ impl ResponseInputItemMessage {
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
     pub fn builder_system(content: &[JsValue]) -> ResponseInputItemMessageBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseInputItemMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
         inner.set_role("system");
         ResponseInputItemMessageBuilder { inner }
@@ -17587,7 +17933,7 @@ impl ResponseInputItemMessage {
     #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
     pub fn builder_developer(content: &[JsValue]) -> ResponseInputItemMessageBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseInputItemMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
         inner.set_role("developer");
         ResponseInputItemMessageBuilder { inner }
@@ -17660,7 +18006,7 @@ impl ResponseInputMessageItem {
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
     pub fn builder_user(id: &str, content: &[JsValue]) -> ResponseInputMessageItemBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseInputMessageItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
         inner.set_role("user");
@@ -17670,7 +18016,7 @@ impl ResponseInputMessageItem {
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
     pub fn builder_system(id: &str, content: &[JsValue]) -> ResponseInputMessageItemBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseInputMessageItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
         inner.set_role("system");
@@ -17680,7 +18026,7 @@ impl ResponseInputMessageItem {
     #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
     pub fn builder_developer(id: &str, content: &[JsValue]) -> ResponseInputMessageItemBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseInputMessageItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
         inner.set_role("developer");
@@ -17722,7 +18068,7 @@ impl ResponseInputText {
     #[doc = ""]
     #[doc = " * `type: \"input_text\"`"]
     pub fn new_input_text(text: &str) -> ResponseInputText {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseInputText = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("input_text");
         inner
@@ -17747,7 +18093,7 @@ impl ResponseInputTextContent {
     #[doc = ""]
     #[doc = " * `type: \"input_text\"`"]
     pub fn new_input_text(text: &str) -> ResponseInputTextContent {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseInputTextContent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("input_text");
         inner
@@ -17798,7 +18144,7 @@ impl ResponseOutputItemAddedEvent {
         output_index: f64,
         sequence_number: f64,
     ) -> ResponseOutputItemAddedEvent {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseOutputItemAddedEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_item(item);
         inner.set_output_index(output_index);
         inner.set_sequence_number(sequence_number);
@@ -17847,7 +18193,7 @@ impl ResponseOutputItemDoneEvent {
         output_index: f64,
         sequence_number: f64,
     ) -> ResponseOutputItemDoneEvent {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseOutputItemDoneEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_item(item);
         inner.set_output_index(output_index);
         inner.set_sequence_number(sequence_number);
@@ -17891,7 +18237,7 @@ impl ResponseOutputMessage {
         id: &str,
         content: &[JsValue],
     ) -> ResponseOutputMessage {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
         inner.set_role("assistant");
@@ -17905,7 +18251,7 @@ impl ResponseOutputMessage {
     #[doc = " * `status: \"completed\"`"]
     #[doc = " * `type: \"message\"`"]
     pub fn new_assistant_completed_message(id: &str, content: &[JsValue]) -> ResponseOutputMessage {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
         inner.set_role("assistant");
@@ -17922,7 +18268,7 @@ impl ResponseOutputMessage {
         id: &str,
         content: &[JsValue],
     ) -> ResponseOutputMessage {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
         inner.set_role("assistant");
@@ -17950,7 +18296,7 @@ impl ResponseOutputRefusal {
     #[doc = ""]
     #[doc = " * `type: \"refusal\"`"]
     pub fn new_refusal(refusal: &str) -> ResponseOutputRefusal {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseOutputRefusal = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_refusal(refusal);
         inner.set_type("refusal");
         inner
@@ -17985,7 +18331,7 @@ impl ResponseOutputText {
     #[doc = ""]
     #[doc = " * `type: \"output_text\"`"]
     pub fn builder_output_text(text: &str) -> ResponseOutputTextBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseOutputText = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("output_text");
         ResponseOutputTextBuilder { inner }
@@ -18050,7 +18396,7 @@ impl ResponseReasoningItem {
         id: &str,
         summary: &[ResponseReasoningSummaryItem],
     ) -> ResponseReasoningItemBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseReasoningItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_summary(summary);
         inner.set_type("reasoning");
@@ -18096,7 +18442,7 @@ impl ResponseReasoningSummaryItem {
     #[doc = ""]
     #[doc = " * `type: \"summary_text\"`"]
     pub fn new_summary_text(text: &str) -> ResponseReasoningSummaryItem {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseReasoningSummaryItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("summary_text");
         inner
@@ -18121,7 +18467,7 @@ impl ResponseReasoningContentItem {
     #[doc = ""]
     #[doc = " * `type: \"reasoning_text\"`"]
     pub fn new_reasoning_text(text: &str) -> ResponseReasoningContentItem {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseReasoningContentItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("reasoning_text");
         inner
@@ -18168,7 +18514,7 @@ impl ResponseReasoningTextDeltaEvent {
         output_index: f64,
         sequence_number: f64,
     ) -> ResponseReasoningTextDeltaEvent {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseReasoningTextDeltaEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content_index(content_index);
         inner.set_delta(delta);
         inner.set_item_id(item_id);
@@ -18219,7 +18565,7 @@ impl ResponseReasoningTextDoneEvent {
         sequence_number: f64,
         text: &str,
     ) -> ResponseReasoningTextDoneEvent {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseReasoningTextDoneEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content_index(content_index);
         inner.set_item_id(item_id);
         inner.set_output_index(output_index);
@@ -18270,7 +18616,7 @@ impl ResponseRefusalDeltaEvent {
         output_index: f64,
         sequence_number: f64,
     ) -> ResponseRefusalDeltaEvent {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseRefusalDeltaEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content_index(content_index);
         inner.set_delta(delta);
         inner.set_item_id(item_id);
@@ -18321,7 +18667,7 @@ impl ResponseRefusalDoneEvent {
         refusal: &str,
         sequence_number: f64,
     ) -> ResponseRefusalDoneEvent {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseRefusalDoneEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content_index(content_index);
         inner.set_item_id(item_id);
         inner.set_output_index(output_index);
@@ -18375,7 +18721,7 @@ impl ResponseCompletedEvent {
         response: &Response,
         sequence_number: f64,
     ) -> ResponseCompletedEvent {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseCompletedEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
         inner.set_sequence_number(sequence_number);
         inner.set_type("response.completed");
@@ -18490,7 +18836,7 @@ impl ResponseTextDeltaEvent {
         output_index: f64,
         sequence_number: f64,
     ) -> ResponseTextDeltaEvent {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseTextDeltaEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content_index(content_index);
         inner.set_delta(delta);
         inner.set_item_id(item_id);
@@ -18547,7 +18893,7 @@ impl ResponseTextDoneEvent {
         sequence_number: f64,
         text: &str,
     ) -> ResponseTextDoneEvent {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseTextDoneEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content_index(content_index);
         inner.set_item_id(item_id);
         inner.set_logprobs(logprobs);
@@ -18581,7 +18927,7 @@ impl Logprob {
         Self::builder(token, logprob).build()
     }
     pub fn builder(token: &str, logprob: f64) -> LogprobBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Logprob = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_token(token);
         inner.set_logprob(logprob);
         LogprobBuilder { inner }
@@ -18659,7 +19005,7 @@ extern "C" {
 }
 impl ResponseUsage {
     pub fn new(input_tokens: f64, output_tokens: f64, total_tokens: f64) -> ResponseUsage {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ResponseUsage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_input_tokens(input_tokens);
         inner.set_output_tokens(output_tokens);
         inner.set_total_tokens(total_tokens);
@@ -18687,7 +19033,7 @@ impl ToolChoiceFunction {
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
     pub fn new_function(name: &str) -> ToolChoiceFunction {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ToolChoiceFunction = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         inner.set_type("function");
         inner
@@ -18878,7 +19224,7 @@ impl Ai_Cf_Openai_Whisper_Output {
     }
     #[doc = " * `text` - The transcription"]
     pub fn builder(text: &str) -> Ai_Cf_Openai_Whisper_OutputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Openai_Whisper_Output = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         Ai_Cf_Openai_Whisper_OutputBuilder { inner }
     }
@@ -19349,7 +19695,8 @@ impl Ai_Cf_Openai_Whisper_Tiny_En_Output {
     }
     #[doc = " * `text` - The transcription"]
     pub fn builder(text: &str) -> Ai_Cf_Openai_Whisper_Tiny_En_OutputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Openai_Whisper_Tiny_En_Output =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         Ai_Cf_Openai_Whisper_Tiny_En_OutputBuilder { inner }
     }
@@ -19438,7 +19785,8 @@ impl Ai_Cf_Openai_Whisper_Large_V3_Turbo_Input {
     }
     #[doc = " * `audio` - Base64 encoded value of the audio data."]
     pub fn builder(audio: &str) -> Ai_Cf_Openai_Whisper_Large_V3_Turbo_InputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Openai_Whisper_Large_V3_Turbo_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_audio(audio);
         Ai_Cf_Openai_Whisper_Large_V3_Turbo_InputBuilder { inner }
     }
@@ -19507,7 +19855,8 @@ impl Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output {
     }
     #[doc = " * `text` - The complete transcription of the audio."]
     pub fn builder(text: &str) -> Ai_Cf_Openai_Whisper_Large_V3_Turbo_OutputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         Ai_Cf_Openai_Whisper_Large_V3_Turbo_OutputBuilder { inner }
     }
@@ -19590,7 +19939,8 @@ impl Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts {
     }
     #[doc = " * `contexts` - List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
     pub fn builder(contexts: &[Object]) -> Ai_Cf_Baai_Bge_M3_Input_QueryAnd_ContextsBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_contexts(contexts);
         Ai_Cf_Baai_Bge_M3_Input_QueryAnd_ContextsBuilder { inner }
     }
@@ -19636,12 +19986,14 @@ impl Ai_Cf_Baai_Bge_M3_Input_Embedding {
         Self::builder_with_slice(text).build()
     }
     pub fn builder(text: &str) -> Ai_Cf_Baai_Bge_M3_Input_EmbeddingBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Baai_Bge_M3_Input_Embedding =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         Ai_Cf_Baai_Bge_M3_Input_EmbeddingBuilder { inner }
     }
     pub fn builder_with_slice(text: &[String]) -> Ai_Cf_Baai_Bge_M3_Input_EmbeddingBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Baai_Bge_M3_Input_Embedding =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         Ai_Cf_Baai_Bge_M3_Input_EmbeddingBuilder { inner }
     }
@@ -19686,7 +20038,8 @@ impl Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1 {
     }
     #[doc = " * `contexts` - List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
     pub fn builder(contexts: &[Object]) -> Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1Builder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1 =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_contexts(contexts);
         Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1Builder { inner }
     }
@@ -19732,12 +20085,14 @@ impl Ai_Cf_Baai_Bge_M3_Input_Embedding_1 {
         Self::builder_with_slice(text).build()
     }
     pub fn builder(text: &str) -> Ai_Cf_Baai_Bge_M3_Input_Embedding_1Builder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Baai_Bge_M3_Input_Embedding_1 =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         Ai_Cf_Baai_Bge_M3_Input_Embedding_1Builder { inner }
     }
     pub fn builder_with_slice(text: &[String]) -> Ai_Cf_Baai_Bge_M3_Input_Embedding_1Builder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Baai_Bge_M3_Input_Embedding_1 =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         Ai_Cf_Baai_Bge_M3_Input_Embedding_1Builder { inner }
     }
@@ -19986,7 +20341,8 @@ impl Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input {
     }
     #[doc = " * `prompt` - A text description of the image you want to generate."]
     pub fn builder(prompt: &str) -> Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_InputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
         Ai_Cf_Black_Forest_Labs_Flux_1_Schnell_InputBuilder { inner }
     }
@@ -20147,7 +20503,8 @@ impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt {
     }
     #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_PromptBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
         Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_PromptBuilder { inner }
     }
@@ -20309,7 +20666,8 @@ impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages {
     pub fn builder(
         messages: &[Object],
     ) -> Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
         Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesBuilder { inner }
     }
@@ -20541,7 +20899,8 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt {
     }
     #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_PromptBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Prompt =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
         Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_PromptBuilder { inner }
     }
@@ -20760,7 +21119,8 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages {
     pub fn builder(
         messages: &[Object],
     ) -> Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_MessagesBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
         Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_MessagesBuilder { inner }
     }
@@ -21070,7 +21430,8 @@ impl Ai_Cf_Meta_Llama_Guard_3_8B_Input {
     }
     #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn builder(messages: &[Object]) -> Ai_Cf_Meta_Llama_Guard_3_8B_InputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Meta_Llama_Guard_3_8B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
         Ai_Cf_Meta_Llama_Guard_3_8B_InputBuilder { inner }
     }
@@ -21187,7 +21548,8 @@ impl Ai_Cf_Baai_Bge_Reranker_Base_Input {
     }
     #[doc = " * `contexts` - List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
     pub fn builder(contexts: &[Object]) -> Ai_Cf_Baai_Bge_Reranker_Base_InputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Baai_Bge_Reranker_Base_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_contexts(contexts);
         Ai_Cf_Baai_Bge_Reranker_Base_InputBuilder { inner }
     }
@@ -21342,7 +21704,8 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Prompt {
     }
     #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_PromptBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Prompt =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
         Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_PromptBuilder { inner }
     }
@@ -21532,7 +21895,8 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages {
     }
     #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn builder(messages: &[Object]) -> Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_MessagesBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
         Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_MessagesBuilder { inner }
     }
@@ -21667,7 +22031,8 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output {
     }
     #[doc = " * `response` - The generated text response from the model"]
     pub fn builder(response: &str) -> Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_OutputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
         Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_OutputBuilder { inner }
     }
@@ -21790,7 +22155,7 @@ impl Ai_Cf_Qwen_Qwq_32B_Prompt {
     }
     #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Qwen_Qwq_32B_PromptBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Qwen_Qwq_32B_Prompt = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
         Ai_Cf_Qwen_Qwq_32B_PromptBuilder { inner }
     }
@@ -21929,7 +22294,7 @@ impl Ai_Cf_Qwen_Qwq_32B_Messages {
     }
     #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn builder(messages: &[Object]) -> Ai_Cf_Qwen_Qwq_32B_MessagesBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Qwen_Qwq_32B_Messages = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
         Ai_Cf_Qwen_Qwq_32B_MessagesBuilder { inner }
     }
@@ -22022,7 +22387,7 @@ impl Ai_Cf_Qwen_Qwq_32B_Output {
     }
     #[doc = " * `response` - The generated text response from the model"]
     pub fn builder(response: &str) -> Ai_Cf_Qwen_Qwq_32B_OutputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Qwen_Qwq_32B_Output = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
         Ai_Cf_Qwen_Qwq_32B_OutputBuilder { inner }
     }
@@ -22161,7 +22526,8 @@ impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Prompt {
     }
     #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_PromptBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Prompt =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
         Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_PromptBuilder { inner }
     }
@@ -22342,7 +22708,8 @@ impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages {
     pub fn builder(
         messages: &[Object],
     ) -> Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
         Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesBuilder { inner }
     }
@@ -22440,7 +22807,8 @@ impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output {
     }
     #[doc = " * `response` - The generated text response from the model"]
     pub fn builder(response: &str) -> Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_OutputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
         Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_OutputBuilder { inner }
     }
@@ -22563,7 +22931,8 @@ impl Ai_Cf_Google_Gemma_3_12B_It_Prompt {
     }
     #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Google_Gemma_3_12B_It_PromptBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Google_Gemma_3_12B_It_Prompt =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
         Ai_Cf_Google_Gemma_3_12B_It_PromptBuilder { inner }
     }
@@ -22702,7 +23071,8 @@ impl Ai_Cf_Google_Gemma_3_12B_It_Messages {
     }
     #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn builder(messages: &[Object]) -> Ai_Cf_Google_Gemma_3_12B_It_MessagesBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Google_Gemma_3_12B_It_Messages =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
         Ai_Cf_Google_Gemma_3_12B_It_MessagesBuilder { inner }
     }
@@ -22795,7 +23165,8 @@ impl Ai_Cf_Google_Gemma_3_12B_It_Output {
     }
     #[doc = " * `response` - The generated text response from the model"]
     pub fn builder(response: &str) -> Ai_Cf_Google_Gemma_3_12B_It_OutputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Google_Gemma_3_12B_It_Output =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
         Ai_Cf_Google_Gemma_3_12B_It_OutputBuilder { inner }
     }
@@ -22935,7 +23306,8 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt {
     }
     #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_PromptBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
         Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_PromptBuilder { inner }
     }
@@ -23156,7 +23528,8 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages {
     pub fn builder(
         messages: &[Object],
     ) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
         Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesBuilder { inner }
     }
@@ -23243,7 +23616,8 @@ extern "C" {
 }
 impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch {
     pub fn new(requests: &[JsValue]) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_requests(requests);
         inner
     }
@@ -23353,7 +23727,8 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_Inner {
     }
     #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_InnerBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_Inner =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
         Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Prompt_InnerBuilder { inner }
     }
@@ -23554,7 +23929,8 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner {
     pub fn builder(
         messages: &[Object],
     ) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
         Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerBuilder { inner }
     }
@@ -23656,7 +24032,8 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output {
     }
     #[doc = " * `response` - The generated text response from the model"]
     pub fn builder(response: &str) -> Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
         Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_OutputBuilder { inner }
     }
@@ -23793,7 +24170,8 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt {
     }
     #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_PromptBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
         Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_PromptBuilder { inner }
     }
@@ -23982,7 +24360,8 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages {
     }
     #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn builder(messages: &[Object]) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_MessagesBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
         Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_MessagesBuilder { inner }
     }
@@ -24101,7 +24480,8 @@ extern "C" {
 }
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch {
     pub fn new(requests: &[JsValue]) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_requests(requests);
         inner
     }
@@ -24188,7 +24568,8 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1 {
     }
     #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1Builder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1 =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
         Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Prompt_1Builder { inner }
     }
@@ -24377,7 +24758,8 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1 {
     }
     #[doc = " * `messages` - An array of message objects representing the conversation history."]
     pub fn builder(messages: &[Object]) -> Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1Builder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1 =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
         Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1Builder { inner }
     }
@@ -24931,7 +25313,7 @@ impl Ai_Cf_Deepgram_Nova_3_Input {
         Self::builder(audio).build()
     }
     pub fn builder(audio: &Object) -> Ai_Cf_Deepgram_Nova_3_InputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Deepgram_Nova_3_Input = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_audio(audio);
         Ai_Cf_Deepgram_Nova_3_InputBuilder { inner }
     }
@@ -25303,13 +25685,15 @@ impl Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input {
     }
     #[doc = " * `audio` - readable stream with audio data and content-type specified for that data"]
     pub fn builder(audio: &Object) -> Ai_Cf_Pipecat_Ai_Smart_Turn_V2_InputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_audio(audio);
         Ai_Cf_Pipecat_Ai_Smart_Turn_V2_InputBuilder { inner }
     }
     #[doc = " * `audio` - readable stream with audio data and content-type specified for that data"]
     pub fn builder_with_str(audio: &str) -> Ai_Cf_Pipecat_Ai_Smart_Turn_V2_InputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Pipecat_Ai_Smart_Turn_V2_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_audio_with_str(audio);
         Ai_Cf_Pipecat_Ai_Smart_Turn_V2_InputBuilder { inner }
     }
@@ -25468,7 +25852,7 @@ impl Ai_Cf_Leonardo_Phoenix_1_0_Input {
     }
     #[doc = " * `prompt` - A text description of the image you want to generate."]
     pub fn builder(prompt: &str) -> Ai_Cf_Leonardo_Phoenix_1_0_InputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Leonardo_Phoenix_1_0_Input = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
         Ai_Cf_Leonardo_Phoenix_1_0_InputBuilder { inner }
     }
@@ -25572,7 +25956,8 @@ impl Ai_Cf_Leonardo_Lucid_Origin_Input {
     }
     #[doc = " * `prompt` - A text description of the image you want to generate."]
     pub fn builder(prompt: &str) -> Ai_Cf_Leonardo_Lucid_Origin_InputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Leonardo_Lucid_Origin_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
         Ai_Cf_Leonardo_Lucid_Origin_InputBuilder { inner }
     }
@@ -25709,7 +26094,7 @@ impl Ai_Cf_Deepgram_Aura_1_Input {
     }
     #[doc = " * `text` - The text content to be converted to speech"]
     pub fn builder(text: &str) -> Ai_Cf_Deepgram_Aura_1_InputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Deepgram_Aura_1_Input = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         Ai_Cf_Deepgram_Aura_1_InputBuilder { inner }
     }
@@ -25788,7 +26173,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_asm_beng(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("asm_Beng");
         inner
@@ -25799,7 +26185,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_awa_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("awa_Deva");
         inner
@@ -25810,7 +26197,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_ben_beng(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("ben_Beng");
         inner
@@ -25821,7 +26209,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_bho_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("bho_Deva");
         inner
@@ -25832,7 +26221,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_brx_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("brx_Deva");
         inner
@@ -25843,7 +26233,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_doi_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("doi_Deva");
         inner
@@ -25854,7 +26245,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_eng_latn(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("eng_Latn");
         inner
@@ -25865,7 +26257,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_gom_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("gom_Deva");
         inner
@@ -25876,7 +26269,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_gon_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("gon_Deva");
         inner
@@ -25887,7 +26281,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_guj_gujr(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("guj_Gujr");
         inner
@@ -25898,7 +26293,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_hin_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("hin_Deva");
         inner
@@ -25909,7 +26305,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_hne_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("hne_Deva");
         inner
@@ -25920,7 +26317,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_kan_knda(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("kan_Knda");
         inner
@@ -25931,7 +26329,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_kas_arab(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("kas_Arab");
         inner
@@ -25942,7 +26341,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_kas_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("kas_Deva");
         inner
@@ -25953,7 +26353,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_kha_latn(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("kha_Latn");
         inner
@@ -25964,7 +26365,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_lus_latn(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("lus_Latn");
         inner
@@ -25975,7 +26377,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mag_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("mag_Deva");
         inner
@@ -25986,7 +26389,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mai_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("mai_Deva");
         inner
@@ -25997,7 +26401,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mal_mlym(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("mal_Mlym");
         inner
@@ -26008,7 +26413,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mar_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("mar_Deva");
         inner
@@ -26019,7 +26425,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mni_beng(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("mni_Beng");
         inner
@@ -26030,7 +26437,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_mni_mtei(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("mni_Mtei");
         inner
@@ -26041,7 +26449,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_npi_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("npi_Deva");
         inner
@@ -26052,7 +26461,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_ory_orya(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("ory_Orya");
         inner
@@ -26063,7 +26473,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_pan_guru(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("pan_Guru");
         inner
@@ -26074,7 +26485,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_san_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("san_Deva");
         inner
@@ -26085,7 +26497,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_sat_olck(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("sat_Olck");
         inner
@@ -26096,7 +26509,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_snd_arab(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("snd_Arab");
         inner
@@ -26107,7 +26521,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_snd_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("snd_Deva");
         inner
@@ -26118,7 +26533,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_tam_taml(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("tam_Taml");
         inner
@@ -26129,7 +26545,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_tel_telu(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("tel_Telu");
         inner
@@ -26140,7 +26557,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_urd_arab(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("urd_Arab");
         inner
@@ -26151,7 +26569,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
     pub fn new_unr_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_target_language("unr_Deva");
         inner
@@ -26164,7 +26583,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_asm_beng_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("asm_Beng");
         inner
@@ -26177,7 +26597,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_awa_deva_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("awa_Deva");
         inner
@@ -26190,7 +26611,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_ben_beng_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("ben_Beng");
         inner
@@ -26203,7 +26625,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_bho_deva_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("bho_Deva");
         inner
@@ -26216,7 +26639,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_brx_deva_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("brx_Deva");
         inner
@@ -26229,7 +26653,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_doi_deva_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("doi_Deva");
         inner
@@ -26242,7 +26667,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_eng_latn_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("eng_Latn");
         inner
@@ -26255,7 +26681,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_gom_deva_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("gom_Deva");
         inner
@@ -26268,7 +26695,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_gon_deva_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("gon_Deva");
         inner
@@ -26281,7 +26709,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_guj_gujr_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("guj_Gujr");
         inner
@@ -26294,7 +26723,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_hin_deva_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("hin_Deva");
         inner
@@ -26307,7 +26737,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_hne_deva_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("hne_Deva");
         inner
@@ -26320,7 +26751,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_kan_knda_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("kan_Knda");
         inner
@@ -26333,7 +26765,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_kas_arab_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("kas_Arab");
         inner
@@ -26346,7 +26779,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_kas_deva_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("kas_Deva");
         inner
@@ -26359,7 +26793,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_kha_latn_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("kha_Latn");
         inner
@@ -26372,7 +26807,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_lus_latn_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("lus_Latn");
         inner
@@ -26385,7 +26821,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_mag_deva_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("mag_Deva");
         inner
@@ -26398,7 +26835,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_mai_deva_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("mai_Deva");
         inner
@@ -26411,7 +26849,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_mal_mlym_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("mal_Mlym");
         inner
@@ -26424,7 +26863,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_mar_deva_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("mar_Deva");
         inner
@@ -26437,7 +26877,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_mni_beng_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("mni_Beng");
         inner
@@ -26450,7 +26891,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_mni_mtei_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("mni_Mtei");
         inner
@@ -26463,7 +26905,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_npi_deva_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("npi_Deva");
         inner
@@ -26476,7 +26919,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_ory_orya_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("ory_Orya");
         inner
@@ -26489,7 +26933,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_pan_guru_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("pan_Guru");
         inner
@@ -26502,7 +26947,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_san_deva_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("san_Deva");
         inner
@@ -26515,7 +26961,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_sat_olck_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("sat_Olck");
         inner
@@ -26528,7 +26975,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_snd_arab_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("snd_Arab");
         inner
@@ -26541,7 +26989,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_snd_deva_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("snd_Deva");
         inner
@@ -26554,7 +27003,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_tam_taml_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("tam_Taml");
         inner
@@ -26567,7 +27017,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_tel_telu_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("tel_Telu");
         inner
@@ -26580,7 +27031,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_urd_arab_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("urd_Arab");
         inner
@@ -26593,7 +27045,8 @@ impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
     pub fn new_unr_deva_with_slice(
         text: &[String],
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner.set_target_language("unr_Deva");
         inner
@@ -26613,7 +27066,8 @@ extern "C" {
 impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Output {
     #[doc = " * `translations` - Translated texts"]
     pub fn new(translations: &[String]) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Output {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Output =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_translations(translations);
         inner
     }
@@ -26738,7 +27192,8 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt {
     }
     #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_PromptBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
         Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_PromptBuilder { inner }
     }
@@ -26957,7 +27412,8 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages {
     pub fn builder(
         messages: &[Object],
     ) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_MessagesBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
         Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_MessagesBuilder { inner }
     }
@@ -27085,7 +27541,8 @@ extern "C" {
 }
 impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch {
     pub fn new(requests: &[JsValue]) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_requests(requests);
         inner
     }
@@ -27187,7 +27644,8 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1 {
     }
     #[doc = " * `prompt` - The input text prompt for the model to generate a response."]
     pub fn builder(prompt: &str) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1Builder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1 =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_prompt(prompt);
         Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Prompt_1Builder { inner }
     }
@@ -27410,7 +27868,8 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1 {
     pub fn builder(
         messages: &[Object],
     ) -> Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1Builder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1 =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
         Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1Builder { inner }
     }
@@ -27856,13 +28315,15 @@ extern "C" {
 impl Ai_Cf_Pfnet_Plamo_Embedding_1B_Input {
     #[doc = " * `text` - Input text to embed. Can be a single string or a list of strings."]
     pub fn new(text: &str) -> Ai_Cf_Pfnet_Plamo_Embedding_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Pfnet_Plamo_Embedding_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner
     }
     #[doc = " * `text` - Input text to embed. Can be a single string or a list of strings."]
     pub fn new_with_slice(text: &[String]) -> Ai_Cf_Pfnet_Plamo_Embedding_1B_Input {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Pfnet_Plamo_Embedding_1B_Input =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
         inner
     }
@@ -27899,7 +28360,8 @@ impl Ai_Cf_Pfnet_Plamo_Embedding_1B_Output {
         data: &[Vec<f64>],
         shape: &ArrayTuple<(Number, Number)>,
     ) -> Ai_Cf_Pfnet_Plamo_Embedding_1B_Output {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Pfnet_Plamo_Embedding_1B_Output =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_data(data);
         inner.set_shape(shape);
         inner
@@ -27990,7 +28452,7 @@ impl Ai_Cf_Deepgram_Flux_Input {
     #[doc = ""]
     #[doc = " * `sample_rate` - Sample rate of the audio stream in Hz."]
     pub fn builder_linear16(sample_rate: &str) -> Ai_Cf_Deepgram_Flux_InputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Deepgram_Flux_Input = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_encoding("linear16");
         inner.set_sample_rate(sample_rate);
         Ai_Cf_Deepgram_Flux_InputBuilder { inner }
@@ -28197,7 +28659,7 @@ impl Ai_Cf_Deepgram_Aura_2_En_Input {
     }
     #[doc = " * `text` - The text content to be converted to speech"]
     pub fn builder(text: &str) -> Ai_Cf_Deepgram_Aura_2_En_InputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Deepgram_Aura_2_En_Input = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         Ai_Cf_Deepgram_Aura_2_En_InputBuilder { inner }
     }
@@ -28293,7 +28755,7 @@ impl Ai_Cf_Deepgram_Aura_2_Es_Input {
     }
     #[doc = " * `text` - The text content to be converted to speech"]
     pub fn builder(text: &str) -> Ai_Cf_Deepgram_Aura_2_Es_InputBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: Ai_Cf_Deepgram_Aura_2_Es_Input = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         Ai_Cf_Deepgram_Aura_2_Es_InputBuilder { inner }
     }
@@ -28882,7 +29344,7 @@ impl AiModels {
         cfdeepgramaura2_en: &Base_Ai_Cf_Deepgram_Aura_2_En,
         cfdeepgramaura2_es: &Base_Ai_Cf_Deepgram_Aura_2_Es,
     ) -> AiModels {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiModels = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cfhuggingfacedistilbert_sst2_int8(cfhuggingfacedistilbert_sst2_int8);
         inner
             .set_cfstabilityaistable_diffusion_xl_base_10(cfstabilityaistable_diffusion_xl_base_10);
@@ -29195,7 +29657,7 @@ impl AiModelsSearchObject {
         tags: &[String],
         properties: &[Object],
     ) -> AiModelsSearchObject {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiModelsSearchObject = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_source(source);
         inner.set_name(name);
@@ -29226,9 +29688,14 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai<AiModelList: ::wasm_bindgen::JsGeneric>;
     #[wasm_bindgen(method, getter, js_name = "aiGatewayLogId")]
-    pub fn ai_gateway_log_id(this: &Ai) -> Option<String>;
+    pub fn ai_gateway_log_id<AiModelList: ::wasm_bindgen::JsGeneric>(
+        this: &Ai<AiModelList>,
+    ) -> Option<String>;
     #[wasm_bindgen(method, setter, js_name = "aiGatewayLogId")]
-    pub fn set_ai_gateway_log_id(this: &Ai, val: &str);
+    pub fn set_ai_gateway_log_id<AiModelList: ::wasm_bindgen::JsGeneric>(
+        this: &Ai<AiModelList>,
+        val: &str,
+    );
     #[wasm_bindgen(method)]
     pub fn gateway<AiModelList: ::wasm_bindgen::JsGeneric>(
         this: &Ai<AiModelList>,
@@ -29520,7 +29987,7 @@ impl GatewayOptions {
         Self::builder(id).build()
     }
     pub fn builder(id: &str) -> GatewayOptionsBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: GatewayOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         GatewayOptionsBuilder { inner }
     }
@@ -29769,7 +30236,7 @@ impl AiGatewayLog {
         response_head_complete: bool,
         created_at: &Date,
     ) -> AiGatewayLogBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AiGatewayLog = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_provider(provider);
         inner.set_model(model);
@@ -29976,7 +30443,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30007,7 +30474,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30038,7 +30505,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30069,7 +30536,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30100,7 +30567,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30131,7 +30598,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30162,7 +30629,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30193,7 +30660,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30224,7 +30691,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30255,7 +30722,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30286,7 +30753,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30317,7 +30784,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30348,7 +30815,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30379,7 +30846,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30410,7 +30877,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30441,7 +30908,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30472,7 +30939,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30503,7 +30970,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30534,7 +31001,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30565,7 +31032,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30596,7 +31063,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30627,7 +31094,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30658,7 +31125,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30689,7 +31156,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30720,7 +31187,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30751,7 +31218,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30782,7 +31249,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30813,7 +31280,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30844,7 +31311,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30875,7 +31342,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30906,7 +31373,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30937,7 +31404,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -30968,7 +31435,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -30999,7 +31466,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31030,7 +31497,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31061,7 +31528,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31092,7 +31559,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31123,7 +31590,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31154,7 +31621,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31185,7 +31652,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31216,7 +31683,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31247,7 +31714,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31278,7 +31745,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31309,7 +31776,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31340,7 +31807,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31371,7 +31838,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31402,7 +31869,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31433,7 +31900,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31464,7 +31931,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31495,7 +31962,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31526,7 +31993,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31557,7 +32024,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31588,7 +32055,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31619,7 +32086,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31650,7 +32117,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31681,7 +32148,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31712,7 +32179,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31743,7 +32210,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31774,7 +32241,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31805,7 +32272,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31836,7 +32303,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31867,7 +32334,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31898,7 +32365,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31929,7 +32396,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -31960,7 +32427,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -31991,7 +32458,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32022,7 +32489,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32053,7 +32520,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32084,7 +32551,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32115,7 +32582,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32146,7 +32613,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32177,7 +32644,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32208,7 +32675,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32239,7 +32706,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32270,7 +32737,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32301,7 +32768,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32332,7 +32799,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32363,7 +32830,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32394,7 +32861,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32425,7 +32892,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32456,7 +32923,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32487,7 +32954,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32518,7 +32985,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32549,7 +33016,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32580,7 +33047,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32611,7 +33078,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32642,7 +33109,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32673,7 +33140,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32704,7 +33171,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32735,7 +33202,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32766,7 +33233,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32797,7 +33264,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32828,7 +33295,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32859,7 +33326,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32890,7 +33357,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32921,7 +33388,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32952,7 +33419,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -32983,7 +33450,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33014,7 +33481,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33045,7 +33512,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33076,7 +33543,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33107,7 +33574,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33138,7 +33605,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33169,7 +33636,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33200,7 +33667,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33231,7 +33698,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33262,7 +33729,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33293,7 +33760,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33324,7 +33791,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33355,7 +33822,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33386,7 +33853,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33417,7 +33884,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33448,7 +33915,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33479,7 +33946,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33510,7 +33977,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33541,7 +34008,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33572,7 +34039,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33603,7 +34070,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33634,7 +34101,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33665,7 +34132,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33696,7 +34163,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33727,7 +34194,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33758,7 +34225,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33789,7 +34256,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33820,7 +34287,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33851,7 +34318,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33882,7 +34349,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33913,7 +34380,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33944,7 +34411,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -33975,7 +34442,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34006,7 +34473,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34037,7 +34504,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34068,7 +34535,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34099,7 +34566,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34130,7 +34597,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34161,7 +34628,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34192,7 +34659,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34223,7 +34690,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34254,7 +34721,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34285,7 +34752,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34316,7 +34783,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34347,7 +34814,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34378,7 +34845,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34409,7 +34876,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34440,7 +34907,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34471,7 +34938,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34502,7 +34969,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34533,7 +35000,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34564,7 +35031,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34595,7 +35062,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34626,7 +35093,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34657,7 +35124,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34688,7 +35155,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34719,7 +35186,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34750,7 +35217,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34781,7 +35248,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34812,7 +35279,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34843,7 +35310,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34874,7 +35341,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34905,7 +35372,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34936,7 +35403,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -34967,7 +35434,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -34998,7 +35465,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35029,7 +35496,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35060,7 +35527,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35091,7 +35558,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35122,7 +35589,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35153,7 +35620,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35184,7 +35651,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35215,7 +35682,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35246,7 +35713,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35277,7 +35744,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35308,7 +35775,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35339,7 +35806,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35370,7 +35837,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35401,7 +35868,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35432,7 +35899,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35463,7 +35930,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35494,7 +35961,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35525,7 +35992,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35556,7 +36023,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35587,7 +36054,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35618,7 +36085,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35649,7 +36116,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35680,7 +36147,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35711,7 +36178,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35742,7 +36209,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35773,7 +36240,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35804,7 +36271,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35835,7 +36302,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35866,7 +36333,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35897,7 +36364,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35928,7 +36395,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -35959,7 +36426,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -35990,7 +36457,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36021,7 +36488,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36052,7 +36519,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36083,7 +36550,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36114,7 +36581,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36145,7 +36612,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36176,7 +36643,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36207,7 +36674,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36238,7 +36705,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36269,7 +36736,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36300,7 +36767,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36331,7 +36798,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36362,7 +36829,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36393,7 +36860,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36424,7 +36891,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36455,7 +36922,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36486,7 +36953,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36517,7 +36984,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36548,7 +37015,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36579,7 +37046,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36610,7 +37077,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36641,7 +37108,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36672,7 +37139,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36703,7 +37170,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36734,7 +37201,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36765,7 +37232,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36796,7 +37263,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36827,7 +37294,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36858,7 +37325,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36889,7 +37356,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36920,7 +37387,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
@@ -36951,7 +37418,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -36982,7 +37449,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37013,7 +37480,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37044,7 +37511,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37075,7 +37542,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37106,7 +37573,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37137,7 +37604,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37168,7 +37635,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37199,7 +37666,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37230,7 +37697,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37261,7 +37728,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37292,7 +37759,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37323,7 +37790,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37354,7 +37821,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37385,7 +37852,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37416,7 +37883,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37447,7 +37914,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37478,7 +37945,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37509,7 +37976,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37540,7 +38007,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37571,7 +38038,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37602,7 +38069,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37633,7 +38100,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37664,7 +38131,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37695,7 +38162,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37726,7 +38193,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37757,7 +38224,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37788,7 +38255,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37819,7 +38286,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37850,7 +38317,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37881,7 +38348,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37912,7 +38379,7 @@ impl AIGatewayHeaders {
         authorization: &str,
         content_type: &str,
     ) -> AIGatewayHeaders {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
         inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
         inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
@@ -37960,7 +38427,7 @@ impl AIGatewayUniversalRequest {
         headers: &AIGatewayHeaders,
         query: &JsValue,
     ) -> AIGatewayUniversalRequest {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayUniversalRequest = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_provider(provider);
         inner.set_endpoint(endpoint);
         inner.set_headers(headers);
@@ -37973,7 +38440,7 @@ impl AIGatewayUniversalRequest {
         headers: &AIGatewayHeaders,
         query: &JsValue,
     ) -> AIGatewayUniversalRequest {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AIGatewayUniversalRequest = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_provider_with_str(provider);
         inner.set_endpoint(endpoint);
         inner.set_headers(headers);
@@ -38129,7 +38596,7 @@ impl ComparisonFilter {
     #[doc = ""]
     #[doc = " * `type: \"eq\"`"]
     pub fn new_eq(key: &str, value: &str) -> ComparisonFilter {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
         inner.set_type("eq");
         inner.set_value(value);
@@ -38139,7 +38606,7 @@ impl ComparisonFilter {
     #[doc = ""]
     #[doc = " * `type: \"eq\"`"]
     pub fn new_eq_with_f64(key: &str, value: f64) -> ComparisonFilter {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
         inner.set_type("eq");
         inner.set_value_with_f64(value);
@@ -38149,7 +38616,7 @@ impl ComparisonFilter {
     #[doc = ""]
     #[doc = " * `type: \"eq\"`"]
     pub fn new_eq_with_bool(key: &str, value: bool) -> ComparisonFilter {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
         inner.set_type("eq");
         inner.set_value_with_bool(value);
@@ -38159,7 +38626,7 @@ impl ComparisonFilter {
     #[doc = ""]
     #[doc = " * `type: \"ne\"`"]
     pub fn new_ne(key: &str, value: &str) -> ComparisonFilter {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
         inner.set_type("ne");
         inner.set_value(value);
@@ -38169,7 +38636,7 @@ impl ComparisonFilter {
     #[doc = ""]
     #[doc = " * `type: \"ne\"`"]
     pub fn new_ne_with_f64(key: &str, value: f64) -> ComparisonFilter {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
         inner.set_type("ne");
         inner.set_value_with_f64(value);
@@ -38179,7 +38646,7 @@ impl ComparisonFilter {
     #[doc = ""]
     #[doc = " * `type: \"ne\"`"]
     pub fn new_ne_with_bool(key: &str, value: bool) -> ComparisonFilter {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
         inner.set_type("ne");
         inner.set_value_with_bool(value);
@@ -38189,7 +38656,7 @@ impl ComparisonFilter {
     #[doc = ""]
     #[doc = " * `type: \"gt\"`"]
     pub fn new_gt(key: &str, value: &str) -> ComparisonFilter {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
         inner.set_type("gt");
         inner.set_value(value);
@@ -38199,7 +38666,7 @@ impl ComparisonFilter {
     #[doc = ""]
     #[doc = " * `type: \"gt\"`"]
     pub fn new_gt_with_f64(key: &str, value: f64) -> ComparisonFilter {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
         inner.set_type("gt");
         inner.set_value_with_f64(value);
@@ -38209,7 +38676,7 @@ impl ComparisonFilter {
     #[doc = ""]
     #[doc = " * `type: \"gt\"`"]
     pub fn new_gt_with_bool(key: &str, value: bool) -> ComparisonFilter {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
         inner.set_type("gt");
         inner.set_value_with_bool(value);
@@ -38219,7 +38686,7 @@ impl ComparisonFilter {
     #[doc = ""]
     #[doc = " * `type: \"gte\"`"]
     pub fn new_gte(key: &str, value: &str) -> ComparisonFilter {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
         inner.set_type("gte");
         inner.set_value(value);
@@ -38229,7 +38696,7 @@ impl ComparisonFilter {
     #[doc = ""]
     #[doc = " * `type: \"gte\"`"]
     pub fn new_gte_with_f64(key: &str, value: f64) -> ComparisonFilter {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
         inner.set_type("gte");
         inner.set_value_with_f64(value);
@@ -38239,7 +38706,7 @@ impl ComparisonFilter {
     #[doc = ""]
     #[doc = " * `type: \"gte\"`"]
     pub fn new_gte_with_bool(key: &str, value: bool) -> ComparisonFilter {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
         inner.set_type("gte");
         inner.set_value_with_bool(value);
@@ -38249,7 +38716,7 @@ impl ComparisonFilter {
     #[doc = ""]
     #[doc = " * `type: \"lt\"`"]
     pub fn new_lt(key: &str, value: &str) -> ComparisonFilter {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
         inner.set_type("lt");
         inner.set_value(value);
@@ -38259,7 +38726,7 @@ impl ComparisonFilter {
     #[doc = ""]
     #[doc = " * `type: \"lt\"`"]
     pub fn new_lt_with_f64(key: &str, value: f64) -> ComparisonFilter {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
         inner.set_type("lt");
         inner.set_value_with_f64(value);
@@ -38269,7 +38736,7 @@ impl ComparisonFilter {
     #[doc = ""]
     #[doc = " * `type: \"lt\"`"]
     pub fn new_lt_with_bool(key: &str, value: bool) -> ComparisonFilter {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
         inner.set_type("lt");
         inner.set_value_with_bool(value);
@@ -38279,7 +38746,7 @@ impl ComparisonFilter {
     #[doc = ""]
     #[doc = " * `type: \"lte\"`"]
     pub fn new_lte(key: &str, value: &str) -> ComparisonFilter {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
         inner.set_type("lte");
         inner.set_value(value);
@@ -38289,7 +38756,7 @@ impl ComparisonFilter {
     #[doc = ""]
     #[doc = " * `type: \"lte\"`"]
     pub fn new_lte_with_f64(key: &str, value: f64) -> ComparisonFilter {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
         inner.set_type("lte");
         inner.set_value_with_f64(value);
@@ -38299,7 +38766,7 @@ impl ComparisonFilter {
     #[doc = ""]
     #[doc = " * `type: \"lte\"`"]
     pub fn new_lte_with_bool(key: &str, value: bool) -> ComparisonFilter {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ComparisonFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
         inner.set_type("lte");
         inner.set_value_with_bool(value);
@@ -38325,7 +38792,7 @@ impl CompoundFilter {
     #[doc = ""]
     #[doc = " * `type: \"and\"`"]
     pub fn new_and(filters: &[ComparisonFilter]) -> CompoundFilter {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: CompoundFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("and");
         inner.set_filters(filters);
         inner
@@ -38334,7 +38801,7 @@ impl CompoundFilter {
     #[doc = ""]
     #[doc = " * `type: \"or\"`"]
     pub fn new_or(filters: &[ComparisonFilter]) -> CompoundFilter {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: CompoundFilter = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("or");
         inner.set_filters(filters);
         inner
@@ -38377,7 +38844,7 @@ impl AutoRagSearchRequest {
         Self::builder(query).build()
     }
     pub fn builder(query: &str) -> AutoRagSearchRequestBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AutoRagSearchRequest = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_query(query);
         AutoRagSearchRequestBuilder { inner }
     }
@@ -38454,7 +38921,7 @@ impl AutoRagSearchResponse {
         has_more: bool,
         next_page: Option<&str>,
     ) -> AutoRagSearchResponse {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AutoRagSearchResponse = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_object("vector_store.search_results.page");
         inner.set_search_query(search_query);
         inner.set_data(data);
@@ -38897,7 +39364,7 @@ impl RequestInitCfPropertiesImageDraw {
     #[doc = " the supported file formats. For drawing of watermarks or non-rectangular"]
     #[doc = " overlays we recommend using PNG or WebP images."]
     pub fn builder(url: &str) -> RequestInitCfPropertiesImageDrawBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: RequestInitCfPropertiesImageDraw = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_url(url);
         RequestInitCfPropertiesImageDrawBuilder { inner }
     }
@@ -39453,7 +39920,7 @@ impl IncomingRequestCfPropertiesBase {
         tls_version: &str,
         tls_cipher: &str,
     ) -> IncomingRequestCfPropertiesBaseBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: IncomingRequestCfPropertiesBase = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
         inner.set_edge_request_keep_alive_status(edge_request_keep_alive_status);
         inner.set_http_protocol(http_protocol);
@@ -39548,7 +40015,8 @@ impl IncomingRequestCfPropertiesBotManagementBase {
         static_resource: bool,
         detection_ids: &[f64],
     ) -> IncomingRequestCfPropertiesBotManagementBase {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: IncomingRequestCfPropertiesBotManagementBase =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_score(score);
         inner.set_verified_bot(verified_bot);
         inner.set_corporate_proxy(corporate_proxy);
@@ -39589,7 +40057,8 @@ impl IncomingRequestCfPropertiesBotManagement {
         bot_management: &IncomingRequestCfPropertiesBotManagementBase,
         client_trust_score: f64,
     ) -> IncomingRequestCfPropertiesBotManagement {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: IncomingRequestCfPropertiesBotManagement =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_bot_management(bot_management);
         inner.set_client_trust_score(client_trust_score);
         inner
@@ -39612,7 +40081,8 @@ extern "C" {
 impl IncomingRequestCfPropertiesBotManagementEnterprise {
     #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
     pub fn new(bot_management: &JsValue) -> IncomingRequestCfPropertiesBotManagementEnterprise {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: IncomingRequestCfPropertiesBotManagementEnterprise =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_bot_management(bot_management);
         inner
     }
@@ -39629,34 +40099,41 @@ extern "C" {
     #[doc = " This field is only present if you have Cloudflare for SaaS enabled on your account"]
     #[doc = " and you have followed the [required steps to enable it]((https://developers.cloudflare.com/cloudflare-for-platforms/cloudflare-for-saas/domain-support/custom-metadata/))."]
     #[wasm_bindgen(method, getter, js_name = "hostMetadata")]
-    pub fn host_metadata(
-        this: &IncomingRequestCfPropertiesCloudflareForSaaSEnterprise,
+    pub fn host_metadata<HostMetadata: ::wasm_bindgen::JsGeneric>(
+        this: &IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata>,
     ) -> Option<HostMetadata>;
     #[wasm_bindgen(method, setter, js_name = "hostMetadata")]
-    pub fn set_host_metadata(
-        this: &IncomingRequestCfPropertiesCloudflareForSaaSEnterprise,
+    pub fn set_host_metadata<HostMetadata: ::wasm_bindgen::JsGeneric>(
+        this: &IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata>,
         val: &HostMetadata,
     );
 }
-impl IncomingRequestCfPropertiesCloudflareForSaaSEnterprise {
-    pub fn new() -> IncomingRequestCfPropertiesCloudflareForSaaSEnterprise {
+impl<HostMetadata: ::wasm_bindgen::JsGeneric>
+    IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata>
+{
+    pub fn new() -> IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata> {
         Self::builder().build()
     }
-    pub fn builder() -> IncomingRequestCfPropertiesCloudflareForSaaSEnterpriseBuilder {
+    pub fn builder() -> IncomingRequestCfPropertiesCloudflareForSaaSEnterpriseBuilder<HostMetadata>
+    {
         IncomingRequestCfPropertiesCloudflareForSaaSEnterpriseBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
-pub struct IncomingRequestCfPropertiesCloudflareForSaaSEnterpriseBuilder {
-    inner: IncomingRequestCfPropertiesCloudflareForSaaSEnterprise,
+pub struct IncomingRequestCfPropertiesCloudflareForSaaSEnterpriseBuilder<
+    HostMetadata: ::wasm_bindgen::JsGeneric,
+> {
+    inner: IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata>,
 }
-impl IncomingRequestCfPropertiesCloudflareForSaaSEnterpriseBuilder {
+impl<HostMetadata: ::wasm_bindgen::JsGeneric>
+    IncomingRequestCfPropertiesCloudflareForSaaSEnterpriseBuilder<HostMetadata>
+{
     pub fn host_metadata(self, val: &HostMetadata) -> Self {
         self.inner.set_host_metadata(val);
         self
     }
-    pub fn build(self) -> IncomingRequestCfPropertiesCloudflareForSaaSEnterprise {
+    pub fn build(self) -> IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata> {
         self.inner
     }
 }
@@ -39708,7 +40185,8 @@ impl IncomingRequestCfPropertiesCloudflareAccessOrApiShield {
     pub fn new(
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuth,
     ) -> IncomingRequestCfPropertiesCloudflareAccessOrApiShield {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: IncomingRequestCfPropertiesCloudflareAccessOrApiShield =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_tls_client_auth(tls_client_auth);
         inner
     }
@@ -39727,7 +40205,8 @@ impl IncomingRequestCfPropertiesCloudflareAccessOrApiShield {
     pub fn new_with_incoming_request_cf_properties_tls_client_auth_placeholder(
         tls_client_auth: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
     ) -> IncomingRequestCfPropertiesCloudflareAccessOrApiShield {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: IncomingRequestCfPropertiesCloudflareAccessOrApiShield =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_tls_client_auth_with_incoming_request_cf_properties_tls_client_auth_placeholder(
             tls_client_auth,
         );
@@ -39807,7 +40286,8 @@ impl IncomingRequestCfPropertiesExportedAuthenticatorMetadata {
         client_finished: &str,
         server_finished: &str,
     ) -> IncomingRequestCfPropertiesExportedAuthenticatorMetadata {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: IncomingRequestCfPropertiesExportedAuthenticatorMetadata =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_client_handshake(client_handshake);
         inner.set_server_handshake(server_handshake);
         inner.set_client_finished(client_finished);
@@ -40177,7 +40657,8 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
         cert_not_before: &str,
         cert_not_after: &str,
     ) -> IncomingRequestCfPropertiesTLSClientAuth {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: IncomingRequestCfPropertiesTLSClientAuth =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cert_presented("1");
         inner.set_cert_verified(cert_verified);
         inner.set_cert_revoked("1");
@@ -40263,7 +40744,8 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
         cert_not_before: &str,
         cert_not_after: &str,
     ) -> IncomingRequestCfPropertiesTLSClientAuth {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: IncomingRequestCfPropertiesTLSClientAuth =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cert_presented("1");
         inner.set_cert_verified(cert_verified);
         inner.set_cert_revoked("0");
@@ -40431,7 +40913,8 @@ impl IncomingRequestCfPropertiesTLSClientAuthPlaceholder {
     #[doc = " * `certNotBefore: \"\"`"]
     #[doc = " * `certNotAfter: \"\"`"]
     pub fn new_0_none_0______________() -> IncomingRequestCfPropertiesTLSClientAuthPlaceholder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: IncomingRequestCfPropertiesTLSClientAuthPlaceholder =
+            JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cert_presented("0");
         inner.set_cert_verified("NONE");
         inner.set_cert_revoked("0");
@@ -41083,7 +41566,7 @@ impl D1Meta {
         changed_db: bool,
         changes: f64,
     ) -> D1MetaBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: D1Meta = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_duration(duration);
         inner.set_size_after(size_after);
         inner.set_rows_read(rows_read);
@@ -41151,7 +41634,7 @@ impl D1Response {
     #[doc = ""]
     #[doc = " * `success: true`"]
     pub fn builder_true(meta: &JsValue) -> D1ResponseBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: D1Response = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_success(true);
         inner.set_meta(meta);
         D1ResponseBuilder { inner }
@@ -41187,7 +41670,7 @@ extern "C" {
 }
 impl D1ExecResult {
     pub fn new(count: f64, duration: f64) -> D1ExecResult {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: D1ExecResult = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_count(count);
         inner.set_duration(duration);
         inner
@@ -41364,7 +41847,7 @@ impl D1PreparedStatementOptions {
     #[doc = ""]
     #[doc = " * `columnNames: true`"]
     pub fn new_true() -> D1PreparedStatementOptions {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: D1PreparedStatementOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_column_names(true);
         inner
     }
@@ -41421,7 +41904,7 @@ extern "C" {
 impl EmailSendResult {
     #[doc = " * `message_id` - The Email Message ID"]
     pub fn new(message_id: &str) -> EmailSendResult {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: EmailSendResult = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_message_id(message_id);
         inner
     }
@@ -41440,7 +41923,7 @@ extern "C" {
 }
 impl EmailMessage {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> EmailMessage {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -41549,7 +42032,7 @@ impl EmailAttachment {
         r#type: &str,
         content: &str,
     ) -> EmailAttachment {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: EmailAttachment = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_disposition("inline");
         inner.set_content_id(content_id);
         inner.set_filename(filename);
@@ -41566,7 +42049,7 @@ impl EmailAttachment {
         r#type: &str,
         content: &ArrayBuffer,
     ) -> EmailAttachment {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: EmailAttachment = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_disposition("inline");
         inner.set_content_id(content_id);
         inner.set_filename(filename);
@@ -41583,7 +42066,7 @@ impl EmailAttachment {
         r#type: &str,
         content: &T,
     ) -> EmailAttachment {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: EmailAttachment = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_disposition("inline");
         inner.set_content_id(content_id);
         inner.set_filename(filename);
@@ -41625,7 +42108,7 @@ impl EmailAttachment {
         r#type: &str,
         content: &str,
     ) -> EmailAttachmentBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: EmailAttachment = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_disposition("attachment");
         inner.set_filename(filename);
         inner.set_type(r#type);
@@ -41640,7 +42123,7 @@ impl EmailAttachment {
         r#type: &str,
         content: &ArrayBuffer,
     ) -> EmailAttachmentBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: EmailAttachment = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_disposition("attachment");
         inner.set_filename(filename);
         inner.set_type(r#type);
@@ -41655,7 +42138,7 @@ impl EmailAttachment {
         r#type: &str,
         content: &T,
     ) -> EmailAttachmentBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: EmailAttachment = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_disposition("attachment");
         inner.set_filename(filename);
         inner.set_type(r#type);
@@ -41691,7 +42174,7 @@ extern "C" {
 }
 impl EmailAddress {
     pub fn new(name: &str, email: &str) -> EmailAddress {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: EmailAddress = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         inner.set_email(email);
         inner
@@ -41791,7 +42274,7 @@ impl SendEmailBuilder {
         Self::builder_with_email_address_and_slice(from, to, subject).build()
     }
     pub fn builder(from: &str, to: &str, subject: &str) -> SendEmailBuilderBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: SendEmailBuilder = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_from(from);
         inner.set_to(to);
         inner.set_subject(subject);
@@ -41802,7 +42285,7 @@ impl SendEmailBuilder {
         to: &[String],
         subject: &str,
     ) -> SendEmailBuilderBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: SendEmailBuilder = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_from(from);
         inner.set_to_with_slice(to);
         inner.set_subject(subject);
@@ -41813,7 +42296,7 @@ impl SendEmailBuilder {
         to: &str,
         subject: &str,
     ) -> SendEmailBuilderBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: SendEmailBuilder = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_from_with_email_address(from);
         inner.set_to(to);
         inner.set_subject(subject);
@@ -41824,7 +42307,7 @@ impl SendEmailBuilder {
         to: &[String],
         subject: &str,
     ) -> SendEmailBuilderBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: SendEmailBuilder = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_from_with_email_address(from);
         inner.set_to_with_slice(to);
         inner.set_subject(subject);
@@ -41982,12 +42465,12 @@ impl ImageInfoResponse {
     #[doc = ""]
     #[doc = " * `format: \"image/svg+xml\"`"]
     pub fn builder_imagesvgxml() -> ImageInfoResponseBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ImageInfoResponse = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format("image/svg+xml");
         ImageInfoResponseBuilder { inner }
     }
     pub fn builder(format: &str) -> ImageInfoResponseBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ImageInfoResponse = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format(format);
         ImageInfoResponseBuilder { inner }
     }
@@ -42355,7 +42838,7 @@ impl ImageOutputOptions {
     #[doc = ""]
     #[doc = " * `format: \"image/jpeg\"`"]
     pub fn builder_imagejpeg() -> ImageOutputOptionsBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ImageOutputOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format("image/jpeg");
         ImageOutputOptionsBuilder { inner }
     }
@@ -42363,7 +42846,7 @@ impl ImageOutputOptions {
     #[doc = ""]
     #[doc = " * `format: \"image/png\"`"]
     pub fn builder_imagepng() -> ImageOutputOptionsBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ImageOutputOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format("image/png");
         ImageOutputOptionsBuilder { inner }
     }
@@ -42371,7 +42854,7 @@ impl ImageOutputOptions {
     #[doc = ""]
     #[doc = " * `format: \"image/gif\"`"]
     pub fn builder_imagegif() -> ImageOutputOptionsBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ImageOutputOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format("image/gif");
         ImageOutputOptionsBuilder { inner }
     }
@@ -42379,7 +42862,7 @@ impl ImageOutputOptions {
     #[doc = ""]
     #[doc = " * `format: \"image/webp\"`"]
     pub fn builder_imagewebp() -> ImageOutputOptionsBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ImageOutputOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format("image/webp");
         ImageOutputOptionsBuilder { inner }
     }
@@ -42387,7 +42870,7 @@ impl ImageOutputOptions {
     #[doc = ""]
     #[doc = " * `format: \"image/avif\"`"]
     pub fn builder_imageavif() -> ImageOutputOptionsBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ImageOutputOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format("image/avif");
         ImageOutputOptionsBuilder { inner }
     }
@@ -42395,7 +42878,7 @@ impl ImageOutputOptions {
     #[doc = ""]
     #[doc = " * `format: \"rgb\"`"]
     pub fn builder_rgb() -> ImageOutputOptionsBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ImageOutputOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format("rgb");
         ImageOutputOptionsBuilder { inner }
     }
@@ -42403,7 +42886,7 @@ impl ImageOutputOptions {
     #[doc = ""]
     #[doc = " * `format: \"rgba\"`"]
     pub fn builder_rgba() -> ImageOutputOptionsBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ImageOutputOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_format("rgba");
         ImageOutputOptionsBuilder { inner }
     }
@@ -42475,7 +42958,7 @@ impl ImageMetadata {
         require_signed_ur_ls: bool,
         variants: &[String],
     ) -> ImageMetadataBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ImageMetadata = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_require_signed_ur_ls(require_signed_ur_ls);
         inner.set_variants(variants);
@@ -42709,7 +43192,7 @@ impl ImageList {
         Self::builder(images, list_complete).build()
     }
     pub fn builder(images: &[ImageMetadata], list_complete: bool) -> ImageListBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ImageList = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_images(images);
         inner.set_list_complete(list_complete);
         ImageListBuilder { inner }
@@ -43131,7 +43614,7 @@ extern "C" {
 }
 impl ImagesError {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> ImagesError {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -43449,7 +43932,7 @@ extern "C" {
 }
 impl MediaError {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> MediaError {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -43513,7 +43996,7 @@ impl EventContext {
         params: &Params<P>,
         data: &Data,
     ) -> EventContext {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: EventContext = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_request(request);
         inner.set_function_path(function_path);
         inner.set_wait_until(wait_until);
@@ -43594,7 +44077,7 @@ impl EventPluginContext {
         data: &Data,
         plugin_args: &PluginArgs,
     ) -> EventPluginContext {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: EventPluginContext = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_request(request);
         inner.set_function_path(function_path);
         inner.set_wait_until(wait_until);
@@ -43640,7 +44123,7 @@ extern "C" {
 }
 impl PubSubMessage {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> PubSubMessage {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -43657,7 +44140,7 @@ extern "C" {
 }
 impl JsonWebKeyWithKid {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> JsonWebKeyWithKid {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -43676,7 +44159,7 @@ extern "C" {
 }
 impl RateLimitOptions {
     pub fn new(key: &str) -> RateLimitOptions {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: RateLimitOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_key(key);
         inner
     }
@@ -43693,7 +44176,7 @@ extern "C" {
 }
 impl RateLimitOutcome {
     pub fn new(success: bool) -> RateLimitOutcome {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: RateLimitOutcome = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_success(success);
         inner
     }
@@ -43830,13 +44313,23 @@ pub mod cloudflare_workers_module {
             Props: ::wasm_bindgen::JsGeneric,
         >;
         #[wasm_bindgen(method, getter)]
-        pub fn ctx(this: &WorkerEntrypoint) -> ExecutionContext<Props>;
+        pub fn ctx<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+            this: &WorkerEntrypoint<Env, Props>,
+        ) -> ExecutionContext<Props>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_ctx(this: &WorkerEntrypoint, val: &ExecutionContext<Props>);
+        pub fn set_ctx<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+            this: &WorkerEntrypoint<Env, Props>,
+            val: &ExecutionContext<Props>,
+        );
         #[wasm_bindgen(method, getter)]
-        pub fn env(this: &WorkerEntrypoint) -> Env;
+        pub fn env<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+            this: &WorkerEntrypoint<Env, Props>,
+        ) -> Env;
         #[wasm_bindgen(method, setter)]
-        pub fn set_env(this: &WorkerEntrypoint, val: &Env);
+        pub fn set_env<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+            this: &WorkerEntrypoint<Env, Props>,
+            val: &Env,
+        );
         #[wasm_bindgen(method)]
         pub fn email<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
@@ -43924,13 +44417,23 @@ pub mod cloudflare_workers_module {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type DurableObject<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>;
         #[wasm_bindgen(method, getter)]
-        pub fn ctx(this: &DurableObject) -> DurableObjectState<Props>;
+        pub fn ctx<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+            this: &DurableObject<Env, Props>,
+        ) -> DurableObjectState<Props>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_ctx(this: &DurableObject, val: &DurableObjectState<Props>);
+        pub fn set_ctx<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+            this: &DurableObject<Env, Props>,
+            val: &DurableObjectState<Props>,
+        );
         #[wasm_bindgen(method, getter)]
-        pub fn env(this: &DurableObject) -> Env;
+        pub fn env<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+            this: &DurableObject<Env, Props>,
+        ) -> Env;
         #[wasm_bindgen(method, setter)]
-        pub fn set_env(this: &DurableObject, val: &Env);
+        pub fn set_env<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+            this: &DurableObject<Env, Props>,
+            val: &Env,
+        );
         #[wasm_bindgen(method)]
         pub fn alarm<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &DurableObject<Env, Props>,
@@ -44130,7 +44633,7 @@ pub mod cloudflare_workers_module {
     }
     impl WorkflowEvent {
         pub fn new(payload: &Readonly, timestamp: &Date, instance_id: &str) -> WorkflowEvent {
-            let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+            let inner: WorkflowEvent = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_payload(payload);
             inner.set_timestamp(timestamp);
             inner.set_instance_id(instance_id);
@@ -44157,7 +44660,7 @@ pub mod cloudflare_workers_module {
     }
     impl WorkflowStepEvent {
         pub fn new(payload: &Readonly, timestamp: &Date, r#type: &str) -> WorkflowStepEvent {
-            let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+            let inner: WorkflowStepEvent = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_payload(payload);
             inner.set_timestamp(timestamp);
             inner.set_type(r#type);
@@ -44176,7 +44679,7 @@ pub mod cloudflare_workers_module {
     }
     impl WorkflowStepContext {
         pub fn new(attempt: f64) -> WorkflowStepContext {
-            let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+            let inner: WorkflowStepContext = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_attempt(attempt);
             inner
         }
@@ -44243,7 +44746,7 @@ pub mod cloudflare_workers_module {
             Self::builder(r#type).build()
         }
         pub fn builder(r#type: &str) -> WorkflowStepOptionsBuilder {
-            let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+            let inner: WorkflowStepOptions = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_type(r#type);
             WorkflowStepOptionsBuilder { inner }
         }
@@ -44292,13 +44795,23 @@ pub mod cloudflare_workers_module {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type WorkflowEntrypoint<Env: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>;
         #[wasm_bindgen(method, getter)]
-        pub fn ctx(this: &WorkflowEntrypoint) -> ExecutionContext;
+        pub fn ctx<Env: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
+            this: &WorkflowEntrypoint<Env, T>,
+        ) -> ExecutionContext;
         #[wasm_bindgen(method, setter)]
-        pub fn set_ctx(this: &WorkflowEntrypoint, val: &ExecutionContext);
+        pub fn set_ctx<Env: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
+            this: &WorkflowEntrypoint<Env, T>,
+            val: &ExecutionContext,
+        );
         #[wasm_bindgen(method, getter)]
-        pub fn env(this: &WorkflowEntrypoint) -> Env;
+        pub fn env<Env: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
+            this: &WorkflowEntrypoint<Env, T>,
+        ) -> Env;
         #[wasm_bindgen(method, setter)]
-        pub fn set_env(this: &WorkflowEntrypoint, val: &Env);
+        pub fn set_env<Env: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
+            this: &WorkflowEntrypoint<Env, T>,
+            val: &Env,
+        );
         #[wasm_bindgen(method, catch)]
         pub async fn run<Env: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
             this: &WorkflowEntrypoint<Env, T>,
@@ -44819,7 +45332,7 @@ impl StreamVideo {
         clipped_from_id: Option<&str>,
         public_details: Option<&StreamPublicDetails>,
     ) -> StreamVideoBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: StreamVideo = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_creator(creator);
         inner.set_thumbnail(thumbnail);
@@ -44910,7 +45423,7 @@ impl StreamVideoStatus {
         error_reason_code: &str,
         error_reason_text: &str,
     ) -> StreamVideoStatusBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: StreamVideoStatus = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_state(state);
         inner.set_error_reason_code(error_reason_code);
         inner.set_error_reason_text(error_reason_text);
@@ -44953,7 +45466,7 @@ impl StreamVideoInput {
     #[doc = " * `width` - The input width in pixels."]
     #[doc = " * `height` - The input height in pixels."]
     pub fn new(width: f64, height: f64) -> StreamVideoInput {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: StreamVideoInput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_width(width);
         inner.set_height(height);
         inner
@@ -44996,7 +45509,7 @@ impl StreamPublicDetails {
         channel_link: Option<&str>,
         logo: Option<&str>,
     ) -> StreamPublicDetails {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: StreamPublicDetails = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_title(title);
         inner.set_share_link(share_link);
         inner.set_channel_link(channel_link);
@@ -45041,7 +45554,7 @@ impl StreamDirectUpload {
         watermark: Option<&StreamWatermark>,
         scheduled_deletion: Option<&str>,
     ) -> StreamDirectUpload {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: StreamDirectUpload = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_upload_url(upload_url);
         inner.set_id(id);
         inner.set_watermark(watermark);
@@ -45110,7 +45623,7 @@ impl StreamDirectUploadCreateParams {
     }
     #[doc = " * `max_duration_seconds` - The maximum duration in seconds for a video upload."]
     pub fn builder(max_duration_seconds: f64) -> StreamDirectUploadCreateParamsBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: StreamDirectUploadCreateParams = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_max_duration_seconds(max_duration_seconds);
         StreamDirectUploadCreateParamsBuilder { inner }
     }
@@ -45169,7 +45682,7 @@ extern "C" {
 impl StreamDirectUploadWatermark {
     #[doc = " * `id` - The unique identifier for the watermark profile."]
     pub fn new(id: &str) -> StreamDirectUploadWatermark {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: StreamDirectUploadWatermark = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner
     }
@@ -45698,7 +46211,7 @@ impl StreamCaption {
     #[doc = " * `label` - The language label displayed in the native language to users."]
     #[doc = " * `language` - The language tag in BCP 47 format."]
     pub fn builder(label: &str, language: &str) -> StreamCaptionBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: StreamCaption = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_label(label);
         inner.set_language(language);
         StreamCaptionBuilder { inner }
@@ -45768,7 +46281,7 @@ impl StreamDownload {
     #[doc = " * `percent_complete` - Indicates the progress as a percentage between 0 and 100."]
     #[doc = " * `status` - The status of a generated download."]
     pub fn builder(percent_complete: f64, status: &StreamDownloadStatus) -> StreamDownloadBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: StreamDownload = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_percent_complete(percent_complete);
         inner.set_status(status);
         StreamDownloadBuilder { inner }
@@ -45948,7 +46461,7 @@ impl StreamWatermark {
         scale: f64,
         position: &StreamWatermarkPosition,
     ) -> StreamWatermark {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: StreamWatermark = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_size(size);
         inner.set_height(height);
@@ -46143,7 +46656,7 @@ extern "C" {
 }
 impl StreamError {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> StreamError {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -46165,7 +46678,7 @@ impl InternalError {
     #[doc = ""]
     #[doc = " * `name: \"InternalError\"`"]
     pub fn new_internal_error() -> InternalError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: InternalError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("InternalError");
         inner
     }
@@ -46185,7 +46698,7 @@ impl BadRequestError {
     #[doc = ""]
     #[doc = " * `name: \"BadRequestError\"`"]
     pub fn new_bad_request_error() -> BadRequestError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: BadRequestError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("BadRequestError");
         inner
     }
@@ -46205,7 +46718,7 @@ impl NotFoundError {
     #[doc = ""]
     #[doc = " * `name: \"NotFoundError\"`"]
     pub fn new_not_found_error() -> NotFoundError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: NotFoundError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("NotFoundError");
         inner
     }
@@ -46225,7 +46738,7 @@ impl ForbiddenError {
     #[doc = ""]
     #[doc = " * `name: \"ForbiddenError\"`"]
     pub fn new_forbidden_error() -> ForbiddenError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ForbiddenError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("ForbiddenError");
         inner
     }
@@ -46245,7 +46758,7 @@ impl RateLimitedError {
     #[doc = ""]
     #[doc = " * `name: \"RateLimitedError\"`"]
     pub fn new_rate_limited_error() -> RateLimitedError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: RateLimitedError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("RateLimitedError");
         inner
     }
@@ -46265,7 +46778,7 @@ impl QuotaReachedError {
     #[doc = ""]
     #[doc = " * `name: \"QuotaReachedError\"`"]
     pub fn new_quota_reached_error() -> QuotaReachedError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: QuotaReachedError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("QuotaReachedError");
         inner
     }
@@ -46285,7 +46798,7 @@ impl MaxFileSizeError {
     #[doc = ""]
     #[doc = " * `name: \"MaxFileSizeError\"`"]
     pub fn new_max_file_size_error() -> MaxFileSizeError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: MaxFileSizeError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("MaxFileSizeError");
         inner
     }
@@ -46305,7 +46818,7 @@ impl InvalidURLError {
     #[doc = ""]
     #[doc = " * `name: \"InvalidURLError\"`"]
     pub fn new_invalid_url_error() -> InvalidURLError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: InvalidURLError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("InvalidURLError");
         inner
     }
@@ -46325,7 +46838,7 @@ impl AlreadyUploadedError {
     #[doc = ""]
     #[doc = " * `name: \"AlreadyUploadedError\"`"]
     pub fn new_already_uploaded_error() -> AlreadyUploadedError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AlreadyUploadedError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("AlreadyUploadedError");
         inner
     }
@@ -46345,7 +46858,7 @@ impl TooManyWatermarksError {
     #[doc = ""]
     #[doc = " * `name: \"TooManyWatermarksError\"`"]
     pub fn new_too_many_watermarks_error() -> TooManyWatermarksError {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: TooManyWatermarksError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("TooManyWatermarksError");
         inner
     }
@@ -46366,7 +46879,7 @@ extern "C" {
 }
 impl MarkdownDocument {
     pub fn new(name: &str, blob: &Blob) -> MarkdownDocument {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: MarkdownDocument = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         inner.set_blob(blob);
         inner
@@ -46435,7 +46948,7 @@ impl ConversionResponse {
         tokens: f64,
         data: &str,
     ) -> ConversionResponseBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ConversionResponse = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_name(name);
         inner.set_mime_type(mime_type);
@@ -46453,7 +46966,7 @@ impl ConversionResponse {
         mime_type: &str,
         error: &str,
     ) -> ConversionResponseBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: ConversionResponse = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_name(name);
         inner.set_mime_type(mime_type);
@@ -46636,7 +47149,7 @@ extern "C" {
 }
 impl SupportedFileFormat {
     pub fn new(mime_type: &str, extension: &str) -> SupportedFileFormat {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: SupportedFileFormat = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_mime_type(mime_type);
         inner.set_extension(extension);
         inner
@@ -46687,7 +47200,7 @@ pub mod tail_stream {
     }
     impl Header {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> Header {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -46712,7 +47225,7 @@ pub mod tail_stream {
     }
     impl FetchEventInfo {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> FetchEventInfo {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -46729,7 +47242,7 @@ pub mod tail_stream {
     }
     impl JsRpcEventInfo {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> JsRpcEventInfo {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -46750,7 +47263,7 @@ pub mod tail_stream {
     }
     impl ScheduledEventInfo {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> ScheduledEventInfo {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -46769,7 +47282,7 @@ pub mod tail_stream {
     }
     impl AlarmEventInfo {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> AlarmEventInfo {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -46790,7 +47303,7 @@ pub mod tail_stream {
     }
     impl QueueEventInfo {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> QueueEventInfo {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -46813,7 +47326,7 @@ pub mod tail_stream {
     }
     impl EmailEventInfo {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> EmailEventInfo {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -46832,7 +47345,7 @@ pub mod tail_stream {
     }
     impl TraceEventInfo {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> TraceEventInfo {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -46849,7 +47362,7 @@ pub mod tail_stream {
     }
     impl HibernatableWebSocketEventInfoMessage {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> HibernatableWebSocketEventInfoMessage {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -46866,7 +47379,7 @@ pub mod tail_stream {
     }
     impl HibernatableWebSocketEventInfoError {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> HibernatableWebSocketEventInfoError {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -46887,7 +47400,7 @@ pub mod tail_stream {
     }
     impl HibernatableWebSocketEventInfoClose {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> HibernatableWebSocketEventInfoClose {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -46906,7 +47419,7 @@ pub mod tail_stream {
     }
     impl HibernatableWebSocketEventInfo {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> HibernatableWebSocketEventInfo {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -46923,7 +47436,7 @@ pub mod tail_stream {
     }
     impl CustomEventInfo {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> CustomEventInfo {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -46942,7 +47455,7 @@ pub mod tail_stream {
     }
     impl FetchResponseInfo {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> FetchResponseInfo {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -46989,7 +47502,7 @@ pub mod tail_stream {
     }
     impl ScriptVersion {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> ScriptVersion {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -47024,7 +47537,7 @@ pub mod tail_stream {
     }
     impl Onset {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> Onset {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -47047,7 +47560,7 @@ pub mod tail_stream {
     }
     impl Outcome {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> Outcome {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -47070,7 +47583,7 @@ pub mod tail_stream {
     }
     impl SpanOpen {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> SpanOpen {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -47089,7 +47602,7 @@ pub mod tail_stream {
     }
     impl SpanClose {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> SpanClose {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -47110,7 +47623,7 @@ pub mod tail_stream {
     }
     impl DiagnosticChannelEvent {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> DiagnosticChannelEvent {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -47133,7 +47646,7 @@ pub mod tail_stream {
     }
     impl Exception {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> Exception {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -47154,7 +47667,7 @@ pub mod tail_stream {
     }
     impl Log {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> Log {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -47173,7 +47686,7 @@ pub mod tail_stream {
     }
     impl DroppedEventsDiagnostic {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> DroppedEventsDiagnostic {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -47192,7 +47705,7 @@ pub mod tail_stream {
     }
     impl StreamDiagnostic {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> StreamDiagnostic {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -47211,7 +47724,7 @@ pub mod tail_stream {
     }
     impl Return {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> Return {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -47230,7 +47743,7 @@ pub mod tail_stream {
     }
     impl Attribute {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> Attribute {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -47249,7 +47762,7 @@ pub mod tail_stream {
     }
     impl Attributes {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> Attributes {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -47268,7 +47781,7 @@ pub mod tail_stream {
     }
     impl SpanContext {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> SpanContext {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -47281,19 +47794,21 @@ pub mod tail_stream {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type TailEvent<Event: ::wasm_bindgen::JsGeneric>;
         #[wasm_bindgen(method, getter, js_name = "invocationId")]
-        pub fn invocation_id(this: &TailEvent) -> String;
+        pub fn invocation_id<Event: ::wasm_bindgen::JsGeneric>(this: &TailEvent<Event>) -> String;
         #[wasm_bindgen(method, getter, js_name = "spanContext")]
-        pub fn span_context(this: &TailEvent) -> SpanContext;
+        pub fn span_context<Event: ::wasm_bindgen::JsGeneric>(
+            this: &TailEvent<Event>,
+        ) -> SpanContext;
         #[wasm_bindgen(method, getter)]
-        pub fn timestamp(this: &TailEvent) -> Date;
+        pub fn timestamp<Event: ::wasm_bindgen::JsGeneric>(this: &TailEvent<Event>) -> Date;
         #[wasm_bindgen(method, getter)]
-        pub fn sequence(this: &TailEvent) -> f64;
+        pub fn sequence<Event: ::wasm_bindgen::JsGeneric>(this: &TailEvent<Event>) -> f64;
         #[wasm_bindgen(method, getter)]
-        pub fn event(this: &TailEvent) -> Event;
+        pub fn event<Event: ::wasm_bindgen::JsGeneric>(this: &TailEvent<Event>) -> Event;
     }
-    impl TailEvent {
+    impl<Event: ::wasm_bindgen::JsGeneric> TailEvent<Event> {
         #[allow(clippy::new_without_default)]
-        pub fn new() -> Self {
+        pub fn new() -> TailEvent<Event> {
             #[allow(unused_unsafe)]
             unsafe {
                 JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -47414,7 +47929,7 @@ impl VectorizeError {
         Self::builder(error).build()
     }
     pub fn builder(error: &str) -> VectorizeErrorBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: VectorizeError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_error(error);
         VectorizeErrorBuilder { inner }
     }
@@ -47637,7 +48152,7 @@ extern "C" {
 }
 impl VectorizeIndexDetails {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> VectorizeIndexDetails {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -47681,7 +48196,7 @@ impl VectorizeIndexInfo {
         processed_up_to_datetime: f64,
         processed_up_to_mutation: f64,
     ) -> VectorizeIndexInfo {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: VectorizeIndexInfo = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_vector_count(vector_count);
         inner.set_dimensions(dimensions);
         inner.set_processed_up_to_datetime(processed_up_to_datetime);
@@ -47733,7 +48248,7 @@ impl VectorizeVector {
     #[doc = " * `id` - The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
     #[doc = " * `values` - The vector values"]
     pub fn builder(id: &str, values: &JsValue) -> VectorizeVectorBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: VectorizeVector = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_values(values);
         VectorizeVectorBuilder { inner }
@@ -47741,7 +48256,7 @@ impl VectorizeVector {
     #[doc = " * `id` - The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
     #[doc = " * `values` - The vector values"]
     pub fn builder_with_slice(id: &str, values: &[f64]) -> VectorizeVectorBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: VectorizeVector = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_values_with_slice(values);
         VectorizeVectorBuilder { inner }
@@ -47781,7 +48296,7 @@ extern "C" {
 }
 impl VectorizeMatches {
     pub fn new(matches: &[JsValue], count: f64) -> VectorizeMatches {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: VectorizeMatches = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_matches(matches);
         inner.set_count(count);
         inner
@@ -47803,7 +48318,7 @@ extern "C" {
 }
 impl VectorizeVectorMutation {
     pub fn new(ids: &[String], count: f64) -> VectorizeVectorMutation {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: VectorizeVectorMutation = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_ids(ids);
         inner.set_count(count);
         inner
@@ -47823,7 +48338,7 @@ extern "C" {
 impl VectorizeAsyncMutation {
     #[doc = " * `mutation_id` - The unique identifier for the async mutation operation containing the changeset."]
     pub fn new(mutation_id: &str) -> VectorizeAsyncMutation {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: VectorizeAsyncMutation = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_mutation_id(mutation_id);
         inner
     }
@@ -48117,7 +48632,7 @@ impl WorkerVersionMetadata {
     #[doc = " * `tag` - The tag of the Worker Version using this binding"]
     #[doc = " * `timestamp` - The timestamp of when the Worker Version was uploaded"]
     pub fn new(id: &str, tag: &str, timestamp: &str) -> WorkerVersionMetadata {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: WorkerVersionMetadata = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_tag(tag);
         inner.set_timestamp(timestamp);
@@ -48377,35 +48892,50 @@ extern "C" {
     pub type WorkflowInstanceCreateOptions<PARAMS: ::wasm_bindgen::JsGeneric>;
     #[doc = " An id for your Workflow instance. Must be unique within the Workflow."]
     #[wasm_bindgen(method, getter)]
-    pub fn id(this: &WorkflowInstanceCreateOptions) -> Option<String>;
+    pub fn id<PARAMS: ::wasm_bindgen::JsGeneric>(
+        this: &WorkflowInstanceCreateOptions<PARAMS>,
+    ) -> Option<String>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_id(this: &WorkflowInstanceCreateOptions, val: &str);
+    pub fn set_id<PARAMS: ::wasm_bindgen::JsGeneric>(
+        this: &WorkflowInstanceCreateOptions<PARAMS>,
+        val: &str,
+    );
     #[doc = " The event payload the Workflow instance is triggered with"]
     #[wasm_bindgen(method, getter)]
-    pub fn params(this: &WorkflowInstanceCreateOptions) -> Option<PARAMS>;
+    pub fn params<PARAMS: ::wasm_bindgen::JsGeneric>(
+        this: &WorkflowInstanceCreateOptions<PARAMS>,
+    ) -> Option<PARAMS>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_params(this: &WorkflowInstanceCreateOptions, val: &PARAMS);
+    pub fn set_params<PARAMS: ::wasm_bindgen::JsGeneric>(
+        this: &WorkflowInstanceCreateOptions<PARAMS>,
+        val: &PARAMS,
+    );
     #[doc = " The retention policy for Workflow instance."]
     #[doc = " Defaults to the maximum retention period available for the owner's account."]
     #[wasm_bindgen(method, getter)]
-    pub fn retention(this: &WorkflowInstanceCreateOptions) -> Option<Object>;
+    pub fn retention<PARAMS: ::wasm_bindgen::JsGeneric>(
+        this: &WorkflowInstanceCreateOptions<PARAMS>,
+    ) -> Option<Object>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_retention(this: &WorkflowInstanceCreateOptions, val: &Object);
+    pub fn set_retention<PARAMS: ::wasm_bindgen::JsGeneric>(
+        this: &WorkflowInstanceCreateOptions<PARAMS>,
+        val: &Object,
+    );
 }
-impl WorkflowInstanceCreateOptions {
-    pub fn new() -> WorkflowInstanceCreateOptions {
+impl<PARAMS: ::wasm_bindgen::JsGeneric> WorkflowInstanceCreateOptions<PARAMS> {
+    pub fn new() -> WorkflowInstanceCreateOptions<PARAMS> {
         Self::builder().build()
     }
-    pub fn builder() -> WorkflowInstanceCreateOptionsBuilder {
+    pub fn builder() -> WorkflowInstanceCreateOptionsBuilder<PARAMS> {
         WorkflowInstanceCreateOptionsBuilder {
             inner: JsCast::unchecked_into(js_sys::Object::new()),
         }
     }
 }
-pub struct WorkflowInstanceCreateOptionsBuilder {
-    inner: WorkflowInstanceCreateOptions,
+pub struct WorkflowInstanceCreateOptionsBuilder<PARAMS: ::wasm_bindgen::JsGeneric> {
+    inner: WorkflowInstanceCreateOptions<PARAMS>,
 }
-impl WorkflowInstanceCreateOptionsBuilder {
+impl<PARAMS: ::wasm_bindgen::JsGeneric> WorkflowInstanceCreateOptionsBuilder<PARAMS> {
     pub fn id(self, val: &str) -> Self {
         self.inner.set_id(val);
         self
@@ -48418,7 +48948,7 @@ impl WorkflowInstanceCreateOptionsBuilder {
         self.inner.set_retention(val);
         self
     }
-    pub fn build(self) -> WorkflowInstanceCreateOptions {
+    pub fn build(self) -> WorkflowInstanceCreateOptions<PARAMS> {
         self.inner
     }
 }
@@ -48499,7 +49029,7 @@ impl InstanceStatus {
     #[doc = ""]
     #[doc = " * `status: \"queued\"`"]
     pub fn builder_queued() -> InstanceStatusBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status("queued");
         InstanceStatusBuilder { inner }
     }
@@ -48507,7 +49037,7 @@ impl InstanceStatus {
     #[doc = ""]
     #[doc = " * `status: \"running\"`"]
     pub fn builder_running() -> InstanceStatusBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status("running");
         InstanceStatusBuilder { inner }
     }
@@ -48515,7 +49045,7 @@ impl InstanceStatus {
     #[doc = ""]
     #[doc = " * `status: \"paused\"`"]
     pub fn builder_paused() -> InstanceStatusBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status("paused");
         InstanceStatusBuilder { inner }
     }
@@ -48523,7 +49053,7 @@ impl InstanceStatus {
     #[doc = ""]
     #[doc = " * `status: \"errored\"`"]
     pub fn builder_errored() -> InstanceStatusBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status("errored");
         InstanceStatusBuilder { inner }
     }
@@ -48531,7 +49061,7 @@ impl InstanceStatus {
     #[doc = ""]
     #[doc = " * `status: \"terminated\"`"]
     pub fn builder_terminated() -> InstanceStatusBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status("terminated");
         InstanceStatusBuilder { inner }
     }
@@ -48539,7 +49069,7 @@ impl InstanceStatus {
     #[doc = ""]
     #[doc = " * `status: \"complete\"`"]
     pub fn builder_complete() -> InstanceStatusBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status("complete");
         InstanceStatusBuilder { inner }
     }
@@ -48547,7 +49077,7 @@ impl InstanceStatus {
     #[doc = ""]
     #[doc = " * `status: \"waiting\"`"]
     pub fn builder_waiting() -> InstanceStatusBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status("waiting");
         InstanceStatusBuilder { inner }
     }
@@ -48555,7 +49085,7 @@ impl InstanceStatus {
     #[doc = ""]
     #[doc = " * `status: \"waitingForPause\"`"]
     pub fn builder_waiting_for_pause() -> InstanceStatusBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status("waitingForPause");
         InstanceStatusBuilder { inner }
     }
@@ -48563,7 +49093,7 @@ impl InstanceStatus {
     #[doc = ""]
     #[doc = " * `status: \"unknown\"`"]
     pub fn builder_unknown() -> InstanceStatusBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: InstanceStatus = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_status("unknown");
         InstanceStatusBuilder { inner }
     }
@@ -48603,7 +49133,7 @@ impl WorkflowError {
         Self::builder(message).build()
     }
     pub fn builder(message: &str) -> WorkflowErrorBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: WorkflowError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_message(message);
         WorkflowErrorBuilder { inner }
     }
@@ -48667,7 +49197,7 @@ extern "C" {
 }
 impl WorkflowInstanceSendEvent {
     pub fn new(r#type: &str, payload: &JsValue) -> WorkflowInstanceSendEvent {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: WorkflowInstanceSendEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type(r#type);
         inner.set_payload(payload);
         inner
@@ -48741,13 +49271,39 @@ pub mod pipelines {
             O: ::wasm_bindgen::JsGeneric,
         >;
         #[wasm_bindgen(method, getter)]
-        pub fn env(this: &PipelineTransformationEntrypoint) -> Env;
+        pub fn env<
+            Env: ::wasm_bindgen::JsGeneric,
+            I: ::wasm_bindgen::JsGeneric,
+            O: ::wasm_bindgen::JsGeneric,
+        >(
+            this: &PipelineTransformationEntrypoint<Env, I, O>,
+        ) -> Env;
         #[wasm_bindgen(method, setter)]
-        pub fn set_env(this: &PipelineTransformationEntrypoint, val: &Env);
+        pub fn set_env<
+            Env: ::wasm_bindgen::JsGeneric,
+            I: ::wasm_bindgen::JsGeneric,
+            O: ::wasm_bindgen::JsGeneric,
+        >(
+            this: &PipelineTransformationEntrypoint<Env, I, O>,
+            val: &Env,
+        );
         #[wasm_bindgen(method, getter)]
-        pub fn ctx(this: &PipelineTransformationEntrypoint) -> ExecutionContext;
+        pub fn ctx<
+            Env: ::wasm_bindgen::JsGeneric,
+            I: ::wasm_bindgen::JsGeneric,
+            O: ::wasm_bindgen::JsGeneric,
+        >(
+            this: &PipelineTransformationEntrypoint<Env, I, O>,
+        ) -> ExecutionContext;
         #[wasm_bindgen(method, setter)]
-        pub fn set_ctx(this: &PipelineTransformationEntrypoint, val: &ExecutionContext);
+        pub fn set_ctx<
+            Env: ::wasm_bindgen::JsGeneric,
+            I: ::wasm_bindgen::JsGeneric,
+            O: ::wasm_bindgen::JsGeneric,
+        >(
+            this: &PipelineTransformationEntrypoint<Env, I, O>,
+            val: &ExecutionContext,
+        );
         #[doc = " run receives an array of PipelineRecord which can be"]
         #[doc = " transformed and returned to the pipeline"]
         #[doc = ""]
@@ -48784,7 +49340,7 @@ pub mod pipelines {
     }
     impl PipelineBatchMetadata {
         pub fn new(pipeline_id: &str, pipeline_name: &str) -> PipelineBatchMetadata {
-            let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+            let inner: PipelineBatchMetadata = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_pipeline_id(pipeline_id);
             inner.set_pipeline_name(pipeline_name);
             inner

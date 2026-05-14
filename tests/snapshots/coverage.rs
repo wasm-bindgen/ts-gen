@@ -26,7 +26,7 @@ extern "C" {
 }
 impl NumberIndexed {
     pub fn new(length: f64) -> NumberIndexed {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: NumberIndexed = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_length(length);
         inner
     }
@@ -43,7 +43,7 @@ extern "C" {
 }
 impl MixedWithIndex {
     pub fn new(name: &str) -> MixedWithIndex {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: MixedWithIndex = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         inner
     }
@@ -60,7 +60,7 @@ extern "C" {
 }
 impl HasName {
     pub fn new(name: &str) -> HasName {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: HasName = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         inner
     }
@@ -77,7 +77,7 @@ extern "C" {
 }
 impl HasAge {
     pub fn new(age: f64) -> HasAge {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: HasAge = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_age(age);
         inner
     }
@@ -183,7 +183,7 @@ impl TreeNode {
         Self::builder(value, children).build()
     }
     pub fn builder(value: &str, children: &[TreeNode]) -> TreeNodeBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: TreeNode = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_value(value);
         inner.set_children(children);
         TreeNodeBuilder { inner }
@@ -217,7 +217,7 @@ extern "C" {
 }
 impl LinkedList {
     pub fn new(data: &JsValue, next: Option<&LinkedList>) -> LinkedList {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: LinkedList = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_data(data);
         inner.set_next(next);
         inner
@@ -278,7 +278,7 @@ extern "C" {
 }
 impl MultiExtend {
     pub fn new(id: &str) -> MultiExtend {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: MultiExtend = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner
     }
@@ -569,7 +569,7 @@ extern "C" {
 }
 impl MutableWidget {
     #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub fn new() -> MutableWidget {
         #[allow(unused_unsafe)]
         unsafe {
             JsValue::from(js_sys::Object::new()).unchecked_into()
@@ -604,7 +604,7 @@ pub mod my_module {
             Self::builder(success).build()
         }
         pub fn builder(success: bool) -> WorkResultBuilder {
-            let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+            let inner: WorkResult = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_success(success);
             WorkResultBuilder { inner }
         }

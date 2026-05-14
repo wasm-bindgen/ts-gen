@@ -946,18 +946,24 @@ pub fn generate_concrete_params(
     quote! { #(#items),* }
 }
 
-/// Convert dictionary factory params to a (generics, params) token-stream pair.
+/// Convert dictionary factory params to a `(bounds, params)` token-stream pair.
 ///
 /// `ArrayBufferView` switches the helper into a generic signature
 /// `<Tn: js_sys::TypedArray>` and a `&Tn` parameter, so callers can pass any
 /// concrete typed-array (`Uint8Array`, `Int32Array`, etc.) without explicit
 /// casts. All other types pass through `generate_concrete_params`.
+///
+/// Returns each synthesised ABV bound as a separate `TokenStream` (e.g.
+/// `T: ::js_sys::TypedArray`). Callers compose these with type-level
+/// generic bounds (`T: ::wasm_bindgen::JsGeneric`) via
+/// [`render_generic_bounds`] so a single `<...>` declaration carries
+/// every bound the `fn` needs.
 pub fn generate_dictionary_params(
     params: &[ConcreteParam],
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
     from_module: &crate::ir::ModuleContext,
-) -> (TokenStream, TokenStream) {
+) -> (Vec<TokenStream>, TokenStream) {
     let mut generic_idents: Vec<syn::Ident> = Vec::new();
     let items: Vec<_> = params
         .iter()
@@ -985,16 +991,23 @@ pub fn generate_dictionary_params(
         })
         .collect();
 
-    let generics = if generic_idents.is_empty() {
+    let bounds: Vec<TokenStream> = generic_idents
+        .iter()
+        .map(|g| quote! { #g: ::js_sys::TypedArray })
+        .collect();
+
+    (bounds, quote! { #(#items),* })
+}
+
+/// Wrap a list of `<T: Bound>` token streams into a `<T: Bound, U: Bound>`
+/// declaration. Empty input renders as empty tokens (not `<>`), which is
+/// what `quote!` interpolation expects for "no generics".
+pub fn render_generic_bounds(bounds: &[TokenStream]) -> TokenStream {
+    if bounds.is_empty() {
         quote! {}
     } else {
-        let bounds = generic_idents
-            .iter()
-            .map(|g| quote! { #g: ::js_sys::TypedArray });
         quote! { <#(#bounds),*> }
-    };
-
-    (generics, quote! { #(#items),* })
+    }
 }
 
 /// Generic identifier names, walking `T, U, V, W, X, Y, Z, A, B, C, ...`

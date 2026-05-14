@@ -24,7 +24,7 @@ impl AllRequired {
     #[doc = " * `name` - The thing's name."]
     #[doc = " * `count` - The thing's count."]
     pub fn new(name: &str, count: f64) -> AllRequired {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: AllRequired = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         inner.set_count(count);
         inner
@@ -53,7 +53,7 @@ impl HasOptional {
     }
     #[doc = " * `name` - Required."]
     pub fn builder(name: &str) -> HasOptionalBuilder {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: HasOptional = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         HasOptionalBuilder { inner }
     }
@@ -126,7 +126,7 @@ extern "C" {
 impl SingleRequired {
     #[doc = " * `id` - The id."]
     pub fn new(id: &str) -> SingleRequired {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+        let inner: SingleRequired = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner
     }
