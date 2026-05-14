@@ -1,0 +1,23 @@
+tests/snapshots/workers-types.rs
+  9418efac90a3952d 10626,10628,22018-22019,25321-25326,25328-25332,25338,25340-25349,25351-25353,25356,25360,25362,56534,56539,56581,56583-56584,56589-56591,56775-56776,56781-56783
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "e3cb1712f49cc62248479de86cbb527c6274a7e5",
+  "prompts": {
+    "9418efac90a3952d": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_1d7ef9582ffe0KnClk2y8M0It6",
+        "model": "anthropic/claude-opus-4-7"
+      },
+      "human_author": "Guy Bedford",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 2498,
+      "overriden_lines": 0
+    }
+  }
+}
