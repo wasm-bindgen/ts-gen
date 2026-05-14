@@ -18,6 +18,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [Primitive types](#primitive-types)
 * [Optional and nullable types](#optional-and-nullable-types)
 * [Array and slice types](#array-and-slice-types)
+* [Outer-type ABI fan-out](#outer-type-abi-fan-out)
 * [Property accessors](#property-accessors)
 * [Naming conversion](#naming-conversion)
 * [JS-name collisions with `js_sys` glob imports](#js-name-collisions-with-js_sys-glob-imports)
@@ -133,6 +134,55 @@ imported callable that has at least one qualifying parameter gets
 its own `slice_to_array`. Functions whose only slice params are
 numeric (`&[f64]`, `&[i64]`) keep the default typed-array
 representation and do not get the attribute.
+
+## Outer-type ABI fan-out
+
+Some Rust-idiomatic outer-type lowerings imply a copy across the
+Wasm boundary for large data:
+
+* `&str` arguments incur a UTF-8 conversion vs the JS-side
+  `String`/`JsString` representation.
+* `&[T]` arguments with non-numeric `T` materialise a JS `Array`
+  element-by-element via the `slice_to_array` attribute.
+
+Rather than emit dual variants for every callable, ts-gen
+**defers to the TS author** to pick the form. Each ABI choice
+is exposed as a distinct TS spelling:
+
+| TS arg form        | Rust arg-pos       | Rust return-pos | Notes                                  |
+| ------------------ | ------------------ | --------------- | -------------------------------------- |
+| `string`           | `&str`             | `String`        | Idiomatic Rust; UTF-8 copy on boundary |
+| `String`           | `&JsString`        | `JsString`      | Zero-copy JS handle                    |
+| `T[]`              | `&[T]`             | `Vec<T>`        | Idiomatic Rust slice / owned vec       |
+| `Array<T>`         | `&Array<U>`        | `Array<U>`      | Zero-copy JS array handle              |
+| `ReadonlyArray<T>` | `&Array<U>`        | `Array<U>`      | Same as `Array<T>` for FFI purposes    |
+
+Where `U` is the element's inner-position lowering (`JsString`
+for `string`, `Number` for `number`, `Foo` for a named ref).
+
+Writing `Array<T>` (the explicit generic) gets the JS-array
+reference form; writing `T[]` (the syntactic shortcut) gets
+the Rust slice form. Writing `String` (the JS wrapper class) gets
+`&JsString`; writing `string` (the primitive) gets `&str`. The
+TS spelling controls the choice 1:1 — no fan-out, no duplicate
+variants.
+
+Other arg lowerings are independent of this rule:
+
+* `&Foo` / `&Uint8Array` / `&Headers` — already JS references.
+* `bool` / `f64` / `i64` — pass-by-value primitives.
+
+### Why TS-spelling control rather than fan-out
+
+An earlier design emitted both `&str` and `&JsString` variants
+of every `string`-taking callable (`new_with_body` plus
+`new_with_js_string`), letting the *caller* pick at the call
+site. That doubled the API surface for every fan-out-eligible
+arg and cartesian-multiplied when combined with union
+expansion — a 13-required-field dict (Cloudflare worker-types'
+`AIGatewayHeaders`) ballooned to 279,936 variants. Deferring to
+the TS author keeps each callable's surface compact and makes
+the binding's perf characteristics part of the TS contract.
 
 ## Property accessors
 

@@ -14,7 +14,7 @@ extern "C" {
     pub fn content(this: &Erased) -> ContentKind;
     #[doc = " Inner-erased generic — outer Array stays as `Vec<JsValue>`."]
     #[wasm_bindgen(method, getter)]
-    pub fn tags(this: &Erased) -> Vec<JsValue>;
+    pub fn tags(this: &Erased) -> Array;
 }
 impl Erased {
     #[allow(clippy::new_without_default)]

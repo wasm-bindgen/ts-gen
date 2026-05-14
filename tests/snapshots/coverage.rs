@@ -216,7 +216,7 @@ extern "C" {
     pub fn set_next(this: &LinkedList, val: &LinkedList);
 }
 impl LinkedList {
-    pub fn new(data: &JsValue, next: Option<&LinkedList>) -> LinkedList {
+    pub fn new(data: &JsValue, next: &LinkedList) -> LinkedList {
         let inner: LinkedList = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_data(data);
         inner.set_next(next);

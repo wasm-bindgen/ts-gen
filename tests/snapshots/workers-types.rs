@@ -8205,7 +8205,7 @@ impl KVNamespaceListResult {
     pub fn new_false(
         keys: &[KVNamespaceListKey<Metadata, Key>],
         cursor: &str,
-        cache_status: Option<&str>,
+        cache_status: &str,
     ) -> KVNamespaceListResult {
         let inner: KVNamespaceListResult = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_list_complete(false);
@@ -8219,7 +8219,7 @@ impl KVNamespaceListResult {
     #[doc = " * `list_complete: true`"]
     pub fn new_true(
         keys: &[KVNamespaceListKey<Metadata, Key>],
-        cache_status: Option<&str>,
+        cache_status: &str,
     ) -> KVNamespaceListResult {
         Self::builder_true(keys, cache_status).build()
     }
@@ -8228,7 +8228,7 @@ impl KVNamespaceListResult {
     #[doc = " * `list_complete: true`"]
     pub fn builder_true(
         keys: &[KVNamespaceListKey<Metadata, Key>],
-        cache_status: Option<&str>,
+        cache_status: &str,
     ) -> KVNamespaceListResultBuilder {
         let inner: KVNamespaceListResult = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_list_complete(true);
@@ -8272,32 +8272,36 @@ extern "C" {
         r#type: &str,
     ) -> Result<JsOption<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_key_and_kv_namespace_get_options_2<Key: ::wasm_bindgen::JsGeneric>(
+    pub async fn get_with_key_key_and_options_kv_namespace_get_options<
+        Key: ::wasm_bindgen::JsGeneric,
+    >(
         this: &KVNamespace<Key>,
         key: &Key,
         options: &KVNamespaceGetOptions<JsString>,
     ) -> Result<JsOption<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, slice_to_array, js_name = "get")]
-    pub async fn get_with_slice_and_type<Key: ::wasm_bindgen::JsGeneric>(
+    pub async fn get_with_array_and_type<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
-        key: &[Key],
+        key: &Array<Key>,
         r#type: &str,
     ) -> Result<JsOption<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, slice_to_array, js_name = "get")]
-    pub async fn get_with_slice<Key: ::wasm_bindgen::JsGeneric>(
+    pub async fn get_with_array<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
-        key: &[Key],
+        key: &Array<Key>,
     ) -> Result<JsOption<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, slice_to_array, js_name = "get")]
-    pub async fn get_with_slice_and_kv_namespace_get_options<Key: ::wasm_bindgen::JsGeneric>(
+    pub async fn get_with_array_and_kv_namespace_get_options<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
-        key: &[Key],
+        key: &Array<Key>,
         options: &KVNamespaceGetOptions<Undefined>,
     ) -> Result<JsOption<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, slice_to_array, js_name = "get")]
-    pub async fn get_with_slice_and_kv_namespace_get_options_2<Key: ::wasm_bindgen::JsGeneric>(
+    pub async fn get_with_key_array_and_options_kv_namespace_get_options<
+        Key: ::wasm_bindgen::JsGeneric,
+    >(
         this: &KVNamespace<Key>,
-        key: &[Key],
+        key: &Array<Key>,
         options: &KVNamespaceGetOptions<JsString>,
     ) -> Result<JsOption<JsString>, JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -8391,7 +8395,7 @@ extern "C" {
         r#type: &str,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_key_and_kv_namespace_get_options_2<
+    pub async fn get_with_metadata_with_key_key_and_options_kv_namespace_get_options<
         Key: ::wasm_bindgen::JsGeneric,
         Metadata: ::wasm_bindgen::JsGeneric,
     >(
@@ -8400,38 +8404,38 @@ extern "C" {
         options: &KVNamespaceGetOptions<JsString>,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
     #[wasm_bindgen(method, catch, slice_to_array, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_slice_and_type<
+    pub async fn get_with_metadata_with_array_and_type<
         Key: ::wasm_bindgen::JsGeneric,
         Metadata: ::wasm_bindgen::JsGeneric,
     >(
         this: &KVNamespace<Key>,
-        key: &[Key],
+        key: &Array<Key>,
         r#type: &str,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
     #[wasm_bindgen(method, catch, slice_to_array, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_slice<
+    pub async fn get_with_metadata_with_array<
         Key: ::wasm_bindgen::JsGeneric,
         Metadata: ::wasm_bindgen::JsGeneric,
     >(
         this: &KVNamespace<Key>,
-        key: &[Key],
+        key: &Array<Key>,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
     #[wasm_bindgen(method, catch, slice_to_array, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_slice_and_kv_namespace_get_options<
+    pub async fn get_with_metadata_with_array_and_kv_namespace_get_options<
         Key: ::wasm_bindgen::JsGeneric,
         Metadata: ::wasm_bindgen::JsGeneric,
     >(
         this: &KVNamespace<Key>,
-        key: &[Key],
+        key: &Array<Key>,
         options: &KVNamespaceGetOptions<Undefined>,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
     #[wasm_bindgen(method, catch, slice_to_array, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_slice_and_kv_namespace_get_options_2<
+    pub async fn get_with_metadata_with_key_array_and_options_kv_namespace_get_options<
         Key: ::wasm_bindgen::JsGeneric,
         Metadata: ::wasm_bindgen::JsGeneric,
     >(
         this: &KVNamespace<Key>,
-        key: &[Key],
+        key: &Array<Key>,
         options: &KVNamespaceGetOptions<JsString>,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -8620,9 +8624,9 @@ impl<Value: ::wasm_bindgen::JsGeneric, Metadata: ::wasm_bindgen::JsGeneric>
     KVNamespaceGetWithMetadataResult<Value, Metadata>
 {
     pub fn new(
-        value: Option<&Value>,
-        metadata: Option<&Metadata>,
-        cache_status: Option<&str>,
+        value: &Value,
+        metadata: &Metadata,
+        cache_status: &str,
     ) -> KVNamespaceGetWithMetadataResult<Value, Metadata> {
         let inner: KVNamespaceGetWithMetadataResult<Value, Metadata> =
             JsCast::unchecked_into(js_sys::Object::new());
@@ -14128,19 +14132,19 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiSearchSearchRequest;
     #[wasm_bindgen(method, getter)]
-    pub fn messages(this: &AiSearchSearchRequest) -> Vec<Object>;
+    pub fn messages(this: &AiSearchSearchRequest) -> Array<Object>;
     #[wasm_bindgen(method, setter, slice_to_array)]
-    pub fn set_messages(this: &AiSearchSearchRequest, val: &[Object]);
+    pub fn set_messages(this: &AiSearchSearchRequest, val: &Array<Object>);
     #[wasm_bindgen(method, getter)]
     pub fn ai_search_options(this: &AiSearchSearchRequest) -> Option<Object>;
     #[wasm_bindgen(method, setter)]
     pub fn set_ai_search_options(this: &AiSearchSearchRequest, val: &Object);
 }
 impl AiSearchSearchRequest {
-    pub fn new(messages: &[Object]) -> AiSearchSearchRequest {
+    pub fn new(messages: &Array<Object>) -> AiSearchSearchRequest {
         Self::builder(messages).build()
     }
-    pub fn builder(messages: &[Object]) -> AiSearchSearchRequestBuilder {
+    pub fn builder(messages: &Array<Object>) -> AiSearchSearchRequestBuilder {
         let inner: AiSearchSearchRequest = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
         AiSearchSearchRequestBuilder { inner }
@@ -14164,9 +14168,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiSearchChatCompletionsRequest;
     #[wasm_bindgen(method, getter)]
-    pub fn messages(this: &AiSearchChatCompletionsRequest) -> Vec<Object>;
+    pub fn messages(this: &AiSearchChatCompletionsRequest) -> Array<Object>;
     #[wasm_bindgen(method, setter, slice_to_array)]
-    pub fn set_messages(this: &AiSearchChatCompletionsRequest, val: &[Object]);
+    pub fn set_messages(this: &AiSearchChatCompletionsRequest, val: &Array<Object>);
     #[wasm_bindgen(method, getter)]
     pub fn model(this: &AiSearchChatCompletionsRequest) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -14181,10 +14185,10 @@ extern "C" {
     pub fn set_ai_search_options(this: &AiSearchChatCompletionsRequest, val: &Object);
 }
 impl AiSearchChatCompletionsRequest {
-    pub fn new(messages: &[Object]) -> AiSearchChatCompletionsRequest {
+    pub fn new(messages: &Array<Object>) -> AiSearchChatCompletionsRequest {
         Self::builder(messages).build()
     }
-    pub fn builder(messages: &[Object]) -> AiSearchChatCompletionsRequestBuilder {
+    pub fn builder(messages: &Array<Object>) -> AiSearchChatCompletionsRequestBuilder {
         let inner: AiSearchChatCompletionsRequest = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
         AiSearchChatCompletionsRequestBuilder { inner }
@@ -14220,12 +14224,12 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_search_query(this: &AiSearchSearchResponse, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn chunks(this: &AiSearchSearchResponse) -> Vec<Object>;
+    pub fn chunks(this: &AiSearchSearchResponse) -> Array<Object>;
     #[wasm_bindgen(method, setter, slice_to_array)]
-    pub fn set_chunks(this: &AiSearchSearchResponse, val: &[Object]);
+    pub fn set_chunks(this: &AiSearchSearchResponse, val: &Array<Object>);
 }
 impl AiSearchSearchResponse {
-    pub fn new(search_query: &str, chunks: &[Object]) -> AiSearchSearchResponse {
+    pub fn new(search_query: &str, chunks: &Array<Object>) -> AiSearchSearchResponse {
         let inner: AiSearchSearchResponse = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_search_query(search_query);
         inner.set_chunks(chunks);
@@ -16015,15 +16019,15 @@ extern "C" {
         val: &ResponseConversationParam,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn include(this: &ResponsesInput) -> Option<Vec<ResponseIncludable>>;
+    pub fn include(this: &ResponsesInput) -> Option<Array<ResponseIncludable>>;
     #[wasm_bindgen(method, setter, slice_to_array)]
-    pub fn set_include(this: &ResponsesInput, val: &[ResponseIncludable]);
+    pub fn set_include(this: &ResponsesInput, val: &Array<ResponseIncludable>);
     #[wasm_bindgen(method, getter)]
     pub fn input(this: &ResponsesInput) -> Option<InputKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_input(this: &ResponsesInput, val: &str);
     #[wasm_bindgen(method, setter, slice_to_array, js_name = "input")]
-    pub fn set_input_with_slice(this: &ResponsesInput, val: &[JsValue]);
+    pub fn set_input_with_array(this: &ResponsesInput, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn instructions(this: &ResponsesInput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -16082,9 +16086,9 @@ extern "C" {
         val: &ToolChoiceFunction,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn tools(this: &ResponsesInput) -> Option<Vec<ResponsesFunctionTool>>;
+    pub fn tools(this: &ResponsesInput) -> Option<Array<ResponsesFunctionTool>>;
     #[wasm_bindgen(method, setter, slice_to_array)]
-    pub fn set_tools(this: &ResponsesInput, val: &[ResponsesFunctionTool]);
+    pub fn set_tools(this: &ResponsesInput, val: &Array<ResponsesFunctionTool>);
     #[wasm_bindgen(method, getter)]
     pub fn top_p(this: &ResponsesInput) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
@@ -16124,7 +16128,7 @@ impl ResponsesInputBuilder {
             .set_conversation_with_response_conversation_param(val);
         self
     }
-    pub fn include(self, val: &[ResponseIncludable]) -> Self {
+    pub fn include(self, val: &Array<ResponseIncludable>) -> Self {
         self.inner.set_include(val);
         self
     }
@@ -16132,8 +16136,8 @@ impl ResponsesInputBuilder {
         self.inner.set_input(val);
         self
     }
-    pub fn input_with_slice(self, val: &[JsValue]) -> Self {
-        self.inner.set_input_with_slice(val);
+    pub fn input_with_array(self, val: &Array) -> Self {
+        self.inner.set_input_with_array(val);
         self
     }
     pub fn instructions(self, val: &str) -> Self {
@@ -16192,7 +16196,7 @@ impl ResponsesInputBuilder {
         self.inner.set_tool_choice_with_tool_choice_function(val);
         self
     }
-    pub fn tools(self, val: &[ResponsesFunctionTool]) -> Self {
+    pub fn tools(self, val: &Array<ResponsesFunctionTool>) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -16238,15 +16242,15 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_instructions(this: &ResponsesOutput, val: &str);
     #[wasm_bindgen(method, setter, slice_to_array, js_name = "instructions")]
-    pub fn set_instructions_with_slice(this: &ResponsesOutput, val: &[JsValue]);
+    pub fn set_instructions_with_array(this: &ResponsesOutput, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn object(this: &ResponsesOutput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_object(this: &ResponsesOutput, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn output(this: &ResponsesOutput) -> Option<Vec<JsValue>>;
+    pub fn output(this: &ResponsesOutput) -> Option<Array>;
     #[wasm_bindgen(method, setter, slice_to_array)]
-    pub fn set_output(this: &ResponsesOutput, val: &[JsValue]);
+    pub fn set_output(this: &ResponsesOutput, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn parallel_tool_calls(this: &ResponsesOutput) -> Option<bool>;
     #[wasm_bindgen(method, setter)]
@@ -16265,9 +16269,9 @@ extern "C" {
         val: &ToolChoiceFunction,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn tools(this: &ResponsesOutput) -> Option<Vec<ResponsesFunctionTool>>;
+    pub fn tools(this: &ResponsesOutput) -> Option<Array<ResponsesFunctionTool>>;
     #[wasm_bindgen(method, setter, slice_to_array)]
-    pub fn set_tools(this: &ResponsesOutput, val: &[ResponsesFunctionTool]);
+    pub fn set_tools(this: &ResponsesOutput, val: &Array<ResponsesFunctionTool>);
     #[wasm_bindgen(method, getter)]
     pub fn top_p(this: &ResponsesOutput) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
@@ -16351,15 +16355,15 @@ impl ResponsesOutputBuilder {
         self.inner.set_instructions(val);
         self
     }
-    pub fn instructions_with_slice(self, val: &[JsValue]) -> Self {
-        self.inner.set_instructions_with_slice(val);
+    pub fn instructions_with_array(self, val: &Array) -> Self {
+        self.inner.set_instructions_with_array(val);
         self
     }
     pub fn object(self, val: &str) -> Self {
         self.inner.set_object(val);
         self
     }
-    pub fn output(self, val: &[JsValue]) -> Self {
+    pub fn output(self, val: &Array) -> Self {
         self.inner.set_output(val);
         self
     }
@@ -16379,7 +16383,7 @@ impl ResponsesOutputBuilder {
         self.inner.set_tool_choice_with_tool_choice_function(val);
         self
     }
-    pub fn tools(self, val: &[ResponsesFunctionTool]) -> Self {
+    pub fn tools(self, val: &Array<ResponsesFunctionTool>) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -16441,7 +16445,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_content(this: &EasyInputMessage, val: &str);
     #[wasm_bindgen(method, setter, slice_to_array, js_name = "content")]
-    pub fn set_content_with_slice(this: &EasyInputMessage, val: &[JsValue]);
+    pub fn set_content_with_array(this: &EasyInputMessage, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn role(this: &EasyInputMessage) -> EasyInputMessageRoleKind;
     #[wasm_bindgen(method, setter)]
@@ -16479,34 +16483,26 @@ impl EasyInputMessage {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
-    pub fn new_user_with_response_input_message_content_list(
-        content: &[JsValue],
-    ) -> EasyInputMessage {
-        Self::builder_user_with_response_input_message_content_list(content).build()
+    pub fn new_user_with_array(content: &Array) -> EasyInputMessage {
+        Self::builder_user_with_array(content).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
-    pub fn new_assistant_with_response_input_message_content_list(
-        content: &[JsValue],
-    ) -> EasyInputMessage {
-        Self::builder_assistant_with_response_input_message_content_list(content).build()
+    pub fn new_assistant_with_array(content: &Array) -> EasyInputMessage {
+        Self::builder_assistant_with_array(content).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
-    pub fn new_system_with_response_input_message_content_list(
-        content: &[JsValue],
-    ) -> EasyInputMessage {
-        Self::builder_system_with_response_input_message_content_list(content).build()
+    pub fn new_system_with_array(content: &Array) -> EasyInputMessage {
+        Self::builder_system_with_array(content).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
-    pub fn new_developer_with_response_input_message_content_list(
-        content: &[JsValue],
-    ) -> EasyInputMessage {
-        Self::builder_developer_with_response_input_message_content_list(content).build()
+    pub fn new_developer_with_array(content: &Array) -> EasyInputMessage {
+        Self::builder_developer_with_array(content).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
@@ -16547,44 +16543,36 @@ impl EasyInputMessage {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
-    pub fn builder_user_with_response_input_message_content_list(
-        content: &[JsValue],
-    ) -> EasyInputMessageBuilder {
+    pub fn builder_user_with_array(content: &Array) -> EasyInputMessageBuilder {
         let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_content(content);
+        inner.set_content_with_array(content);
         inner.set_role("user");
         EasyInputMessageBuilder { inner }
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
-    pub fn builder_assistant_with_response_input_message_content_list(
-        content: &[JsValue],
-    ) -> EasyInputMessageBuilder {
+    pub fn builder_assistant_with_array(content: &Array) -> EasyInputMessageBuilder {
         let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_content(content);
+        inner.set_content_with_array(content);
         inner.set_role("assistant");
         EasyInputMessageBuilder { inner }
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
-    pub fn builder_system_with_response_input_message_content_list(
-        content: &[JsValue],
-    ) -> EasyInputMessageBuilder {
+    pub fn builder_system_with_array(content: &Array) -> EasyInputMessageBuilder {
         let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_content(content);
+        inner.set_content_with_array(content);
         inner.set_role("system");
         EasyInputMessageBuilder { inner }
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
-    pub fn builder_developer_with_response_input_message_content_list(
-        content: &[JsValue],
-    ) -> EasyInputMessageBuilder {
+    pub fn builder_developer_with_array(content: &Array) -> EasyInputMessageBuilder {
         let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_content(content);
+        inner.set_content_with_array(content);
         inner.set_role("developer");
         EasyInputMessageBuilder { inner }
     }
@@ -16631,11 +16619,7 @@ impl ResponsesFunctionTool {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    pub fn new_function(
-        name: &str,
-        parameters: Option<&Object>,
-        strict: Option<bool>,
-    ) -> ResponsesFunctionTool {
+    pub fn new_function(name: &str, parameters: &Object, strict: bool) -> ResponsesFunctionTool {
         Self::builder_function(name, parameters, strict).build()
     }
     #[doc = " ## Inlined fields"]
@@ -16643,8 +16627,8 @@ impl ResponsesFunctionTool {
     #[doc = " * `type: \"function\"`"]
     pub fn builder_function(
         name: &str,
-        parameters: Option<&Object>,
-        strict: Option<bool>,
+        parameters: &Object,
+        strict: bool,
     ) -> ResponsesFunctionToolBuilder {
         let inner: ResponsesFunctionTool = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
@@ -16878,7 +16862,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_output(this: &ResponseCustomToolCallOutput, val: &str);
     #[wasm_bindgen(method, setter, slice_to_array, js_name = "output")]
-    pub fn set_output_with_slice(this: &ResponseCustomToolCallOutput, val: &[JsValue]);
+    pub fn set_output_with_array(this: &ResponseCustomToolCallOutput, val: &Array);
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseCustomToolCallOutput) -> String;
     #[wasm_bindgen(method, setter)]
@@ -16901,11 +16885,11 @@ impl ResponseCustomToolCallOutput {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
-    pub fn new_custom_tool_call_output_with_slice(
+    pub fn new_custom_tool_call_output_with_array(
         call_id: &str,
-        output: &[JsValue],
+        output: &Array,
     ) -> ResponseCustomToolCallOutput {
-        Self::builder_custom_tool_call_output_with_slice(call_id, output).build()
+        Self::builder_custom_tool_call_output_with_array(call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
@@ -16923,13 +16907,13 @@ impl ResponseCustomToolCallOutput {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
-    pub fn builder_custom_tool_call_output_with_slice(
+    pub fn builder_custom_tool_call_output_with_array(
         call_id: &str,
-        output: &[JsValue],
+        output: &Array,
     ) -> ResponseCustomToolCallOutputBuilder {
         let inner: ResponseCustomToolCallOutput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_call_id(call_id);
-        inner.set_output_with_slice(output);
+        inner.set_output_with_array(output);
         inner.set_type("custom_tool_call_output");
         ResponseCustomToolCallOutputBuilder { inner }
     }
@@ -16961,165 +16945,9 @@ extern "C" {
     pub fn set_message(this: &ResponseError, val: &str);
 }
 impl ResponseError {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `code: \"server_error\"`"]
-    pub fn new_server_error(message: &str) -> ResponseError {
+    pub fn new(code: &str, message: &str) -> ResponseError {
         let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_code("server_error");
-        inner.set_message(message);
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `code: \"rate_limit_exceeded\"`"]
-    pub fn new_rate_limit_exceeded(message: &str) -> ResponseError {
-        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_code("rate_limit_exceeded");
-        inner.set_message(message);
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `code: \"invalid_prompt\"`"]
-    pub fn new_invalid_prompt(message: &str) -> ResponseError {
-        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_code("invalid_prompt");
-        inner.set_message(message);
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `code: \"vector_store_timeout\"`"]
-    pub fn new_vector_store_timeout(message: &str) -> ResponseError {
-        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_code("vector_store_timeout");
-        inner.set_message(message);
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `code: \"invalid_image\"`"]
-    pub fn new_invalid_image(message: &str) -> ResponseError {
-        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_code("invalid_image");
-        inner.set_message(message);
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `code: \"invalid_image_format\"`"]
-    pub fn new_invalid_image_format(message: &str) -> ResponseError {
-        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_code("invalid_image_format");
-        inner.set_message(message);
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `code: \"invalid_base64_image\"`"]
-    pub fn new_invalid_base64_image(message: &str) -> ResponseError {
-        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_code("invalid_base64_image");
-        inner.set_message(message);
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `code: \"invalid_image_url\"`"]
-    pub fn new_invalid_image_url(message: &str) -> ResponseError {
-        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_code("invalid_image_url");
-        inner.set_message(message);
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `code: \"image_too_large\"`"]
-    pub fn new_image_too_large(message: &str) -> ResponseError {
-        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_code("image_too_large");
-        inner.set_message(message);
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `code: \"image_too_small\"`"]
-    pub fn new_image_too_small(message: &str) -> ResponseError {
-        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_code("image_too_small");
-        inner.set_message(message);
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `code: \"image_parse_error\"`"]
-    pub fn new_image_parse_error(message: &str) -> ResponseError {
-        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_code("image_parse_error");
-        inner.set_message(message);
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `code: \"image_content_policy_violation\"`"]
-    pub fn new_image_content_policy_violation(message: &str) -> ResponseError {
-        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_code("image_content_policy_violation");
-        inner.set_message(message);
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `code: \"invalid_image_mode\"`"]
-    pub fn new_invalid_image_mode(message: &str) -> ResponseError {
-        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_code("invalid_image_mode");
-        inner.set_message(message);
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `code: \"image_file_too_large\"`"]
-    pub fn new_image_file_too_large(message: &str) -> ResponseError {
-        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_code("image_file_too_large");
-        inner.set_message(message);
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `code: \"unsupported_image_media_type\"`"]
-    pub fn new_unsupported_image_media_type(message: &str) -> ResponseError {
-        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_code("unsupported_image_media_type");
-        inner.set_message(message);
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `code: \"empty_image_file\"`"]
-    pub fn new_empty_image_file(message: &str) -> ResponseError {
-        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_code("empty_image_file");
-        inner.set_message(message);
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `code: \"failed_to_download_image\"`"]
-    pub fn new_failed_to_download_image(message: &str) -> ResponseError {
-        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_code("failed_to_download_image");
-        inner.set_message(message);
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `code: \"image_file_not_found\"`"]
-    pub fn new_image_file_not_found(message: &str) -> ResponseError {
-        let inner: ResponseError = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_code("image_file_not_found");
+        inner.set_code(code);
         inner.set_message(message);
         inner
     }
@@ -17155,9 +16983,9 @@ impl ResponseErrorEvent {
     #[doc = ""]
     #[doc = " * `type: \"error\"`"]
     pub fn new_error(
-        code: Option<&str>,
+        code: &str,
         message: &str,
-        param: Option<&str>,
+        param: &str,
         sequence_number: f64,
     ) -> ResponseErrorEvent {
         let inner: ResponseErrorEvent = JsCast::unchecked_into(js_sys::Object::new());
@@ -17515,7 +17343,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_output(this: &ResponseFunctionToolCallOutputItem, val: &str);
     #[wasm_bindgen(method, setter, slice_to_array, js_name = "output")]
-    pub fn set_output_with_slice(this: &ResponseFunctionToolCallOutputItem, val: &[JsValue]);
+    pub fn set_output_with_array(this: &ResponseFunctionToolCallOutputItem, val: &Array);
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseFunctionToolCallOutputItem) -> String;
     #[wasm_bindgen(method, setter)]
@@ -17539,12 +17367,12 @@ impl ResponseFunctionToolCallOutputItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn new_function_call_output_with_slice(
+    pub fn new_function_call_output_with_array(
         id: &str,
         call_id: &str,
-        output: &[JsValue],
+        output: &Array,
     ) -> ResponseFunctionToolCallOutputItem {
-        Self::builder_function_call_output_with_slice(id, call_id, output).build()
+        Self::builder_function_call_output_with_array(id, call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
@@ -17565,16 +17393,16 @@ impl ResponseFunctionToolCallOutputItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn builder_function_call_output_with_slice(
+    pub fn builder_function_call_output_with_array(
         id: &str,
         call_id: &str,
-        output: &[JsValue],
+        output: &Array,
     ) -> ResponseFunctionToolCallOutputItemBuilder {
         let inner: ResponseFunctionToolCallOutputItem =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_call_id(call_id);
-        inner.set_output_with_slice(output);
+        inner.set_output_with_array(output);
         inner.set_type("function_call_output");
         ResponseFunctionToolCallOutputItemBuilder { inner }
     }
@@ -17789,7 +17617,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_output(this: &ResponseInputItemFunctionCallOutput, val: &str);
     #[wasm_bindgen(method, setter, slice_to_array, js_name = "output")]
-    pub fn set_output_with_slice(this: &ResponseInputItemFunctionCallOutput, val: &[JsValue]);
+    pub fn set_output_with_array(this: &ResponseInputItemFunctionCallOutput, val: &Array);
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseInputItemFunctionCallOutput) -> String;
     #[wasm_bindgen(method, setter)]
@@ -17816,14 +17644,11 @@ impl ResponseInputItemFunctionCallOutput {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn new_function_call_output_with_response_function_call_output_item_list(
+    pub fn new_function_call_output_with_array(
         call_id: &str,
-        output: &[JsValue],
+        output: &Array,
     ) -> ResponseInputItemFunctionCallOutput {
-        Self::builder_function_call_output_with_response_function_call_output_item_list(
-            call_id, output,
-        )
-        .build()
+        Self::builder_function_call_output_with_array(call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
@@ -17842,14 +17667,14 @@ impl ResponseInputItemFunctionCallOutput {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn builder_function_call_output_with_response_function_call_output_item_list(
+    pub fn builder_function_call_output_with_array(
         call_id: &str,
-        output: &[JsValue],
+        output: &Array,
     ) -> ResponseInputItemFunctionCallOutputBuilder {
         let inner: ResponseInputItemFunctionCallOutput =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_call_id(call_id);
-        inner.set_output(output);
+        inner.set_output_with_array(output);
         inner.set_type("function_call_output");
         ResponseInputItemFunctionCallOutputBuilder { inner }
     }
@@ -17876,9 +17701,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseInputItemMessage;
     #[wasm_bindgen(method, getter)]
-    pub fn content(this: &ResponseInputItemMessage) -> Vec<JsValue>;
+    pub fn content(this: &ResponseInputItemMessage) -> Array;
     #[wasm_bindgen(method, setter, slice_to_array)]
-    pub fn set_content(this: &ResponseInputItemMessage, val: &[JsValue]);
+    pub fn set_content(this: &ResponseInputItemMessage, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn role(this: &ResponseInputItemMessage) -> ResponseInputItemMessageRoleKind;
     #[wasm_bindgen(method, setter)]
@@ -17896,25 +17721,25 @@ impl ResponseInputItemMessage {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
-    pub fn new_user(content: &[JsValue]) -> ResponseInputItemMessage {
+    pub fn new_user(content: &Array) -> ResponseInputItemMessage {
         Self::builder_user(content).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
-    pub fn new_system(content: &[JsValue]) -> ResponseInputItemMessage {
+    pub fn new_system(content: &Array) -> ResponseInputItemMessage {
         Self::builder_system(content).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
-    pub fn new_developer(content: &[JsValue]) -> ResponseInputItemMessage {
+    pub fn new_developer(content: &Array) -> ResponseInputItemMessage {
         Self::builder_developer(content).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
-    pub fn builder_user(content: &[JsValue]) -> ResponseInputItemMessageBuilder {
+    pub fn builder_user(content: &Array) -> ResponseInputItemMessageBuilder {
         let inner: ResponseInputItemMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
         inner.set_role("user");
@@ -17923,7 +17748,7 @@ impl ResponseInputItemMessage {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
-    pub fn builder_system(content: &[JsValue]) -> ResponseInputItemMessageBuilder {
+    pub fn builder_system(content: &Array) -> ResponseInputItemMessageBuilder {
         let inner: ResponseInputItemMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
         inner.set_role("system");
@@ -17932,7 +17757,7 @@ impl ResponseInputItemMessage {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
-    pub fn builder_developer(content: &[JsValue]) -> ResponseInputItemMessageBuilder {
+    pub fn builder_developer(content: &Array) -> ResponseInputItemMessageBuilder {
         let inner: ResponseInputItemMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
         inner.set_role("developer");
@@ -17967,9 +17792,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_id(this: &ResponseInputMessageItem, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn content(this: &ResponseInputMessageItem) -> Vec<JsValue>;
+    pub fn content(this: &ResponseInputMessageItem) -> Array;
     #[wasm_bindgen(method, setter, slice_to_array)]
-    pub fn set_content(this: &ResponseInputMessageItem, val: &[JsValue]);
+    pub fn set_content(this: &ResponseInputMessageItem, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn role(this: &ResponseInputMessageItem) -> ResponseInputItemMessageRoleKind;
     #[wasm_bindgen(method, setter)]
@@ -17987,25 +17812,25 @@ impl ResponseInputMessageItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
-    pub fn new_user(id: &str, content: &[JsValue]) -> ResponseInputMessageItem {
+    pub fn new_user(id: &str, content: &Array) -> ResponseInputMessageItem {
         Self::builder_user(id, content).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
-    pub fn new_system(id: &str, content: &[JsValue]) -> ResponseInputMessageItem {
+    pub fn new_system(id: &str, content: &Array) -> ResponseInputMessageItem {
         Self::builder_system(id, content).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
-    pub fn new_developer(id: &str, content: &[JsValue]) -> ResponseInputMessageItem {
+    pub fn new_developer(id: &str, content: &Array) -> ResponseInputMessageItem {
         Self::builder_developer(id, content).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
-    pub fn builder_user(id: &str, content: &[JsValue]) -> ResponseInputMessageItemBuilder {
+    pub fn builder_user(id: &str, content: &Array) -> ResponseInputMessageItemBuilder {
         let inner: ResponseInputMessageItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
@@ -18015,7 +17840,7 @@ impl ResponseInputMessageItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
-    pub fn builder_system(id: &str, content: &[JsValue]) -> ResponseInputMessageItemBuilder {
+    pub fn builder_system(id: &str, content: &Array) -> ResponseInputMessageItemBuilder {
         let inner: ResponseInputMessageItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
@@ -18025,7 +17850,7 @@ impl ResponseInputMessageItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
-    pub fn builder_developer(id: &str, content: &[JsValue]) -> ResponseInputMessageItemBuilder {
+    pub fn builder_developer(id: &str, content: &Array) -> ResponseInputMessageItemBuilder {
         let inner: ResponseInputMessageItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
@@ -18140,12 +17965,42 @@ impl ResponseOutputItemAddedEvent {
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.added\"`"]
     pub fn new_responseoutput_itemadded(
-        item: &JsValue,
+        item: &ResponseOutputMessage,
         output_index: f64,
         sequence_number: f64,
     ) -> ResponseOutputItemAddedEvent {
         let inner: ResponseOutputItemAddedEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_item(item);
+        inner.set_output_index(output_index);
+        inner.set_sequence_number(sequence_number);
+        inner.set_type("response.output_item.added");
+        inner
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `type: \"response.output_item.added\"`"]
+    pub fn new_responseoutput_itemadded_with_response_function_tool_call(
+        item: &ResponseFunctionToolCall,
+        output_index: f64,
+        sequence_number: f64,
+    ) -> ResponseOutputItemAddedEvent {
+        let inner: ResponseOutputItemAddedEvent = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_item_with_response_function_tool_call(item);
+        inner.set_output_index(output_index);
+        inner.set_sequence_number(sequence_number);
+        inner.set_type("response.output_item.added");
+        inner
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `type: \"response.output_item.added\"`"]
+    pub fn new_responseoutput_itemadded_with_response_reasoning_item(
+        item: &ResponseReasoningItem,
+        output_index: f64,
+        sequence_number: f64,
+    ) -> ResponseOutputItemAddedEvent {
+        let inner: ResponseOutputItemAddedEvent = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_item_with_response_reasoning_item(item);
         inner.set_output_index(output_index);
         inner.set_sequence_number(sequence_number);
         inner.set_type("response.output_item.added");
@@ -18189,12 +18044,42 @@ impl ResponseOutputItemDoneEvent {
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.done\"`"]
     pub fn new_responseoutput_itemdone(
-        item: &JsValue,
+        item: &ResponseOutputMessage,
         output_index: f64,
         sequence_number: f64,
     ) -> ResponseOutputItemDoneEvent {
         let inner: ResponseOutputItemDoneEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_item(item);
+        inner.set_output_index(output_index);
+        inner.set_sequence_number(sequence_number);
+        inner.set_type("response.output_item.done");
+        inner
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `type: \"response.output_item.done\"`"]
+    pub fn new_responseoutput_itemdone_with_response_function_tool_call(
+        item: &ResponseFunctionToolCall,
+        output_index: f64,
+        sequence_number: f64,
+    ) -> ResponseOutputItemDoneEvent {
+        let inner: ResponseOutputItemDoneEvent = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_item_with_response_function_tool_call(item);
+        inner.set_output_index(output_index);
+        inner.set_sequence_number(sequence_number);
+        inner.set_type("response.output_item.done");
+        inner
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `type: \"response.output_item.done\"`"]
+    pub fn new_responseoutput_itemdone_with_response_reasoning_item(
+        item: &ResponseReasoningItem,
+        output_index: f64,
+        sequence_number: f64,
+    ) -> ResponseOutputItemDoneEvent {
+        let inner: ResponseOutputItemDoneEvent = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_item_with_response_reasoning_item(item);
         inner.set_output_index(output_index);
         inner.set_sequence_number(sequence_number);
         inner.set_type("response.output_item.done");
@@ -18211,9 +18096,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_id(this: &ResponseOutputMessage, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn content(this: &ResponseOutputMessage) -> Vec<JsValue>;
+    pub fn content(this: &ResponseOutputMessage) -> Array;
     #[wasm_bindgen(method, setter, slice_to_array)]
-    pub fn set_content(this: &ResponseOutputMessage, val: &[JsValue]);
+    pub fn set_content(this: &ResponseOutputMessage, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn role(this: &ResponseOutputMessage) -> String;
     #[wasm_bindgen(method, setter)]
@@ -18233,10 +18118,7 @@ impl ResponseOutputMessage {
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"in_progress\"`"]
     #[doc = " * `type: \"message\"`"]
-    pub fn new_assistant_in_progress_message(
-        id: &str,
-        content: &[JsValue],
-    ) -> ResponseOutputMessage {
+    pub fn new_assistant_in_progress_message(id: &str, content: &Array) -> ResponseOutputMessage {
         let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
@@ -18250,7 +18132,7 @@ impl ResponseOutputMessage {
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"completed\"`"]
     #[doc = " * `type: \"message\"`"]
-    pub fn new_assistant_completed_message(id: &str, content: &[JsValue]) -> ResponseOutputMessage {
+    pub fn new_assistant_completed_message(id: &str, content: &Array) -> ResponseOutputMessage {
         let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
@@ -18264,10 +18146,7 @@ impl ResponseOutputMessage {
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"incomplete\"`"]
     #[doc = " * `type: \"message\"`"]
-    pub fn new_assistant_incomplete_message(
-        id: &str,
-        content: &[JsValue],
-    ) -> ResponseOutputMessage {
+    pub fn new_assistant_incomplete_message(id: &str, content: &Array) -> ResponseOutputMessage {
         let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
@@ -18316,9 +18195,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseOutputText, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn logprobs(this: &ResponseOutputText) -> Option<Vec<Logprob>>;
+    pub fn logprobs(this: &ResponseOutputText) -> Option<Array<Logprob>>;
     #[wasm_bindgen(method, setter, slice_to_array)]
-    pub fn set_logprobs(this: &ResponseOutputText, val: &[Logprob]);
+    pub fn set_logprobs(this: &ResponseOutputText, val: &Array<Logprob>);
 }
 impl ResponseOutputText {
     #[doc = " ## Inlined fields"]
@@ -18341,7 +18220,7 @@ pub struct ResponseOutputTextBuilder {
     inner: ResponseOutputText,
 }
 impl ResponseOutputTextBuilder {
-    pub fn logprobs(self, val: &[Logprob]) -> Self {
+    pub fn logprobs(self, val: &Array<Logprob>) -> Self {
         self.inner.set_logprobs(val);
         self
     }
@@ -18359,17 +18238,17 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_id(this: &ResponseReasoningItem, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn summary(this: &ResponseReasoningItem) -> Vec<ResponseReasoningSummaryItem>;
+    pub fn summary(this: &ResponseReasoningItem) -> Array<ResponseReasoningSummaryItem>;
     #[wasm_bindgen(method, setter, slice_to_array)]
-    pub fn set_summary(this: &ResponseReasoningItem, val: &[ResponseReasoningSummaryItem]);
+    pub fn set_summary(this: &ResponseReasoningItem, val: &Array<ResponseReasoningSummaryItem>);
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseReasoningItem) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseReasoningItem, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn content(this: &ResponseReasoningItem) -> Option<Vec<ResponseReasoningContentItem>>;
+    pub fn content(this: &ResponseReasoningItem) -> Option<Array<ResponseReasoningContentItem>>;
     #[wasm_bindgen(method, setter, slice_to_array)]
-    pub fn set_content(this: &ResponseReasoningItem, val: &[ResponseReasoningContentItem]);
+    pub fn set_content(this: &ResponseReasoningItem, val: &Array<ResponseReasoningContentItem>);
     #[wasm_bindgen(method, getter)]
     pub fn encrypted_content(this: &ResponseReasoningItem) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -18385,7 +18264,7 @@ impl ResponseReasoningItem {
     #[doc = " * `type: \"reasoning\"`"]
     pub fn new_reasoning(
         id: &str,
-        summary: &[ResponseReasoningSummaryItem],
+        summary: &Array<ResponseReasoningSummaryItem>,
     ) -> ResponseReasoningItem {
         Self::builder_reasoning(id, summary).build()
     }
@@ -18394,7 +18273,7 @@ impl ResponseReasoningItem {
     #[doc = " * `type: \"reasoning\"`"]
     pub fn builder_reasoning(
         id: &str,
-        summary: &[ResponseReasoningSummaryItem],
+        summary: &Array<ResponseReasoningSummaryItem>,
     ) -> ResponseReasoningItemBuilder {
         let inner: ResponseReasoningItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
@@ -18407,7 +18286,7 @@ pub struct ResponseReasoningItemBuilder {
     inner: ResponseReasoningItem,
 }
 impl ResponseReasoningItemBuilder {
-    pub fn content(self, val: &[ResponseReasoningContentItem]) -> Self {
+    pub fn content(self, val: &Array<ResponseReasoningContentItem>) -> Self {
         self.inner.set_content(val);
         self
     }
@@ -18808,9 +18687,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_item_id(this: &ResponseTextDeltaEvent, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn logprobs(this: &ResponseTextDeltaEvent) -> Vec<Logprob>;
+    pub fn logprobs(this: &ResponseTextDeltaEvent) -> Array<Logprob>;
     #[wasm_bindgen(method, setter, slice_to_array)]
-    pub fn set_logprobs(this: &ResponseTextDeltaEvent, val: &[Logprob]);
+    pub fn set_logprobs(this: &ResponseTextDeltaEvent, val: &Array<Logprob>);
     #[wasm_bindgen(method, getter)]
     pub fn output_index(this: &ResponseTextDeltaEvent) -> f64;
     #[wasm_bindgen(method, setter)]
@@ -18832,7 +18711,7 @@ impl ResponseTextDeltaEvent {
         content_index: f64,
         delta: &str,
         item_id: &str,
-        logprobs: &[Logprob],
+        logprobs: &Array<Logprob>,
         output_index: f64,
         sequence_number: f64,
     ) -> ResponseTextDeltaEvent {
@@ -18861,9 +18740,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_item_id(this: &ResponseTextDoneEvent, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn logprobs(this: &ResponseTextDoneEvent) -> Vec<Logprob>;
+    pub fn logprobs(this: &ResponseTextDoneEvent) -> Array<Logprob>;
     #[wasm_bindgen(method, setter, slice_to_array)]
-    pub fn set_logprobs(this: &ResponseTextDoneEvent, val: &[Logprob]);
+    pub fn set_logprobs(this: &ResponseTextDoneEvent, val: &Array<Logprob>);
     #[wasm_bindgen(method, getter)]
     pub fn output_index(this: &ResponseTextDoneEvent) -> f64;
     #[wasm_bindgen(method, setter)]
@@ -18888,7 +18767,7 @@ impl ResponseTextDoneEvent {
     pub fn new_responseoutput_textdone(
         content_index: f64,
         item_id: &str,
-        logprobs: &[Logprob],
+        logprobs: &Array<Logprob>,
         output_index: f64,
         sequence_number: f64,
         text: &str,
@@ -18918,9 +18797,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_logprob(this: &Logprob, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn top_logprobs(this: &Logprob) -> Option<Vec<TopLogprob>>;
+    pub fn top_logprobs(this: &Logprob) -> Option<Array<TopLogprob>>;
     #[wasm_bindgen(method, setter, slice_to_array)]
-    pub fn set_top_logprobs(this: &Logprob, val: &[TopLogprob]);
+    pub fn set_top_logprobs(this: &Logprob, val: &Array<TopLogprob>);
 }
 impl Logprob {
     pub fn new(token: &str, logprob: f64) -> Logprob {
@@ -18937,7 +18816,7 @@ pub struct LogprobBuilder {
     inner: Logprob,
 }
 impl LogprobBuilder {
-    pub fn top_logprobs(self, val: &[TopLogprob]) -> Self {
+    pub fn top_logprobs(self, val: &Array<TopLogprob>) -> Self {
         self.inner.set_top_logprobs(val);
         self
     }
@@ -26167,888 +26046,25 @@ extern "C" {
     pub fn set_target_language(this: &Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input, val: &str);
 }
 impl Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"asm_Beng\"` - Target language to translate to"]
-    #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_asm_beng(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
+    #[doc = " * `target_language` - Target language to translate to"]
+    pub fn new(text: &str, target_language: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
-        inner.set_target_language("asm_Beng");
+        inner.set_target_language(target_language);
         inner
     }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"awa_Deva\"` - Target language to translate to"]
-    #[doc = ""]
     #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_awa_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("awa_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"ben_Beng\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_ben_beng(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("ben_Beng");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"bho_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_bho_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("bho_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"brx_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_brx_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("brx_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"doi_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_doi_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("doi_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"eng_Latn\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_eng_latn(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("eng_Latn");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"gom_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_gom_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("gom_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"gon_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_gon_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("gon_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"guj_Gujr\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_guj_gujr(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("guj_Gujr");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"hin_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_hin_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("hin_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"hne_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_hne_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("hne_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"kan_Knda\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_kan_knda(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("kan_Knda");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"kas_Arab\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_kas_arab(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("kas_Arab");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"kas_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_kas_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("kas_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"kha_Latn\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_kha_latn(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("kha_Latn");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"lus_Latn\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_lus_latn(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("lus_Latn");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"mag_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_mag_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("mag_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"mai_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_mai_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("mai_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"mal_Mlym\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_mal_mlym(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("mal_Mlym");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"mar_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_mar_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("mar_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"mni_Beng\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_mni_beng(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("mni_Beng");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"mni_Mtei\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_mni_mtei(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("mni_Mtei");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"npi_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_npi_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("npi_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"ory_Orya\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_ory_orya(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("ory_Orya");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"pan_Guru\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_pan_guru(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("pan_Guru");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"san_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_san_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("san_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"sat_Olck\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_sat_olck(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("sat_Olck");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"snd_Arab\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_snd_arab(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("snd_Arab");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"snd_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_snd_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("snd_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"tam_Taml\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_tam_taml(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("tam_Taml");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"tel_Telu\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_tel_telu(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("tel_Telu");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"urd_Arab\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_urd_arab(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("urd_Arab");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"unr_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_unr_deva(text: &str) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text(text);
-        inner.set_target_language("unr_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"asm_Beng\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_asm_beng_with_slice(
+    #[doc = " * `target_language` - Target language to translate to"]
+    pub fn new_with_slice(
         text: &[String],
+        target_language: &str,
     ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
         let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text_with_slice(text);
-        inner.set_target_language("asm_Beng");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"awa_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_awa_deva_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("awa_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"ben_Beng\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_ben_beng_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("ben_Beng");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"bho_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_bho_deva_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("bho_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"brx_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_brx_deva_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("brx_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"doi_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_doi_deva_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("doi_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"eng_Latn\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_eng_latn_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("eng_Latn");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"gom_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_gom_deva_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("gom_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"gon_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_gon_deva_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("gon_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"guj_Gujr\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_guj_gujr_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("guj_Gujr");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"hin_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_hin_deva_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("hin_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"hne_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_hne_deva_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("hne_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"kan_Knda\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_kan_knda_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("kan_Knda");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"kas_Arab\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_kas_arab_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("kas_Arab");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"kas_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_kas_deva_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("kas_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"kha_Latn\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_kha_latn_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("kha_Latn");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"lus_Latn\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_lus_latn_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("lus_Latn");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"mag_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_mag_deva_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("mag_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"mai_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_mai_deva_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("mai_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"mal_Mlym\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_mal_mlym_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("mal_Mlym");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"mar_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_mar_deva_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("mar_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"mni_Beng\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_mni_beng_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("mni_Beng");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"mni_Mtei\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_mni_mtei_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("mni_Mtei");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"npi_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_npi_deva_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("npi_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"ory_Orya\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_ory_orya_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("ory_Orya");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"pan_Guru\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_pan_guru_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("pan_Guru");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"san_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_san_deva_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("san_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"sat_Olck\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_sat_olck_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("sat_Olck");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"snd_Arab\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_snd_arab_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("snd_Arab");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"snd_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_snd_deva_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("snd_Deva");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"tam_Taml\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_tam_taml_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("tam_Taml");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"tel_Telu\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_tel_telu_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("tel_Telu");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"urd_Arab\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_urd_arab_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("urd_Arab");
-        inner
-    }
-    #[doc = " ## Inlined fields"]
-    #[doc = ""]
-    #[doc = " * `target_language: \"unr_Deva\"` - Target language to translate to"]
-    #[doc = ""]
-    #[doc = " * `text` - Input text to translate. Can be a single string or a list of strings."]
-    pub fn new_unr_deva_with_slice(
-        text: &[String],
-    ) -> Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input {
-        let inner: Ai_Cf_Ai4Bharat_Indictrans2_En_Indic_1B_Input =
-            JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_text_with_slice(text);
-        inner.set_target_language("unr_Deva");
+        inner.set_target_language(target_language);
         inner
     }
 }
@@ -30459,7942 +29475,6 @@ impl AIGatewayHeaders {
         inner.set_content_type(content_type);
         inner
     }
-    pub fn new_with_record_and_object_and_f64_and_bool_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_bool_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_bool_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_bool_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_bool_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_bool_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_bool_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_bool_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_bool_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_bool_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_bool_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_bool_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_bool_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_bool_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_bool_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_str_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_str_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_str_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_str_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_str_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_str_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_str_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_str_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_str_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_str_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_str_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_str_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_str_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_str_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_str_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_str_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_bool_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_bool_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_bool_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_bool_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_bool_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_bool_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_bool_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_bool_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_bool_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_bool_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_bool_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_bool_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_bool_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_bool_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_bool_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_bool_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_str_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_str_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_str_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_str_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_str_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_str_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_str_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_str_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_str_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_str_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_str_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_str_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_str_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_str_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_str_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_str_and_str_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_object_and_f64_and_bool_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_bool_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_bool_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_bool_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_bool_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_bool_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_bool_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_bool_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_bool_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_bool_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_bool_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_bool_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_bool_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_bool_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_bool_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_bool_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_bool_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_str_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_str_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_str_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_str_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_str_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_str_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_str_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_str_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_str_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_str_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_str_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_str_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_str_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_str_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_str_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_f64_and_str_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_bool_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_bool_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_bool_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_bool_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_bool_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_bool_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_bool_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_bool_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_bool_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_bool_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_bool_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_bool_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_bool_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_bool_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_bool_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_bool_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_str_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_str_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_str_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_str_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_str_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_str_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_str_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_str_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_str_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_str_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_str_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_str_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_str_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_str_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_str_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_record_and_str_and_str_and_str_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &Object,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_bool_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_bool_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_bool_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_bool_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_bool_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_bool_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_bool_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_bool_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_bool_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_bool_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_bool_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_bool_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_bool_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_bool_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_bool_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_bool_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_str_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_str_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_str_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_str_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_str_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_str_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_str_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_str_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_str_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_str_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_str_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_str_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_str_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_str_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_str_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_f64_and_str_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_bool_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_bool_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_bool_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_bool_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_bool_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_bool_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_bool_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_bool_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_bool_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_bool_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_bool_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_bool_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_bool_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_bool_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_bool_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_bool_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_str_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_str_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_str_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_str_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_str_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_str_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_str_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_str_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_str_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_str_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_str_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_str_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_str_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_str_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_str_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_object_and_str_and_str_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &Object,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_bool_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_bool_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_bool_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_bool_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_bool_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_bool_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_bool_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_bool_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_bool_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_bool_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_bool_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_bool_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_bool_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_bool_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_bool_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_bool_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_str_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_str_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_str_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_str_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_str_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_str_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_str_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_str_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_str_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_str_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_str_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_str_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_str_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_str_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_str_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_f64_and_str_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: f64,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_bool_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_bool_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_bool_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_bool_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_bool_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_bool_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_bool_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_bool_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_bool_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_bool_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_bool_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_bool_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_bool_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_bool_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_bool_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_bool_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: bool,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_str_and_f64_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_str_and_f64_and_f64_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_str_and_f64_and_f64_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_str_and_f64_and_f64_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_str_and_f64_and_str_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_str_and_f64_and_str_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_str_and_f64_and_str_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_str_and_f64_and_str_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: f64,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_str_and_str_and_f64_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_str_and_str_and_f64_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_str_and_str_and_f64_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_str_and_str_and_f64_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: f64,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_str_and_str_and_str_and_f64_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_str_and_str_and_str_and_f64_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: f64,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_str_and_str_and_str_and_str_and_bool(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: bool,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
-    pub fn new_with_str_and_str_and_str_and_str_and_str_and_str_and_str_and_str(
-        cf_aig_metadata: &str,
-        cf_aig_custom_cost: &str,
-        cf_aig_cache_ttl: &str,
-        cf_aig_skip_cache: &str,
-        cf_aig_cache_key: &str,
-        cf_aig_event_id: &str,
-        cf_aig_request_timeout: &str,
-        cf_aig_max_attempts: &str,
-        cf_aig_retry_delay: &str,
-        cf_aig_backoff: &str,
-        cf_aig_collect_log: &str,
-        authorization: &str,
-        content_type: &str,
-    ) -> AIGatewayHeaders {
-        let inner: AIGatewayHeaders = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_cf_aig_metadata_with_str(cf_aig_metadata);
-        inner.set_cf_aig_custom_cost_with_str(cf_aig_custom_cost);
-        inner.set_cf_aig_cache_ttl_with_str(cf_aig_cache_ttl);
-        inner.set_cf_aig_skip_cache_with_str(cf_aig_skip_cache);
-        inner.set_cf_aig_cache_key(cf_aig_cache_key);
-        inner.set_cf_aig_event_id(cf_aig_event_id);
-        inner.set_cf_aig_request_timeout_with_str(cf_aig_request_timeout);
-        inner.set_cf_aig_max_attempts_with_str(cf_aig_max_attempts);
-        inner.set_cf_aig_retry_delay_with_str(cf_aig_retry_delay);
-        inner.set_cf_aig_backoff(cf_aig_backoff);
-        inner.set_cf_aig_collect_log_with_str(cf_aig_collect_log);
-        inner.set_authorization(authorization);
-        inner.set_content_type(content_type);
-        inner
-    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -38919,7 +29999,7 @@ impl AutoRagSearchResponse {
         search_query: &str,
         data: &[Object],
         has_more: bool,
-        next_page: Option<&str>,
+        next_page: &str,
     ) -> AutoRagSearchResponse {
         let inner: AutoRagSearchResponse = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_object("vector_store.search_results.page");
@@ -39838,17 +30918,20 @@ extern "C" {
     );
 }
 impl IncomingRequestCfPropertiesBase {
-    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
-    #[doc = " airport code of the data center that the request hit."]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " @example \"DFW\""]
-    #[doc = " * `edge_request_keep_alive_status` - Represents the upstream's response to a"]
+    #[doc = " * `edgeRequestKeepAliveStatus: 0` - Represents the upstream's response to a"]
     #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
     #[doc = " from cloudflare."]
     #[doc = ""]
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
     #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
     #[doc = ""]
     #[doc = " @example \"HTTP/2\""]
@@ -39866,17 +30949,15 @@ impl IncomingRequestCfPropertiesBase {
     #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
     #[doc = ""]
     #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
-    pub fn new(
+    pub fn new_0(
         colo: &str,
-        edge_request_keep_alive_status: f64,
         http_protocol: &str,
         request_priority: &str,
         tls_version: &str,
         tls_cipher: &str,
     ) -> IncomingRequestCfPropertiesBase {
-        Self::builder(
+        Self::builder_0(
             colo,
-            edge_request_keep_alive_status,
             http_protocol,
             request_priority,
             tls_version,
@@ -39884,17 +30965,20 @@ impl IncomingRequestCfPropertiesBase {
         )
         .build()
     }
-    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
-    #[doc = " airport code of the data center that the request hit."]
+    #[doc = " ## Inlined fields"]
     #[doc = ""]
-    #[doc = " @example \"DFW\""]
-    #[doc = " * `edge_request_keep_alive_status` - Represents the upstream's response to a"]
+    #[doc = " * `edgeRequestKeepAliveStatus: 1` - Represents the upstream's response to a"]
     #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
     #[doc = " from cloudflare."]
     #[doc = ""]
     #[doc = " For workers with no upstream, this will always be `1`."]
     #[doc = ""]
     #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
     #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
     #[doc = ""]
     #[doc = " @example \"HTTP/2\""]
@@ -39912,9 +30996,243 @@ impl IncomingRequestCfPropertiesBase {
     #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
     #[doc = ""]
     #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
-    pub fn builder(
+    pub fn new_1(
         colo: &str,
-        edge_request_keep_alive_status: f64,
+        http_protocol: &str,
+        request_priority: &str,
+        tls_version: &str,
+        tls_cipher: &str,
+    ) -> IncomingRequestCfPropertiesBase {
+        Self::builder_1(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+        )
+        .build()
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 2` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    pub fn new_2(
+        colo: &str,
+        http_protocol: &str,
+        request_priority: &str,
+        tls_version: &str,
+        tls_cipher: &str,
+    ) -> IncomingRequestCfPropertiesBase {
+        Self::builder_2(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+        )
+        .build()
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 3` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    pub fn new_3(
+        colo: &str,
+        http_protocol: &str,
+        request_priority: &str,
+        tls_version: &str,
+        tls_cipher: &str,
+    ) -> IncomingRequestCfPropertiesBase {
+        Self::builder_3(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+        )
+        .build()
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 4` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    pub fn new_4(
+        colo: &str,
+        http_protocol: &str,
+        request_priority: &str,
+        tls_version: &str,
+        tls_cipher: &str,
+    ) -> IncomingRequestCfPropertiesBase {
+        Self::builder_4(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+        )
+        .build()
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 5` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    pub fn new_5(
+        colo: &str,
+        http_protocol: &str,
+        request_priority: &str,
+        tls_version: &str,
+        tls_cipher: &str,
+    ) -> IncomingRequestCfPropertiesBase {
+        Self::builder_5(
+            colo,
+            http_protocol,
+            request_priority,
+            tls_version,
+            tls_cipher,
+        )
+        .build()
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 0` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    pub fn builder_0(
+        colo: &str,
         http_protocol: &str,
         request_priority: &str,
         tls_version: &str,
@@ -39922,7 +31240,242 @@ impl IncomingRequestCfPropertiesBase {
     ) -> IncomingRequestCfPropertiesBaseBuilder {
         let inner: IncomingRequestCfPropertiesBase = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(edge_request_keep_alive_status);
+        inner.set_edge_request_keep_alive_status(0);
+        inner.set_http_protocol(http_protocol);
+        inner.set_request_priority(request_priority);
+        inner.set_tls_version(tls_version);
+        inner.set_tls_cipher(tls_cipher);
+        IncomingRequestCfPropertiesBaseBuilder { inner }
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 1` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    pub fn builder_1(
+        colo: &str,
+        http_protocol: &str,
+        request_priority: &str,
+        tls_version: &str,
+        tls_cipher: &str,
+    ) -> IncomingRequestCfPropertiesBaseBuilder {
+        let inner: IncomingRequestCfPropertiesBase = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_colo(colo);
+        inner.set_edge_request_keep_alive_status(1);
+        inner.set_http_protocol(http_protocol);
+        inner.set_request_priority(request_priority);
+        inner.set_tls_version(tls_version);
+        inner.set_tls_cipher(tls_cipher);
+        IncomingRequestCfPropertiesBaseBuilder { inner }
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 2` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    pub fn builder_2(
+        colo: &str,
+        http_protocol: &str,
+        request_priority: &str,
+        tls_version: &str,
+        tls_cipher: &str,
+    ) -> IncomingRequestCfPropertiesBaseBuilder {
+        let inner: IncomingRequestCfPropertiesBase = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_colo(colo);
+        inner.set_edge_request_keep_alive_status(2);
+        inner.set_http_protocol(http_protocol);
+        inner.set_request_priority(request_priority);
+        inner.set_tls_version(tls_version);
+        inner.set_tls_cipher(tls_cipher);
+        IncomingRequestCfPropertiesBaseBuilder { inner }
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 3` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    pub fn builder_3(
+        colo: &str,
+        http_protocol: &str,
+        request_priority: &str,
+        tls_version: &str,
+        tls_cipher: &str,
+    ) -> IncomingRequestCfPropertiesBaseBuilder {
+        let inner: IncomingRequestCfPropertiesBase = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_colo(colo);
+        inner.set_edge_request_keep_alive_status(3);
+        inner.set_http_protocol(http_protocol);
+        inner.set_request_priority(request_priority);
+        inner.set_tls_version(tls_version);
+        inner.set_tls_cipher(tls_cipher);
+        IncomingRequestCfPropertiesBaseBuilder { inner }
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 4` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    pub fn builder_4(
+        colo: &str,
+        http_protocol: &str,
+        request_priority: &str,
+        tls_version: &str,
+        tls_cipher: &str,
+    ) -> IncomingRequestCfPropertiesBaseBuilder {
+        let inner: IncomingRequestCfPropertiesBase = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_colo(colo);
+        inner.set_edge_request_keep_alive_status(4);
+        inner.set_http_protocol(http_protocol);
+        inner.set_request_priority(request_priority);
+        inner.set_tls_version(tls_version);
+        inner.set_tls_cipher(tls_cipher);
+        IncomingRequestCfPropertiesBaseBuilder { inner }
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `edgeRequestKeepAliveStatus: 5` - Represents the upstream's response to a"]
+    #[doc = " [TCP `keepalive` message](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html)"]
+    #[doc = " from cloudflare."]
+    #[doc = ""]
+    #[doc = " For workers with no upstream, this will always be `1`."]
+    #[doc = ""]
+    #[doc = " @example 3"]
+    #[doc = ""]
+    #[doc = " * `colo` - The three-letter [IATA](https://en.wikipedia.org/wiki/IATA_airport_code)"]
+    #[doc = " airport code of the data center that the request hit."]
+    #[doc = ""]
+    #[doc = " @example \"DFW\""]
+    #[doc = " * `http_protocol` - The HTTP Protocol the request used."]
+    #[doc = ""]
+    #[doc = " @example \"HTTP/2\""]
+    #[doc = " * `request_priority` - The browser-requested prioritization information in the request object."]
+    #[doc = ""]
+    #[doc = " If no information was set, defaults to the empty string `\"\"`"]
+    #[doc = ""]
+    #[doc = " @example \"weight=192;exclusive=0;group=3;group-weight=127\""]
+    #[doc = " @default \"\""]
+    #[doc = " * `tls_version` - The TLS version of the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"TLSv1.3\""]
+    #[doc = " * `tls_cipher` - The cipher for the connection to Cloudflare."]
+    #[doc = " In requests served over plaintext (without TLS), this property is the empty string `\"\"`."]
+    #[doc = ""]
+    #[doc = " @example \"AEAD-AES128-GCM-SHA256\""]
+    pub fn builder_5(
+        colo: &str,
+        http_protocol: &str,
+        request_priority: &str,
+        tls_version: &str,
+        tls_cipher: &str,
+    ) -> IncomingRequestCfPropertiesBaseBuilder {
+        let inner: IncomingRequestCfPropertiesBase = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_colo(colo);
+        inner.set_edge_request_keep_alive_status(5);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -45132,9 +36685,9 @@ extern "C" {
     pub fn set_preview(this: &StreamVideo, val: &str);
     #[doc = " Origins allowed to display the video."]
     #[wasm_bindgen(method, getter, js_name = "allowedOrigins")]
-    pub fn allowed_origins(this: &StreamVideo) -> Vec<String>;
+    pub fn allowed_origins(this: &StreamVideo) -> Array<JsString>;
     #[wasm_bindgen(method, setter, slice_to_array, js_name = "allowedOrigins")]
-    pub fn set_allowed_origins(this: &StreamVideo, val: &[String]);
+    pub fn set_allowed_origins(this: &StreamVideo, val: &Array<JsString>);
     #[doc = " Indicates whether signed URLs are required."]
     #[wasm_bindgen(method, getter, js_name = "requireSignedURLs")]
     pub fn require_signed_ur_ls(this: &StreamVideo) -> Option<bool>;
@@ -45227,30 +36780,30 @@ impl StreamVideo {
     #[doc = " * `public_details` - Public details associated with the video."]
     pub fn new(
         id: &str,
-        creator: Option<&str>,
+        creator: &str,
         thumbnail: &str,
         thumbnail_timestamp_pct: f64,
         ready_to_stream: bool,
-        ready_to_stream_at: Option<&str>,
+        ready_to_stream_at: &str,
         status: &StreamVideoStatus,
         meta: &Object<JsString>,
         created: &str,
         modified: &str,
-        scheduled_deletion: Option<&str>,
+        scheduled_deletion: &str,
         size: f64,
-        allowed_origins: &[String],
-        require_signed_ur_ls: Option<bool>,
-        uploaded: Option<&str>,
-        upload_expiry: Option<&str>,
-        max_size_bytes: Option<f64>,
-        max_duration_seconds: Option<f64>,
+        allowed_origins: &Array<JsString>,
+        require_signed_ur_ls: bool,
+        uploaded: &str,
+        upload_expiry: &str,
+        max_size_bytes: f64,
+        max_duration_seconds: f64,
         duration: f64,
         input: &StreamVideoInput,
         hls_playback_url: &str,
         dash_playback_url: &str,
-        watermark: Option<&StreamWatermark>,
-        clipped_from_id: Option<&str>,
-        public_details: Option<&StreamPublicDetails>,
+        watermark: &StreamWatermark,
+        clipped_from_id: &str,
+        public_details: &StreamPublicDetails,
     ) -> StreamVideo {
         Self::builder(
             id,
@@ -45307,30 +36860,30 @@ impl StreamVideo {
     #[doc = " * `public_details` - Public details associated with the video."]
     pub fn builder(
         id: &str,
-        creator: Option<&str>,
+        creator: &str,
         thumbnail: &str,
         thumbnail_timestamp_pct: f64,
         ready_to_stream: bool,
-        ready_to_stream_at: Option<&str>,
+        ready_to_stream_at: &str,
         status: &StreamVideoStatus,
         meta: &Object<JsString>,
         created: &str,
         modified: &str,
-        scheduled_deletion: Option<&str>,
+        scheduled_deletion: &str,
         size: f64,
-        allowed_origins: &[String],
-        require_signed_ur_ls: Option<bool>,
-        uploaded: Option<&str>,
-        upload_expiry: Option<&str>,
-        max_size_bytes: Option<f64>,
-        max_duration_seconds: Option<f64>,
+        allowed_origins: &Array<JsString>,
+        require_signed_ur_ls: bool,
+        uploaded: &str,
+        upload_expiry: &str,
+        max_size_bytes: f64,
+        max_duration_seconds: f64,
         duration: f64,
         input: &StreamVideoInput,
         hls_playback_url: &str,
         dash_playback_url: &str,
-        watermark: Option<&StreamWatermark>,
-        clipped_from_id: Option<&str>,
-        public_details: Option<&StreamPublicDetails>,
+        watermark: &StreamWatermark,
+        clipped_from_id: &str,
+        public_details: &StreamPublicDetails,
     ) -> StreamVideoBuilder {
         let inner: StreamVideo = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
@@ -45504,10 +37057,10 @@ impl StreamPublicDetails {
     #[doc = " * `channel_link` - The public channel link."]
     #[doc = " * `logo` - The public logo URL."]
     pub fn new(
-        title: Option<&str>,
-        share_link: Option<&str>,
-        channel_link: Option<&str>,
-        logo: Option<&str>,
+        title: &str,
+        share_link: &str,
+        channel_link: &str,
+        logo: &str,
     ) -> StreamPublicDetails {
         let inner: StreamPublicDetails = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_title(title);
@@ -45551,8 +37104,8 @@ impl StreamDirectUpload {
     pub fn new(
         upload_url: &str,
         id: &str,
-        watermark: Option<&StreamWatermark>,
-        scheduled_deletion: Option<&str>,
+        watermark: &StreamWatermark,
+        scheduled_deletion: &str,
     ) -> StreamDirectUpload {
         let inner: StreamDirectUpload = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_upload_url(upload_url);
@@ -45590,9 +37143,9 @@ extern "C" {
     pub fn set_meta(this: &StreamDirectUploadCreateParams, val: &Object<JsString>);
     #[doc = " Lists the origins allowed to display the video."]
     #[wasm_bindgen(method, getter, js_name = "allowedOrigins")]
-    pub fn allowed_origins(this: &StreamDirectUploadCreateParams) -> Option<Vec<String>>;
+    pub fn allowed_origins(this: &StreamDirectUploadCreateParams) -> Option<Array<JsString>>;
     #[wasm_bindgen(method, setter, slice_to_array, js_name = "allowedOrigins")]
-    pub fn set_allowed_origins(this: &StreamDirectUploadCreateParams, val: &[String]);
+    pub fn set_allowed_origins(this: &StreamDirectUploadCreateParams, val: &Array<JsString>);
     #[doc = " Indicates whether the video can be accessed using the id. When set to `true`,"]
     #[doc = " a signed token must be generated with a signing key to view the video."]
     #[wasm_bindgen(method, getter, js_name = "requireSignedURLs")]
@@ -45644,7 +37197,7 @@ impl StreamDirectUploadCreateParamsBuilder {
         self.inner.set_meta(val);
         self
     }
-    pub fn allowed_origins(self, val: &[String]) -> Self {
+    pub fn allowed_origins(self, val: &Array<JsString>) -> Self {
         self.inner.set_allowed_origins(val);
         self
     }
@@ -45696,9 +37249,9 @@ extern "C" {
     #[doc = " domains in an array and use `*` for wildcard subdomains. Empty arrays allow the"]
     #[doc = " video to be viewed on any origin."]
     #[wasm_bindgen(method, getter, js_name = "allowedOrigins")]
-    pub fn allowed_origins(this: &StreamUrlUploadParams) -> Option<Vec<String>>;
+    pub fn allowed_origins(this: &StreamUrlUploadParams) -> Option<Array<JsString>>;
     #[wasm_bindgen(method, setter, slice_to_array, js_name = "allowedOrigins")]
-    pub fn set_allowed_origins(this: &StreamUrlUploadParams, val: &[String]);
+    pub fn set_allowed_origins(this: &StreamUrlUploadParams, val: &Array<JsString>);
     #[doc = " A user-defined identifier for the media creator."]
     #[wasm_bindgen(method, getter)]
     pub fn creator(this: &StreamUrlUploadParams) -> Option<String>;
@@ -45754,7 +37307,7 @@ pub struct StreamUrlUploadParamsBuilder {
     inner: StreamUrlUploadParams,
 }
 impl StreamUrlUploadParamsBuilder {
-    pub fn allowed_origins(self, val: &[String]) -> Self {
+    pub fn allowed_origins(self, val: &Array<JsString>) -> Self {
         self.inner.set_allowed_origins(val);
         self
     }
@@ -46083,9 +37636,9 @@ extern "C" {
     #[doc = " domains in an array and use `*` for wildcard subdomains. Empty arrays allow the"]
     #[doc = " video to be viewed on any origin."]
     #[wasm_bindgen(method, getter, js_name = "allowedOrigins")]
-    pub fn allowed_origins(this: &StreamUpdateVideoParams) -> Option<Vec<String>>;
+    pub fn allowed_origins(this: &StreamUpdateVideoParams) -> Option<Array<JsString>>;
     #[wasm_bindgen(method, setter, slice_to_array, js_name = "allowedOrigins")]
-    pub fn set_allowed_origins(this: &StreamUpdateVideoParams, val: &[String]);
+    pub fn set_allowed_origins(this: &StreamUpdateVideoParams, val: &Array<JsString>);
     #[doc = " A user-defined identifier for the media creator."]
     #[wasm_bindgen(method, getter)]
     pub fn creator(this: &StreamUpdateVideoParams) -> Option<String>;
@@ -46144,7 +37697,7 @@ pub struct StreamUpdateVideoParamsBuilder {
     inner: StreamUpdateVideoParams,
 }
 impl StreamUpdateVideoParamsBuilder {
-    pub fn allowed_origins(self, val: &[String]) -> Self {
+    pub fn allowed_origins(self, val: &Array<JsString>) -> Self {
         self.inner.set_allowed_origins(val);
         self
     }
@@ -46454,7 +38007,7 @@ impl StreamWatermark {
         height: f64,
         width: f64,
         created: &str,
-        downloaded_from: Option<&str>,
+        downloaded_from: &str,
         name: &str,
         opacity: f64,
         padding: f64,
@@ -48237,8 +39790,13 @@ extern "C" {
 impl VectorizeVector {
     #[doc = " * `id` - The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
     #[doc = " * `values` - The vector values"]
-    pub fn new(id: &str, values: &JsValue) -> VectorizeVector {
+    pub fn new(id: &str, values: &Float32Array) -> VectorizeVector {
         Self::builder(id, values).build()
+    }
+    #[doc = " * `id` - The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
+    #[doc = " * `values` - The vector values"]
+    pub fn new_with_float64_array(id: &str, values: &Float64Array) -> VectorizeVector {
+        Self::builder_with_float64_array(id, values).build()
     }
     #[doc = " * `id` - The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
     #[doc = " * `values` - The vector values"]
@@ -48247,10 +39805,18 @@ impl VectorizeVector {
     }
     #[doc = " * `id` - The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
     #[doc = " * `values` - The vector values"]
-    pub fn builder(id: &str, values: &JsValue) -> VectorizeVectorBuilder {
+    pub fn builder(id: &str, values: &Float32Array) -> VectorizeVectorBuilder {
         let inner: VectorizeVector = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_values(values);
+        VectorizeVectorBuilder { inner }
+    }
+    #[doc = " * `id` - The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
+    #[doc = " * `values` - The vector values"]
+    pub fn builder_with_float64_array(id: &str, values: &Float64Array) -> VectorizeVectorBuilder {
+        let inner: VectorizeVector = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_id(id);
+        inner.set_values_with_float64_array(values);
         VectorizeVectorBuilder { inner }
     }
     #[doc = " * `id` - The ID for the vector. This can be user-defined, and must be unique. It should uniquely identify the object, and is best set based on the ID of what the vector represents."]
@@ -49570,7 +41136,7 @@ pub enum ConversationKind {
 #[wasm_bindgen]
 pub enum InputKind {
     String(String),
-    ResponseInput(Vec<JsValue>),
+    ResponseInput(Array),
 }
 #[wasm_bindgen]
 pub enum ServiceTierKind {
@@ -49593,12 +41159,12 @@ pub enum TruncationKind {
 #[wasm_bindgen]
 pub enum InstructionsKind {
     String(String),
-    Array(Vec<JsValue>),
+    Array(Array),
 }
 #[wasm_bindgen]
 pub enum ContentKind {
     String(String),
-    ResponseInputMessageContentList(Vec<JsValue>),
+    ResponseInputMessageContentList(Array),
 }
 #[wasm_bindgen]
 pub enum EasyInputMessageRoleKind {
@@ -49621,7 +41187,7 @@ pub enum GenerateSummaryKind {
 #[wasm_bindgen]
 pub enum OutputKind {
     String(String),
-    Array(Vec<JsValue>),
+    Array(Array),
 }
 #[wasm_bindgen]
 pub enum CodeKind {
@@ -49659,7 +41225,7 @@ pub enum DetailKind {
 #[wasm_bindgen]
 pub enum ResponseInputItemFunctionCallOutputOutputKind {
     String(String),
-    ResponseFunctionCallOutputItemList(Vec<JsValue>),
+    ResponseFunctionCallOutputItemList(Array),
 }
 #[wasm_bindgen]
 pub enum ResponseInputItemMessageRoleKind {

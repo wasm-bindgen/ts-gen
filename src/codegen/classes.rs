@@ -524,15 +524,11 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         options: Vec<FieldOption>,
     }
 
-    // Decompose a getter's `type_ref` into its union members (or the
-    // single member if it isn't a union), with literal types peeled
-    // out for the discriminant collapse.
-    fn split_union(ty: &crate::ir::TypeRef) -> Vec<&crate::ir::TypeRef> {
-        match ty {
-            crate::ir::TypeRef::Union(members) => members.iter().collect(),
-            other => vec![other],
-        }
-    }
+    // Decompose a getter's `type_ref` into union members + ABI
+    // fan-out flavors.
+    let split_union = |ty: &crate::ir::TypeRef| -> Vec<crate::ir::TypeRef> {
+        crate::codegen::signatures::flatten_type_pub(ty, config.cgctx, config.scope)
+    };
 
     // Helper that turns one required-getter list into a list of
     // `FieldDim`s — the cartesian product axes for that pass.
@@ -545,10 +541,15 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 continue;
             }
 
-            // Each member of the union (or the single non-union type) maps
-            // to one option. Literals find their setter by matching the
-            // setter's param type_ref structurally; non-literals get their
-            // own option with an `expand_signatures`-compatible param.
+            // Each alternative (union member or ABI fan-out flavor)
+            // maps to one option. Literals find their setter by
+            // matching the setter's param type_ref structurally;
+            // non-literals get their own option with an
+            // `expand_signatures`-compatible param. Fan-out flavors
+            // emitted by `flatten_type` (e.g. `JsString` next to
+            // `String`) appear as additional Value alternatives and
+            // pick up their matching setter (`set_from_with_js_string`)
+            // via the same `pick_setter` lookup.
             let mut options: Vec<FieldOption> = Vec::new();
             let members = split_union(&g.type_ref);
             let any_literal = members.iter().any(|m| {
@@ -561,7 +562,6 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             });
             let value_members: Vec<&crate::ir::TypeRef> = members
                 .iter()
-                .copied()
                 .filter(|m| {
                     !matches!(
                         m,
@@ -632,7 +632,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             let value_targets: Vec<&crate::ir::TypeRef> = if any_literal {
                 value_members
             } else {
-                members.clone()
+                members.iter().collect()
             };
             for m in value_targets {
                 let setter_ident = pick_setter(m).unwrap_or_else(|| default_setter.clone());
@@ -695,7 +695,39 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             .all(|opt| required_pass.iter().any(|req| req.js_name == opt.js_name));
         let pass_emit_builder = emit_builder && !pass_covers_optionals;
 
-        let field_dims = build_field_dims(required_pass);
+        let mut field_dims = build_field_dims(required_pass);
+
+        // Cap the dict-factory cartesian. The product across
+        // required fields can blow up (a 13-required-field dict
+        // with a few small unions each is the case that motivated
+        // this cap — workers-types' `AIGatewayHeaders`).
+        // Above the cap, every field's options collapse to its
+        // single idiomatic-LUB Value option so the cartesian
+        // degenerates to one combo per literal-prefix group.
+        const DICT_FACTORY_COMBO_LIMIT: usize = 64;
+        let combo_count: usize = field_dims
+            .iter()
+            .map(|d| d.options.len())
+            .fold(1usize, |a, n| a.saturating_mul(n));
+        if combo_count > DICT_FACTORY_COMBO_LIMIT {
+            if let Some(c) = config.cgctx {
+                c.warn(format!(
+                    "dictionary `{}` factory cartesian is {} combinations (above the \
+                     {}-combo limit) — collapsing each required field's setter \
+                     overloads to its idiomatic form and suppressing ABI fan-out \
+                     for this required set",
+                    config.rust_name, combo_count, DICT_FACTORY_COMBO_LIMIT,
+                ));
+            }
+            for dim in &mut field_dims {
+                // Keep only the first option (the idiomatic /
+                // first-listed setter for the field). All other
+                // alternatives are dropped — the wrapper builder's
+                // fluent setters still expose them on a per-field
+                // basis, no combinatorial cost there.
+                dim.options.truncate(1);
+            }
+        }
 
         // Cartesian product across field dimensions → list of combos
         // (each is a Vec<&FieldOption>).

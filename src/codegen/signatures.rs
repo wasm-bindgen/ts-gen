@@ -583,12 +583,51 @@ fn expand_single_overload(
         (params, None)
     };
 
+    // Pre-flatten every param's alternatives once. Reused below in
+    // the cartesian-size projection and in the expansion loop, so
+    // we never re-flatten the same `TypeRef`.
+    let per_param_alts: Vec<Vec<TypeRef>> = non_variadic
+        .iter()
+        .map(|p| flatten_type(&p.type_ref, cgctx, scope))
+        .collect();
+
+    // Cap the cartesian product across params. Each optional param
+    // contributes +1 (the truncation case) on top of its alt count;
+    // required params multiply. Above the cap, every param's
+    // alternative list collapses to a single LUB so the cartesian
+    // degenerates to one signature.
+    let projected: usize = non_variadic
+        .iter()
+        .zip(per_param_alts.iter())
+        .map(|(p, alts)| {
+            let n = alts.len().max(1);
+            if p.optional {
+                n + 1
+            } else {
+                n
+            }
+        })
+        .fold(1usize, |acc, n| acc.saturating_mul(n));
+    let collapse_each = projected > CARTESIAN_PRODUCT_LIMIT;
+    if collapse_each {
+        if let Some(c) = cgctx {
+            c.warn(format!(
+                "callable cartesian product is {projected} signatures (above the \
+                 {CARTESIAN_PRODUCT_LIMIT}-variant limit) — collapsing each \
+                 union-typed parameter to its LUB and suppressing ABI fan-out \
+                 for this callable",
+            ));
+        }
+    }
+
     // Build expanded signatures via cartesian product.
     // Start with one empty signature, iterate params left to right.
     let mut sigs: Vec<Vec<ConcreteParam>> = vec![vec![]];
 
-    for (i, param) in non_variadic.iter().enumerate() {
-        let type_alternatives = flatten_type(&param.type_ref, cgctx, scope);
+    for (i, (param, mut type_alternatives)) in non_variadic.iter().zip(per_param_alts).enumerate() {
+        if collapse_each && type_alternatives.len() > 1 {
+            type_alternatives = vec![flatten_collapse_to_lub(&param.type_ref, cgctx, scope)];
+        }
 
         if param.optional {
             // Only extend sigs that are "full" up to this point (len == i).
@@ -662,51 +701,188 @@ fn expand_single_overload(
     sigs
 }
 
-/// Recursively flatten a type into its concrete alternatives.
+/// Public alias of [`flatten_type`] for callers in sibling modules
+/// (e.g. the dictionary-factory pipeline) that need to apply the
+/// same union + ABI fan-out rules to ad-hoc field types.
+pub fn flatten_type_pub(
+    ty: &TypeRef,
+    cgctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> Vec<TypeRef> {
+    flatten_type(ty, cgctx, scope)
+}
+
+/// Hard cap on the number of alternatives any single [`flatten_type`]
+/// call may produce. Above this, the entire input collapses to a
+/// single LUB alternative — the per-callable cartesian downstream
+/// then degrades to a single signature rather than exploding.
 ///
-/// - `Union([A, B])` → flatten(A) ++ flatten(B)
-/// - `Nullable(T)` → flatten(T) wrapped in Nullable
-/// - `Named("Foo")` → resolve alias; if alias is a union, flatten it
-/// - Generic container type arguments do not flatten
-/// - Everything else → single leaf
+/// 32 is enough for every realistic TS union the codegen pipeline
+/// has seen (the largest fixture in the test suite tops out around
+/// a dozen). The Cloudflare worker-types dictionary that motivated
+/// this limit had a union of 68 string literals on one field —
+/// well above 32 — and that case is exactly what the saturation
+/// is here to handle.
+const FLATTEN_ALTERNATIVE_LIMIT: usize = 8;
+
+/// Hard cap on the per-callable cartesian product size in
+/// [`expand_single_overload`]. When the product of per-param
+/// alternative counts (each clamped by [`FLATTEN_ALTERNATIVE_LIMIT`])
+/// exceeds this cap, every union-typed param collapses to its LUB
+/// and ABI fan-out is suppressed for the callable — the cartesian
+/// degenerates to a single signature. A warning surfaces the
+/// dropped overloads through the codegen context.
+///
+/// 64 is enough room for a 6-param fn whose every arg is a fan-out
+/// terminal (2^6 = 64), or a 5-param fn with one binary union arg
+/// (2^5 × 2 = 64). Beyond that the rendered API is already an
+/// unreadable wall of `_with_…` function names.
+const CARTESIAN_PRODUCT_LIMIT: usize = 64;
+
+/// Flatten a type into its concrete codegen alternatives.
+///
+/// Two orthogonal axes of fan-out compose in one recursive pass:
+///
+/// 1. **Semantic** — `Union` / `Nullable` / single-segment aliases
+///    unfold into each member, mirroring TS's narrowing semantics.
+///
+/// 2. **ABI** — arg-position outer types whose Rust-idiomatic
+///    lowering implies a Wasm-boundary copy emit a parallel
+///    JS-handle alternative:
+///    * `string` / `StringLiteral` → also `TypeRef::JsString`
+///      (`&JsString` lowering, no UTF-8 conversion).
+///    * `T[]` / `Array<T>` → also `TypeRef::JsArray(T)`
+///      (`&Array<U>` lowering, no element-wise materialisation).
+///
+/// `Foo | string` arg fans into `[Foo, string, JsString]`. The
+/// per-overload cartesian step in [`expand_single_overload`] then
+/// handles the cross-param product.
+///
+/// Fan-out terminates at the param boundary: `Promise<string>` /
+/// `Array<string>` don't recurse into their type arguments — the
+/// inner `string` keeps its source form and goes through
+/// inner-position lowering at codegen time.
+///
+/// ## Saturation
+///
+/// The output is capped at [`FLATTEN_ALTERNATIVE_LIMIT`]. A union
+/// of 68 string literals would fan out to 69 alternatives (one
+/// per literal plus the shared `JsString` ABI variant), exploding
+/// the cartesian product of any signature it appears in. The
+/// recursion **short-circuits as soon as the cap is hit** —
+/// downstream members aren't even visited — and the entire input
+/// is replaced with a single LUB alternative computed by
+/// [`flatten_collapse_to_lub`]. A warning surfaces through the
+/// codegen context so the user sees that some source-level
+/// alternatives were dropped from the public API.
 fn flatten_type(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId) -> Vec<TypeRef> {
+    let mut out: Vec<TypeRef> = Vec::new();
+    if flatten_into(ty, cgctx, scope, &mut out) {
+        return out;
+    }
+    if let Some(c) = cgctx {
+        c.warn(format!(
+            "flattening `{}` exceeded the {}-alternative limit \
+             — collapsing to the union LUB and suppressing \
+             per-member overloads / ABI fan-out for this site",
+            ty.format_ts(),
+            FLATTEN_ALTERNATIVE_LIMIT,
+        ));
+    }
+    vec![flatten_collapse_to_lub(ty, cgctx, scope)]
+}
+
+/// Push every flatten-alternative for `ty` into `out`. Returns
+/// `false` the first time the running total exceeds
+/// [`FLATTEN_ALTERNATIVE_LIMIT`], short-circuiting the recursion
+/// so a 1000-member union doesn't materialise every member just
+/// to be discarded.
+///
+/// `out` may contain garbage on early-return (partial fan-out).
+/// Callers ignore `out` entirely when `false` is returned.
+fn flatten_into(
+    ty: &TypeRef,
+    cgctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    out: &mut Vec<TypeRef>,
+) -> bool {
+    if out.len() > FLATTEN_ALTERNATIVE_LIMIT {
+        return false;
+    }
     match ty {
-        // Unions fan out into each member, recursively
-        TypeRef::Union(members) => members
-            .iter()
-            .flat_map(|m| flatten_type(m, cgctx, scope))
-            .collect(),
+        // Unions fan out into each member recursively. Short-circuit
+        // as soon as the limit trips so a huge union doesn't pay for
+        // members beyond the cap.
+        TypeRef::Union(members) => {
+            for m in members {
+                if !flatten_into(m, cgctx, scope, out) {
+                    return false;
+                }
+            }
+            true
+        }
 
         // Bare references: resolve through aliases, then re-flatten.
         // Generic instantiations and qualified paths don't follow
-        // aliases (they're already concrete enough at this level).
+        // aliases (they're already concrete at this level).
         TypeRef::Reference { .. } if ty.as_ident().is_some() => {
             let head = ty.as_ident().unwrap();
             if let Some(c) = cgctx {
                 if let Some(target) = c.resolve_alias(head, scope) {
                     let target = target.clone();
-                    return flatten_type(&target, cgctx, scope);
+                    return flatten_into(&target, cgctx, scope, out);
                 }
             }
-            vec![ty.clone()]
+            out.push(ty.clone());
+            true
         }
 
-        // Nullable: flatten the inner type, dropping the Null arm.
-        //
-        // Argument-position `Nullable<T>` carries no information that helps
-        // the caller — a `_with_null(val: &Null)` overload is always
-        // useless: callers either have a value to pass (use the `T` arm)
-        // or they don't (use an optional-truncation overload, or the
-        // setter just isn't called). Forcing them to construct a `Null`
-        // value just to clear a field is API noise.
-        //
-        // Return-position handling (`Option<T>` / `JsOption<T>`) is
-        // independent of this fan-out — it lives in `to_syn_type`.
-        TypeRef::Nullable(inner) => flatten_type(inner, cgctx, scope),
+        // Nullable: flatten the inner, dropping the `Null` arm.
+        // Argument-position `Nullable<T>` carries no useful overload
+        // information — a `_with_null(val: &Null)` variant is API
+        // noise. Return-position handling (`Option<T>` /
+        // `JsOption<T>`) is independent and lives in `to_syn_type`.
+        TypeRef::Nullable(inner) => flatten_into(inner, cgctx, scope, out),
 
-        // Generic containers are not distributive: `Array<A | B>` and
-        // `Record<K, A | B>` are single parameter shapes, not overloads.
-        _ => vec![ty.clone()],
+        // Everything else is terminal — generic containers are not
+        // distributive (`Array<A | B>` and `Record<K, A | B>` are
+        // single parameter shapes, not overloads), and TS spelling
+        // controls Rust outer lowering rather than fanning out into
+        // alternative forms.
+        _ => {
+            out.push(ty.clone());
+            true
+        }
+    }
+}
+
+/// Compute the LUB-collapsed single alternative for a `TypeRef`
+/// whose normal flatten would exceed
+/// [`FLATTEN_ALTERNATIVE_LIMIT`].
+///
+/// Returns [`crate::codegen::subtyping::lub_union`] for unions
+/// (and aliases that chase through to one); otherwise returns the
+/// input unchanged. The `Null`-arm-drop applied by `Nullable`
+/// flattening carries through for argument-position consistency.
+fn flatten_collapse_to_lub(
+    ty: &TypeRef,
+    cgctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> TypeRef {
+    match ty {
+        TypeRef::Union(members) => {
+            crate::codegen::subtyping::lub_union(members, cgctx, scope).unwrap_or(TypeRef::Any)
+        }
+        TypeRef::Nullable(inner) => flatten_collapse_to_lub(inner, cgctx, scope),
+        TypeRef::Reference { .. } if ty.as_ident().is_some() => {
+            if let Some(c) = cgctx {
+                if let Some(target) = c.resolve_alias(ty.as_ident().unwrap(), scope) {
+                    return flatten_collapse_to_lub(&target.clone(), cgctx, scope);
+                }
+            }
+            ty.clone()
+        }
+        other => other.clone(),
     }
 }
 
@@ -740,7 +916,14 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
     // Only the "middle" params that differ contribute to naming suffixes.
     let (trim_start, trim_end) = compute_trim(signatures);
 
-    let mut names = Vec::new();
+    // Greedy single-pass naming: the first signature with a given
+    // candidate suffix keeps it; subsequent siblings whose
+    // type-name-driven suffix would collide retry the offending
+    // position using the param-name path instead. This replaces
+    // numeric dedup (`_with_record` + `_with_record_2`) with
+    // semantic disambiguation (`_with_record` + `_with_context`).
+    let mut names = Vec::with_capacity(signatures.len());
+    let mut used: std::collections::HashSet<String> = std::collections::HashSet::new();
 
     for (sig_idx, sig) in signatures.iter().enumerate() {
         // The first signature (shortest / most basic) gets the base name
@@ -748,11 +931,16 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
         // common calling pattern uses the simplest name.
         if sig_idx == 0 {
             names.push(base_name.to_string());
+            used.insert(base_name.to_string());
             continue;
         }
 
-        let mut name = base_name.to_string();
-        let mut first_suffix = true;
+        // Compute per-position suffix parts, each tagged with whether
+        // the suffix used the type-name (which is collision-prone) or
+        // the param-name (uniquely identifying). On collision the
+        // type-name-tagged parts get rewritten to param-name during
+        // the post-collision retry.
+        let mut parts: Vec<SuffixPart> = Vec::new();
 
         let end = if sig.len() >= trim_end {
             sig.len() - trim_end
@@ -765,8 +953,6 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
         for (param_idx, param) in sig[start..end].iter().enumerate() {
             let abs_idx = start + param_idx;
 
-            // Check if this param position differs from any other signature
-            // we need to disambiguate against (using original absolute indices).
             let mut any_different = false;
             let mut any_same_name_different_type = false;
 
@@ -795,26 +981,130 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
                 continue;
             }
 
-            if first_suffix {
-                name.push_str("_with_");
-                first_suffix = false;
+            let param_snake = to_snake_case(&param.name);
+            let (text, from_type) = if any_same_name_different_type {
+                (type_snake_name(&param.type_ref), true)
             } else {
-                name.push_str("_and_");
-            }
+                (param_snake.clone(), false)
+            };
+            parts.push(SuffixPart {
+                text,
+                from_type,
+                param_snake,
+            });
+        }
 
-            if any_same_name_different_type {
-                // Union expansion: use the type name
-                name.push_str(&type_snake_name(&param.type_ref));
-            } else {
-                // Optional expansion or overload: use the param name
-                name.push_str(&to_snake_case(&param.name));
+        // Assemble the candidate name. If it collides with a sibling
+        // already in `used`, retry the type-name parts by prepending
+        // the param name. The retry runs at most twice — once
+        // upgrading the entire suffix to the param-name path, once
+        // upgrading param-name to param-name + flavor. Anything past
+        // that returns to numeric dedup as the last-resort safety
+        // net.
+        let mut name = compose_name(base_name, &parts, NamingStrategy::Greedy);
+        if used.contains(&name) {
+            // Strategy 1: every type-name part adopts its param-name
+            // prefix. The fanned side keeps its flavor as a suffix.
+            name = compose_name(base_name, &parts, NamingStrategy::ParamNamePlusFlavor);
+        }
+        if used.contains(&name) {
+            // Strategy 2: numeric fallback. Unlikely to fire in
+            // practice — the param-name + flavor form is already
+            // very specific.
+            let mut n = 2;
+            let base = name.clone();
+            while used.contains(&name) {
+                name = format!("{base}_{n}");
+                n += 1;
             }
         }
 
+        used.insert(name.clone());
         names.push(name);
     }
 
     names
+}
+
+/// How [`compute_rust_names`] assembles a name from its per-position
+/// [`SuffixPart`] list. Used to retry name composition when a
+/// greedy first-pass name collides with a sibling.
+enum NamingStrategy {
+    /// Use each part's chosen `text` as-is (`_with_record`,
+    /// `_with_context`). The greedy default.
+    Greedy,
+    /// Prefer the **param name** for every part that originally came
+    /// from the type-name path, suffixed with the ABI flavor when
+    /// the part marks itself as a fan-out variant. This is the
+    /// collision-rescue path: `_with_context_record` /
+    /// `_with_default_value_js_string` over numeric dedup.
+    ParamNamePlusFlavor,
+}
+
+fn compose_name(
+    base_name: &str,
+    parts: &[impl SuffixPartView],
+    strategy: NamingStrategy,
+) -> String {
+    let mut name = base_name.to_string();
+    let mut first = true;
+    for p in parts {
+        if first {
+            name.push_str("_with_");
+            first = false;
+        } else {
+            name.push_str("_and_");
+        }
+        let chunk = match strategy {
+            NamingStrategy::Greedy => p.greedy_text().to_string(),
+            NamingStrategy::ParamNamePlusFlavor => p.param_name_plus_flavor(),
+        };
+        name.push_str(&chunk);
+    }
+    name
+}
+
+/// One position's contribution to a `_with_<…>_and_<…>` suffix.
+/// Created by [`compute_rust_names`] and consumed by [`compose_name`]
+/// for greedy-then-retry naming.
+struct SuffixPart {
+    /// The greedy first-pass token (`record`, `context`, `flag_key`,
+    /// …). Comes from `type_snake_name` for union differences, from
+    /// the param name for optional / overload differences.
+    text: String,
+    /// `true` when [`text`] came from `type_snake_name`. Type-name
+    /// suffixes (e.g. two `Record<X,Y>` / `Record<X,Z>` args both
+    /// snake-casing to `record`) are the collision-prone ones and
+    /// get rewritten on retry.
+    from_type: bool,
+    /// Param name in snake_case — the retry fallback that replaces
+    /// the type-name path on greedy-collision.
+    param_snake: String,
+}
+
+impl SuffixPartView for SuffixPart {
+    fn greedy_text(&self) -> &str {
+        &self.text
+    }
+    fn param_name_plus_flavor(&self) -> String {
+        if !self.from_type {
+            // Originally param-name driven — no upgrade needed.
+            self.text.clone()
+        } else {
+            // Type-name driven and lost on collision — swap in the
+            // param name. The original type-name token (`record`,
+            // `js_string`, …) becomes the secondary modifier so the
+            // resulting suffix carries both axes.
+            format!("{}_{}", self.param_snake, self.text)
+        }
+    }
+}
+
+/// Read-only view of the suffix part fields needed by
+/// [`compose_name`]. Lets the assembly step stay strategy-agnostic.
+trait SuffixPartView {
+    fn greedy_text(&self) -> &str;
+    fn param_name_plus_flavor(&self) -> String;
 }
 
 /// Compute how many params to trim from the start and end of all signatures.
@@ -896,13 +1186,15 @@ fn type_snake_name(ty: &TypeRef) -> String {
         TypeRef::ArrayBufferView => "typed_array".to_string(),
         // Snake-case the leftmost (head) segment of any named
         // reference. Type args don't participate in `_with_` suffixes.
-        // `Array<T>` and `ReadonlyArray<T>` lower to `&[T]` /
-        // `Vec<T>` so they're named after the Rust slice form,
-        // not the JS class.
+        // `Array<T>` and `ReadonlyArray<T>` lower to `&Array<U>` /
+        // `Array<U>` — the JS-array reference form. Their suffix is
+        // `array`, matching what callers see in the rendered Rust
+        // type. The syntactic `T[]` (a `TypeRef::Array`) is the
+        // slice form and gets `slice`.
         TypeRef::Reference { segments, .. } => {
             let head = segments.first().map_or("", |s| s.as_str());
             if head == "Array" || head == "ReadonlyArray" {
-                return "slice".to_string();
+                return "array".to_string();
             }
             to_snake_case(head)
         }
@@ -1702,7 +1994,7 @@ mod tests {
     #[test]
     fn test_overloads_with_different_types() {
         // foo(x: string) and foo(x: Promise<string>) should expand as
-        // foo_with_str and foo_with_promise
+        // foo and foo_with_promise.
         let mut used = no_used();
         let overload1 = [typed_param("x", TypeRef::String)];
         let overload2 = [typed_param(
@@ -1720,7 +2012,6 @@ mod tests {
 
         let non_try: Vec<_> = sigs.iter().filter(|s| !s.catch).collect();
         assert_eq!(non_try.len(), 2);
-        // First overload gets base name, second gets type suffix
         assert_eq!(non_try[0].rust_name, "foo");
         assert_eq!(non_try[1].rust_name, "foo_with_promise");
     }
