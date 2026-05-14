@@ -611,11 +611,15 @@ fn expand_single_overload(
     let collapse_each = projected > CARTESIAN_PRODUCT_LIMIT;
     if collapse_each {
         if let Some(c) = cgctx {
+            let param_summary = non_variadic
+                .iter()
+                .map(|p| format!("{}: {}", p.name, p.type_ref.format_ts()))
+                .collect::<Vec<_>>()
+                .join(", ");
             c.warn(format!(
                 "callable cartesian product is {projected} signatures (above the \
                  {CARTESIAN_PRODUCT_LIMIT}-variant limit) — collapsing each \
-                 union-typed parameter to its LUB and suppressing ABI fan-out \
-                 for this callable",
+                 union-typed parameter to its LUB. Params: ({param_summary})",
             ));
         }
     }
@@ -741,22 +745,10 @@ const CARTESIAN_PRODUCT_LIMIT: usize = 64;
 
 /// Flatten a type into its concrete codegen alternatives.
 ///
-/// Two orthogonal axes of fan-out compose in one recursive pass:
-///
-/// 1. **Semantic** — `Union` / `Nullable` / single-segment aliases
-///    unfold into each member, mirroring TS's narrowing semantics.
-///
-/// 2. **ABI** — arg-position outer types whose Rust-idiomatic
-///    lowering implies a Wasm-boundary copy emit a parallel
-///    JS-handle alternative:
-///    * `string` / `StringLiteral` → also `TypeRef::JsString`
-///      (`&JsString` lowering, no UTF-8 conversion).
-///    * `T[]` / `Array<T>` → also `TypeRef::JsArray(T)`
-///      (`&Array<U>` lowering, no element-wise materialisation).
-///
-/// `Foo | string` arg fans into `[Foo, string, JsString]`. The
-/// per-overload cartesian step in [`expand_single_overload`] then
-/// handles the cross-param product.
+/// `Union` / `Nullable` / single-segment aliases unfold into each
+/// member, mirroring TS's narrowing semantics. `Foo | string` arg
+/// fans into `[Foo, string]`. The per-overload cartesian step in
+/// [`expand_single_overload`] then handles the cross-param product.
 ///
 /// Fan-out terminates at the param boundary: `Promise<string>` /
 /// `Array<string>` don't recurse into their type arguments — the
@@ -766,15 +758,14 @@ const CARTESIAN_PRODUCT_LIMIT: usize = 64;
 /// ## Saturation
 ///
 /// The output is capped at [`FLATTEN_ALTERNATIVE_LIMIT`]. A union
-/// of 68 string literals would fan out to 69 alternatives (one
-/// per literal plus the shared `JsString` ABI variant), exploding
-/// the cartesian product of any signature it appears in. The
-/// recursion **short-circuits as soon as the cap is hit** —
-/// downstream members aren't even visited — and the entire input
-/// is replaced with a single LUB alternative computed by
-/// [`flatten_collapse_to_lub`]. A warning surfaces through the
-/// codegen context so the user sees that some source-level
-/// alternatives were dropped from the public API.
+/// of 68 string literals would explode the cartesian product of
+/// any signature it appears in. The recursion **short-circuits as
+/// soon as the cap is hit** — downstream members aren't even
+/// visited — and the entire input is replaced with a single LUB
+/// alternative computed by [`flatten_collapse_to_lub`]. A
+/// warning surfaces through the codegen context so the user sees
+/// that some source-level alternatives were dropped from the
+/// public API.
 fn flatten_type(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId) -> Vec<TypeRef> {
     let mut out: Vec<TypeRef> = Vec::new();
     if flatten_into(ty, cgctx, scope, &mut out) {
@@ -784,7 +775,7 @@ fn flatten_type(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId
         c.warn(format!(
             "flattening `{}` exceeded the {}-alternative limit \
              — collapsing to the union LUB and suppressing \
-             per-member overloads / ABI fan-out for this site",
+             per-member overloads for this site",
             ty.format_ts(),
             FLATTEN_ALTERNATIVE_LIMIT,
         ));

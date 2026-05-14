@@ -818,17 +818,17 @@ pub fn to_syn_type(
             }
             if let Some(c) = ctx {
                 c.warn(format!(
-                    "union with no common supertype erased to JsValue ({} variants)",
-                    members.len()
+                    "union `{}` has no common supertype, erased to JsValue",
+                    ty.format_ts(),
                 ));
             }
             maybe_ref(quote! { JsValue }, borrow)
         }
-        TypeRef::Intersection(parts) => {
+        TypeRef::Intersection(_) => {
             if let Some(c) = ctx {
                 c.warn(format!(
-                    "intersection of {} types erased to JsValue (no structural merge yet)",
-                    parts.len()
+                    "intersection `{}` has no structural merge yet, erased to JsValue",
+                    ty.format_ts(),
                 ));
             }
             maybe_ref(quote! { JsValue }, borrow)
