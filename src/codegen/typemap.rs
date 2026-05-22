@@ -22,7 +22,6 @@ use crate::context::{GlobalContext, TypeId};
 use crate::ir::{self, ModuleContext, TypeKind, TypeRef};
 use crate::parse::scope::ScopeId;
 use crate::util::diagnostics::DiagnosticCollector;
-use crate::util::naming::module_specifier_to_ident;
 
 /// js_sys type names reserved by the `use js_sys::*` glob import.
 /// User-defined types that collide with these will be renamed.
@@ -173,6 +172,21 @@ pub struct CodegenContext<'a> {
     /// `Error` rather than `JsValue`. See
     /// [`crate::codegen::GenerateOptions::errors_as_error`].
     pub errors_as_error: bool,
+    /// JS module specifiers whose declarations are lifted into global
+    /// scope. References to types from these modules emit without the
+    /// `mod_name::` qualifier — they live alongside the global decls.
+    pub exported_modules: HashSet<String>,
+    /// JS module specifiers whose declarations are fully covered by the
+    /// external map. References to their types resolve through
+    /// `external_map.resolve` (yielding e.g. `::other::foo::Bar`)
+    /// rather than emitting a `foo::` local-mod qualifier. The
+    /// corresponding `mod` block is suppressed by `should_emit`.
+    pub externalised_modules: HashSet<String>,
+    /// Already-reported `(type_name, module_spec)` pairs for the
+    /// unresolved-module-ref error. Emitting one diagnostic per
+    /// offending pair keeps the output focused when many references
+    /// point at the same unconfigured module.
+    pub unresolved_module_refs: RefCell<HashSet<(String, String)>>,
 }
 
 /// Registry of synthesised dynamic-union enums, plus the bookkeeping
@@ -352,16 +366,45 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
 
 impl<'a> CodegenContext<'a> {
     /// Build a `CodegenContext` from a parsed IR module + global context.
+    /// Used by tests and library callers that don't customise codegen.
     pub fn from_module(module: &ir::Module, gctx: &'a GlobalContext) -> Self {
-        Self::from_module_with_options(module, gctx, false)
+        Self::from_module_full(module, gctx, false, HashSet::new())
     }
 
-    /// Build a `CodegenContext` with explicit per-codegen options.
-    pub fn from_module_with_options(
+    /// Build a `CodegenContext` with the full set of per-codegen options
+    /// including the set of JS module specifiers lifted to global scope.
+    pub fn from_module_full(
         module: &ir::Module,
         gctx: &'a GlobalContext,
         errors_as_error: bool,
+        exported_modules: HashSet<String>,
     ) -> Self {
+        // Pre-compute which `Module(spec)` groups are fully covered by
+        // the external map (Rule 3). References to types from these
+        // modules go through `external_map.resolve` in `emit_type_name`
+        // instead of producing a local `foo::` qualifier; the
+        // corresponding `mod` block is suppressed in `generate_tokens`.
+        let mut module_groups: std::collections::HashMap<&str, Vec<&str>> =
+            std::collections::HashMap::new();
+        for &type_id in &module.types {
+            let decl = gctx.get_type(type_id);
+            if let ModuleContext::Module(m) = &decl.module_context {
+                let name = type_decl_name(&decl.kind);
+                if let Some(name) = name {
+                    module_groups.entry(m.as_ref()).or_default().push(name);
+                }
+            }
+        }
+        let mut externalised_modules = HashSet::new();
+        for (spec, names) in &module_groups {
+            if names
+                .iter()
+                .all(|n| gctx.external_map.resolve(n, spec).is_some())
+            {
+                externalised_modules.insert((*spec).to_string());
+            }
+        }
+
         let mut ctx = CodegenContext {
             gctx,
             local_types: HashMap::new(),
@@ -374,6 +417,9 @@ impl<'a> CodegenContext<'a> {
             diagnostics: RefCell::new(DiagnosticCollector::new()),
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
             errors_as_error,
+            exported_modules,
+            externalised_modules,
+            unresolved_module_refs: RefCell::new(HashSet::new()),
         };
         for &type_id in &module.types {
             let decl = gctx.get_type(type_id);
@@ -405,6 +451,9 @@ impl<'a> CodegenContext<'a> {
             diagnostics: RefCell::new(DiagnosticCollector::new()),
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
             errors_as_error: false,
+            exported_modules: HashSet::new(),
+            externalised_modules: HashSet::new(),
+            unresolved_module_refs: RefCell::new(HashSet::new()),
         }
     }
 
@@ -643,33 +692,61 @@ impl<'a> CodegenContext<'a> {
         }
     }
 
-    /// Compute the path prefix (`mod_a::`, `super::mod_b::`, …) needed
-    /// to reach `target` from a callsite emitted inside `from`. Returns
-    /// `None` when no prefix is needed: same-module refs, and
-    /// module→parent refs (visible through `use super::*;`).
-    fn module_qualifier(
+    /// Compute the path prefix needed to reach `target` from a callsite
+    /// emitted inside `from`. In the current design every emitted
+    /// declaration lives at global scope — module-context decls are
+    /// either lifted (`--export`), externalised (`--external`), or
+    /// suppressed — so the prefix is always empty when both endpoints
+    /// resolve to something we emit. References to a `Module(m)`
+    /// target that isn't lifted or externalised return `None` here;
+    /// the caller in [`emit_type_name`] emits the bare ident plus a
+    /// `use JsValue as Name;` alias and raises a codegen error.
+    pub(crate) fn module_qualifier(
         &self,
         from: &ModuleContext,
         target: &ModuleContext,
     ) -> Option<TokenStream> {
-        if from == target {
-            return None;
-        }
-        match (from, target) {
-            (ModuleContext::Global, ModuleContext::Global) => None,
-            // Module → its own parent: free via `use super::*;`.
-            (ModuleContext::Module(_), ModuleContext::Global) => None,
-            // Global → Module(m): qualify with `m::`.
-            (ModuleContext::Global, ModuleContext::Module(m)) => {
-                let ident = make_ident(&module_specifier_to_ident(m));
-                Some(quote! { #ident:: })
+        let _ = (from, target);
+        None
+    }
+
+    /// Returns the names of types in `type_ids` whose
+    /// `module_context` is `Module(spec)` that do *not* resolve via
+    /// the external map. Used by `generate_tokens` to emit a partial-
+    /// coverage warning when the user has both `--export <spec>`
+    /// (asking for emission) and some but not all external mappings
+    /// for the same module.
+    pub(crate) fn external_module_unresolved(
+        &self,
+        spec: &str,
+        type_ids: &[crate::context::TypeId],
+    ) -> Vec<String> {
+        let mut unresolved = Vec::new();
+        for &type_id in type_ids {
+            let decl = self.gctx.get_type(type_id);
+            if let Some(name) = type_decl_name(&decl.kind) {
+                if self.gctx.external_map.resolve(name, spec).is_none() {
+                    unresolved.push(name.to_string());
+                }
             }
-            // Module(a) → Module(b): hop up to parent, then down into b.
-            (ModuleContext::Module(_), ModuleContext::Module(m)) => {
-                let ident = make_ident(&module_specifier_to_ident(m));
-                Some(quote! { super::#ident:: })
-            }
         }
+        unresolved
+    }
+}
+
+/// Helper: get the public name of a declaration kind, if it has one.
+/// Mirrors the `kind` arms in `populate_builtin_scope::declaration_name`.
+fn type_decl_name(kind: &ir::TypeKind) -> Option<&str> {
+    match kind {
+        ir::TypeKind::Class(c) => Some(&c.name),
+        ir::TypeKind::Interface(i) => Some(&i.name),
+        ir::TypeKind::DiscriminatedUnion(d) => Some(&d.name),
+        ir::TypeKind::TypeAlias(a) => Some(&a.name),
+        ir::TypeKind::StringEnum(e) => Some(&e.name),
+        ir::TypeKind::NumericEnum(e) => Some(&e.name),
+        ir::TypeKind::Function(f) => Some(&f.name),
+        ir::TypeKind::Variable(v) => Some(&v.name),
+        ir::TypeKind::Namespace(n) => Some(&n.name),
     }
 }
 
@@ -1070,6 +1147,43 @@ fn emit_type_name(
         });
 
     if let Some(target_module) = target_module {
+        // Externalised module: references resolve through the external
+        // map to the user-supplied crate path.
+        if let ModuleContext::Module(m) = &target_module {
+            let m_str: &str = m.as_ref();
+            if ctx.externalised_modules.contains(m_str) {
+                if let Some(rust_path) = ctx.gctx.external_map.resolve(ident_name, m_str) {
+                    ctx.register_external(ident_name, &rust_path.path);
+                    let ident = make_ident(ident_name);
+                    return quote! { #ident };
+                }
+            }
+        }
+        // Resolution-only module: the type lives in a `Module(m)` we
+        // parsed but the user neither lifted it (`--export m`) nor
+        // externalised it (`--external m=...`). The reference can't
+        // compile against any emitted declaration, so we error and
+        // fall back to a `use JsValue as Name;` alias to keep the
+        // output buildable.
+        if let ModuleContext::Module(m) = &target_module {
+            let m_str: &str = m.as_ref();
+            let not_exported = !ctx.exported_modules.contains(m_str);
+            let no_external = ctx.gctx.external_map.resolve(ident_name, m_str).is_none();
+            if not_exported && no_external {
+                let key = (ident_name.to_string(), m_str.to_string());
+                if ctx.unresolved_module_refs.borrow_mut().insert(key) {
+                    ctx.error(format!(
+                        "type `{ident_name}` from module \"{m_str}\" is referenced by exported \
+                         declarations but module \"{m_str}\" is not in --export and not in \
+                         --external. Add `--export {m_str}` to lift it to global scope, or \
+                         `--external {m_str}=...` to point at a separately-generated crate."
+                    ));
+                }
+                ctx.register_external(ident_name, "JsValue");
+                let ident = make_ident(ident_name);
+                return quote! { #ident };
+            }
+        }
         let rust_name = ctx
             .renamed_locals
             .get(ident_name)
@@ -2081,12 +2195,13 @@ mod tests {
     }
 
     #[test]
-    fn test_qualified_local_from_global_to_module() {
-        // EmailMessage lives inside `pub mod email { ... }` (the
-        // "cloudflare:email" module). A reference from a Global extern
-        // block must qualify with `email::`.
+    fn test_lifted_module_emits_bare_ident_from_global() {
+        // Module-context decls always emit at global scope (lifted via
+        // `--export`), so references to them from another global decl
+        // are bare — no `mod::` prefix.
         let (gctx, scope) = test_gctx();
         let mut ctx = CodegenContext::empty(&gctx, scope);
+        ctx.exported_modules.insert("cloudflare:email".to_string());
         let module = ModuleContext::Module("cloudflare:email".into());
         ctx.local_types
             .insert("EmailMessage".into(), module.clone());
@@ -2100,37 +2215,27 @@ mod tests {
             &ModuleContext::Global,
         )
         .to_string();
-        assert_eq!(result, "& email :: EmailMessage");
+        assert_eq!(result, "& EmailMessage");
     }
 
     #[test]
-    fn test_qualified_local_module_to_global_is_bare() {
-        // Inside `pub mod email { use super::*; }`, references to a
-        // Global type don't need a prefix — `super::*` makes them visible.
+    fn test_global_to_global_is_bare() {
+        // Trivial: same-scope references are bare.
         let (gctx, scope) = test_gctx();
         let mut ctx = CodegenContext::empty(&gctx, scope);
         ctx.local_types
             .insert("EmailSendResult".into(), ModuleContext::Global);
 
-        let from = ModuleContext::Module("cloudflare:email".into());
         let ty = TypeRef::ident("EmailSendResult");
-        let result = to_syn_type(&ty, TypePosition::RETURN, Some(&ctx), scope, &from).to_string();
+        let result = to_syn_type(
+            &ty,
+            TypePosition::RETURN,
+            Some(&ctx),
+            scope,
+            &ModuleContext::Global,
+        )
+        .to_string();
         assert_eq!(result, "EmailSendResult");
-    }
-
-    #[test]
-    fn test_qualified_local_across_modules() {
-        // A reference from `mod a` to a type in `mod b` must hop up
-        // through the parent: `super::b::Name`.
-        let (gctx, scope) = test_gctx();
-        let mut ctx = CodegenContext::empty(&gctx, scope);
-        ctx.local_types
-            .insert("Sibling".into(), ModuleContext::Module("node:b".into()));
-
-        let from = ModuleContext::Module("node:a".into());
-        let ty = TypeRef::ident("Sibling");
-        let result = to_syn_type(&ty, TypePosition::RETURN, Some(&ctx), scope, &from).to_string();
-        assert_eq!(result, "super :: b :: Sibling");
     }
 
     // === New tests for the unified approach ===

@@ -1,3 +1,5 @@
+//! @ts-gen --export tests/fixtures/coverage.d.ts --export my-module
+
 // Test fixture covering patterns missing from other fixtures.
 // Each section targets a specific gap from the review's test coverage table.
 

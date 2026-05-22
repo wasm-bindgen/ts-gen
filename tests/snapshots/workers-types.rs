@@ -33485,7 +33485,7 @@ impl EmailMessage {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = email :: EmailMessage , extends = Object)]
+    # [wasm_bindgen (extends = EmailMessage , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ForwardableEmailMessage;
     #[doc = " Stream of the email message content."]
@@ -33542,7 +33542,7 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn reply(
         this: &ForwardableEmailMessage,
-        message: &email::EmailMessage,
+        message: &EmailMessage,
     ) -> Result<EmailSendResult, JsValue>;
 }
 #[wasm_bindgen]
@@ -33739,10 +33739,8 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SendEmail;
     #[wasm_bindgen(method, catch)]
-    pub async fn send(
-        this: &SendEmail,
-        message: &email::EmailMessage,
-    ) -> Result<EmailSendResult, JsValue>;
+    pub async fn send(this: &SendEmail, message: &EmailMessage)
+        -> Result<EmailSendResult, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "send")]
     pub async fn send_with_builder(
         this: &SendEmail,
@@ -33927,6 +33925,16 @@ extern "C" {
 pub type EmailExportedHandler<Env, Props> = Function<
     fn(ForwardableEmailMessage, Env, ExecutionContext<Props>) -> JsOption<Promise<Undefined>>,
 >;
+#[wasm_bindgen(module = "cloudflare:email")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type EmailMessage;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new(from: &str, to: &str, raw: &ReadableStream) -> Result<EmailMessage, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "EmailMessage")]
+    pub fn new_with_str(from: &str, to: &str, raw: &str) -> Result<EmailMessage, JsValue>;
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -35492,6 +35500,30 @@ impl MediaError {
         }
     }
 }
+#[wasm_bindgen(module = "cloudflare:node")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type NodeStyleServer;
+    #[wasm_bindgen(method, variadic, slice_to_array)]
+    pub fn listen(this: &NodeStyleServer, args: &[JsValue]) -> JsValue;
+    #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "listen")]
+    pub fn try_listen(this: &NodeStyleServer, args: &[JsValue]) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn address(this: &NodeStyleServer) -> Object;
+    #[wasm_bindgen(method, catch, js_name = "address")]
+    pub fn try_address(this: &NodeStyleServer) -> Result<Object, JsValue>;
+}
+#[wasm_bindgen(module = "cloudflare:node")]
+extern "C" {
+    #[wasm_bindgen(js_name = "httpServerHandler")]
+    pub fn http_server_handler(port: f64) -> ExportedHandler;
+}
+#[wasm_bindgen(module = "cloudflare:node")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "httpServerHandler")]
+    pub fn try_http_server_handler(port: f64) -> Result<ExportedHandler, JsValue>;
+}
 #[allow(dead_code)]
 pub type Params<P> = Object;
 #[wasm_bindgen]
@@ -35646,6 +35678,110 @@ impl EventPluginContext {
 #[allow(dead_code)]
 pub type PagesPluginFunction<Env, Params, Data, PluginArgs> =
     Function<fn(EventPluginContext) -> JsValue>;
+#[wasm_bindgen(module = "assets:*")]
+extern "C" {
+    #[wasm_bindgen(thread_local_v2, js_name = "onRequest")]
+    pub static on_request: Function<fn(EventContext) -> JsValue>;
+}
+#[wasm_bindgen(module = "cloudflare:pipelines")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type PipelineTransformationEntrypoint<
+        Env: ::wasm_bindgen::JsGeneric,
+        I: ::wasm_bindgen::JsGeneric,
+        O: ::wasm_bindgen::JsGeneric,
+    >;
+    #[wasm_bindgen(method, getter)]
+    pub fn env<
+        Env: ::wasm_bindgen::JsGeneric,
+        I: ::wasm_bindgen::JsGeneric,
+        O: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &PipelineTransformationEntrypoint<Env, I, O>,
+    ) -> Env;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_env<
+        Env: ::wasm_bindgen::JsGeneric,
+        I: ::wasm_bindgen::JsGeneric,
+        O: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &PipelineTransformationEntrypoint<Env, I, O>,
+        val: &Env,
+    );
+    #[wasm_bindgen(method, getter)]
+    pub fn ctx<
+        Env: ::wasm_bindgen::JsGeneric,
+        I: ::wasm_bindgen::JsGeneric,
+        O: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &PipelineTransformationEntrypoint<Env, I, O>,
+    ) -> ExecutionContext;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_ctx<
+        Env: ::wasm_bindgen::JsGeneric,
+        I: ::wasm_bindgen::JsGeneric,
+        O: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &PipelineTransformationEntrypoint<Env, I, O>,
+        val: &ExecutionContext,
+    );
+    #[doc = " run receives an array of PipelineRecord which can be"]
+    #[doc = " transformed and returned to the pipeline"]
+    #[doc = ""]
+    #[doc = " * `records` - Incoming records from the pipeline to be transformed"]
+    #[doc = " * `metadata` - Information about the specific pipeline calling the transformation entrypoint"]
+    #[doc = ""]
+    #[doc = " Returns: A promise containing the transformed PipelineRecord array"]
+    #[wasm_bindgen(method, catch, slice_to_array)]
+    pub async fn run<
+        Env: ::wasm_bindgen::JsGeneric,
+        I: ::wasm_bindgen::JsGeneric,
+        O: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &PipelineTransformationEntrypoint<Env, I, O>,
+        records: &[I],
+        metadata: &PipelineBatchMetadata,
+    ) -> Result<Array<O>, JsValue>;
+}
+#[allow(dead_code)]
+pub type PipelineRecord = Object;
+#[wasm_bindgen(module = "cloudflare:pipelines")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type PipelineBatchMetadata;
+    #[wasm_bindgen(method, getter, js_name = "pipelineId")]
+    pub fn pipeline_id(this: &PipelineBatchMetadata) -> String;
+    #[wasm_bindgen(method, setter, js_name = "pipelineId")]
+    pub fn set_pipeline_id(this: &PipelineBatchMetadata, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "pipelineName")]
+    pub fn pipeline_name(this: &PipelineBatchMetadata) -> String;
+    #[wasm_bindgen(method, setter, js_name = "pipelineName")]
+    pub fn set_pipeline_name(this: &PipelineBatchMetadata, val: &str);
+}
+impl PipelineBatchMetadata {
+    pub fn new(pipeline_id: &str, pipeline_name: &str) -> PipelineBatchMetadata {
+        let inner: PipelineBatchMetadata = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_pipeline_id(pipeline_id);
+        inner.set_pipeline_name(pipeline_name);
+        inner
+    }
+}
+#[wasm_bindgen(module = "cloudflare:pipelines")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Pipeline<T: ::wasm_bindgen::JsGeneric>;
+    #[doc = " The Pipeline interface represents the type of a binding to a Pipeline"]
+    #[doc = ""]
+    #[doc = " * `records` - The records to send to the pipeline"]
+    #[wasm_bindgen(method, catch, slice_to_array)]
+    pub async fn send<T: ::wasm_bindgen::JsGeneric>(
+        this: &Pipeline<T>,
+        records: &[T],
+    ) -> Result<Undefined, JsValue>;
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -36452,6 +36588,55 @@ extern "C" {
     #[doc = " if it exists, or throws an error if it does not exist"]
     #[wasm_bindgen(method, catch)]
     pub async fn get(this: &SecretsStoreSecret) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "cloudflare:sockets")]
+extern "C" {
+    #[wasm_bindgen(js_name = "_connect")]
+    pub fn connect(address: &str) -> Socket;
+}
+#[wasm_bindgen(module = "cloudflare:sockets")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "_connect")]
+    pub fn try_connect(address: &str) -> Result<Socket, JsValue>;
+}
+#[wasm_bindgen(module = "cloudflare:sockets")]
+extern "C" {
+    #[wasm_bindgen(js_name = "_connect")]
+    pub fn connect_with_socket_address(address: &SocketAddress) -> Socket;
+}
+#[wasm_bindgen(module = "cloudflare:sockets")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "_connect")]
+    pub fn try_connect_with_socket_address(address: &SocketAddress) -> Result<Socket, JsValue>;
+}
+#[wasm_bindgen(module = "cloudflare:sockets")]
+extern "C" {
+    #[wasm_bindgen(js_name = "_connect")]
+    pub fn connect_with_str_and_options(address: &str, options: &SocketOptions) -> Socket;
+}
+#[wasm_bindgen(module = "cloudflare:sockets")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "_connect")]
+    pub fn try_connect_with_str_and_options(
+        address: &str,
+        options: &SocketOptions,
+    ) -> Result<Socket, JsValue>;
+}
+#[wasm_bindgen(module = "cloudflare:sockets")]
+extern "C" {
+    #[wasm_bindgen(js_name = "_connect")]
+    pub fn connect_with_socket_address_and_options(
+        address: &SocketAddress,
+        options: &SocketOptions,
+    ) -> Socket;
+}
+#[wasm_bindgen(module = "cloudflare:sockets")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "_connect")]
+    pub fn try_connect_with_socket_address_and_options(
+        address: &SocketAddress,
+        options: &SocketOptions,
+    ) -> Result<Socket, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -40385,6 +40570,16 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DispatchNamespaceArgs;
 }
+#[wasm_bindgen(module = "cloudflare:workflows")]
+extern "C" {
+    # [wasm_bindgen (extends = Error , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type NonRetryableError;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new(message: &str) -> Result<NonRetryableError, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "NonRetryableError")]
+    pub fn new_with_name(message: &str, name: &str) -> Result<NonRetryableError, JsValue>;
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -40767,233 +40962,6 @@ impl WorkflowInstanceSendEvent {
         inner.set_type(r#type);
         inner.set_payload(payload);
         inner
-    }
-}
-pub mod star {
-    use super::*;
-    use js_sys::*;
-    use wasm_bindgen::prelude::*;
-    #[wasm_bindgen(module = "assets:*")]
-    extern "C" {
-        #[wasm_bindgen(thread_local_v2, js_name = "onRequest")]
-        pub static on_request: Function<fn(EventContext) -> JsValue>;
-    }
-}
-pub mod email {
-    use super::*;
-    use js_sys::*;
-    use wasm_bindgen::prelude::*;
-    #[wasm_bindgen(module = "cloudflare:email")]
-    extern "C" {
-        # [wasm_bindgen (extends = Object)]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type EmailMessage;
-        #[wasm_bindgen(constructor, catch)]
-        pub fn new(from: &str, to: &str, raw: &ReadableStream) -> Result<EmailMessage, JsValue>;
-        #[wasm_bindgen(constructor, catch, js_name = "EmailMessage")]
-        pub fn new_with_str(from: &str, to: &str, raw: &str) -> Result<EmailMessage, JsValue>;
-    }
-}
-pub mod node {
-    use super::*;
-    use js_sys::*;
-    use wasm_bindgen::prelude::*;
-    #[wasm_bindgen(module = "cloudflare:node")]
-    extern "C" {
-        # [wasm_bindgen (extends = Object)]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type NodeStyleServer;
-        #[wasm_bindgen(method, variadic, slice_to_array)]
-        pub fn listen(this: &NodeStyleServer, args: &[JsValue]) -> JsValue;
-        #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "listen")]
-        pub fn try_listen(this: &NodeStyleServer, args: &[JsValue]) -> Result<JsValue, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn address(this: &NodeStyleServer) -> Object;
-        #[wasm_bindgen(method, catch, js_name = "address")]
-        pub fn try_address(this: &NodeStyleServer) -> Result<Object, JsValue>;
-    }
-    #[wasm_bindgen(module = "cloudflare:node")]
-    extern "C" {
-        #[wasm_bindgen(js_name = "httpServerHandler")]
-        pub fn http_server_handler(port: f64) -> ExportedHandler;
-    }
-    #[wasm_bindgen(module = "cloudflare:node")]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "httpServerHandler")]
-        pub fn try_http_server_handler(port: f64) -> Result<ExportedHandler, JsValue>;
-    }
-}
-pub mod pipelines {
-    use super::*;
-    use js_sys::*;
-    use wasm_bindgen::prelude::*;
-    #[wasm_bindgen(module = "cloudflare:pipelines")]
-    extern "C" {
-        # [wasm_bindgen (extends = Object)]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type PipelineTransformationEntrypoint<
-            Env: ::wasm_bindgen::JsGeneric,
-            I: ::wasm_bindgen::JsGeneric,
-            O: ::wasm_bindgen::JsGeneric,
-        >;
-        #[wasm_bindgen(method, getter)]
-        pub fn env<
-            Env: ::wasm_bindgen::JsGeneric,
-            I: ::wasm_bindgen::JsGeneric,
-            O: ::wasm_bindgen::JsGeneric,
-        >(
-            this: &PipelineTransformationEntrypoint<Env, I, O>,
-        ) -> Env;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_env<
-            Env: ::wasm_bindgen::JsGeneric,
-            I: ::wasm_bindgen::JsGeneric,
-            O: ::wasm_bindgen::JsGeneric,
-        >(
-            this: &PipelineTransformationEntrypoint<Env, I, O>,
-            val: &Env,
-        );
-        #[wasm_bindgen(method, getter)]
-        pub fn ctx<
-            Env: ::wasm_bindgen::JsGeneric,
-            I: ::wasm_bindgen::JsGeneric,
-            O: ::wasm_bindgen::JsGeneric,
-        >(
-            this: &PipelineTransformationEntrypoint<Env, I, O>,
-        ) -> ExecutionContext;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_ctx<
-            Env: ::wasm_bindgen::JsGeneric,
-            I: ::wasm_bindgen::JsGeneric,
-            O: ::wasm_bindgen::JsGeneric,
-        >(
-            this: &PipelineTransformationEntrypoint<Env, I, O>,
-            val: &ExecutionContext,
-        );
-        #[doc = " run receives an array of PipelineRecord which can be"]
-        #[doc = " transformed and returned to the pipeline"]
-        #[doc = ""]
-        #[doc = " * `records` - Incoming records from the pipeline to be transformed"]
-        #[doc = " * `metadata` - Information about the specific pipeline calling the transformation entrypoint"]
-        #[doc = ""]
-        #[doc = " Returns: A promise containing the transformed PipelineRecord array"]
-        #[wasm_bindgen(method, catch, slice_to_array)]
-        pub async fn run<
-            Env: ::wasm_bindgen::JsGeneric,
-            I: ::wasm_bindgen::JsGeneric,
-            O: ::wasm_bindgen::JsGeneric,
-        >(
-            this: &PipelineTransformationEntrypoint<Env, I, O>,
-            records: &[I],
-            metadata: &PipelineBatchMetadata,
-        ) -> Result<Array<O>, JsValue>;
-    }
-    #[allow(dead_code)]
-    pub type PipelineRecord = Object;
-    #[wasm_bindgen(module = "cloudflare:pipelines")]
-    extern "C" {
-        # [wasm_bindgen (extends = Object)]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type PipelineBatchMetadata;
-        #[wasm_bindgen(method, getter, js_name = "pipelineId")]
-        pub fn pipeline_id(this: &PipelineBatchMetadata) -> String;
-        #[wasm_bindgen(method, setter, js_name = "pipelineId")]
-        pub fn set_pipeline_id(this: &PipelineBatchMetadata, val: &str);
-        #[wasm_bindgen(method, getter, js_name = "pipelineName")]
-        pub fn pipeline_name(this: &PipelineBatchMetadata) -> String;
-        #[wasm_bindgen(method, setter, js_name = "pipelineName")]
-        pub fn set_pipeline_name(this: &PipelineBatchMetadata, val: &str);
-    }
-    impl PipelineBatchMetadata {
-        pub fn new(pipeline_id: &str, pipeline_name: &str) -> PipelineBatchMetadata {
-            let inner: PipelineBatchMetadata = JsCast::unchecked_into(js_sys::Object::new());
-            inner.set_pipeline_id(pipeline_id);
-            inner.set_pipeline_name(pipeline_name);
-            inner
-        }
-    }
-    #[wasm_bindgen(module = "cloudflare:pipelines")]
-    extern "C" {
-        # [wasm_bindgen (extends = Object)]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type Pipeline<T: ::wasm_bindgen::JsGeneric>;
-        #[doc = " The Pipeline interface represents the type of a binding to a Pipeline"]
-        #[doc = ""]
-        #[doc = " * `records` - The records to send to the pipeline"]
-        #[wasm_bindgen(method, catch, slice_to_array)]
-        pub async fn send<T: ::wasm_bindgen::JsGeneric>(
-            this: &Pipeline<T>,
-            records: &[T],
-        ) -> Result<Undefined, JsValue>;
-    }
-}
-pub mod sockets {
-    use super::*;
-    use js_sys::*;
-    use wasm_bindgen::prelude::*;
-    #[wasm_bindgen(module = "cloudflare:sockets")]
-    extern "C" {
-        #[wasm_bindgen(js_name = "_connect")]
-        pub fn connect(address: &str) -> Socket;
-    }
-    #[wasm_bindgen(module = "cloudflare:sockets")]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "_connect")]
-        pub fn try_connect(address: &str) -> Result<Socket, JsValue>;
-    }
-    #[wasm_bindgen(module = "cloudflare:sockets")]
-    extern "C" {
-        #[wasm_bindgen(js_name = "_connect")]
-        pub fn connect_with_socket_address(address: &SocketAddress) -> Socket;
-    }
-    #[wasm_bindgen(module = "cloudflare:sockets")]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "_connect")]
-        pub fn try_connect_with_socket_address(address: &SocketAddress) -> Result<Socket, JsValue>;
-    }
-    #[wasm_bindgen(module = "cloudflare:sockets")]
-    extern "C" {
-        #[wasm_bindgen(js_name = "_connect")]
-        pub fn connect_with_str_and_options(address: &str, options: &SocketOptions) -> Socket;
-    }
-    #[wasm_bindgen(module = "cloudflare:sockets")]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "_connect")]
-        pub fn try_connect_with_str_and_options(
-            address: &str,
-            options: &SocketOptions,
-        ) -> Result<Socket, JsValue>;
-    }
-    #[wasm_bindgen(module = "cloudflare:sockets")]
-    extern "C" {
-        #[wasm_bindgen(js_name = "_connect")]
-        pub fn connect_with_socket_address_and_options(
-            address: &SocketAddress,
-            options: &SocketOptions,
-        ) -> Socket;
-    }
-    #[wasm_bindgen(module = "cloudflare:sockets")]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "_connect")]
-        pub fn try_connect_with_socket_address_and_options(
-            address: &SocketAddress,
-            options: &SocketOptions,
-        ) -> Result<Socket, JsValue>;
-    }
-}
-pub mod workflows {
-    use super::*;
-    use js_sys::*;
-    use wasm_bindgen::prelude::*;
-    #[wasm_bindgen(module = "cloudflare:workflows")]
-    extern "C" {
-        # [wasm_bindgen (extends = Error , extends = Object)]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type NonRetryableError;
-        #[wasm_bindgen(constructor, catch)]
-        pub fn new(message: &str) -> Result<NonRetryableError, JsValue>;
-        #[wasm_bindgen(constructor, catch, js_name = "NonRetryableError")]
-        pub fn new_with_name(message: &str, name: &str) -> Result<NonRetryableError, JsValue>;
     }
 }
 #[wasm_bindgen]

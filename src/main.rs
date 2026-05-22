@@ -16,6 +16,27 @@ struct Cli {
     #[arg(short, long)]
     output: PathBuf,
 
+    /// Output surface: files and/or JS module specifiers to emit. The
+    /// `--input` set defines the full type universe for resolution;
+    /// `--export` is authoritative about what gets emitted as public
+    /// Rust code.
+    ///
+    /// Two forms:
+    ///   - File path (e.g. `types/email.d.ts`) — emits that file's
+    ///     **global-scope** declarations.
+    ///   - Module specifier (e.g. `cloudflare:email`) — lifts that
+    ///     module's declarations to global scope in the output. The
+    ///     `#[wasm_bindgen(module = "...")]` attribute already on each
+    ///     extern block keeps the module association.
+    ///
+    /// When omitted entirely, every `--input` file becomes an implicit
+    /// file export. NO modules are emitted by the implicit default —
+    /// modules must be explicitly listed. As soon as one `--export` is
+    /// passed, the implicit default is disabled and only what's listed
+    /// contributes to the output.
+    #[arg(short = 'E', long = "export", num_args = 1..)]
+    export: Vec<String>,
+
     /// JS module specifier (required when .d.ts has top-level exports).
     #[arg(long)]
     lib_name: Option<String>,
@@ -94,9 +115,36 @@ fn main() -> Result<()> {
         }
     }
 
-    // Generate Rust code
+    // Resolve `--export` into a flat set of `ExportSpec`s. A spec is
+    // treated as a file path when it exists on disk (same logic as
+    // `--input`, which also accepts files or directories); otherwise
+    // it's a JS module specifier.
+    let mut exports: std::collections::HashSet<ts_gen::codegen::ExportSpec> =
+        std::collections::HashSet::new();
+    for spec in &cli.export {
+        let as_path = PathBuf::from(spec);
+        if as_path.exists() {
+            for resolved in resolve_input_files(&[as_path])? {
+                let canonical = resolved.canonicalize().unwrap_or(resolved);
+                exports.insert(ts_gen::codegen::ExportSpec::File(canonical));
+            }
+        } else {
+            exports.insert(ts_gen::codegen::ExportSpec::Module(spec.clone()));
+        }
+    }
+    // Implicit default: every `--input` file becomes an implicit
+    // file export. Modules are never auto-added — emitting a module
+    // requires an explicit `--export <spec>`.
+    if cli.export.is_empty() {
+        for path in &input_files {
+            let canonical = path.canonicalize().unwrap_or_else(|_| path.clone());
+            exports.insert(ts_gen::codegen::ExportSpec::File(canonical));
+        }
+    }
+
     let options = ts_gen::codegen::GenerateOptions {
         errors_as_error: cli.errors_as_error,
+        exports,
     };
     let rust_source = ts_gen::codegen::generate_with_options(&module, &gctx, &options)?;
 

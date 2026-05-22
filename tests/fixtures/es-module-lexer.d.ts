@@ -1,4 +1,4 @@
-//! @ts-gen --lib-name es-module-lexer
+//! @ts-gen --lib-name es-module-lexer --export es-module-lexer
 export declare enum ImportType {
     /**
      * A normal static using any syntax variations

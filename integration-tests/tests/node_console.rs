@@ -3,7 +3,7 @@
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_test::*;
 
-use ts_gen_integration_tests::console::*;
+use ts_gen_integration_tests::node_console::*;
 
 #[wasm_bindgen]
 extern "C" {

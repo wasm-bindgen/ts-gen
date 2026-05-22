@@ -1,3 +1,4 @@
+//! @ts-gen --export tests/fixtures/workers-types.d.ts --export assets:* --export cloudflare:email --export cloudflare:node --export cloudflare:pipelines --export cloudflare:sockets --export cloudflare:workflows --export cloudflare:workers
 /*! *****************************************************************************
 Copyright (c) Cloudflare. All rights reserved.
 Copyright (c) Microsoft Corporation. All rights reserved.

@@ -3,8 +3,10 @@ use std::path::{Path, PathBuf};
 /// For every `integration-tests/tests/<name>.rs` test file, generate Rust
 /// bindings from the matching fixture at
 /// `<workspace>/tests/fixtures/<name-with-dashes>.d.ts` and `include!` the
-/// result into the test crate's lib under `pub mod <name>`. Fixtures that
-/// don't have a matching test file are simply not touched.
+/// result into a `pub mod <name>` in the test crate's lib. The wrapper
+/// module namespaces each fixture's top-level extern blocks so they don't
+/// collide when multiple fixtures share type names. Fixtures that don't
+/// have a matching test file are simply not touched.
 ///
 /// Per-fixture configuration may optionally be embedded as a comment
 /// header in the `.d.ts` file using the same `//! @ts-gen ...` directive
@@ -27,10 +29,14 @@ fn main() {
 
     let mut lib_code = String::new();
 
+    // Each fixture's bindings go inside their own `pub mod <name> { ... }`
+    // wrapper. ts-gen emits at global scope (one extern block per type)
+    // and we can't have multiple fixtures' top-level declarations
+    // colliding at the crate root, so we namespace them here.
     for entry in &entries {
         generate_bindings(entry, &out_dir);
         lib_code.push_str(&format!(
-            "include!(concat!(env!(\"OUT_DIR\"), \"/{}.rs\"));\n\n",
+            "pub mod {0} {{ include!(concat!(env!(\"OUT_DIR\"), \"/{0}.rs\")); }}\n\n",
             entry.mod_name
         ));
     }
@@ -196,7 +202,17 @@ fn generate_bindings(entry: &Entry, out_dir: &Path) {
         );
     }
 
-    let rust_code = ts_gen::codegen::generate(&module, &gctx)
+    // The fixture's `--lib-name` causes every declaration to land in
+    // `ModuleContext::Module(lib_name)`. Lift it explicitly via
+    // `ExportSpec::Module` so codegen emits it at global scope.
+    let mut exports: std::collections::HashSet<ts_gen::codegen::ExportSpec> =
+        std::collections::HashSet::new();
+    exports.insert(ts_gen::codegen::ExportSpec::Module(entry.lib_name.clone()));
+    let options = ts_gen::codegen::GenerateOptions {
+        errors_as_error: false,
+        exports,
+    };
+    let rust_code = ts_gen::codegen::generate_with_options(&module, &gctx, &options)
         .unwrap_or_else(|e| panic!("codegen failed for {}: {e}", entry.mod_name));
 
     // Generated code uses inner attributes (`#![...]`, `//!`) which are only

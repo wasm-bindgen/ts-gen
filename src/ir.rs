@@ -318,6 +318,10 @@ pub struct Module {
     pub builtin_scope: ScopeId,
     /// Input file scope ids (for scope-based codegen iteration).
     pub file_scopes: Vec<ScopeId>,
+    /// Canonical source-file path for each input file scope. Used by
+    /// codegen to decide whether a declaration's owning file is in the
+    /// `--export` set when filtering the output surface.
+    pub file_scope_paths: HashMap<ScopeId, std::path::PathBuf>,
 }
 
 #[derive(Clone, Debug)]

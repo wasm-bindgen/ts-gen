@@ -1,3 +1,5 @@
+//! @ts-gen --export tests/fixtures/basic.d.ts --export cloudflare:sockets
+
 // Basic test fixture covering core patterns from CF Workers types
 
 /** Represents an error from a DOM operation. */

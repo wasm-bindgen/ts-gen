@@ -239,6 +239,88 @@ pub enum QueueContentType {
 pub type BodyInit = JsValue;
 #[allow(dead_code)]
 pub type HeadersInit = JsValue;
+#[wasm_bindgen(module = "cloudflare:sockets")]
+extern "C" {
+    pub fn connect(address: &str) -> Socket;
+}
+#[wasm_bindgen(module = "cloudflare:sockets")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "connect")]
+    pub fn try_connect(address: &str) -> Result<Socket, JsValue>;
+}
+#[wasm_bindgen(module = "cloudflare:sockets")]
+extern "C" {
+    #[wasm_bindgen(js_name = "connect")]
+    pub fn connect_with_options(address: &str, options: &SocketOptions) -> Socket;
+}
+#[wasm_bindgen(module = "cloudflare:sockets")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "connect")]
+    pub fn try_connect_with_options(
+        address: &str,
+        options: &SocketOptions,
+    ) -> Result<Socket, JsValue>;
+}
+#[wasm_bindgen(module = "cloudflare:sockets")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Socket;
+    #[wasm_bindgen(method, catch)]
+    pub async fn close(this: &Socket) -> Result<Undefined, JsValue>;
+    #[wasm_bindgen(method, getter)]
+    pub fn closed(this: &Socket) -> Promise<Undefined>;
+    #[wasm_bindgen(method, getter)]
+    pub fn opened(this: &Socket) -> Promise<Undefined>;
+    #[wasm_bindgen(method, getter)]
+    pub fn readable(this: &Socket) -> ReadableStream;
+    #[wasm_bindgen(method, getter)]
+    pub fn writable(this: &Socket) -> WritableStream;
+    #[wasm_bindgen(method, js_name = "startTls")]
+    pub fn start_tls(this: &Socket) -> Socket;
+    #[wasm_bindgen(method, catch, js_name = "startTls")]
+    pub fn try_start_tls(this: &Socket) -> Result<Socket, JsValue>;
+}
+#[wasm_bindgen(module = "cloudflare:sockets")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type SocketOptions;
+    #[wasm_bindgen(method, getter, js_name = "secureTransport")]
+    pub fn secure_transport(this: &SocketOptions) -> Option<String>;
+    #[wasm_bindgen(method, setter, js_name = "secureTransport")]
+    pub fn set_secure_transport(this: &SocketOptions, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "allowHalfOpen")]
+    pub fn allow_half_open(this: &SocketOptions) -> Option<bool>;
+    #[wasm_bindgen(method, setter, js_name = "allowHalfOpen")]
+    pub fn set_allow_half_open(this: &SocketOptions, val: bool);
+}
+impl SocketOptions {
+    pub fn new() -> SocketOptions {
+        Self::builder().build()
+    }
+    pub fn builder() -> SocketOptionsBuilder {
+        SocketOptionsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+pub struct SocketOptionsBuilder {
+    inner: SocketOptions,
+}
+impl SocketOptionsBuilder {
+    pub fn secure_transport(self, val: &str) -> Self {
+        self.inner.set_secure_transport(val);
+        self
+    }
+    pub fn allow_half_open(self, val: bool) -> Self {
+        self.inner.set_allow_half_open(val);
+        self
+    }
+    pub fn build(self) -> SocketOptions {
+        self.inner
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -348,91 +430,4 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(thread_local_v2)]
     pub static self_: ServiceWorkerGlobalScope;
-}
-pub mod sockets {
-    use super::*;
-    use js_sys::*;
-    use wasm_bindgen::prelude::*;
-    #[wasm_bindgen(module = "cloudflare:sockets")]
-    extern "C" {
-        pub fn connect(address: &str) -> Socket;
-    }
-    #[wasm_bindgen(module = "cloudflare:sockets")]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "connect")]
-        pub fn try_connect(address: &str) -> Result<Socket, JsValue>;
-    }
-    #[wasm_bindgen(module = "cloudflare:sockets")]
-    extern "C" {
-        #[wasm_bindgen(js_name = "connect")]
-        pub fn connect_with_options(address: &str, options: &SocketOptions) -> Socket;
-    }
-    #[wasm_bindgen(module = "cloudflare:sockets")]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "connect")]
-        pub fn try_connect_with_options(
-            address: &str,
-            options: &SocketOptions,
-        ) -> Result<Socket, JsValue>;
-    }
-    #[wasm_bindgen(module = "cloudflare:sockets")]
-    extern "C" {
-        # [wasm_bindgen (extends = Object)]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type Socket;
-        #[wasm_bindgen(method, catch)]
-        pub async fn close(this: &Socket) -> Result<Undefined, JsValue>;
-        #[wasm_bindgen(method, getter)]
-        pub fn closed(this: &Socket) -> Promise<Undefined>;
-        #[wasm_bindgen(method, getter)]
-        pub fn opened(this: &Socket) -> Promise<Undefined>;
-        #[wasm_bindgen(method, getter)]
-        pub fn readable(this: &Socket) -> ReadableStream;
-        #[wasm_bindgen(method, getter)]
-        pub fn writable(this: &Socket) -> WritableStream;
-        #[wasm_bindgen(method, js_name = "startTls")]
-        pub fn start_tls(this: &Socket) -> Socket;
-        #[wasm_bindgen(method, catch, js_name = "startTls")]
-        pub fn try_start_tls(this: &Socket) -> Result<Socket, JsValue>;
-    }
-    #[wasm_bindgen(module = "cloudflare:sockets")]
-    extern "C" {
-        # [wasm_bindgen (extends = Object)]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type SocketOptions;
-        #[wasm_bindgen(method, getter, js_name = "secureTransport")]
-        pub fn secure_transport(this: &SocketOptions) -> Option<String>;
-        #[wasm_bindgen(method, setter, js_name = "secureTransport")]
-        pub fn set_secure_transport(this: &SocketOptions, val: &str);
-        #[wasm_bindgen(method, getter, js_name = "allowHalfOpen")]
-        pub fn allow_half_open(this: &SocketOptions) -> Option<bool>;
-        #[wasm_bindgen(method, setter, js_name = "allowHalfOpen")]
-        pub fn set_allow_half_open(this: &SocketOptions, val: bool);
-    }
-    impl SocketOptions {
-        pub fn new() -> SocketOptions {
-            Self::builder().build()
-        }
-        pub fn builder() -> SocketOptionsBuilder {
-            SocketOptionsBuilder {
-                inner: JsCast::unchecked_into(js_sys::Object::new()),
-            }
-        }
-    }
-    pub struct SocketOptionsBuilder {
-        inner: SocketOptions,
-    }
-    impl SocketOptionsBuilder {
-        pub fn secure_transport(self, val: &str) -> Self {
-            self.inner.set_secure_transport(val);
-            self
-        }
-        pub fn allow_half_open(self, val: bool) -> Self {
-            self.inner.set_allow_half_open(val);
-            self
-        }
-        pub fn build(self) -> SocketOptions {
-            self.inner
-        }
-    }
 }

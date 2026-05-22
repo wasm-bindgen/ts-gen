@@ -1,4 +1,4 @@
-//! @ts-gen --lib-name node:console
+//! @ts-gen --lib-name node:console --export node:console
 
 /**
  * Options for the Console constructor.

@@ -43,10 +43,16 @@ pub fn parse_dts_files(
     let mut scope_dirs: std::collections::HashMap<ScopeId, PathBuf> =
         std::collections::HashMap::new();
 
+    // Map each input file scope to its canonical source path so codegen
+    // can resolve a `TypeDeclaration`'s `scope_id` back to its owning
+    // file (needed by `--export <path>` filtering).
+    let mut file_scope_paths: std::collections::HashMap<ScopeId, PathBuf> =
+        std::collections::HashMap::new();
+
     for path in paths {
         let path = path.as_ref();
         let canonical = path.canonicalize().unwrap_or_else(|_| path.to_path_buf());
-        parsed_files.insert(canonical);
+        parsed_files.insert(canonical.clone());
 
         let source = std::fs::read_to_string(path)
             .with_context(|| format!("Failed to read {}", path.display()))?;
@@ -54,6 +60,7 @@ pub fn parse_dts_files(
         let file_scope = gctx.create_child_scope(builtin);
         input_file_scopes.push(file_scope);
         all_file_scopes.push(file_scope);
+        file_scope_paths.insert(file_scope, canonical);
         if let Some(parent) = path.parent() {
             scope_dirs.insert(file_scope, parent.to_path_buf());
         }
@@ -77,6 +84,7 @@ pub fn parse_dts_files(
             lib_name: lib_name.map(|s| s.to_string()),
             builtin_scope: builtin,
             file_scopes: input_file_scopes,
+            file_scope_paths,
         },
         gctx,
     ))
@@ -99,6 +107,7 @@ pub fn parse_single_source(
             lib_name: lib_name.map(|s| s.to_string()),
             builtin_scope: builtin,
             file_scopes: vec![file_scope],
+            file_scope_paths: std::collections::HashMap::new(),
         },
         gctx,
     ))

@@ -11,6 +11,9 @@ pub mod signatures;
 pub mod subtyping;
 pub mod typemap;
 
+use std::collections::HashSet;
+use std::path::PathBuf;
+
 use proc_macro2::TokenStream;
 use quote::quote;
 
@@ -60,6 +63,35 @@ pub struct GenerateOptions {
     /// (e.g. `throw "oops"`) now produces a runtime conversion
     /// error rather than the silent `JsValue` pass-through.
     pub errors_as_error: bool,
+
+    /// The output surface — the authoritative list of inputs (files /
+    /// modules) whose declarations are emitted. The `--input` set
+    /// still defines the *type universe* for resolution; `exports`
+    /// only selects what gets emitted as public Rust code.
+    ///
+    /// * Empty → implicit default: emit every input file's global
+    ///   declarations. No module-context declarations are emitted.
+    /// * Non-empty → authoritative: emit exactly the listed files'
+    ///   globals plus the listed modules' declarations. Modules in
+    ///   this set are lifted directly to global scope — there is no
+    ///   enclosing `mod` block; the per-decl
+    ///   `#[wasm_bindgen(module = "...")]` attribute carries the
+    ///   module association.
+    ///
+    /// A module that is fully covered by `--external` is always
+    /// suppressed from emission regardless of its presence here.
+    pub exports: HashSet<ExportSpec>,
+}
+
+/// A single entry in [`GenerateOptions::exports`].
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ExportSpec {
+    /// Canonical path of an input file whose global-scope
+    /// declarations should be emitted.
+    File(PathBuf),
+    /// JS module specifier whose declarations are lifted to global
+    /// scope in the output.
+    Module(String),
 }
 
 /// Generate Rust source code from a parsed IR module + global context.
@@ -132,7 +164,16 @@ fn generate_tokens(
     gctx: &crate::context::GlobalContext,
     options: &GenerateOptions,
 ) -> TokenStream {
-    let cgctx = CodegenContext::from_module_with_options(module, gctx, options.errors_as_error);
+    let exported_modules: HashSet<String> = options
+        .exports
+        .iter()
+        .filter_map(|e| match e {
+            ExportSpec::Module(m) => Some(m.clone()),
+            ExportSpec::File(_) => None,
+        })
+        .collect();
+    let cgctx =
+        CodegenContext::from_module_full(module, gctx, options.errors_as_error, exported_modules);
 
     let preamble = quote! {
         #[allow(unused_imports)]
@@ -141,63 +182,102 @@ fn generate_tokens(
         use js_sys::*;
     };
 
-    // Group declarations by module context.
-    // Global declarations go at the top level.
-    // Module declarations go inside `mod <name> { ... }` blocks.
-    let mut global_items = Vec::new();
-    let mut module_items: std::collections::BTreeMap<std::rc::Rc<str>, Vec<TokenStream>> =
-        std::collections::BTreeMap::new();
-
+    // Partial-coverage diagnostic: when a module is explicitly
+    // emitted but only *some* of its types resolve through the
+    // external map, the user has a mismatch — call it out so they
+    // can either expand the external map to cover the rest or drop
+    // the partial mapping.
+    let mut module_groups: std::collections::BTreeMap<
+        std::rc::Rc<str>,
+        Vec<crate::context::TypeId>,
+    > = std::collections::BTreeMap::new();
     for &type_id in &module.types {
         let decl = gctx.get_type(type_id);
-        if let Some(tokens) = generate_declaration(decl, &cgctx) {
-            match &decl.module_context {
-                crate::ir::ModuleContext::Global => {
-                    global_items.push(tokens);
-                }
-                crate::ir::ModuleContext::Module(m) => {
-                    module_items.entry(m.clone()).or_default().push(tokens);
-                }
-            }
+        if let crate::ir::ModuleContext::Module(m) = &decl.module_context {
+            module_groups.entry(m.clone()).or_default().push(type_id);
+        }
+    }
+    for (spec, ids) in &module_groups {
+        if cgctx.externalised_modules.contains(spec.as_ref()) {
+            continue;
+        }
+        if !options
+            .exports
+            .contains(&ExportSpec::Module(spec.to_string()))
+        {
+            continue;
+        }
+        let unresolved = cgctx.external_module_unresolved(spec, ids);
+        if !unresolved.is_empty() && unresolved.len() < ids.len() {
+            cgctx.warn(format!(
+                "module \"{spec}\" partially externalised; emitting bindings for \
+                 unresolved types: {}",
+                unresolved.join(", ")
+            ));
         }
     }
 
-    // Wrap each module's items in a `mod` block
-    let mod_blocks: Vec<TokenStream> = module_items
-        .into_iter()
-        .map(|(mod_specifier, items)| {
-            let mod_name = typemap::make_ident(&crate::util::naming::module_specifier_to_ident(
-                &mod_specifier,
-            ));
-            quote! {
-                pub mod #mod_name {
-                    use wasm_bindgen::prelude::*;
-                    use js_sys::*;
-                    use super::*;
-                    #(#items)*
+    // Decide whether a declaration is in the output surface. The type
+    // universe is the full `module.types` (so resolution sees
+    // everything); this only filters emission.
+    //
+    // * `Global` decls: when `exports` is empty, every input file's
+    //   globals are emitted (implicit default). Otherwise the
+    //   decl's owning file must be listed as `ExportSpec::File`.
+    // * `Module(m)` decls: only emitted when `m` is explicitly listed
+    //   as `ExportSpec::Module`. A module that's externalised wins
+    //   regardless — emission is suppressed and references route
+    //   through the external map.
+    let exports_empty = options.exports.is_empty();
+    let should_emit = |decl: &crate::ir::TypeDeclaration| -> bool {
+        match &decl.module_context {
+            crate::ir::ModuleContext::Global => {
+                if exports_empty {
+                    return true;
+                }
+                if let Some(path) = module.file_scope_paths.get(&decl.scope_id) {
+                    options.exports.contains(&ExportSpec::File(path.clone()))
+                } else {
+                    // Decls without a tracked file (synthetic, builtin)
+                    // are emitted alongside any explicit selection.
+                    true
                 }
             }
-        })
-        .collect();
+            crate::ir::ModuleContext::Module(m) => {
+                let m_str: &str = m.as_ref();
+                if cgctx.externalised_modules.contains(m_str) {
+                    return false;
+                }
+                options
+                    .exports
+                    .contains(&ExportSpec::Module(m_str.to_string()))
+            }
+        }
+    };
 
-    // External type use aliases (collected during codegen above)
+    let mut global_items = Vec::new();
+    for &type_id in &module.types {
+        let decl = gctx.get_type(type_id);
+        if !should_emit(decl) {
+            continue;
+        }
+        if let Some(tokens) = generate_declaration(decl, &cgctx) {
+            global_items.push(tokens);
+        }
+    }
+
     let external_uses = cgctx.external_use_tokens();
 
     // Dynamic-union enums synthesised during the per-declaration
-    // emit pass. Emitted at the global scope; references inside
-    // each enum already resolve through the regular `to_syn_type`
-    // lowering, so cross-module member types are emitted with the
-    // appropriate path qualifier (`module_name::TypeName`).
+    // emit pass.
     let dynamic_unions = generate_dynamic_unions(&cgctx);
 
-    // Emit codegen diagnostics
     cgctx.take_diagnostics().emit();
 
     quote! {
         #preamble
         #external_uses
         #(#global_items)*
-        #(#mod_blocks)*
         #dynamic_unions
     }
 }
