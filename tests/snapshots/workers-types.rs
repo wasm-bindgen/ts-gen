@@ -551,20 +551,13 @@ pub mod web_assembly {
     #[wasm_bindgen]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum ValueType {
-        #[wasm_bindgen(js_name = "anyfunc")]
-        Anyfunc,
-        #[wasm_bindgen(js_name = "externref")]
-        Externref,
-        #[wasm_bindgen(js_name = "f32")]
-        F32,
-        #[wasm_bindgen(js_name = "f64")]
-        F64,
-        #[wasm_bindgen(js_name = "i32")]
-        I32,
-        #[wasm_bindgen(js_name = "i64")]
-        I64,
-        #[wasm_bindgen(js_name = "v128")]
-        V128,
+        Anyfunc = "anyfunc",
+        Externref = "externref",
+        F32 = "f32",
+        F64 = "f64",
+        I32 = "i32",
+        I64 = "i64",
+        V128 = "v128",
     }
     #[wasm_bindgen]
     extern "C" {
@@ -574,17 +567,17 @@ pub mod web_assembly {
         #[wasm_bindgen(method, getter)]
         pub fn value(this: &GlobalDescriptor) -> ValueType;
         #[wasm_bindgen(method, setter)]
-        pub fn set_value(this: &GlobalDescriptor, val: &ValueType);
+        pub fn set_value(this: &GlobalDescriptor, val: ValueType);
         #[wasm_bindgen(method, getter)]
         pub fn mutable(this: &GlobalDescriptor) -> Option<bool>;
         #[wasm_bindgen(method, setter)]
         pub fn set_mutable(this: &GlobalDescriptor, val: bool);
     }
     impl GlobalDescriptor {
-        pub fn new(value: &ValueType) -> GlobalDescriptor {
+        pub fn new(value: ValueType) -> GlobalDescriptor {
             Self::builder(value).build()
         }
-        pub fn builder(value: &ValueType) -> GlobalDescriptorBuilder {
+        pub fn builder(value: ValueType) -> GlobalDescriptorBuilder {
             let inner: GlobalDescriptor = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_value(value);
             GlobalDescriptorBuilder { inner }
@@ -697,14 +690,10 @@ pub mod web_assembly {
     #[wasm_bindgen]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum ImportExportKind {
-        #[wasm_bindgen(js_name = "function")]
-        Function,
-        #[wasm_bindgen(js_name = "global")]
-        Global,
-        #[wasm_bindgen(js_name = "memory")]
-        Memory,
-        #[wasm_bindgen(js_name = "table")]
-        Table,
+        Function = "function",
+        Global = "global",
+        Memory = "memory",
+        Table = "table",
     }
     #[wasm_bindgen]
     extern "C" {
@@ -714,14 +703,14 @@ pub mod web_assembly {
         #[wasm_bindgen(method, getter)]
         pub fn kind(this: &ModuleExportDescriptor) -> ImportExportKind;
         #[wasm_bindgen(method, setter)]
-        pub fn set_kind(this: &ModuleExportDescriptor, val: &ImportExportKind);
+        pub fn set_kind(this: &ModuleExportDescriptor, val: ImportExportKind);
         #[wasm_bindgen(method, getter)]
         pub fn name(this: &ModuleExportDescriptor) -> String;
         #[wasm_bindgen(method, setter)]
         pub fn set_name(this: &ModuleExportDescriptor, val: &str);
     }
     impl ModuleExportDescriptor {
-        pub fn new(kind: &ImportExportKind, name: &str) -> ModuleExportDescriptor {
+        pub fn new(kind: ImportExportKind, name: &str) -> ModuleExportDescriptor {
             let inner: ModuleExportDescriptor = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_kind(kind);
             inner.set_name(name);
@@ -736,7 +725,7 @@ pub mod web_assembly {
         #[wasm_bindgen(method, getter)]
         pub fn kind(this: &ModuleImportDescriptor) -> ImportExportKind;
         #[wasm_bindgen(method, setter)]
-        pub fn set_kind(this: &ModuleImportDescriptor, val: &ImportExportKind);
+        pub fn set_kind(this: &ModuleImportDescriptor, val: ImportExportKind);
         #[wasm_bindgen(method, getter)]
         pub fn module(this: &ModuleImportDescriptor) -> String;
         #[wasm_bindgen(method, setter)]
@@ -747,7 +736,7 @@ pub mod web_assembly {
         pub fn set_name(this: &ModuleImportDescriptor, val: &str);
     }
     impl ModuleImportDescriptor {
-        pub fn new(kind: &ImportExportKind, module: &str, name: &str) -> ModuleImportDescriptor {
+        pub fn new(kind: ImportExportKind, module: &str, name: &str) -> ModuleImportDescriptor {
             let inner: ModuleImportDescriptor = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_kind(kind);
             inner.set_module(module);
@@ -779,10 +768,8 @@ pub mod web_assembly {
     #[wasm_bindgen]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum TableKind {
-        #[wasm_bindgen(js_name = "anyfunc")]
-        Anyfunc,
-        #[wasm_bindgen(js_name = "externref")]
-        Externref,
+        Anyfunc = "anyfunc",
+        Externref = "externref",
     }
     #[wasm_bindgen]
     extern "C" {
@@ -792,7 +779,7 @@ pub mod web_assembly {
         #[wasm_bindgen(method, getter)]
         pub fn element(this: &TableDescriptor) -> TableKind;
         #[wasm_bindgen(method, setter)]
-        pub fn set_element(this: &TableDescriptor, val: &TableKind);
+        pub fn set_element(this: &TableDescriptor, val: TableKind);
         #[wasm_bindgen(method, getter)]
         pub fn initial(this: &TableDescriptor) -> f64;
         #[wasm_bindgen(method, setter)]
@@ -803,10 +790,10 @@ pub mod web_assembly {
         pub fn set_maximum(this: &TableDescriptor, val: f64);
     }
     impl TableDescriptor {
-        pub fn new(element: &TableKind, initial: f64) -> TableDescriptor {
+        pub fn new(element: TableKind, initial: f64) -> TableDescriptor {
             Self::builder(element, initial).build()
         }
-        pub fn builder(element: &TableKind, initial: f64) -> TableDescriptorBuilder {
+        pub fn builder(element: TableKind, initial: f64) -> TableDescriptorBuilder {
             let inner: TableDescriptor = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_element(element);
             inner.set_initial(initial);
@@ -2363,23 +2350,20 @@ extern "C" {
     #[wasm_bindgen(method)]
     pub fn jurisdiction<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectNamespace<T>,
-        jurisdiction: &DurableObjectJurisdiction,
+        jurisdiction: DurableObjectJurisdiction,
     ) -> DurableObjectNamespace<T>;
     #[wasm_bindgen(method, catch, js_name = "jurisdiction")]
     pub fn try_jurisdiction<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectNamespace<T>,
-        jurisdiction: &DurableObjectJurisdiction,
+        jurisdiction: DurableObjectJurisdiction,
     ) -> Result<DurableObjectNamespace<T>, JsValue>;
 }
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DurableObjectJurisdiction {
-    #[wasm_bindgen(js_name = "eu")]
-    Eu,
-    #[wasm_bindgen(js_name = "fedramp")]
-    Fedramp,
-    #[wasm_bindgen(js_name = "fedramp-high")]
-    FedrampHigh,
+    Eu = "eu",
+    Fedramp = "fedramp",
+    FedrampHigh = "fedramp-high",
 }
 #[wasm_bindgen]
 extern "C" {
@@ -2393,7 +2377,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_jurisdiction(
         this: &DurableObjectNamespaceNewUniqueIdOptions,
-        val: &DurableObjectJurisdiction,
+        val: DurableObjectJurisdiction,
     );
 }
 impl DurableObjectNamespaceNewUniqueIdOptions {
@@ -2410,7 +2394,7 @@ pub struct DurableObjectNamespaceNewUniqueIdOptionsBuilder {
     inner: DurableObjectNamespaceNewUniqueIdOptions,
 }
 impl DurableObjectNamespaceNewUniqueIdOptionsBuilder {
-    pub fn jurisdiction(self, val: &DurableObjectJurisdiction) -> Self {
+    pub fn jurisdiction(self, val: DurableObjectJurisdiction) -> Self {
         self.inner.set_jurisdiction(val);
         self
     }
@@ -2421,30 +2405,20 @@ impl DurableObjectNamespaceNewUniqueIdOptionsBuilder {
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DurableObjectLocationHint {
-    #[wasm_bindgen(js_name = "wnam")]
-    Wnam,
-    #[wasm_bindgen(js_name = "enam")]
-    Enam,
-    #[wasm_bindgen(js_name = "sam")]
-    Sam,
-    #[wasm_bindgen(js_name = "weur")]
-    Weur,
-    #[wasm_bindgen(js_name = "eeur")]
-    Eeur,
-    #[wasm_bindgen(js_name = "apac")]
-    Apac,
-    #[wasm_bindgen(js_name = "oc")]
-    Oc,
-    #[wasm_bindgen(js_name = "afr")]
-    Afr,
-    #[wasm_bindgen(js_name = "me")]
-    Me,
+    Wnam = "wnam",
+    Enam = "enam",
+    Sam = "sam",
+    Weur = "weur",
+    Eeur = "eeur",
+    Apac = "apac",
+    Oc = "oc",
+    Afr = "afr",
+    Me = "me",
 }
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DurableObjectRoutingMode {
-    #[wasm_bindgen(js_name = "primary-only")]
-    PrimaryOnly,
+    PrimaryOnly = "primary-only",
 }
 #[wasm_bindgen]
 extern "C" {
@@ -2458,7 +2432,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "locationHint")]
     pub fn set_location_hint(
         this: &DurableObjectNamespaceGetDurableObjectOptions,
-        val: &DurableObjectLocationHint,
+        val: DurableObjectLocationHint,
     );
     #[wasm_bindgen(method, getter, js_name = "routingMode")]
     pub fn routing_mode(
@@ -2467,7 +2441,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "routingMode")]
     pub fn set_routing_mode(
         this: &DurableObjectNamespaceGetDurableObjectOptions,
-        val: &DurableObjectRoutingMode,
+        val: DurableObjectRoutingMode,
     );
 }
 impl DurableObjectNamespaceGetDurableObjectOptions {
@@ -2484,11 +2458,11 @@ pub struct DurableObjectNamespaceGetDurableObjectOptionsBuilder {
     inner: DurableObjectNamespaceGetDurableObjectOptions,
 }
 impl DurableObjectNamespaceGetDurableObjectOptionsBuilder {
-    pub fn location_hint(self, val: &DurableObjectLocationHint) -> Self {
+    pub fn location_hint(self, val: DurableObjectLocationHint) -> Self {
         self.inner.set_location_hint(val);
         self
     }
-    pub fn routing_mode(self, val: &DurableObjectRoutingMode) -> Self {
+    pub fn routing_mode(self, val: DurableObjectRoutingMode) -> Self {
         self.inner.set_routing_mode(val);
         self
     }
@@ -8639,14 +8613,10 @@ impl<Value: ::wasm_bindgen::JsGeneric, Metadata: ::wasm_bindgen::JsGeneric>
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum QueueContentType {
-    #[wasm_bindgen(js_name = "text")]
-    Text,
-    #[wasm_bindgen(js_name = "bytes")]
-    Bytes,
-    #[wasm_bindgen(js_name = "json")]
-    Json,
-    #[wasm_bindgen(js_name = "v8")]
-    V8,
+    Text = "text",
+    Bytes = "bytes",
+    Json = "json",
+    V8 = "v8",
 }
 #[wasm_bindgen]
 extern "C" {
@@ -8684,7 +8654,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "contentType")]
     pub fn content_type(this: &QueueSendOptions) -> Option<QueueContentType>;
     #[wasm_bindgen(method, setter, js_name = "contentType")]
-    pub fn set_content_type(this: &QueueSendOptions, val: &QueueContentType);
+    pub fn set_content_type(this: &QueueSendOptions, val: QueueContentType);
     #[wasm_bindgen(method, getter, js_name = "delaySeconds")]
     pub fn delay_seconds(this: &QueueSendOptions) -> Option<f64>;
     #[wasm_bindgen(method, setter, js_name = "delaySeconds")]
@@ -8704,7 +8674,7 @@ pub struct QueueSendOptionsBuilder {
     inner: QueueSendOptions,
 }
 impl QueueSendOptionsBuilder {
-    pub fn content_type(self, val: &QueueContentType) -> Self {
+    pub fn content_type(self, val: QueueContentType) -> Self {
         self.inner.set_content_type(val);
         self
     }
@@ -8764,7 +8734,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "contentType")]
     pub fn set_content_type<Body: ::wasm_bindgen::JsGeneric>(
         this: &MessageSendRequest<Body>,
-        val: &QueueContentType,
+        val: QueueContentType,
     );
     #[wasm_bindgen(method, getter, js_name = "delaySeconds")]
     pub fn delay_seconds<Body: ::wasm_bindgen::JsGeneric>(
@@ -8790,7 +8760,7 @@ pub struct MessageSendRequestBuilder<Body: ::wasm_bindgen::JsGeneric> {
     inner: MessageSendRequest<Body>,
 }
 impl<Body: ::wasm_bindgen::JsGeneric> MessageSendRequestBuilder<Body> {
-    pub fn content_type(self, val: &QueueContentType) -> Self {
+    pub fn content_type(self, val: QueueContentType) -> Self {
         self.inner.set_content_type(val);
         self
     }
@@ -16079,7 +16049,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn tool_choice(this: &ResponsesInput) -> Option<ToolChoiceKind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tool_choice(this: &ResponsesInput, val: &ToolChoiceOptions);
+    pub fn set_tool_choice(this: &ResponsesInput, val: ToolChoiceOptions);
     #[wasm_bindgen(method, setter, js_name = "tool_choice")]
     pub fn set_tool_choice_with_tool_choice_function(
         this: &ResponsesInput,
@@ -16188,7 +16158,7 @@ impl ResponsesInputBuilder {
         self.inner.set_text(val);
         self
     }
-    pub fn tool_choice(self, val: &ToolChoiceOptions) -> Self {
+    pub fn tool_choice(self, val: ToolChoiceOptions) -> Self {
         self.inner.set_tool_choice(val);
         self
     }
@@ -16262,7 +16232,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn tool_choice(this: &ResponsesOutput) -> Option<ToolChoiceKind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tool_choice(this: &ResponsesOutput, val: &ToolChoiceOptions);
+    pub fn set_tool_choice(this: &ResponsesOutput, val: ToolChoiceOptions);
     #[wasm_bindgen(method, setter, js_name = "tool_choice")]
     pub fn set_tool_choice_with_tool_choice_function(
         this: &ResponsesOutput,
@@ -16303,7 +16273,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn status(this: &ResponsesOutput) -> Option<ResponseStatus>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_status(this: &ResponsesOutput, val: &ResponseStatus);
+    pub fn set_status(this: &ResponsesOutput, val: ResponseStatus);
     #[wasm_bindgen(method, getter)]
     pub fn text(this: &ResponsesOutput) -> Option<ResponseTextConfig>;
     #[wasm_bindgen(method, setter)]
@@ -16375,7 +16345,7 @@ impl ResponsesOutputBuilder {
         self.inner.set_temperature(val);
         self
     }
-    pub fn tool_choice(self, val: &ToolChoiceOptions) -> Self {
+    pub fn tool_choice(self, val: ToolChoiceOptions) -> Self {
         self.inner.set_tool_choice(val);
         self
     }
@@ -16415,7 +16385,7 @@ impl ResponsesOutputBuilder {
         self.inner.set_service_tier(val);
         self
     }
-    pub fn status(self, val: &ResponseStatus) -> Self {
+    pub fn status(self, val: ResponseStatus) -> Self {
         self.inner.set_status(val);
         self
     }
@@ -17422,10 +17392,8 @@ impl ResponseFunctionToolCallOutputItemBuilder {
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ResponseIncludable {
-    #[wasm_bindgen(js_name = "message.input_image.image_url")]
-    MessageinputImageimageUrl,
-    #[wasm_bindgen(js_name = "message.output_text.logprobs")]
-    MessageoutputTextlogprobs,
+    MessageinputImageimageUrl = "message.input_image.image_url",
+    MessageoutputTextlogprobs = "message.output_text.logprobs",
 }
 #[wasm_bindgen]
 extern "C" {
@@ -18559,18 +18527,12 @@ impl ResponseRefusalDoneEvent {
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ResponseStatus {
-    #[wasm_bindgen(js_name = "completed")]
-    Completed,
-    #[wasm_bindgen(js_name = "failed")]
-    Failed,
-    #[wasm_bindgen(js_name = "in_progress")]
-    InProgress,
-    #[wasm_bindgen(js_name = "cancelled")]
-    Cancelled,
-    #[wasm_bindgen(js_name = "queued")]
-    Queued,
-    #[wasm_bindgen(js_name = "incomplete")]
-    Incomplete,
+    Completed = "completed",
+    Failed = "failed",
+    InProgress = "in_progress",
+    Cancelled = "cancelled",
+    Queued = "queued",
+    Incomplete = "incomplete",
 }
 #[allow(dead_code)]
 pub type ResponseStreamEvent = JsValue;
@@ -18921,8 +18883,7 @@ impl ToolChoiceFunction {
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ToolChoiceOptions {
-    #[wasm_bindgen(js_name = "none")]
-    None,
+    None = "none",
 }
 #[allow(dead_code)]
 pub type ReasoningEffort = JsOption<JsString>;
@@ -29328,46 +29289,26 @@ impl AiGatewayLogBuilder {
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AIGatewayProviders {
-    #[wasm_bindgen(js_name = "workers-ai")]
-    WorkersAi,
-    #[wasm_bindgen(js_name = "anthropic")]
-    Anthropic,
-    #[wasm_bindgen(js_name = "aws-bedrock")]
-    AwsBedrock,
-    #[wasm_bindgen(js_name = "azure-openai")]
-    AzureOpenai,
-    #[wasm_bindgen(js_name = "google-vertex-ai")]
-    GoogleVertexAi,
-    #[wasm_bindgen(js_name = "huggingface")]
-    Huggingface,
-    #[wasm_bindgen(js_name = "openai")]
-    Openai,
-    #[wasm_bindgen(js_name = "perplexity-ai")]
-    PerplexityAi,
-    #[wasm_bindgen(js_name = "replicate")]
-    Replicate,
-    #[wasm_bindgen(js_name = "groq")]
-    Groq,
-    #[wasm_bindgen(js_name = "cohere")]
-    Cohere,
-    #[wasm_bindgen(js_name = "google-ai-studio")]
-    GoogleAiStudio,
-    #[wasm_bindgen(js_name = "mistral")]
-    Mistral,
-    #[wasm_bindgen(js_name = "grok")]
-    Grok,
-    #[wasm_bindgen(js_name = "openrouter")]
-    Openrouter,
-    #[wasm_bindgen(js_name = "deepseek")]
-    Deepseek,
-    #[wasm_bindgen(js_name = "cerebras")]
-    Cerebras,
-    #[wasm_bindgen(js_name = "cartesia")]
-    Cartesia,
-    #[wasm_bindgen(js_name = "elevenlabs")]
-    Elevenlabs,
-    #[wasm_bindgen(js_name = "adobe-firefly")]
-    AdobeFirefly,
+    WorkersAi = "workers-ai",
+    Anthropic = "anthropic",
+    AwsBedrock = "aws-bedrock",
+    AzureOpenai = "azure-openai",
+    GoogleVertexAi = "google-vertex-ai",
+    Huggingface = "huggingface",
+    Openai = "openai",
+    PerplexityAi = "perplexity-ai",
+    Replicate = "replicate",
+    Groq = "groq",
+    Cohere = "cohere",
+    GoogleAiStudio = "google-ai-studio",
+    Mistral = "mistral",
+    Grok = "grok",
+    Openrouter = "openrouter",
+    Deepseek = "deepseek",
+    Cerebras = "cerebras",
+    Cartesia = "cartesia",
+    Elevenlabs = "elevenlabs",
+    AdobeFirefly = "adobe-firefly",
 }
 #[wasm_bindgen]
 extern "C" {
@@ -29484,7 +29425,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn provider(this: &AIGatewayUniversalRequest) -> ProviderKind;
     #[wasm_bindgen(method, setter)]
-    pub fn set_provider(this: &AIGatewayUniversalRequest, val: &AIGatewayProviders);
+    pub fn set_provider(this: &AIGatewayUniversalRequest, val: AIGatewayProviders);
     #[wasm_bindgen(method, setter, js_name = "provider")]
     pub fn set_provider_with_str(this: &AIGatewayUniversalRequest, val: &str);
     #[wasm_bindgen(method, getter)]
@@ -29502,7 +29443,7 @@ extern "C" {
 }
 impl AIGatewayUniversalRequest {
     pub fn new(
-        provider: &AIGatewayProviders,
+        provider: AIGatewayProviders,
         endpoint: &str,
         headers: &AIGatewayHeaders,
         query: &JsValue,
@@ -29580,7 +29521,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "getUrl")]
     pub async fn get_url_with_ai_gateway_providers(
         this: &AiGateway,
-        provider: &AIGatewayProviders,
+        provider: AIGatewayProviders,
     ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getUrl")]
     pub async fn get_url_with_str(this: &AiGateway, provider: &str) -> Result<JsString, JsValue>;
@@ -31867,7 +31808,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_country(
         this: &IncomingRequestCfPropertiesGeographicInformation,
-        val: &Iso3166Alpha2Code,
+        val: Iso3166Alpha2Code,
     );
     #[wasm_bindgen(method, setter, js_name = "country")]
     pub fn set_country_with_js_value(
@@ -31892,7 +31833,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_continent(
         this: &IncomingRequestCfPropertiesGeographicInformation,
-        val: &ContinentCode,
+        val: ContinentCode,
     );
     #[doc = " The city the request originated from"]
     #[doc = ""]
@@ -31967,7 +31908,7 @@ pub struct IncomingRequestCfPropertiesGeographicInformationBuilder {
     inner: IncomingRequestCfPropertiesGeographicInformation,
 }
 impl IncomingRequestCfPropertiesGeographicInformationBuilder {
-    pub fn country(self, val: &Iso3166Alpha2Code) -> Self {
+    pub fn country(self, val: Iso3166Alpha2Code) -> Self {
         self.inner.set_country(val);
         self
     }
@@ -31979,7 +31920,7 @@ impl IncomingRequestCfPropertiesGeographicInformationBuilder {
         self.inner.set_is_eu_country(val);
         self
     }
-    pub fn continent(self, val: &ContinentCode) -> Self {
+    pub fn continent(self, val: ContinentCode) -> Self {
         self.inner.set_continent(val);
         self
     }
@@ -32038,7 +31979,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "certVerified")]
     pub fn set_cert_verified(
         this: &IncomingRequestCfPropertiesTLSClientAuth,
-        val: &CertVerificationStatus,
+        val: CertVerificationStatus,
     );
     #[doc = " The presented certificate's revokation status."]
     #[doc = ""]
@@ -32194,7 +32135,7 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
     #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
     pub fn new_1_1(
-        cert_verified: &CertVerificationStatus,
+        cert_verified: CertVerificationStatus,
         cert_issuer_dn: &str,
         cert_subject_dn: &str,
         cert_issuer_dnrfc2253: &str,
@@ -32281,7 +32222,7 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
     #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
     pub fn new_1_0(
-        cert_verified: &CertVerificationStatus,
+        cert_verified: CertVerificationStatus,
         cert_issuer_dn: &str,
         cert_subject_dn: &str,
         cert_issuer_dnrfc2253: &str,
@@ -32491,542 +32432,279 @@ impl IncomingRequestCfPropertiesTLSClientAuthPlaceholder {
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CertVerificationStatus {
-    #[wasm_bindgen(js_name = "SUCCESS")]
-    Success,
-    #[wasm_bindgen(js_name = "NONE")]
-    None,
-    #[wasm_bindgen(js_name = "FAILED:self signed certificate")]
-    FailedselfSignedCertificate,
-    #[wasm_bindgen(js_name = "FAILED:unable to verify the first certificate")]
-    FailedunableToVerifyTheFirstCertificate,
-    #[wasm_bindgen(js_name = "FAILED:certificate is not yet valid")]
-    FailedcertificateIsNotYetValid,
-    #[wasm_bindgen(js_name = "FAILED:certificate has expired")]
-    FailedcertificateHasExpired,
-    #[wasm_bindgen(js_name = "FAILED")]
-    Failed,
+    Success = "SUCCESS",
+    None = "NONE",
+    FailedselfSignedCertificate = "FAILED:self signed certificate",
+    FailedunableToVerifyTheFirstCertificate = "FAILED:unable to verify the first certificate",
+    FailedcertificateIsNotYetValid = "FAILED:certificate is not yet valid",
+    FailedcertificateHasExpired = "FAILED:certificate has expired",
+    Failed = "FAILED",
 }
 #[allow(dead_code)]
 pub type IncomingRequestCfPropertiesEdgeRequestKeepAliveStatus = Number;
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Iso3166Alpha2Code {
-    #[wasm_bindgen(js_name = "AD")]
-    Ad,
-    #[wasm_bindgen(js_name = "AE")]
-    Ae,
-    #[wasm_bindgen(js_name = "AF")]
-    Af,
-    #[wasm_bindgen(js_name = "AG")]
-    Ag,
-    #[wasm_bindgen(js_name = "AI")]
-    Ai,
-    #[wasm_bindgen(js_name = "AL")]
-    Al,
-    #[wasm_bindgen(js_name = "AM")]
-    Am,
-    #[wasm_bindgen(js_name = "AO")]
-    Ao,
-    #[wasm_bindgen(js_name = "AQ")]
-    Aq,
-    #[wasm_bindgen(js_name = "AR")]
-    Ar,
-    #[wasm_bindgen(js_name = "AS")]
-    As,
-    #[wasm_bindgen(js_name = "AT")]
-    At,
-    #[wasm_bindgen(js_name = "AU")]
-    Au,
-    #[wasm_bindgen(js_name = "AW")]
-    Aw,
-    #[wasm_bindgen(js_name = "AX")]
-    Ax,
-    #[wasm_bindgen(js_name = "AZ")]
-    Az,
-    #[wasm_bindgen(js_name = "BA")]
-    Ba,
-    #[wasm_bindgen(js_name = "BB")]
-    Bb,
-    #[wasm_bindgen(js_name = "BD")]
-    Bd,
-    #[wasm_bindgen(js_name = "BE")]
-    Be,
-    #[wasm_bindgen(js_name = "BF")]
-    Bf,
-    #[wasm_bindgen(js_name = "BG")]
-    Bg,
-    #[wasm_bindgen(js_name = "BH")]
-    Bh,
-    #[wasm_bindgen(js_name = "BI")]
-    Bi,
-    #[wasm_bindgen(js_name = "BJ")]
-    Bj,
-    #[wasm_bindgen(js_name = "BL")]
-    Bl,
-    #[wasm_bindgen(js_name = "BM")]
-    Bm,
-    #[wasm_bindgen(js_name = "BN")]
-    Bn,
-    #[wasm_bindgen(js_name = "BO")]
-    Bo,
-    #[wasm_bindgen(js_name = "BQ")]
-    Bq,
-    #[wasm_bindgen(js_name = "BR")]
-    Br,
-    #[wasm_bindgen(js_name = "BS")]
-    Bs,
-    #[wasm_bindgen(js_name = "BT")]
-    Bt,
-    #[wasm_bindgen(js_name = "BV")]
-    Bv,
-    #[wasm_bindgen(js_name = "BW")]
-    Bw,
-    #[wasm_bindgen(js_name = "BY")]
-    By,
-    #[wasm_bindgen(js_name = "BZ")]
-    Bz,
-    #[wasm_bindgen(js_name = "CA")]
-    Ca,
-    #[wasm_bindgen(js_name = "CC")]
-    Cc,
-    #[wasm_bindgen(js_name = "CD")]
-    Cd,
-    #[wasm_bindgen(js_name = "CF")]
-    Cf,
-    #[wasm_bindgen(js_name = "CG")]
-    Cg,
-    #[wasm_bindgen(js_name = "CH")]
-    Ch,
-    #[wasm_bindgen(js_name = "CI")]
-    Ci,
-    #[wasm_bindgen(js_name = "CK")]
-    Ck,
-    #[wasm_bindgen(js_name = "CL")]
-    Cl,
-    #[wasm_bindgen(js_name = "CM")]
-    Cm,
-    #[wasm_bindgen(js_name = "CN")]
-    Cn,
-    #[wasm_bindgen(js_name = "CO")]
-    Co,
-    #[wasm_bindgen(js_name = "CR")]
-    Cr,
-    #[wasm_bindgen(js_name = "CU")]
-    Cu,
-    #[wasm_bindgen(js_name = "CV")]
-    Cv,
-    #[wasm_bindgen(js_name = "CW")]
-    Cw,
-    #[wasm_bindgen(js_name = "CX")]
-    Cx,
-    #[wasm_bindgen(js_name = "CY")]
-    Cy,
-    #[wasm_bindgen(js_name = "CZ")]
-    Cz,
-    #[wasm_bindgen(js_name = "DE")]
-    De,
-    #[wasm_bindgen(js_name = "DJ")]
-    Dj,
-    #[wasm_bindgen(js_name = "DK")]
-    Dk,
-    #[wasm_bindgen(js_name = "DM")]
-    Dm,
-    #[wasm_bindgen(js_name = "DO")]
-    Do,
-    #[wasm_bindgen(js_name = "DZ")]
-    Dz,
-    #[wasm_bindgen(js_name = "EC")]
-    Ec,
-    #[wasm_bindgen(js_name = "EE")]
-    Ee,
-    #[wasm_bindgen(js_name = "EG")]
-    Eg,
-    #[wasm_bindgen(js_name = "EH")]
-    Eh,
-    #[wasm_bindgen(js_name = "ER")]
-    Er,
-    #[wasm_bindgen(js_name = "ES")]
-    Es,
-    #[wasm_bindgen(js_name = "ET")]
-    Et,
-    #[wasm_bindgen(js_name = "FI")]
-    Fi,
-    #[wasm_bindgen(js_name = "FJ")]
-    Fj,
-    #[wasm_bindgen(js_name = "FK")]
-    Fk,
-    #[wasm_bindgen(js_name = "FM")]
-    Fm,
-    #[wasm_bindgen(js_name = "FO")]
-    Fo,
-    #[wasm_bindgen(js_name = "FR")]
-    Fr,
-    #[wasm_bindgen(js_name = "GA")]
-    Ga,
-    #[wasm_bindgen(js_name = "GB")]
-    Gb,
-    #[wasm_bindgen(js_name = "GD")]
-    Gd,
-    #[wasm_bindgen(js_name = "GE")]
-    Ge,
-    #[wasm_bindgen(js_name = "GF")]
-    Gf,
-    #[wasm_bindgen(js_name = "GG")]
-    Gg,
-    #[wasm_bindgen(js_name = "GH")]
-    Gh,
-    #[wasm_bindgen(js_name = "GI")]
-    Gi,
-    #[wasm_bindgen(js_name = "GL")]
-    Gl,
-    #[wasm_bindgen(js_name = "GM")]
-    Gm,
-    #[wasm_bindgen(js_name = "GN")]
-    Gn,
-    #[wasm_bindgen(js_name = "GP")]
-    Gp,
-    #[wasm_bindgen(js_name = "GQ")]
-    Gq,
-    #[wasm_bindgen(js_name = "GR")]
-    Gr,
-    #[wasm_bindgen(js_name = "GS")]
-    Gs,
-    #[wasm_bindgen(js_name = "GT")]
-    Gt,
-    #[wasm_bindgen(js_name = "GU")]
-    Gu,
-    #[wasm_bindgen(js_name = "GW")]
-    Gw,
-    #[wasm_bindgen(js_name = "GY")]
-    Gy,
-    #[wasm_bindgen(js_name = "HK")]
-    Hk,
-    #[wasm_bindgen(js_name = "HM")]
-    Hm,
-    #[wasm_bindgen(js_name = "HN")]
-    Hn,
-    #[wasm_bindgen(js_name = "HR")]
-    Hr,
-    #[wasm_bindgen(js_name = "HT")]
-    Ht,
-    #[wasm_bindgen(js_name = "HU")]
-    Hu,
-    #[wasm_bindgen(js_name = "ID")]
-    Id,
-    #[wasm_bindgen(js_name = "IE")]
-    Ie,
-    #[wasm_bindgen(js_name = "IL")]
-    Il,
-    #[wasm_bindgen(js_name = "IM")]
-    Im,
-    #[wasm_bindgen(js_name = "IN")]
-    In,
-    #[wasm_bindgen(js_name = "IO")]
-    Io,
-    #[wasm_bindgen(js_name = "IQ")]
-    Iq,
-    #[wasm_bindgen(js_name = "IR")]
-    Ir,
-    #[wasm_bindgen(js_name = "IS")]
-    Is,
-    #[wasm_bindgen(js_name = "IT")]
-    It,
-    #[wasm_bindgen(js_name = "JE")]
-    Je,
-    #[wasm_bindgen(js_name = "JM")]
-    Jm,
-    #[wasm_bindgen(js_name = "JO")]
-    Jo,
-    #[wasm_bindgen(js_name = "JP")]
-    Jp,
-    #[wasm_bindgen(js_name = "KE")]
-    Ke,
-    #[wasm_bindgen(js_name = "KG")]
-    Kg,
-    #[wasm_bindgen(js_name = "KH")]
-    Kh,
-    #[wasm_bindgen(js_name = "KI")]
-    Ki,
-    #[wasm_bindgen(js_name = "KM")]
-    Km,
-    #[wasm_bindgen(js_name = "KN")]
-    Kn,
-    #[wasm_bindgen(js_name = "KP")]
-    Kp,
-    #[wasm_bindgen(js_name = "KR")]
-    Kr,
-    #[wasm_bindgen(js_name = "KW")]
-    Kw,
-    #[wasm_bindgen(js_name = "KY")]
-    Ky,
-    #[wasm_bindgen(js_name = "KZ")]
-    Kz,
-    #[wasm_bindgen(js_name = "LA")]
-    La,
-    #[wasm_bindgen(js_name = "LB")]
-    Lb,
-    #[wasm_bindgen(js_name = "LC")]
-    Lc,
-    #[wasm_bindgen(js_name = "LI")]
-    Li,
-    #[wasm_bindgen(js_name = "LK")]
-    Lk,
-    #[wasm_bindgen(js_name = "LR")]
-    Lr,
-    #[wasm_bindgen(js_name = "LS")]
-    Ls,
-    #[wasm_bindgen(js_name = "LT")]
-    Lt,
-    #[wasm_bindgen(js_name = "LU")]
-    Lu,
-    #[wasm_bindgen(js_name = "LV")]
-    Lv,
-    #[wasm_bindgen(js_name = "LY")]
-    Ly,
-    #[wasm_bindgen(js_name = "MA")]
-    Ma,
-    #[wasm_bindgen(js_name = "MC")]
-    Mc,
-    #[wasm_bindgen(js_name = "MD")]
-    Md,
-    #[wasm_bindgen(js_name = "ME")]
-    Me,
-    #[wasm_bindgen(js_name = "MF")]
-    Mf,
-    #[wasm_bindgen(js_name = "MG")]
-    Mg,
-    #[wasm_bindgen(js_name = "MH")]
-    Mh,
-    #[wasm_bindgen(js_name = "MK")]
-    Mk,
-    #[wasm_bindgen(js_name = "ML")]
-    Ml,
-    #[wasm_bindgen(js_name = "MM")]
-    Mm,
-    #[wasm_bindgen(js_name = "MN")]
-    Mn,
-    #[wasm_bindgen(js_name = "MO")]
-    Mo,
-    #[wasm_bindgen(js_name = "MP")]
-    Mp,
-    #[wasm_bindgen(js_name = "MQ")]
-    Mq,
-    #[wasm_bindgen(js_name = "MR")]
-    Mr,
-    #[wasm_bindgen(js_name = "MS")]
-    Ms,
-    #[wasm_bindgen(js_name = "MT")]
-    Mt,
-    #[wasm_bindgen(js_name = "MU")]
-    Mu,
-    #[wasm_bindgen(js_name = "MV")]
-    Mv,
-    #[wasm_bindgen(js_name = "MW")]
-    Mw,
-    #[wasm_bindgen(js_name = "MX")]
-    Mx,
-    #[wasm_bindgen(js_name = "MY")]
-    My,
-    #[wasm_bindgen(js_name = "MZ")]
-    Mz,
-    #[wasm_bindgen(js_name = "NA")]
-    Na,
-    #[wasm_bindgen(js_name = "NC")]
-    Nc,
-    #[wasm_bindgen(js_name = "NE")]
-    Ne,
-    #[wasm_bindgen(js_name = "NF")]
-    Nf,
-    #[wasm_bindgen(js_name = "NG")]
-    Ng,
-    #[wasm_bindgen(js_name = "NI")]
-    Ni,
-    #[wasm_bindgen(js_name = "NL")]
-    Nl,
-    #[wasm_bindgen(js_name = "NO")]
-    No,
-    #[wasm_bindgen(js_name = "NP")]
-    Np,
-    #[wasm_bindgen(js_name = "NR")]
-    Nr,
-    #[wasm_bindgen(js_name = "NU")]
-    Nu,
-    #[wasm_bindgen(js_name = "NZ")]
-    Nz,
-    #[wasm_bindgen(js_name = "OM")]
-    Om,
-    #[wasm_bindgen(js_name = "PA")]
-    Pa,
-    #[wasm_bindgen(js_name = "PE")]
-    Pe,
-    #[wasm_bindgen(js_name = "PF")]
-    Pf,
-    #[wasm_bindgen(js_name = "PG")]
-    Pg,
-    #[wasm_bindgen(js_name = "PH")]
-    Ph,
-    #[wasm_bindgen(js_name = "PK")]
-    Pk,
-    #[wasm_bindgen(js_name = "PL")]
-    Pl,
-    #[wasm_bindgen(js_name = "PM")]
-    Pm,
-    #[wasm_bindgen(js_name = "PN")]
-    Pn,
-    #[wasm_bindgen(js_name = "PR")]
-    Pr,
-    #[wasm_bindgen(js_name = "PS")]
-    Ps,
-    #[wasm_bindgen(js_name = "PT")]
-    Pt,
-    #[wasm_bindgen(js_name = "PW")]
-    Pw,
-    #[wasm_bindgen(js_name = "PY")]
-    Py,
-    #[wasm_bindgen(js_name = "QA")]
-    Qa,
-    #[wasm_bindgen(js_name = "RE")]
-    Re,
-    #[wasm_bindgen(js_name = "RO")]
-    Ro,
-    #[wasm_bindgen(js_name = "RS")]
-    Rs,
-    #[wasm_bindgen(js_name = "RU")]
-    Ru,
-    #[wasm_bindgen(js_name = "RW")]
-    Rw,
-    #[wasm_bindgen(js_name = "SA")]
-    Sa,
-    #[wasm_bindgen(js_name = "SB")]
-    Sb,
-    #[wasm_bindgen(js_name = "SC")]
-    Sc,
-    #[wasm_bindgen(js_name = "SD")]
-    Sd,
-    #[wasm_bindgen(js_name = "SE")]
-    Se,
-    #[wasm_bindgen(js_name = "SG")]
-    Sg,
-    #[wasm_bindgen(js_name = "SH")]
-    Sh,
-    #[wasm_bindgen(js_name = "SI")]
-    Si,
-    #[wasm_bindgen(js_name = "SJ")]
-    Sj,
-    #[wasm_bindgen(js_name = "SK")]
-    Sk,
-    #[wasm_bindgen(js_name = "SL")]
-    Sl,
-    #[wasm_bindgen(js_name = "SM")]
-    Sm,
-    #[wasm_bindgen(js_name = "SN")]
-    Sn,
-    #[wasm_bindgen(js_name = "SO")]
-    So,
-    #[wasm_bindgen(js_name = "SR")]
-    Sr,
-    #[wasm_bindgen(js_name = "SS")]
-    Ss,
-    #[wasm_bindgen(js_name = "ST")]
-    St,
-    #[wasm_bindgen(js_name = "SV")]
-    Sv,
-    #[wasm_bindgen(js_name = "SX")]
-    Sx,
-    #[wasm_bindgen(js_name = "SY")]
-    Sy,
-    #[wasm_bindgen(js_name = "SZ")]
-    Sz,
-    #[wasm_bindgen(js_name = "TC")]
-    Tc,
-    #[wasm_bindgen(js_name = "TD")]
-    Td,
-    #[wasm_bindgen(js_name = "TF")]
-    Tf,
-    #[wasm_bindgen(js_name = "TG")]
-    Tg,
-    #[wasm_bindgen(js_name = "TH")]
-    Th,
-    #[wasm_bindgen(js_name = "TJ")]
-    Tj,
-    #[wasm_bindgen(js_name = "TK")]
-    Tk,
-    #[wasm_bindgen(js_name = "TL")]
-    Tl,
-    #[wasm_bindgen(js_name = "TM")]
-    Tm,
-    #[wasm_bindgen(js_name = "TN")]
-    Tn,
-    #[wasm_bindgen(js_name = "TO")]
-    To,
-    #[wasm_bindgen(js_name = "TR")]
-    Tr,
-    #[wasm_bindgen(js_name = "TT")]
-    Tt,
-    #[wasm_bindgen(js_name = "TV")]
-    Tv,
-    #[wasm_bindgen(js_name = "TW")]
-    Tw,
-    #[wasm_bindgen(js_name = "TZ")]
-    Tz,
-    #[wasm_bindgen(js_name = "UA")]
-    Ua,
-    #[wasm_bindgen(js_name = "UG")]
-    Ug,
-    #[wasm_bindgen(js_name = "UM")]
-    Um,
-    #[wasm_bindgen(js_name = "US")]
-    Us,
-    #[wasm_bindgen(js_name = "UY")]
-    Uy,
-    #[wasm_bindgen(js_name = "UZ")]
-    Uz,
-    #[wasm_bindgen(js_name = "VA")]
-    Va,
-    #[wasm_bindgen(js_name = "VC")]
-    Vc,
-    #[wasm_bindgen(js_name = "VE")]
-    Ve,
-    #[wasm_bindgen(js_name = "VG")]
-    Vg,
-    #[wasm_bindgen(js_name = "VI")]
-    Vi,
-    #[wasm_bindgen(js_name = "VN")]
-    Vn,
-    #[wasm_bindgen(js_name = "VU")]
-    Vu,
-    #[wasm_bindgen(js_name = "WF")]
-    Wf,
-    #[wasm_bindgen(js_name = "WS")]
-    Ws,
-    #[wasm_bindgen(js_name = "YE")]
-    Ye,
-    #[wasm_bindgen(js_name = "YT")]
-    Yt,
-    #[wasm_bindgen(js_name = "ZA")]
-    Za,
-    #[wasm_bindgen(js_name = "ZM")]
-    Zm,
-    #[wasm_bindgen(js_name = "ZW")]
-    Zw,
+    Ad = "AD",
+    Ae = "AE",
+    Af = "AF",
+    Ag = "AG",
+    Ai = "AI",
+    Al = "AL",
+    Am = "AM",
+    Ao = "AO",
+    Aq = "AQ",
+    Ar = "AR",
+    As = "AS",
+    At = "AT",
+    Au = "AU",
+    Aw = "AW",
+    Ax = "AX",
+    Az = "AZ",
+    Ba = "BA",
+    Bb = "BB",
+    Bd = "BD",
+    Be = "BE",
+    Bf = "BF",
+    Bg = "BG",
+    Bh = "BH",
+    Bi = "BI",
+    Bj = "BJ",
+    Bl = "BL",
+    Bm = "BM",
+    Bn = "BN",
+    Bo = "BO",
+    Bq = "BQ",
+    Br = "BR",
+    Bs = "BS",
+    Bt = "BT",
+    Bv = "BV",
+    Bw = "BW",
+    By = "BY",
+    Bz = "BZ",
+    Ca = "CA",
+    Cc = "CC",
+    Cd = "CD",
+    Cf = "CF",
+    Cg = "CG",
+    Ch = "CH",
+    Ci = "CI",
+    Ck = "CK",
+    Cl = "CL",
+    Cm = "CM",
+    Cn = "CN",
+    Co = "CO",
+    Cr = "CR",
+    Cu = "CU",
+    Cv = "CV",
+    Cw = "CW",
+    Cx = "CX",
+    Cy = "CY",
+    Cz = "CZ",
+    De = "DE",
+    Dj = "DJ",
+    Dk = "DK",
+    Dm = "DM",
+    Do = "DO",
+    Dz = "DZ",
+    Ec = "EC",
+    Ee = "EE",
+    Eg = "EG",
+    Eh = "EH",
+    Er = "ER",
+    Es = "ES",
+    Et = "ET",
+    Fi = "FI",
+    Fj = "FJ",
+    Fk = "FK",
+    Fm = "FM",
+    Fo = "FO",
+    Fr = "FR",
+    Ga = "GA",
+    Gb = "GB",
+    Gd = "GD",
+    Ge = "GE",
+    Gf = "GF",
+    Gg = "GG",
+    Gh = "GH",
+    Gi = "GI",
+    Gl = "GL",
+    Gm = "GM",
+    Gn = "GN",
+    Gp = "GP",
+    Gq = "GQ",
+    Gr = "GR",
+    Gs = "GS",
+    Gt = "GT",
+    Gu = "GU",
+    Gw = "GW",
+    Gy = "GY",
+    Hk = "HK",
+    Hm = "HM",
+    Hn = "HN",
+    Hr = "HR",
+    Ht = "HT",
+    Hu = "HU",
+    Id = "ID",
+    Ie = "IE",
+    Il = "IL",
+    Im = "IM",
+    In = "IN",
+    Io = "IO",
+    Iq = "IQ",
+    Ir = "IR",
+    Is = "IS",
+    It = "IT",
+    Je = "JE",
+    Jm = "JM",
+    Jo = "JO",
+    Jp = "JP",
+    Ke = "KE",
+    Kg = "KG",
+    Kh = "KH",
+    Ki = "KI",
+    Km = "KM",
+    Kn = "KN",
+    Kp = "KP",
+    Kr = "KR",
+    Kw = "KW",
+    Ky = "KY",
+    Kz = "KZ",
+    La = "LA",
+    Lb = "LB",
+    Lc = "LC",
+    Li = "LI",
+    Lk = "LK",
+    Lr = "LR",
+    Ls = "LS",
+    Lt = "LT",
+    Lu = "LU",
+    Lv = "LV",
+    Ly = "LY",
+    Ma = "MA",
+    Mc = "MC",
+    Md = "MD",
+    Me = "ME",
+    Mf = "MF",
+    Mg = "MG",
+    Mh = "MH",
+    Mk = "MK",
+    Ml = "ML",
+    Mm = "MM",
+    Mn = "MN",
+    Mo = "MO",
+    Mp = "MP",
+    Mq = "MQ",
+    Mr = "MR",
+    Ms = "MS",
+    Mt = "MT",
+    Mu = "MU",
+    Mv = "MV",
+    Mw = "MW",
+    Mx = "MX",
+    My = "MY",
+    Mz = "MZ",
+    Na = "NA",
+    Nc = "NC",
+    Ne = "NE",
+    Nf = "NF",
+    Ng = "NG",
+    Ni = "NI",
+    Nl = "NL",
+    No = "NO",
+    Np = "NP",
+    Nr = "NR",
+    Nu = "NU",
+    Nz = "NZ",
+    Om = "OM",
+    Pa = "PA",
+    Pe = "PE",
+    Pf = "PF",
+    Pg = "PG",
+    Ph = "PH",
+    Pk = "PK",
+    Pl = "PL",
+    Pm = "PM",
+    Pn = "PN",
+    Pr = "PR",
+    Ps = "PS",
+    Pt = "PT",
+    Pw = "PW",
+    Py = "PY",
+    Qa = "QA",
+    Re = "RE",
+    Ro = "RO",
+    Rs = "RS",
+    Ru = "RU",
+    Rw = "RW",
+    Sa = "SA",
+    Sb = "SB",
+    Sc = "SC",
+    Sd = "SD",
+    Se = "SE",
+    Sg = "SG",
+    Sh = "SH",
+    Si = "SI",
+    Sj = "SJ",
+    Sk = "SK",
+    Sl = "SL",
+    Sm = "SM",
+    Sn = "SN",
+    So = "SO",
+    Sr = "SR",
+    Ss = "SS",
+    St = "ST",
+    Sv = "SV",
+    Sx = "SX",
+    Sy = "SY",
+    Sz = "SZ",
+    Tc = "TC",
+    Td = "TD",
+    Tf = "TF",
+    Tg = "TG",
+    Th = "TH",
+    Tj = "TJ",
+    Tk = "TK",
+    Tl = "TL",
+    Tm = "TM",
+    Tn = "TN",
+    To = "TO",
+    Tr = "TR",
+    Tt = "TT",
+    Tv = "TV",
+    Tw = "TW",
+    Tz = "TZ",
+    Ua = "UA",
+    Ug = "UG",
+    Um = "UM",
+    Us = "US",
+    Uy = "UY",
+    Uz = "UZ",
+    Va = "VA",
+    Vc = "VC",
+    Ve = "VE",
+    Vg = "VG",
+    Vi = "VI",
+    Vn = "VN",
+    Vu = "VU",
+    Wf = "WF",
+    Ws = "WS",
+    Ye = "YE",
+    Yt = "YT",
+    Za = "ZA",
+    Zm = "ZM",
+    Zw = "ZW",
 }
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContinentCode {
-    #[wasm_bindgen(js_name = "AF")]
-    Af,
-    #[wasm_bindgen(js_name = "AN")]
-    An,
-    #[wasm_bindgen(js_name = "AS")]
-    As,
-    #[wasm_bindgen(js_name = "EU")]
-    Eu,
-    #[wasm_bindgen(js_name = "NA")]
-    Na,
-    #[wasm_bindgen(js_name = "OC")]
-    Oc,
-    #[wasm_bindgen(js_name = "SA")]
-    Sa,
+    Af = "AF",
+    An = "AN",
+    As = "AS",
+    Eu = "EU",
+    Na = "NA",
+    Oc = "OC",
+    Sa = "SA",
 }
 #[allow(dead_code)]
 pub type CfProperties<HostMetadata> = JsValue;
@@ -33232,10 +32910,8 @@ impl D1ExecResult {
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum D1SessionConstraint {
-    #[wasm_bindgen(js_name = "first-primary")]
-    FirstPrimary,
-    #[wasm_bindgen(js_name = "first-unconstrained")]
-    FirstUnconstrained,
+    FirstPrimary = "first-primary",
+    FirstUnconstrained = "first-unconstrained",
 }
 #[allow(dead_code)]
 pub type D1SessionBookmark = JsString;
@@ -33297,7 +32973,7 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "withSession")]
     pub fn with_session_with_d1_session_constraint(
         this: &D1Database,
-        constraint_or_bookmark: &D1SessionConstraint,
+        constraint_or_bookmark: D1SessionConstraint,
     ) -> D1DatabaseSession;
     #[doc = " Creates a new D1 Session anchored at the given constraint or the bookmark."]
     #[doc = " All queries executed using the created session will have sequential consistency,"]
@@ -33307,7 +32983,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "withSession")]
     pub fn try_with_session_with_d1_session_constraint(
         this: &D1Database,
-        constraint_or_bookmark: &D1SessionConstraint,
+        constraint_or_bookmark: D1SessionConstraint,
     ) -> Result<D1DatabaseSession, JsValue>;
     #[doc = " @deprecated dump() will be removed soon, only applies to deprecated alpha v1 databases."]
     #[wasm_bindgen(method, catch)]
@@ -36231,30 +35907,20 @@ pub mod cloudflare_workers_module {
     #[wasm_bindgen]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum WorkflowDurationLabel {
-        #[wasm_bindgen(js_name = "second")]
-        Second,
-        #[wasm_bindgen(js_name = "minute")]
-        Minute,
-        #[wasm_bindgen(js_name = "hour")]
-        Hour,
-        #[wasm_bindgen(js_name = "day")]
-        Day,
-        #[wasm_bindgen(js_name = "week")]
-        Week,
-        #[wasm_bindgen(js_name = "month")]
-        Month,
-        #[wasm_bindgen(js_name = "year")]
-        Year,
+        Second = "second",
+        Minute = "minute",
+        Hour = "hour",
+        Day = "day",
+        Week = "week",
+        Month = "month",
+        Year = "year",
     }
     #[wasm_bindgen]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum WorkflowBackoff {
-        #[wasm_bindgen(js_name = "constant")]
-        Constant,
-        #[wasm_bindgen(js_name = "linear")]
-        Linear,
-        #[wasm_bindgen(js_name = "exponential")]
-        Exponential,
+        Constant = "constant",
+        Linear = "linear",
+        Exponential = "exponential",
     }
     #[wasm_bindgen]
     extern "C" {
@@ -36459,24 +36125,15 @@ pub mod cloudflare_workers_module {
     #[wasm_bindgen]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum WorkflowInstanceStatus {
-        #[wasm_bindgen(js_name = "queued")]
-        Queued,
-        #[wasm_bindgen(js_name = "running")]
-        Running,
-        #[wasm_bindgen(js_name = "paused")]
-        Paused,
-        #[wasm_bindgen(js_name = "errored")]
-        Errored,
-        #[wasm_bindgen(js_name = "terminated")]
-        Terminated,
-        #[wasm_bindgen(js_name = "complete")]
-        Complete,
-        #[wasm_bindgen(js_name = "waiting")]
-        Waiting,
-        #[wasm_bindgen(js_name = "waitingForPause")]
-        WaitingForPause,
-        #[wasm_bindgen(js_name = "unknown")]
-        Unknown,
+        Queued = "queued",
+        Running = "running",
+        Paused = "paused",
+        Errored = "errored",
+        Terminated = "terminated",
+        Complete = "complete",
+        Waiting = "waiting",
+        WaitingForPause = "waitingForPause",
+        Unknown = "unknown",
     }
     #[wasm_bindgen]
     extern "C" {
@@ -37654,7 +37311,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "generate")]
     pub async fn generate_with_download_type(
         this: &StreamScopedDownloads,
-        download_type: &StreamDownloadType,
+        download_type: StreamDownloadType,
     ) -> Result<StreamDownloadGetResponse, StreamError>;
     #[doc = " Lists the downloads created for a video."]
     #[doc = ""]
@@ -37695,7 +37352,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "delete")]
     pub async fn delete_with_download_type(
         this: &StreamScopedDownloads,
-        download_type: &StreamDownloadType,
+        download_type: StreamDownloadType,
     ) -> Result<Undefined, StreamError>;
 }
 #[wasm_bindgen]
@@ -37974,20 +37631,15 @@ impl StreamCaptionBuilder {
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StreamDownloadStatus {
-    #[wasm_bindgen(js_name = "ready")]
-    Ready,
-    #[wasm_bindgen(js_name = "inprogress")]
-    Inprogress,
-    #[wasm_bindgen(js_name = "error")]
-    Error,
+    Ready = "ready",
+    Inprogress = "inprogress",
+    Error = "error",
 }
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StreamDownloadType {
-    #[wasm_bindgen(js_name = "default")]
-    Default,
-    #[wasm_bindgen(js_name = "audio")]
-    Audio,
+    Default = "default",
+    Audio = "audio",
 }
 #[wasm_bindgen]
 extern "C" {
@@ -38003,7 +37655,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn status(this: &StreamDownload) -> StreamDownloadStatus;
     #[wasm_bindgen(method, setter)]
-    pub fn set_status(this: &StreamDownload, val: &StreamDownloadStatus);
+    pub fn set_status(this: &StreamDownload, val: StreamDownloadStatus);
     #[doc = " The URL to access the generated download."]
     #[wasm_bindgen(method, getter)]
     pub fn url(this: &StreamDownload) -> Option<String>;
@@ -38013,12 +37665,12 @@ extern "C" {
 impl StreamDownload {
     #[doc = " * `percent_complete` - Indicates the progress as a percentage between 0 and 100."]
     #[doc = " * `status` - The status of a generated download."]
-    pub fn new(percent_complete: f64, status: &StreamDownloadStatus) -> StreamDownload {
+    pub fn new(percent_complete: f64, status: StreamDownloadStatus) -> StreamDownload {
         Self::builder(percent_complete, status).build()
     }
     #[doc = " * `percent_complete` - Indicates the progress as a percentage between 0 and 100."]
     #[doc = " * `status` - The status of a generated download."]
-    pub fn builder(percent_complete: f64, status: &StreamDownloadStatus) -> StreamDownloadBuilder {
+    pub fn builder(percent_complete: f64, status: StreamDownloadStatus) -> StreamDownloadBuilder {
         let inner: StreamDownload = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_percent_complete(percent_complete);
         inner.set_status(status);
@@ -38082,16 +37734,11 @@ impl StreamDownloadGetResponseBuilder {
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StreamWatermarkPosition {
-    #[wasm_bindgen(js_name = "upperRight")]
-    UpperRight,
-    #[wasm_bindgen(js_name = "upperLeft")]
-    UpperLeft,
-    #[wasm_bindgen(js_name = "lowerLeft")]
-    LowerLeft,
-    #[wasm_bindgen(js_name = "lowerRight")]
-    LowerRight,
-    #[wasm_bindgen(js_name = "center")]
-    Center,
+    UpperRight = "upperRight",
+    UpperLeft = "upperLeft",
+    LowerLeft = "lowerLeft",
+    LowerRight = "lowerRight",
+    Center = "center",
 }
 #[wasm_bindgen]
 extern "C" {
@@ -38162,7 +37809,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn position(this: &StreamWatermark) -> StreamWatermarkPosition;
     #[wasm_bindgen(method, setter)]
-    pub fn set_position(this: &StreamWatermark, val: &StreamWatermarkPosition);
+    pub fn set_position(this: &StreamWatermark, val: StreamWatermarkPosition);
 }
 impl StreamWatermark {
     #[doc = " * `id` - The unique identifier for a watermark profile."]
@@ -38197,7 +37844,7 @@ impl StreamWatermark {
         opacity: f64,
         padding: f64,
         scale: f64,
-        position: &StreamWatermarkPosition,
+        position: StreamWatermarkPosition,
     ) -> StreamWatermark {
         let inner: StreamWatermark = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
@@ -38251,7 +37898,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn position(this: &StreamWatermarkCreateParams) -> Option<StreamWatermarkPosition>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_position(this: &StreamWatermarkCreateParams, val: &StreamWatermarkPosition);
+    pub fn set_position(this: &StreamWatermarkCreateParams, val: StreamWatermarkPosition);
 }
 impl StreamWatermarkCreateParams {
     pub fn new() -> StreamWatermarkCreateParams {
@@ -38283,7 +37930,7 @@ impl StreamWatermarkCreateParamsBuilder {
         self.inner.set_scale(val);
         self
     }
-    pub fn position(self, val: &StreamWatermarkPosition) -> Self {
+    pub fn position(self, val: StreamWatermarkPosition) -> Self {
         self.inner.set_position(val);
         self
     }
@@ -38312,7 +37959,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "beforeComp")]
     pub fn before_comp(this: &StreamVideosListParams) -> Option<StreamPaginationComparison>;
     #[wasm_bindgen(method, setter, js_name = "beforeComp")]
-    pub fn set_before_comp(this: &StreamVideosListParams, val: &StreamPaginationComparison);
+    pub fn set_before_comp(this: &StreamVideosListParams, val: StreamPaginationComparison);
     #[doc = " Return videos created after this timestamp."]
     #[doc = " (RFC3339/RFC3339Nano)"]
     #[wasm_bindgen(method, getter)]
@@ -38324,7 +37971,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "afterComp")]
     pub fn after_comp(this: &StreamVideosListParams) -> Option<StreamPaginationComparison>;
     #[wasm_bindgen(method, setter, js_name = "afterComp")]
-    pub fn set_after_comp(this: &StreamVideosListParams, val: &StreamPaginationComparison);
+    pub fn set_after_comp(this: &StreamVideosListParams, val: StreamPaginationComparison);
 }
 impl StreamVideosListParams {
     pub fn new() -> StreamVideosListParams {
@@ -38348,7 +37995,7 @@ impl StreamVideosListParamsBuilder {
         self.inner.set_before(val);
         self
     }
-    pub fn before_comp(self, val: &StreamPaginationComparison) -> Self {
+    pub fn before_comp(self, val: StreamPaginationComparison) -> Self {
         self.inner.set_before_comp(val);
         self
     }
@@ -38356,7 +38003,7 @@ impl StreamVideosListParamsBuilder {
         self.inner.set_after(val);
         self
     }
-    pub fn after_comp(self, val: &StreamPaginationComparison) -> Self {
+    pub fn after_comp(self, val: StreamPaginationComparison) -> Self {
         self.inner.set_after_comp(val);
         self
     }
@@ -38367,16 +38014,11 @@ impl StreamVideosListParamsBuilder {
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StreamPaginationComparison {
-    #[wasm_bindgen(js_name = "eq")]
-    Eq,
-    #[wasm_bindgen(js_name = "gt")]
-    Gt,
-    #[wasm_bindgen(js_name = "gte")]
-    Gte,
-    #[wasm_bindgen(js_name = "lt")]
-    Lt,
-    #[wasm_bindgen(js_name = "lte")]
-    Lte,
+    Eq = "eq",
+    Gt = "gt",
+    Gte = "gte",
+    Lt = "lt",
+    Lte = "lte",
 }
 #[wasm_bindgen]
 extern "C" {
@@ -39203,28 +38845,17 @@ pub mod tail_stream {
     #[wasm_bindgen]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum EventOutcome {
-        #[wasm_bindgen(js_name = "ok")]
-        Ok,
-        #[wasm_bindgen(js_name = "canceled")]
-        Canceled,
-        #[wasm_bindgen(js_name = "exception")]
-        Exception,
-        #[wasm_bindgen(js_name = "unknown")]
-        Unknown,
-        #[wasm_bindgen(js_name = "killSwitch")]
-        KillSwitch,
-        #[wasm_bindgen(js_name = "daemonDown")]
-        DaemonDown,
-        #[wasm_bindgen(js_name = "exceededCpu")]
-        ExceededCpu,
-        #[wasm_bindgen(js_name = "exceededMemory")]
-        ExceededMemory,
-        #[wasm_bindgen(js_name = "loadShed")]
-        LoadShed,
-        #[wasm_bindgen(js_name = "responseStreamDisconnected")]
-        ResponseStreamDisconnected,
-        #[wasm_bindgen(js_name = "scriptNotFound")]
-        ScriptNotFound,
+        Ok = "ok",
+        Canceled = "canceled",
+        Exception = "exception",
+        Unknown = "unknown",
+        KillSwitch = "killSwitch",
+        DaemonDown = "daemonDown",
+        ExceededCpu = "exceededCpu",
+        ExceededMemory = "exceededMemory",
+        LoadShed = "loadShed",
+        ResponseStreamDisconnected = "responseStreamDisconnected",
+        ScriptNotFound = "scriptNotFound",
     }
     #[wasm_bindgen]
     extern "C" {
@@ -39687,26 +39318,18 @@ impl VectorizeErrorBuilder {
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VectorizeVectorMetadataFilterOp {
-    #[wasm_bindgen(js_name = "$eq")]
-    eq,
-    #[wasm_bindgen(js_name = "$ne")]
-    ne,
-    #[wasm_bindgen(js_name = "$lt")]
-    lt,
-    #[wasm_bindgen(js_name = "$lte")]
-    lte,
-    #[wasm_bindgen(js_name = "$gt")]
-    gt,
-    #[wasm_bindgen(js_name = "$gte")]
-    gte,
+    Eq = "$eq",
+    Ne = "$ne",
+    Lt = "$lt",
+    Lte = "$lte",
+    Gt = "$gt",
+    Gte = "$gte",
 }
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VectorizeVectorMetadataFilterCollectionOp {
-    #[wasm_bindgen(js_name = "$in")]
-    r#in,
-    #[wasm_bindgen(js_name = "$nin")]
-    nin,
+    In = "$in",
+    Nin = "$nin",
 }
 #[wasm_bindgen]
 extern "C" {
@@ -39717,22 +39340,16 @@ extern "C" {
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VectorizeDistanceMetric {
-    #[wasm_bindgen(js_name = "euclidean")]
-    Euclidean,
-    #[wasm_bindgen(js_name = "cosine")]
-    Cosine,
-    #[wasm_bindgen(js_name = "dot-product")]
-    DotProduct,
+    Euclidean = "euclidean",
+    Cosine = "cosine",
+    DotProduct = "dot-product",
 }
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VectorizeMetadataRetrievalLevel {
-    #[wasm_bindgen(js_name = "all")]
-    All,
-    #[wasm_bindgen(js_name = "indexed")]
-    Indexed,
-    #[wasm_bindgen(js_name = "none")]
-    None,
+    All = "all",
+    Indexed = "indexed",
+    None = "none",
 }
 #[wasm_bindgen]
 extern "C" {
@@ -39758,7 +39375,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "returnMetadata")]
     pub fn set_return_metadata_with_vectorize_metadata_retrieval_level(
         this: &VectorizeQueryOptions,
-        val: &VectorizeMetadataRetrievalLevel,
+        val: VectorizeMetadataRetrievalLevel,
     );
     #[wasm_bindgen(method, getter)]
     pub fn filter(this: &VectorizeQueryOptions) -> Option<VectorizeVectorMetadataFilter>;
@@ -39797,7 +39414,7 @@ impl VectorizeQueryOptionsBuilder {
     }
     pub fn return_metadata_with_vectorize_metadata_retrieval_level(
         self,
-        val: &VectorizeMetadataRetrievalLevel,
+        val: VectorizeMetadataRetrievalLevel,
     ) -> Self {
         self.inner
             .set_return_metadata_with_vectorize_metadata_retrieval_level(val);
@@ -39823,7 +39440,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn metric(this: &VectorizeIndexConfig) -> Option<VectorizeDistanceMetric>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_metric(this: &VectorizeIndexConfig, val: &VectorizeDistanceMetric);
+    pub fn set_metric(this: &VectorizeIndexConfig, val: VectorizeDistanceMetric);
     #[wasm_bindgen(method, getter)]
     pub fn preset(this: &VectorizeIndexConfig) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -39847,7 +39464,7 @@ impl VectorizeIndexConfigBuilder {
         self.inner.set_dimensions(val);
         self
     }
-    pub fn metric(self, val: &VectorizeDistanceMetric) -> Self {
+    pub fn metric(self, val: VectorizeDistanceMetric) -> Self {
         self.inner.set_metric(val);
         self
     }
@@ -40629,20 +40246,13 @@ extern "C" {
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WorkflowDurationLabel {
-    #[wasm_bindgen(js_name = "second")]
-    Second,
-    #[wasm_bindgen(js_name = "minute")]
-    Minute,
-    #[wasm_bindgen(js_name = "hour")]
-    Hour,
-    #[wasm_bindgen(js_name = "day")]
-    Day,
-    #[wasm_bindgen(js_name = "week")]
-    Week,
-    #[wasm_bindgen(js_name = "month")]
-    Month,
-    #[wasm_bindgen(js_name = "year")]
-    Year,
+    Second = "second",
+    Minute = "minute",
+    Hour = "hour",
+    Day = "day",
+    Week = "week",
+    Month = "month",
+    Year = "year",
 }
 #[allow(dead_code)]
 pub type WorkflowSleepDuration = JsValue;
@@ -41116,7 +40726,7 @@ pub enum ServiceTierKind {
 }
 #[wasm_bindgen]
 pub enum ToolChoiceKind {
-    ToolChoiceOptions(ToolChoiceOptions),
+    JsString(JsString),
     ToolChoiceFunction(ToolChoiceFunction),
 }
 #[wasm_bindgen]
@@ -41439,7 +41049,7 @@ pub enum CfAigSkipCacheKind {
 }
 #[wasm_bindgen]
 pub enum ProviderKind {
-    AiGatewayProviders(AIGatewayProviders),
+    JsString(JsString),
     String(String),
 }
 #[wasm_bindgen]
@@ -41558,7 +41168,7 @@ pub enum TlsClientAuthKind {
 }
 #[wasm_bindgen]
 pub enum CountryKind {
-    Iso3166Alpha2Code(Iso3166Alpha2Code),
+    JsString(JsString),
     T1 = "T1",
 }
 #[wasm_bindgen]
@@ -41730,7 +41340,7 @@ pub enum AttributeValueKind {
 #[wasm_bindgen]
 pub enum ReturnMetadataKind {
     Bool(bool),
-    VectorizeMetadataRetrievalLevel(VectorizeMetadataRetrievalLevel),
+    JsString(JsString),
 }
 #[wasm_bindgen]
 pub enum ValuesKind {

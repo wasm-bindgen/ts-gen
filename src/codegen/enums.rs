@@ -1,17 +1,19 @@
 //! Enum code generation: string enums and numeric enums.
 //!
-//! String enums use wasm_bindgen's native string enum support:
+//! String enums use wasm_bindgen's native string enum support, where each
+//! variant's JS value is its string discriminant:
 //!
 //! ```rust,ignore
 //! #[wasm_bindgen]
 //! #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 //! pub enum QueueContentType {
-//!     #[wasm_bindgen(js_name = "text")]
-//!     Text,
-//!     #[wasm_bindgen(js_name = "bytes")]
-//!     Bytes,
+//!     Text = "text",
+//!     Bytes = "bytes",
 //! }
 //! ```
+//!
+//! (wasm_bindgen doesn't accept a per-variant `#[wasm_bindgen(js_name = ...)]`
+//! attribute, which is why the value lives in the discriminant.)
 //!
 //! Numeric enums use `#[repr(u32)]` or `#[repr(i32)]` (selected based on
 //! discriminant values) with wasm_bindgen:
@@ -43,8 +45,7 @@ pub fn generate_string_enum(decl: &StringEnumDecl) -> TokenStream {
             let rust_name = super::typemap::make_ident(&v.rust_name);
             let js_value = &v.js_value;
             quote! {
-                #[wasm_bindgen(js_name = #js_value)]
-                #rust_name
+                #rust_name = #js_value
             }
         })
         .collect();

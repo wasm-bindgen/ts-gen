@@ -299,6 +299,10 @@ fn generate_dynamic_unions(cgctx: &CodegenContext) -> TokenStream {
         .values()
         .map(|info| {
             let enum_ident = typemap::make_ident(&info.rust_name);
+            // Resolve member references in the scope the union was
+            // synthesised from, not `root_scope` — a module-scoped enum
+            // isn't reachable from the root. See `DynamicUnionInfo::scope`.
+            let union_scope = info.scope;
             // Track variant names within a single enum so that a
             // `string` arm doesn't collide with another arm whose
             // payload also lowers to `String`. First-seen wins; the
@@ -322,6 +326,19 @@ fn generate_dynamic_unions(cgctx: &CodegenContext) -> TokenStream {
                 .members
                 .iter()
                 .map(|m| {
+                    // A string/numeric enum member can't be a union payload
+                    // directly: value enums don't implement `JsCast`. Substitute
+                    // the js_sys wrapper that carries the same FFI value
+                    // (`JsString` for string enums, `Number` for numeric ones).
+                    if let Some(kind) = m
+                        .as_ident()
+                        .and_then(|name| cgctx.value_enum_kind(name, union_scope))
+                    {
+                        let wrapper = kind.js_wrapper();
+                        let payload = typemap::make_ident(wrapper);
+                        let variant_ident = typemap::make_ident(&alloc_variant(wrapper));
+                        return quote! { #variant_ident(#payload) };
+                    }
                     match m {
                         // String / number / boolean literal members
                         // become string-discriminant / numeric-discriminant

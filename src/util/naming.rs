@@ -81,8 +81,13 @@ pub fn to_pascal_case(name: &str) -> String {
 /// Convert a string literal to a PascalCase enum variant name.
 /// Handles things like `"v8"` → `"V8"`, `"text"` → `"Text"`.
 pub fn to_enum_variant(s: &str) -> String {
-    // Special-case: if the string is all lowercase/digits, just PascalCase it
-    let pascal = s.to_case(Case::Pascal);
+    // Strip leading non-alphanumeric characters before PascalCasing. A leading
+    // symbol (such as the `$` in Vectorize's `$eq` / `$in` filter operators) stops
+    // `convert_case` from capitalizing the first word: `$eq` would come out as
+    // `eq`, and `$in` as `in`, which is also a keyword. Trimming gives `Eq` and
+    // `In`. Interior delimiters still work, so `dot-product` becomes `DotProduct`.
+    let trimmed = s.trim_start_matches(|c: char| !c.is_ascii_alphanumeric());
+    let pascal = trimmed.to_case(Case::Pascal);
     if pascal.is_empty() {
         "Empty".to_string()
     } else {
@@ -150,6 +155,22 @@ mod tests {
         assert_eq!(to_enum_variant("text"), "Text");
         assert_eq!(to_enum_variant("bytes"), "Bytes");
         assert_eq!(to_enum_variant("json"), "Json");
+        assert_eq!(to_enum_variant("v8"), "V8");
+        assert_eq!(to_enum_variant("dot-product"), "DotProduct");
+    }
+
+    #[test]
+    fn test_enum_variant_symbol_prefix() {
+        // Leading symbols (Vectorize's `$`-prefixed filter operators) are
+        // stripped so the first word capitalizes; `$in` also dodges the `in`
+        // keyword by becoming `In`.
+        assert_eq!(to_enum_variant("$eq"), "Eq");
+        assert_eq!(to_enum_variant("$ne"), "Ne");
+        assert_eq!(to_enum_variant("$lte"), "Lte");
+        assert_eq!(to_enum_variant("$in"), "In");
+        assert_eq!(to_enum_variant("$nin"), "Nin");
+        // All-symbol values still fall back to `Empty`.
+        assert_eq!(to_enum_variant("$"), "Empty");
     }
 
     #[test]
