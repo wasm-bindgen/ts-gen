@@ -62,7 +62,12 @@ pub struct GenerateOptions {
     /// trade-off is that JS code returning a non-Error throwable
     /// (e.g. `throw "oops"`) now produces a runtime conversion
     /// error rather than the silent `JsValue` pass-through.
-    pub errors_as_error: bool,
+    errors_as_error: bool,
+
+    /// Opt generic imports into wasm-bindgen's experimental
+    /// per-monomorphization codegen. Type parameters are emitted without
+    /// `JsGeneric` bounds and cross the ABI at their concrete Rust types.
+    experimental_generic_mono: bool,
 
     /// The output surface — the authoritative list of inputs (files /
     /// modules) whose declarations are emitted. The `--input` set
@@ -80,7 +85,32 @@ pub struct GenerateOptions {
     ///
     /// A module that is fully covered by `--external` is always
     /// suppressed from emission regardless of its presence here.
-    pub exports: HashSet<ExportSpec>,
+    exports: HashSet<ExportSpec>,
+}
+
+impl GenerateOptions {
+    /// Create code-generation options with the default behavior.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Configure whether untyped caught exceptions use `js_sys::Error`.
+    pub fn errors_as_error(mut self, enabled: bool) -> Self {
+        self.errors_as_error = enabled;
+        self
+    }
+
+    /// Configure wasm-bindgen's experimental per-monomorphization codegen.
+    pub fn experimental_generic_mono(mut self, enabled: bool) -> Self {
+        self.experimental_generic_mono = enabled;
+        self
+    }
+
+    /// Select the input files and modules emitted as public Rust code.
+    pub fn exports(mut self, exports: HashSet<ExportSpec>) -> Self {
+        self.exports = exports;
+        self
+    }
 }
 
 /// A single entry in [`GenerateOptions::exports`].
@@ -172,8 +202,13 @@ fn generate_tokens(
             ExportSpec::File(_) => None,
         })
         .collect();
-    let cgctx =
-        CodegenContext::from_module_full(module, gctx, options.errors_as_error, exported_modules);
+    let cgctx = CodegenContext::from_module_full(
+        module,
+        gctx,
+        options.errors_as_error,
+        options.experimental_generic_mono,
+        exported_modules,
+    );
 
     let preamble = quote! {
         #[allow(unused_imports)]

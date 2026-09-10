@@ -172,6 +172,9 @@ pub struct CodegenContext<'a> {
     /// `Error` rather than `JsValue`. See
     /// [`crate::codegen::GenerateOptions::errors_as_error`].
     pub errors_as_error: bool,
+    /// Whether generic imports use wasm-bindgen's experimental
+    /// per-monomorphization codegen rather than type erasure.
+    pub experimental_generic_mono: bool,
     /// JS module specifiers whose declarations are lifted into global
     /// scope. References to types from these modules emit without the
     /// `mod_name::` qualifier — they live alongside the global decls.
@@ -365,10 +368,27 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
 }
 
 impl<'a> CodegenContext<'a> {
+    /// Build the attribute for a generated extern block, including the
+    /// per-monomorphization opt-in when enabled.
+    pub(crate) fn extern_attr(
+        ctx: Option<&CodegenContext<'_>>,
+        module: Option<&str>,
+    ) -> TokenStream {
+        let per_mono = ctx.is_some_and(|ctx| ctx.experimental_generic_mono);
+        match (module, per_mono) {
+            (Some(module), true) => {
+                quote! { #[wasm_bindgen(module = #module, experimental_generic_mono)] }
+            }
+            (Some(module), false) => quote! { #[wasm_bindgen(module = #module)] },
+            (None, true) => quote! { #[wasm_bindgen(experimental_generic_mono)] },
+            (None, false) => quote! { #[wasm_bindgen] },
+        }
+    }
+
     /// Build a `CodegenContext` from a parsed IR module + global context.
     /// Used by tests and library callers that don't customise codegen.
     pub fn from_module(module: &ir::Module, gctx: &'a GlobalContext) -> Self {
-        Self::from_module_full(module, gctx, false, HashSet::new())
+        Self::from_module_full(module, gctx, false, false, HashSet::new())
     }
 
     /// Build a `CodegenContext` with the full set of per-codegen options
@@ -377,6 +397,7 @@ impl<'a> CodegenContext<'a> {
         module: &ir::Module,
         gctx: &'a GlobalContext,
         errors_as_error: bool,
+        experimental_generic_mono: bool,
         exported_modules: HashSet<String>,
     ) -> Self {
         // Pre-compute which `Module(spec)` groups are fully covered by
@@ -417,6 +438,7 @@ impl<'a> CodegenContext<'a> {
             diagnostics: RefCell::new(DiagnosticCollector::new()),
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
             errors_as_error,
+            experimental_generic_mono,
             exported_modules,
             externalised_modules,
             unresolved_module_refs: RefCell::new(HashSet::new()),
@@ -451,6 +473,7 @@ impl<'a> CodegenContext<'a> {
             diagnostics: RefCell::new(DiagnosticCollector::new()),
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
             errors_as_error: false,
+            experimental_generic_mono: false,
             exported_modules: HashSet::new(),
             externalised_modules: HashSet::new(),
             unresolved_module_refs: RefCell::new(HashSet::new()),
@@ -987,6 +1010,21 @@ pub fn to_syn_type(
             }
             if segments.len() == 1 && generic_args.is_empty() {
                 if let Some(c) = ctx {
+                    if c.experimental_generic_mono
+                        && matches!(
+                            c.gctx.scopes.resolve_binding(scope, &segments[0]),
+                            Some(crate::parse::scope::Binding::TypeParam),
+                        )
+                    {
+                        return lower_reference(
+                            segments,
+                            generic_args,
+                            pos,
+                            ctx,
+                            scope,
+                            from_module,
+                        );
+                    }
                     if let Some(target) = c.resolve_alias(&segments[0], scope) {
                         let target = target.clone();
                         return to_syn_type(&target, pos, ctx, scope, from_module);
@@ -1377,12 +1415,63 @@ fn lower_reference(
         }
         return base;
     }
-    let inner_pos = pos.to_inner();
     let arg_tokens: Vec<TokenStream> = generic_args
         .iter()
-        .map(|a| to_syn_type(a, inner_pos, ctx, scope, from_module))
+        .map(|a| {
+            if ctx.is_some_and(|c| c.experimental_generic_mono) {
+                to_mono_user_generic_arg(a, ctx, scope, from_module)
+            } else {
+                to_syn_type(a, pos.to_inner(), ctx, scope, from_module)
+            }
+        })
         .collect();
     quote! { #base<#(#arg_tokens),*> }
+}
+
+/// Lower an argument of a locally declared generic type in per-mono mode.
+/// Primitive leaves use their native Rust ABI, while built-in JS containers
+/// remain on the established inner-position wrapper mapping.
+fn to_mono_user_generic_arg(
+    ty: &TypeRef,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+) -> TokenStream {
+    match ty {
+        TypeRef::Boolean
+        | TypeRef::BooleanLiteral(_)
+        | TypeRef::Number
+        | TypeRef::NumberLiteral(_)
+        | TypeRef::String
+        | TypeRef::StringLiteral(_) => {
+            to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module)
+        }
+        TypeRef::Nullable(inner) => {
+            let inner = to_mono_user_generic_arg(inner, ctx, scope, from_module);
+            quote! { Option<#inner> }
+        }
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } if segments.len() == 1
+            && !generic_args.is_empty()
+            && ctx.is_some_and(|c| {
+                c.local_type_param_counts
+                    .get(&segments[0])
+                    .is_some_and(|count| *count > 0)
+            }) =>
+        {
+            to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module)
+        }
+        TypeRef::Union(members) => {
+            if let Some(lub) = crate::codegen::subtyping::lub_union(members, ctx, scope) {
+                to_mono_user_generic_arg(&lub, ctx, scope, from_module)
+            } else {
+                to_syn_type(ty, TypePosition::RETURN.to_inner(), ctx, scope, from_module)
+            }
+        }
+        _ => to_syn_type(ty, TypePosition::RETURN.to_inner(), ctx, scope, from_module),
+    }
 }
 
 /// Create a `syn::Ident`, sanitizing invalid characters and escaping keywords.
@@ -1425,6 +1514,7 @@ pub fn to_return_type(
     ty: &TypeRef,
     catch: bool,
     is_async: bool,
+    js_string_return: bool,
     error_ty: Option<&TypeRef>,
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
@@ -1442,7 +1532,14 @@ pub fn to_return_type(
     //
     // Top-level (non-`is_async`) returns also participate in
     // dynamic-union synthesis — see [`maybe_synthesise_return_union`].
-    let inner = if !is_async {
+    let mono_native_return = is_async
+        && ctx.is_some_and(|c| {
+            c.experimental_generic_mono && is_mono_native_return_shape(ty, c, scope)
+        });
+    let inner = if js_string_return {
+        let ctx = ctx.expect("_js_string returns require a codegen context");
+        to_mono_js_string_return_type(ty, ctx, scope, from_module)
+    } else if !is_async || mono_native_return {
         match maybe_synthesise_return_union(ty, ctx, scope, anchor) {
             Some(tokens) => tokens,
             None => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
@@ -1460,6 +1557,185 @@ pub fn to_return_type(
     } else {
         inner
     }
+}
+
+/// Whether an async per-monomorphization return should keep Rust-native
+/// lowering instead of using the wrapper-only mapping required inside
+/// built-in JS containers.
+fn is_mono_native_return_shape(ty: &TypeRef, ctx: &CodegenContext<'_>, scope: ScopeId) -> bool {
+    is_mono_native_return_shape_impl(ty, ctx, scope, &mut HashSet::new())
+}
+
+fn is_mono_native_return_shape_impl(
+    ty: &TypeRef,
+    ctx: &CodegenContext<'_>,
+    scope: ScopeId,
+    visited_aliases: &mut HashSet<String>,
+) -> bool {
+    match ty {
+        TypeRef::Boolean
+        | TypeRef::BooleanLiteral(_)
+        | TypeRef::Number
+        | TypeRef::NumberLiteral(_)
+        | TypeRef::String
+        | TypeRef::StringLiteral(_) => true,
+        TypeRef::Nullable(inner) => {
+            is_mono_native_return_shape_impl(inner, ctx, scope, visited_aliases)
+        }
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } if segments.len() == 1 && generic_args.is_empty() => {
+            let name = &segments[0];
+            visited_aliases.insert(name.clone())
+                && ctx.resolve_alias(name, scope).is_some_and(|target| {
+                    is_mono_native_return_shape_impl(target, ctx, scope, visited_aliases)
+                })
+        }
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } => {
+            segments.len() == 1
+                && !generic_args.is_empty()
+                && ctx
+                    .local_type_param_counts
+                    .get(&segments[0])
+                    .is_some_and(|count| *count > 0)
+        }
+        TypeRef::Union(members) => crate::codegen::subtyping::lub_union(members, Some(ctx), scope)
+            .is_some_and(|lub| is_mono_native_return_shape_impl(&lub, ctx, scope, visited_aliases)),
+        _ => false,
+    }
+}
+
+/// Whether a return has an eligible string leaf for a `_js_string` variant.
+/// Traversal enters aliases, locally declared generic types, and nullable
+/// wrappers, but intentionally stops at built-in JS containers, callbacks,
+/// and tuples.
+pub fn has_mono_js_string_return(ty: &TypeRef, ctx: &CodegenContext<'_>, scope: ScopeId) -> bool {
+    has_mono_js_string_return_impl(ty, ctx, scope, &mut HashSet::new())
+}
+
+fn has_mono_js_string_return_impl(
+    ty: &TypeRef,
+    ctx: &CodegenContext<'_>,
+    scope: ScopeId,
+    visited_aliases: &mut HashSet<String>,
+) -> bool {
+    match ty {
+        TypeRef::String | TypeRef::StringLiteral(_) => true,
+        TypeRef::Nullable(inner) => {
+            has_mono_js_string_return_impl(inner, ctx, scope, visited_aliases)
+        }
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } if segments.len() == 1 && generic_args.is_empty() => {
+            let name = &segments[0];
+            visited_aliases.insert(name.clone())
+                && ctx.resolve_alias(name, scope).is_some_and(|target| {
+                    has_mono_js_string_return_impl(target, ctx, scope, visited_aliases)
+                })
+        }
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } if segments.len() == 1
+            && !generic_args.is_empty()
+            && ctx
+                .local_type_param_counts
+                .get(&segments[0])
+                .is_some_and(|count| *count > 0) =>
+        {
+            generic_args
+                .iter()
+                .any(|arg| has_mono_js_string_return_impl(arg, ctx, scope, visited_aliases))
+        }
+        _ => false,
+    }
+}
+
+/// Lower the original TypeScript return while replacing only the eligible
+/// string leaves with `JsString`. This consumes the explicit signature marker
+/// rather than smuggling a synthetic `TypeRef::Reference("JsString")` through
+/// normal name resolution, where a user declaration could shadow it.
+fn to_mono_js_string_return_type(
+    ty: &TypeRef,
+    ctx: &CodegenContext<'_>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+) -> TokenStream {
+    to_mono_js_string_return_type_impl(ty, ctx, scope, from_module, &mut HashSet::new())
+}
+
+fn to_mono_js_string_return_type_impl(
+    ty: &TypeRef,
+    ctx: &CodegenContext<'_>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+    visited_aliases: &mut HashSet<String>,
+) -> TokenStream {
+    match ty {
+        TypeRef::String | TypeRef::StringLiteral(_) => quote! { JsString },
+        TypeRef::Nullable(inner) => {
+            let inner =
+                to_mono_js_string_return_type_impl(inner, ctx, scope, from_module, visited_aliases);
+            quote! { Option<#inner> }
+        }
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } if segments.len() == 1 && generic_args.is_empty() => {
+            let name = &segments[0];
+            if visited_aliases.insert(name.clone()) {
+                if let Some(target) = ctx.resolve_alias(name, scope) {
+                    return to_mono_js_string_return_type_impl(
+                        target,
+                        ctx,
+                        scope,
+                        from_module,
+                        visited_aliases,
+                    );
+                }
+            }
+            to_syn_type(ty, TypePosition::RETURN, Some(ctx), scope, from_module)
+        }
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } if segments.len() == 1
+            && !generic_args.is_empty()
+            && ctx
+                .local_type_param_counts
+                .get(&segments[0])
+                .is_some_and(|count| *count > 0) =>
+        {
+            let base = named_type_to_rust(&segments[0], Some(ctx), from_module);
+            let args = generic_args
+                .iter()
+                .map(|arg| {
+                    if has_mono_js_string_return(arg, ctx, scope) {
+                        to_mono_js_string_return_type(arg, ctx, scope, from_module)
+                    } else {
+                        to_mono_user_generic_arg(arg, Some(ctx), scope, from_module)
+                    }
+                })
+                .collect::<Vec<_>>();
+            quote! { #base<#(#args),*> }
+        }
+        _ => to_syn_type(ty, TypePosition::RETURN, Some(ctx), scope, from_module),
+    }
+}
+
+/// Lower an additive `_js_string` getter variant from its original source type.
+pub fn to_js_string_getter_return_type(
+    ty: &TypeRef,
+    ctx: &CodegenContext<'_>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+) -> TokenStream {
+    to_mono_js_string_return_type(ty, ctx, scope, from_module)
 }
 
 /// The default error type used when a fallible binding has no
@@ -2052,6 +2328,7 @@ mod tests {
         let result = to_return_type(
             &ty,
             true,
+            false,
             false,
             None,
             None,

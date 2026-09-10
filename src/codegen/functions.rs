@@ -4,8 +4,8 @@ use proc_macro2::TokenStream;
 use quote::quote;
 
 use crate::codegen::signatures::{
-    build_signatures, generate_concrete_params, is_void_return, CallableSpec, FunctionSignature,
-    SignatureKind,
+    build_signatures, generate_concrete_params_with_mono_strings, is_void_return,
+    render_generic_bounds, CallableSpec, FunctionSignature, SignatureKind,
 };
 use crate::codegen::typemap::{to_return_type, to_syn_type, CodegenContext, TypePosition};
 use crate::parse::scope::ScopeId;
@@ -84,11 +84,12 @@ fn generate_expanded_free_function(
     // directly so `T` references lower to a bare ident.
     let scope = sig.body_scope;
     let rust_ident = super::typemap::make_ident(&sig.rust_name);
-    let params = generate_concrete_params(&sig.params, cgctx, scope, ctx);
+    let params = generate_concrete_params_with_mono_strings(&sig.params, cgctx, scope, ctx);
     let ret_ty = to_return_type(
         &sig.return_type,
         sig.catch,
         sig.is_async,
+        sig.js_string_return,
         sig.error_type.as_ref(),
         cgctx,
         scope,
@@ -141,12 +142,13 @@ fn generate_expanded_free_function(
         quote! {}
     };
 
-    let wb_extern_attr = match ctx {
-        ModuleContext::Module(m) => quote! { #[wasm_bindgen(module = #m)] },
-        ModuleContext::Global => quote! { #[wasm_bindgen] },
+    let module = match ctx {
+        ModuleContext::Module(module) => Some(module.as_ref()),
+        ModuleContext::Global => None,
     };
+    let wb_extern_attr = CodegenContext::extern_attr(cgctx, module);
 
-    let generics = generic_params_for_function(sig, cgctx);
+    let generics = render_generic_bounds(&generic_bounds_for_function(sig, cgctx));
 
     quote! {
         #wb_extern_attr
@@ -163,12 +165,12 @@ fn generate_expanded_free_function(
 /// referenced. Walks the params + return type and consults the
 /// signature's `body_scope` to pick out names that bind as
 /// [`crate::parse::scope::Binding::TypeParam`].
-fn generic_params_for_function(
+fn generic_bounds_for_function(
     sig: &FunctionSignature,
     cgctx: Option<&CodegenContext<'_>>,
-) -> TokenStream {
+) -> Vec<TokenStream> {
     let Some(cgctx) = cgctx else {
-        return quote! {};
+        return Vec::new();
     };
     let mut names: Vec<String> = Vec::new();
     for p in &sig.params {
@@ -176,13 +178,20 @@ fn generic_params_for_function(
     }
     super::signatures::collect_type_params(&sig.return_type, cgctx, sig.body_scope, &mut names);
     if names.is_empty() {
-        return quote! {};
+        return Vec::new();
     }
     let idents = names
         .iter()
         .map(|n| super::typemap::make_ident(n))
         .collect::<Vec<_>>();
-    quote! { <#(#idents: ::wasm_bindgen::JsGeneric),*> }
+    if cgctx.experimental_generic_mono {
+        idents.into_iter().map(|ident| quote! { #ident }).collect()
+    } else {
+        idents
+            .into_iter()
+            .map(|ident| quote! { #ident: ::wasm_bindgen::JsGeneric })
+            .collect()
+    }
 }
 
 /// Generate a wasm_bindgen extern block for a global constant/variable.
@@ -209,10 +218,11 @@ pub fn generate_variable(
 
     let wb_attr = quote! { #[wasm_bindgen(#(#wb_parts),*)] };
 
-    let wb_extern_attr = match ctx {
-        ModuleContext::Module(m) => quote! { #[wasm_bindgen(module = #m)] },
-        ModuleContext::Global => quote! { #[wasm_bindgen] },
+    let module = match ctx {
+        ModuleContext::Module(module) => Some(module.as_ref()),
+        ModuleContext::Global => None,
     };
+    let wb_extern_attr = CodegenContext::extern_attr(cgctx, module);
 
     quote! {
         #wb_extern_attr

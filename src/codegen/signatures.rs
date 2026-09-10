@@ -225,6 +225,10 @@ pub struct FunctionSignature {
     pub is_async: bool,
     /// Return type (already Promise-unwrapped when `is_async`).
     pub return_type: TypeRef,
+    /// Lower eligible string leaves to `JsString` for the additive
+    /// `_js_string` variant. Keeping this as metadata avoids representing a
+    /// codegen-only choice as a user-resolvable [`TypeRef::Reference`].
+    pub js_string_return: bool,
     /// Custom error type for the `Result` wrapper. `None` falls back to
     /// `JsValue` in [`to_return_type`].
     pub error_type: Option<TypeRef>,
@@ -485,7 +489,13 @@ pub fn build_signatures(
     let augmented_doc = spec.doc.clone();
 
     let allow_try = !is_async && !nothrow && spec.kind.allows_try_variant();
-    let mut out = Vec::with_capacity(expansions.len() * if allow_try { 2 } else { 1 });
+    let per_mono = cgctx.is_some_and(|ctx| ctx.experimental_generic_mono);
+    let variants_per_expansion = match (allow_try, per_mono) {
+        (true, true) => 4,
+        (true, false) | (false, true) => 2,
+        (false, false) => 1,
+    };
+    let mut out = Vec::with_capacity(expansions.len() * variants_per_expansion);
 
     for exp in expansions {
         let primary_candidate = public_rust_name(&format!("{base}{}", exp.name_suffix));
@@ -495,13 +505,14 @@ pub fn build_signatures(
         // * the kind always catches (constructors), OR
         // * it's async — *unless* `Throws::Never` opts out.
         let primary_catches = spec.kind.always_catches() || (is_async && !nothrow);
-        out.push(FunctionSignature {
+        let primary = FunctionSignature {
             rust_name: primary_name.clone(),
             js_name: spec.js_name.to_string(),
             params: exp.params.clone(),
             catch: primary_catches,
             is_async,
             return_type: return_type.clone(),
+            js_string_return: false,
             error_type: if primary_catches {
                 error_type.cloned()
             } else {
@@ -509,25 +520,48 @@ pub fn build_signatures(
             },
             doc: augmented_doc.clone(),
             body_scope: spec.body_scope,
-        });
+        };
+        push_with_js_string_return(&mut out, primary, used_names, cgctx, scope);
 
         if allow_try {
             let try_name = dedupe_name(&format!("try_{primary_name}"), used_names);
-            out.push(FunctionSignature {
+            let try_sig = FunctionSignature {
                 rust_name: try_name,
                 js_name: spec.js_name.to_string(),
                 params: exp.params,
                 catch: true,
                 is_async: false,
                 return_type: return_type.clone(),
+                js_string_return: false,
                 error_type: error_type.cloned(),
                 doc: augmented_doc.clone(),
                 body_scope: spec.body_scope,
-            });
+            };
+            push_with_js_string_return(&mut out, try_sig, used_names, cgctx, scope);
         }
     }
 
     out
+}
+
+fn push_with_js_string_return(
+    out: &mut Vec<FunctionSignature>,
+    sig: FunctionSignature,
+    used_names: &mut HashSet<String>,
+    cgctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) {
+    let has_js_return = cgctx.is_some_and(|ctx| {
+        ctx.experimental_generic_mono
+            && typemap::has_mono_js_string_return(&sig.return_type, ctx, scope)
+    });
+    out.push(sig.clone());
+    if has_js_return {
+        let mut js_sig = sig;
+        js_sig.rust_name = dedupe_name(&format!("{}_js_string", js_sig.rust_name), used_names);
+        js_sig.js_string_return = true;
+        out.push(js_sig);
+    }
 }
 
 /// Compute `_with_X` / `_with_X_and_Y` suffixes across a cohort of expanded
@@ -1229,6 +1263,57 @@ pub fn generate_concrete_params(
     quote! { #(#items),* }
 }
 
+/// Convert parameters while making each direct string position an inferred
+/// `impl JsStringLike` in per-monomorphization mode.
+pub fn generate_concrete_params_with_mono_strings(
+    params: &[ConcreteParam],
+    cgctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &crate::ir::ModuleContext,
+) -> TokenStream {
+    let per_mono = cgctx.is_some_and(|ctx| ctx.experimental_generic_mono);
+    if !per_mono {
+        return generate_concrete_params(params, cgctx, scope, from_module);
+    }
+
+    let items = params
+        .iter()
+        .map(|param| {
+            let name = typemap::make_ident(&param.name);
+            let ty = if param.variadic {
+                quote! { &[JsValue] }
+            } else if let Some(ty) = mono_string_argument_type(&param.type_ref) {
+                ty
+            } else {
+                typemap::to_syn_type(
+                    &param.type_ref,
+                    TypePosition::ARGUMENT,
+                    cgctx,
+                    scope,
+                    from_module,
+                )
+            };
+            quote! { #name: #ty }
+        })
+        .collect::<Vec<_>>();
+
+    quote! { #(#items),* }
+}
+
+fn mono_string_argument_type(ty: &TypeRef) -> Option<TokenStream> {
+    match ty {
+        TypeRef::String | TypeRef::StringLiteral(_) => {
+            Some(quote! { impl ::wasm_bindgen::JsStringLike })
+        }
+        TypeRef::Nullable(inner)
+            if matches!(inner.as_ref(), TypeRef::String | TypeRef::StringLiteral(_)) =>
+        {
+            Some(quote! { Option<impl ::wasm_bindgen::JsStringLike> })
+        }
+        _ => None,
+    }
+}
+
 /// Convert dictionary factory params to a `(bounds, params)` token-stream pair.
 ///
 /// `ArrayBufferView` switches the helper into a generic signature
@@ -1237,16 +1322,21 @@ pub fn generate_concrete_params(
 /// casts. All other types pass through `generate_concrete_params`.
 ///
 /// Returns each synthesised ABV bound as a separate `TokenStream` (e.g.
-/// `T: ::js_sys::TypedArray`). Callers compose these with type-level
-/// generic bounds (`T: ::wasm_bindgen::JsGeneric`) via
-/// [`render_generic_bounds`] so a single `<...>` declaration carries
-/// every bound the `fn` needs.
+/// `T: ::js_sys::TypedArray`), a helper-only `where` clause, and the rendered
+/// parameters. Callers compose the declarations with type-level generic bounds
+/// (`T: ::wasm_bindgen::JsGeneric`) via [`render_generic_bounds`] so a single
+/// `<...>` declaration carries every bound the `fn` needs.
+///
+/// Under per-monomorphization codegen, ordinary Rust helpers that call an
+/// imported `&T` parameter must repeat the macro-generated reference ABI bound.
+/// Extern declarations ignore the returned clause because wasm-bindgen adds
+/// that requirement to their generated call shim itself.
 pub fn generate_dictionary_params(
     params: &[ConcreteParam],
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
     from_module: &crate::ir::ModuleContext,
-) -> (Vec<TokenStream>, TokenStream) {
+) -> (Vec<TokenStream>, TokenStream, TokenStream) {
     let mut generic_idents: Vec<syn::Ident> = Vec::new();
     let items: Vec<_> = params
         .iter()
@@ -1261,6 +1351,11 @@ pub fn generate_dictionary_params(
                 );
                 generic_idents.push(g.clone());
                 quote! { &#g }
+            } else if let Some(ty) = cgctx
+                .filter(|ctx| ctx.experimental_generic_mono)
+                .and_then(|_| mono_string_argument_type(&p.type_ref))
+            {
+                ty
             } else {
                 typemap::to_syn_type(
                     &p.type_ref,
@@ -1274,12 +1369,24 @@ pub fn generate_dictionary_params(
         })
         .collect();
 
-    let bounds: Vec<TokenStream> = generic_idents
+    let bounds = generic_idents
         .iter()
         .map(|g| quote! { #g: ::js_sys::TypedArray })
-        .collect();
+        .collect::<Vec<_>>();
 
-    (bounds, quote! { #(#items),* })
+    // This must mirror wasm-bindgen's macro-generated import-shim bound: the
+    // ordinary Rust dictionary helper calls that shim with `&T` directly.
+    let helper_where_clause =
+        if cgctx.is_some_and(|ctx| ctx.experimental_generic_mono) && !generic_idents.is_empty() {
+            quote! {
+                where
+                    #(for<'__wbg> &'__wbg #generic_idents: ::wasm_bindgen::convert::IntoWasmAbi),*
+            }
+        } else {
+            quote! {}
+        };
+
+    (bounds, helper_where_clause, quote! { #(#items),* })
 }
 
 /// Wrap a list of `<T: Bound>` token streams into a `<T: Bound, U: Bound>`
@@ -1321,6 +1428,23 @@ mod tests {
 
     fn no_used() -> HashSet<String> {
         HashSet::new()
+    }
+
+    #[test]
+    fn mono_strings_use_anonymous_impl_trait() {
+        assert_eq!(
+            mono_string_argument_type(&TypeRef::String)
+                .unwrap()
+                .to_string(),
+            "impl :: wasm_bindgen :: JsStringLike"
+        );
+        assert_eq!(
+            mono_string_argument_type(&TypeRef::Nullable(Box::new(TypeRef::String)))
+                .unwrap()
+                .to_string(),
+            "Option < impl :: wasm_bindgen :: JsStringLike >"
+        );
+        assert!(mono_string_argument_type(&TypeRef::Number).is_none());
     }
 
     /// Create a GlobalContext + scope + CodegenContext for tests.

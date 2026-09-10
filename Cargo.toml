@@ -10,11 +10,13 @@ resolver = "2"
 [workspace.dependencies]
 ts-gen = { path = "." }
 
-# wasm-bindgen ecosystem — used by crates/wasm-bindgen-tests.
-js-sys = "0.3"
-wasm-bindgen = "0.2.121"
-wasm-bindgen-futures = "0.4"
-wasm-bindgen-test = "0.3"
+# wasm-bindgen ecosystem — used by integration-tests.
+# Companion crates version independently but in lockstep with wasm-bindgen:
+# js-sys 0.3.105, futures 0.4.78, and test 0.3.78 all pair with 0.2.128.
+js-sys = "0.3.105"
+wasm-bindgen = "0.2.128"
+wasm-bindgen-futures = "0.4.78"
+wasm-bindgen-test = "0.3.78"
 
 [package]
 categories = ["wasm", "development-tools::ffi"]

@@ -1068,6 +1068,79 @@ pub fn put<T: ::wasm_bindgen::JsGeneric>(this: &KeyValueStore, key: &str, value:
 pub fn get<T: ::wasm_bindgen::JsGeneric>(this: &KeyValueStore, key: &str) -> Option<T>;
 ```
 
+Passing `--experimental-generic-mono` selects wasm-bindgen's experimental
+per-monomorphization path. Every generated extern block receives
+`experimental_generic_mono`, type parameters omit the `JsGeneric` bound, and
+bare type-parameter arguments are passed by value so each concrete Rust type
+uses its native ABI representation:
+
+```rust
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    pub fn identity<T>(value: T) -> T;
+}
+```
+
+Generated dictionary helpers call their extern setters from ordinary Rust, so
+their type parameters carry the narrower ABI bound required at those call
+sites. The extern declarations themselves remain unconstrained:
+
+```rust
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> EvaluationDetails<T> { /* … */ }
+pub struct EvaluationDetailsBuilder<T> { /* … */ }
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> EvaluationDetailsBuilder<T> { /* … */ }
+```
+
+The ABI bound stays on helper `impl` blocks whose methods call generated
+setters. It is not attached to the builder struct itself, so merely storing or
+returning a builder does not constrain its type parameter.
+
+Array-buffer-view helper parameters retain their `TypedArray` widening bound.
+In per-monomorphization mode the helper also repeats the reference ABI bound
+that wasm-bindgen places on the generated import shim:
+
+```rust
+pub fn new<T: ::js_sys::TypedArray>(value: &T) -> TypedArrayOptions
+where
+    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+{ /* … */ }
+```
+
+Concrete primitive arguments to locally declared generic types use native Rust
+ABIs in this mode: `Details<boolean>`, `Details<number>`, and `Details<string>`
+become `Details<bool>`, `Details<f64>`, and `Details<String>`. This native-leaf
+rule is deliberately limited to user declarations. Built-in JS containers,
+tuples, iterators, and callbacks retain their established wrapper elements
+(`Array<JsString>`, `Map<JsString, JsString>`, and so on).
+
+Direct string arguments use argument-position `impl JsStringLike`, allowing
+`&str`, `String`, `&JsString`, and `JsString` without caller-side conversion.
+Each occurrence is an independent anonymous type parameter, so different
+string arguments may use different representations without generated names
+that could shadow source declarations. String returns remain concrete and get
+one additive zero-copy variant bound to the same JS name:
+
+```rust
+pub fn value(default_value: impl ::wasm_bindgen::JsStringLike) -> String;
+#[wasm_bindgen(js_name = "value")]
+pub fn value_js_string(default_value: impl ::wasm_bindgen::JsStringLike) -> JsString;
+```
+
+The return transform preserves nullable, fallible, and locally declared
+generic wrappers. If a return has multiple eligible string leaves, one
+`_js_string` method replaces all of them rather than generating a Cartesian
+set of variants.
+
+Async primitive returns also use native Rust values in this mode. Thus
+`Promise<string>`, `Promise<number>`, and `Promise<boolean>` become
+`Result<String, _>`, `Result<f64, _>`, and `Result<bool, _>` respectively;
+without the flag they retain the established `JsString`, `Number`, and
+`Boolean` wrapper returns.
+
+This can increase code size because wasm-bindgen generates a separate shim and
+descriptor for every instantiation. The option is experimental and tracks the
+upstream attribute of the same name.
+
 Parse-time, every type-parameter-bearing declaration (class,
 interface, type alias, method, function, namespace) creates a child
 **body scope** with its `<T, ...>` bound as

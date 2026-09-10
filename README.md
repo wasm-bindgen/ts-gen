@@ -56,6 +56,13 @@ ts-gen --input types.d.ts --output src/bindings.rs \
   --external "node:buffer=node_buffer_sys"
 ```
 
+Opt generic imports into wasm-bindgen's experimental per-monomorphization
+codegen:
+
+```sh
+ts-gen --input types.d.ts --output src/bindings.rs --experimental-generic-mono
+```
+
 ### Library API
 
 ```rust
@@ -82,13 +89,13 @@ println!("{rust_code}");
 - Type aliases
 - Namespaces
 - Module declarations
-- Generics (partial -- type parameters are erased to their base types)
+- Generics (`JsGeneric` erasure by default, with experimental
+  per-monomorphization support)
 
 ## Known limitations
 
-- **Generic type arguments** are not yet preserved in codegen; generic types
-  emit their base name only. This will improve as `wasm-bindgen` generic
-  support matures.
+- **External generic type arguments** are not preserved unless the target is a
+  recognized `js_sys` container; locally declared generic types keep theirs.
 - The parsed IR uses `Rc<str>` internally and is `!Send` / `!Sync`.
 
 ## License

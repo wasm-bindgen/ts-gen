@@ -28,9 +28,9 @@ use quote::quote;
 use std::collections::HashMap;
 
 use crate::codegen::signatures::{
-    build_signatures, dedupe_name, generate_concrete_params, generate_dictionary_params,
-    is_void_return, public_rust_name, render_generic_bounds, CallableSpec, ConcreteParam,
-    FunctionSignature, SignatureKind,
+    build_signatures, dedupe_name, generate_concrete_params_with_mono_strings,
+    generate_dictionary_params, is_void_return, public_rust_name, render_generic_bounds,
+    CallableSpec, ConcreteParam, FunctionSignature, SignatureKind,
 };
 use crate::codegen::typemap::{to_return_type, CodegenContext, TypePosition};
 use crate::ir::{
@@ -173,6 +173,25 @@ impl<'a> ClassConfig<'a> {
         render_generic_bounds(&self.type_param_bounds())
     }
 
+    /// Generic declaration for Rust helper impls and builder structs. The
+    /// erased path keeps the extern declaration's `JsGeneric` bound. The
+    /// per-monomorphization path instead needs `IntoWasmAbi` because helper
+    /// bodies call generated setters with values of these types.
+    fn helper_generics_decl(&self) -> TokenStream {
+        if !self.cgctx.is_some_and(|ctx| ctx.experimental_generic_mono) {
+            return self.type_generics_decl();
+        }
+        let bounds = self
+            .type_params
+            .iter()
+            .map(|tp| {
+                let ident = super::typemap::make_ident(&tp.name);
+                quote! { #ident: ::wasm_bindgen::convert::IntoWasmAbi }
+            })
+            .collect::<Vec<_>>();
+        render_generic_bounds(&bounds)
+    }
+
     /// Tokens for the type's generic-argument list (`<T, …>`) used in
     /// `this: &Type<T, …>` references inside the extern block. Empty
     /// when there are no parameters.
@@ -194,11 +213,16 @@ impl<'a> ClassConfig<'a> {
     /// signature types) and ABV widening bounds (`<Tn: TypedArray>`)
     /// into a single `<...>` declaration on each emitted `fn`.
     fn type_param_bounds(&self) -> Vec<TokenStream> {
+        let per_mono = self.cgctx.is_some_and(|ctx| ctx.experimental_generic_mono);
         self.type_params
             .iter()
             .map(|tp| {
                 let ident = super::typemap::make_ident(&tp.name);
-                quote! { #ident: ::wasm_bindgen::JsGeneric }
+                if per_mono {
+                    quote! { #ident }
+                } else {
+                    quote! { #ident: ::wasm_bindgen::JsGeneric }
+                }
             })
             .collect()
     }
@@ -227,7 +251,11 @@ impl<'a> ClassConfig<'a> {
             .filter(|n| !type_level.contains(n.as_str()))
             .map(|n| {
                 let ident = super::typemap::make_ident(&n);
-                quote! { #ident: ::wasm_bindgen::JsGeneric }
+                if cgctx.experimental_generic_mono {
+                    quote! { #ident }
+                } else {
+                    quote! { #ident: ::wasm_bindgen::JsGeneric }
+                }
             })
             .collect()
     }
@@ -376,7 +404,8 @@ pub(crate) fn generate_dictionary_factory_with_passes(
     // for non-generic dictionaries, in which case `quote!`
     // interpolation leaves the bare identifier intact.
     let type_args = config.type_generics_args();
-    let type_decl = config.type_generics_decl();
+    let type_decl = config.helper_generics_decl();
+    let builder_struct_decl = config.type_generics_decl();
     let rust_type = quote! { #rust_type_ident #type_args };
     let builder_name = quote! { #builder_name_ident #type_args };
 
@@ -835,7 +864,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 continue;
             }
             let new_ident = super::typemap::make_ident(&format!("new{full_suffix}"));
-            let (abv_bounds, params_tokens) = generate_dictionary_params(
+            let (abv_bounds, helper_where_clause, params_tokens) = generate_dictionary_params(
                 &plan.value_params,
                 config.cgctx,
                 config.scope,
@@ -914,13 +943,17 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 let builder_ident = super::typemap::make_ident(&format!("builder{full_suffix}"));
                 builder_variants.push(quote! {
                     #doc_attr
-                    pub fn #builder_ident #generics (#params_tokens) -> #builder_name {
+                    pub fn #builder_ident #generics (#params_tokens) -> #builder_name
+                    #helper_where_clause
+                    {
                         #builder_body
                     }
                 });
                 new_variants.push(quote! {
                     #doc_attr
-                    pub fn #new_ident #generics (#params_tokens) -> #rust_type {
+                    pub fn #new_ident #generics (#params_tokens) -> #rust_type
+                    #helper_where_clause
+                    {
                         Self::#builder_ident(#(#arg_idents),*).build()
                     }
                 });
@@ -944,7 +977,9 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 };
                 new_variants.push(quote! {
                     #doc_attr
-                    pub fn #new_ident #generics (#params_tokens) -> #rust_type {
+                    pub fn #new_ident #generics (#params_tokens) -> #rust_type
+                    #helper_where_clause
+                    {
                         #body
                     }
                 });
@@ -962,7 +997,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             let builder_method_name = public_rust_name(builder_method_name);
             let method_ident = super::typemap::make_ident(&builder_method_name);
             let setter_ident = super::typemap::make_ident(&sig.rust_name);
-            let params = generate_concrete_params(
+            let params = generate_concrete_params_with_mono_strings(
                 &sig.params,
                 config.cgctx,
                 config.scope,
@@ -974,7 +1009,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 .map(|p| super::typemap::make_ident(&p.name))
                 .collect();
             builder_methods.push(quote! {
-                pub fn #method_ident(self, #params) -> Self {
+                pub fn #method_ident (self, #params) -> Self {
                     self.inner.#setter_ident(#(#param_idents),*);
                     self
                 }
@@ -989,7 +1024,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 #(#builder_variants)*
             }
 
-            pub struct #builder_name_ident #type_decl {
+            pub struct #builder_name_ident #builder_struct_decl {
                 inner: #rust_type,
             }
 
@@ -1089,7 +1124,21 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                     .first()
                     .map(|c| &c.throws)
                     .unwrap_or(&empty_throws);
-                let return_type = TypeRef::ident(config.rust_name.clone());
+                let per_mono = config
+                    .cgctx
+                    .is_some_and(|ctx| ctx.experimental_generic_mono);
+                let return_type = if per_mono && !config.type_params.is_empty() {
+                    TypeRef::generic(
+                        config.rust_name.clone(),
+                        config
+                            .type_params
+                            .iter()
+                            .map(|tp| TypeRef::ident(tp.name.clone()))
+                            .collect(),
+                    )
+                } else {
+                    TypeRef::ident(config.rust_name.clone())
+                };
                 let sigs = build_signatures(
                     &CallableSpec {
                         js_name: &config.js_name,
@@ -1194,10 +1243,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
     }
 
     // Build the extern block with optional module attribute
-    let wb_extern_attr = match &config.module {
-        Some(m) => quote! { #[wasm_bindgen(module = #m)] },
-        None => quote! { #[wasm_bindgen] },
-    };
+    let wb_extern_attr = CodegenContext::extern_attr(config.cgctx, config.module.as_deref());
 
     // Re-export the type under its original (un-suffixed) name when collision
     // resolution renamed it. The suffixed name (`Foo_`) is purely an internal
@@ -1305,7 +1351,7 @@ fn generate_type_decl(config: &ClassConfig) -> TokenStream {
 /// (`<Tn: TypedArray>`) don't apply to methods — they're emitted
 /// only at the dictionary-factory / setter sites that use
 /// [`generate_dictionary_params`].
-fn generic_params_for_method(config: &ClassConfig, sig: &FunctionSignature) -> TokenStream {
+fn generic_bounds_for_method(config: &ClassConfig, sig: &FunctionSignature) -> Vec<TokenStream> {
     let mut bounds = config.type_param_bounds();
     let sig_tys: Vec<&TypeRef> = sig
         .params
@@ -1314,14 +1360,19 @@ fn generic_params_for_method(config: &ClassConfig, sig: &FunctionSignature) -> T
         .chain(std::iter::once(&sig.return_type))
         .collect();
     bounds.extend(config.local_generic_bounds(sig.body_scope, &sig_tys));
-    render_generic_bounds(&bounds)
+    bounds
 }
 
 /// Generate a constructor binding from a resolved signature.
 fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) -> TokenStream {
     let rust_ident = super::typemap::make_ident(&sig.rust_name);
     let scope = sig.body_scope;
-    let params = generate_concrete_params(&sig.params, config.cgctx, scope, &config.from_module());
+    let params = generate_concrete_params_with_mono_strings(
+        &sig.params,
+        config.cgctx,
+        scope,
+        &config.from_module(),
+    );
     let doc = super::doc_tokens(&sig.doc);
 
     // Constructors always return the constructed type, wrapped in Result
@@ -1330,6 +1381,7 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
         &sig.return_type,
         sig.catch,
         sig.is_async,
+        sig.js_string_return,
         sig.error_type.as_ref(),
         config.cgctx,
         scope,
@@ -1355,10 +1407,19 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
         wb_parts.push(quote! { js_name = #js_name });
     }
 
+    let generics = if config
+        .cgctx
+        .is_some_and(|ctx| ctx.experimental_generic_mono)
+    {
+        render_generic_bounds(&generic_bounds_for_method(config, sig))
+    } else {
+        quote! {}
+    };
+
     quote! {
         #doc
         #[wasm_bindgen(#(#wb_parts),*)]
-        pub fn #rust_ident(#params) -> #ret;
+        pub fn #rust_ident #generics (#params) -> #ret;
     }
 }
 
@@ -1370,7 +1431,7 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
     // names through that scope so `T` (etc.) lowers to a bare ident
     // rather than slipping through to `emit_type_name`.
     let method_scope = sig.body_scope;
-    let params = generate_concrete_params(
+    let params = generate_concrete_params_with_mono_strings(
         &sig.params,
         config.cgctx,
         method_scope,
@@ -1399,6 +1460,7 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
         &sig.return_type,
         sig.catch,
         sig.is_async,
+        sig.js_string_return,
         sig.error_type.as_ref(),
         config.cgctx,
         method_scope,
@@ -1421,7 +1483,7 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
         quote! {}
     };
 
-    let method_generics = generic_params_for_method(config, sig);
+    let method_generics = render_generic_bounds(&generic_bounds_for_method(config, sig));
     let this_generics = config.type_generics_args();
 
     quote! {
@@ -1436,7 +1498,12 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
     let rust_ident = super::typemap::make_ident(&sig.rust_name);
     let class_ident = super::typemap::make_ident(&config.effective_rust_name());
     let scope = sig.body_scope;
-    let params = generate_concrete_params(&sig.params, config.cgctx, scope, &config.from_module());
+    let params = generate_concrete_params_with_mono_strings(
+        &sig.params,
+        config.cgctx,
+        scope,
+        &config.from_module(),
+    );
     let doc = super::doc_tokens(&sig.doc);
     let has_variadic = sig.params.last().is_some_and(|p| p.variadic);
 
@@ -1459,6 +1526,7 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
         &sig.return_type,
         sig.catch,
         sig.is_async,
+        sig.js_string_return,
         sig.error_type.as_ref(),
         config.cgctx,
         scope,
@@ -1481,7 +1549,7 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
         quote! {}
     };
 
-    let generics = generic_params_for_method(config, sig);
+    let generics = render_generic_bounds(&generic_bounds_for_method(config, sig));
 
     quote! {
         #doc
@@ -1552,10 +1620,34 @@ fn generate_getter(
     let fn_generics = render_generic_bounds(&bounds);
     let this_generics = config.type_generics_args();
 
+    let js_string_variant = config
+        .cgctx
+        .filter(|ctx| {
+            ctx.experimental_generic_mono
+                && super::typemap::has_mono_js_string_return(&lowered_ty, ctx, config.scope)
+        })
+        .map(|ctx| {
+            let js_name = dedupe_name(&format!("{rust_name}_js_string"), used_names);
+            let js_ident = super::typemap::make_ident(&js_name);
+            let js_type = super::typemap::to_js_string_getter_return_type(
+                &lowered_ty,
+                ctx,
+                config.scope,
+                &config.from_module(),
+            );
+            let source_name = &getter.js_name;
+            quote! {
+                #doc
+                #[wasm_bindgen(method, getter, js_name = #source_name)]
+                pub fn #js_ident #fn_generics (this: &#this_type #this_generics) -> #js_type;
+            }
+        });
+
     quote! {
         #doc
         #[wasm_bindgen(#(#wb_parts),*)]
         pub fn #rust_ident #fn_generics (this: &#this_type #this_generics) -> #getter_type;
+        #js_string_variant
     }
 }
 
@@ -1597,7 +1689,7 @@ fn generate_setter(
     sigs.iter()
         .map(|sig| {
             let rust_ident = super::typemap::make_ident(&sig.rust_name);
-            let (abv_bounds, params) = generate_dictionary_params(
+            let (abv_bounds, _helper_where_clause, params) = generate_dictionary_params(
                 &sig.params,
                 config.cgctx,
                 config.scope,
@@ -1675,10 +1767,34 @@ fn generate_static_getter(
     bounds.extend(config.local_generic_bounds(config.scope, &[&getter.type_ref]));
     let fn_generics = render_generic_bounds(&bounds);
 
+    let js_string_variant = config
+        .cgctx
+        .filter(|ctx| {
+            ctx.experimental_generic_mono
+                && super::typemap::has_mono_js_string_return(&getter.type_ref, ctx, config.scope)
+        })
+        .map(|ctx| {
+            let js_name = dedupe_name(&format!("{rust_name}_js_string"), used_names);
+            let js_ident = super::typemap::make_ident(&js_name);
+            let js_type = super::typemap::to_js_string_getter_return_type(
+                &getter.type_ref,
+                ctx,
+                config.scope,
+                &config.from_module(),
+            );
+            let source_name = &getter.js_name;
+            quote! {
+                #doc
+                #[wasm_bindgen(static_method_of = #class_ident, getter, js_name = #source_name)]
+                pub fn #js_ident #fn_generics () -> #js_type;
+            }
+        });
+
     quote! {
         #doc
         #[wasm_bindgen(#(#wb_parts),*)]
         pub fn #rust_ident #fn_generics () -> #getter_type;
+        #js_string_variant
     }
 }
 
@@ -1718,7 +1834,7 @@ fn generate_static_setter(
     sigs.iter()
         .map(|sig| {
             let rust_ident = super::typemap::make_ident(&sig.rust_name);
-            let (abv_bounds, params) = generate_dictionary_params(
+            let (abv_bounds, _helper_where_clause, params) = generate_dictionary_params(
                 &sig.params,
                 config.cgctx,
                 config.scope,

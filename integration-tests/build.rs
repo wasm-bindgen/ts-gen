@@ -16,6 +16,7 @@ use std::path::{Path, PathBuf};
 ///     string. When absent, the kebab-case fixture stem is used.
 ///     The Rust `pub mod` name is always derived (snake_case) from the
 ///     `--lib-name` value (after stripping protocol prefixes like `node:`).
+///   - `--experimental-generic-mono` enables per-monomorphization imports.
 fn main() {
     let out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
     let crate_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
@@ -63,6 +64,8 @@ struct Entry {
     /// External type mappings parsed from `//! @ts-gen --external ...`
     /// directives in the fixture, if any.
     externals: Vec<String>,
+    /// Whether this fixture opts into per-monomorphization generic imports.
+    experimental_generic_mono: bool,
 }
 
 /// Pair every `integration-tests/tests/<name>.rs` with the fixture
@@ -106,6 +109,7 @@ fn discover_entries(tests_dir: &Path, fixtures_dir: &Path) -> Vec<Entry> {
             lib_name: directive.lib_name.unwrap_or(kebab),
             dts_path,
             externals: directive.externals,
+            experimental_generic_mono: directive.experimental_generic_mono,
         });
     }
 
@@ -118,6 +122,8 @@ struct Directive {
     lib_name: Option<String>,
     /// All `--external <mapping>` (or `-e <mapping>`) values.
     externals: Vec<String>,
+    /// Whether `--experimental-generic-mono` is present.
+    experimental_generic_mono: bool,
 }
 
 /// Parse the `//! @ts-gen ...` directive lines at the top of the fixture
@@ -126,6 +132,7 @@ fn parse_directive(dts_path: &Path) -> Directive {
     let content = std::fs::read_to_string(dts_path).unwrap_or_default();
     let mut lib_name = None;
     let mut externals = Vec::new();
+    let mut experimental_generic_mono = false;
 
     for line in content.lines() {
         let trimmed = line.trim();
@@ -142,6 +149,10 @@ fn parse_directive(dts_path: &Path) -> Directive {
                         externals.push(args[i + 1].clone());
                         i += 2;
                     }
+                    "--experimental-generic-mono" => {
+                        experimental_generic_mono = true;
+                        i += 1;
+                    }
                     _ => i += 1,
                 }
             }
@@ -153,6 +164,7 @@ fn parse_directive(dts_path: &Path) -> Directive {
     Directive {
         lib_name,
         externals,
+        experimental_generic_mono,
     }
 }
 
@@ -208,10 +220,9 @@ fn generate_bindings(entry: &Entry, out_dir: &Path) {
     let mut exports: std::collections::HashSet<ts_gen::codegen::ExportSpec> =
         std::collections::HashSet::new();
     exports.insert(ts_gen::codegen::ExportSpec::Module(entry.lib_name.clone()));
-    let options = ts_gen::codegen::GenerateOptions {
-        errors_as_error: false,
-        exports,
-    };
+    let options = ts_gen::codegen::GenerateOptions::new()
+        .experimental_generic_mono(entry.experimental_generic_mono)
+        .exports(exports);
     let rust_code = ts_gen::codegen::generate_with_options(&module, &gctx, &options)
         .unwrap_or_else(|e| panic!("codegen failed for {}: {e}", entry.mod_name));
 
