@@ -49,8 +49,6 @@ use JsValue as Metadata;
 #[allow(dead_code)]
 use JsValue as P;
 #[allow(dead_code)]
-use JsValue as Params;
-#[allow(dead_code)]
 use JsValue as PluginArgs;
 #[allow(dead_code)]
 use JsValue as R;
@@ -624,6 +622,48 @@ pub mod web_assembly {
         pub fn try_value_of(this: &Global_) -> Result<JsValue, JsValue>;
     }
     pub use Global_ as Global;
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type ModuleImports;
+        #[wasm_bindgen(catch, method, indexing_setter)]
+        pub fn set(this: &ModuleImports, key: &str, value: &JsValue) -> Result<(), JsValue>;
+    }
+    impl ModuleImports {
+        #[allow(clippy::new_without_default)]
+        pub fn new() -> Self {
+            JsCast::unchecked_into(js_sys::Object::new())
+        }
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Imports;
+        #[wasm_bindgen(catch, method, indexing_setter)]
+        pub fn set(this: &Imports, key: &str, value: &JsValue) -> Result<(), JsValue>;
+    }
+    impl Imports {
+        #[allow(clippy::new_without_default)]
+        pub fn new() -> Self {
+            JsCast::unchecked_into(js_sys::Object::new())
+        }
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Exports;
+        #[wasm_bindgen(catch, method, indexing_setter)]
+        pub fn set(this: &Exports, key: &str, value: &JsValue) -> Result<(), JsValue>;
+    }
+    impl Exports {
+        #[allow(clippy::new_without_default)]
+        pub fn new() -> Self {
+            JsCast::unchecked_into(js_sys::Object::new())
+        }
+    }
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "WebAssembly")]
@@ -28696,8 +28736,20 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiInternalError;
 }
-#[allow(dead_code)]
-pub type AiModelListType = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiModelListType;
+    #[wasm_bindgen(catch, method, indexing_setter)]
+    pub fn set(this: &AiModelListType, key: &str, value: &JsValue) -> Result<(), JsValue>;
+}
+impl AiModelListType {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -35524,8 +35576,30 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "httpServerHandler")]
     pub fn try_http_server_handler(port: f64) -> Result<ExportedHandler, JsValue>;
 }
-#[allow(dead_code)]
-pub type Params<P> = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Params<P: ::wasm_bindgen::JsGeneric>;
+    #[wasm_bindgen(catch, method, indexing_setter)]
+    pub fn set_string<P: ::wasm_bindgen::JsGeneric>(
+        this: &Params<P>,
+        key: &str,
+        value: &str,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(catch, method, indexing_setter, slice_to_array)]
+    pub fn set_slice<P: ::wasm_bindgen::JsGeneric>(
+        this: &Params<P>,
+        key: &str,
+        value: &[String],
+    ) -> Result<(), JsValue>;
+}
+impl<P: ::wasm_bindgen::JsGeneric> Params<P> {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -35744,8 +35818,20 @@ extern "C" {
         metadata: &PipelineBatchMetadata,
     ) -> Result<Array<O>, JsValue>;
 }
-#[allow(dead_code)]
-pub type PipelineRecord = Object;
+#[wasm_bindgen(module = "cloudflare:pipelines")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type PipelineRecord;
+    #[wasm_bindgen(catch, method, indexing_setter)]
+    pub fn set(this: &PipelineRecord, key: &str, value: &JsValue) -> Result<(), JsValue>;
+}
+impl PipelineRecord {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+}
 #[wasm_bindgen(module = "cloudflare:pipelines")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
