@@ -9,6 +9,21 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EvaluationContext;
+    #[wasm_bindgen(catch, method, indexing_getter)]
+    pub fn get_string(
+        this: &EvaluationContext,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<String, JsValue>;
+    #[wasm_bindgen(catch, method, indexing_getter)]
+    pub fn get_number(
+        this: &EvaluationContext,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<f64, JsValue>;
+    #[wasm_bindgen(catch, method, indexing_getter)]
+    pub fn get_bool(
+        this: &EvaluationContext,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<bool, JsValue>;
     #[wasm_bindgen(catch, method, indexing_setter)]
     pub fn set_string(
         this: &EvaluationContext,
@@ -39,6 +54,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Labels;
+    #[wasm_bindgen(catch, method, indexing_getter)]
+    pub fn get(this: &Labels, key: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
     #[wasm_bindgen(catch, method, indexing_setter)]
     pub fn set(
         this: &Labels,
@@ -57,6 +74,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Values<T>;
+    #[wasm_bindgen(catch, method, indexing_getter)]
+    pub fn get<T>(this: &Values<T>, key: impl ::wasm_bindgen::JsStringLike) -> Result<T, JsValue>;
     #[wasm_bindgen(catch, method, indexing_setter)]
     pub fn set<T>(
         this: &Values<T>,
@@ -75,6 +94,16 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MixedValues;
+    #[wasm_bindgen(catch, method, indexing_getter)]
+    pub fn get_string(
+        this: &MixedValues,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<String, JsValue>;
+    #[wasm_bindgen(catch, method, indexing_getter)]
+    pub fn get_slice(
+        this: &MixedValues,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Vec<String>, JsValue>;
     #[wasm_bindgen(catch, method, indexing_setter)]
     pub fn set_string(
         this: &MixedValues,
@@ -89,6 +118,116 @@ extern "C" {
     ) -> Result<(), JsValue>;
 }
 impl MixedValues {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type FlexibleRecord;
+    #[wasm_bindgen(catch, method, indexing_getter)]
+    pub fn get_string_as_string(
+        this: &FlexibleRecord,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<String, JsValue>;
+    #[wasm_bindgen(catch, method, indexing_getter)]
+    pub fn get_number_as_string(this: &FlexibleRecord, key: f64) -> Result<String, JsValue>;
+    #[wasm_bindgen(catch, method, indexing_getter)]
+    pub fn get_string_as_bool(
+        this: &FlexibleRecord,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<bool, JsValue>;
+    #[wasm_bindgen(catch, method, indexing_getter)]
+    pub fn get_number_as_bool(this: &FlexibleRecord, key: f64) -> Result<bool, JsValue>;
+    #[wasm_bindgen(catch, method, indexing_setter)]
+    pub fn set_string_with_string(
+        this: &FlexibleRecord,
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(catch, method, indexing_setter)]
+    pub fn set_number_with_string(
+        this: &FlexibleRecord,
+        key: f64,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(catch, method, indexing_setter)]
+    pub fn set_string_with_bool(
+        this: &FlexibleRecord,
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(catch, method, indexing_setter)]
+    pub fn set_number_with_bool(
+        this: &FlexibleRecord,
+        key: f64,
+        value: bool,
+    ) -> Result<(), JsValue>;
+}
+impl FlexibleRecord {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type KnownLabels;
+    #[wasm_bindgen(catch, method, getter, js_name = "displayName")]
+    pub fn get_display_name(this: &KnownLabels) -> Result<String, JsValue>;
+    #[wasm_bindgen(catch, method, getter, js_name = "region")]
+    pub fn get_region(this: &KnownLabels) -> Result<String, JsValue>;
+    #[wasm_bindgen(catch, method, setter, js_name = "displayName")]
+    pub fn set_display_name(
+        this: &KnownLabels,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(catch, method, setter, js_name = "region")]
+    pub fn set_region(
+        this: &KnownLabels,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<(), JsValue>;
+}
+impl KnownLabels {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type KnownValues;
+    #[wasm_bindgen(catch, method, getter, js_name = "name")]
+    pub fn get_name_as_string(this: &KnownValues) -> Result<String, JsValue>;
+    #[wasm_bindgen(catch, method, getter, js_name = "name")]
+    pub fn get_name_as_bool(this: &KnownValues) -> Result<bool, JsValue>;
+    #[wasm_bindgen(catch, method, getter, js_name = "enabled")]
+    pub fn get_enabled_as_string(this: &KnownValues) -> Result<String, JsValue>;
+    #[wasm_bindgen(catch, method, getter, js_name = "enabled")]
+    pub fn get_enabled_as_bool(this: &KnownValues) -> Result<bool, JsValue>;
+    #[wasm_bindgen(catch, method, setter, js_name = "name")]
+    pub fn set_name_with_string(
+        this: &KnownValues,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(catch, method, setter, js_name = "name")]
+    pub fn set_name_with_bool(this: &KnownValues, value: bool) -> Result<(), JsValue>;
+    #[wasm_bindgen(catch, method, setter, js_name = "enabled")]
+    pub fn set_enabled_with_string(
+        this: &KnownValues,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(catch, method, setter, js_name = "enabled")]
+    pub fn set_enabled_with_bool(this: &KnownValues, value: bool) -> Result<(), JsValue>;
+}
+impl KnownValues {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         JsCast::unchecked_into(js_sys::Object::new())

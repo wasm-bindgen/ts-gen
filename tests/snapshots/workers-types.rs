@@ -627,6 +627,8 @@ pub mod web_assembly {
         # [wasm_bindgen (extends = Object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type ModuleImports;
+        #[wasm_bindgen(catch, method, indexing_getter)]
+        pub fn get(this: &ModuleImports, key: &str) -> Result<JsValue, JsValue>;
         #[wasm_bindgen(catch, method, indexing_setter)]
         pub fn set(this: &ModuleImports, key: &str, value: &JsValue) -> Result<(), JsValue>;
     }
@@ -641,6 +643,8 @@ pub mod web_assembly {
         # [wasm_bindgen (extends = Object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Imports;
+        #[wasm_bindgen(catch, method, indexing_getter)]
+        pub fn get(this: &Imports, key: &str) -> Result<JsValue, JsValue>;
         #[wasm_bindgen(catch, method, indexing_setter)]
         pub fn set(this: &Imports, key: &str, value: &JsValue) -> Result<(), JsValue>;
     }
@@ -655,6 +659,8 @@ pub mod web_assembly {
         # [wasm_bindgen (extends = Object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Exports;
+        #[wasm_bindgen(catch, method, indexing_getter)]
+        pub fn get(this: &Exports, key: &str) -> Result<JsValue, JsValue>;
         #[wasm_bindgen(catch, method, indexing_setter)]
         pub fn set(this: &Exports, key: &str, value: &JsValue) -> Result<(), JsValue>;
     }
@@ -28741,6 +28747,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiModelListType;
+    #[wasm_bindgen(catch, method, indexing_getter)]
+    pub fn get(this: &AiModelListType, key: &str) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(catch, method, indexing_setter)]
     pub fn set(this: &AiModelListType, key: &str, value: &JsValue) -> Result<(), JsValue>;
 }
@@ -35581,16 +35589,26 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Params<P: ::wasm_bindgen::JsGeneric>;
+    #[wasm_bindgen(catch, method, indexing_getter)]
+    pub fn get_string<P: ::wasm_bindgen::JsGeneric>(
+        this: &Params<P>,
+        key: &P,
+    ) -> Result<String, JsValue>;
+    #[wasm_bindgen(catch, method, indexing_getter)]
+    pub fn get_slice<P: ::wasm_bindgen::JsGeneric>(
+        this: &Params<P>,
+        key: &P,
+    ) -> Result<Vec<String>, JsValue>;
     #[wasm_bindgen(catch, method, indexing_setter)]
     pub fn set_string<P: ::wasm_bindgen::JsGeneric>(
         this: &Params<P>,
-        key: &str,
+        key: &P,
         value: &str,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(catch, method, indexing_setter, slice_to_array)]
     pub fn set_slice<P: ::wasm_bindgen::JsGeneric>(
         this: &Params<P>,
-        key: &str,
+        key: &P,
         value: &[String],
     ) -> Result<(), JsValue>;
 }
@@ -35823,6 +35841,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type PipelineRecord;
+    #[wasm_bindgen(catch, method, indexing_getter)]
+    pub fn get(this: &PipelineRecord, key: &str) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(catch, method, indexing_setter)]
     pub fn set(this: &PipelineRecord, key: &str, value: &JsValue) -> Result<(), JsValue>;
 }
