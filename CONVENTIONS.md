@@ -26,6 +26,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [Interfaces (class-like vs dictionary)](#interfaces-class-like-vs-dictionary)
 * [Dictionary builders](#dictionary-builders)
 * [Anonymous interface synthesis](#anonymous-interface-synthesis)
+* [Named `Record<K, V>` aliases](#named-recordk-v-aliases)
 * [Discriminated unions](#discriminated-unions)
 * [`var X: { new(...): T }` patterns](#var-x--new-t-patterns)
 * [Module-scoped constructor variables](#module-scoped-constructor-variables)
@@ -573,8 +574,9 @@ type R2Range = {
 is treated as if the user had written `interface R2Range { … }`.
 Type aliases whose target is a single inline literal — or a union of
 inline literals (see below) — promote directly to interfaces; aliases
-to anything else (named types, primitives, function types, generics,
-`Record<…>`, etc.) keep their existing alias semantics.
+to anything else (named types, primitives, function types, other
+generics, etc.) keep their existing alias semantics. Named `Record`
+aliases receive the dedicated treatment described below.
 
 ### Union of inline literals
 
@@ -647,6 +649,41 @@ synthesized. Anonymous types nested inside a generic, an array,
 — they follow the regular type-mapping rules and erase to `Object`.
 Inline literals inside the *body* of a hoisted interface are themselves
 hoisted recursively, using the synthesized parent's name.
+
+## Named `Record<K, V>` aliases
+
+A named alias to the global TypeScript utility `Record<K, V>` becomes a
+nominal wasm-bindgen object wrapper. The wrapper has `new()` and a caught
+indexing setter, corresponding to JavaScript's `record[key] = value`:
+
+```ts
+type Labels = Record<string, string>;
+```
+
+```rust
+#[wasm_bindgen(extends = Object)]
+pub type Labels;
+
+#[wasm_bindgen(catch, method, indexing_setter)]
+pub fn set(this: &Labels, key: &str, value: &str) -> Result<(), JsValue>;
+
+impl Labels {
+    pub fn new() -> Self { /* unchecked_into of new Object */ }
+}
+```
+
+When `V` is a union, its ABI alternatives use the same flattening and
+deduplication rules as callable parameters. Every surviving alternative gets
+a type-named setter so no union member is privileged as the unsuffixed form:
+
+```ts
+type EvaluationContext = Record<string, string | number | boolean>;
+```
+
+emits `set_string`, `set_number`, and `set_bool`. The key type remains in the
+IR, but runtime setters accept `&str`, matching ordinary JavaScript object
+property keys at the wasm-bindgen boundary. A user declaration named `Record`
+shadows the global utility type and keeps normal alias behavior.
 
 ## Discriminated unions
 

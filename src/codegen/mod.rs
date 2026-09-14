@@ -8,6 +8,7 @@ pub mod discriminated_unions;
 pub mod enums;
 pub mod functions;
 pub(crate) mod primitive_unions;
+pub mod records;
 pub mod signatures;
 pub mod subtyping;
 pub mod typemap;
@@ -516,6 +517,11 @@ fn generate_declaration(decl: &TypeDeclaration, cgctx: &CodegenContext) -> Optio
                 decl.scope_id,
             ))
         }
+        TypeKind::Record(r) => Some(records::generate_record(
+            r,
+            &decl.module_context,
+            Some(cgctx),
+        )),
         TypeKind::StringEnum(e) => Some(enums::generate_string_enum(e)),
         TypeKind::NumericEnum(e) => Some(enums::generate_numeric_enum(e)),
         TypeKind::Function(f) => Some(functions::generate_function(
@@ -704,6 +710,11 @@ fn generate_ns_declaration(
                 decl.scope_id,
             ))
         }
+        TypeKind::Record(r) => Some(records::generate_record(
+            r,
+            &decl.module_context,
+            Some(cgctx),
+        )),
         TypeKind::Function(f) => Some(functions::generate_function_with_js_namespace(
             f,
             &decl.module_context,

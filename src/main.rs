@@ -239,6 +239,12 @@ fn print_declaration(decl: &ts_gen::ir::TypeDeclaration, indent: usize) {
                 print_member(member, indent + 1);
             }
         }
+        ts_gen::ir::TypeKind::Record(r) => {
+            eprintln!(
+                "{prefix}[{ctx}] record {}: {:?} => {:?}",
+                r.name, r.key_type, r.value_type
+            );
+        }
         ts_gen::ir::TypeKind::TypeAlias(t) => {
             eprintln!("{prefix}[{ctx}] type {} = {:?}", t.name, t.target);
         }

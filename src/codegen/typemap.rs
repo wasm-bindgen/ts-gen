@@ -682,6 +682,12 @@ impl<'a> CodegenContext<'a> {
                 self.local_type_param_counts
                     .insert(d.name.clone(), d.type_params.len());
             }
+            ir::TypeKind::Record(r) => {
+                self.local_types.insert(r.name.clone(), mctx.clone());
+                self.local_type_ids.insert(type_id);
+                self.local_type_param_counts
+                    .insert(r.name.clone(), r.type_params.len());
+            }
             ir::TypeKind::StringEnum(e) => {
                 self.local_types.insert(e.name.clone(), mctx.clone());
                 self.local_type_ids.insert(type_id);
@@ -724,6 +730,9 @@ impl<'a> CodegenContext<'a> {
             }
             ir::TypeKind::DiscriminatedUnion(d) => {
                 self.local_types.insert(d.name.clone(), mctx.clone());
+            }
+            ir::TypeKind::Record(r) => {
+                self.local_types.insert(r.name.clone(), mctx.clone());
             }
             ir::TypeKind::StringEnum(e) => {
                 self.local_types.insert(e.name.clone(), mctx.clone());
@@ -789,6 +798,7 @@ fn type_decl_name(kind: &ir::TypeKind) -> Option<&str> {
         ir::TypeKind::Class(c) => Some(&c.name),
         ir::TypeKind::Interface(i) => Some(&i.name),
         ir::TypeKind::DiscriminatedUnion(d) => Some(&d.name),
+        ir::TypeKind::Record(r) => Some(&r.name),
         ir::TypeKind::TypeAlias(a) => Some(&a.name),
         ir::TypeKind::StringEnum(e) => Some(&e.name),
         ir::TypeKind::NumericEnum(e) => Some(&e.name),
