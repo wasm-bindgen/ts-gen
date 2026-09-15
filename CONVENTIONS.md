@@ -695,18 +695,25 @@ emits `get_string` / `try_get_string` / `set_string`,
 `get_number` / `try_get_number` / `set_number`, and
 `get_bool` / `try_get_bool` / `set_bool`.
 
+When literal union members deduplicate to one ABI type, naming uses that ABI
+flavor rather than arbitrarily selecting the first literal. For example,
+`"red" | "blue"` produces a `string` flavor, not `string_red`.
+
 When `K` is not a union, it does not participate in method naming; this keeps
-the common string-keyed case at `get_<value>` / `set_<value>`. A non-literal
-key union uses the same expansion as `V`. When both key and value have multiple
-ABI alternatives, codegen emits their Cartesian product. The value flavor
-comes first, followed by `_with_<key>`:
+the common string-keyed case at `get_<value>` / `set_<value>`. A heterogeneous
+open key union erases to `&JsValue` rather than expanding into separate key
+flavors. The erased key does not add a method-name suffix because the loss of
+key type safety is already visible in the parameter type:
 
 ```ts
 type Flexible = Record<string | number, string | boolean>;
 ```
 
-includes `get_bool_with_string`, `get_string_with_number`,
-`set_bool_with_string`, and `set_string_with_number`.
+includes `get_bool(key: &JsValue)`, `get_string(key: &JsValue)`,
+`set_bool(key: &JsValue, value: bool)`, and
+`set_string(key: &JsValue, value: &str)`. With a non-union `V`, the methods
+remain simply `get`, `try_get`, and `set`. A single open key domain retains its
+precise type, so `Record<string, V>` still takes `key: &str`.
 
 A string literal or a union made entirely of string literals instead becomes
 fixed-property accessors, with no runtime key argument. Aliases to such literal
@@ -724,10 +731,15 @@ property. Literal names that would be confused with type flavors are prefixed
 with `string_`, so a key named `"number"` becomes `get_string_number` when
 `V` is not a union.
 
-Finite-key records do not expose `new()` or `Default`: an empty object would
-not contain their required properties and therefore would not satisfy the
-TypeScript type. They can be received from JavaScript or explicitly cast from
-an object after the caller has initialized all required properties. A user
+Finite-key records expose constructors that require one value per key, in key
+declaration order. They do not implement `Default` or expose a zero-argument
+constructor because an empty object would not contain their required
+properties. When a value union has multiple distinct Rust ABI alternatives,
+the record exposes one constructor taking `&JsValue` for every key rather than
+an exponential Cartesian product. The `Known` example therefore has
+`new(name: &JsValue, enabled: &JsValue)`. A homogeneous union whose alternatives
+deduplicate to one Rust parameter type retains that precise type. Each
+constructor initializes every property before returning the wrapper. A user
 declaration named `Record` shadows the global utility type and keeps normal
 alias behavior.
 
