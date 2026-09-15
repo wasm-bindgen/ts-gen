@@ -1223,7 +1223,7 @@ fn compute_trim(signatures: &[Vec<ConcreteParam>]) -> (usize, usize) {
 /// `ArrayBufferView` is a synthetic union that lowers to `&Object` /
 /// `Uint8Array` depending on position; `typed_array` is short for
 /// "any concrete typed-array" which captures both arms.
-fn type_snake_name(ty: &TypeRef) -> String {
+pub(crate) fn type_snake_name(ty: &TypeRef) -> String {
     match ty {
         TypeRef::String => "str".to_string(),
         TypeRef::Number => "f64".to_string(),

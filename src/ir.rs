@@ -379,12 +379,11 @@ pub enum TypeKind {
     Namespace(NamespaceDecl),
 }
 
-// ─── Record ───────────────────────────────────────────────────────────
-
 /// A first-class binding for `type Name = Record<K, V>`.
 ///
-/// The key type remains in the IR for fidelity, while codegen exposes
-/// string-keyed indexing setters. The value type drives typed setter fan-out.
+/// Codegen uses both key and value types to expand typed getters and setters.
+/// Finite string-literal keys become fixed-property accessors; other keys use
+/// JavaScript indexing accessors.
 #[derive(Clone, Debug)]
 pub struct RecordDecl {
     pub name: String,
@@ -394,8 +393,6 @@ pub struct RecordDecl {
     /// Scope inside this alias's body — see [`ClassDecl::body_scope`].
     pub body_scope: crate::parse::scope::ScopeId,
 }
-
-// ─── Class ───────────────────────────────────────────────────────────
 
 #[derive(Clone, Debug)]
 pub struct ClassDecl {

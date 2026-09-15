@@ -654,9 +654,9 @@ hoisted recursively, using the synthesized parent's name.
 ## Named `Record<K, V>` aliases
 
 A named alias to the global TypeScript utility `Record<K, V>` becomes a
-nominal wasm-bindgen object wrapper. The wrapper has `new()` plus caught
-indexing getters and setters, corresponding to JavaScript's `record[key]` and
-`record[key] = value`:
+nominal wasm-bindgen object wrapper. Open-key records implement `Default` and
+have `new()`. Their indexing getters and setters correspond to JavaScript's
+`record[key]` and `record[key] = value`:
 
 ```ts
 type Labels = Record<string, string>;
@@ -666,53 +666,71 @@ type Labels = Record<string, string>;
 #[wasm_bindgen(extends = Object)]
 pub type Labels;
 
-#[wasm_bindgen(catch, method, indexing_setter)]
-pub fn set(this: &Labels, key: &str, value: &str) -> Result<(), JsValue>;
+#[wasm_bindgen(method, indexing_setter)]
+pub fn set(this: &Labels, key: &str, value: &str);
+
+#[wasm_bindgen(method, indexing_getter)]
+pub fn get(this: &Labels, key: &str) -> String;
 
 #[wasm_bindgen(catch, method, indexing_getter)]
-pub fn get(this: &Labels, key: &str) -> Result<String, JsValue>;
+pub fn try_get(this: &Labels, key: &str) -> Result<String, JsValue>;
 
 impl Labels {
     pub fn new() -> Self { /* unchecked_into of new Object */ }
 }
+
+impl Default for Labels { /* new Object */ }
 ```
 
 When `V` is a union, its ABI alternatives use the same flattening and
 deduplication rules as callable parameters. Every surviving alternative gets
-a type-named setter so no union member is privileged as the unsuffixed form:
+type-named getters and setters so no union member is privileged as the
+unsuffixed form. Getters follow the normal primary / caught `try_` pairing;
+setters are infallible like other generated setters:
 
 ```ts
 type EvaluationContext = Record<string, string | number | boolean>;
 ```
 
-emits `get_string` / `set_string`, `get_number` / `set_number`, and
-`get_bool` / `set_bool`.
+emits `get_string` / `try_get_string` / `set_string`,
+`get_number` / `try_get_number` / `set_number`, and
+`get_bool` / `try_get_bool` / `set_bool`.
 
 When `K` is not a union, it does not participate in method naming; this keeps
 the common string-keyed case at `get_<value>` / `set_<value>`. A non-literal
 key union uses the same expansion as `V`. When both key and value have multiple
-ABI alternatives, codegen emits their Cartesian product and names both roles:
+ABI alternatives, codegen emits their Cartesian product. The value flavor
+comes first, followed by `_with_<key>`:
 
 ```ts
 type Flexible = Record<string | number, string | boolean>;
 ```
 
-includes `get_string_as_bool`, `get_number_as_string`,
-`set_string_with_bool`, and `set_number_with_string`.
+includes `get_bool_with_string`, `get_string_with_number`,
+`set_bool_with_string`, and `set_string_with_number`.
 
-A union made entirely of string literals instead becomes fixed-property
-accessors, with no runtime key argument:
+A string literal or a union made entirely of string literals instead becomes
+fixed-property accessors, with no runtime key argument. Aliases to such literal
+sets receive the same treatment:
 
 ```ts
 type Known = Record<"name" | "enabled", string | boolean>;
 ```
 
-This includes `get_name_as_string()`, `get_enabled_as_bool()`,
-`set_name_with_string(value)`, and `set_enabled_with_bool(value)`. With a
+This includes `get_string_with_name()`, `get_bool_with_enabled()`,
+`set_string_with_name(value)`, and `set_bool_with_enabled(value)`. With a
 non-union `V`, the value suffix is omitted (`get_name`, `set_name`). Literal
 names are snake-cased for Rust while `js_name` preserves the exact JavaScript
-property. A user declaration named `Record` shadows the global utility type
-and keeps normal alias behavior.
+property. Literal names that would be confused with type flavors are prefixed
+with `string_`, so a key named `"number"` becomes `get_string_number` when
+`V` is not a union.
+
+Finite-key records do not expose `new()` or `Default`: an empty object would
+not contain their required properties and therefore would not satisfy the
+TypeScript type. They can be received from JavaScript or explicitly cast from
+an object after the caller has initialized all required properties. A user
+declaration named `Record` shadows the global utility type and keeps normal
+alias behavior.
 
 ## Discriminated unions
 
