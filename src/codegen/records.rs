@@ -20,6 +20,20 @@ struct RecordWrapper {
     type_args: TokenStream,
     type_bounds: Vec<TokenStream>,
     type_generics: TokenStream,
+    constructor_impl_generics: TokenStream,
+}
+
+#[derive(Clone)]
+enum FiniteKey {
+    String(String),
+    Number(f64),
+    Boolean(bool),
+}
+
+struct SetterBinding {
+    key_type: TypeRef,
+    value_type: TypeRef,
+    method_ident: syn::Ident,
 }
 
 impl RecordWrapper {
@@ -59,6 +73,16 @@ impl RecordWrapper {
             })
             .collect::<Vec<_>>();
         let type_generics = render_generic_bounds(&type_bounds);
+        let constructor_impl_generics = if per_mono {
+            render_generic_bounds(
+                &type_param_idents
+                    .iter()
+                    .map(|ident| quote! { #ident: ::wasm_bindgen::convert::IntoWasmAbi })
+                    .collect::<Vec<_>>(),
+            )
+        } else {
+            type_generics.clone()
+        };
 
         Self {
             extern_attr: CodegenContext::extern_attr(cgctx, module),
@@ -67,6 +91,7 @@ impl RecordWrapper {
             type_args,
             type_bounds,
             type_generics,
+            constructor_impl_generics,
         }
     }
 
@@ -75,13 +100,12 @@ impl RecordWrapper {
         source_name: &str,
         getters: &[TokenStream],
         setters: &[TokenStream],
-        supports_empty_construction: bool,
+        construction: &TokenStream,
     ) -> TokenStream {
         let Self {
             extern_attr,
             rust_name,
             rust_ident,
-            type_args,
             type_generics,
             ..
         } = self;
@@ -91,24 +115,6 @@ impl RecordWrapper {
         } else {
             quote! {}
         };
-        let construction = if supports_empty_construction {
-            quote! {
-                impl #type_generics Default for #rust_ident #type_args {
-                    fn default() -> Self {
-                        JsCast::unchecked_into(js_sys::Object::new())
-                    }
-                }
-
-                impl #type_generics #rust_ident #type_args {
-                    pub fn new() -> Self {
-                        Self::default()
-                    }
-                }
-            }
-        } else {
-            quote! {}
-        };
-
         quote! {
             #extern_attr
             extern "C" {
@@ -120,6 +126,25 @@ impl RecordWrapper {
             }
             #public_alias
             #construction
+        }
+    }
+
+    fn empty_construction(&self) -> TokenStream {
+        let rust_ident = &self.rust_ident;
+        let type_args = &self.type_args;
+        let type_generics = &self.type_generics;
+        quote! {
+            impl #type_generics Default for #rust_ident #type_args {
+                fn default() -> Self {
+                    JsCast::unchecked_into(js_sys::Object::new())
+                }
+            }
+
+            impl #type_generics #rust_ident #type_args {
+                pub fn new() -> Self {
+                    Self::default()
+                }
+            }
         }
     }
 }
@@ -144,10 +169,17 @@ fn generate_indexed_record(
     cgctx: Option<&CodegenContext<'_>>,
     wrapper: &RecordWrapper,
 ) -> TokenStream {
+    let finite_keys = finite_literal_keys(&decl.key_type, cgctx, decl.body_scope, 0);
+    let key_is_open_union =
+        is_union_type(&decl.key_type, cgctx, decl.body_scope, 0) && finite_keys.is_none();
     let source_params = [
         Param {
             name: "key".to_string(),
-            type_ref: decl.key_type.clone(),
+            type_ref: if key_is_open_union {
+                TypeRef::Any
+            } else {
+                decl.key_type.clone()
+            },
             optional: false,
             variadic: false,
         },
@@ -159,11 +191,22 @@ fn generate_indexed_record(
         },
     ];
     let alternatives = expand_signatures(&[&source_params], cgctx, decl.body_scope);
-    let key_is_union = is_union_type(&decl.key_type, cgctx, decl.body_scope, 0);
+    let mut distinct_value_types = Vec::new();
+    for alternative in &alternatives {
+        if let Some(value) = alternative.params.get(1) {
+            if !distinct_value_types.contains(&value.type_ref) {
+                distinct_value_types.push(value.type_ref.clone());
+            }
+        }
+    }
+    let value_alternative_count = distinct_value_types.len();
+    let key_is_union =
+        !key_is_open_union && is_union_type(&decl.key_type, cgctx, decl.body_scope, 0);
     let value_is_union = is_union_type(&decl.value_type, cgctx, decl.body_scope, 0);
     let mut used_names = HashSet::new();
     let mut getters = Vec::new();
     let mut setters = Vec::new();
+    let mut setter_bindings = Vec::new();
 
     for alternative in alternatives {
         let (Some(key), Some(value)) = (alternative.params.first(), alternative.params.get(1))
@@ -171,7 +214,8 @@ fn generate_indexed_record(
             continue;
         };
         let key_name = record_type_name(&key.type_ref);
-        let value_name = record_type_name(&value.type_ref);
+        let value_name =
+            record_value_name(&value.type_ref, value_is_union, value_alternative_count);
         let getter_base =
             record_method_name("get", &key_name, &value_name, key_is_union, value_is_union);
         let getter_name = super::signatures::dedupe_name(&getter_base, &mut used_names);
@@ -237,11 +281,25 @@ fn generate_indexed_record(
                 #rendered_params,
             );
         });
+        setter_bindings.push(SetterBinding {
+            key_type: key.type_ref.clone(),
+            value_type: value.type_ref.clone(),
+            method_ident: setter_ident,
+        });
     }
 
-    let supports_empty_construction =
-        !is_finite_literal_key_type(&decl.key_type, cgctx, decl.body_scope, 0);
-    wrapper.render(&decl.name, &getters, &setters, supports_empty_construction)
+    let construction = match finite_keys {
+        Some(keys) => generate_finite_constructors(
+            decl,
+            module_context,
+            cgctx,
+            wrapper,
+            &keys,
+            &setter_bindings,
+        ),
+        None => wrapper.empty_construction(),
+    };
+    wrapper.render(&decl.name, &getters, &setters, &construction)
 }
 
 fn generate_string_literal_record(
@@ -258,18 +316,21 @@ fn generate_string_literal_record(
         variadic: false,
     };
     let alternatives = expand_signatures(&[&[source_value]], cgctx, decl.body_scope);
+    let value_alternative_count = alternatives.len();
     let value_is_union = is_union_type(&decl.value_type, cgctx, decl.body_scope, 0);
     let mut used_names = HashSet::new();
     let mut getters = Vec::new();
     let mut setters = Vec::new();
+    let mut setter_bindings = Vec::new();
 
-    for literal in literal_keys {
-        let literal_name = string_literal_method_name(&literal);
+    for literal in &literal_keys {
+        let literal_name = string_literal_method_name(literal);
         for alternative in &alternatives {
             let Some(value) = alternative.params.first() else {
                 continue;
             };
-            let value_name = record_type_name(&value.type_ref);
+            let value_name =
+                record_value_name(&value.type_ref, value_is_union, value_alternative_count);
             let getter_base = if value_is_union {
                 format!("get_{value_name}_with_{literal_name}")
             } else {
@@ -330,12 +391,160 @@ fn generate_string_literal_record(
                     #rendered_params,
                 );
             });
+            setter_bindings.push(SetterBinding {
+                key_type: TypeRef::StringLiteral(literal.clone()),
+                value_type: value.type_ref.clone(),
+                method_ident: setter_ident,
+            });
         }
     }
 
-    // A finite-key Record requires every key to exist. Constructing it from an
-    // empty object would create a value that does not satisfy its TS type.
-    wrapper.render(&decl.name, &getters, &setters, false)
+    let keys = literal_keys
+        .into_iter()
+        .map(FiniteKey::String)
+        .collect::<Vec<_>>();
+    let construction = generate_finite_constructors(
+        decl,
+        module_context,
+        cgctx,
+        wrapper,
+        &keys,
+        &setter_bindings,
+    );
+    wrapper.render(&decl.name, &getters, &setters, &construction)
+}
+
+fn generate_finite_constructors(
+    decl: &RecordDecl,
+    module_context: &ModuleContext,
+    cgctx: Option<&CodegenContext<'_>>,
+    wrapper: &RecordWrapper,
+    keys: &[FiniteKey],
+    setter_bindings: &[SetterBinding],
+) -> TokenStream {
+    let value_probe = [Param {
+        name: "value".to_string(),
+        type_ref: decl.value_type.clone(),
+        optional: false,
+        variadic: false,
+    }];
+    let value_alternatives = expand_signatures(&[&value_probe], cgctx, decl.body_scope);
+    let constructor_value_type = if value_alternatives.len() > 1 {
+        TypeRef::Any
+    } else {
+        value_alternatives
+            .first()
+            .and_then(|alternative| alternative.params.first())
+            .map(|param| param.type_ref.clone())
+            .unwrap_or_else(|| decl.value_type.clone())
+    };
+    let mut used_param_names = HashSet::new();
+    let source_params = keys
+        .iter()
+        .map(|key| Param {
+            name: super::signatures::dedupe_name(&key.parameter_name(), &mut used_param_names),
+            type_ref: constructor_value_type.clone(),
+            optional: false,
+            variadic: false,
+        })
+        .collect::<Vec<_>>();
+    let alternatives = expand_signatures(&[&source_params], cgctx, decl.body_scope);
+    let mut used_constructor_names = HashSet::new();
+    let mut constructors = Vec::new();
+
+    for alternative in alternatives {
+        let constructor_name = super::signatures::dedupe_name(
+            &format!("new{}", alternative.name_suffix),
+            &mut used_constructor_names,
+        );
+        let constructor_ident = super::typemap::make_ident(&constructor_name);
+        let (bounds, helper_where_clause, rendered_params) =
+            generate_dictionary_params(&alternative.params, cgctx, decl.body_scope, module_context);
+        let generics = render_generic_bounds(&bounds);
+        let mut initialization = Vec::new();
+
+        for ((key, param), source_param) in keys.iter().zip(&alternative.params).zip(&source_params)
+        {
+            let param_ident = super::typemap::make_ident(&source_param.name);
+            let binding = setter_bindings.iter().find(|binding| {
+                key.matches_binding_type(&binding.key_type) && binding.value_type == param.type_ref
+            });
+            if let Some(binding) = binding {
+                let setter_ident = &binding.method_ident;
+                let key_arg = key.setter_argument();
+                if key_arg.is_empty() {
+                    initialization.push(quote! { inner.#setter_ident(#param_ident); });
+                } else {
+                    initialization.push(quote! { inner.#setter_ident(#key_arg, #param_ident); });
+                }
+            } else {
+                let key_value = key.js_value();
+                initialization.push(quote! {
+                    js_sys::Reflect::set(inner.as_ref(), &#key_value, #param_ident.as_ref())
+                        .expect("setting a property on a fresh object should not fail");
+                });
+            }
+        }
+
+        constructors.push(quote! {
+            /// Creates a record with every required key initialized.
+            pub fn #constructor_ident #generics(
+                #rendered_params,
+            ) -> Self
+            #helper_where_clause
+            {
+                let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
+                #(#initialization)*
+                inner
+            }
+        });
+    }
+
+    let rust_ident = &wrapper.rust_ident;
+    let type_args = &wrapper.type_args;
+    let constructor_impl_generics = &wrapper.constructor_impl_generics;
+    quote! {
+        impl #constructor_impl_generics #rust_ident #type_args {
+            #(#constructors)*
+        }
+    }
+}
+
+impl FiniteKey {
+    fn parameter_name(&self) -> String {
+        match self {
+            Self::String(value) => string_literal_method_name(value),
+            Self::Number(value) => format!("number_{}", normalized_number_name(*value)),
+            Self::Boolean(value) => format!("bool_{value}"),
+        }
+    }
+
+    fn matches_binding_type(&self, ty: &TypeRef) -> bool {
+        match (self, ty) {
+            (Self::String(key), TypeRef::StringLiteral(binding)) => key == binding,
+            (Self::Number(_), TypeRef::NumberLiteral(_))
+            | (Self::Boolean(_), TypeRef::BooleanLiteral(_)) => true,
+            _ => false,
+        }
+    }
+
+    fn setter_argument(&self) -> TokenStream {
+        match self {
+            // String-literal records use fixed-property setters, which do not
+            // take the key as a runtime argument.
+            Self::String(_) => quote! {},
+            Self::Number(value) => quote! { #value },
+            Self::Boolean(value) => quote! { #value },
+        }
+    }
+
+    fn js_value(&self) -> TokenStream {
+        match self {
+            Self::String(value) => quote! { JsValue::from_str(#value) },
+            Self::Number(value) => quote! { JsValue::from_f64(#value) },
+            Self::Boolean(value) => quote! { JsValue::from_bool(#value) },
+        }
+    }
 }
 
 fn string_literal_keys(
@@ -344,23 +553,41 @@ fn string_literal_keys(
     scope: ScopeId,
     depth: usize,
 ) -> Option<Vec<String>> {
+    finite_literal_keys(ty, cgctx, scope, depth)?
+        .into_iter()
+        .map(|key| match key {
+            FiniteKey::String(value) => Some(value),
+            FiniteKey::Number(_) | FiniteKey::Boolean(_) => None,
+        })
+        .collect()
+}
+
+fn finite_literal_keys(
+    ty: &TypeRef,
+    cgctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    depth: usize,
+) -> Option<Vec<FiniteKey>> {
     if depth > 16 {
         return None;
     }
     match ty {
-        TypeRef::StringLiteral(value) => Some(vec![value.clone()]),
-        TypeRef::Union(members) => members
+        TypeRef::StringLiteral(value) => Some(vec![FiniteKey::String(value.clone())]),
+        TypeRef::NumberLiteral(value) => Some(vec![FiniteKey::Number(*value)]),
+        TypeRef::BooleanLiteral(value) => Some(vec![FiniteKey::Boolean(*value)]),
+        TypeRef::Union(members) if !members.is_empty() => members
             .iter()
-            .map(|member| string_literal_keys(member, cgctx, scope, depth + 1))
+            .map(|member| finite_literal_keys(member, cgctx, scope, depth + 1))
             .collect::<Option<Vec<_>>>()
             .map(|groups| groups.into_iter().flatten().collect()),
         _ => {
             let name = ty.as_ident()?;
             let ctx = cgctx?;
-            ctx.resolve_string_literal_set(name, scope).or_else(|| {
-                ctx.resolve_alias(name, scope)
-                    .and_then(|target| string_literal_keys(target, cgctx, scope, depth + 1))
-            })
+            if let Some(values) = ctx.resolve_string_literal_set(name, scope) {
+                return Some(values.into_iter().map(FiniteKey::String).collect());
+            }
+            ctx.resolve_alias(name, scope)
+                .and_then(|target| finite_literal_keys(target, cgctx, scope, depth + 1))
         }
     }
 }
@@ -380,38 +607,6 @@ fn is_union_type(
             .as_ident()
             .and_then(|name| cgctx?.resolve_alias(name, scope))
             .is_some_and(|target| is_union_type(target, cgctx, scope, depth + 1)),
-    }
-}
-
-fn is_finite_literal_key_type(
-    ty: &TypeRef,
-    cgctx: Option<&CodegenContext<'_>>,
-    scope: ScopeId,
-    depth: usize,
-) -> bool {
-    if depth > 16 {
-        return false;
-    }
-    match ty {
-        TypeRef::StringLiteral(_) | TypeRef::NumberLiteral(_) | TypeRef::BooleanLiteral(_) => true,
-        TypeRef::Union(members) => {
-            !members.is_empty()
-                && members
-                    .iter()
-                    .all(|member| is_finite_literal_key_type(member, cgctx, scope, depth + 1))
-        }
-        _ => {
-            let Some(name) = ty.as_ident() else {
-                return false;
-            };
-            let Some(ctx) = cgctx else {
-                return false;
-            };
-            ctx.resolve_string_literal_set(name, scope).is_some()
-                || ctx.resolve_alias(name, scope).is_some_and(|target| {
-                    is_finite_literal_key_type(target, cgctx, scope, depth + 1)
-                })
-        }
     }
 }
 
@@ -446,6 +641,13 @@ fn normalized_literal_name(literal: &str) -> String {
     }
 }
 
+fn normalized_number_name(value: f64) -> String {
+    value
+        .to_string()
+        .replace('-', "negative_")
+        .replace('.', "_")
+}
+
 fn record_method_name(
     operation: &str,
     key: &str,
@@ -459,6 +661,18 @@ fn record_method_name(
         (false, true) => format!("{operation}_{value}"),
         (true, true) => format!("{operation}_{value}_with_{key}"),
     }
+}
+
+fn record_value_name(ty: &TypeRef, source_is_union: bool, alternative_count: usize) -> String {
+    if source_is_union && alternative_count == 1 {
+        match ty {
+            TypeRef::StringLiteral(_) => return "string".to_string(),
+            TypeRef::NumberLiteral(_) => return "number".to_string(),
+            TypeRef::BooleanLiteral(_) => return "bool".to_string(),
+            _ => {}
+        }
+    }
+    record_type_name(ty)
 }
 
 fn record_type_name(ty: &TypeRef) -> String {
@@ -535,17 +749,18 @@ mod tests {
     }
 
     #[test]
-    fn key_and_value_unions_name_value_before_key() {
+    fn open_key_union_erases_the_key_without_a_name_suffix() {
         let decl = record(
             TypeRef::Union(vec![TypeRef::String, TypeRef::Number]),
             TypeRef::Union(vec![TypeRef::String, TypeRef::Boolean]),
         );
         let tokens = generate_record(&decl, &ModuleContext::Global, None).to_string();
 
-        assert!(tokens.contains("fn get_string_with_string"));
-        assert!(tokens.contains("fn get_bool_with_number"));
-        assert!(tokens.contains("fn set_string_with_number"));
-        assert!(!tokens.contains("get_number_as_bool"));
+        assert!(tokens.contains("fn get_string"));
+        assert!(tokens.contains("fn get_bool"));
+        assert!(tokens.contains("key : & JsValue"));
+        assert!(!tokens.contains("with_js_value"));
+        assert!(!tokens.contains("with_string"));
     }
 
     #[test]
@@ -564,7 +779,34 @@ mod tests {
         assert!(tokens.contains("fn set_bool_with_display_name"));
         assert!(tokens.contains("getter , js_name = \"displayName\""));
         assert!(!tokens.contains("indexing_getter"));
-        assert!(!tokens.contains("fn new"));
+        assert!(tokens.contains("fn new"));
+        assert!(tokens.contains("display_name"));
+        assert!(tokens.contains("enabled"));
+        assert!(tokens.contains("display_name : & JsValue"));
+        assert!(tokens.contains("enabled : & JsValue"));
+        assert!(!tokens.contains("new_with_"));
+    }
+
+    #[test]
+    fn homogeneous_value_union_keeps_one_precise_constructor() {
+        let decl = record(
+            TypeRef::Union(vec![
+                TypeRef::StringLiteral("primary".to_string()),
+                TypeRef::StringLiteral("secondary".to_string()),
+            ]),
+            TypeRef::Union(vec![
+                TypeRef::StringLiteral("red".to_string()),
+                TypeRef::StringLiteral("blue".to_string()),
+            ]),
+        );
+        let tokens = generate_record(&decl, &ModuleContext::Global, None).to_string();
+
+        assert!(tokens.contains("primary : & str"));
+        assert!(tokens.contains("secondary : & str"));
+        assert!(tokens.contains("get_string_with_primary"));
+        assert!(!tokens.contains("get_string_red"));
+        assert!(!tokens.contains("primary : & JsValue"));
+        assert!(!tokens.contains("new_with_"));
     }
 
     #[test]
@@ -575,6 +817,8 @@ mod tests {
         assert!(tokens.contains("fn get_name"));
         assert!(tokens.contains("fn set_name"));
         assert!(!tokens.contains("key :"));
+        assert!(tokens.contains("fn new"));
+        assert!(tokens.contains("name : & str"));
     }
 
     #[test]
@@ -587,7 +831,7 @@ mod tests {
     }
 
     #[test]
-    fn finite_numeric_keys_do_not_allow_empty_construction() {
+    fn finite_numeric_keys_require_every_value_during_construction() {
         let decl = record(
             TypeRef::Union(vec![
                 TypeRef::NumberLiteral(1.0),
@@ -597,7 +841,9 @@ mod tests {
         );
         let tokens = generate_record(&decl, &ModuleContext::Global, None).to_string();
 
-        assert!(!tokens.contains("fn new"));
+        assert!(tokens.contains("fn new"));
+        assert!(tokens.contains("number_1 : & str"));
+        assert!(tokens.contains("number_2 : & str"));
         assert!(!tokens.contains("impl Default"));
     }
 
