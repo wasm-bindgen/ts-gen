@@ -627,15 +627,21 @@ pub mod web_assembly {
         # [wasm_bindgen (extends = Object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type ModuleImports;
+        #[wasm_bindgen(method, indexing_getter)]
+        pub fn get(this: &ModuleImports, key: &str) -> JsValue;
         #[wasm_bindgen(catch, method, indexing_getter)]
-        pub fn get(this: &ModuleImports, key: &str) -> Result<JsValue, JsValue>;
-        #[wasm_bindgen(catch, method, indexing_setter)]
-        pub fn set(this: &ModuleImports, key: &str, value: &JsValue) -> Result<(), JsValue>;
+        pub fn try_get(this: &ModuleImports, key: &str) -> Result<JsValue, JsValue>;
+        #[wasm_bindgen(method, indexing_setter)]
+        pub fn set(this: &ModuleImports, key: &str, value: &JsValue);
+    }
+    impl Default for ModuleImports {
+        fn default() -> Self {
+            JsCast::unchecked_into(js_sys::Object::new())
+        }
     }
     impl ModuleImports {
-        #[allow(clippy::new_without_default)]
         pub fn new() -> Self {
-            JsCast::unchecked_into(js_sys::Object::new())
+            Self::default()
         }
     }
     #[wasm_bindgen]
@@ -643,15 +649,21 @@ pub mod web_assembly {
         # [wasm_bindgen (extends = Object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Imports;
+        #[wasm_bindgen(method, indexing_getter)]
+        pub fn get(this: &Imports, key: &str) -> JsValue;
         #[wasm_bindgen(catch, method, indexing_getter)]
-        pub fn get(this: &Imports, key: &str) -> Result<JsValue, JsValue>;
-        #[wasm_bindgen(catch, method, indexing_setter)]
-        pub fn set(this: &Imports, key: &str, value: &JsValue) -> Result<(), JsValue>;
+        pub fn try_get(this: &Imports, key: &str) -> Result<JsValue, JsValue>;
+        #[wasm_bindgen(method, indexing_setter)]
+        pub fn set(this: &Imports, key: &str, value: &JsValue);
+    }
+    impl Default for Imports {
+        fn default() -> Self {
+            JsCast::unchecked_into(js_sys::Object::new())
+        }
     }
     impl Imports {
-        #[allow(clippy::new_without_default)]
         pub fn new() -> Self {
-            JsCast::unchecked_into(js_sys::Object::new())
+            Self::default()
         }
     }
     #[wasm_bindgen]
@@ -659,15 +671,21 @@ pub mod web_assembly {
         # [wasm_bindgen (extends = Object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Exports;
+        #[wasm_bindgen(method, indexing_getter)]
+        pub fn get(this: &Exports, key: &str) -> JsValue;
         #[wasm_bindgen(catch, method, indexing_getter)]
-        pub fn get(this: &Exports, key: &str) -> Result<JsValue, JsValue>;
-        #[wasm_bindgen(catch, method, indexing_setter)]
-        pub fn set(this: &Exports, key: &str, value: &JsValue) -> Result<(), JsValue>;
+        pub fn try_get(this: &Exports, key: &str) -> Result<JsValue, JsValue>;
+        #[wasm_bindgen(method, indexing_setter)]
+        pub fn set(this: &Exports, key: &str, value: &JsValue);
+    }
+    impl Default for Exports {
+        fn default() -> Self {
+            JsCast::unchecked_into(js_sys::Object::new())
+        }
     }
     impl Exports {
-        #[allow(clippy::new_without_default)]
         pub fn new() -> Self {
-            JsCast::unchecked_into(js_sys::Object::new())
+            Self::default()
         }
     }
     #[wasm_bindgen]
@@ -28747,15 +28765,21 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiModelListType;
+    #[wasm_bindgen(method, indexing_getter)]
+    pub fn get(this: &AiModelListType, key: &str) -> JsValue;
     #[wasm_bindgen(catch, method, indexing_getter)]
-    pub fn get(this: &AiModelListType, key: &str) -> Result<JsValue, JsValue>;
-    #[wasm_bindgen(catch, method, indexing_setter)]
-    pub fn set(this: &AiModelListType, key: &str, value: &JsValue) -> Result<(), JsValue>;
+    pub fn try_get(this: &AiModelListType, key: &str) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method, indexing_setter)]
+    pub fn set(this: &AiModelListType, key: &str, value: &JsValue);
+}
+impl Default for AiModelListType {
+    fn default() -> Self {
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
 }
 impl AiModelListType {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        JsCast::unchecked_into(js_sys::Object::new())
+        Self::default()
     }
 }
 #[wasm_bindgen]
@@ -35589,33 +35613,40 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Params<P: ::wasm_bindgen::JsGeneric>;
+    #[wasm_bindgen(method, indexing_getter)]
+    pub fn get_string<P: ::wasm_bindgen::JsGeneric>(this: &Params<P>, key: &P) -> String;
     #[wasm_bindgen(catch, method, indexing_getter)]
-    pub fn get_string<P: ::wasm_bindgen::JsGeneric>(
+    pub fn try_get_string<P: ::wasm_bindgen::JsGeneric>(
         this: &Params<P>,
         key: &P,
     ) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, indexing_getter)]
+    pub fn get_slice_of_string<P: ::wasm_bindgen::JsGeneric>(
+        this: &Params<P>,
+        key: &P,
+    ) -> Vec<String>;
     #[wasm_bindgen(catch, method, indexing_getter)]
-    pub fn get_slice<P: ::wasm_bindgen::JsGeneric>(
+    pub fn try_get_slice_of_string<P: ::wasm_bindgen::JsGeneric>(
         this: &Params<P>,
         key: &P,
     ) -> Result<Vec<String>, JsValue>;
-    #[wasm_bindgen(catch, method, indexing_setter)]
-    pub fn set_string<P: ::wasm_bindgen::JsGeneric>(
-        this: &Params<P>,
-        key: &P,
-        value: &str,
-    ) -> Result<(), JsValue>;
-    #[wasm_bindgen(catch, method, indexing_setter, slice_to_array)]
-    pub fn set_slice<P: ::wasm_bindgen::JsGeneric>(
+    #[wasm_bindgen(method, indexing_setter)]
+    pub fn set_string<P: ::wasm_bindgen::JsGeneric>(this: &Params<P>, key: &P, value: &str);
+    #[wasm_bindgen(method, indexing_setter, slice_to_array)]
+    pub fn set_slice_of_string<P: ::wasm_bindgen::JsGeneric>(
         this: &Params<P>,
         key: &P,
         value: &[String],
-    ) -> Result<(), JsValue>;
+    );
+}
+impl<P: ::wasm_bindgen::JsGeneric> Default for Params<P> {
+    fn default() -> Self {
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
 }
 impl<P: ::wasm_bindgen::JsGeneric> Params<P> {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        JsCast::unchecked_into(js_sys::Object::new())
+        Self::default()
     }
 }
 #[wasm_bindgen]
@@ -35841,15 +35872,21 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type PipelineRecord;
+    #[wasm_bindgen(method, indexing_getter)]
+    pub fn get(this: &PipelineRecord, key: &str) -> JsValue;
     #[wasm_bindgen(catch, method, indexing_getter)]
-    pub fn get(this: &PipelineRecord, key: &str) -> Result<JsValue, JsValue>;
-    #[wasm_bindgen(catch, method, indexing_setter)]
-    pub fn set(this: &PipelineRecord, key: &str, value: &JsValue) -> Result<(), JsValue>;
+    pub fn try_get(this: &PipelineRecord, key: &str) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method, indexing_setter)]
+    pub fn set(this: &PipelineRecord, key: &str, value: &JsValue);
+}
+impl Default for PipelineRecord {
+    fn default() -> Self {
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
 }
 impl PipelineRecord {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        JsCast::unchecked_into(js_sys::Object::new())
+        Self::default()
     }
 }
 #[wasm_bindgen(module = "cloudflare:pipelines")]
