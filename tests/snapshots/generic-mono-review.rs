@@ -112,3 +112,48 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "holderOfId")]
     pub fn try_holder_of_id_js_string() -> Result<Holder<JsString>, JsValue>;
 }
+#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "literalHolder")]
+    pub fn literal_holder() -> Holder<String>;
+}
+#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "literalHolder")]
+    pub fn literal_holder_js_string() -> Holder<JsString>;
+}
+#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "literalHolder")]
+    pub fn try_literal_holder() -> Result<Holder<String>, JsValue>;
+}
+#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "literalHolder")]
+    pub fn try_literal_holder_js_string() -> Result<Holder<JsString>, JsValue>;
+}
+#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "literalUnion")]
+    pub fn literal_union() -> LiteralUnionReturnKind;
+}
+#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "literalUnion")]
+    pub fn try_literal_union() -> Result<LiteralUnionReturnKind, JsValue>;
+}
+#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "shadowsAlias")]
+    pub fn shadows_alias<Id>(h: &Holder<Id>) -> Holder<Id>;
+}
+#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "shadowsAlias")]
+    pub fn try_shadows_alias<Id>(h: &Holder<Id>) -> Result<Holder<Id>, JsValue>;
+}
+#[wasm_bindgen]
+pub enum LiteralUnionReturnKind {
+    A = "a",
+    B = "b",
+}

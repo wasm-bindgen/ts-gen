@@ -21,3 +21,6 @@ export declare class Holder<T> {
 
 export declare function takesHolder(h: Holder<Id>, g: Holder<string>): void;
 export declare function holderOfId(): Holder<Id>;
+export declare function literalHolder(): Holder<"a" | "b">;
+export declare function literalUnion(): "a" | "b";
+export declare function shadowsAlias<Id>(h: Holder<Id>): Holder<Id>;

@@ -4,7 +4,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 
 use crate::codegen::signatures::{
-    build_signatures, generate_concrete_params_with_mono_strings, is_void_return,
+    build_signatures, generate_concrete_params_with_mono_bounds, is_void_return,
     render_generic_bounds, CallableSpec, FunctionSignature, SignatureKind,
 };
 use crate::codegen::typemap::{to_return_type, to_syn_type, CodegenContext, TypePosition};
@@ -84,7 +84,7 @@ fn generate_expanded_free_function(
     // directly so `T` references lower to a bare ident.
     let scope = sig.body_scope;
     let rust_ident = super::typemap::make_ident(&sig.rust_name);
-    let params = generate_concrete_params_with_mono_strings(&sig.params, cgctx, scope, ctx);
+    let params = generate_concrete_params_with_mono_bounds(&sig.params, cgctx, scope, ctx);
     let ret_ty = to_return_type(
         &sig.return_type,
         sig.catch,
@@ -142,11 +142,7 @@ fn generate_expanded_free_function(
         quote! {}
     };
 
-    let module = match ctx {
-        ModuleContext::Module(module) => Some(module.as_ref()),
-        ModuleContext::Global => None,
-    };
-    let wb_extern_attr = CodegenContext::extern_attr(cgctx, module);
+    let wb_extern_attr = CodegenContext::extern_attr(cgctx, ctx.specifier());
 
     let generics = render_generic_bounds(&generic_bounds_for_function(sig, cgctx));
 
@@ -180,18 +176,10 @@ fn generic_bounds_for_function(
     if names.is_empty() {
         return Vec::new();
     }
-    let idents = names
+    names
         .iter()
-        .map(|n| super::typemap::make_ident(n))
-        .collect::<Vec<_>>();
-    if cgctx.experimental_generic_mono {
-        idents.into_iter().map(|ident| quote! { #ident }).collect()
-    } else {
-        idents
-            .into_iter()
-            .map(|ident| quote! { #ident: ::wasm_bindgen::JsGeneric })
-            .collect()
-    }
+        .map(|n| CodegenContext::type_param_decl(Some(cgctx), n))
+        .collect()
 }
 
 /// Generate a wasm_bindgen extern block for a global constant/variable.
@@ -218,11 +206,7 @@ pub fn generate_variable(
 
     let wb_attr = quote! { #[wasm_bindgen(#(#wb_parts),*)] };
 
-    let module = match ctx {
-        ModuleContext::Module(module) => Some(module.as_ref()),
-        ModuleContext::Global => None,
-    };
-    let wb_extern_attr = CodegenContext::extern_attr(cgctx, module);
+    let wb_extern_attr = CodegenContext::extern_attr(cgctx, ctx.specifier());
 
     quote! {
         #wb_extern_attr

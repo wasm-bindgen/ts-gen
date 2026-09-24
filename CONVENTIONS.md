@@ -1109,10 +1109,14 @@ where
 Concrete primitive arguments to locally declared generic types use native Rust
 ABIs in this mode: `Details<boolean>`, `Details<number>`, and `Details<string>`
 become `Details<bool>`, `Details<f64>`, and `Details<String>`. Aliases resolve
-first, so `Details<Id>` with `type Id = string` is also `Details<String>`.
-This native-leaf rule is deliberately limited to user declarations. Built-in JS containers,
-tuples, iterators, and callbacks retain their established wrapper elements
-(`Array<JsString>`, `Map<JsString, JsString>`, and so on).
+first, so `Details<Id>` with `type Id = string` is also `Details<String>`, and
+a union with a single common type lowers as that type (`Details<"a" | "b">` is
+`Details<String>`). Aliases emitted as their own Rust type, such as
+string-literal enums, stay named (`Details<Mode>`). A type parameter that
+shadows an alias stays a type parameter. This native-leaf rule is deliberately
+limited to user declarations. Built-in JS containers, tuples, iterators, and
+callbacks retain their established wrapper elements (`Array<JsString>`,
+`Map<JsString, JsString>`, and so on).
 
 Direct string arguments use argument-position `impl JsStringLike`, allowing
 `&str`, `String`, `&JsString`, and `JsString` without caller-side conversion.
@@ -1127,16 +1131,43 @@ pub fn value(default_value: impl ::wasm_bindgen::JsStringLike) -> String;
 pub fn value_js_string(default_value: impl ::wasm_bindgen::JsStringLike) -> JsString;
 ```
 
-The return transform preserves nullable, fallible, and locally declared
-generic wrappers. If a return has multiple eligible string leaves, one
-`_js_string` method replaces all of them rather than generating a Cartesian
-set of variants.
+The return transform preserves nullable, fallible, async, and locally declared
+generic wrappers, using the same alias and union resolution as generic
+arguments. If a return has multiple eligible string leaves, one `_js_string`
+method replaces all of them rather than generating a Cartesian set of
+variants:
 
-Async primitive returns also use native Rust values in this mode. Thus
-`Promise<string>`, `Promise<number>`, and `Promise<boolean>` become
-`Result<String, _>`, `Result<f64, _>`, and `Result<bool, _>` respectively;
-without the flag they retain the established `JsString`, `Number`, and
-`Boolean` wrapper returns.
+```rust
+pub fn details() -> Pair<f64, String>;
+#[wasm_bindgen(js_name = "details")]
+pub fn details_js_string() -> Pair<f64, JsString>;
+```
+
+Getters, including static getters, get the same additive variant:
+
+```rust
+#[wasm_bindgen(method, getter, js_name = "flagKey")]
+pub fn flag_key<T>(this: &EvaluationDetails<T>) -> String;
+#[wasm_bindgen(method, getter, js_name = "flagKey")]
+pub fn flag_key_js_string<T>(this: &EvaluationDetails<T>) -> JsString;
+```
+
+No variant is generated when the return has no string leaf outside built-in
+containers (`Array<string>` keeps its single binding), or when a top-level
+union becomes a [dynamic-union enum](#erased-return-position-unions-become-dynamic-union-enums):
+`"a" | "b"` returns its enum only.
+
+Async returns use native Rust values in this mode when the resolved type is
+a primitive, a nullable primitive, or a locally declared generic type:
+
+| TypeScript | Default | `--experimental-generic-mono` |
+|---|---|---|
+| `Promise<string>` | `Result<JsString, _>` | `Result<String, _>` + `_js_string` |
+| `Promise<number>` | `Result<Number, _>` | `Result<f64, _>` |
+| `Promise<boolean>` | `Result<Boolean, _>` | `Result<bool, _>` |
+| `Promise<string \| undefined>` | `Result<JsOption<JsString>, _>` | `Result<Option<String>, _>` + `_js_string` |
+| `Promise<Details<string>>` | `Result<Details<JsString>, _>` | `Result<Details<String>, _>` + `_js_string` |
+| `Promise<Array<string>>` | `Result<Array<JsString>, _>` | unchanged |
 
 This can increase code size because wasm-bindgen generates a separate shim and
 descriptor for every instantiation. The option is experimental and tracks the

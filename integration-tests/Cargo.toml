@@ -15,6 +15,8 @@ ts-gen = { workspace = true }
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 js-sys = { workspace = true }
 wasm-bindgen = { workspace = true }
+# Generated `async fn` imports live in this library crate (via build.rs) and
+# expand to `wasm_bindgen_futures` paths, so it can't be a dev-dependency.
 wasm-bindgen-futures = { workspace = true }
 
 [target.'cfg(target_arch = "wasm32")'.dev-dependencies]

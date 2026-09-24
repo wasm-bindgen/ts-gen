@@ -489,7 +489,7 @@ pub fn build_signatures(
     let augmented_doc = spec.doc.clone();
 
     let allow_try = !is_async && !nothrow && spec.kind.allows_try_variant();
-    let per_mono = cgctx.is_some_and(|ctx| ctx.experimental_generic_mono);
+    let per_mono = CodegenContext::generic_mono(cgctx);
     let variants_per_expansion = match (allow_try, per_mono) {
         (true, true) => 4,
         (true, false) | (false, true) => 2,
@@ -1265,13 +1265,13 @@ pub fn generate_concrete_params(
 
 /// Convert parameters while making each direct string position an inferred
 /// `impl JsStringLike` in per-monomorphization mode.
-pub fn generate_concrete_params_with_mono_strings(
+pub(crate) fn generate_concrete_params_with_mono_bounds(
     params: &[ConcreteParam],
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
     from_module: &crate::ir::ModuleContext,
 ) -> TokenStream {
-    let per_mono = cgctx.is_some_and(|ctx| ctx.experimental_generic_mono);
+    let per_mono = CodegenContext::generic_mono(cgctx);
     if !per_mono {
         return generate_concrete_params(params, cgctx, scope, from_module);
     }
@@ -1312,16 +1312,26 @@ fn mono_string_argument_type(ty: &TypeRef) -> Option<TokenStream> {
     }
 }
 
-/// Convert dictionary factory params to a `(bounds, params)` token-stream pair.
+/// Rendered parameters for a dictionary factory, builder method, or setter.
+pub struct DictionaryParams {
+    /// One `Tn: ::js_sys::TypedArray` bound per `ArrayBufferView` param.
+    pub bounds: Vec<TokenStream>,
+    /// Extra `where` clause for Rust helper bodies. Extern declarations must
+    /// not use it; see [`generate_dictionary_params`].
+    pub helper_where_clause: TokenStream,
+    /// The rendered `name: Type, …` list.
+    pub params: TokenStream,
+}
+
+/// Render dictionary factory params into a [`DictionaryParams`].
 ///
 /// `ArrayBufferView` switches the helper into a generic signature
 /// `<Tn: js_sys::TypedArray>` and a `&Tn` parameter, so callers can pass any
 /// concrete typed-array (`Uint8Array`, `Int32Array`, etc.) without explicit
 /// casts. All other types pass through `generate_concrete_params`.
 ///
-/// Returns each synthesised ABV bound as a separate `TokenStream` (e.g.
-/// `T: ::js_sys::TypedArray`), a helper-only `where` clause, and the rendered
-/// parameters. Callers compose the declarations with type-level generic bounds
+/// Each synthesised ABV bound is a separate `TokenStream` (e.g.
+/// `T: ::js_sys::TypedArray`). Callers compose the declarations with type-level generic bounds
 /// (`T: ::wasm_bindgen::JsGeneric`) via [`render_generic_bounds`] so a single
 /// `<...>` declaration carries every bound the `fn` needs.
 ///
@@ -1334,7 +1344,7 @@ pub fn generate_dictionary_params(
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
     from_module: &crate::ir::ModuleContext,
-) -> (Vec<TokenStream>, TokenStream, TokenStream) {
+) -> DictionaryParams {
     let mut generic_idents: Vec<syn::Ident> = Vec::new();
     let items: Vec<_> = params
         .iter()
@@ -1349,9 +1359,9 @@ pub fn generate_dictionary_params(
                 );
                 generic_idents.push(g.clone());
                 quote! { &#g }
-            } else if let Some(ty) = cgctx
-                .filter(|ctx| ctx.experimental_generic_mono)
-                .and_then(|_| mono_string_argument_type(&p.type_ref))
+            } else if let Some(ty) = CodegenContext::generic_mono(cgctx)
+                .then(|| mono_string_argument_type(&p.type_ref))
+                .flatten()
             {
                 ty
             } else {
@@ -1374,17 +1384,20 @@ pub fn generate_dictionary_params(
 
     // This must mirror wasm-bindgen's macro-generated import-shim bound: the
     // ordinary Rust dictionary helper calls that shim with `&T` directly.
-    let helper_where_clause =
-        if cgctx.is_some_and(|ctx| ctx.experimental_generic_mono) && !generic_idents.is_empty() {
-            quote! {
-                where
-                    #(for<'__wbg> &'__wbg #generic_idents: ::wasm_bindgen::convert::IntoWasmAbi),*
-            }
-        } else {
-            quote! {}
-        };
+    let helper_where_clause = if CodegenContext::generic_mono(cgctx) && !generic_idents.is_empty() {
+        quote! {
+            where
+                #(for<'__wbg> &'__wbg #generic_idents: ::wasm_bindgen::convert::IntoWasmAbi),*
+        }
+    } else {
+        quote! {}
+    };
 
-    (bounds, helper_where_clause, quote! { #(#items),* })
+    DictionaryParams {
+        bounds,
+        helper_where_clause,
+        params: quote! { #(#items),* },
+    }
 }
 
 /// Wrap a list of `<T: Bound>` token streams into a `<T: Bound, U: Bound>`
@@ -1437,6 +1450,155 @@ mod tests {
             "impl :: wasm_bindgen :: JsStringLike"
         );
         assert!(mono_string_argument_type(&TypeRef::Number).is_none());
+    }
+
+    fn string_param(name: &str) -> Param {
+        Param {
+            name: name.into(),
+            type_ref: TypeRef::String,
+            optional: false,
+            variadic: false,
+        }
+    }
+
+    fn concrete(name: &str, type_ref: TypeRef, variadic: bool) -> ConcreteParam {
+        ConcreteParam {
+            name: name.into(),
+            type_ref,
+            variadic,
+        }
+    }
+
+    /// Build signatures for one overload with per-monomorphization on or off.
+    fn expand_mode(
+        mono: bool,
+        js: &str,
+        params: &[Param],
+        ret: &TypeRef,
+        used: &mut HashSet<String>,
+    ) -> Vec<FunctionSignature> {
+        let (gctx, scope) = test_ctx();
+        let mut cgctx = CodegenContext::empty(&gctx, scope);
+        cgctx.experimental_generic_mono = mono;
+        build_signatures(
+            &CallableSpec {
+                js_name: js,
+                kind: SignatureKind::Function,
+                overloads: &[params],
+                return_type: ret,
+                throws: &Throws::None,
+                doc: &None,
+                body_scope: scope,
+            },
+            used,
+            Some(&cgctx),
+            scope,
+        )
+    }
+
+    #[test]
+    fn mono_string_returns_add_js_string_variants() {
+        let sigs = expand_mode(
+            true,
+            "value",
+            &[string_param("fallback")],
+            &TypeRef::String,
+            &mut no_used(),
+        );
+        let names: Vec<(&str, bool)> = sigs
+            .iter()
+            .map(|s| (s.rust_name.as_str(), s.js_string_return))
+            .collect();
+        assert!(names.contains(&("value", false)));
+        assert!(names.contains(&("value_js_string", true)));
+        assert!(names.contains(&("try_value", false)));
+        assert!(names.contains(&("try_value_js_string", true)));
+        // The variant binds the same JS function with the same params.
+        let js = sigs
+            .iter()
+            .find(|s| s.rust_name == "value_js_string")
+            .unwrap();
+        assert_eq!(js.js_name, "value");
+        assert_eq!(js.params.len(), 1);
+    }
+
+    #[test]
+    fn js_string_variants_need_mono_and_a_string_return() {
+        let default = expand_mode(false, "value", &[], &TypeRef::String, &mut no_used());
+        assert!(default.iter().all(|s| !s.js_string_return));
+        let number = expand_mode(true, "count", &[], &TypeRef::Number, &mut no_used());
+        assert!(number.iter().all(|s| !s.js_string_return));
+    }
+
+    #[test]
+    fn js_string_variant_names_are_deduped() {
+        let mut used: HashSet<String> = ["value_js_string".to_string()].into();
+        let sigs = expand_mode(true, "value", &[], &TypeRef::String, &mut used);
+        assert!(sigs.iter().any(|s| s.rust_name == "value_js_string_2"));
+    }
+
+    #[test]
+    fn mono_bounds_params_switch_strings_only_in_mono_mode() {
+        let (gctx, scope) = test_ctx();
+        let mut cgctx = CodegenContext::empty(&gctx, scope);
+        let params = [
+            concrete("name", TypeRef::String, false),
+            concrete("count", TypeRef::Number, false),
+            concrete("rest", TypeRef::Any, true),
+        ];
+        let render = |cgctx: &CodegenContext<'_>| {
+            generate_concrete_params_with_mono_bounds(
+                &params,
+                Some(cgctx),
+                scope,
+                &crate::ir::ModuleContext::Global,
+            )
+            .to_string()
+        };
+        assert_eq!(
+            render(&cgctx),
+            "name : & str , count : f64 , rest : & [JsValue]"
+        );
+        cgctx.experimental_generic_mono = true;
+        assert_eq!(
+            render(&cgctx),
+            "name : impl :: wasm_bindgen :: JsStringLike , count : f64 , rest : & [JsValue]"
+        );
+    }
+
+    #[test]
+    fn dictionary_params_helper_where_clause_only_in_mono_mode() {
+        let (gctx, scope) = test_ctx();
+        let mut cgctx = CodegenContext::empty(&gctx, scope);
+        let params = [
+            concrete("view", TypeRef::ArrayBufferView, false),
+            concrete("label", TypeRef::String, false),
+        ];
+        let render = |cgctx: &CodegenContext<'_>| {
+            generate_dictionary_params(
+                &params,
+                Some(cgctx),
+                scope,
+                &crate::ir::ModuleContext::Global,
+            )
+        };
+
+        let default = render(&cgctx);
+        assert_eq!(default.bounds.len(), 1);
+        assert_eq!(default.bounds[0].to_string(), "T : :: js_sys :: TypedArray");
+        assert!(default.helper_where_clause.is_empty());
+        assert_eq!(default.params.to_string(), "view : & T , label : & str");
+
+        cgctx.experimental_generic_mono = true;
+        let mono = render(&cgctx);
+        assert_eq!(
+            mono.helper_where_clause.to_string(),
+            "where for < '__wbg > & '__wbg T : :: wasm_bindgen :: convert :: IntoWasmAbi"
+        );
+        assert_eq!(
+            mono.params.to_string(),
+            "view : & T , label : impl :: wasm_bindgen :: JsStringLike"
+        );
     }
 
     /// Create a GlobalContext + scope + CodegenContext for tests.

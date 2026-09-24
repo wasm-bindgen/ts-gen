@@ -80,6 +80,16 @@ let rust_code = codegen::generate(&module, &gctx)?;
 println!("{rust_code}");
 ```
 
+Options are set through `GenerateOptions` builder methods (its fields are
+private):
+
+```rust
+let options = codegen::GenerateOptions::new()
+    .errors_as_error(true)
+    .experimental_generic_mono(true);
+let rust_code = codegen::generate_with_options(&module, &gctx, &options)?;
+```
+
 ## Supported TypeScript constructs
 
 - Classes (including abstract classes and inheritance)

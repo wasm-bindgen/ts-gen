@@ -28,6 +28,16 @@ pub enum ModuleContext {
     Module(std::rc::Rc<str>),
 }
 
+impl ModuleContext {
+    /// The JS module specifier, or `None` for globals.
+    pub(crate) fn specifier(&self) -> Option<&str> {
+        match self {
+            ModuleContext::Global => None,
+            ModuleContext::Module(module) => Some(module),
+        }
+    }
+}
+
 // ─── Type References ─────────────────────────────────────────────────
 
 /// A reference to a TypeScript type, resolved from the AST.
