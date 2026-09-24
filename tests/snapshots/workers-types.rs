@@ -35620,6 +35620,8 @@ extern "C" {
         this: &Params<P>,
         key: &P,
     ) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, indexing_setter)]
+    pub fn set_string<P: ::wasm_bindgen::JsGeneric>(this: &Params<P>, key: &P, value: &str);
     #[wasm_bindgen(method, indexing_getter)]
     pub fn get_slice_of_string<P: ::wasm_bindgen::JsGeneric>(
         this: &Params<P>,
@@ -35630,8 +35632,6 @@ extern "C" {
         this: &Params<P>,
         key: &P,
     ) -> Result<Vec<String>, JsValue>;
-    #[wasm_bindgen(method, indexing_setter)]
-    pub fn set_string<P: ::wasm_bindgen::JsGeneric>(this: &Params<P>, key: &P, value: &str);
     #[wasm_bindgen(method, indexing_setter, slice_to_array)]
     pub fn set_slice_of_string<P: ::wasm_bindgen::JsGeneric>(
         this: &Params<P>,

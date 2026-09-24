@@ -8,7 +8,7 @@ pub mod discriminated_unions;
 pub mod enums;
 pub mod functions;
 pub(crate) mod primitive_unions;
-pub mod records;
+pub(crate) mod records;
 pub mod signatures;
 pub mod subtyping;
 pub mod typemap;

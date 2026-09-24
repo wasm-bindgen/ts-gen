@@ -653,9 +653,9 @@ hoisted recursively, using the synthesized parent's name.
 ## Named `Record<K, V>` aliases
 
 A named alias to the global TypeScript utility `Record<K, V>` becomes a
-nominal wasm-bindgen object wrapper. Open-key records implement `Default` and
-have `new()`. Their indexing getters and setters correspond to JavaScript's
-`record[key]` and `record[key] = value`:
+nominal wasm-bindgen object wrapper. Its indexing getters and setters
+correspond to JavaScript's `record[key]` and `record[key] = value`, and every
+record has `new()` and `Default`, both creating an empty object:
 
 ```ts
 type Labels = Record<string, string>;
@@ -665,27 +665,27 @@ type Labels = Record<string, string>;
 #[wasm_bindgen(extends = Object)]
 pub type Labels;
 
-#[wasm_bindgen(method, indexing_setter)]
-pub fn set(this: &Labels, key: &str, value: &str);
-
 #[wasm_bindgen(method, indexing_getter)]
 pub fn get(this: &Labels, key: &str) -> String;
 
 #[wasm_bindgen(catch, method, indexing_getter)]
 pub fn try_get(this: &Labels, key: &str) -> Result<String, JsValue>;
 
-impl Labels {
-    pub fn new() -> Self { /* unchecked_into of new Object */ }
-}
+#[wasm_bindgen(method, indexing_setter)]
+pub fn set(this: &Labels, key: &str, value: &str);
 
 impl Default for Labels { /* new Object */ }
+impl Labels {
+    pub fn new() -> Self { Self::default() }
+}
 ```
 
-When `V` is a union, its ABI alternatives use the same flattening and
-deduplication rules as callable parameters. Every surviving alternative gets
-type-named getters and setters so no union member is privileged as the
-unsuffixed form. Getters follow the normal primary / caught `try_` pairing;
-setters are infallible like other generated setters:
+Keys and values use the usual argument and return mappings, so under
+`--experimental-generic-mono` a `string` key is `impl JsStringLike`.
+
+**Union values** get one accessor family per distinct Rust alternative, named
+after it. The unsuffixed `get` / `set` are not emitted, so no member is
+privileged:
 
 ```ts
 type EvaluationContext = Record<string, string | number | boolean>;
@@ -693,55 +693,29 @@ type EvaluationContext = Record<string, string | number | boolean>;
 
 emits `get_string` / `try_get_string` / `set_string`,
 `get_number` / `try_get_number` / `set_number`, and
-`get_bool` / `try_get_bool` / `set_bool`.
+`get_bool` / `try_get_bool` / `set_bool`. Members use one alternative each,
+without the primitive-union grouping that callable parameters get under
+per-monomorphization, because each getter needs its own return type. Members
+that lower to the same Rust setter type collapse, so `"red" | "blue"` or
+`string | "auto"` is a single alternative and keeps plain `get` / `set`.
 
-When literal union members deduplicate to one ABI type, naming uses that ABI
-flavor rather than arbitrarily selecting the first literal. For example,
-`"red" | "blue"` produces a `string` flavor, not `string_red`.
-
-When `K` is not a union, it does not participate in method naming; this keeps
-the common string-keyed case at `get_<value>` / `set_<value>`. A heterogeneous
-open key union erases to `&JsValue` rather than expanding into separate key
-flavors. The erased key does not add a method-name suffix because the loss of
-key type safety is already visible in the parameter type:
+**Union keys**, including unions of literals, erase to `&JsValue`. They never
+multiply the methods:
 
 ```ts
-type Flexible = Record<string | number, string | boolean>;
+type Flexible = Record<string | number, boolean>;
+type Known = Record<"name" | "region", string>;
 ```
 
-includes `get_bool(key: &JsValue)`, `get_string(key: &JsValue)`,
-`set_bool(key: &JsValue, value: bool)`, and
-`set_string(key: &JsValue, value: &str)`. With a non-union `V`, the methods
-remain simply `get`, `try_get`, and `set`. A single open key domain retains its
-precise type, so `Record<string, V>` still takes `key: &str`.
-
-A string literal or a union made entirely of string literals instead becomes
-fixed-property accessors, with no runtime key argument. Aliases to such literal
-sets receive the same treatment:
-
-```ts
-type Known = Record<"name" | "enabled", string | boolean>;
+```rust
+pub fn get(this: &Flexible, key: &JsValue) -> bool;
+pub fn set(this: &Known, key: &JsValue, value: &str);
 ```
 
-This includes `get_string_with_name()`, `get_bool_with_enabled()`,
-`set_string_with_name(value)`, and `set_bool_with_enabled(value)`. With a
-non-union `V`, the value suffix is omitted (`get_name`, `set_name`). Literal
-names are snake-cased for Rust while `js_name` preserves the exact JavaScript
-property. Literal names that would be confused with type flavors are prefixed
-with `string_`, so a key named `"number"` becomes `get_string_number` when
-`V` is not a union.
-
-Finite-key records expose constructors that require one value per key, in key
-declaration order. They do not implement `Default` or expose a zero-argument
-constructor because an empty object would not contain their required
-properties. When a value union has multiple distinct Rust ABI alternatives,
-the record exposes one constructor taking `&JsValue` for every key rather than
-an exponential Cartesian product. The `Known` example therefore has
-`new(name: &JsValue, enabled: &JsValue)`. A homogeneous union whose alternatives
-deduplicate to one Rust parameter type retains that precise type. Each
-constructor initializes every property before returning the wrapper. A user
-declaration named `Record` shadows the global utility type and keeps normal
-alias behavior.
+Literal keys get no fixed-property accessors and no constructor that
+requires them; `new()` still returns an empty object. A user declaration
+named `Record` shadows the global utility type and keeps normal alias
+behavior.
 
 ## Discriminated unions
 
