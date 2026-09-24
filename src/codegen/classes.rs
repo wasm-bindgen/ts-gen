@@ -541,7 +541,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
     // Decompose a getter's `type_ref` into union members + ABI
     // fan-out flavors.
     let split_union = |ty: &crate::ir::TypeRef| -> Vec<crate::ir::TypeRef> {
-        crate::codegen::signatures::flatten_type_pub(ty, config.cgctx, config.scope)
+        crate::codegen::signatures::flatten_dictionary_field(ty, config.cgctx, config.scope)
     };
 
     // Helper that turns one required-getter list into a list of
@@ -586,10 +586,25 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 })
                 .collect();
 
+            // Exact param-type match first. Per-mono primitive-union
+            // grouping gives setters and factory options different
+            // groupings of the same members (the factory keeps literals
+            // apart), so fall back to the grouped setter whose marker
+            // trait accepts the option's type.
             let pick_setter = |target: &crate::ir::TypeRef| -> Option<syn::Ident> {
+                fn param_type<'s>(sig: &&'s FunctionSignature) -> Option<&'s crate::ir::TypeRef> {
+                    sig.params.first().map(|p| &p.type_ref)
+                }
                 setters
                     .iter()
-                    .find(|sig| sig.params.first().is_some_and(|p| &p.type_ref == target))
+                    .find(|sig| param_type(sig) == Some(target))
+                    .or_else(|| {
+                        setters.iter().find(|sig| {
+                            param_type(sig)
+                                .and_then(super::primitive_unions::PrimitiveUnion::classify)
+                                .is_some_and(|u| u.accepts(target))
+                        })
+                    })
                     .map(|sig| super::typemap::make_ident(&sig.rust_name))
             };
             // Fallback for fields without per-member setter granularity:

@@ -7,6 +7,7 @@ pub mod classes;
 pub mod discriminated_unions;
 pub mod enums;
 pub mod functions;
+pub(crate) mod primitive_unions;
 pub mod signatures;
 pub mod subtyping;
 pub mod typemap;
@@ -473,7 +474,7 @@ fn dynamic_union_variant_name(ty: &TypeRef) -> String {
             to_pascal_case(segments.last().map(|s| s.as_str()).unwrap_or("Unknown"))
         }
         T::Tuple(_) => "Tuple".to_string(),
-        T::Union(_) => "JsValue".to_string(),
+        T::Union(_) | T::PropertyKey => "JsValue".to_string(),
         T::Intersection(_) => "JsValue".to_string(),
         T::Function(_) => "Function".to_string(),
         T::Unresolved(_) => "JsValue".to_string(),

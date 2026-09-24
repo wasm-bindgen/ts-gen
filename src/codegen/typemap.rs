@@ -290,6 +290,7 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
         TypeRef::Object => buf.push_str("Object"),
         TypeRef::Symbol => buf.push_str("Symbol"),
         TypeRef::ArrayBufferView => buf.push_str("ArrayBufferView"),
+        TypeRef::PropertyKey => buf.push_str("PropertyKey"),
         TypeRef::StringLiteral(s) => write!(buf, "lit:{s:?}").unwrap(),
         TypeRef::NumberLiteral(n) => write!(buf, "lit:{n}").unwrap(),
         TypeRef::BooleanLiteral(b) => write!(buf, "lit:{b}").unwrap(),
@@ -815,6 +816,19 @@ pub fn to_syn_type(
     scope: ScopeId,
     from_module: &ModuleContext,
 ) -> TokenStream {
+    // Only per-mono arguments distinguish the `PropertyKey` spelling (see
+    // `signatures::mono_argument_type`); every other position lowers it as
+    // the union it abbreviates.
+    if matches!(ty, TypeRef::PropertyKey) {
+        return to_syn_type(
+            &TypeRef::Union(TypeRef::property_key_members()),
+            pos,
+            ctx,
+            scope,
+            from_module,
+        );
+    }
+
     // When inner, intercept primitives and nullable early to use JS wrapper forms
     if pos.inner {
         match ty {
@@ -873,6 +887,7 @@ pub fn to_syn_type(
                 quote! { Uint8Array }
             }
         }
+        TypeRef::PropertyKey => unreachable!("desugared at the top of `to_syn_type`"),
 
         // === Syntactic constructs ===
         //
@@ -1881,8 +1896,13 @@ fn maybe_synthesise_return_union(
     scope: ScopeId,
     anchor: ReturnAnchor<'_>,
 ) -> Option<TokenStream> {
+    let property_key_members;
     let members = match ty {
         TypeRef::Union(members) => members,
+        TypeRef::PropertyKey => {
+            property_key_members = TypeRef::property_key_members();
+            &property_key_members
+        }
         _ => return None,
     };
     let cgctx = ctx?;

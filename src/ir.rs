@@ -81,6 +81,12 @@ pub enum TypeRef {
     /// family + `DataView`. There is no JS class with this name, so it
     /// can't lower to a `js_sys` ident — codegen erases it to `Object`.
     ArrayBufferView,
+    /// TypeScript's built-in `PropertyKey` alias for `string | number |
+    /// symbol`. Kept distinct from the equivalent [`TypeRef::Union`] so
+    /// per-monomorphization arguments can use the `js_sys::PropertyKey`
+    /// spelling; everywhere else it lowers exactly like that union (see
+    /// [`TypeRef::property_key_members`]).
+    PropertyKey,
 
     // === Syntactic constructs ===
     /// `T[]` — the syntactic array shortcut. Distinct from
@@ -193,6 +199,12 @@ impl TypeRef {
         args.first()
     }
 
+    /// Members of the `string | number | symbol` union that
+    /// [`TypeRef::PropertyKey`] abbreviates, in `lib.es5.d.ts` order.
+    pub fn property_key_members() -> Vec<TypeRef> {
+        vec![TypeRef::String, TypeRef::Number, TypeRef::Symbol]
+    }
+
     /// Render this `TypeRef` back into a TypeScript-like string.
     ///
     /// Pretty-prints structurally faithful to the source — primitives
@@ -214,6 +226,7 @@ impl TypeRef {
             TypeRef::Object => "object".into(),
             TypeRef::Symbol => "symbol".into(),
             TypeRef::ArrayBufferView => "ArrayBufferView".into(),
+            TypeRef::PropertyKey => "PropertyKey".into(),
             TypeRef::Array(inner) => {
                 // Wrap composite inner types in parens so e.g.
                 // `(A | B)[]` doesn't render as the wrong-precedence

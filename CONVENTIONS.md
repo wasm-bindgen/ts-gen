@@ -61,6 +61,11 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 position vs return position. Argument-position container types are
 borrowed by reference; return-position container types are owned.
 
+TypeScript's built-in `PropertyKey` is recognised without a declaration
+and lowers exactly like `string | number | symbol`, except for
+[primitive union arguments](#primitive-union-arguments) in
+per-monomorphization mode.
+
 ## Optional and nullable types
 
 * `T | null` → `Option<T>` in return position. In argument position the
@@ -832,6 +837,9 @@ For every JS callable, `ts-gen`:
    Unions inside generic type arguments do not distribute:
    `Array<A | B>` and `Record<K, A | B>` are each one parameter shape,
    not `Array<A> | Array<B>` or `Record<K, A> | Record<K, B>`.
+   Under `--experimental-generic-mono`, primitive members spanning
+   several categories expand as one alternative instead (see
+   [primitive union arguments](#primitive-union-arguments)).
 2. **Cross-overload dedup**: When multiple overloads expand to the same
    concrete parameter list, drop the duplicates. Two overloads that
    both truncate to `(callback)` produce only one binding.
@@ -1262,6 +1270,53 @@ impl<T: ::wasm_bindgen::JsGeneric> EvaluationDetailsBuilder<T> {
     pub fn build(self) -> EvaluationDetails<T> { self.inner }
 }
 ```
+
+### Primitive union arguments
+
+In per-monomorphization mode, primitive union arguments use `js_sys`'s
+primitive-union marker traits instead of
+[signature flattening](#signature-flattening). When a parameter's
+alternatives include primitives from two or more of `bigint`, `boolean`,
+`number`, `string`, and `symbol`, those alternatives merge into one
+argument-position `impl` bound named `Js` + the categories in alphabetical
+order joined by `Or` + `Like`:
+
+```ts
+function setValue(value: string | number): void;
+function setLevel(level: 1 | 2 | "auto"): void;
+function hasKey(key: PropertyKey): boolean;
+function send(to: Target | string | number): void;
+```
+
+```rust
+pub fn set_value(value: impl ::js_sys::JsNumberOrStringLike);
+pub fn set_level(level: impl ::js_sys::JsNumberOrStringLike);
+pub fn has_key(key: impl ::js_sys::PropertyKey) -> bool;
+pub fn send(to: &Target);
+#[wasm_bindgen(js_name = "send")]
+pub fn send_with_number_or_string(to: impl ::js_sys::JsNumberOrStringLike);
+```
+
+* Literals count toward their category, so `1 | 2 | "auto"` is a
+  `number | string` union.
+* Aliases resolve first, and `null` / `undefined` arms are dropped as for
+  every argument-position union.
+* Non-primitive members keep their own overloads. The grouped binding takes
+  the position of the first primitive member, and its `_with_` suffix lists
+  the categories (`_with_number_or_string`).
+* A union covering one category (`"a" | "b" | string`) is not a primitive
+  union and keeps the `impl JsStringLike` / concrete-type rules above.
+* TypeScript's built-in `PropertyKey` maps to the `js_sys::PropertyKey`
+  alias. If the members are written out (`string | number | symbol`), the
+  canonical `JsNumberOrStringOrSymbolLike` name is used.
+* Dictionary factories keep literal members as `new_<literal>` constructors
+  and group only the remaining non-literal members. The field's setter still
+  takes the whole union, so the literal constructors call it.
+
+Return positions are unchanged: an erased union still becomes a
+[dynamic-union enum](#erased-return-position-unions-become-dynamic-union-enums).
+Without `--experimental-generic-mono` the traits aren't available, so
+primitive unions (including `PropertyKey`) keep the per-member fan-out.
 
 ## `@throws` JSDoc → typed error
 

@@ -18,6 +18,14 @@ wasm-bindgen = "0.2.128"
 wasm-bindgen-futures = "0.4.78"
 wasm-bindgen-test = "0.3.78"
 
+# Temporarily track wasm-bindgen/wasm-bindgen#5341 (primitive union traits +
+# generic property keys). All four crates must come from the same source.
+[patch.crates-io]
+js-sys = { git = "https://github.com/wasm-bindgen/wasm-bindgen", branch = "logan/generate-primitive-union-traits" }
+wasm-bindgen = { git = "https://github.com/wasm-bindgen/wasm-bindgen", branch = "logan/generate-primitive-union-traits" }
+wasm-bindgen-futures = { git = "https://github.com/wasm-bindgen/wasm-bindgen", branch = "logan/generate-primitive-union-traits" }
+wasm-bindgen-test = { git = "https://github.com/wasm-bindgen/wasm-bindgen", branch = "logan/generate-primitive-union-traits" }
+
 [package]
 categories = ["wasm", "development-tools::ffi"]
 description = "Generate wasm-bindgen Rust bindings from TypeScript .d.ts files"

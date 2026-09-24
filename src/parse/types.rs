@@ -248,6 +248,7 @@ fn convert_type_reference(
             "Number" => return TypeRef::Number,
             "String" => return TypeRef::String,
             "Object" => return TypeRef::Object,
+            "PropertyKey" => return TypeRef::PropertyKey,
             "Symbol" => return TypeRef::Symbol,
 
             "Function" => {
