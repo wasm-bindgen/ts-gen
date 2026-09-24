@@ -16,6 +16,12 @@ extern "C" {
         this: &EvaluationContext,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, indexing_setter)]
+    pub fn set_string(
+        this: &EvaluationContext,
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: impl ::wasm_bindgen::JsStringLike,
+    );
     #[wasm_bindgen(method, indexing_getter)]
     pub fn get_number(this: &EvaluationContext, key: impl ::wasm_bindgen::JsStringLike) -> f64;
     #[wasm_bindgen(catch, method, indexing_getter)]
@@ -23,6 +29,8 @@ extern "C" {
         this: &EvaluationContext,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<f64, JsValue>;
+    #[wasm_bindgen(method, indexing_setter)]
+    pub fn set_number(this: &EvaluationContext, key: impl ::wasm_bindgen::JsStringLike, value: f64);
     #[wasm_bindgen(method, indexing_getter)]
     pub fn get_bool(this: &EvaluationContext, key: impl ::wasm_bindgen::JsStringLike) -> bool;
     #[wasm_bindgen(catch, method, indexing_getter)]
@@ -30,14 +38,6 @@ extern "C" {
         this: &EvaluationContext,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, indexing_setter)]
-    pub fn set_string(
-        this: &EvaluationContext,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: impl ::wasm_bindgen::JsStringLike,
-    );
-    #[wasm_bindgen(method, indexing_setter)]
-    pub fn set_number(this: &EvaluationContext, key: impl ::wasm_bindgen::JsStringLike, value: f64);
     #[wasm_bindgen(method, indexing_setter)]
     pub fn set_bool(this: &EvaluationContext, key: impl ::wasm_bindgen::JsStringLike, value: bool);
 }
@@ -117,6 +117,12 @@ extern "C" {
         this: &MixedValues,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, indexing_setter)]
+    pub fn set_string(
+        this: &MixedValues,
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: impl ::wasm_bindgen::JsStringLike,
+    );
     #[wasm_bindgen(method, indexing_getter)]
     pub fn get_slice_of_string(
         this: &MixedValues,
@@ -127,12 +133,6 @@ extern "C" {
         this: &MixedValues,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Vec<String>, JsValue>;
-    #[wasm_bindgen(method, indexing_setter)]
-    pub fn set_string(
-        this: &MixedValues,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: impl ::wasm_bindgen::JsStringLike,
-    );
     #[wasm_bindgen(method, indexing_setter, slice_to_array)]
     pub fn set_slice_of_string(
         this: &MixedValues,
@@ -154,21 +154,72 @@ impl MixedValues {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Colors;
+    #[wasm_bindgen(method, indexing_getter)]
+    pub fn get(this: &Colors, key: impl ::wasm_bindgen::JsStringLike) -> String;
+    #[wasm_bindgen(catch, method, indexing_getter)]
+    pub fn try_get(
+        this: &Colors,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, indexing_setter)]
+    pub fn set(
+        this: &Colors,
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: impl ::wasm_bindgen::JsStringLike,
+    );
+}
+impl Default for Colors {
+    fn default() -> Self {
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+}
+impl Colors {
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type NumericLabels;
+    #[wasm_bindgen(method, indexing_getter)]
+    pub fn get(this: &NumericLabels, key: f64) -> String;
+    #[wasm_bindgen(catch, method, indexing_getter)]
+    pub fn try_get(this: &NumericLabels, key: f64) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, indexing_setter)]
+    pub fn set(this: &NumericLabels, key: f64, value: impl ::wasm_bindgen::JsStringLike);
+}
+impl Default for NumericLabels {
+    fn default() -> Self {
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+}
+impl NumericLabels {
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
     pub type FlexibleRecord;
     #[wasm_bindgen(method, indexing_getter)]
     pub fn get_string(this: &FlexibleRecord, key: &JsValue) -> String;
     #[wasm_bindgen(catch, method, indexing_getter)]
     pub fn try_get_string(this: &FlexibleRecord, key: &JsValue) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, indexing_getter)]
-    pub fn get_bool(this: &FlexibleRecord, key: &JsValue) -> bool;
-    #[wasm_bindgen(catch, method, indexing_getter)]
-    pub fn try_get_bool(this: &FlexibleRecord, key: &JsValue) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, indexing_setter)]
     pub fn set_string(
         this: &FlexibleRecord,
         key: &JsValue,
         value: impl ::wasm_bindgen::JsStringLike,
     );
+    #[wasm_bindgen(method, indexing_getter)]
+    pub fn get_bool(this: &FlexibleRecord, key: &JsValue) -> bool;
+    #[wasm_bindgen(catch, method, indexing_getter)]
+    pub fn try_get_bool(this: &FlexibleRecord, key: &JsValue) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, indexing_setter)]
     pub fn set_bool(this: &FlexibleRecord, key: &JsValue, value: bool);
 }
@@ -209,246 +260,21 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KnownLabels;
-    #[wasm_bindgen(method, getter, js_name = "displayName")]
-    pub fn get_display_name(this: &KnownLabels) -> String;
-    #[wasm_bindgen(catch, method, getter, js_name = "displayName")]
-    pub fn try_get_display_name(this: &KnownLabels) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, getter, js_name = "region")]
-    pub fn get_region(this: &KnownLabels) -> String;
-    #[wasm_bindgen(catch, method, getter, js_name = "region")]
-    pub fn try_get_region(this: &KnownLabels) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, setter, js_name = "displayName")]
-    pub fn set_display_name(this: &KnownLabels, value: impl ::wasm_bindgen::JsStringLike);
-    #[wasm_bindgen(method, setter, js_name = "region")]
-    pub fn set_region(this: &KnownLabels, value: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, indexing_getter)]
+    pub fn get(this: &KnownLabels, key: &JsValue) -> String;
+    #[wasm_bindgen(catch, method, indexing_getter)]
+    pub fn try_get(this: &KnownLabels, key: &JsValue) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, indexing_setter)]
+    pub fn set(this: &KnownLabels, key: &JsValue, value: impl ::wasm_bindgen::JsStringLike);
+}
+impl Default for KnownLabels {
+    fn default() -> Self {
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
 }
 impl KnownLabels {
-    #[doc = r" Creates a record with every required key initialized."]
-    pub fn new(
-        display_name: impl ::wasm_bindgen::JsStringLike,
-        region: impl ::wasm_bindgen::JsStringLike,
-    ) -> Self {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_display_name(display_name);
-        inner.set_region(region);
-        inner
-    }
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    # [wasm_bindgen (extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type KnownValues;
-    #[wasm_bindgen(method, getter, js_name = "name")]
-    pub fn get_string_with_name(this: &KnownValues) -> String;
-    #[wasm_bindgen(catch, method, getter, js_name = "name")]
-    pub fn try_get_string_with_name(this: &KnownValues) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, getter, js_name = "name")]
-    pub fn get_bool_with_name(this: &KnownValues) -> bool;
-    #[wasm_bindgen(catch, method, getter, js_name = "name")]
-    pub fn try_get_bool_with_name(this: &KnownValues) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, getter, js_name = "enabled")]
-    pub fn get_string_with_enabled(this: &KnownValues) -> String;
-    #[wasm_bindgen(catch, method, getter, js_name = "enabled")]
-    pub fn try_get_string_with_enabled(this: &KnownValues) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, getter, js_name = "enabled")]
-    pub fn get_bool_with_enabled(this: &KnownValues) -> bool;
-    #[wasm_bindgen(catch, method, getter, js_name = "enabled")]
-    pub fn try_get_bool_with_enabled(this: &KnownValues) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, setter, js_name = "name")]
-    pub fn set_string_with_name(this: &KnownValues, value: impl ::wasm_bindgen::JsStringLike);
-    #[wasm_bindgen(method, setter, js_name = "name")]
-    pub fn set_bool_with_name(this: &KnownValues, value: bool);
-    #[wasm_bindgen(method, setter, js_name = "enabled")]
-    pub fn set_string_with_enabled(this: &KnownValues, value: impl ::wasm_bindgen::JsStringLike);
-    #[wasm_bindgen(method, setter, js_name = "enabled")]
-    pub fn set_bool_with_enabled(this: &KnownValues, value: bool);
-}
-impl KnownValues {
-    #[doc = r" Creates a record with every required key initialized."]
-    pub fn new(name: &JsValue, enabled: &JsValue) -> Self {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
-        js_sys::Reflect::set(inner.as_ref(), &JsValue::from_str("name"), name.as_ref())
-            .expect("setting a property on a fresh object should not fail");
-        js_sys::Reflect::set(
-            inner.as_ref(),
-            &JsValue::from_str("enabled"),
-            enabled.as_ref(),
-        )
-        .expect("setting a property on a fresh object should not fail");
-        inner
-    }
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    # [wasm_bindgen (extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type KnownLiteralValues;
-    #[wasm_bindgen(method, getter, js_name = "primary")]
-    pub fn get_string_with_primary(this: &KnownLiteralValues) -> String;
-    #[wasm_bindgen(catch, method, getter, js_name = "primary")]
-    pub fn try_get_string_with_primary(this: &KnownLiteralValues) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, getter, js_name = "secondary")]
-    pub fn get_string_with_secondary(this: &KnownLiteralValues) -> String;
-    #[wasm_bindgen(catch, method, getter, js_name = "secondary")]
-    pub fn try_get_string_with_secondary(this: &KnownLiteralValues) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, setter, js_name = "primary")]
-    pub fn set_string_with_primary(
-        this: &KnownLiteralValues,
-        value: impl ::wasm_bindgen::JsStringLike,
-    );
-    #[wasm_bindgen(method, setter, js_name = "secondary")]
-    pub fn set_string_with_secondary(
-        this: &KnownLiteralValues,
-        value: impl ::wasm_bindgen::JsStringLike,
-    );
-}
-impl KnownLiteralValues {
-    #[doc = r" Creates a record with every required key initialized."]
-    pub fn new(
-        primary: impl ::wasm_bindgen::JsStringLike,
-        secondary: impl ::wasm_bindgen::JsStringLike,
-    ) -> Self {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_string_with_primary(primary);
-        inner.set_string_with_secondary(secondary);
-        inner
-    }
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    # [wasm_bindgen (extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type SingleLabel;
-    #[wasm_bindgen(method, getter, js_name = "name")]
-    pub fn get_name(this: &SingleLabel) -> String;
-    #[wasm_bindgen(catch, method, getter, js_name = "name")]
-    pub fn try_get_name(this: &SingleLabel) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, setter, js_name = "name")]
-    pub fn set_name(this: &SingleLabel, value: impl ::wasm_bindgen::JsStringLike);
-}
-impl SingleLabel {
-    #[doc = r" Creates a record with every required key initialized."]
-    pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> Self {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_name(name);
-        inner
-    }
-}
-#[wasm_bindgen]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum KnownKeys {
-    #[wasm_bindgen(js_name = "primary")]
-    Primary,
-    #[wasm_bindgen(js_name = "secondary")]
-    Secondary,
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    # [wasm_bindgen (extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type AliasedKnownLabels;
-    #[wasm_bindgen(method, getter, js_name = "primary")]
-    pub fn get_primary(this: &AliasedKnownLabels) -> String;
-    #[wasm_bindgen(catch, method, getter, js_name = "primary")]
-    pub fn try_get_primary(this: &AliasedKnownLabels) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, getter, js_name = "secondary")]
-    pub fn get_secondary(this: &AliasedKnownLabels) -> String;
-    #[wasm_bindgen(catch, method, getter, js_name = "secondary")]
-    pub fn try_get_secondary(this: &AliasedKnownLabels) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, setter, js_name = "primary")]
-    pub fn set_primary(this: &AliasedKnownLabels, value: impl ::wasm_bindgen::JsStringLike);
-    #[wasm_bindgen(method, setter, js_name = "secondary")]
-    pub fn set_secondary(this: &AliasedKnownLabels, value: impl ::wasm_bindgen::JsStringLike);
-}
-impl AliasedKnownLabels {
-    #[doc = r" Creates a record with every required key initialized."]
-    pub fn new(
-        primary: impl ::wasm_bindgen::JsStringLike,
-        secondary: impl ::wasm_bindgen::JsStringLike,
-    ) -> Self {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_primary(primary);
-        inner.set_secondary(secondary);
-        inner
-    }
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    # [wasm_bindgen (extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type ReservedKeyLabels;
-    #[wasm_bindgen(method, getter, js_name = "string")]
-    pub fn get_string_string(this: &ReservedKeyLabels) -> bool;
-    #[wasm_bindgen(catch, method, getter, js_name = "string")]
-    pub fn try_get_string_string(this: &ReservedKeyLabels) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, getter, js_name = "number")]
-    pub fn get_string_number(this: &ReservedKeyLabels) -> bool;
-    #[wasm_bindgen(catch, method, getter, js_name = "number")]
-    pub fn try_get_string_number(this: &ReservedKeyLabels) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, setter, js_name = "string")]
-    pub fn set_string_string(this: &ReservedKeyLabels, value: bool);
-    #[wasm_bindgen(method, setter, js_name = "number")]
-    pub fn set_string_number(this: &ReservedKeyLabels, value: bool);
-}
-impl ReservedKeyLabels {
-    #[doc = r" Creates a record with every required key initialized."]
-    pub fn new(string_string: bool, string_number: bool) -> Self {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_string_string(string_string);
-        inner.set_string_number(string_number);
-        inner
-    }
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    # [wasm_bindgen (extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type NumericLabels;
-    #[wasm_bindgen(method, indexing_getter)]
-    pub fn get_number(this: &NumericLabels, key: f64) -> String;
-    #[wasm_bindgen(catch, method, indexing_getter)]
-    pub fn try_get_number(this: &NumericLabels, key: f64) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, indexing_setter)]
-    pub fn set_number(this: &NumericLabels, key: f64, value: impl ::wasm_bindgen::JsStringLike);
-}
-impl NumericLabels {
-    #[doc = r" Creates a record with every required key initialized."]
-    pub fn new(
-        number_1: impl ::wasm_bindgen::JsStringLike,
-        number_2: impl ::wasm_bindgen::JsStringLike,
-    ) -> Self {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_number(1f64, number_1);
-        inner.set_number(2f64, number_2);
-        inner
-    }
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    # [wasm_bindgen (extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type GenericKnown<T>;
-    #[wasm_bindgen(method, getter, js_name = "first")]
-    pub fn get_first<T>(this: &GenericKnown<T>) -> T;
-    #[wasm_bindgen(catch, method, getter, js_name = "first")]
-    pub fn try_get_first<T>(this: &GenericKnown<T>) -> Result<T, JsValue>;
-    #[wasm_bindgen(method, getter, js_name = "second")]
-    pub fn get_second<T>(this: &GenericKnown<T>) -> T;
-    #[wasm_bindgen(catch, method, getter, js_name = "second")]
-    pub fn try_get_second<T>(this: &GenericKnown<T>) -> Result<T, JsValue>;
-    #[wasm_bindgen(method, setter, js_name = "first")]
-    pub fn set_first<T>(this: &GenericKnown<T>, value: T);
-    #[wasm_bindgen(method, setter, js_name = "second")]
-    pub fn set_second<T>(this: &GenericKnown<T>, value: T);
-}
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> GenericKnown<T> {
-    #[doc = r" Creates a record with every required key initialized."]
-    pub fn new(first: T, second: T) -> Self {
-        let inner: Self = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_first(first);
-        inner.set_second(second);
-        inner
+    pub fn new() -> Self {
+        Self::default()
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]

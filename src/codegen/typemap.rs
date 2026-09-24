@@ -602,26 +602,6 @@ impl<'a> CodegenContext<'a> {
         self.resolve_alias_impl(name, scope, &mut visited)
     }
 
-    /// Resolve a named string-literal set that parsing promoted to a string enum.
-    pub(crate) fn resolve_string_literal_set(
-        &self,
-        name: &str,
-        scope: ScopeId,
-    ) -> Option<Vec<String>> {
-        let type_id = self.gctx.scopes.resolve(scope, name)?;
-        let decl = self.gctx.get_type(type_id);
-        let TypeKind::StringEnum(string_enum) = &decl.kind else {
-            return None;
-        };
-        Some(
-            string_enum
-                .variants
-                .iter()
-                .map(|variant| variant.js_value.clone())
-                .collect(),
-        )
-    }
-
     fn resolve_alias_impl<'b>(
         &'b self,
         name: &str,
