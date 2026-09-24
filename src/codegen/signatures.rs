@@ -1300,15 +1300,13 @@ pub fn generate_concrete_params_with_mono_strings(
     quote! { #(#items),* }
 }
 
+/// Nullable string params are not handled: `string | null` and `x?: string`
+/// already lower non-nullable before reaching here, so they never arrive as
+/// `Nullable(String)`.
 fn mono_string_argument_type(ty: &TypeRef) -> Option<TokenStream> {
     match ty {
         TypeRef::String | TypeRef::StringLiteral(_) => {
             Some(quote! { impl ::wasm_bindgen::JsStringLike })
-        }
-        TypeRef::Nullable(inner)
-            if matches!(inner.as_ref(), TypeRef::String | TypeRef::StringLiteral(_)) =>
-        {
-            Some(quote! { Option<impl ::wasm_bindgen::JsStringLike> })
         }
         _ => None,
     }
@@ -1437,12 +1435,6 @@ mod tests {
                 .unwrap()
                 .to_string(),
             "impl :: wasm_bindgen :: JsStringLike"
-        );
-        assert_eq!(
-            mono_string_argument_type(&TypeRef::Nullable(Box::new(TypeRef::String)))
-                .unwrap()
-                .to_string(),
-            "Option < impl :: wasm_bindgen :: JsStringLike >"
         );
         assert!(mono_string_argument_type(&TypeRef::Number).is_none());
     }

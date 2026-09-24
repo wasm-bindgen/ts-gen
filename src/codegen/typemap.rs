@@ -1437,6 +1437,16 @@ fn to_mono_user_generic_arg(
     scope: ScopeId,
     from_module: &ModuleContext,
 ) -> TokenStream {
+    to_mono_user_generic_arg_impl(ty, ctx, scope, from_module, &mut HashSet::new())
+}
+
+fn to_mono_user_generic_arg_impl(
+    ty: &TypeRef,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+    visited_aliases: &mut HashSet<String>,
+) -> TokenStream {
     match ty {
         TypeRef::Boolean
         | TypeRef::BooleanLiteral(_)
@@ -1447,8 +1457,30 @@ fn to_mono_user_generic_arg(
             to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module)
         }
         TypeRef::Nullable(inner) => {
-            let inner = to_mono_user_generic_arg(inner, ctx, scope, from_module);
+            let inner =
+                to_mono_user_generic_arg_impl(inner, ctx, scope, from_module, visited_aliases);
             quote! { Option<#inner> }
+        }
+        // Chase aliases so `Holder<Id>` (with `type Id = string`) lowers
+        // identically to `Holder<string>`; otherwise the same TS type would
+        // map to two incompatible Rust instantiations.
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } if segments.len() == 1 && generic_args.is_empty() => {
+            let name = &segments[0];
+            if visited_aliases.insert(name.clone()) {
+                if let Some(target) = ctx.and_then(|c| c.resolve_alias(name, scope)) {
+                    return to_mono_user_generic_arg_impl(
+                        target,
+                        ctx,
+                        scope,
+                        from_module,
+                        visited_aliases,
+                    );
+                }
+            }
+            to_syn_type(ty, TypePosition::RETURN.to_inner(), ctx, scope, from_module)
         }
         TypeRef::Reference {
             segments,
@@ -1465,7 +1497,7 @@ fn to_mono_user_generic_arg(
         }
         TypeRef::Union(members) => {
             if let Some(lub) = crate::codegen::subtyping::lub_union(members, ctx, scope) {
-                to_mono_user_generic_arg(&lub, ctx, scope, from_module)
+                to_mono_user_generic_arg_impl(&lub, ctx, scope, from_module, visited_aliases)
             } else {
                 to_syn_type(ty, TypePosition::RETURN.to_inner(), ctx, scope, from_module)
             }
@@ -1660,7 +1692,9 @@ fn has_mono_js_string_return_impl(
 /// string leaves with `JsString`. This consumes the explicit signature marker
 /// rather than smuggling a synthetic `TypeRef::Reference("JsString")` through
 /// normal name resolution, where a user declaration could shadow it.
-fn to_mono_js_string_return_type(
+///
+/// Also used directly for additive `_js_string` getter variants.
+pub(crate) fn to_mono_js_string_return_type(
     ty: &TypeRef,
     ctx: &CodegenContext<'_>,
     scope: ScopeId,
@@ -1726,16 +1760,6 @@ fn to_mono_js_string_return_type_impl(
         }
         _ => to_syn_type(ty, TypePosition::RETURN, Some(ctx), scope, from_module),
     }
-}
-
-/// Lower an additive `_js_string` getter variant from its original source type.
-pub fn to_js_string_getter_return_type(
-    ty: &TypeRef,
-    ctx: &CodegenContext<'_>,
-    scope: ScopeId,
-    from_module: &ModuleContext,
-) -> TokenStream {
-    to_mono_js_string_return_type(ty, ctx, scope, from_module)
 }
 
 /// The default error type used when a fallible binding has no

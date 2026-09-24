@@ -1108,8 +1108,9 @@ where
 
 Concrete primitive arguments to locally declared generic types use native Rust
 ABIs in this mode: `Details<boolean>`, `Details<number>`, and `Details<string>`
-become `Details<bool>`, `Details<f64>`, and `Details<String>`. This native-leaf
-rule is deliberately limited to user declarations. Built-in JS containers,
+become `Details<bool>`, `Details<f64>`, and `Details<String>`. Aliases resolve
+first, so `Details<Id>` with `type Id = string` is also `Details<String>`.
+This native-leaf rule is deliberately limited to user declarations. Built-in JS containers,
 tuples, iterators, and callbacks retain their established wrapper elements
 (`Array<JsString>`, `Map<JsString, JsString>`, and so on).
 

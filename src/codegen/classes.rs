@@ -1629,7 +1629,7 @@ fn generate_getter(
         .map(|ctx| {
             let js_name = dedupe_name(&format!("{rust_name}_js_string"), used_names);
             let js_ident = super::typemap::make_ident(&js_name);
-            let js_type = super::typemap::to_js_string_getter_return_type(
+            let js_type = super::typemap::to_mono_js_string_return_type(
                 &lowered_ty,
                 ctx,
                 config.scope,
@@ -1776,7 +1776,7 @@ fn generate_static_getter(
         .map(|ctx| {
             let js_name = dedupe_name(&format!("{rust_name}_js_string"), used_names);
             let js_ident = super::typemap::make_ident(&js_name);
-            let js_type = super::typemap::to_js_string_getter_return_type(
+            let js_type = super::typemap::to_mono_js_string_return_type(
                 &getter.type_ref,
                 ctx,
                 config.scope,

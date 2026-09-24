@@ -70,3 +70,45 @@ extern "C" {
         name: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>;
 }
+#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Holder<T>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new<T>(value: T) -> Result<Holder<T>, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn get<T>(this: &Holder<T>) -> T;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub fn try_get<T>(this: &Holder<T>) -> Result<T, JsValue>;
+}
+#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "takesHolder")]
+    pub fn takes_holder(h: &Holder<String>, g: &Holder<String>);
+}
+#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "takesHolder")]
+    pub fn try_takes_holder(h: &Holder<String>, g: &Holder<String>) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "holderOfId")]
+    pub fn holder_of_id() -> Holder<String>;
+}
+#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "holderOfId")]
+    pub fn holder_of_id_js_string() -> Holder<JsString>;
+}
+#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "holderOfId")]
+    pub fn try_holder_of_id() -> Result<Holder<String>, JsValue>;
+}
+#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "holderOfId")]
+    pub fn try_holder_of_id_js_string() -> Result<Holder<JsString>, JsValue>;
+}
