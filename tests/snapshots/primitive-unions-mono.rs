@@ -27,24 +27,44 @@ extern "C" {
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "setAny")]
-    pub fn set_any(value: impl ::js_sys::JsBigIntOrBooleanOrNumberOrStringOrSymbolLike);
+    pub fn set_any(value: impl ::js_sys::JsBigIntOrBooleanOrNumberOrStringLike);
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setAny")]
     pub fn try_set_any(
-        value: impl ::js_sys::JsBigIntOrBooleanOrNumberOrStringOrSymbolLike,
+        value: impl ::js_sys::JsBigIntOrBooleanOrNumberOrStringLike,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
+    #[wasm_bindgen(js_name = "setAny")]
+    pub fn set_any_with_js_value(value: &JsValue);
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "setAny")]
+    pub fn try_set_any_with_js_value(value: &JsValue) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
     #[wasm_bindgen(js_name = "setKeyed")]
-    pub fn set_keyed(value: impl ::js_sys::JsStringOrSymbolLike);
+    pub fn set_keyed(value: impl ::wasm_bindgen::JsStringLike);
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setKeyed")]
-    pub fn try_set_keyed(value: impl ::js_sys::JsStringOrSymbolLike) -> Result<(), JsValue>;
+    pub fn try_set_keyed(value: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "setKeyed")]
+    pub fn set_keyed_with_js_value(value: &JsValue);
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "setKeyed")]
+    pub fn try_set_keyed_with_js_value(value: &JsValue) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
@@ -112,14 +132,12 @@ extern "C" {
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "hasKeyExplicit")]
-    pub fn has_key_explicit(key: impl ::js_sys::JsNumberOrStringOrSymbolLike) -> bool;
+    pub fn has_key_explicit(key: impl ::js_sys::PropertyKey) -> bool;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "hasKeyExplicit")]
-    pub fn try_has_key_explicit(
-        key: impl ::js_sys::JsNumberOrStringOrSymbolLike,
-    ) -> Result<bool, JsValue>;
+    pub fn try_has_key_explicit(key: impl ::js_sys::PropertyKey) -> Result<bool, JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {

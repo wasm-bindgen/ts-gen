@@ -18,8 +18,9 @@ export declare function setMaybe(value?: string | number): void;
 export type Id = string | number;
 export declare function lookup(id: Id): void;
 
-// `PropertyKey` keeps its `js_sys::PropertyKey` spelling; the same
-// members written out use the canonical trait name.
+// `number | string | symbol` maps to `js_sys::PropertyKey` however it is
+// spelled. Other `symbol` mixes (`setAny`, `setKeyed`) have no trait, so
+// `symbol` keeps its own overload and the remaining members group.
 export declare function hasKey(key: PropertyKey): boolean;
 export declare function hasKeyExplicit(key: string | number | symbol): boolean;
 

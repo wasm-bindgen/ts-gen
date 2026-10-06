@@ -1277,9 +1277,9 @@ In per-monomorphization mode, primitive union arguments use `js_sys`'s
 primitive-union marker traits instead of
 [signature flattening](#signature-flattening). When a parameter's
 alternatives include primitives from two or more of `bigint`, `boolean`,
-`number`, `string`, and `symbol`, those alternatives merge into one
-argument-position `impl` bound named `Js` + the categories in alphabetical
-order joined by `Or` + `Like`:
+`number`, and `string`, those alternatives merge into one argument-position
+`impl` bound named `Js` + the categories in alphabetical order joined by
+`Or` + `Like`:
 
 ```ts
 function setValue(value: string | number): void;
@@ -1306,9 +1306,12 @@ pub fn send_with_number_or_string(to: impl ::js_sys::JsNumberOrStringLike);
   the categories (`_with_number_or_string`).
 * A union covering one category (`"a" | "b" | string`) is not a primitive
   union and keeps the `impl JsStringLike` / concrete-type rules above.
-* TypeScript's built-in `PropertyKey` maps to the `js_sys::PropertyKey`
-  alias. If the members are written out (`string | number | symbol`), the
-  canonical `JsNumberOrStringOrSymbolLike` name is used.
+* `symbol` only groups as part of `number | string | symbol`, which maps to
+  `js_sys::PropertyKey` whether it's spelled `PropertyKey` or written out.
+  In any other mix, `symbol` members keep their own `&JsValue` overload
+  and the remaining members group: `string | symbol | boolean` becomes
+  `impl JsBooleanOrStringLike` plus `_with_js_value(&JsValue)`, and
+  `string | symbol` stays `impl JsStringLike` plus `&JsValue`.
 * Dictionary factories keep literal members as `new_<literal>` constructors
   and group only the remaining non-literal members. The field's setter still
   takes the whole union, so the literal constructors call it.

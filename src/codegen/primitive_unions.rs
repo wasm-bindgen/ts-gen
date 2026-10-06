@@ -1,8 +1,11 @@
 //! TypeScript primitive unions → `js_sys` primitive-union marker traits.
 //!
 //! `js-sys` exposes one experimental marker trait for every union of two or
-//! more of the value primitives `bigint`, `boolean`, `number`, `string`, and
-//! `symbol` (`JsNumberOrStringLike` for `number | string`, …). Under
+//! more of the value primitives `bigint`, `boolean`, `number`, and `string`
+//! (`JsNumberOrStringLike` for `number | string`, …), plus `PropertyKey` for
+//! `number | string | symbol`. No other union containing `symbol` has a
+//! trait; those group their remaining members and keep `symbol` as its own
+//! `&Symbol` alternative. Under
 //! `experimental_generic_mono` an import parameter bounded by one of them
 //! accepts every Rust representation of every member while keeping each
 //! instantiation's native ABI, so a primitive union parameter becomes one
@@ -88,6 +91,15 @@ fn leaf_categories(ty: &TypeRef) -> Option<&'static [PrimitiveCategory]> {
     })
 }
 
+/// Whether `js-sys` defines a marker trait for exactly this category set.
+fn has_trait(categories: &BTreeSet<PrimitiveCategory>) -> bool {
+    if categories.contains(&PrimitiveCategory::Symbol) {
+        categories.iter().eq(PROPERTY_KEY_CATEGORIES.iter())
+    } else {
+        categories.len() >= 2
+    }
+}
+
 fn is_literal(ty: &TypeRef) -> bool {
     matches!(
         ty,
@@ -95,44 +107,40 @@ fn is_literal(ty: &TypeRef) -> bool {
     )
 }
 
-/// A union of at least two primitive categories, lowered to one marker trait.
+/// A union of primitive categories that `js-sys` has a marker trait for.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct PrimitiveUnion {
     categories: BTreeSet<PrimitiveCategory>,
-    /// The source spelled the whole union as TypeScript's `PropertyKey`,
-    /// which maps to the `js_sys::PropertyKey` alias rather than its
-    /// canonical `JsNumberOrStringOrSymbolLike` name.
-    property_key: bool,
 }
 
 impl PrimitiveUnion {
     /// Classify a grouped alternative produced by [`group_alternatives`]:
     /// `PropertyKey`, or a `Union` whose members are all primitive leaves
-    /// spanning at least two categories. Aliases must already be resolved.
+    /// spanning a category set with a marker trait. Aliases must already be
+    /// resolved.
     pub(crate) fn classify(ty: &TypeRef) -> Option<Self> {
-        match ty {
-            TypeRef::PropertyKey => Some(Self {
-                categories: PROPERTY_KEY_CATEGORIES.into_iter().collect(),
-                property_key: true,
-            }),
+        let categories: BTreeSet<PrimitiveCategory> = match ty {
+            TypeRef::PropertyKey => PROPERTY_KEY_CATEGORIES.into_iter().collect(),
             TypeRef::Union(members) => {
                 let mut categories = BTreeSet::new();
                 for member in members {
                     categories.extend(leaf_categories(member)?.iter().copied());
                 }
-                (categories.len() >= 2).then_some(Self {
-                    categories,
-                    property_key: false,
-                })
+                categories
             }
-            _ => None,
-        }
+            _ => return None,
+        };
+        has_trait(&categories).then_some(Self { categories })
     }
 
-    /// `::js_sys::JsNumberOrStringLike`, or `::js_sys::PropertyKey` when
-    /// the source used that spelling.
+    fn is_property_key(&self) -> bool {
+        self.categories.contains(&PrimitiveCategory::Symbol)
+    }
+
+    /// `::js_sys::JsNumberOrStringLike`, or `::js_sys::PropertyKey` for
+    /// `number | string | symbol` however it is spelled.
     pub(crate) fn trait_path(&self) -> TokenStream {
-        if self.property_key {
+        if self.is_property_key() {
             return quote! { ::js_sys::PropertyKey };
         }
         let name = self
@@ -148,7 +156,7 @@ impl PrimitiveUnion {
     /// `_with_<suffix>` disambiguator: the TypeScript member names joined
     /// by `_or_`, mirroring the trait name.
     pub(crate) fn suffix(&self) -> String {
-        if self.property_key {
+        if self.is_property_key() {
             return "property_key".to_string();
         }
         self.categories
@@ -173,23 +181,42 @@ impl PrimitiveUnion {
 }
 
 /// Merge the primitive leaves of a flattened alternative list into one
-/// grouped alternative when they span at least two categories.
+/// grouped alternative when `js-sys` has a marker trait for their
+/// categories.
 ///
 /// The grouped alternative takes the position of the first primitive leaf;
 /// every non-primitive alternative keeps its own slot, so `string | number |
 /// Foo` becomes `[string | number, Foo]`. With `keep_literals`, literal
 /// leaves stay separate alternatives (dictionary factories turn them into
 /// `new_<literal>` constructors) and only the non-literal leaves group.
+///
+/// When the leaves mix `symbol` with categories other than `PropertyKey`'s,
+/// no trait covers them, so the `symbol`-bearing leaves stay separate and
+/// only the rest group: `string | number | symbol | boolean` becomes
+/// `[boolean | number | string, symbol]`.
 pub(crate) fn group_alternatives(alts: Vec<TypeRef>, keep_literals: bool) -> Vec<TypeRef> {
     let is_candidate =
         |ty: &TypeRef| leaf_categories(ty).is_some() && !(keep_literals && is_literal(ty));
+    if let Some(grouped) = group_where(&alts, is_candidate) {
+        return grouped;
+    }
+    group_where(&alts, |ty| {
+        is_candidate(ty)
+            && !leaf_categories(ty)
+                .unwrap()
+                .contains(&PrimitiveCategory::Symbol)
+    })
+    .unwrap_or(alts)
+}
+
+fn group_where(alts: &[TypeRef], is_candidate: impl Fn(&TypeRef) -> bool) -> Option<Vec<TypeRef>> {
     let categories: BTreeSet<PrimitiveCategory> = alts
         .iter()
         .filter(|ty| is_candidate(ty))
         .flat_map(|ty| leaf_categories(ty).unwrap().iter().copied())
         .collect();
-    if categories.len() < 2 {
-        return alts;
+    if !has_trait(&categories) {
+        return None;
     }
 
     let candidates: Vec<&TypeRef> = alts.iter().filter(|ty| is_candidate(ty)).collect();
@@ -201,15 +228,15 @@ pub(crate) fn group_alternatives(alts: Vec<TypeRef>, keep_literals: bool) -> Vec
     let mut out = Vec::with_capacity(alts.len());
     let mut grouped = Some(grouped);
     for ty in alts {
-        if is_candidate(&ty) {
+        if is_candidate(ty) {
             if let Some(g) = grouped.take() {
                 out.push(g);
             }
         } else {
-            out.push(ty);
+            out.push(ty.clone());
         }
     }
-    out
+    Some(out)
 }
 
 #[cfg(test)]
@@ -235,13 +262,20 @@ mod tests {
         );
         assert_eq!(
             trait_name(&union(&[
-                TypeRef::Symbol,
                 TypeRef::String,
                 TypeRef::Boolean,
                 TypeRef::BigInt,
                 TypeRef::Number,
             ])),
-            ":: js_sys :: JsBigIntOrBooleanOrNumberOrStringOrSymbolLike"
+            ":: js_sys :: JsBigIntOrBooleanOrNumberOrStringLike"
+        );
+    }
+
+    #[test]
+    fn symbol_unions_other_than_property_key_have_no_trait() {
+        assert!(PrimitiveUnion::classify(&union(&[TypeRef::String, TypeRef::Symbol])).is_none());
+        assert!(
+            PrimitiveUnion::classify(&union(&[TypeRef::PropertyKey, TypeRef::Boolean])).is_none()
         );
     }
 
@@ -268,18 +302,14 @@ mod tests {
     }
 
     #[test]
-    fn property_key_keeps_its_spelling() {
+    fn property_key_members_map_to_property_key() {
         assert_eq!(
             trait_name(&TypeRef::PropertyKey),
             ":: js_sys :: PropertyKey"
         );
         assert_eq!(
             trait_name(&union(&[TypeRef::Number, TypeRef::String, TypeRef::Symbol])),
-            ":: js_sys :: JsNumberOrStringOrSymbolLike"
-        );
-        assert_eq!(
-            trait_name(&union(&[TypeRef::PropertyKey, TypeRef::Boolean])),
-            ":: js_sys :: JsBooleanOrNumberOrStringOrSymbolLike"
+            ":: js_sys :: PropertyKey"
         );
     }
 
@@ -332,6 +362,33 @@ mod tests {
             TypeRef::StringLiteral("auto".into()),
         ];
         assert_eq!(group_alternatives(literals.clone(), true), literals);
+    }
+
+    #[test]
+    fn grouping_splits_off_symbol_without_a_covering_trait() {
+        let out = group_alternatives(
+            vec![
+                TypeRef::String,
+                TypeRef::Symbol,
+                TypeRef::Number,
+                TypeRef::Boolean,
+            ],
+            false,
+        );
+        assert_eq!(
+            out,
+            vec![
+                union(&[TypeRef::String, TypeRef::Number, TypeRef::Boolean]),
+                TypeRef::Symbol,
+            ]
+        );
+
+        let keyed = vec![TypeRef::String, TypeRef::Symbol];
+        assert_eq!(group_alternatives(keyed.clone(), false), keyed);
+
+        // `PropertyKey` can't be split, so it stays whole next to `boolean`.
+        let mixed = vec![TypeRef::PropertyKey, TypeRef::Boolean];
+        assert_eq!(group_alternatives(mixed.clone(), false), mixed);
     }
 
     #[test]

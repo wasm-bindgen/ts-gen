@@ -3,8 +3,9 @@
 use js_sys::{BigInt, JsString, Symbol};
 
 use ts_gen_integration_tests::primitive_unions_mono::{
-    has_key, has_key_explicit, lookup, send, send_with_number_or_string, set_any, set_flag,
-    set_keyed, set_level, set_maybe_with_value, set_nullable, set_value, Settings, Store, Target,
+    has_key, has_key_explicit, lookup, send, send_with_number_or_string, set_any,
+    set_any_with_js_value, set_flag, set_keyed, set_keyed_with_js_value, set_level,
+    set_maybe_with_value, set_nullable, set_value, Settings, Store, Target,
 };
 
 // This fixture has no backing JavaScript module, so it provides compile-only
@@ -27,10 +28,10 @@ fn primitive_union_signatures_compile(js_string: &JsString, symbol: &Symbol, big
     set_any(false);
     set_any(2u32);
     set_any("s");
-    set_any(symbol);
+    set_any_with_js_value(symbol);
 
     set_keyed("key");
-    set_keyed(symbol.clone());
+    set_keyed_with_js_value(symbol);
 
     set_level(1i32);
     set_level("auto");
@@ -42,6 +43,7 @@ fn primitive_union_signatures_compile(js_string: &JsString, symbol: &Symbol, big
     let _: bool = has_key(0u32);
     let _: bool = has_key(symbol);
     let _: bool = has_key_explicit(js_string.clone());
+    let _: bool = has_key_explicit(symbol);
 
     let target = Target::new("name");
     send(&target);

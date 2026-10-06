@@ -18,13 +18,14 @@ wasm-bindgen = "0.2.128"
 wasm-bindgen-futures = "0.4.78"
 wasm-bindgen-test = "0.3.78"
 
-# Temporarily track wasm-bindgen/wasm-bindgen#5341 (primitive union traits +
-# generic property keys). All four crates must come from the same source.
+# Temporarily track wasm-bindgen main at the merge of wasm-bindgen/wasm-bindgen#5341
+# (primitive union traits + generic property keys) until it ships in a release.
+# All four crates must come from the same source.
 [patch.crates-io]
-js-sys = { git = "https://github.com/wasm-bindgen/wasm-bindgen", branch = "logan/generate-primitive-union-traits" }
-wasm-bindgen = { git = "https://github.com/wasm-bindgen/wasm-bindgen", branch = "logan/generate-primitive-union-traits" }
-wasm-bindgen-futures = { git = "https://github.com/wasm-bindgen/wasm-bindgen", branch = "logan/generate-primitive-union-traits" }
-wasm-bindgen-test = { git = "https://github.com/wasm-bindgen/wasm-bindgen", branch = "logan/generate-primitive-union-traits" }
+js-sys = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "abfd615d3b7be189ce0f5f6135c31a11f011362e" }
+wasm-bindgen = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "abfd615d3b7be189ce0f5f6135c31a11f011362e" }
+wasm-bindgen-futures = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "abfd615d3b7be189ce0f5f6135c31a11f011362e" }
+wasm-bindgen-test = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "abfd615d3b7be189ce0f5f6135c31a11f011362e" }
 
 [package]
 categories = ["wasm", "development-tools::ffi"]

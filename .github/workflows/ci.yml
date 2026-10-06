@@ -62,9 +62,11 @@ jobs:
         node-version: '20'
     - uses: extractions/setup-just@v2
     # `just test-integration` invokes the wasm-bindgen-test-runner that
-    # ships with `wasm-bindgen-cli`. Install at the lockfile-pinned version
-    # so the schema matches the wasm-bindgen crate version.
-    - uses: taiki-e/install-action@v2
-      with:
-        tool: wasm-bindgen-cli@0.2.128
+    # ships with `wasm-bindgen-cli`. Install from the same revision as the
+    # patched workspace dependencies so their binary schemas match.
+    - run: >-
+        cargo install wasm-bindgen-cli
+        --git https://github.com/wasm-bindgen/wasm-bindgen
+        --rev abfd615d3b7be189ce0f5f6135c31a11f011362e
+        --locked
     - run: just test-integration
