@@ -45,6 +45,7 @@ use std::collections::HashSet;
 use proc_macro2::TokenStream;
 use quote::quote;
 
+use crate::codegen::primitive_unions;
 use crate::codegen::typemap::{self, CodegenContext, TypePosition};
 use crate::ir::{Param, Throws, TypeRef};
 use crate::parse::scope::ScopeId;
@@ -225,6 +226,10 @@ pub struct FunctionSignature {
     pub is_async: bool,
     /// Return type (already Promise-unwrapped when `is_async`).
     pub return_type: TypeRef,
+    /// Lower eligible string leaves to `JsString` for the additive
+    /// `_js_string` variant. Keeping this as metadata avoids representing a
+    /// codegen-only choice as a user-resolvable [`TypeRef::Reference`].
+    pub js_string_return: bool,
     /// Custom error type for the `Result` wrapper. `None` falls back to
     /// `JsValue` in [`to_return_type`].
     pub error_type: Option<TypeRef>,
@@ -325,6 +330,7 @@ pub fn collect_type_params(
         | TypeRef::Object
         | TypeRef::Symbol
         | TypeRef::ArrayBufferView
+        | TypeRef::PropertyKey
         | TypeRef::StringLiteral(_)
         | TypeRef::NumberLiteral(_)
         | TypeRef::BooleanLiteral(_)
@@ -359,18 +365,8 @@ pub fn expand_signatures(
     let render = |sig: &[ConcreteParam]| -> Vec<String> {
         sig.iter()
             .map(|p| {
-                if p.variadic {
-                    format!("{}: &[JsValue]", p.name)
-                } else {
-                    let ty = typemap::to_syn_type(
-                        &p.type_ref,
-                        TypePosition::ARGUMENT,
-                        cgctx,
-                        scope,
-                        &from_module,
-                    );
-                    format!("{}: {}", p.name, ty)
-                }
+                let ty = render_param_type(p, cgctx, scope, &from_module);
+                format!("{}: {}", p.name, ty)
             })
             .collect()
     };
@@ -485,7 +481,13 @@ pub fn build_signatures(
     let augmented_doc = spec.doc.clone();
 
     let allow_try = !is_async && !nothrow && spec.kind.allows_try_variant();
-    let mut out = Vec::with_capacity(expansions.len() * if allow_try { 2 } else { 1 });
+    let per_mono = CodegenContext::generic_mono(cgctx);
+    let variants_per_expansion = match (allow_try, per_mono) {
+        (true, true) => 4,
+        (true, false) | (false, true) => 2,
+        (false, false) => 1,
+    };
+    let mut out = Vec::with_capacity(expansions.len() * variants_per_expansion);
 
     for exp in expansions {
         let primary_candidate = public_rust_name(&format!("{base}{}", exp.name_suffix));
@@ -495,13 +497,14 @@ pub fn build_signatures(
         // * the kind always catches (constructors), OR
         // * it's async — *unless* `Throws::Never` opts out.
         let primary_catches = spec.kind.always_catches() || (is_async && !nothrow);
-        out.push(FunctionSignature {
+        let primary = FunctionSignature {
             rust_name: primary_name.clone(),
             js_name: spec.js_name.to_string(),
             params: exp.params.clone(),
             catch: primary_catches,
             is_async,
             return_type: return_type.clone(),
+            js_string_return: false,
             error_type: if primary_catches {
                 error_type.cloned()
             } else {
@@ -509,25 +512,48 @@ pub fn build_signatures(
             },
             doc: augmented_doc.clone(),
             body_scope: spec.body_scope,
-        });
+        };
+        push_with_js_string_return(&mut out, primary, used_names, cgctx, scope);
 
         if allow_try {
             let try_name = dedupe_name(&format!("try_{primary_name}"), used_names);
-            out.push(FunctionSignature {
+            let try_sig = FunctionSignature {
                 rust_name: try_name,
                 js_name: spec.js_name.to_string(),
                 params: exp.params,
                 catch: true,
                 is_async: false,
                 return_type: return_type.clone(),
+                js_string_return: false,
                 error_type: error_type.cloned(),
                 doc: augmented_doc.clone(),
                 body_scope: spec.body_scope,
-            });
+            };
+            push_with_js_string_return(&mut out, try_sig, used_names, cgctx, scope);
         }
     }
 
     out
+}
+
+fn push_with_js_string_return(
+    out: &mut Vec<FunctionSignature>,
+    sig: FunctionSignature,
+    used_names: &mut HashSet<String>,
+    cgctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) {
+    let has_js_return = cgctx.is_some_and(|ctx| {
+        ctx.experimental_generic_mono
+            && typemap::has_mono_js_string_return(&sig.return_type, ctx, scope)
+    });
+    out.push(sig.clone());
+    if has_js_return {
+        let mut js_sig = sig;
+        js_sig.rust_name = dedupe_name(&format!("{}_js_string", js_sig.rust_name), used_names);
+        js_sig.js_string_return = true;
+        out.push(js_sig);
+    }
 }
 
 /// Compute `_with_X` / `_with_X_and_Y` suffixes across a cohort of expanded
@@ -705,15 +731,16 @@ fn expand_single_overload(
     sigs
 }
 
-/// Public alias of [`flatten_type`] for callers in sibling modules
-/// (e.g. the dictionary-factory pipeline) that need to apply the
-/// same union + ABI fan-out rules to ad-hoc field types.
-pub fn flatten_type_pub(
+/// [`flatten_type`] for dictionary-factory fields. Literal members stay
+/// separate alternatives even under per-monomorphization primitive-union
+/// grouping, because the factory bakes each literal into its own
+/// `new_<literal>` constructor rather than taking it as an argument.
+pub fn flatten_dictionary_field(
     ty: &TypeRef,
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) -> Vec<TypeRef> {
-    flatten_type(ty, cgctx, scope)
+    flatten_type_with(ty, cgctx, scope, true)
 }
 
 /// Hard cap on the number of alternatives any single [`flatten_type`]
@@ -766,9 +793,28 @@ const CARTESIAN_PRODUCT_LIMIT: usize = 64;
 /// warning surfaces through the codegen context so the user sees
 /// that some source-level alternatives were dropped from the
 /// public API.
+///
+/// ## Primitive-union grouping
+///
+/// Under per-monomorphization codegen, primitive alternatives spanning
+/// two or more categories (`string | number`) merge into one grouped
+/// alternative that lowers to a `js_sys` marker-trait bound; see
+/// [`primitive_unions::group_alternatives`].
 fn flatten_type(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId) -> Vec<TypeRef> {
+    flatten_type_with(ty, cgctx, scope, false)
+}
+
+fn flatten_type_with(
+    ty: &TypeRef,
+    cgctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    keep_literals: bool,
+) -> Vec<TypeRef> {
     let mut out: Vec<TypeRef> = Vec::new();
     if flatten_into(ty, cgctx, scope, &mut out) {
+        if cgctx.is_some_and(|ctx| ctx.experimental_generic_mono) {
+            return primitive_unions::group_alternatives(out, keep_literals);
+        }
         return out;
     }
     if let Some(c) = cgctx {
@@ -835,6 +881,18 @@ fn flatten_into(
         // `JsOption<T>`) is independent and lives in `to_syn_type`.
         TypeRef::Nullable(inner) => flatten_into(inner, cgctx, scope, out),
 
+        // `PropertyKey` stays whole for per-mono grouping so it keeps
+        // the `js_sys::PropertyKey` spelling; otherwise it fans out like
+        // the union it abbreviates.
+        TypeRef::PropertyKey if !cgctx.is_some_and(|ctx| ctx.experimental_generic_mono) => {
+            flatten_into(
+                &TypeRef::Union(TypeRef::property_key_members()),
+                cgctx,
+                scope,
+                out,
+            )
+        }
+
         // Everything else is terminal — generic containers are not
         // distributive (`Array<A | B>` and `Record<K, A | B>` are
         // single parameter shapes, not overloads), and TS spelling
@@ -865,6 +923,7 @@ fn flatten_collapse_to_lub(
             crate::codegen::subtyping::lub_union(members, cgctx, scope).unwrap_or(TypeRef::Any)
         }
         TypeRef::Nullable(inner) => flatten_collapse_to_lub(inner, cgctx, scope),
+        TypeRef::PropertyKey => TypeRef::Any,
         TypeRef::Reference { .. } if ty.as_ident().is_some() => {
             if let Some(c) = cgctx {
                 if let Some(target) = c.resolve_alias(ty.as_ident().unwrap(), scope) {
@@ -1175,6 +1234,11 @@ fn type_snake_name(ty: &TypeRef) -> String {
         TypeRef::Any | TypeRef::Unknown => "js_value".to_string(),
         TypeRef::Object => "object".to_string(),
         TypeRef::ArrayBufferView => "typed_array".to_string(),
+        // Grouped per-mono primitive unions (`number_or_string`,
+        // `property_key`). Outside that mode `PropertyKey` has already
+        // fanned out into its members.
+        TypeRef::Union(_) | TypeRef::PropertyKey => primitive_unions::PrimitiveUnion::classify(ty)
+            .map_or_else(|| "js_value".to_string(), |u| u.suffix()),
         // Snake-case the leftmost (head) segment of any named
         // reference. Type args don't participate in `_with_` suffixes.
         // `Array<T>` and `ReadonlyArray<T>` lower to `&Array<U>` /
@@ -1229,32 +1293,114 @@ pub fn generate_concrete_params(
     quote! { #(#items),* }
 }
 
-/// Convert dictionary factory params to a `(bounds, params)` token-stream pair.
+/// Convert parameters, using argument-position `impl Trait` bounds for
+/// strings and primitive unions in per-monomorphization mode (see
+/// [`mono_argument_type`]).
+pub(crate) fn generate_concrete_params_with_mono_bounds(
+    params: &[ConcreteParam],
+    cgctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &crate::ir::ModuleContext,
+) -> TokenStream {
+    let per_mono = CodegenContext::generic_mono(cgctx);
+    if !per_mono {
+        return generate_concrete_params(params, cgctx, scope, from_module);
+    }
+
+    let items = params
+        .iter()
+        .map(|param| {
+            let name = typemap::make_ident(&param.name);
+            let ty = render_param_type(param, cgctx, scope, from_module);
+            quote! { #name: #ty }
+        })
+        .collect::<Vec<_>>();
+
+    quote! { #(#items),* }
+}
+
+/// The Rust type of one concrete parameter, exactly as the emitters render
+/// it. Cross-overload dedup compares these so two expansions collapse only
+/// when their rendered signatures coincide.
+fn render_param_type(
+    param: &ConcreteParam,
+    cgctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &crate::ir::ModuleContext,
+) -> TokenStream {
+    if param.variadic {
+        return quote! { &[JsValue] };
+    }
+    cgctx
+        .filter(|ctx| ctx.experimental_generic_mono)
+        .and_then(|_| mono_argument_type(&param.type_ref))
+        .unwrap_or_else(|| {
+            typemap::to_syn_type(
+                &param.type_ref,
+                TypePosition::ARGUMENT,
+                cgctx,
+                scope,
+                from_module,
+            )
+        })
+}
+
+/// Per-monomorphization argument bounds: strings become `impl
+/// JsStringLike`, and grouped primitive unions become the matching `impl
+/// js_sys::Js…Like` marker trait. Each occurrence is an independent
+/// anonymous type parameter.
+fn mono_argument_type(ty: &TypeRef) -> Option<TokenStream> {
+    let bound = |ty: &TypeRef| match ty {
+        TypeRef::String | TypeRef::StringLiteral(_) => {
+            Some(quote! { ::wasm_bindgen::JsStringLike })
+        }
+        _ => primitive_unions::PrimitiveUnion::classify(ty).map(|u| u.trait_path()),
+    };
+    match ty {
+        TypeRef::Nullable(inner) => bound(inner).map(|b| quote! { Option<impl #b> }),
+        _ => bound(ty).map(|b| quote! { impl #b }),
+    }
+}
+
+/// Rendered parameters for a dictionary factory, builder method, or setter.
+pub struct DictionaryParams {
+    /// One `Tn: ::js_sys::TypedArray` bound per `ArrayBufferView` param.
+    pub bounds: Vec<TokenStream>,
+    /// Extra `where` clause for Rust helper bodies. Extern declarations must
+    /// not use it; see [`generate_dictionary_params`].
+    pub helper_where_clause: TokenStream,
+    /// The rendered `name: Type, …` list.
+    pub params: TokenStream,
+}
+
+/// Render dictionary factory params into a [`DictionaryParams`].
 ///
 /// `ArrayBufferView` switches the helper into a generic signature
 /// `<Tn: js_sys::TypedArray>` and a `&Tn` parameter, so callers can pass any
 /// concrete typed-array (`Uint8Array`, `Int32Array`, etc.) without explicit
 /// casts. All other types pass through `generate_concrete_params`.
 ///
-/// Returns each synthesised ABV bound as a separate `TokenStream` (e.g.
-/// `T: ::js_sys::TypedArray`). Callers compose these with type-level
-/// generic bounds (`T: ::wasm_bindgen::JsGeneric`) via
-/// [`render_generic_bounds`] so a single `<...>` declaration carries
-/// every bound the `fn` needs.
+/// Each synthesised ABV bound is a separate `TokenStream` (e.g.
+/// `T: ::js_sys::TypedArray`). Callers compose the declarations with type-level generic bounds
+/// (`T: ::wasm_bindgen::JsGeneric`) via [`render_generic_bounds`] so a single
+/// `<...>` declaration carries every bound the `fn` needs.
+///
+/// Under per-monomorphization codegen, ordinary Rust helpers that call an
+/// imported `&T` parameter must repeat the macro-generated reference ABI bound.
+/// Extern declarations ignore the returned clause because wasm-bindgen adds
+/// that requirement to their generated call shim itself.
 pub fn generate_dictionary_params(
     params: &[ConcreteParam],
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
     from_module: &crate::ir::ModuleContext,
-) -> (Vec<TokenStream>, TokenStream) {
+) -> DictionaryParams {
     let mut generic_idents: Vec<syn::Ident> = Vec::new();
     let items: Vec<_> = params
         .iter()
         .map(|p| {
             let name = typemap::make_ident(&p.name);
-            let ty = if p.variadic {
-                quote! { &[JsValue] }
-            } else if matches!(p.type_ref, TypeRef::ArrayBufferView) {
+            let ty = if !p.variadic && matches!(p.type_ref, TypeRef::ArrayBufferView) {
                 let g = syn::Ident::new(
                     &generic_letter(generic_idents.len()),
                     proc_macro2::Span::call_site(),
@@ -1262,24 +1408,33 @@ pub fn generate_dictionary_params(
                 generic_idents.push(g.clone());
                 quote! { &#g }
             } else {
-                typemap::to_syn_type(
-                    &p.type_ref,
-                    TypePosition::ARGUMENT,
-                    cgctx,
-                    scope,
-                    from_module,
-                )
+                render_param_type(p, cgctx, scope, from_module)
             };
             quote! { #name: #ty }
         })
         .collect();
 
-    let bounds: Vec<TokenStream> = generic_idents
+    let bounds = generic_idents
         .iter()
         .map(|g| quote! { #g: ::js_sys::TypedArray })
-        .collect();
+        .collect::<Vec<_>>();
 
-    (bounds, quote! { #(#items),* })
+    // This must mirror wasm-bindgen's macro-generated import-shim bound: the
+    // ordinary Rust dictionary helper calls that shim with `&T` directly.
+    let helper_where_clause = if CodegenContext::generic_mono(cgctx) && !generic_idents.is_empty() {
+        quote! {
+            where
+                #(for<'__wbg> &'__wbg #generic_idents: ::wasm_bindgen::convert::IntoWasmAbi),*
+        }
+    } else {
+        quote! {}
+    };
+
+    DictionaryParams {
+        bounds,
+        helper_where_clause,
+        params: quote! { #(#items),* },
+    }
 }
 
 /// Wrap a list of `<T: Bound>` token streams into a `<T: Bound, U: Bound>`
@@ -1321,6 +1476,191 @@ mod tests {
 
     fn no_used() -> HashSet<String> {
         HashSet::new()
+    }
+
+    #[test]
+    fn mono_strings_use_anonymous_impl_trait() {
+        assert_eq!(
+            mono_argument_type(&TypeRef::String).unwrap().to_string(),
+            "impl :: wasm_bindgen :: JsStringLike"
+        );
+        assert_eq!(
+            mono_argument_type(&TypeRef::Nullable(Box::new(TypeRef::String)))
+                .unwrap()
+                .to_string(),
+            "Option < impl :: wasm_bindgen :: JsStringLike >"
+        );
+        assert!(mono_argument_type(&TypeRef::Number).is_none());
+    }
+
+    #[test]
+    fn mono_primitive_unions_use_marker_traits() {
+        let union = TypeRef::Union(vec![TypeRef::String, TypeRef::Number]);
+        assert_eq!(
+            mono_argument_type(&union).unwrap().to_string(),
+            "impl :: js_sys :: JsNumberOrStringLike"
+        );
+        assert_eq!(
+            mono_argument_type(&TypeRef::Nullable(Box::new(union)))
+                .unwrap()
+                .to_string(),
+            "Option < impl :: js_sys :: JsNumberOrStringLike >"
+        );
+        assert_eq!(
+            mono_argument_type(&TypeRef::PropertyKey)
+                .unwrap()
+                .to_string(),
+            "impl :: js_sys :: PropertyKey"
+        );
+    }
+
+    fn string_param(name: &str) -> Param {
+        Param {
+            name: name.into(),
+            type_ref: TypeRef::String,
+            optional: false,
+            variadic: false,
+        }
+    }
+
+    fn concrete(name: &str, type_ref: TypeRef, variadic: bool) -> ConcreteParam {
+        ConcreteParam {
+            name: name.into(),
+            type_ref,
+            variadic,
+        }
+    }
+
+    /// Build signatures for one overload with per-monomorphization on or off.
+    fn expand_mode(
+        mono: bool,
+        js: &str,
+        params: &[Param],
+        ret: &TypeRef,
+        used: &mut HashSet<String>,
+    ) -> Vec<FunctionSignature> {
+        let (gctx, scope) = test_ctx();
+        let mut cgctx = CodegenContext::empty(&gctx, scope);
+        cgctx.experimental_generic_mono = mono;
+        build_signatures(
+            &CallableSpec {
+                js_name: js,
+                kind: SignatureKind::Function,
+                overloads: &[params],
+                return_type: ret,
+                throws: &Throws::None,
+                doc: &None,
+                body_scope: scope,
+            },
+            used,
+            Some(&cgctx),
+            scope,
+        )
+    }
+
+    #[test]
+    fn mono_string_returns_add_js_string_variants() {
+        let sigs = expand_mode(
+            true,
+            "value",
+            &[string_param("fallback")],
+            &TypeRef::String,
+            &mut no_used(),
+        );
+        let names: Vec<(&str, bool)> = sigs
+            .iter()
+            .map(|s| (s.rust_name.as_str(), s.js_string_return))
+            .collect();
+        assert!(names.contains(&("value", false)));
+        assert!(names.contains(&("value_js_string", true)));
+        assert!(names.contains(&("try_value", false)));
+        assert!(names.contains(&("try_value_js_string", true)));
+        // The variant binds the same JS function with the same params.
+        let js = sigs
+            .iter()
+            .find(|s| s.rust_name == "value_js_string")
+            .unwrap();
+        assert_eq!(js.js_name, "value");
+        assert_eq!(js.params.len(), 1);
+    }
+
+    #[test]
+    fn js_string_variants_need_mono_and_a_string_return() {
+        let default = expand_mode(false, "value", &[], &TypeRef::String, &mut no_used());
+        assert!(default.iter().all(|s| !s.js_string_return));
+        let number = expand_mode(true, "count", &[], &TypeRef::Number, &mut no_used());
+        assert!(number.iter().all(|s| !s.js_string_return));
+    }
+
+    #[test]
+    fn js_string_variant_names_are_deduped() {
+        let mut used: HashSet<String> = ["value_js_string".to_string()].into();
+        let sigs = expand_mode(true, "value", &[], &TypeRef::String, &mut used);
+        assert!(sigs.iter().any(|s| s.rust_name == "value_js_string_2"));
+    }
+
+    #[test]
+    fn mono_bounds_params_switch_strings_only_in_mono_mode() {
+        let (gctx, scope) = test_ctx();
+        let mut cgctx = CodegenContext::empty(&gctx, scope);
+        let params = [
+            concrete("name", TypeRef::String, false),
+            concrete("count", TypeRef::Number, false),
+            concrete("rest", TypeRef::Any, true),
+        ];
+        let render = |cgctx: &CodegenContext<'_>| {
+            generate_concrete_params_with_mono_bounds(
+                &params,
+                Some(cgctx),
+                scope,
+                &crate::ir::ModuleContext::Global,
+            )
+            .to_string()
+        };
+        assert_eq!(
+            render(&cgctx),
+            "name : & str , count : f64 , rest : & [JsValue]"
+        );
+        cgctx.experimental_generic_mono = true;
+        assert_eq!(
+            render(&cgctx),
+            "name : impl :: wasm_bindgen :: JsStringLike , count : f64 , rest : & [JsValue]"
+        );
+    }
+
+    #[test]
+    fn dictionary_params_helper_where_clause_only_in_mono_mode() {
+        let (gctx, scope) = test_ctx();
+        let mut cgctx = CodegenContext::empty(&gctx, scope);
+        let params = [
+            concrete("view", TypeRef::ArrayBufferView, false),
+            concrete("label", TypeRef::String, false),
+        ];
+        let render = |cgctx: &CodegenContext<'_>| {
+            generate_dictionary_params(
+                &params,
+                Some(cgctx),
+                scope,
+                &crate::ir::ModuleContext::Global,
+            )
+        };
+
+        let default = render(&cgctx);
+        assert_eq!(default.bounds.len(), 1);
+        assert_eq!(default.bounds[0].to_string(), "T : :: js_sys :: TypedArray");
+        assert!(default.helper_where_clause.is_empty());
+        assert_eq!(default.params.to_string(), "view : & T , label : & str");
+
+        cgctx.experimental_generic_mono = true;
+        let mono = render(&cgctx);
+        assert_eq!(
+            mono.helper_where_clause.to_string(),
+            "where for < '__wbg > & '__wbg T : :: wasm_bindgen :: convert :: IntoWasmAbi"
+        );
+        assert_eq!(
+            mono.params.to_string(),
+            "view : & T , label : impl :: wasm_bindgen :: JsStringLike"
+        );
     }
 
     /// Create a GlobalContext + scope + CodegenContext for tests.

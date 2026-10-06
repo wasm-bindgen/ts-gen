@@ -61,6 +61,11 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 position vs return position. Argument-position container types are
 borrowed by reference; return-position container types are owned.
 
+TypeScript's built-in `PropertyKey` is recognised without a declaration
+and lowers exactly like `string | number | symbol`, except for
+[primitive union arguments](#primitive-union-arguments) in
+per-monomorphization mode.
+
 ## Optional and nullable types
 
 * `T | null` → `Option<T>` in return position. In argument position the
@@ -832,6 +837,9 @@ For every JS callable, `ts-gen`:
    Unions inside generic type arguments do not distribute:
    `Array<A | B>` and `Record<K, A | B>` are each one parameter shape,
    not `Array<A> | Array<B>` or `Record<K, A> | Record<K, B>`.
+   Under `--experimental-generic-mono`, primitive members spanning
+   several categories expand as one alternative instead (see
+   [primitive union arguments](#primitive-union-arguments)).
 2. **Cross-overload dedup**: When multiple overloads expand to the same
    concrete parameter list, drop the duplicates. Two overloads that
    both truncate to `(callback)` produce only one binding.
@@ -1068,6 +1076,111 @@ pub fn put<T: ::wasm_bindgen::JsGeneric>(this: &KeyValueStore, key: &str, value:
 pub fn get<T: ::wasm_bindgen::JsGeneric>(this: &KeyValueStore, key: &str) -> Option<T>;
 ```
 
+Passing `--experimental-generic-mono` selects wasm-bindgen's experimental
+per-monomorphization path. Every generated extern block receives
+`experimental_generic_mono`, type parameters omit the `JsGeneric` bound, and
+bare type-parameter arguments are passed by value so each concrete Rust type
+uses its native ABI representation:
+
+```rust
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    pub fn identity<T>(value: T) -> T;
+}
+```
+
+Generated dictionary helpers call their extern setters from ordinary Rust, so
+their type parameters carry the narrower ABI bound required at those call
+sites. The extern declarations themselves remain unconstrained:
+
+```rust
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> EvaluationDetails<T> { /* … */ }
+pub struct EvaluationDetailsBuilder<T> { /* … */ }
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> EvaluationDetailsBuilder<T> { /* … */ }
+```
+
+The ABI bound stays on helper `impl` blocks whose methods call generated
+setters. It is not attached to the builder struct itself, so merely storing or
+returning a builder does not constrain its type parameter.
+
+Array-buffer-view helper parameters retain their `TypedArray` widening bound.
+In per-monomorphization mode the helper also repeats the reference ABI bound
+that wasm-bindgen places on the generated import shim:
+
+```rust
+pub fn new<T: ::js_sys::TypedArray>(value: &T) -> TypedArrayOptions
+where
+    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+{ /* … */ }
+```
+
+Concrete primitive arguments to locally declared generic types use native Rust
+ABIs in this mode: `Details<boolean>`, `Details<number>`, and `Details<string>`
+become `Details<bool>`, `Details<f64>`, and `Details<String>`. Aliases resolve
+first, so `Details<Id>` with `type Id = string` is also `Details<String>`, and
+a union with a single common type lowers as that type (`Details<"a" | "b">` is
+`Details<String>`). Aliases emitted as their own Rust type, such as
+string-literal enums, stay named (`Details<Mode>`). A type parameter that
+shadows an alias stays a type parameter. This native-leaf rule is deliberately
+limited to user declarations. Built-in JS containers, tuples, iterators, and
+callbacks retain their established wrapper elements (`Array<JsString>`,
+`Map<JsString, JsString>`, and so on).
+
+Direct string arguments use argument-position `impl JsStringLike`, allowing
+`&str`, `String`, `&JsString`, and `JsString` without caller-side conversion.
+Each occurrence is an independent anonymous type parameter, so different
+string arguments may use different representations without generated names
+that could shadow source declarations. String returns remain concrete and get
+one additive zero-copy variant bound to the same JS name:
+
+```rust
+pub fn value(default_value: impl ::wasm_bindgen::JsStringLike) -> String;
+#[wasm_bindgen(js_name = "value")]
+pub fn value_js_string(default_value: impl ::wasm_bindgen::JsStringLike) -> JsString;
+```
+
+The return transform preserves nullable, fallible, async, and locally declared
+generic wrappers, using the same alias and union resolution as generic
+arguments. If a return has multiple eligible string leaves, one `_js_string`
+method replaces all of them rather than generating a Cartesian set of
+variants:
+
+```rust
+pub fn details() -> Pair<f64, String>;
+#[wasm_bindgen(js_name = "details")]
+pub fn details_js_string() -> Pair<f64, JsString>;
+```
+
+Getters, including static getters, get the same additive variant:
+
+```rust
+#[wasm_bindgen(method, getter, js_name = "flagKey")]
+pub fn flag_key<T>(this: &EvaluationDetails<T>) -> String;
+#[wasm_bindgen(method, getter, js_name = "flagKey")]
+pub fn flag_key_js_string<T>(this: &EvaluationDetails<T>) -> JsString;
+```
+
+No variant is generated when the return has no string leaf outside built-in
+containers (`Array<string>` keeps its single binding), or when a top-level
+union becomes a [dynamic-union enum](#erased-return-position-unions-become-dynamic-union-enums):
+`"a" | "b"` returns its enum only.
+
+Async returns use native Rust values in this mode when the resolved type is
+a primitive, a nullable primitive, or a locally declared generic type:
+
+| TypeScript | Default | `--experimental-generic-mono` |
+|---|---|---|
+| `Promise<string>` | `Result<JsString, _>` | `Result<String, _>` + `_js_string` |
+| `Promise<number>` | `Result<Number, _>` | `Result<f64, _>` |
+| `Promise<boolean>` | `Result<Boolean, _>` | `Result<bool, _>` |
+| `Promise<string \| undefined>` | `Result<JsOption<JsString>, _>` | `Result<Option<String>, _>` + `_js_string` |
+| `Promise<Details<string>>` | `Result<Details<JsString>, _>` | `Result<Details<String>, _>` + `_js_string` |
+| `Promise<Array<string>>` | `Result<Array<JsString>, _>` | unchanged |
+
+This can increase code size because wasm-bindgen generates a separate shim and
+descriptor for every instantiation. The option is experimental and tracks the
+upstream attribute of the same name.
+
 Parse-time, every type-parameter-bearing declaration (class,
 interface, type alias, method, function, namespace) creates a child
 **body scope** with its `<T, ...>` bound as
@@ -1157,6 +1270,56 @@ impl<T: ::wasm_bindgen::JsGeneric> EvaluationDetailsBuilder<T> {
     pub fn build(self) -> EvaluationDetails<T> { self.inner }
 }
 ```
+
+### Primitive union arguments
+
+In per-monomorphization mode, primitive union arguments use `js_sys`'s
+primitive-union marker traits instead of
+[signature flattening](#signature-flattening). When a parameter's
+alternatives include primitives from two or more of `bigint`, `boolean`,
+`number`, and `string`, those alternatives merge into one argument-position
+`impl` bound named `Js` + the categories in alphabetical order joined by
+`Or` + `Like`:
+
+```ts
+function setValue(value: string | number): void;
+function setLevel(level: 1 | 2 | "auto"): void;
+function hasKey(key: PropertyKey): boolean;
+function send(to: Target | string | number): void;
+```
+
+```rust
+pub fn set_value(value: impl ::js_sys::JsNumberOrStringLike);
+pub fn set_level(level: impl ::js_sys::JsNumberOrStringLike);
+pub fn has_key(key: impl ::js_sys::PropertyKey) -> bool;
+pub fn send(to: &Target);
+#[wasm_bindgen(js_name = "send")]
+pub fn send_with_number_or_string(to: impl ::js_sys::JsNumberOrStringLike);
+```
+
+* Literals count toward their category, so `1 | 2 | "auto"` is a
+  `number | string` union.
+* Aliases resolve first, and `null` / `undefined` arms are dropped as for
+  every argument-position union.
+* Non-primitive members keep their own overloads. The grouped binding takes
+  the position of the first primitive member, and its `_with_` suffix lists
+  the categories (`_with_number_or_string`).
+* A union covering one category (`"a" | "b" | string`) is not a primitive
+  union and keeps the `impl JsStringLike` / concrete-type rules above.
+* `symbol` only groups as part of `number | string | symbol`, which maps to
+  `js_sys::PropertyKey` whether it's spelled `PropertyKey` or written out.
+  In any other mix, `symbol` members keep their own `&JsValue` overload
+  and the remaining members group: `string | symbol | boolean` becomes
+  `impl JsBooleanOrStringLike` plus `_with_js_value(&JsValue)`, and
+  `string | symbol` stays `impl JsStringLike` plus `&JsValue`.
+* Dictionary factories keep literal members as `new_<literal>` constructors
+  and group only the remaining non-literal members. The field's setter still
+  takes the whole union, so the literal constructors call it.
+
+Return positions are unchanged: an erased union still becomes a
+[dynamic-union enum](#erased-return-position-unions-become-dynamic-union-enums).
+Without `--experimental-generic-mono` the traits aren't available, so
+primitive unions (including `PropertyKey`) keep the per-member fan-out.
 
 ## `@throws` JSDoc → typed error
 
