@@ -158,7 +158,7 @@ fn convert_ts_type_with_arena(
             TypeRef::Unresolved("infer type".to_string())
         }
         TSType::TSTypeOperatorType(op) => match op.operator {
-            TSTypeOperatorOperator::Readonly => {
+            TSTypeOperatorOperator::Readonly | TSTypeOperatorOperator::Unique => {
                 convert_ts_type_with_arena(&op.type_annotation, scope, scopes, diag)
             }
             _ => {

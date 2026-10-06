@@ -12,6 +12,12 @@ export declare function forEach(callback: (value: symbol) => void): void;
 export declare function setKey(key: string | symbol): void;
 export declare function lookup(): string | symbol;
 
+// `unique symbol` is just `symbol` to the binding.
+export declare const marker: unique symbol;
+export declare class Kinded {
+  static readonly kind: unique symbol;
+}
+
 export interface Tagged {
   tag: symbol;
   alias?: symbol;

@@ -50,7 +50,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 | `number`                        | `f64`                      |
 | `boolean`                       | `bool`                     |
 | `bigint`                        | `i64`                      |
-| `symbol`                        | `Symbol`                   |
+| `symbol` / `unique symbol`      | `Symbol`                   |
 | `void`                          | `()` (or omitted from sig) |
 | `undefined`                     | `Undefined`                |
 | `null`                          | `()`                       |

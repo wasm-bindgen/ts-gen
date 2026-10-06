@@ -91,6 +91,19 @@ extern "C" {
 }
 #[wasm_bindgen(module = "symbol")]
 extern "C" {
+    #[wasm_bindgen(thread_local_v2)]
+    pub static marker: Symbol;
+}
+#[wasm_bindgen(module = "symbol")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Kinded;
+    # [wasm_bindgen (static_method_of = Kinded , getter)]
+    pub fn kind() -> Symbol;
+}
+#[wasm_bindgen(module = "symbol")]
+extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Tagged;
