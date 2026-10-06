@@ -39,12 +39,12 @@ extern "C" {
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "setAny")]
-    pub fn set_any_with_js_value(value: &JsValue);
+    pub fn set_any_with_symbol(value: &Symbol);
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setAny")]
-    pub fn try_set_any_with_js_value(value: &JsValue) -> Result<(), JsValue>;
+    pub fn try_set_any_with_symbol(value: &Symbol) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
@@ -59,12 +59,12 @@ extern "C" {
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "setKeyed")]
-    pub fn set_keyed_with_js_value(value: &JsValue);
+    pub fn set_keyed_with_symbol(value: &Symbol);
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setKeyed")]
-    pub fn try_set_keyed_with_js_value(value: &JsValue) -> Result<(), JsValue>;
+    pub fn try_set_keyed_with_symbol(value: &Symbol) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {

@@ -50,6 +50,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 | `number`                        | `f64`                      |
 | `boolean`                       | `bool`                     |
 | `bigint`                        | `i64`                      |
+| `symbol`                        | `Symbol`                   |
 | `void`                          | `()` (or omitted from sig) |
 | `undefined`                     | `Undefined`                |
 | `null`                          | `()`                       |
@@ -915,6 +916,7 @@ up with what callers see in the function signature:
 | `number`        | `f64`            | `_with_f64`     |
 | `boolean`       | `bool`           | `_with_bool`    |
 | `bigint`        | `BigInt`         | `_with_big_int` |
+| `symbol`        | `&Symbol`        | `_with_symbol`  |
 | `Array<T>` / `T[]` | `&[T]`        | `_with_slice`   |
 | `Uint8Array`    | `&Uint8Array`    | `_with_uint8_array` |
 | `Foo` (named)   | `&Foo`           | `_with_foo`     |
@@ -1308,10 +1310,10 @@ pub fn send_with_number_or_string(to: impl ::js_sys::JsNumberOrStringLike);
   union and keeps the `impl JsStringLike` / concrete-type rules above.
 * `symbol` only groups as part of `number | string | symbol`, which maps to
   `js_sys::PropertyKey` whether it's spelled `PropertyKey` or written out.
-  In any other mix, `symbol` members keep their own `&JsValue` overload
+  In any other mix, `symbol` members keep their own `&Symbol` overload
   and the remaining members group: `string | symbol | boolean` becomes
-  `impl JsBooleanOrStringLike` plus `_with_js_value(&JsValue)`, and
-  `string | symbol` stays `impl JsStringLike` plus `&JsValue`.
+  `impl JsBooleanOrStringLike` plus `_with_symbol(&Symbol)`, and
+  `string | symbol` stays `impl JsStringLike` plus `&Symbol`.
 * Dictionary factories keep literal members as `new_<literal>` constructors
   and group only the remaining non-literal members. The field's setter still
   takes the whole union, so the literal constructors call it.
@@ -1574,6 +1576,7 @@ A synthesised enum can mix two variant forms in the same body:
   | `number`          | `f64`           | `F64(f64)`      |
   | `bigint`          | `BigInt`        | `BigInt(BigInt)` |
   | `boolean`         | `bool`          | `Bool(bool)`    |
+  | `symbol`          | `Symbol`        | `Symbol(Symbol)` |
   | `ArrayBuffer`     | `ArrayBuffer`   | `ArrayBuffer(ArrayBuffer)` |
   | `ArrayBufferView` | `Uint8Array`    | `Uint8Array(Uint8Array)` |
   | `Array<Foo>`      | `Vec<Foo>`      | `VecOfFoo(Vec<Foo>)` |
