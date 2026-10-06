@@ -447,6 +447,7 @@ fn generate_dynamic_unions(cgctx: &CodegenContext) -> TokenStream {
 /// | `number`          | `f64`           | `F64`           |
 /// | `bigint`          | `BigInt`        | `BigInt`        |
 /// | `boolean`         | `bool`          | `Bool`          |
+/// | `symbol`          | `Symbol`        | `Symbol`        |
 /// | `ArrayBufferView` | `Uint8Array`    | `Uint8Array`    |
 /// | `Foo` (named)     | `Foo`           | `Foo`           |
 fn dynamic_union_variant_name(ty: &TypeRef) -> String {
@@ -461,7 +462,7 @@ fn dynamic_union_variant_name(ty: &TypeRef) -> String {
         T::Null => "Null".to_string(),
         T::Any | T::Unknown => "JsValue".to_string(),
         T::Object => "Object".to_string(),
-        T::Symbol => "JsValue".to_string(),
+        T::Symbol => "Symbol".to_string(),
         // Return-position lowering specialises `ArrayBufferView` to
         // `Uint8Array` (see `to_syn_type`), so the variant name
         // matches the payload.

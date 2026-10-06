@@ -1229,6 +1229,7 @@ fn type_snake_name(ty: &TypeRef) -> String {
         TypeRef::Number => "f64".to_string(),
         TypeRef::Boolean => "bool".to_string(),
         TypeRef::BigInt => "big_int".to_string(),
+        TypeRef::Symbol => "symbol".to_string(),
         TypeRef::Void | TypeRef::Undefined => "undefined".to_string(),
         TypeRef::Null => "null".to_string(),
         TypeRef::Any | TypeRef::Unknown => "js_value".to_string(),

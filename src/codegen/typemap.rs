@@ -867,7 +867,7 @@ pub fn to_syn_type(
         TypeRef::Any => maybe_ref(quote! { JsValue }, borrow),
         TypeRef::Unknown => maybe_ref(quote! { JsValue }, borrow),
         TypeRef::Object => maybe_ref(quote! { Object }, borrow),
-        TypeRef::Symbol => maybe_ref(quote! { JsValue }, borrow),
+        TypeRef::Symbol => maybe_ref(quote! { Symbol }, borrow),
 
         // === TS-only synthetic ===
         // `ArrayBufferView` is a TS-only union alias (typed-array

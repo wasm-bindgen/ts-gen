@@ -27,12 +27,12 @@ extern "C" {
 #[wasm_bindgen(module = "property-key")]
 extern "C" {
     #[wasm_bindgen(js_name = "hasKey")]
-    pub fn has_key_with_js_value(key: &JsValue) -> bool;
+    pub fn has_key_with_symbol(key: &Symbol) -> bool;
 }
 #[wasm_bindgen(module = "property-key")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "hasKey")]
-    pub fn try_has_key_with_js_value(key: &JsValue) -> Result<bool, JsValue>;
+    pub fn try_has_key_with_symbol(key: &Symbol) -> Result<bool, JsValue>;
 }
 #[wasm_bindgen(module = "property-key")]
 extern "C" {
@@ -77,5 +77,5 @@ extern "C" {
 pub enum FirstKeyReturnKind {
     String(String),
     F64(f64),
-    JsValue(JsValue),
+    Symbol(Symbol),
 }
