@@ -810,11 +810,23 @@ fn flatten_type_with(
     scope: ScopeId,
     keep_literals: bool,
 ) -> Vec<TypeRef> {
+    let out = flatten_members(ty, cgctx, scope);
+    if out.len() > 1 && CodegenContext::generic_mono(cgctx) {
+        return primitive_unions::group_alternatives(out, keep_literals);
+    }
+    out
+}
+
+/// [`flatten_type`] without primitive-union grouping: one alternative per
+/// union member, even under per-monomorphization. Used where each
+/// alternative needs its own concrete return type, such as record getters.
+pub(crate) fn flatten_members(
+    ty: &TypeRef,
+    cgctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> Vec<TypeRef> {
     let mut out: Vec<TypeRef> = Vec::new();
     if flatten_into(ty, cgctx, scope, &mut out) {
-        if cgctx.is_some_and(|ctx| ctx.experimental_generic_mono) {
-            return primitive_unions::group_alternatives(out, keep_literals);
-        }
         return out;
     }
     if let Some(c) = cgctx {
@@ -1223,7 +1235,7 @@ fn compute_trim(signatures: &[Vec<ConcreteParam>]) -> (usize, usize) {
 /// `ArrayBufferView` is a synthetic union that lowers to `&Object` /
 /// `Uint8Array` depending on position; `typed_array` is short for
 /// "any concrete typed-array" which captures both arms.
-fn type_snake_name(ty: &TypeRef) -> String {
+pub(crate) fn type_snake_name(ty: &TypeRef) -> String {
     match ty {
         TypeRef::String => "str".to_string(),
         TypeRef::Number => "f64".to_string(),

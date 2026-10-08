@@ -26,6 +26,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [Interfaces (class-like vs dictionary)](#interfaces-class-like-vs-dictionary)
 * [Dictionary builders](#dictionary-builders)
 * [Anonymous interface synthesis](#anonymous-interface-synthesis)
+* [Named `Record<K, V>` aliases](#named-recordk-v-aliases)
 * [Discriminated unions](#discriminated-unions)
 * [`var X: { new(...): T }` patterns](#var-x--new-t-patterns)
 * [Module-scoped constructor variables](#module-scoped-constructor-variables)
@@ -574,8 +575,9 @@ type R2Range = {
 is treated as if the user had written `interface R2Range { … }`.
 Type aliases whose target is a single inline literal — or a union of
 inline literals (see below) — promote directly to interfaces; aliases
-to anything else (named types, primitives, function types, generics,
-`Record<…>`, etc.) keep their existing alias semantics.
+to anything else (named types, primitives, function types, other
+generics, etc.) keep their existing alias semantics. Named `Record`
+aliases receive the dedicated treatment described below.
 
 ### Union of inline literals
 
@@ -648,6 +650,90 @@ synthesized. Anonymous types nested inside a generic, an array,
 — they follow the regular type-mapping rules and erase to `Object`.
 Inline literals inside the *body* of a hoisted interface are themselves
 hoisted recursively, using the synthesized parent's name.
+
+## Named `Record<K, V>` aliases
+
+A named alias to the global TypeScript utility `Record<K, V>` becomes a
+nominal wasm-bindgen object wrapper. Its indexing getters and setters
+correspond to JavaScript's `record[key]` and `record[key] = value`, and every
+record has `new()` and `Default`, both creating an empty object:
+
+```ts
+type Labels = Record<string, string>;
+```
+
+```rust
+#[wasm_bindgen(extends = Object)]
+pub type Labels;
+
+#[wasm_bindgen(method, indexing_getter)]
+pub fn get(this: &Labels, key: &str) -> Option<String>;
+
+#[wasm_bindgen(method, indexing_setter)]
+pub fn set(this: &Labels, key: &str, value: &str);
+
+impl Default for Labels { /* new Object */ }
+impl Labels {
+    pub fn new() -> Self { Self::default() }
+}
+```
+
+Keys and values use the usual argument and return mappings, so under
+`--experimental-generic-mono` a `string` key is `impl JsStringLike`.
+
+Getters return `Option<V>`, following
+[Optional and nullable types](#optional-and-nullable-types): reading a missing
+key yields `undefined`, which is the normal case for a record rather than an
+exception, so there is no `catch` / `try_get` variant. An already-nullable
+value is not wrapped twice, and an `any` / `unknown` value reads as plain
+`JsValue`, which carries `undefined` in-band.
+
+**Union values** get one `get_<v>` / `set_<v>` pair per distinct Rust
+alternative, named after it, plus an untyped `get(key) -> JsValue` for
+inspecting whatever is stored. There is no unsuffixed `set`, so no member is
+privileged:
+
+```ts
+type EvaluationContext = Record<string, string | number | boolean>;
+```
+
+```rust
+pub fn get(this: &EvaluationContext, key: &str) -> JsValue;
+pub fn get_string(this: &EvaluationContext, key: &str) -> Option<String>;
+pub fn set_string(this: &EvaluationContext, key: &str, value: &str);
+pub fn get_number(this: &EvaluationContext, key: &str) -> Option<f64>;
+pub fn set_number(this: &EvaluationContext, key: &str, value: f64);
+pub fn get_bool(this: &EvaluationContext, key: &str) -> Option<bool>;
+pub fn set_bool(this: &EvaluationContext, key: &str, value: bool);
+```
+
+Members use one alternative each, without the primitive-union grouping that
+callable parameters get under per-monomorphization, because each getter needs
+its own return type. A typed getter maps only a missing key to `None`; it
+assumes any stored value is its member, so reading a number through
+`get_string` fails in the wasm-bindgen glue. Use `get` and inspect the
+`JsValue` when the stored member is not known.
+
+**Union members collapse** when they lower to the same Rust argument type,
+for keys and values alike. `"red" | "blue"` or `string | "auto"` is a single
+alternative, so such a value keeps plain `get` / `set` and such a key stays
+`&str`. A key that is still heterogeneous after collapsing erases to
+`&JsValue`; keys never multiply the methods:
+
+```ts
+type Flexible = Record<string | number, boolean>;
+type Known = Record<"name" | "region", string>;
+```
+
+```rust
+pub fn get(this: &Flexible, key: &JsValue) -> Option<bool>;
+pub fn set(this: &Known, key: &str, value: &str);
+```
+
+Literal keys get no fixed-property accessors and no constructor that
+requires them; `new()` still returns an empty object. A user declaration
+named `Record` shadows the global utility type and keeps normal alias
+behavior.
 
 ## Discriminated unions
 

@@ -49,8 +49,6 @@ use JsValue as Metadata;
 #[allow(dead_code)]
 use JsValue as P;
 #[allow(dead_code)]
-use JsValue as Params;
-#[allow(dead_code)]
 use JsValue as PluginArgs;
 #[allow(dead_code)]
 use JsValue as R;
@@ -624,6 +622,66 @@ pub mod web_assembly {
         pub fn try_value_of(this: &Global_) -> Result<JsValue, JsValue>;
     }
     pub use Global_ as Global;
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type ModuleImports;
+        #[wasm_bindgen(method, indexing_getter)]
+        pub fn get(this: &ModuleImports, key: &str) -> JsValue;
+        #[wasm_bindgen(method, indexing_setter)]
+        pub fn set(this: &ModuleImports, key: &str, value: &JsValue);
+    }
+    impl Default for ModuleImports {
+        fn default() -> Self {
+            JsCast::unchecked_into(js_sys::Object::new())
+        }
+    }
+    impl ModuleImports {
+        pub fn new() -> Self {
+            Self::default()
+        }
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Imports;
+        #[wasm_bindgen(method, indexing_getter)]
+        pub fn get(this: &Imports, key: &str) -> JsValue;
+        #[wasm_bindgen(method, indexing_setter)]
+        pub fn set(this: &Imports, key: &str, value: &JsValue);
+    }
+    impl Default for Imports {
+        fn default() -> Self {
+            JsCast::unchecked_into(js_sys::Object::new())
+        }
+    }
+    impl Imports {
+        pub fn new() -> Self {
+            Self::default()
+        }
+    }
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Exports;
+        #[wasm_bindgen(method, indexing_getter)]
+        pub fn get(this: &Exports, key: &str) -> JsValue;
+        #[wasm_bindgen(method, indexing_setter)]
+        pub fn set(this: &Exports, key: &str, value: &JsValue);
+    }
+    impl Default for Exports {
+        fn default() -> Self {
+            JsCast::unchecked_into(js_sys::Object::new())
+        }
+    }
+    impl Exports {
+        pub fn new() -> Self {
+            Self::default()
+        }
+    }
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "WebAssembly")]
@@ -28696,8 +28754,26 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiInternalError;
 }
-#[allow(dead_code)]
-pub type AiModelListType = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AiModelListType;
+    #[wasm_bindgen(method, indexing_getter)]
+    pub fn get(this: &AiModelListType, key: &str) -> JsValue;
+    #[wasm_bindgen(method, indexing_setter)]
+    pub fn set(this: &AiModelListType, key: &str, value: &JsValue);
+}
+impl Default for AiModelListType {
+    fn default() -> Self {
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+}
+impl AiModelListType {
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -35524,8 +35600,39 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "httpServerHandler")]
     pub fn try_http_server_handler(port: f64) -> Result<ExportedHandler, JsValue>;
 }
-#[allow(dead_code)]
-pub type Params<P> = Object;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Params<P: ::wasm_bindgen::JsGeneric>;
+    #[wasm_bindgen(method, indexing_getter)]
+    pub fn get<P: ::wasm_bindgen::JsGeneric>(this: &Params<P>, key: &P) -> JsValue;
+    #[wasm_bindgen(method, indexing_getter)]
+    pub fn get_string<P: ::wasm_bindgen::JsGeneric>(this: &Params<P>, key: &P) -> Option<String>;
+    #[wasm_bindgen(method, indexing_setter)]
+    pub fn set_string<P: ::wasm_bindgen::JsGeneric>(this: &Params<P>, key: &P, value: &str);
+    #[wasm_bindgen(method, indexing_getter)]
+    pub fn get_slice_of_string<P: ::wasm_bindgen::JsGeneric>(
+        this: &Params<P>,
+        key: &P,
+    ) -> Option<Vec<String>>;
+    #[wasm_bindgen(method, indexing_setter, slice_to_array)]
+    pub fn set_slice_of_string<P: ::wasm_bindgen::JsGeneric>(
+        this: &Params<P>,
+        key: &P,
+        value: &[String],
+    );
+}
+impl<P: ::wasm_bindgen::JsGeneric> Default for Params<P> {
+    fn default() -> Self {
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+}
+impl<P: ::wasm_bindgen::JsGeneric> Params<P> {
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -35744,8 +35851,26 @@ extern "C" {
         metadata: &PipelineBatchMetadata,
     ) -> Result<Array<O>, JsValue>;
 }
-#[allow(dead_code)]
-pub type PipelineRecord = Object;
+#[wasm_bindgen(module = "cloudflare:pipelines")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type PipelineRecord;
+    #[wasm_bindgen(method, indexing_getter)]
+    pub fn get(this: &PipelineRecord, key: &str) -> JsValue;
+    #[wasm_bindgen(method, indexing_setter)]
+    pub fn set(this: &PipelineRecord, key: &str, value: &JsValue);
+}
+impl Default for PipelineRecord {
+    fn default() -> Self {
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+}
+impl PipelineRecord {
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
 #[wasm_bindgen(module = "cloudflare:pipelines")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]

@@ -369,6 +369,8 @@ pub enum TypeKind {
     /// A `type X = A | B | ...` whose branches share a string-literal
     /// discriminant property — see [`DiscriminatedUnionDecl`].
     DiscriminatedUnion(DiscriminatedUnionDecl),
+    /// A named alias whose target is the built-in `Record<K, V>` utility type.
+    Record(RecordDecl),
     TypeAlias(TypeAliasDecl),
     StringEnum(StringEnumDecl),
     NumericEnum(NumericEnumDecl),
@@ -377,10 +379,21 @@ pub enum TypeKind {
     Namespace(NamespaceDecl),
 }
 
-// ─── Class ───────────────────────────────────────────────────────────
+/// A first-class binding for `type Name = Record<K, V>`.
+///
+/// Codegen emits JavaScript indexing accessors typed by both the key and the
+/// value; see `codegen::records` for how union keys and values lower.
+#[derive(Clone, Debug)]
+pub struct RecordDecl {
+    pub name: String,
+    pub type_params: Vec<TypeParam>,
+    pub key_type: TypeRef,
+    pub value_type: TypeRef,
+    /// Scope inside this alias's body — see [`ClassDecl::body_scope`].
+    pub body_scope: crate::parse::scope::ScopeId,
+}
 
 #[derive(Clone, Debug)]
-
 pub struct ClassDecl {
     pub name: String,
     /// Original JS name (may differ from Rust name after case conversion).

@@ -455,6 +455,28 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         );
         let target =
             convert_ts_type_scoped(&alias.type_annotation, body_scope, &mut self.parse_ctx());
+
+        // A named alias to the global utility `Record<K, V>` gets a nominal
+        // wrapper instead of erasing to `Object`. A local declaration named
+        // `Record` shadows the utility type and retains alias semantics.
+        if self.scopes.resolve(dcx.scope, "Record").is_none() {
+            if let Some(args) = target.as_generic_head("Record") {
+                if args.len() == 2 {
+                    declarations.push(dcx.decl(
+                        ir::TypeKind::Record(ir::RecordDecl {
+                            name,
+                            type_params,
+                            key_type: args[0].clone(),
+                            value_type: args[1].clone(),
+                            body_scope,
+                        }),
+                        doc,
+                    ));
+                    return;
+                }
+            }
+        }
+
         declarations.push(dcx.decl(
             ir::TypeKind::TypeAlias(ir::TypeAliasDecl {
                 name,
