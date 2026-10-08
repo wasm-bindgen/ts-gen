@@ -10,12 +10,12 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EvaluationContext;
     #[wasm_bindgen(method, indexing_getter)]
-    pub fn get_string(this: &EvaluationContext, key: impl ::wasm_bindgen::JsStringLike) -> String;
-    #[wasm_bindgen(catch, method, indexing_getter)]
-    pub fn try_get_string(
+    pub fn get(this: &EvaluationContext, key: impl ::wasm_bindgen::JsStringLike) -> JsValue;
+    #[wasm_bindgen(method, indexing_getter)]
+    pub fn get_string(
         this: &EvaluationContext,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<String, JsValue>;
+    ) -> Option<String>;
     #[wasm_bindgen(method, indexing_setter)]
     pub fn set_string(
         this: &EvaluationContext,
@@ -23,21 +23,17 @@ extern "C" {
         value: impl ::wasm_bindgen::JsStringLike,
     );
     #[wasm_bindgen(method, indexing_getter)]
-    pub fn get_number(this: &EvaluationContext, key: impl ::wasm_bindgen::JsStringLike) -> f64;
-    #[wasm_bindgen(catch, method, indexing_getter)]
-    pub fn try_get_number(
+    pub fn get_number(
         this: &EvaluationContext,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<f64, JsValue>;
+    ) -> Option<f64>;
     #[wasm_bindgen(method, indexing_setter)]
     pub fn set_number(this: &EvaluationContext, key: impl ::wasm_bindgen::JsStringLike, value: f64);
     #[wasm_bindgen(method, indexing_getter)]
-    pub fn get_bool(this: &EvaluationContext, key: impl ::wasm_bindgen::JsStringLike) -> bool;
-    #[wasm_bindgen(catch, method, indexing_getter)]
-    pub fn try_get_bool(
+    pub fn get_bool(
         this: &EvaluationContext,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<bool, JsValue>;
+    ) -> Option<bool>;
     #[wasm_bindgen(method, indexing_setter)]
     pub fn set_bool(this: &EvaluationContext, key: impl ::wasm_bindgen::JsStringLike, value: bool);
 }
@@ -57,12 +53,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Labels;
     #[wasm_bindgen(method, indexing_getter)]
-    pub fn get(this: &Labels, key: impl ::wasm_bindgen::JsStringLike) -> String;
-    #[wasm_bindgen(catch, method, indexing_getter)]
-    pub fn try_get(
-        this: &Labels,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<String, JsValue>;
+    pub fn get(this: &Labels, key: impl ::wasm_bindgen::JsStringLike) -> Option<String>;
     #[wasm_bindgen(method, indexing_setter)]
     pub fn set(
         this: &Labels,
@@ -86,12 +77,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Values<T>;
     #[wasm_bindgen(method, indexing_getter)]
-    pub fn get<T>(this: &Values<T>, key: impl ::wasm_bindgen::JsStringLike) -> T;
-    #[wasm_bindgen(catch, method, indexing_getter)]
-    pub fn try_get<T>(
-        this: &Values<T>,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<T, JsValue>;
+    pub fn get<T>(this: &Values<T>, key: impl ::wasm_bindgen::JsStringLike) -> Option<T>;
     #[wasm_bindgen(method, indexing_setter)]
     pub fn set<T>(this: &Values<T>, key: impl ::wasm_bindgen::JsStringLike, value: T);
 }
@@ -111,12 +97,10 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MixedValues;
     #[wasm_bindgen(method, indexing_getter)]
-    pub fn get_string(this: &MixedValues, key: impl ::wasm_bindgen::JsStringLike) -> String;
-    #[wasm_bindgen(catch, method, indexing_getter)]
-    pub fn try_get_string(
-        this: &MixedValues,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<String, JsValue>;
+    pub fn get(this: &MixedValues, key: impl ::wasm_bindgen::JsStringLike) -> JsValue;
+    #[wasm_bindgen(method, indexing_getter)]
+    pub fn get_string(this: &MixedValues, key: impl ::wasm_bindgen::JsStringLike)
+        -> Option<String>;
     #[wasm_bindgen(method, indexing_setter)]
     pub fn set_string(
         this: &MixedValues,
@@ -127,12 +111,7 @@ extern "C" {
     pub fn get_slice_of_string(
         this: &MixedValues,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Vec<String>;
-    #[wasm_bindgen(catch, method, indexing_getter)]
-    pub fn try_get_slice_of_string(
-        this: &MixedValues,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Vec<String>, JsValue>;
+    ) -> Option<Vec<String>>;
     #[wasm_bindgen(method, indexing_setter, slice_to_array)]
     pub fn set_slice_of_string(
         this: &MixedValues,
@@ -156,12 +135,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Colors;
     #[wasm_bindgen(method, indexing_getter)]
-    pub fn get(this: &Colors, key: impl ::wasm_bindgen::JsStringLike) -> String;
-    #[wasm_bindgen(catch, method, indexing_getter)]
-    pub fn try_get(
-        this: &Colors,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<String, JsValue>;
+    pub fn get(this: &Colors, key: impl ::wasm_bindgen::JsStringLike) -> Option<String>;
     #[wasm_bindgen(method, indexing_setter)]
     pub fn set(
         this: &Colors,
@@ -185,9 +159,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type NumericLabels;
     #[wasm_bindgen(method, indexing_getter)]
-    pub fn get(this: &NumericLabels, key: f64) -> String;
-    #[wasm_bindgen(catch, method, indexing_getter)]
-    pub fn try_get(this: &NumericLabels, key: f64) -> Result<String, JsValue>;
+    pub fn get(this: &NumericLabels, key: f64) -> Option<String>;
     #[wasm_bindgen(method, indexing_setter)]
     pub fn set(this: &NumericLabels, key: f64, value: impl ::wasm_bindgen::JsStringLike);
 }
@@ -207,9 +179,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type FlexibleRecord;
     #[wasm_bindgen(method, indexing_getter)]
-    pub fn get_string(this: &FlexibleRecord, key: &JsValue) -> String;
-    #[wasm_bindgen(catch, method, indexing_getter)]
-    pub fn try_get_string(this: &FlexibleRecord, key: &JsValue) -> Result<String, JsValue>;
+    pub fn get(this: &FlexibleRecord, key: &JsValue) -> JsValue;
+    #[wasm_bindgen(method, indexing_getter)]
+    pub fn get_string(this: &FlexibleRecord, key: &JsValue) -> Option<String>;
     #[wasm_bindgen(method, indexing_setter)]
     pub fn set_string(
         this: &FlexibleRecord,
@@ -217,9 +189,7 @@ extern "C" {
         value: impl ::wasm_bindgen::JsStringLike,
     );
     #[wasm_bindgen(method, indexing_getter)]
-    pub fn get_bool(this: &FlexibleRecord, key: &JsValue) -> bool;
-    #[wasm_bindgen(catch, method, indexing_getter)]
-    pub fn try_get_bool(this: &FlexibleRecord, key: &JsValue) -> Result<bool, JsValue>;
+    pub fn get_bool(this: &FlexibleRecord, key: &JsValue) -> Option<bool>;
     #[wasm_bindgen(method, indexing_setter)]
     pub fn set_bool(this: &FlexibleRecord, key: &JsValue, value: bool);
 }
@@ -239,9 +209,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type OpenKeyFlags;
     #[wasm_bindgen(method, indexing_getter)]
-    pub fn get(this: &OpenKeyFlags, key: &JsValue) -> bool;
-    #[wasm_bindgen(catch, method, indexing_getter)]
-    pub fn try_get(this: &OpenKeyFlags, key: &JsValue) -> Result<bool, JsValue>;
+    pub fn get(this: &OpenKeyFlags, key: &JsValue) -> Option<bool>;
     #[wasm_bindgen(method, indexing_setter)]
     pub fn set(this: &OpenKeyFlags, key: &JsValue, value: bool);
 }
@@ -261,11 +229,13 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KnownLabels;
     #[wasm_bindgen(method, indexing_getter)]
-    pub fn get(this: &KnownLabels, key: &JsValue) -> String;
-    #[wasm_bindgen(catch, method, indexing_getter)]
-    pub fn try_get(this: &KnownLabels, key: &JsValue) -> Result<String, JsValue>;
+    pub fn get(this: &KnownLabels, key: impl ::wasm_bindgen::JsStringLike) -> Option<String>;
     #[wasm_bindgen(method, indexing_setter)]
-    pub fn set(this: &KnownLabels, key: &JsValue, value: impl ::wasm_bindgen::JsStringLike);
+    pub fn set(
+        this: &KnownLabels,
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: impl ::wasm_bindgen::JsStringLike,
+    );
 }
 impl Default for KnownLabels {
     fn default() -> Self {
@@ -273,6 +243,26 @@ impl Default for KnownLabels {
     }
 }
 impl KnownLabels {
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type AutoKeyed;
+    #[wasm_bindgen(method, indexing_getter)]
+    pub fn get(this: &AutoKeyed, key: impl ::wasm_bindgen::JsStringLike) -> Option<f64>;
+    #[wasm_bindgen(method, indexing_setter)]
+    pub fn set(this: &AutoKeyed, key: impl ::wasm_bindgen::JsStringLike, value: f64);
+}
+impl Default for AutoKeyed {
+    fn default() -> Self {
+        JsCast::unchecked_into(js_sys::Object::new())
+    }
+}
+impl AutoKeyed {
     pub fn new() -> Self {
         Self::default()
     }

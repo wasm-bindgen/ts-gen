@@ -381,9 +381,8 @@ pub enum TypeKind {
 
 /// A first-class binding for `type Name = Record<K, V>`.
 ///
-/// Codegen uses both key and value types to expand typed getters and setters.
-/// Finite string-literal keys become fixed-property accessors; other keys use
-/// JavaScript indexing accessors.
+/// Codegen emits JavaScript indexing accessors typed by both the key and the
+/// value; see `codegen::records` for how union keys and values lower.
 #[derive(Clone, Debug)]
 pub struct RecordDecl {
     pub name: String,

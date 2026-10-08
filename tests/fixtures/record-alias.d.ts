@@ -9,6 +9,7 @@ export type NumericLabels = Record<number, string>;
 export type FlexibleRecord = Record<string | number, string | boolean>;
 export type OpenKeyFlags = Record<string | number, boolean>;
 export type KnownLabels = Record<"displayName" | "region", string>;
+export type AutoKeyed = Record<string | "auto", number>;
 
 export declare function evaluate(context: EvaluationContext): void;
 export declare function labelAll(labels: Labels): void;

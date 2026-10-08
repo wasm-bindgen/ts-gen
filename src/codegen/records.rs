@@ -3,9 +3,14 @@
 //! `type Name = Record<K, V>` becomes a nominal `Object` wrapper with JS
 //! indexing accessors (`record[key]`) plus `new()` / `Default`:
 //!
-//! * A union key erases to `&JsValue`; any other key keeps its argument type.
-//! * A union value gets one `get_<v>` / `try_get_<v>` / `set_<v>` family per
-//!   distinct Rust alternative; any other value uses plain `get` / `set`.
+//! * Getters return `Option<V>`: a missing key reads `undefined`, which is the
+//!   normal case for a record rather than an error.
+//! * Key and value union members that lower to the same Rust type collapse, so
+//!   `"a" | "b"` keys stay `&str`. A key that is still heterogeneous erases to
+//!   `&JsValue`.
+//! * A value with several distinct alternatives gets one `get_<v>` / `set_<v>`
+//!   pair per alternative plus an untyped `get(key) -> JsValue`; any other
+//!   value uses plain `get` / `set`.
 
 use std::collections::HashSet;
 
@@ -52,18 +57,38 @@ pub(crate) fn generate_record(
 
     let key = ConcreteParam {
         name: "key".to_string(),
-        type_ref: if is_union(&decl.key_type, cgctx, scope) {
-            TypeRef::Any
-        } else {
-            decl.key_type.clone()
+        type_ref: match rust_alternatives(&decl.key_type, cgctx, scope, module_context).as_slice() {
+            [only] => only.clone(),
+            _ => TypeRef::Any,
         },
         variadic: false,
     };
-    let values = value_alternatives(&decl.value_type, cgctx, scope, module_context);
+    let values = rust_alternatives(&decl.value_type, cgctx, scope, module_context);
     let suffixed = values.len() > 1;
+
+    let render_params = |params: &[ConcreteParam]| {
+        let DictionaryParams { bounds, params, .. } =
+            generate_dictionary_params(params, cgctx, scope, module_context);
+        let generics = render_generic_bounds(&[type_bounds.clone(), bounds].concat());
+        (generics, params)
+    };
+    let (getter_generics, getter_params) = render_params(std::slice::from_ref(&key));
 
     let mut used_names = HashSet::new();
     let mut methods = Vec::new();
+    if suffixed {
+        // No typed family is privileged for a union value, so expose the raw
+        // slot as well; it is also the only way to inspect which member is
+        // stored.
+        let getter_ident = make_ident(&dedupe_name("get", &mut used_names));
+        methods.push(quote! {
+            #[wasm_bindgen(method, indexing_getter)]
+            pub fn #getter_ident #getter_generics(
+                this: &#rust_ident #type_args,
+                #getter_params
+            ) -> JsValue;
+        });
+    }
     for value in values {
         let suffix = if suffixed {
             format!("_{}", value_name(&value))
@@ -71,17 +96,8 @@ pub(crate) fn generate_record(
             String::new()
         };
         let getter_ident = make_ident(&dedupe_name(&format!("get{suffix}"), &mut used_names));
-        let try_getter_ident =
-            make_ident(&dedupe_name(&format!("try_get{suffix}"), &mut used_names));
         let setter_ident = make_ident(&dedupe_name(&format!("set{suffix}"), &mut used_names));
 
-        let render_params = |params: &[ConcreteParam]| {
-            let DictionaryParams { bounds, params, .. } =
-                generate_dictionary_params(params, cgctx, scope, module_context);
-            let generics = render_generic_bounds(&[type_bounds.clone(), bounds].concat());
-            (generics, params)
-        };
-        let (getter_generics, getter_params) = render_params(std::slice::from_ref(&key));
         let setter_params = [
             key.clone(),
             ConcreteParam {
@@ -96,7 +112,17 @@ pub(crate) fn generate_record(
             quote! {}
         };
         let (setter_generics, setter_params) = render_params(&setter_params);
-        let return_type = to_syn_type(&value, TypePosition::RETURN, cgctx, scope, module_context);
+        let optional = match &value {
+            TypeRef::Nullable(_) => value.clone(),
+            _ => TypeRef::Nullable(Box::new(value.clone())),
+        };
+        let return_type = to_syn_type(
+            &optional,
+            TypePosition::RETURN,
+            cgctx,
+            scope,
+            module_context,
+        );
 
         methods.push(quote! {
             #[wasm_bindgen(method, indexing_getter)]
@@ -104,11 +130,6 @@ pub(crate) fn generate_record(
                 this: &#rust_ident #type_args,
                 #getter_params
             ) -> #return_type;
-            #[wasm_bindgen(catch, method, indexing_getter)]
-            pub fn #try_getter_ident #getter_generics(
-                this: &#rust_ident #type_args,
-                #getter_params
-            ) -> Result<#return_type, JsValue>;
             #[wasm_bindgen(method, indexing_setter #slice_to_array)]
             pub fn #setter_ident #setter_generics(
                 this: &#rust_ident #type_args,
@@ -146,21 +167,10 @@ pub(crate) fn generate_record(
     }
 }
 
-/// Whether `ty` is a union, directly or through aliases.
-fn is_union(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId) -> bool {
-    match ty {
-        TypeRef::Union(_) => true,
-        _ => ty
-            .as_ident()
-            .and_then(|name| cgctx?.resolve_alias(name, scope))
-            .is_some_and(|target| matches!(target, TypeRef::Union(_))),
-    }
-}
-
-/// One entry per distinct Rust setter type among the value's union members,
-/// in source order. Members that render identically (`"red" | "blue"`, or
-/// `string | "auto"`) collapse to one, so such a value is not suffixed.
-fn value_alternatives(
+/// One entry per distinct Rust argument type among `ty`'s union members, in
+/// source order. Members that render identically (`"red" | "blue"`, or
+/// `string | "auto"`) collapse to one; a non-union yields itself.
+fn rust_alternatives(
     ty: &TypeRef,
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
@@ -236,11 +246,28 @@ mod tests {
     #[test]
     fn plain_value_uses_unsuffixed_accessors() {
         let tokens = render(TypeRef::String, TypeRef::Number);
-        assert!(tokens.contains("fn get (this : & Values , key : & str) -> f64"));
-        assert!(tokens.contains("fn try_get (this : & Values , key : & str) -> Result < f64"));
+        assert!(tokens.contains("fn get (this : & Values , key : & str) -> Option < f64 >"));
         assert!(tokens.contains("fn set (this : & Values , key : & str , value : f64)"));
+        assert!(!tokens.contains("try_get"));
+        assert!(!tokens.contains("catch"));
         assert!(tokens.contains("impl Default for Values"));
         assert!(tokens.contains("pub fn new () -> Self"));
+    }
+
+    #[test]
+    fn nullable_value_is_not_double_wrapped() {
+        let tokens = render(
+            TypeRef::String,
+            TypeRef::Nullable(Box::new(TypeRef::Number)),
+        );
+        assert!(tokens.contains("-> Option < f64 >"));
+        assert!(!tokens.contains("Option < Option"));
+    }
+
+    #[test]
+    fn any_value_reads_as_plain_js_value() {
+        let tokens = render(TypeRef::String, TypeRef::Any);
+        assert!(tokens.contains("fn get (this : & Values , key : & str) -> JsValue"));
     }
 
     #[test]
@@ -249,15 +276,17 @@ mod tests {
             TypeRef::String,
             TypeRef::Union(vec![TypeRef::String, TypeRef::Number, TypeRef::Boolean]),
         );
-        for name in ["string", "number", "bool"] {
-            assert!(tokens.contains(&format!("fn get_{name} ")), "get_{name}");
+        for (name, ty) in [("string", "String"), ("number", "f64"), ("bool", "bool")] {
             assert!(
-                tokens.contains(&format!("fn try_get_{name} ")),
-                "try_get_{name}"
+                tokens.contains(&format!(
+                    "fn get_{name} (this : & Values , key : & str) -> Option < {ty} >"
+                )),
+                "get_{name}"
             );
             assert!(tokens.contains(&format!("fn set_{name} ")), "set_{name}");
         }
-        assert!(!tokens.contains("fn get ("));
+        assert!(tokens.contains("fn get (this : & Values , key : & str) -> JsValue"));
+        assert!(!tokens.contains("fn set ("));
     }
 
     #[test]
@@ -270,32 +299,34 @@ mod tests {
                 TypeRef::String,
             ]),
         );
-        assert!(tokens.contains("fn get ("));
+        assert!(tokens.contains("fn get (this : & Values , key : & str) -> Option < String >"));
         assert!(!tokens.contains("fn get_string"));
     }
 
     #[test]
-    fn union_key_erases_to_js_value_without_extra_methods() {
+    fn heterogeneous_union_key_erases_to_js_value() {
         let tokens = render(
             TypeRef::Union(vec![TypeRef::String, TypeRef::Number]),
             TypeRef::Boolean,
         );
-        assert!(tokens.contains("fn get (this : & Values , key : & JsValue) -> bool"));
+        assert!(tokens.contains("fn get (this : & Values , key : & JsValue) -> Option < bool >"));
         assert!(tokens.contains("fn set (this : & Values , key : & JsValue , value : bool)"));
-        assert_eq!(tokens.matches("indexing_getter").count(), 2);
+        assert_eq!(tokens.matches("indexing_getter").count(), 1);
     }
 
     #[test]
-    fn literal_union_key_is_just_a_union_key() {
-        let tokens = render(
+    fn key_members_with_the_same_rust_type_collapse() {
+        for key in [
             TypeRef::Union(vec![
                 TypeRef::StringLiteral("a".into()),
                 TypeRef::StringLiteral("b".into()),
             ]),
-            TypeRef::String,
-        );
-        assert!(tokens.contains("key : & JsValue"));
-        assert!(!tokens.contains("js_name"));
+            TypeRef::Union(vec![TypeRef::String, TypeRef::StringLiteral("auto".into())]),
+        ] {
+            let tokens = render(key, TypeRef::String);
+            assert!(tokens.contains("key : & str"), "{tokens}");
+            assert!(!tokens.contains("JsValue"), "{tokens}");
+        }
     }
 
     #[test]
