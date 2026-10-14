@@ -205,6 +205,9 @@ pub struct ExpandedSignature {
     /// Concrete params (no optional flags — those have been resolved by
     /// truncation; no union types — those have been cartesian-expanded).
     pub params: Vec<ConcreteParam>,
+    /// Index into the overload list this expansion came from, so the
+    /// per-callable layer can pick that overload's return type.
+    pub overload_index: usize,
 }
 
 /// A fully-resolved emitter input: an [`ExpandedSignature`] augmented with
@@ -331,22 +334,31 @@ pub fn expand_signatures(
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) -> Vec<ExpandedSignature> {
+    let scopes = vec![scope; overloads.len()];
+    expand_signatures_scoped(overloads, cgctx, &scopes)
+}
+
+/// [`expand_signatures`] with one resolution scope per overload.
+pub fn expand_signatures_scoped(
+    overloads: &[&[Param]],
+    cgctx: Option<&CodegenContext<'_>>,
+    scopes: &[ScopeId],
+) -> Vec<ExpandedSignature> {
     // Phase 1: Per-overload expansion — optional truncation + union cartesian product.
-    let mut all_sigs: Vec<Vec<ConcreteParam>> = Vec::new();
-    let mut first_overload_sigs = 0;
+    let mut all_sigs: Vec<(usize, Vec<ConcreteParam>)> = Vec::new();
     for (index, params) in overloads.iter().enumerate() {
-        let sigs = expand_single_overload(params, cgctx, scope);
-        if index == 0 {
-            first_overload_sigs = sigs.len();
-        }
-        all_sigs.extend(sigs);
+        all_sigs.extend(
+            expand_single_overload(params, cgctx, scopes[index])
+                .into_iter()
+                .map(|sig| (index, sig)),
+        );
     }
 
     // Phase 2: Cross-overload dedup — remove signatures that are identical
     // structurally OR after lowering to Rust type tokens (so `"inline"` and
     // `"attachment"` literal arms both collapse to a single `&str` overload).
     let from_module = crate::ir::ModuleContext::Global;
-    let render = |sig: &[ConcreteParam]| -> Vec<String> {
+    let render = |sig: &[ConcreteParam], scope: ScopeId| -> Vec<String> {
         sig.iter()
             .map(|p| {
                 let ty = render_param_type(p, cgctx, scope, &from_module);
@@ -358,24 +370,23 @@ pub fn expand_signatures(
     let mut seen_concrete: Vec<&Vec<ConcreteParam>> = Vec::new();
     let mut seen_rendered: Vec<Vec<String>> = Vec::new();
     let mut deduped: Vec<Vec<ConcreteParam>> = Vec::new();
-    // The first overload's expansions are never dropped as duplicates of a
-    // later overload's, so its survivors are a contiguous prefix of `deduped`.
-    let mut first_overload_len = 0;
-    for (i, sig) in all_sigs.iter().enumerate() {
+    let mut indices: Vec<usize> = Vec::new();
+    for (index, sig) in &all_sigs {
         if seen_concrete.iter().any(|s| concrete_params_eq(s, sig)) {
             continue;
         }
-        let rendered = render(sig);
+        let rendered = render(sig, scopes.get(*index).copied().unwrap_or(ScopeId::DUMMY));
         if seen_rendered.contains(&rendered) {
             continue;
         }
         seen_concrete.push(sig);
         seen_rendered.push(rendered);
         deduped.push(sig.clone());
-        if i < first_overload_sigs {
-            first_overload_len += 1;
-        }
+        indices.push(*index);
     }
+    // The first overload's expansions are never dropped as duplicates of a
+    // later overload's, so its survivors are a contiguous prefix of `deduped`.
+    let first_overload_len = indices.iter().take_while(|&&i| i == 0).count();
 
     // Phase 3: Suffix — compute `_with_X` disambiguators across the cohort.
     // The base name goes to the first overload's shortest expansion, or to
@@ -386,14 +397,19 @@ pub fn expand_signatures(
     // `put(key, value)`) does not displace the first overload.
     if let Some(primary) = primary_expansion(&deduped, first_overload_len) {
         deduped[..=primary].rotate_right(1);
+        indices[..=primary].rotate_right(1);
     }
     compute_suffixes(&deduped)
         .into_iter()
         .zip(deduped)
-        .map(|(name_suffix, params)| ExpandedSignature {
-            name_suffix,
-            params,
-        })
+        .zip(indices)
+        .map(
+            |((name_suffix, params), overload_index)| ExpandedSignature {
+                name_suffix,
+                params,
+                overload_index,
+            },
+        )
         .collect()
 }
 
@@ -429,7 +445,18 @@ pub struct CallableSpec<'a> {
     /// All overloads sharing this `js_name` — typically one element, but TS
     /// allows multiple overloaded declarations.
     pub overloads: &'a [&'a [Param]],
+    /// Return type shared by every overload; see `overload_returns`.
     pub return_type: &'a TypeRef,
+    /// Per-overload return types, parallel to `overloads`. Overloads may
+    /// differ in what they return (`get(key): Promise<T>` vs
+    /// `get(keys: string[]): Promise<Map<string, T>>`); each expansion
+    /// uses its own overload's entry, falling back to `return_type`.
+    pub overload_returns: Option<&'a [&'a TypeRef]>,
+    /// Per-overload body scopes, parallel to `overloads`: each overload
+    /// declares its own `<T>` (`get<T>(key)` next to `get<U>(keys)`), so
+    /// its expansions resolve and declare type parameters in its own
+    /// scope. `None` uses `body_scope` for every overload.
+    pub overload_scopes: Option<&'a [ScopeId]>,
     /// Failure-mode info from `@throws` JSDoc — see [`Throws`].
     ///
     /// Drives three orthogonal decisions:
@@ -482,17 +509,13 @@ pub fn build_signatures(
     let base = spec
         .rust_name
         .map_or_else(|| base_rust_name(spec.js_name, spec.kind), ident_chars);
-    let expansions = expand_signatures(spec.overloads, cgctx, scope);
-
-    // Promise unwrap is per-callable, not per-overload — every expansion of a
-    // given JS callable shares the same return type.
-    let (is_async, return_type) = match (
-        spec.return_type.as_promise_inner(),
-        spec.kind.allows_async(),
-    ) {
-        (Some(inner), true) => (true, inner.clone()),
-        _ => (false, spec.return_type.clone()),
+    let scope_of = |overload_index: usize| {
+        spec.overload_scopes
+            .and_then(|scopes| scopes.get(overload_index).copied())
+            .unwrap_or(spec.body_scope)
     };
+    let overload_scopes: Vec<ScopeId> = (0..spec.overloads.len()).map(scope_of).collect();
+    let expansions = expand_signatures_scoped(spec.overloads, cgctx, &overload_scopes);
 
     // `Throws::Never` suppresses every fallible form — except for
     // constructors, which always catch (`new` can always throw in JS).
@@ -504,16 +527,20 @@ pub fn build_signatures(
     // Under the `fallible` policy the primary binding itself catches, so
     // the `try_` companion has nothing to add.
     let fallible = cgctx.is_some_and(|c| c.fallible);
-    let allow_try = !is_async && !nothrow && !fallible && spec.kind.allows_try_variant();
-    let per_mono = CodegenContext::generic_mono(cgctx);
-    let variants_per_expansion = match (allow_try, per_mono) {
-        (true, true) => 4,
-        (true, false) | (false, true) => 2,
-        (false, false) => 1,
-    };
-    let mut out = Vec::with_capacity(expansions.len() * variants_per_expansion);
+    let mut out = Vec::with_capacity(expansions.len() * 2);
 
     for exp in expansions {
+        let declared_return = spec
+            .overload_returns
+            .and_then(|returns| returns.get(exp.overload_index).copied())
+            .unwrap_or(spec.return_type);
+        let (is_async, return_type) =
+            match (declared_return.as_promise_inner(), spec.kind.allows_async()) {
+                (Some(inner), true) => (true, inner.clone()),
+                _ => (false, declared_return.clone()),
+            };
+        let allow_try = !is_async && !nothrow && !fallible && spec.kind.allows_try_variant();
+
         let primary_candidate = public_rust_name(&format!("{base}{}", exp.name_suffix));
         let primary_name = names.declare(&primary_candidate, Suffix::Snake);
 
@@ -537,7 +564,7 @@ pub fn build_signatures(
                 None
             },
             doc: augmented_doc.clone(),
-            body_scope: spec.body_scope,
+            body_scope: scope_of(exp.overload_index),
         };
         push_with_js_string_return(&mut out, primary, names, cgctx, scope);
 
@@ -556,7 +583,7 @@ pub fn build_signatures(
                 params: exp.params.clone(),
                 catch: promise_catches,
                 is_async: false,
-                return_type: spec.return_type.clone(),
+                return_type: declared_return.clone(),
                 js_string_return: false,
                 error_type: if promise_catches {
                     error_type.cloned()
@@ -564,7 +591,7 @@ pub fn build_signatures(
                     None
                 },
                 doc: augmented_doc.clone(),
-                body_scope: spec.body_scope,
+                body_scope: scope_of(exp.overload_index),
             });
         }
 
@@ -580,7 +607,7 @@ pub fn build_signatures(
                 js_string_return: false,
                 error_type: error_type.cloned(),
                 doc: augmented_doc.clone(),
-                body_scope: spec.body_scope,
+                body_scope: scope_of(exp.overload_index),
             };
             push_with_js_string_return(&mut out, try_sig, names, cgctx, scope);
         }
@@ -1756,6 +1783,8 @@ mod tests {
                 kind: SignatureKind::Function,
                 overloads: &[params],
                 return_type: ret,
+                overload_returns: None,
+                overload_scopes: None,
                 throws: &Throws::None,
                 doc: &None,
                 body_scope: scope,
@@ -1807,6 +1836,8 @@ mod tests {
                 kind,
                 overloads: &[&[]],
                 return_type: ret,
+                overload_returns: None,
+                overload_scopes: None,
                 throws,
                 doc: &None,
                 body_scope: scope,
@@ -2002,6 +2033,8 @@ mod tests {
                 kind,
                 overloads: &[params],
                 return_type: ret,
+                overload_returns: None,
+                overload_scopes: None,
                 throws,
                 doc,
                 body_scope: scope,
@@ -2030,6 +2063,8 @@ mod tests {
                 kind,
                 overloads,
                 return_type: ret,
+                overload_returns: None,
+                overload_scopes: None,
                 throws: &Throws::None,
                 doc,
                 body_scope: scope,

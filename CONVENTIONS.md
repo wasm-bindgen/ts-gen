@@ -1378,10 +1378,31 @@ For every JS callable, `ts-gen`:
    pub async fn put_with_entries(this: &Store, entries: &Object<JsString>) -> …;
    ```
 
-The output is a `Vec<{ name_suffix, params }>` — a focused
-parameter-axis result. The per-callable layer (`build_signatures`)
-then handles the orthogonal decisions (base name, async-ness, `try_`
-companions, doc, error type).
+The output is a `Vec<{ name_suffix, params, overload_index }>` — a
+focused parameter-axis result. The per-callable layer
+(`build_signatures`) then handles the orthogonal decisions (base name,
+async-ness, `try_` companions, doc, error type) **per expansion**,
+using the return type of the overload each expansion came from, and
+resolving it in that overload's own scope so its `<T>` is the one
+declared on the binding (`get<T>(key)` next to `get<U>(keys)` declares
+`U` on `get_with_keys`):
+
+```ts
+get<T>(key: string): Promise<T | undefined>;
+get<T>(keys: string[]): Promise<Map<string, T>>;
+first(): string;
+first(column: string): Promise<string | null>;
+```
+
+```rust
+pub async fn get<T>(this: &Storage, key: &str) -> Result<JsOption<T>, JsValue>;
+pub async fn get_with_keys<T>(this: &Storage, keys: &[String]) -> Result<Map<JsString, T>, JsValue>;
+pub fn first(this: &Storage) -> String;                 // + try_first
+pub async fn first_with_column(this: &Storage, column: &str) -> Result<JsOption<JsString>, JsValue>;
+```
+
+When two overloads dedup to the same parameter list, the first
+declared overload's return type wins.
 
 ### Examples
 

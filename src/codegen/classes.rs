@@ -827,6 +827,8 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 kind: SignatureKind::Setter,
                 overloads: &setter_overloads,
                 return_type: &void,
+                overload_returns: None,
+                overload_scopes: None,
                 throws: &crate::ir::Throws::None,
                 doc: &None,
                 body_scope: config.scope,
@@ -1609,6 +1611,8 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         kind: SignatureKind::Constructor,
                         overloads: &overloads,
                         return_type: &return_type,
+                        overload_returns: None,
+                        overload_scopes: None,
                         throws,
                         doc: &doc,
                         body_scope: ctor_scope,
@@ -1629,6 +1633,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
 
                 let group = &method_groups[&m.js_name];
                 let overloads: Vec<&[Param]> = group.iter().map(|m| m.params.as_slice()).collect();
+                let returns: Vec<&TypeRef> = group.iter().map(|m| &m.return_type).collect();
                 let doc = group.first().and_then(|m| m.doc.clone());
                 let return_type = &group[0].return_type;
                 let empty_throws = crate::ir::Throws::None;
@@ -1637,6 +1642,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 let method_scope = group[0].body_scope;
                 let base = config.member_base(MemberKind::Method, &m.js_name);
                 unreserve_base(&mut names, &base);
+                let scopes: Vec<ScopeId> = group.iter().map(|m| m.body_scope).collect();
                 let sigs = build_signatures(
                     &CallableSpec {
                         js_name: &m.js_name,
@@ -1644,6 +1650,8 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         kind: SignatureKind::Method,
                         overloads: &overloads,
                         return_type,
+                        overload_returns: Some(&returns),
+                        overload_scopes: Some(&scopes),
                         throws,
                         doc: &doc,
                         body_scope: method_scope,
@@ -1664,6 +1672,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
 
                 let group = &static_method_groups[&m.js_name];
                 let overloads: Vec<&[Param]> = group.iter().map(|m| m.params.as_slice()).collect();
+                let returns: Vec<&TypeRef> = group.iter().map(|m| &m.return_type).collect();
                 let doc = group.first().and_then(|m| m.doc.clone());
                 let return_type = &group[0].return_type;
                 let empty_throws = crate::ir::Throws::None;
@@ -1671,6 +1680,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 let method_scope = group[0].body_scope;
                 let base = config.member_base(MemberKind::StaticMethod, &m.js_name);
                 unreserve_base(&mut names, &base);
+                let scopes: Vec<ScopeId> = group.iter().map(|m| m.body_scope).collect();
                 let sigs = build_signatures(
                     &CallableSpec {
                         js_name: &m.js_name,
@@ -1678,6 +1688,8 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         kind: SignatureKind::StaticMethod,
                         overloads: &overloads,
                         return_type,
+                        overload_returns: Some(&returns),
+                        overload_scopes: Some(&scopes),
                         throws,
                         doc: &doc,
                         body_scope: method_scope,
@@ -2242,6 +2254,8 @@ fn generate_setter(
             kind: SignatureKind::Setter,
             overloads: &overloads,
             return_type: &void,
+            overload_returns: None,
+            overload_scopes: None,
             throws: &crate::ir::Throws::None,
             doc: &doc,
             body_scope: config.scope,
@@ -2386,6 +2400,8 @@ fn generate_static_setter(
             kind: SignatureKind::StaticSetter,
             overloads: &overloads,
             return_type: &void,
+            overload_returns: None,
+            overload_scopes: None,
             throws: &crate::ir::Throws::None,
             doc: &doc,
             body_scope: config.scope,
