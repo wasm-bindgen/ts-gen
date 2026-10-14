@@ -63,6 +63,13 @@ Route untyped JS exceptions into your own error type (must implement
 ts-gen --input types.d.ts --output src/bindings.rs --error-type crate::Error
 ```
 
+Emit one `Result`-returning binding per sync callable instead of a panicking
+primary plus `try_` companion, for code that `?`s every call:
+
+```sh
+ts-gen --input types.d.ts --output src/bindings.rs --fallible --error-type crate::Error
+```
+
 Opt generic imports into wasm-bindgen's experimental per-monomorphization
 codegen:
 
