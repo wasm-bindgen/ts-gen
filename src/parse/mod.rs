@@ -408,6 +408,9 @@ impl InsertCtx<'_> {
             crate::ir::TypeKind::Variable(v) => {
                 self.static_sides.remove(&(decl_scope, v.js_name.clone()))
             }
+            crate::ir::TypeKind::Class(c) => {
+                self.static_sides.remove(&(decl_scope, c.name.clone()))
+            }
             _ => None,
         };
         let ctor_interface = match &decl.kind {
@@ -630,6 +633,14 @@ impl InsertCtx<'_> {
                 Some(side) => vec![side.clone(), incoming],
                 None => return false,
             },
+            // A constructor-shaped `var`'s class without its construct
+            // instance, which the interface replaces.
+            (TypeKind::Interface(_), TypeKind::Class(_)) if sides.contains_key(&new) => {
+                vec![base, sides[&new].clone()]
+            }
+            (TypeKind::Class(_), TypeKind::Interface(_)) if sides.contains_key(&existing) => {
+                vec![sides[&existing].clone(), incoming]
+            }
             _ => vec![base, incoming],
         };
         let merged = dedup_function_overloads(merge_class_pairs(pair));
@@ -1523,6 +1534,52 @@ mod tests {
                 matches!(&gctx.get_type(id).kind, TypeKind::Interface(i) if i.name == "ArrConstructor")
             });
             assert_eq!(ctor_interfaces.count(), 0, "{i}");
+        }
+    }
+
+    #[test]
+    fn instance_interface_wins_over_construct_return_across_files() {
+        let iface = "interface Bar { a(): void; }";
+        let var = "declare var Bar: { new (): Baz; prototype: Bar };
+            interface Baz { z(): void; }";
+        let one_file = format!("{iface}\n{var}");
+        for (i, sources) in [vec![iface, var], vec![var, iface], vec![one_file.as_str()]]
+            .iter()
+            .enumerate()
+        {
+            let dir =
+                std::env::temp_dir().join(format!("ts-gen-ctor-ret-{}-{i}", std::process::id()));
+            std::fs::create_dir_all(&dir).unwrap();
+            let paths: Vec<_> = sources
+                .iter()
+                .enumerate()
+                .map(|(n, src)| {
+                    let path = dir.join(format!("{n}.d.ts"));
+                    std::fs::write(&path, src).unwrap();
+                    path
+                })
+                .collect();
+            let result = parse_dts_files(&paths, None);
+            std::fs::remove_dir_all(&dir).unwrap();
+            let (module, gctx) = result.unwrap();
+
+            let bars = gctx.declarations(module.global_scope, "Bar");
+            assert_eq!(bars.len(), 1, "{i}");
+            let TypeKind::Class(bar) = &gctx.get_type(bars[0]).kind else {
+                panic!("{i}: Bar is a class");
+            };
+            assert_eq!(bar.extends, None, "{i}");
+            let mut members: Vec<String> = bar
+                .members
+                .iter()
+                .map(|m| match m {
+                    Member::Constructor(_) => "new".into(),
+                    Member::Method(m) => m.js_name.clone(),
+                    other => panic!("{i}: {other:?}"),
+                })
+                .collect();
+            members.sort();
+            assert_eq!(members, ["a", "new"], "{i}");
         }
     }
 

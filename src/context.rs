@@ -74,9 +74,9 @@ pub struct GlobalContext {
     /// an export map's local names refer to. The global scope holds every
     /// global, with the declarations of all files merged.
     declarations: std::collections::HashMap<ScopeId, indexmap::IndexMap<String, Vec<TypeId>>>,
-    /// The static side of a global constructor-shaped `var` (see
-    /// [`crate::parse::first_pass::StaticSides`]), by the var's id, for an
-    /// instance interface a later file declares.
+    /// The static side of a constructor-shaped `var` (see
+    /// [`crate::parse::first_pass::StaticSides`]), by the id of the var or
+    /// its class, for an instance interface another file declares.
     pub(crate) static_sides: std::collections::HashMap<TypeId, TypeDeclaration>,
     /// The interface the static side of a global var or class came from
     /// (`XConstructor` for `var X: XConstructor`), by its id.

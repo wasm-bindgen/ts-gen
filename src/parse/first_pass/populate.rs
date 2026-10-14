@@ -60,9 +60,10 @@ struct PopulateCtx<'a, 'docs> {
     ctor_interfaces: CtorInterfaces,
 }
 
-/// The static side of each global constructor-shaped `var` with no
-/// instance interface in its file, as a class, by the var's scope and name.
-/// Another file may declare the interface, which then merges with it.
+/// The static side of each constructor-shaped `var` with no instance
+/// interface in its file, as a class without the construct signature's
+/// instance, by the var's scope and name. Another file may declare the
+/// interface, which then merges with it.
 pub type StaticSides = std::collections::HashMap<(ScopeId, String), ir::TypeDeclaration>;
 
 /// The interface each static side of a `var X: XConstructor` comes from, by
@@ -644,12 +645,12 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
     fn push_static_side_class(
         &mut self,
         name: &str,
-        members: &[ast::TSSignature<'_>],
+        static_side: &[ast::TSSignature<'_>],
         dcx: &DeclCtx<'_>,
         doc: Option<String>,
         declarations: &mut Vec<ir::TypeDeclaration>,
     ) {
-        declarations.push(self.static_side_class(name, members, dcx, doc));
+        let mut class = self.static_side_class(name, static_side, dcx, doc);
         // With an instance interface, the interface's members refer to the
         // local name and `merge_class_pairs` pairs the two by it. A var
         // alone is a value nothing refers to by its local name.
@@ -657,7 +658,52 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
             == Some(&ir::RegisteredKind::MergedClassLike)
             || self.registry.has_ctor_interface(dcx.scope, name);
         if !has_instance_interface {
+            // An instance interface another file declares replaces the
+            // construct signature's instance, as it would within one file.
+            self.static_sides
+                .insert((dcx.scope, name.to_string()), class.clone());
+            self.add_construct_instance(&mut class, name, static_side, dcx);
             self.constructor_classes.push((dcx.scope, name.to_string()));
+        }
+        declarations.push(class);
+    }
+
+    /// Nothing else describes the instance of `class`, so the construct
+    /// signature's return type does: an inline literal supplies the
+    /// members, a named type the parent.
+    fn add_construct_instance(
+        &mut self,
+        class: &mut ir::TypeDeclaration,
+        name: &str,
+        static_side: &[ast::TSSignature<'_>],
+        dcx: &DeclCtx<'_>,
+    ) {
+        let ir::TypeKind::Class(c) = &mut class.kind else {
+            return;
+        };
+        let instance = static_side.iter().find_map(|m| match m {
+            ast::TSSignature::TSConstructSignatureDeclaration(c) => c.return_type.as_ref(),
+            _ => None,
+        });
+        match instance.map(|rt| &rt.type_annotation) {
+            Some(ast::TSType::TSTypeLiteral(instance_lit)) => {
+                for sig in &instance_lit.members {
+                    c.members
+                        .extend(crate::parse::members::convert_ts_signature(
+                            sig,
+                            Some(name),
+                            dcx.scope,
+                            &mut self.parse_ctx(),
+                        ));
+                }
+            }
+            Some(other @ ast::TSType::TSTypeReference(_)) => {
+                let parent = convert_ts_type_scoped(other, dcx.scope, &mut self.parse_ctx());
+                if parent.as_ident() != Some(name) {
+                    c.extends = Some(parent);
+                }
+            }
+            _ => {}
         }
     }
 
@@ -725,10 +771,14 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                 //   (b) it lives in a module context and has constructor shape — the
                 //       `declare module "cloudflare:email" { let _X: { new(...): T }; }`
                 //       pattern, where the class is exported (often via rename).
-                let is_module_ctor_var = matches!(dcx.module_context, ir::ModuleContext::Module(_))
-                    && is_class_constructor_var(declarator);
+                //   (c) it has constructor shape and nothing else describes the
+                //       instance — `declare const WebSocketPair: { new (): { 0:
+                //       WebSocket; 1: WebSocket } }`. The construct signature's
+                //       return type then supplies the instance members (an inline
+                //       literal) or the parent (a named type).
+                let is_ctor_var = is_class_constructor_var(declarator);
 
-                if (merged_with_iface || is_module_ctor_var) && !alias_ctor {
+                if (merged_with_iface || is_ctor_var) && !alias_ctor {
                     if let Some(type_ann) = &declarator.type_annotation {
                         if let ast::TSType::TSTypeLiteral(lit) = &type_ann.type_annotation {
                             self.push_static_side_class(
@@ -739,18 +789,6 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                                 declarations,
                             );
                             continue;
-                        }
-                    }
-                }
-                let global =
-                    self.global_scope && matches!(dcx.module_context, ir::ModuleContext::Global);
-                if global && !alias_ctor && is_class_constructor_var(declarator) {
-                    if let Some(type_ann) = &declarator.type_annotation {
-                        if let ast::TSType::TSTypeLiteral(lit) = &type_ann.type_annotation {
-                            let side =
-                                self.static_side_class(&name, &lit.members, dcx, doc.clone());
-                            declarations.extend(self.drain_synth(dcx.module_context, dcx.scope));
-                            self.static_sides.insert((dcx.scope, name.clone()), side);
                         }
                     }
                 }

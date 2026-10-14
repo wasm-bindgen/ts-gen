@@ -1160,6 +1160,30 @@ reference. An `interface URIError` or `URIErrorConstructor` inside a
 `declare module` is a different declaration and leaves the global
 class alone.
 
+Without a same-named interface the variable is still a class when it
+has constructor shape (a `new` signature or a `prototype` member). The
+construct signature's return type then describes the instance: an
+inline literal supplies the instance members, a named type becomes the
+parent:
+
+```ts
+declare const WebSocketPair: { new (): { 0: WebSocket; 1: WebSocket } };
+declare const TcpSocket: { new (address: string): Socket };
+```
+
+```rust
+pub type WebSocketPair;
+pub fn new() -> Result<WebSocketPair, JsValue>;
+#[wasm_bindgen(method, getter, js_name = "0")]
+pub fn _0(this: &WebSocketPair) -> WebSocket;
+
+#[wasm_bindgen(extends = Socket, extends = Object)]
+pub type TcpSocket;
+```
+
+A same-named interface in another file replaces that instance, as it
+does within one file.
+
 A construct signature on any other object type (`interface Factory {
 new (): Widget }`, or an inline `{ new (): T }` parameter type) is the
 type of a constructor *value*, not a constructor of that type. It is
