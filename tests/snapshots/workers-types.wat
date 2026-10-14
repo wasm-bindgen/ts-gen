@@ -4241,8 +4241,17 @@
   ;; set allowHalfOpen(value: boolean)
   (import "./bindings.wasm" "WebSocketAcceptOptions.set_allow_half_open" (func $WebSocketAcceptOptions.set_allow_half_open (param $this externref) (param $value i32)))
 
-  ;; const WebSocketPair: object
-  (import "./bindings.wasm" "WebSocketPair" (func $WebSocketPair (result externref)))
+  ;; WebSocketPair
+  ;; constructor()
+  (import "./bindings.wasm" "WebSocketPair.new" (func $WebSocketPair.new (result externref)))
+  ;; 0: WebSocket
+  (import "./bindings.wasm" "WebSocketPair.0" (func $WebSocketPair.0 (param $this externref) (result externref)))
+  ;; set 0(value: WebSocket)
+  (import "./bindings.wasm" "WebSocketPair.set_0" (func $WebSocketPair.set_0 (param $this externref) (param $value externref)))
+  ;; 1: WebSocket
+  (import "./bindings.wasm" "WebSocketPair.1" (func $WebSocketPair.1 (param $this externref) (result externref)))
+  ;; set 1(value: WebSocket)
+  (import "./bindings.wasm" "WebSocketPair.set_1" (func $WebSocketPair.set_1 (param $this externref) (param $value externref)))
 
   ;; SqlStorage
   ;; exec(query: string, ...bindings: any[]): SqlStorageCursor<T>
