@@ -2070,13 +2070,15 @@ JsValue>`. Recognised forms:
 
 The original prose surfaces in the rendered doc as an `## Errors` section.
 
-### `--errors-as-error` — typed default error
+### `--error-type <path>` — configurable default error
 
 Without `@throws`, fallible bindings default to `Result<T, JsValue>`.
-The `--errors-as-error` flag (or `GenerateOptions::errors_as_error`
-for library callers) flips that default to `Result<T, Error>`
-(`js_sys::Error`). Bindings whose `@throws` JSDoc names a specific
-type still use that type — the flag is purely about the *default*.
+`--error-type <path>` (library: `GenerateOptions::error_type`) replaces
+that default with any Rust type path. wasm-bindgen's `catch` lowers to
+`take_last_exception()?`, so the type only has to implement
+`From<JsValue>`; a project can route every untyped failure into its own
+error enum. Bindings whose `@throws` JSDoc names a specific type still
+use that type — the flag is purely about the *default*.
 
 ```ts
 upload(file: File): Promise<void>;
@@ -2087,15 +2089,21 @@ emits
 ```rust
 // default
 pub async fn upload(this: &Foo, file: &File) -> Result<Undefined, JsValue>;
-// with --errors-as-error
-pub async fn upload(this: &Foo, file: &File) -> Result<Undefined, Error>;
+// with --error-type crate::Error
+pub async fn upload(this: &Foo, file: &File) -> Result<Undefined, crate::Error>;
 ```
 
-Useful in environments that prefer the typed `Error` API
-(`message`, `name`, `cause`, …) over raw `JsValue`. The trade-off
-is that JS code throwing a non-Error value (`throw "oops"`) now
-fails the conversion at the FFI boundary; if you can't audit your
-sources for that, stay with `JsValue`.
+The path is emitted verbatim, so it is resolved from the generated
+module: use `crate::…` or a fully qualified `::some_crate::…` path.
+An unparseable path is a hard error.
+
+`--errors-as-error` is shorthand for `--error-type ::js_sys::Error`,
+for environments that prefer the typed `Error` API (`message`,
+`name`, `cause`, …) over raw `JsValue`. The trade-off is that
+`js_sys::Error: From<JsValue>` is an unchecked cast, so JS code
+throwing a non-Error value (`throw "oops"`) yields an `Error` whose
+accessors misbehave; if you can't audit your sources for that, stay
+with `JsValue` or use an enum with a checked `From<JsValue>`.
 
 ### `@throws {never}` — opting out of fallible variants
 
