@@ -45,6 +45,11 @@ impl<Metadata: ::wasm_bindgen::JsGeneric> ListKeyBuilder<Metadata> {
         self.inner
     }
 }
+impl<Metadata: ::wasm_bindgen::JsGeneric> From<ListKey<Metadata>> for ListKeyBuilder<Metadata> {
+    fn from(inner: ListKey<Metadata>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]

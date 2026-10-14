@@ -253,6 +253,11 @@ impl ResponseInitBuilder {
         self.inner
     }
 }
+impl From<ResponseInit> for ResponseInitBuilder {
+    fn from(inner: ResponseInit) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum QueueContentType {
@@ -353,6 +358,11 @@ pub mod cloudflare {
             }
             pub fn build(self) -> SocketOptions {
                 self.inner
+            }
+        }
+        impl From<SocketOptions> for SocketOptionsBuilder {
+            fn from(inner: SocketOptions) -> Self {
+                Self { inner }
             }
         }
     }

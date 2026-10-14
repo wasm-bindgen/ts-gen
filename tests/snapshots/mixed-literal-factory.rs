@@ -232,6 +232,11 @@ impl OptionalBuilder {
         self.inner
     }
 }
+impl From<Optional> for OptionalBuilder {
+    fn from(inner: Optional) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(private)]
 pub enum ModeKind {
     Bool(bool),

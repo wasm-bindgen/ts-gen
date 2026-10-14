@@ -103,6 +103,11 @@ impl RequestInitBuilder {
         self.inner
     }
 }
+impl From<RequestInit> for RequestInitBuilder {
+    fn from(inner: RequestInit) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch)]

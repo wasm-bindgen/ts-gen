@@ -40,6 +40,11 @@ impl ConditionalBuilder {
         self.inner
     }
 }
+impl From<Conditional> for ConditionalBuilder {
+    fn from(inner: Conditional) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "intersection")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -78,6 +83,11 @@ impl GetOptionsBuilder {
     }
     pub fn build(self) -> GetOptions {
         self.inner
+    }
+}
+impl From<GetOptions> for GetOptionsBuilder {
+    fn from(inner: GetOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(module = "intersection")]
@@ -231,6 +241,11 @@ impl StoreOptionsBuilder {
         self.inner
     }
 }
+impl From<StoreOptions> for StoreOptionsBuilder {
+    fn from(inner: StoreOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "intersection")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -304,6 +319,11 @@ impl RefinedBuilder {
     }
     pub fn build(self) -> Refined {
         self.inner
+    }
+}
+impl From<Refined> for RefinedBuilder {
+    fn from(inner: Refined) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(module = "intersection")]
