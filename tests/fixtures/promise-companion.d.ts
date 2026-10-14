@@ -10,7 +10,7 @@ declare class State {
   /** Overloads: each expansion gets its own `_promise`. */
   fetch(url: string): Promise<Response>;
   fetch(url: string, init: RequestInit): Promise<Response>;
-  /** Nullable result keeps its inner wrapper: `Promise<JsNullable<JsString>>`. */
+  /** The awaited form is `Option<String>`; the promise form keeps `Promise<JsNullable<JsString>>`. */
   get(key: string): Promise<string | null>;
   /**
    * `@throws {never}` drops `catch` from the async form; the promise

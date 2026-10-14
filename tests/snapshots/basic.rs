@@ -167,7 +167,7 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "arrayBuffer")]
     pub fn array_buffer_promise(this: &Body) -> Promise<ArrayBuffer>;
     #[wasm_bindgen(method, catch)]
-    pub async fn text(this: &Body) -> Result<JsString, JsValue>;
+    pub async fn text(this: &Body) -> Result<String, JsValue>;
     #[wasm_bindgen(method, js_name = "text")]
     pub fn text_promise(this: &Body) -> Promise<JsString>;
     #[wasm_bindgen(method, catch)]
@@ -289,7 +289,7 @@ pub mod cloudflare {
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type Socket;
             #[wasm_bindgen(method, catch)]
-            pub async fn close(this: &Socket) -> Result<Undefined, JsValue>;
+            pub async fn close(this: &Socket) -> Result<(), JsValue>;
             #[wasm_bindgen(method, js_name = "close")]
             pub fn close_promise(this: &Socket) -> Promise<Undefined>;
             #[wasm_bindgen(method, getter)]
@@ -361,7 +361,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_env(this: &DurableObject, val: &Object);
     #[wasm_bindgen(method, catch)]
-    pub async fn alarm(this: &DurableObject) -> Result<Undefined, JsValue>;
+    pub async fn alarm(this: &DurableObject) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "alarm")]
     pub fn alarm_promise(this: &DurableObject) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "webSocketMessage")]
@@ -369,7 +369,7 @@ extern "C" {
         this: &DurableObject,
         ws: &WebSocket,
         message: &str,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "webSocketMessage")]
     pub fn web_socket_message_promise(
         this: &DurableObject,
@@ -381,7 +381,7 @@ extern "C" {
         this: &DurableObject,
         ws: &WebSocket,
         message: &ArrayBuffer,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "webSocketMessage")]
     pub fn web_socket_message_with_array_buffer_promise(
         this: &DurableObject,

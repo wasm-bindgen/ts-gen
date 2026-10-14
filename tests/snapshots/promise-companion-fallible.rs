@@ -10,7 +10,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
     #[wasm_bindgen(method, catch)]
-    pub async fn put(this: &Store, key: &str, value: &str) -> Result<Undefined, crate::Error>;
+    pub async fn put(this: &Store, key: &str, value: &str) -> Result<(), crate::Error>;
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_promise(
         this: &Store,
@@ -21,7 +21,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `TypeError` — on an invalid key"]
     #[wasm_bindgen(method, catch)]
-    pub async fn get(this: &Store, key: &str) -> Result<JsNullable<JsString>, TypeError>;
+    pub async fn get(this: &Store, key: &str) -> Result<Option<String>, TypeError>;
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `TypeError` — on an invalid key"]
@@ -29,14 +29,14 @@ extern "C" {
     pub fn get_promise(this: &Store, key: &str)
         -> Result<Promise<JsNullable<JsString>>, TypeError>;
     #[wasm_bindgen(method)]
-    pub async fn ready(this: &Store) -> Boolean;
+    pub async fn ready(this: &Store) -> bool;
     #[wasm_bindgen(method, js_name = "ready")]
     pub fn ready_promise(this: &Store) -> Promise<Boolean>;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub async fn sleep(ms: f64) -> Result<Undefined, crate::Error>;
+    pub async fn sleep(ms: f64) -> Result<(), crate::Error>;
 }
 #[wasm_bindgen]
 extern "C" {

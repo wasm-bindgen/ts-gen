@@ -74,7 +74,7 @@ extern "C" {
 extern "C" {
     #[doc = " Async free function with `@throws {never}` — no Result wrapper."]
     #[wasm_bindgen(js_name = "infallibleFetch")]
-    pub async fn infallible_fetch(url: &str) -> JsString;
+    pub async fn infallible_fetch(url: &str) -> String;
 }
 #[wasm_bindgen]
 extern "C" {

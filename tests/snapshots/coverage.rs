@@ -127,7 +127,7 @@ pub mod my_module {
     #[wasm_bindgen(module = "my-module")]
     extern "C" {
         #[wasm_bindgen(catch, js_name = "doWork")]
-        pub async fn do_work(input: &str) -> Result<JsString, JsValue>;
+        pub async fn do_work(input: &str) -> Result<String, JsValue>;
     }
     #[wasm_bindgen(module = "my-module")]
     extern "C" {
@@ -205,7 +205,7 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new(config: &Object) -> Result<DefaultProcessor, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn process(this: &DefaultProcessor, input: &str) -> Result<JsString, JsValue>;
+    pub async fn process(this: &DefaultProcessor, input: &str) -> Result<String, JsValue>;
     #[wasm_bindgen(method, js_name = "process")]
     pub fn process_promise(this: &DefaultProcessor, input: &str) -> Promise<JsString>;
     #[wasm_bindgen(method, getter)]
@@ -488,7 +488,7 @@ extern "C" {
     pub async fn get(
         this: &Cache,
         key: &str,
-    ) -> Result<JsNullable<Map<JsString, Array<JsString>>>, JsValue>;
+    ) -> Result<Option<Map<JsString, Array<JsString>>>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise(
         this: &Cache,
@@ -499,7 +499,7 @@ extern "C" {
         this: &Cache,
         key: &str,
         value: &Map<JsString, Array<JsString>>,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "set")]
     pub fn set_promise(
         this: &Cache,
