@@ -65,7 +65,7 @@ oxc_span = "0.154"
 prettyplease = "0.2"
 proc-macro2 = "1"
 quote = "1"
-syn = { version = "2", features = ["full", "extra-traits", "printing"] }
+syn = { version = "2", features = ["full", "extra-traits", "printing", "visit-mut"] }
 walkdir = { version = "2", optional = true }
 wasm-encoder = { version = "0.262", features = ["wasmparser"] }
 wasmparser = "0.262"

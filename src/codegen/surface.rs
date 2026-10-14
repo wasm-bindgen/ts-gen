@@ -798,6 +798,7 @@ fn type_refs(ty: &TypeRef, scope: ScopeId, out: &mut Vec<(String, ScopeId)>) {
         | TypeRef::PropertyKey
         | TypeRef::TypedSlice(..)
         | TypeRef::RustScalar(_)
+        | TypeRef::WideScalar(_)
         | TypeRef::StringLiteral(_)
         | TypeRef::NumberLiteral(_)
         | TypeRef::BooleanLiteral(_)
