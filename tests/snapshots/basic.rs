@@ -181,7 +181,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_headers(this: &ResponseInit, val: &Headers);
     #[wasm_bindgen(method, setter, slice_to_array, js_name = "headers")]
-    pub fn set_headers_with_slice(this: &ResponseInit, val: &[Vec<String>]);
+    pub fn set_headers_with_slice(this: &ResponseInit, val: &[Array<JsString>]);
     #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_record(this: &ResponseInit, val: &Object<JsString>);
 }
@@ -211,7 +211,7 @@ impl ResponseInitBuilder {
         self.inner.set_headers(val);
         self
     }
-    pub fn headers_with_slice(self, val: &[Vec<String>]) -> Self {
+    pub fn headers_with_slice(self, val: &[Array<JsString>]) -> Self {
         self.inner.set_headers_with_slice(val);
         self
     }

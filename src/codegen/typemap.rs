@@ -969,7 +969,14 @@ pub fn to_syn_type(
             } else {
                 let repr = ctx.and_then(|c| c.enum_repr(inner, scope));
                 let inner = repr.as_ref().unwrap_or(inner);
-                let elem = to_syn_type(inner, TypePosition::RETURN, ctx, scope, from_module);
+                // wasm-bindgen has no `Vec<Vec<_>>` ABI, so an inner
+                // array stays a JS handle: `string[][]` is `Vec<Array<JsString>>`.
+                let elem_pos = if matches!(*inner, TypeRef::Array(_)) {
+                    TypePosition::RETURN.to_inner()
+                } else {
+                    TypePosition::RETURN
+                };
+                let elem = to_syn_type(inner, elem_pos, ctx, scope, from_module);
                 if pos.is_argument() {
                     quote! { &[#elem] }
                 } else {

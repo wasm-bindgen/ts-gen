@@ -14911,16 +14911,16 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiIMultimodalEmbeddingsOutput;
     #[wasm_bindgen(method, getter)]
-    pub fn data(this: &AiIMultimodalEmbeddingsOutput) -> Vec<Vec<f64>>;
+    pub fn data(this: &AiIMultimodalEmbeddingsOutput) -> Vec<Array<Number>>;
     #[wasm_bindgen(method, setter, slice_to_array)]
-    pub fn set_data(this: &AiIMultimodalEmbeddingsOutput, val: &[Vec<f64>]);
+    pub fn set_data(this: &AiIMultimodalEmbeddingsOutput, val: &[Array<Number>]);
     #[wasm_bindgen(method, getter)]
     pub fn shape(this: &AiIMultimodalEmbeddingsOutput) -> Vec<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_shape(this: &AiIMultimodalEmbeddingsOutput, val: &[f64]);
 }
 impl AiIMultimodalEmbeddingsOutput {
-    pub fn new(data: &[Vec<f64>], shape: &[f64]) -> AiIMultimodalEmbeddingsOutput {
+    pub fn new(data: &[Array<Number>], shape: &[f64]) -> AiIMultimodalEmbeddingsOutput {
         let inner: AiIMultimodalEmbeddingsOutput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_data(data);
         inner.set_shape(shape);
@@ -15237,12 +15237,12 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_shape(this: &AiTextEmbeddingsOutput, val: &[f64]);
     #[wasm_bindgen(method, getter)]
-    pub fn data(this: &AiTextEmbeddingsOutput) -> Vec<Vec<f64>>;
+    pub fn data(this: &AiTextEmbeddingsOutput) -> Vec<Array<Number>>;
     #[wasm_bindgen(method, setter, slice_to_array)]
-    pub fn set_data(this: &AiTextEmbeddingsOutput, val: &[Vec<f64>]);
+    pub fn set_data(this: &AiTextEmbeddingsOutput, val: &[Array<Number>]);
 }
 impl AiTextEmbeddingsOutput {
-    pub fn new(shape: &[f64], data: &[Vec<f64>]) -> AiTextEmbeddingsOutput {
+    pub fn new(shape: &[f64], data: &[Array<Number>]) -> AiTextEmbeddingsOutput {
         let inner: AiTextEmbeddingsOutput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_shape(shape);
         inner.set_data(data);
@@ -20078,10 +20078,14 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts;
     #[wasm_bindgen(method, getter)]
-    pub fn response(this: &Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts)
-        -> Option<Vec<Vec<f64>>>;
+    pub fn response(
+        this: &Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts,
+    ) -> Option<Vec<Array<Number>>>;
     #[wasm_bindgen(method, setter, slice_to_array)]
-    pub fn set_response(this: &Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts, val: &[Vec<f64>]);
+    pub fn set_response(
+        this: &Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts,
+        val: &[Array<Number>],
+    );
     #[wasm_bindgen(method, getter)]
     pub fn shape(this: &Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts) -> Option<Vec<f64>>;
     #[wasm_bindgen(method, setter)]
@@ -20106,7 +20110,7 @@ pub struct Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_ContextsBuilder {
     inner: Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts,
 }
 impl Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_ContextsBuilder {
-    pub fn response(self, val: &[Vec<f64>]) -> Self {
+    pub fn response(self, val: &[Array<Number>]) -> Self {
         self.inner.set_response(val);
         self
     }
@@ -20133,9 +20137,9 @@ extern "C" {
     pub fn set_shape(this: &Ai_Cf_Baai_Bge_M3_Ouput_Embedding, val: &[f64]);
     #[doc = " Embeddings of the requested text values"]
     #[wasm_bindgen(method, getter)]
-    pub fn data(this: &Ai_Cf_Baai_Bge_M3_Ouput_Embedding) -> Option<Vec<Vec<f64>>>;
+    pub fn data(this: &Ai_Cf_Baai_Bge_M3_Ouput_Embedding) -> Option<Vec<Array<Number>>>;
     #[wasm_bindgen(method, setter, slice_to_array)]
-    pub fn set_data(this: &Ai_Cf_Baai_Bge_M3_Ouput_Embedding, val: &[Vec<f64>]);
+    pub fn set_data(this: &Ai_Cf_Baai_Bge_M3_Ouput_Embedding, val: &[Array<Number>]);
     #[doc = " The pooling method used in the embedding process."]
     #[wasm_bindgen(method, getter)]
     pub fn pooling(this: &Ai_Cf_Baai_Bge_M3_Ouput_Embedding) -> Option<PoolingKind>;
@@ -20160,7 +20164,7 @@ impl Ai_Cf_Baai_Bge_M3_Ouput_EmbeddingBuilder {
         self.inner.set_shape(val);
         self
     }
-    pub fn data(self, val: &[Vec<f64>]) -> Self {
+    pub fn data(self, val: &[Array<Number>]) -> Self {
         self.inner.set_data(val);
         self
     }
@@ -25551,9 +25555,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output;
     #[wasm_bindgen(method, getter)]
-    pub fn data(this: &Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output) -> Option<Vec<Vec<f64>>>;
+    pub fn data(this: &Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output) -> Option<Vec<Array<Number>>>;
     #[wasm_bindgen(method, setter, slice_to_array)]
-    pub fn set_data(this: &Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output, val: &[Vec<f64>]);
+    pub fn set_data(this: &Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output, val: &[Array<Number>]);
     #[wasm_bindgen(method, getter)]
     pub fn shape(this: &Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output) -> Option<Vec<f64>>;
     #[wasm_bindgen(method, setter)]
@@ -25573,7 +25577,7 @@ pub struct Ai_Cf_Qwen_Qwen3_Embedding_0_6B_OutputBuilder {
     inner: Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output,
 }
 impl Ai_Cf_Qwen_Qwen3_Embedding_0_6B_OutputBuilder {
-    pub fn data(self, val: &[Vec<f64>]) -> Self {
+    pub fn data(self, val: &[Array<Number>]) -> Self {
         self.inner.set_data(val);
         self
     }
@@ -27443,9 +27447,9 @@ extern "C" {
     pub type Ai_Cf_Pfnet_Plamo_Embedding_1B_Output;
     #[doc = " Embedding vectors, where each vector is a list of floats."]
     #[wasm_bindgen(method, getter)]
-    pub fn data(this: &Ai_Cf_Pfnet_Plamo_Embedding_1B_Output) -> Vec<Vec<f64>>;
+    pub fn data(this: &Ai_Cf_Pfnet_Plamo_Embedding_1B_Output) -> Vec<Array<Number>>;
     #[wasm_bindgen(method, setter, slice_to_array)]
-    pub fn set_data(this: &Ai_Cf_Pfnet_Plamo_Embedding_1B_Output, val: &[Vec<f64>]);
+    pub fn set_data(this: &Ai_Cf_Pfnet_Plamo_Embedding_1B_Output, val: &[Array<Number>]);
     #[doc = " Shape of the embedding data as [number_of_embeddings, embedding_dimension]."]
     #[doc = ""]
     #[doc = " @minItems 2"]
@@ -27465,7 +27469,7 @@ impl Ai_Cf_Pfnet_Plamo_Embedding_1B_Output {
     #[doc = " @minItems 2"]
     #[doc = " @maxItems 2"]
     pub fn new(
-        data: &[Vec<f64>],
+        data: &[Array<Number>],
         shape: &ArrayTuple<(Number, Number)>,
     ) -> Ai_Cf_Pfnet_Plamo_Embedding_1B_Output {
         let inner: Ai_Cf_Pfnet_Plamo_Embedding_1B_Output =

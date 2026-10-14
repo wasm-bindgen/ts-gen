@@ -165,6 +165,8 @@ is exposed as a distinct TS spelling:
 
 Where `U` is the element's inner-position lowering (`JsString`
 for `string`, `Number` for `number`, `Foo` for a named ref).
+A nested `T[][]` has no `Vec<Vec<_>>` ABI, so its inner array is the
+handle: `string[][]` is `&[Array<JsString>]` / `Vec<Array<JsString>>`.
 
 Writing `Array<T>` (the explicit generic) gets the JS-array
 reference form; writing `T[]` (the syntactic shortcut) gets
