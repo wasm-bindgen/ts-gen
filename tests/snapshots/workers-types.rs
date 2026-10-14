@@ -9038,13 +9038,13 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn head(this: &R2Bucket, key: &str) -> Result<JsOption<R2Object>, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn get(
+    pub async fn get(this: &R2Bucket, key: &str) -> Result<JsOption<R2Object>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub async fn get_with_js_value(
         this: &R2Bucket,
         key: &str,
         options: &JsValue,
     ) -> Result<JsOption<R2Object>, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_2(this: &R2Bucket, key: &str) -> Result<JsOption<R2Object>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_r2_get_options(
         this: &R2Bucket,
@@ -33356,11 +33356,11 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn first<T: ::wasm_bindgen::JsGeneric>(
         this: &D1PreparedStatement,
-        col_name: &str,
     ) -> Result<JsOption<T>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "first")]
-    pub async fn first_2<T: ::wasm_bindgen::JsGeneric>(
+    pub async fn first_with_col_name<T: ::wasm_bindgen::JsGeneric>(
         this: &D1PreparedStatement,
+        col_name: &str,
     ) -> Result<JsOption<T>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn run<T: ::wasm_bindgen::JsGeneric>(
@@ -33373,11 +33373,11 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn raw<T: ::wasm_bindgen::JsGeneric>(
         this: &D1PreparedStatement,
-        options: &D1PreparedStatementOptions,
     ) -> Result<ArrayTuple<(Array<JsString>, Array<T>)>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "raw")]
-    pub async fn raw_2<T: ::wasm_bindgen::JsGeneric>(
+    pub async fn raw_with_d1_prepared_statement_options<T: ::wasm_bindgen::JsGeneric>(
         this: &D1PreparedStatement,
+        options: &D1PreparedStatementOptions,
     ) -> Result<ArrayTuple<(Array<JsString>, Array<T>)>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "raw")]
     pub async fn raw_with_d1_prepared_statement_options2<T: ::wasm_bindgen::JsGeneric>(

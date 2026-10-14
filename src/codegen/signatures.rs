@@ -353,9 +353,13 @@ pub fn expand_signatures(
     scope: ScopeId,
 ) -> Vec<ExpandedSignature> {
     // Phase 1: Per-overload expansion — optional truncation + union cartesian product.
-    let mut all_sigs: Vec<Vec<ConcreteParam>> = Vec::new();
-    for params in overloads {
-        all_sigs.extend(expand_single_overload(params, cgctx, scope));
+    let mut all_sigs: Vec<(usize, Vec<ConcreteParam>)> = Vec::new();
+    for (index, params) in overloads.iter().enumerate() {
+        all_sigs.extend(
+            expand_single_overload(params, cgctx, scope)
+                .into_iter()
+                .map(|sig| (index, sig)),
+        );
     }
 
     // Phase 2: Cross-overload dedup — remove signatures that are identical
@@ -374,7 +378,8 @@ pub fn expand_signatures(
     let mut seen_concrete: Vec<&Vec<ConcreteParam>> = Vec::new();
     let mut seen_rendered: Vec<Vec<String>> = Vec::new();
     let mut deduped: Vec<Vec<ConcreteParam>> = Vec::new();
-    for sig in &all_sigs {
+    let mut indices: Vec<usize> = Vec::new();
+    for (index, sig) in &all_sigs {
         if seen_concrete.iter().any(|s| concrete_params_eq(s, sig)) {
             continue;
         }
@@ -385,9 +390,22 @@ pub fn expand_signatures(
         seen_concrete.push(sig);
         seen_rendered.push(rendered);
         deduped.push(sig.clone());
+        indices.push(*index);
     }
 
     // Phase 3: Suffix — compute `_with_X` disambiguators across the cohort.
+    // The base name goes to the first overload's shortest expansion, or to
+    // a shorter expansion that is a parameter-name prefix of it: with
+    // `get(key, options: Required)` declared before `get(key, options?)`,
+    // `(key)` owns `get` rather than the two-arg form. A shorter expansion
+    // with different leading names (`put(entries)` next to
+    // `put(key, value)`) does not displace the first overload.
+    if let Some(primary) = primary_expansion(&deduped, &indices) {
+        let sig = deduped.remove(primary);
+        let index = indices.remove(primary);
+        deduped.insert(0, sig);
+        indices.insert(0, index);
+    }
     compute_suffixes(&deduped)
         .into_iter()
         .zip(deduped)
@@ -396,6 +414,24 @@ pub fn expand_signatures(
             params,
         })
         .collect()
+}
+
+/// Index of the expansion that owns the unsuffixed name; see the Phase 3
+/// comment in [`expand_signatures`]. `None` when there is nothing to move.
+fn primary_expansion(sigs: &[Vec<ConcreteParam>], indices: &[usize]) -> Option<usize> {
+    let first_overload = *indices.iter().min()?;
+    let anchor = (0..sigs.len())
+        .filter(|&i| indices[i] == first_overload)
+        .min_by_key(|&i| sigs[i].len())?;
+    let is_prefix_of_anchor = |sig: &[ConcreteParam]| {
+        sig.len() < sigs[anchor].len()
+            && sig.iter().zip(&sigs[anchor]).all(|(a, b)| a.name == b.name)
+    };
+    let primary = (0..sigs.len())
+        .filter(|&i| is_prefix_of_anchor(&sigs[i]))
+        .min_by_key(|&i| sigs[i].len())
+        .unwrap_or(anchor);
+    (primary != 0).then_some(primary)
 }
 
 /// Per-callable input describing a JS callable that needs to be emitted as
@@ -557,8 +593,8 @@ fn push_with_js_string_return(
 }
 
 /// Compute `_with_X` / `_with_X_and_Y` suffixes across a cohort of expanded
-/// signatures. Returns one suffix string per input. The shortest-arity
-/// variant (or the only one if there's a single signature) gets `""`.
+/// signatures. Returns one suffix string per input. The first variant
+/// (or the only one if there's a single signature) gets `""`.
 ///
 /// Wraps the existing [`compute_rust_names`] helper, then extracts the
 /// suffixes by stripping a shared base prefix. We compute against a
@@ -976,9 +1012,8 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
     let mut used: std::collections::HashSet<String> = std::collections::HashSet::new();
 
     for (sig_idx, sig) in signatures.iter().enumerate() {
-        // The first signature (shortest / most basic) gets the base name
-        // without any suffix. This matches the convention that the most
-        // common calling pattern uses the simplest name.
+        // The first signature gets the base name without any suffix;
+        // `expand_signatures` has already moved the primary to the front.
         if sig_idx == 0 {
             names.push(base_name.to_string());
             used.insert(base_name.to_string());

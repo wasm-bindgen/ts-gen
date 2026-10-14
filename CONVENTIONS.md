@@ -846,8 +846,28 @@ For every JS callable, `ts-gen`:
    both truncate to `(callback)` produce only one binding.
 3. **Suffix assignment**: Across all surviving expansions, compute
    `_with_X` / `_with_X_and_Y` suffixes that disambiguate them. The
-   shortest-arity (or first) variant gets `""`; longer variants are
-   named after their additional parameters.
+   primary variant gets `""`; the others are named after the
+   parameters that distinguish them.
+
+   The primary is the first overload's shortest expansion, unless a
+   shorter expansion shares its leading parameter names, in which case
+   that one is the primary. Declaration order alone would let a
+   required-options overload claim the bare name for its longer form:
+
+   ```ts
+   get(key: string, options: Conditional): Promise<string | null>;
+   get(key: string, options?: GetOptions): Promise<string>;
+   put(key: string, value: string, options?: PutOptions): Promise<void>;
+   put(entries: Record<string, string>, options?: PutOptions): Promise<void>;
+   ```
+
+   ```rust
+   pub async fn get(this: &Store, key: &str) -> …;              // prefix of (key, options)
+   pub async fn get_with_conditional(this: &Store, key: &str, options: &Conditional) -> …;
+   pub async fn get_with_get_options(this: &Store, key: &str, options: &GetOptions) -> …;
+   pub async fn put(this: &Store, key: &str, value: &str) -> …;  // first overload keeps it
+   pub async fn put_with_entries(this: &Store, entries: &Object<JsString>) -> …;
+   ```
 
 The output is a `Vec<{ name_suffix, params }>` — a focused
 parameter-axis result. The per-callable layer (`build_signatures`)
