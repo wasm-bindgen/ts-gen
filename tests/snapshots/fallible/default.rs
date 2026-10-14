@@ -68,3 +68,12 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_max(this: &Counter, val: f64);
 }
+#[wasm_bindgen(module = "fallible")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Signal;
+    #[doc = " Constructor declared infallible — plain `Signal`, no `catch`."]
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> Signal;
+}
