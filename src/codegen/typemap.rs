@@ -104,7 +104,45 @@ pub const JS_SYS_RESERVED: &[&str] = &[
 /// of these names is moved aside like a `js_sys` collision. Re-exporting it
 /// under its own name would shadow the prelude again, so it keeps the
 /// suffixed name.
-const RUST_PRELUDE_RESERVED: &[&str] = &["Option", "Result", "String", "Vec"];
+const RUST_PRELUDE_RESERVED: &[&str] = &[
+    "AsMut",
+    "AsRef",
+    "Box",
+    "Clone",
+    "Copy",
+    "Default",
+    "DoubleEndedIterator",
+    "Drop",
+    "Eq",
+    "Err",
+    "ExactSizeIterator",
+    "Extend",
+    "Fn",
+    "FnMut",
+    "FnOnce",
+    "From",
+    "FromIterator",
+    "Into",
+    "IntoIterator",
+    "None",
+    "Ok",
+    "Option",
+    "Ord",
+    "PartialEq",
+    "PartialOrd",
+    "Result",
+    "Send",
+    "Sized",
+    "Some",
+    "String",
+    "Sync",
+    "ToOwned",
+    "ToString",
+    "TryFrom",
+    "TryInto",
+    "Unpin",
+    "Vec",
+];
 
 pub(crate) fn is_prelude_reserved(name: &str) -> bool {
     RUST_PRELUDE_RESERVED.contains(&name)

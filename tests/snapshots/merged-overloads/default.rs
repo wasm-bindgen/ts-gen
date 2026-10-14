@@ -88,13 +88,13 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Box;
+    pub type Box_;
     #[wasm_bindgen(method)]
-    pub fn put(this: &Box, x: f64);
+    pub fn put(this: &Box_, x: f64);
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub fn try_put(this: &Box, x: f64) -> Result<(), JsValue>;
+    pub fn try_put(this: &Box_, x: f64) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_str(this: &Box, x: &str);
+    pub fn put_with_str(this: &Box_, x: &str);
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub fn try_put_with_str(this: &Box, x: &str) -> Result<(), JsValue>;
+    pub fn try_put_with_str(this: &Box_, x: &str) -> Result<(), JsValue>;
 }

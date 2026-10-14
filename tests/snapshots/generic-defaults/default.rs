@@ -8,13 +8,13 @@ use wasm_bindgen::prelude::*;
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Box<T: ::wasm_bindgen::JsGeneric = JsValue>;
+    pub type Box_<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter)]
-    pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &Box<T>) -> T;
+    pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &Box_<T>) -> T;
     #[wasm_bindgen(method)]
-    pub fn set<T: ::wasm_bindgen::JsGeneric>(this: &Box<T>, value: &T);
+    pub fn set<T: ::wasm_bindgen::JsGeneric>(this: &Box_<T>, value: &T);
     #[wasm_bindgen(method, catch, js_name = "set")]
-    pub fn try_set<T: ::wasm_bindgen::JsGeneric>(this: &Box<T>, value: &T) -> Result<(), JsValue>;
+    pub fn try_set<T: ::wasm_bindgen::JsGeneric>(this: &Box_<T>, value: &T) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
@@ -56,7 +56,10 @@ impl ::core::convert::From<&::js_sys::JsString> for Loose {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Holder<T: ::wasm_bindgen::JsGeneric = JsValue, U: ::wasm_bindgen::JsGeneric = Box<T>>;
+    pub type Holder<
+        T: ::wasm_bindgen::JsGeneric = JsValue,
+        U: ::wasm_bindgen::JsGeneric = Box_<T>,
+    >;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Holder, JsValue>;
     #[wasm_bindgen(method)]
@@ -80,7 +83,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Options<T: ::wasm_bindgen::JsGeneric = Box<JsString>>;
+    pub type Options<T: ::wasm_bindgen::JsGeneric = Box_<JsString>>;
     #[wasm_bindgen(method, getter)]
     pub fn initial<T: ::wasm_bindgen::JsGeneric>(this: &Options<T>) -> Option<T>;
     #[wasm_bindgen(method, setter)]
@@ -116,12 +119,12 @@ impl<T: ::wasm_bindgen::JsGeneric> OptionsBuilder<T> {
 #[wasm_bindgen(module = "generic-defaults")]
 extern "C" {
     #[wasm_bindgen(js_name = "looseBox")]
-    pub fn loose_box() -> Box;
+    pub fn loose_box() -> Box_;
 }
 #[wasm_bindgen(module = "generic-defaults")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "looseBox")]
-    pub fn try_loose_box() -> Result<Box, JsValue>;
+    pub fn try_loose_box() -> Result<Box_, JsValue>;
 }
 #[wasm_bindgen(module = "generic-defaults")]
 extern "C" {
@@ -146,10 +149,10 @@ extern "C" {
 #[wasm_bindgen(module = "generic-defaults")]
 extern "C" {
     #[wasm_bindgen(js_name = "mixedHolder")]
-    pub fn mixed_holder() -> Holder<JsString, Box>;
+    pub fn mixed_holder() -> Holder<JsString, Box_>;
 }
 #[wasm_bindgen(module = "generic-defaults")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "mixedHolder")]
-    pub fn try_mixed_holder() -> Result<Holder<JsString, Box>, JsValue>;
+    pub fn try_mixed_holder() -> Result<Holder<JsString, Box_>, JsValue>;
 }

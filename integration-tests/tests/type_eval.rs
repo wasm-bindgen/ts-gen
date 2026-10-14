@@ -5,7 +5,7 @@ use ts_gen_integration_tests::type_eval::scoped::PartialSettings;
 use ts_gen_integration_tests::type_eval::{
     ExcludeUnitHour, Holder, KeyOfExtended, Mixed, Named, NotMinute, OptionKey, PartialBox,
     PartialOptions, PickOptionsNameOrSize, Plural, PluralHourOrMinute, ReadonlyOptions,
-    RequiredOptions, Rounding, Sized,
+    RequiredOptions, Rounding, Sized_,
 };
 
 // This fixture has no backing JavaScript module, so it provides compile-only
@@ -30,7 +30,7 @@ fn evaluated_types_compile(
     let _: Option<bool> = partial.fixed();
     let picked = PickOptionsNameOrSize::builder("n").size(2.0).build();
     let _: String = picked.name();
-    let _: Option<f64> = Sized::builder().size(3.0).build().size();
+    let _: Option<f64> = Sized_::builder().size(3.0).build().size();
     let named = Named::new();
     named.set_name("n");
     named.set_label("l");

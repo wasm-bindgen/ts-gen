@@ -198,21 +198,18 @@ impl MessageBuilder {
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Box<T = JsValue>;
+    pub type Box_<T = JsValue>;
     #[wasm_bindgen(method, getter)]
-    pub fn value<T>(this: &Box<T>) -> T
+    pub fn value<T>(this: &Box_<T>) -> T
     where
-        for<'__wbg> &'__wbg Box<T>: ::wasm_bindgen::convert::IntoWasmAbi,
         T: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<T>(this: &Box<T>, val: T)
+    pub fn set_value<T>(this: &Box_<T>, val: T)
     where
-        for<'__wbg> &'__wbg Box<T>: ::wasm_bindgen::convert::IntoWasmAbi,
         T: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, catch)]
-    pub fn unwrap<T>(this: &Box<T>) -> Result<T, JsValue>
+    pub fn unwrap<T>(this: &Box_<T>) -> Result<T, JsValue>
     where
-        for<'__wbg> &'__wbg Box<T>: ::wasm_bindgen::convert::IntoWasmAbi,
         T: ::wasm_bindgen::convert::FromWasmAbi;
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -236,7 +233,7 @@ impl Tagged {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Tagged , extends = Box , extends = Object , is_type_of = JsValue :: is_object)]
+    # [wasm_bindgen (extends = Tagged , extends = Box_ , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Named;
     #[wasm_bindgen(method, getter)]

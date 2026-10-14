@@ -665,8 +665,11 @@ pub mod web_assembly {
 Consumers always write `web_assembly::Global`. The `_` suffix is an
 internal detail.
 
-The bindings also spell the prelude's `Option`, `Result`, `String` and
-`Vec` bare, so a declaration with one of those names is suffixed the same
+The bindings also spell the Rust prelude bare (`Result<T, JsValue>` on
+every fallible binding, `String`, `Option<T>`, `From`/`Default`/`Clone`
+in impls), so a declaration named like anything the 2021 prelude exports
+(`Result`, `Option`, `Box`, `Default`, `From`, …; the full list is
+`RUST_PRELUDE_RESERVED` in `codegen/typemap.rs`) is suffixed the same
 way. It is not re-exported, since `pub use Result_ as Result;` would
 shadow the prelude `Result` again, so consumers write `Result_`.
 
@@ -2679,7 +2682,8 @@ parameters thread through every site that mentions `Foo`:
   arguments included. Rust accepts defaults only on the type
   definition, so dictionary builders and helper `impl`s keep the plain
   form and a builder for a defaulted dictionary is named with explicit
-  arguments (`Options::<Box<JsString>>::builder()`).
+  arguments (`Options::<Box_<JsString>>::builder()`, `Box` being in the
+  prelude).
 * Every reference to the type leaves the trailing arguments that equal
   the declared Rust defaults to them, in both modes. `fetch(input:
   RequestInfo)` instantiates `Request<unknown, CfProperties<unknown>>`,
@@ -2690,7 +2694,7 @@ parameters thread through every site that mentions `Foo`:
   argument, so `Holder<string, Box<string>>` with `U = Box<T>` is
   `Holder<JsString>`. Only the trailing run goes, as Rust can't skip a
   middle argument (`Holder<unknown, Box<string>>` stays
-  `Holder<JsValue, Box<JsString>>`), and the comparison is with the
+  `Holder<JsValue, Box_<JsString>>`), and the comparison is with the
   Rust spelling, so under `--experimental-generic-mono` a
   `Foo<String>` is kept against a declared `T = JsString`.
 * Every getter / setter / method `fn` — redeclares
@@ -4579,7 +4583,7 @@ pub enum OptionKey { Name = "name", Size = "size", Fixed = "fixed" }
 // All-optional dictionaries with builders:
 pub type PartialOptions;   // name?, size?, fixed? (readonly)
 pub type PickOptionsName;  // name
-pub type Sized;            // size?
+pub type Sized_;           // size? (`Sized` is in the prelude)
 
 // `Named` has `label`, `name` and `fixed` as its own members and no parent.
 ```
@@ -4613,7 +4617,7 @@ pub type Sized;            // size?
   `PartialTemporalLike<TimeLikeObject>`, which only makes optional what
   already is, is `TimeLikeObject`.
 * **An alias to an evaluated type is promoted.** `type Sized = Pick<…>`
-  is the dictionary `Sized`; `type OptionKey = keyof Options` is the enum
+  is the dictionary `Sized_`; `type OptionKey = keyof Options` is the enum
   `OptionKey`. A utility over such an alias reads it evaluated, so
   `Exclude<Unit, Minute>` and `Pick<Options, Exclude<OptionKey, "fixed">>`
   work wherever the alias is declared.
