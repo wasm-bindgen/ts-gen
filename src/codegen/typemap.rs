@@ -210,6 +210,10 @@ pub struct CodegenContext<'a> {
     /// panicking primary plus `try_` companion. See
     /// [`crate::codegen::GenerateOptions::fallible`].
     pub fallible: bool,
+    /// Name of the generated `@throws` enum; every `@throws`-typed
+    /// binding returns it. See
+    /// [`crate::codegen::GenerateOptions::error_enum`].
+    pub error_enum: Option<String>,
     /// Whether generic imports use wasm-bindgen's experimental
     /// per-monomorphization codegen rather than type erasure.
     pub experimental_generic_mono: bool,
@@ -702,6 +706,7 @@ impl<'a> CodegenContext<'a> {
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
             error_type,
             fallible: options.fallible,
+            error_enum: options.error_enum.clone(),
             experimental_generic_mono: options.experimental_generic_mono,
             exported_modules,
             externalised_modules,
@@ -744,6 +749,7 @@ impl<'a> CodegenContext<'a> {
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
             error_type: None,
             fallible: false,
+            error_enum: None,
             experimental_generic_mono: false,
             exported_modules: HashSet::new(),
             externalised_modules: HashSet::new(),
@@ -2125,7 +2131,8 @@ pub fn to_return_type(
 }
 
 /// The `E` of a fallible binding's `Result<T, E>`: the `@throws` type
-/// when one is given, else the configured default.
+/// when one is given (or the `--error-enum` that stands in for every
+/// `@throws` type), else the configured default.
 pub fn error_type_tokens(
     error_ty: Option<&TypeRef>,
     ctx: Option<&CodegenContext<'_>>,
@@ -2133,6 +2140,13 @@ pub fn error_type_tokens(
     from_module: &ModuleContext,
 ) -> TokenStream {
     match error_ty {
+        Some(_) if ctx.is_some_and(|c| c.error_enum.is_some()) => {
+            let name = ctx
+                .and_then(|c| c.error_enum.as_deref())
+                .unwrap_or_default();
+            let ident = make_ident(name);
+            quote! { #ident }
+        }
         Some(ty) => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
         None => default_error_type(ctx),
     }
