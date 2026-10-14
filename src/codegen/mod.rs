@@ -6,6 +6,7 @@
 pub mod classes;
 pub mod discriminated_unions;
 pub mod enums;
+pub mod error_enum;
 pub mod functions;
 pub(crate) mod null_arms;
 pub mod signatures;
@@ -74,6 +75,16 @@ pub struct GenerateOptions {
     /// callables, constructors and setters are unaffected.
     fallible: bool,
 
+    /// Name of a generated error enum collecting every type named in a
+    /// `@throws` across the output, with `From<JsValue>` dispatching by
+    /// `instanceof` (most derived class first) and an `Other(JsValue)`
+    /// fallback. When set, every `@throws`-typed binding returns
+    /// `Result<T, ThisEnum>` — a union keeps its members instead of
+    /// collapsing to the LUB, and a single type routes through the same
+    /// enum so callers have one `?`-able type. Untyped bindings keep the
+    /// `error_type` default. `None` keeps the LUB lowering.
+    error_enum: Option<String>,
+
     /// Opt generic imports into wasm-bindgen's experimental
     /// per-monomorphization codegen. Type parameters are emitted without
     /// `JsGeneric` bounds and cross the ABI at their concrete Rust types.
@@ -121,6 +132,13 @@ impl GenerateOptions {
     /// Configure whether sync callables emit a single `Result` form.
     pub fn fallible(mut self, enabled: bool) -> Self {
         self.fallible = enabled;
+        self
+    }
+
+    /// Generate an enum of this name over every `@throws` type and
+    /// return it from every `@throws`-typed binding.
+    pub fn error_enum(mut self, name: impl Into<String>) -> Self {
+        self.error_enum = Some(name.into());
         self
     }
 
@@ -352,6 +370,11 @@ fn generate_tokens(
     let global_items = root.generate(&mut Vec::new(), &cgctx);
     cgctx.emit_path.replace(Vec::new());
 
+    let error_enum = options.error_enum.as_deref().map(|name| {
+        let names = error_enum::collect_throws_names(&module.types, &surface);
+        error_enum::generate_error_enum(name, &names, &cgctx)
+    });
+
     // Dynamic-union enums synthesised during the per-declaration
     // emit pass. Lowering their payloads can record externals (a
     // `Worker` reachable only through a `<Name>Kind` arm), so they
@@ -367,6 +390,7 @@ fn generate_tokens(
         #external_uses
         #(#global_items)*
         #dynamic_unions
+        #error_enum
     })
 }
 

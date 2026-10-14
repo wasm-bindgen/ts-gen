@@ -63,6 +63,13 @@ Route untyped JS exceptions into your own error type (must implement
 ts-gen --input types.d.ts --output src/bindings.rs --error-type crate::Error
 ```
 
+Keep `@throws {A | B}` unions as a generated `JsException` enum instead of
+collapsing them to their common ancestor:
+
+```sh
+ts-gen --input types.d.ts --output src/bindings.rs --error-enum
+```
+
 Opt generic imports into wasm-bindgen's experimental per-monomorphization
 codegen:
 

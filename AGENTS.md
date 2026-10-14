@@ -34,6 +34,7 @@ src/
 │   ├── classes.rs             # extern blocks for class-like types
 │   ├── functions.rs           # free function / variable bindings
 │   ├── enums.rs               # string + numeric enums
+│   ├── error_enum.rs          # `--error-enum`: @throws types → one enum
 │   ├── signatures.rs          # parameter expansion + per-callable layer
 │   ├── subtyping.rs           # builtin parents + `lub_types` (LUB)
 │   └── typemap.rs             # TypeRef → syn tokens, `to_return_type`, externals
