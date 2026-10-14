@@ -583,10 +583,16 @@ fn generate_type_alias(
 
     // Resolve the target inside the alias's body scope so its own
     // type parameters bind locally (the alias is a scope-introducing
-    // construct in TS).
+    // construct in TS). An enum target has no inner form, so it is
+    // named directly.
+    let pos = if cgctx.enum_kind(&alias.target, alias.body_scope).is_some() {
+        typemap::TypePosition::RETURN
+    } else {
+        typemap::TypePosition::ARGUMENT.to_inner()
+    };
     let target = typemap::to_syn_type(
         &alias.target,
-        typemap::TypePosition::ARGUMENT.to_inner(),
+        pos,
         Some(cgctx),
         alias.body_scope,
         from_module,

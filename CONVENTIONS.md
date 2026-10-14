@@ -1645,6 +1645,10 @@ A synthesised enum can mix two variant forms in the same body:
   | `Array<Foo>`      | `Vec<Foo>`      | `VecOfFoo(Vec<Foo>)` |
   | `Foo` (named)     | `Foo`           | `Foo(Foo)`      |
 
+  A string enum member is the exception: wasm-bindgen string enums
+  have no `TryFromJsValue`, so its values become literal variants
+  instead (see [String and numeric enums](#string-and-numeric-enums)).
+
 Mixed unions like `"user" | "system" | (string & NonNullable<unknown>)`
 emit literal variants for each named string + a tuple
 `JsValue(JsValue)` fallback for the residual — wasm-bindgen tries
@@ -1857,13 +1861,32 @@ pub enum Color {
 }
 ```
 
-wasm-bindgen converts these by value only, so unlike other named types
-they are not borrowed in argument position: `fn send(kind: Kind)`,
-`fn set_kind(this: &Opts, val: Kind)`, and optional properties still
-read back as `Option<Kind>`.
-
 Numeric enums lower similarly with explicit discriminant values and a
 `#[repr(u32)]` / `#[repr(i32)]` chosen from the value range.
+
+wasm-bindgen converts both kinds by value only, so unlike other named
+types they are not borrowed in argument position: `fn send(kind: Kind)`,
+`fn set_kind(this: &Opts, val: Kind)`, and optional properties still
+read back as `Option<Kind>`. This holds through aliases and qualified
+names (`NS.Kind`).
+
+They are not JS values, so they have no slice or generic form. Anywhere
+other than a top-level argument or return, an enum lowers as the
+primitive it carries, exactly as `string` / `number` would there:
+
+| TypeScript             | Rust                              |
+| ---------------------- | --------------------------------- |
+| `kinds: Kind[]`        | `&[String]` / `Vec<String>`       |
+| `levels: Level[]`      | `&[f64]` / `Vec<f64>`             |
+| `Promise<Kind>`        | `Promise<JsString>`               |
+| `Array<Level>`         | `Array<Number>`                   |
+| `(kind: Kind) => void` | `Function<fn(JsString) -> Undefined>` |
+
+`Kind::from_js_value(&value)` converts back. In a
+[dynamic union](#erased-return-position-unions-become-dynamic-union-enums)
+a string enum contributes its values as literal variants, as if written
+inline (`Kind | number` → `Text = "text"`, `Bytes = "bytes"`,
+`F64(f64)`); a numeric enum stays a `Level(Level)` payload.
 
 ## Multiple-context name resolution
 

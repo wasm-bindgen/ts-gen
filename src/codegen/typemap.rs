@@ -612,16 +612,46 @@ impl<'a> CodegenContext<'a> {
         self.resolve_alias_impl(name, scope, &mut visited)
     }
 
-    /// Whether `name` resolves to a string or numeric enum. Those lower to
-    /// `Copy` Rust enums, which wasm-bindgen only converts by value, so they
-    /// are never borrowed in argument position.
-    pub fn is_enum(&self, name: &str, scope: ScopeId) -> bool {
-        self.gctx.scopes.resolve(scope, name).is_some_and(|id| {
-            matches!(
-                self.gctx.get_type(id).kind,
-                TypeKind::StringEnum(_) | TypeKind::NumericEnum(_)
-            )
-        })
+    /// The string or numeric enum declaration `ty` names, through aliases
+    /// and qualified paths.
+    pub(crate) fn enum_kind(&self, ty: &ir::TypeRef, scope: ScopeId) -> Option<&TypeKind> {
+        let ty = ty
+            .as_ident()
+            .and_then(|name| self.resolve_alias(name, scope))
+            .unwrap_or(ty);
+        let ir::TypeRef::Reference {
+            segments,
+            generic_args,
+        } = ty
+        else {
+            return None;
+        };
+        if !generic_args.is_empty() {
+            return None;
+        }
+        // A namespace inside a module is flattened into the module scope, so
+        // its members only resolve by their last segment.
+        let id = self
+            .gctx
+            .resolve_path(scope, &segments.join("."))
+            .or_else(|| match segments.as_slice() {
+                [_, .., last] => self.gctx.scopes.resolve(scope, last),
+                _ => None,
+            })?;
+        let kind = &self.gctx.get_type(id).kind;
+        matches!(kind, TypeKind::StringEnum(_) | TypeKind::NumericEnum(_)).then_some(kind)
+    }
+
+    /// The primitive an enum reference carries on the JS side.
+    ///
+    /// wasm-bindgen enums are `Copy` values with no `JsGeneric` or slice
+    /// support, so only a top-level argument or return can name one; inside
+    /// a slice, generic or callback it lowers as this primitive instead.
+    pub(crate) fn enum_repr(&self, ty: &ir::TypeRef, scope: ScopeId) -> Option<ir::TypeRef> {
+        match self.enum_kind(ty, scope)? {
+            TypeKind::StringEnum(_) => Some(ir::TypeRef::String),
+            _ => Some(ir::TypeRef::Number),
+        }
     }
 
     fn resolve_alias_impl<'b>(
@@ -945,6 +975,8 @@ pub fn to_syn_type(
             if pos.inner {
                 generic_container(quote! { Array }, inner, pos, ctx, scope, from_module)
             } else {
+                let repr = ctx.and_then(|c| c.enum_repr(inner, scope));
+                let inner = repr.as_ref().unwrap_or(inner);
                 let elem = to_syn_type(inner, TypePosition::RETURN, ctx, scope, from_module);
                 if pos.is_argument() {
                     quote! { &[#elem] }
@@ -1090,17 +1122,13 @@ pub fn to_syn_type(
                         let target = target.clone();
                         return to_syn_type(&target, pos, ctx, scope, from_module);
                     }
-                    if c.is_enum(&segments[0], scope) {
-                        return lower_reference(
-                            segments,
-                            generic_args,
-                            pos,
-                            ctx,
-                            scope,
-                            from_module,
-                        );
-                    }
                 }
+            }
+            if let Some(repr) = ctx.and_then(|c| c.enum_repr(ty, scope)) {
+                if pos.inner {
+                    return to_syn_type(&repr, pos, ctx, scope, from_module);
+                }
+                return lower_reference(segments, generic_args, pos, ctx, scope, from_module);
             }
             maybe_ref(
                 lower_reference(segments, generic_args, pos, ctx, scope, from_module),
@@ -1960,7 +1988,22 @@ fn maybe_synthesise_return_union(
     };
     let cgctx = ctx?;
 
-    let members = dynamic_union_members(members, ctx, scope)?;
+    // A string enum has no `TryFromJsValue`, so it can't be a variant
+    // payload; its values join the union as literals, as if the alias were
+    // written inline.
+    let members: Vec<TypeRef> = members
+        .iter()
+        .flat_map(|m| match cgctx.enum_kind(m, scope) {
+            Some(TypeKind::StringEnum(e)) => e
+                .variants
+                .iter()
+                .map(|v| TypeRef::StringLiteral(v.js_value.clone()))
+                .collect(),
+            _ => vec![m.clone()],
+        })
+        .collect();
+
+    let members = dynamic_union_members(&members, ctx, scope)?;
     let name = cgctx.synthesise_dynamic_union(
         &members,
         &anchor.enum_anchor(),
@@ -2995,5 +3038,54 @@ mod tests {
             members(&[S("auto".into()), N(0.0), N(1.0)]),
             Some(vec![S("auto".into()), Number])
         );
+    }
+
+    #[test]
+    fn enums_are_named_only_at_the_top_level() {
+        let src = r#"
+            type Mode = "fast" | "slow";
+            type ModeAlias = Mode;
+            declare enum Level { Low = 1 }
+            declare namespace Codes { type Region = "eu" | "us"; }
+        "#;
+        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let ctx = CodegenContext::from_module_full(&module, &gctx, false, false, HashSet::new());
+        let scope = *module.file_scopes.first().expect("file scope");
+        let lower = |ty: &TypeRef, pos: TypePosition| {
+            to_syn_type(ty, pos, Some(&ctx), scope, &ModuleContext::Global).to_string()
+        };
+        let region = TypeRef::Reference {
+            segments: vec!["Codes".into(), "Region".into()],
+            generic_args: vec![],
+        };
+        let arg = TypePosition::ARGUMENT;
+        let ret = TypePosition::RETURN;
+
+        assert_eq!(lower(&TypeRef::ident("Mode"), arg), "Mode");
+        assert_eq!(lower(&TypeRef::ident("ModeAlias"), arg), "Mode");
+        assert_eq!(lower(&TypeRef::ident("Level"), arg), "Level");
+        assert_eq!(lower(&region, arg), "Region");
+
+        let modes = TypeRef::Array(Box::new(TypeRef::ident("ModeAlias")));
+        let levels = TypeRef::Array(Box::new(TypeRef::ident("Level")));
+        assert_eq!(lower(&modes, arg), "& [String]");
+        assert_eq!(lower(&levels, ret), "Vec < f64 >");
+        assert_eq!(
+            lower(&TypeRef::generic("Promise", vec![region]), ret),
+            "Promise < JsString >"
+        );
+        assert_eq!(
+            lower(
+                &TypeRef::generic("Array", vec![TypeRef::ident("Level")]),
+                arg
+            ),
+            "& Array < Number >"
+        );
+
+        assert_eq!(
+            ctx.enum_repr(&TypeRef::ident("ModeAlias"), scope),
+            Some(TypeRef::String)
+        );
+        assert_eq!(ctx.enum_repr(&TypeRef::ident("Codes"), scope), None);
     }
 }
