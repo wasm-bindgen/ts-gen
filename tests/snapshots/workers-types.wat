@@ -3352,8 +3352,10 @@
   (import "./bindings.wasm" "ReadableStream.cancel" (func $ReadableStream.cancel (param $this externref) (result externref)))
   ;; cancel(reason: any): Promise<void>
   (import "./bindings.wasm" "ReadableStream.cancel_with_reason" (func $ReadableStream.cancel_with_reason (param $this externref) (param $reason externref) (result externref)))
-  ;; getReader(options: ReadableStreamGetReaderOptions): ReadableStreamBYOBReader
-  (import "./bindings.wasm" "ReadableStream.get_reader" (func $ReadableStream.get_reader (param $this externref) (param $options externref) (result externref)))
+  ;; getReader(): ReadableStreamDefaultReader<R>
+  (import "./bindings.wasm" "ReadableStream.get_reader" (func $ReadableStream.get_reader (param $this externref) (result externref)))
+  ;; getReader(options: ReadableStreamGetReaderOptions): ReadableStreamDefaultReader<R>
+  (import "./bindings.wasm" "ReadableStream.get_reader_with_options" (func $ReadableStream.get_reader_with_options (param $this externref) (param $options externref) (result externref)))
   ;; pipeThrough(transform: ReadableWritablePair<T, R>): ReadableStream<T>
   (import "./bindings.wasm" "ReadableStream.pipe_through" (func $ReadableStream.pipe_through (param $this externref) (param $transform externref) (result externref)))
   ;; pipeThrough(transform: ReadableWritablePair<T, R>, options: StreamPipeOptions): ReadableStream<T>

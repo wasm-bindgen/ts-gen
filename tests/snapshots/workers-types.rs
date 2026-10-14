@@ -12694,13 +12694,27 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "getReader")]
     pub fn get_reader<R: ::wasm_bindgen::JsGeneric>(
         this: &ReadableStream<R>,
+    ) -> ReadableStreamDefaultReader<R>;
+    #[doc = " The **`getReader()`** method of the ReadableStream interface creates a reader and locks the stream to it."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/getReader)"]
+    #[wasm_bindgen(method, catch, js_name = "getReader")]
+    pub fn try_get_reader<R: ::wasm_bindgen::JsGeneric>(
+        this: &ReadableStream<R>,
+    ) -> Result<ReadableStreamDefaultReader<R>, JsValue>;
+    #[doc = " The **`getReader()`** method of the ReadableStream interface creates a reader and locks the stream to it."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/getReader)"]
+    #[wasm_bindgen(method, js_name = "getReader")]
+    pub fn get_reader_with_options<R: ::wasm_bindgen::JsGeneric>(
+        this: &ReadableStream<R>,
         options: &ReadableStreamGetReaderOptions,
     ) -> ReadableStreamBYOBReader;
     #[doc = " The **`getReader()`** method of the ReadableStream interface creates a reader and locks the stream to it."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/getReader)"]
     #[wasm_bindgen(method, catch, js_name = "getReader")]
-    pub fn try_get_reader<R: ::wasm_bindgen::JsGeneric>(
+    pub fn try_get_reader_with_options<R: ::wasm_bindgen::JsGeneric>(
         this: &ReadableStream<R>,
         options: &ReadableStreamGetReaderOptions,
     ) -> Result<ReadableStreamBYOBReader, JsValue>;
