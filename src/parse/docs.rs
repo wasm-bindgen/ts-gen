@@ -48,6 +48,15 @@ pub struct JsDocInfo {
     /// body (outside any `@param`) — the property-doc form, applied to the
     /// setter's value argument.
     pub slice_mode: Option<String>,
+
+    /// `@rust <type>` — Rust scalar type for the member's own type (a
+    /// property's type, a callable's return). See
+    /// [`crate::ir::RustScalar`] for the accepted set.
+    pub rust_type: Option<String>,
+
+    /// `@rust <param>: <type>` — Rust scalar type for one named
+    /// parameter of the callable.
+    pub rust_params: Vec<(String, String)>,
 }
 
 impl JsDocInfo {
@@ -205,6 +214,15 @@ fn convert_jsdoc_tags(lines: &[&str]) -> (String, JsDocInfo) {
             .or_else(|| line.strip_prefix("@return "))
         {
             returns = Some(rest.to_string());
+        } else if let Some(rest) = line.strip_prefix("@rust ") {
+            // `@rust u16` / `@rust status: u16`. Consumed, not rendered.
+            let rest = rest.trim();
+            match rest.split_once(':') {
+                Some((param, ty)) => info
+                    .rust_params
+                    .push((param.trim().to_string(), ty.trim().to_string())),
+                None => info.rust_type = Some(rest.to_string()),
+            }
         } else if let Some(rest) = line.strip_prefix("@throws ") {
             // Capture both the structured type info (for `info.throws`) and a
             // human-readable line for the Errors section in the rendered doc.

@@ -20,7 +20,7 @@ src/
 ├── provides.rs                # `--provides` model: what the module provides to JS (ProvidedFn)
 ├── external_map.rs            # `--external Foo=::path::Bar` resolution
 ├── parse/                     # .d.ts → IR
-│   ├── docs.rs                # JSDoc extraction (incl. @throws)
+│   ├── docs.rs                # JSDoc extraction (incl. @throws, @rust)
 │   ├── members.rs             # interface / class member converters
 │   ├── merge.rs               # var + interface merging
 │   ├── classify.rs            # interface classification (class-like vs dictionary)
