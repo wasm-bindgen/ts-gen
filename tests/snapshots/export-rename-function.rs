@@ -99,7 +99,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Socket;
     #[wasm_bindgen(method, catch)]
-    pub async fn close(this: &Socket) -> Result<Undefined, JsValue>;
+    pub async fn close(this: &Socket) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "close")]
     pub fn close_promise(this: &Socket) -> Promise<Undefined>;
 }

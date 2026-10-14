@@ -139,7 +139,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
     #[wasm_bindgen(method, catch)]
-    pub async fn get(this: &Store, key: &str) -> Result<JsNullable<JsString>, JsValue>;
+    pub async fn get(this: &Store, key: &str) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise(this: &Store, key: &str) -> Promise<JsNullable<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
@@ -147,7 +147,7 @@ extern "C" {
         this: &Store,
         key: &str,
         options: &StoreOptions,
-    ) -> Result<JsNullable<JsString>, JsValue>;
+    ) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_with_store_options_promise(
         this: &Store,
@@ -159,7 +159,7 @@ extern "C" {
         this: &Store,
         key: &str,
         options: &GetOptions,
-    ) -> Result<JsNullable<JsString>, JsValue>;
+    ) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_with_get_options_promise(
         this: &Store,
@@ -268,7 +268,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Fetcher;
     #[wasm_bindgen(method, catch)]
-    pub async fn fetch(this: &Fetcher, input: &str) -> Result<JsString, JsValue>;
+    pub async fn fetch(this: &Fetcher, input: &str) -> Result<String, JsValue>;
     #[wasm_bindgen(method, js_name = "fetch")]
     pub fn fetch_promise(this: &Fetcher, input: &str) -> Promise<JsString>;
 }

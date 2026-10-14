@@ -73,11 +73,7 @@ extern "C" {
         val: &Function<fn(Array<JsString>, Env, ExecutionContext) -> JsOption<Promise<Undefined>>>,
     );
     #[wasm_bindgen(method, catch)]
-    pub async fn scheduled(
-        this: &ExportedHandler,
-        cron: &str,
-        env: &Env,
-    ) -> Result<Undefined, JsValue>;
+    pub async fn scheduled(this: &ExportedHandler, cron: &str, env: &Env) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "scheduled")]
     pub fn scheduled_promise(this: &ExportedHandler, cron: &str, env: &Env) -> Promise<Undefined>;
     #[doc = " Always provided: a plain method with an optional parameter."]

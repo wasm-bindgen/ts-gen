@@ -14,7 +14,7 @@ extern "C" {
     pub async fn block_concurrency_while(
         this: &State,
         callback: &Function<fn() -> Promise<Undefined>>,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[doc = " `block_concurrency_while` + `block_concurrency_while_promise`."]
     #[wasm_bindgen(method, js_name = "blockConcurrencyWhile")]
     pub fn block_concurrency_while_promise(
@@ -41,16 +41,16 @@ extern "C" {
         url: &str,
         init: &RequestInit,
     ) -> Promise<Response>;
-    #[doc = " Nullable result keeps its inner wrapper: `Promise<JsNullable<JsString>>`."]
+    #[doc = " The awaited form is `Option<String>`; the promise form keeps `Promise<JsNullable<JsString>>`."]
     #[wasm_bindgen(method, catch)]
-    pub async fn get(this: &State, key: &str) -> Result<JsNullable<JsString>, JsValue>;
-    #[doc = " Nullable result keeps its inner wrapper: `Promise<JsNullable<JsString>>`."]
+    pub async fn get(this: &State, key: &str) -> Result<Option<String>, JsValue>;
+    #[doc = " The awaited form is `Option<String>`; the promise form keeps `Promise<JsNullable<JsString>>`."]
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise(this: &State, key: &str) -> Promise<JsNullable<JsString>>;
     #[doc = " `@throws {never}` drops `catch` from the async form; the promise"]
     #[doc = " form is plain either way."]
     #[wasm_bindgen(method)]
-    pub async fn ready(this: &State) -> Boolean;
+    pub async fn ready(this: &State) -> bool;
     #[doc = " `@throws {never}` drops `catch` from the async form; the promise"]
     #[doc = " form is plain either way."]
     #[wasm_bindgen(method, js_name = "ready")]
@@ -106,7 +106,7 @@ impl RequestInitBuilder {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub async fn sleep(ms: f64) -> Result<Undefined, JsValue>;
+    pub async fn sleep(ms: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
