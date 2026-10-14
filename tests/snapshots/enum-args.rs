@@ -19,6 +19,10 @@ extern "C" {
     pub fn kind(this: &SendOptions) -> Option<Kind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_kind(this: &SendOptions, val: Kind);
+    #[wasm_bindgen(method, getter)]
+    pub fn payload(this: &SendOptions) -> Option<Uint8Array>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_payload<T: ::js_sys::TypedArray>(this: &SendOptions, val: &T);
 }
 impl SendOptions {
     pub fn new() -> SendOptions {
@@ -36,6 +40,10 @@ pub struct SendOptionsBuilder {
 impl SendOptionsBuilder {
     pub fn kind(self, val: Kind) -> Self {
         self.inner.set_kind(val);
+        self
+    }
+    pub fn payload<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
+        self.inner.set_payload(val);
         self
     }
     pub fn build(self) -> SendOptions {

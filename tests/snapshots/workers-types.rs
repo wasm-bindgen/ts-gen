@@ -5311,7 +5311,7 @@ impl SubtleCryptoDeriveKeyAlgorithmBuilder {
         self.inner.set_salt(val);
         self
     }
-    pub fn salt_with_typed_array(self, val: &Object) -> Self {
+    pub fn salt_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_salt_with_typed_array(val);
         self
     }
@@ -5335,7 +5335,7 @@ impl SubtleCryptoDeriveKeyAlgorithmBuilder {
         self.inner.set_info(val);
         self
     }
-    pub fn info_with_typed_array(self, val: &Object) -> Self {
+    pub fn info_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_info_with_typed_array(val);
         self
     }
@@ -5415,7 +5415,7 @@ impl SubtleCryptoEncryptAlgorithmBuilder {
         self.inner.set_iv(val);
         self
     }
-    pub fn iv_with_typed_array(self, val: &Object) -> Self {
+    pub fn iv_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_iv_with_typed_array(val);
         self
     }
@@ -5423,7 +5423,7 @@ impl SubtleCryptoEncryptAlgorithmBuilder {
         self.inner.set_additional_data(val);
         self
     }
-    pub fn additional_data_with_typed_array(self, val: &Object) -> Self {
+    pub fn additional_data_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_additional_data_with_typed_array(val);
         self
     }
@@ -5435,7 +5435,7 @@ impl SubtleCryptoEncryptAlgorithmBuilder {
         self.inner.set_counter(val);
         self
     }
-    pub fn counter_with_typed_array(self, val: &Object) -> Self {
+    pub fn counter_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_counter_with_typed_array(val);
         self
     }
@@ -5447,7 +5447,7 @@ impl SubtleCryptoEncryptAlgorithmBuilder {
         self.inner.set_label(val);
         self
     }
-    pub fn label_with_typed_array(self, val: &Object) -> Self {
+    pub fn label_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_label_with_typed_array(val);
         self
     }
@@ -5525,7 +5525,7 @@ impl SubtleCryptoGenerateKeyAlgorithmBuilder {
         self.inner.set_public_exponent(val);
         self
     }
-    pub fn public_exponent_with_typed_array(self, val: &Object) -> Self {
+    pub fn public_exponent_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_public_exponent_with_typed_array(val);
         self
     }
@@ -8048,7 +8048,7 @@ impl<Cf: ::wasm_bindgen::JsGeneric> RequestInitBuilder<Cf> {
         self.inner.set_body_with_array_buffer(val);
         self
     }
-    pub fn body_with_typed_array(self, val: &Object) -> Self {
+    pub fn body_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_body_with_typed_array(val);
         self
     }
@@ -9626,7 +9626,7 @@ impl R2PutOptionsBuilder {
         self.inner.set_md5(val);
         self
     }
-    pub fn md5_with_typed_array(self, val: &Object) -> Self {
+    pub fn md5_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_md5_with_typed_array(val);
         self
     }
@@ -9638,7 +9638,7 @@ impl R2PutOptionsBuilder {
         self.inner.set_sha1(val);
         self
     }
-    pub fn sha1_with_typed_array(self, val: &Object) -> Self {
+    pub fn sha1_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_sha1_with_typed_array(val);
         self
     }
@@ -9650,7 +9650,7 @@ impl R2PutOptionsBuilder {
         self.inner.set_sha256(val);
         self
     }
-    pub fn sha256_with_typed_array(self, val: &Object) -> Self {
+    pub fn sha256_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_sha256_with_typed_array(val);
         self
     }
@@ -9662,7 +9662,7 @@ impl R2PutOptionsBuilder {
         self.inner.set_sha384(val);
         self
     }
-    pub fn sha384_with_typed_array(self, val: &Object) -> Self {
+    pub fn sha384_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_sha384_with_typed_array(val);
         self
     }
@@ -9674,7 +9674,7 @@ impl R2PutOptionsBuilder {
         self.inner.set_sha512(val);
         self
     }
-    pub fn sha512_with_typed_array(self, val: &Object) -> Self {
+    pub fn sha512_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
         self.inner.set_sha512_with_typed_array(val);
         self
     }

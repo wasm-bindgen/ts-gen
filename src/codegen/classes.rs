@@ -1081,19 +1081,29 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             let builder_method_name = public_rust_name(builder_method_name);
             let method_ident = super::typemap::make_ident(&builder_method_name);
             let setter_ident = super::typemap::make_ident(&sig.rust_name);
-            let params = generate_concrete_params_with_mono_bounds(
+            // Mirrors `generate_setter`: an `ArrayBufferView` param is a
+            // `<T: TypedArray>` generic on the extern setter, so the fluent
+            // method that forwards to it must carry the same bound.
+            let DictionaryParams {
+                bounds: abv_bounds,
+                helper_where_clause,
+                params,
+            } = generate_dictionary_params(
                 &sig.params,
                 config.cgctx,
                 config.scope,
                 &config.from_module(),
             );
+            let generics = render_generic_bounds(&abv_bounds);
             let param_idents: Vec<_> = sig
                 .params
                 .iter()
                 .map(|p| super::typemap::make_ident(&p.name))
                 .collect();
             builder_methods.push(quote! {
-                pub fn #method_ident (self, #params) -> Self {
+                pub fn #method_ident #generics (self, #params) -> Self
+                #helper_where_clause
+                {
                     self.inner.#setter_ident(#(#param_idents),*);
                     self
                 }
