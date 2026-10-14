@@ -1626,7 +1626,7 @@ pub fn try_frobnicate(this: &Foo) -> Result<String, JsValue>;
 
 The non-`try_` form panics on JS throw; the `try_` form returns `Result`.
 Setters and constructors don't get a `try_` companion (setters never
-catch; constructors always catch).
+catch; constructors catch unless annotated `@throws {never}`).
 
 ### `--fallible` — single `Result` form
 
@@ -1654,8 +1654,9 @@ single catching form; no `try_` name is declared. The error type is
 unchanged: `@throws {T}` → `T`, otherwise `JsValue`, or `js_sys::Error`
 under `--errors-as-error`, so the two flags compose. `@throws {never}`
 keeps a sync binding infallible (no `catch`, plain `T`) and is the only
-way to get one under the flag. Async callables, constructors (always
-catch), setters (never catch) and property getters are not affected.
+way to get one under the flag, constructors included. Async callables,
+other constructors (always catch), setters (never catch) and property
+getters are not affected.
 Without the flag, output is identical to the default.
 
 ## `Promise<T>` returns become `async fn`
@@ -2157,8 +2158,11 @@ pub fn try_frobnicate(this: &Foo) -> Result<String, JsValue>;
 * **Async callables** (returning `Promise<T>`) drop the `Result<T, _>`
   wrapper and the `catch` attribute. The binding becomes
   `pub async fn foo() -> T`.
-* **Constructors** always catch per JS `new` semantics —
-  `@throws {never}` on a constructor is silently ignored.
+* **Constructors** catch by default (JS `new` can throw); annotated
+  `@throws {never}` the binding drops `catch` and returns the type
+  bare (`pub fn new(name: &str) -> Foo`). wasm-bindgen accepts a
+  non-`catch` constructor; a throw then aborts like any other
+  unguarded import.
 * **Setters** never throw and never get `try_` variants regardless,
   so the annotation is a no-op there too.
 * **Mixed annotations** like `@throws {never | TypeError}` collapse to
