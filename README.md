@@ -56,6 +56,15 @@ ts-gen --input types.d.ts --output src/bindings.rs \
   --external "node:buffer=node_buffer_sys"
 ```
 
+Layer `@rust` / `@throws` tags onto a large declaration file from a side
+file (see `CONVENTIONS.md`, "`--annotate` side files"):
+
+```sh
+ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
+  --output src/bindings.rs \
+  --annotate types/annotations.d.ts
+```
+
 Opt generic imports into wasm-bindgen's experimental per-monomorphization
 codegen:
 

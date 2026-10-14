@@ -35,6 +35,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [`Promise<T>` returns become `async fn`](#promiset-returns-become-async-fn)
 * [`@throws` JSDoc → typed error](#throws-jsdoc--typed-error)
 * [`@rust` JSDoc → Rust scalar](#rust-jsdoc--rust-scalar)
+* [`--annotate` side files](#--annotate-side-files)
 * [Subtyping LUB across unions](#subtyping-lub-across-unions)
 * [Module declarations and namespace nesting](#module-declarations-and-namespace-nesting)
 * [Type aliases and `export { X as Y }`](#type-aliases-and-export--x-as-y-)
@@ -2213,6 +2214,55 @@ upstream file never does, so annotations would still have to be
 layered on — and a tag reads as what it is, a Rust-side refinement,
 while a `u16` alias in `.d.ts` suggests a TS-level distinction that
 does not exist.
+
+## `--annotate` side files
+
+Upstream declaration files (`@cloudflare/workers-types`,
+`lib.dom.d.ts`) carry no `@rust` or `@throws` tags, and editing a
+vendored copy does not survive an upgrade. `--annotate` takes side
+`.d.ts` files that re-declare **only the members they tag**; the tags
+are applied to the input's declarations by declaration name and member
+name, and the side file is otherwise not emitted:
+
+```ts
+// annotations.d.ts
+interface Response {
+  /** @rust u16 */
+  readonly status: number;
+  /** @throws {TypeError} if the body has already been used */
+  clone(): Response;
+}
+interface Console { /** @throws {never} */ log(...data: any[]): void; }
+declare abstract class Cache { /** @rust ttl: u32 */ put(url: string, ttl?: number): Promise<void>; }
+```
+
+```sh
+ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
+       --annotate annotations.d.ts …
+```
+
+* `@rust` applies as if written on the input member; a property's tag
+  reaches its setter too. Parameters match by name.
+* `@throws` replaces the input member's failure mode. Getters are
+  infallible, so on a property it contributes only its doc.
+* A side member applies to every overload of the input method or
+  function, and its rendered doc (the `## Errors` section of `@throws`)
+  is appended to the input's doc once. Overloads may differ in return
+  type (`delete(key): Promise<boolean>`, `delete(keys: string[]):
+  Promise<number>`), so a return `@rust` applies to the overloads that
+  can carry it.
+* A declaration, member or parameter named in the side file that does
+  not exist in the input fails the run, so a typo cannot silently miss
+  a binding; so does an invalid `@rust` tag, or one whose scalar the
+  input's type cannot carry. Side members without tags are ignored.
+* Only classes, interfaces and functions can be annotated: a
+  `declare namespace`, `declare module`, alias or variable in the side
+  file fails the run rather than being skipped, as does a bare name
+  that the input declares more than once (globally and inside a
+  module), since names are matched without scope.
+* The side file may use `interface` for a class and need not repeat
+  type parameters or parameter types other than tagged ones; only names
+  matter.
 
 ## Subtyping LUB across unions
 
