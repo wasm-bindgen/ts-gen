@@ -320,7 +320,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                         None => (None, Default::default()),
                     };
                     if let Some(mut decl) =
-                        convert_function_decl(func, jsinfo.throws(), scope, &mut self.parse_ctx())
+                        convert_function_decl(func, &jsinfo, scope, &mut self.parse_ctx())
                     {
                         crate::parse::members::apply_slice_hints(
                             &mut decl.params,
@@ -595,9 +595,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         declarations: &mut Vec<ir::TypeDeclaration>,
     ) {
         let (doc, info) = self.lookup_callable_doc(dcx.export_span_start, func.span.start);
-        if let Some(mut d) =
-            convert_function_decl(func, info.throws(), dcx.scope, &mut self.parse_ctx())
-        {
+        if let Some(mut d) = convert_function_decl(func, &info, dcx.scope, &mut self.parse_ctx()) {
             crate::parse::members::apply_slice_hints(&mut d.params, &info, &d.js_name, self.diag);
             declarations.push(dcx.decl(ir::TypeKind::Function(d), doc));
         }
