@@ -11713,6 +11713,16 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2Objects;
     #[wasm_bindgen(method, getter)]
+    pub fn truncated(this: &R2Objects) -> bool;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_truncated(this: &R2Objects, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn cursor(this: &R2Objects) -> Option<String>;
+    #[wasm_bindgen(method, getter, js_name = "cursor")]
+    pub fn cursor_js_string(this: &R2Objects) -> Option<JsString>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_cursor(this: &R2Objects, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, getter)]
     pub fn objects(this: &R2Objects) -> Vec<R2Object>;
     #[wasm_bindgen(method, setter)]
     pub fn set_objects(this: &R2Objects, val: &[R2Object]);
@@ -11724,14 +11734,61 @@ extern "C" {
     pub fn set_delimited_prefixes(this: &R2Objects, val: &[impl ::wasm_bindgen::JsStringLike]);
 }
 impl R2Objects {
-    pub fn new(
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `truncated: true`"]
+    pub fn new_true(
         objects: &[R2Object],
         delimited_prefixes: &[impl ::wasm_bindgen::JsStringLike],
     ) -> R2Objects {
+        Self::builder_true(objects, delimited_prefixes).build()
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `truncated: false`"]
+    pub fn new_false(
+        objects: &[R2Object],
+        delimited_prefixes: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> R2Objects {
+        Self::builder_false(objects, delimited_prefixes).build()
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `truncated: true`"]
+    pub fn builder_true(
+        objects: &[R2Object],
+        delimited_prefixes: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> R2ObjectsBuilder {
         let inner: R2Objects = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_truncated(true);
         inner.set_objects(objects);
         inner.set_delimited_prefixes(delimited_prefixes);
-        inner
+        R2ObjectsBuilder { inner }
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `truncated: false`"]
+    pub fn builder_false(
+        objects: &[R2Object],
+        delimited_prefixes: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> R2ObjectsBuilder {
+        let inner: R2Objects = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_truncated(false);
+        inner.set_objects(objects);
+        inner.set_delimited_prefixes(delimited_prefixes);
+        R2ObjectsBuilder { inner }
+    }
+}
+pub struct R2ObjectsBuilder {
+    inner: R2Objects,
+}
+impl R2ObjectsBuilder {
+    pub fn cursor(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_cursor(val);
+        self
+    }
+    pub fn build(self) -> R2Objects {
+        self.inner
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]

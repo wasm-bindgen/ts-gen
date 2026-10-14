@@ -1151,7 +1151,7 @@ fn declaration_name(kind: &crate::ir::TypeKind) -> Option<String> {
 /// Which of two merging declarations a member list being merged in came
 /// from, relative to the one it merges into.
 #[derive(Clone, Copy, PartialEq, Eq)]
-enum Declared {
+pub(crate) enum Declared {
     Earlier,
     Later,
 }
@@ -1163,7 +1163,7 @@ enum Declared {
 /// declaration's before the earlier's, so they accumulate in that order.
 /// Any other member is one entry per (kind, name), which `incoming` replaces
 /// in place, as merged properties must agree in type.
-fn merge_members(
+pub(crate) fn merge_members(
     base: &mut Vec<crate::ir::Member>,
     incoming: Vec<crate::ir::Member>,
     declared: Declared,

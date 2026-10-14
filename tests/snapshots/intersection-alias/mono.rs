@@ -265,6 +265,54 @@ impl<R: ::wasm_bindgen::convert::IntoWasmAbi> ReadResultBuilder<R> {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Listing;
+    #[wasm_bindgen(method, getter)]
+    pub fn truncated(this: &Listing) -> bool;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_truncated(this: &Listing, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn cursor(this: &Listing) -> Option<String>;
+    #[wasm_bindgen(method, getter, js_name = "cursor")]
+    pub fn cursor_js_string(this: &Listing) -> Option<JsString>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_cursor(this: &Listing, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, getter)]
+    pub fn objects(this: &Listing) -> Vec<String>;
+    #[wasm_bindgen(method, getter, js_name = "objects")]
+    pub fn objects_js_string(this: &Listing) -> Array<JsString>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_objects(this: &Listing, val: &[impl ::wasm_bindgen::JsStringLike]);
+}
+impl Listing {
+    pub fn new(truncated: bool, objects: &[impl ::wasm_bindgen::JsStringLike]) -> Listing {
+        Self::builder(truncated, objects).build()
+    }
+    pub fn builder(
+        truncated: bool,
+        objects: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> ListingBuilder {
+        let inner: Listing = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_truncated(truncated);
+        inner.set_objects(objects);
+        ListingBuilder { inner }
+    }
+}
+pub struct ListingBuilder {
+    inner: Listing,
+}
+impl ListingBuilder {
+    pub fn cursor(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_cursor(val);
+        self
+    }
+    pub fn build(self) -> Listing {
+        self.inner
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Vector;
     #[wasm_bindgen(method, getter)]
     pub fn id(this: &Vector) -> String;

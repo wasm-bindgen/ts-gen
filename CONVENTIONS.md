@@ -1167,6 +1167,12 @@ writing, and a property typed differently across branches carries the
 intersection of those types, which is bounded at codegen (see
 [Intersections take their most specific member](#intersections-take-their-most-specific-member)).
 
+A parenthesised union of literals as a part — `R2Objects`' `& ({
+truncated: true; cursor: string } | { truncated: false })` — merges
+like a [union of inline literals](#union-of-inline-literals): `cursor`
+becomes optional. Members declared alongside win over the union's
+narrowing, so `truncated` keeps the explicit `boolean`.
+
 Every parent must be something an interface could `extends`. A type
 parameter (`T & { id: string }`) or an alias to a non-object type
 (`type Id = string`) leaves the intersection unhoisted, to be bounded
@@ -1177,8 +1183,9 @@ parameters (`type Branded<T> = T & { … }`, `type Same<T> = T`,
 `type Of<T> = Provider<T>`) is refused, since its arguments are not
 substituted into the target. Imported and `--external` names have no local binding and
 are allowed through. A part that only narrows in TS (a conditional
-or indexed-access type or a union, parenthesised or not) has no
-structural reading and is dropped with a warning, and `object` / `unknown` add
+or indexed-access type, or a union other than of literals, see
+below; parenthesised or not) has no structural reading and is dropped
+with a warning, and `object` / `unknown` add
 nothing, so `(T extends X ? … : unknown) & { fetch(): … }` is still an
 interface with `fetch`. A parent that erases at codegen (a name that
 never resolves and is reported) is dropped from `extends` rather than
