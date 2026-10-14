@@ -1086,7 +1086,7 @@ fn push_callable(
     // Without a codegen context, expansion keeps a type alias as one
     // parameter and renders every reference outside `js_sys` as `JsValue`,
     // so arms that differ only there are one function taking any of them.
-    for sig in expand_signatures(overloads, None) {
+    for sig in expand_signatures(overloads, None, kind.allows_literal_cohort()) {
         let Overload {
             return_type,
             body_scope: scope,

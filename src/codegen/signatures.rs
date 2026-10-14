@@ -82,6 +82,13 @@ impl SignatureKind {
     pub fn always_catches(self) -> bool {
         matches!(self, Self::Constructor)
     }
+
+    /// Whether overloads distinguished only by string literals become a
+    /// literal-keyed cohort. A setter takes the value itself, so its
+    /// literal arms stay one `&str` binding.
+    pub fn allows_literal_cohort(self) -> bool {
+        !matches!(self, Self::Setter | Self::StaticSetter)
+    }
 }
 
 /// Compute the default Rust name for a callable's primary variant before
@@ -207,6 +214,45 @@ pub struct ExpandedSignature {
     /// Concrete params (no optional flags — those have been resolved by
     /// truncation; no union types — those have been cartesian-expanded).
     pub params: Vec<ConcreteParam>,
+    /// Sibling expansions that differ from this one only in the value of
+    /// string-literal parameters, this one included and first. Two or
+    /// more arms make a literal-keyed cohort (see
+    /// [`FunctionSignature::literal`]); the literal positions render as
+    /// `&str` in `params`.
+    pub literal_arms: Vec<LiteralArm>,
+}
+
+/// One value assignment for the string-literal parameters of an
+/// expansion: `(position, literal)` pairs plus the overload it came from.
+#[derive(Clone, Debug, PartialEq)]
+pub struct LiteralArm {
+    pub values: Vec<(usize, String)>,
+    pub overload: usize,
+}
+
+/// A literal-keyed cohort attached to an extern binding: the binding takes
+/// `&str` at `positions`, and the emitter adds one inline wrapper per arm
+/// that bakes the arm's literals in and carries the arm's own name.
+#[derive(Clone, Debug, PartialEq)]
+pub struct LiteralSpec {
+    pub positions: Vec<usize>,
+    /// `(literals in `positions` order, wrapper rust name)`.
+    pub arms: Vec<(Vec<String>, String)>,
+}
+
+impl LiteralSpec {
+    /// A derived form (`_promise`, `try_`, `_js_string`) names its wrappers
+    /// off each arm's wrapper name, so the extern keeps pairing with its arms.
+    fn derive(&self, names: &mut LocalScope, f: &dyn Fn(&str) -> String) -> LiteralSpec {
+        LiteralSpec {
+            positions: self.positions.clone(),
+            arms: self
+                .arms
+                .iter()
+                .map(|(lits, name)| (lits.clone(), names.declare(&f(name), Suffix::Snake)))
+                .collect(),
+        }
+    }
 }
 
 /// A fully-resolved emitter input: an [`ExpandedSignature`] augmented with
@@ -243,6 +289,10 @@ pub struct FunctionSignature {
     /// by codegen to resolve type-parameter references during emit.
     /// For non-generic callables this is just the enclosing scope.
     pub body_scope: ScopeId,
+    /// Set when this binding stands for several overloads distinguished
+    /// only by string-literal arguments; `rust_name` is then the first
+    /// arm's wrapper name and the extern itself is emitted privately.
+    pub literal: Option<LiteralSpec>,
 }
 
 /// Recursively collect every in-scope type-parameter name reachable
@@ -330,9 +380,14 @@ pub fn collect_type_params(
 ///
 /// The caller is responsible for choosing a base name, applying the suffix,
 /// and deduping the final names against the surrounding extern block.
+///
+/// `literal_cohorts` keeps literal-only duplicates as arms of the kept
+/// signature (see [`ExpandedSignature::literal_arms`]); off, they are
+/// dropped as plain duplicates.
 pub fn expand_signatures(
     overloads: &[Overload<'_>],
     cgctx: Option<&CodegenContext<'_>>,
+    literal_cohorts: bool,
 ) -> Vec<ExpandedSignature> {
     // Phase 1: Per-overload expansion — optional truncation + union cartesian product.
     let mut all_sigs: Vec<(usize, Vec<ConcreteParam>)> = Vec::new();
@@ -362,6 +417,10 @@ pub fn expand_signatures(
     let mut seen_rendered: Vec<Vec<String>> = Vec::new();
     let mut deduped: Vec<Vec<ConcreteParam>> = Vec::new();
     let mut origins: Vec<usize> = Vec::new();
+    // `None` marks a cohort that also absorbed a non-literal duplicate
+    // (`"a" | "b" | string`): the plain form covers every arm, so it is
+    // not literal-keyed.
+    let mut arms: Vec<Option<Vec<LiteralArm>>> = Vec::new();
     // The first overload's expansions are never dropped as duplicates of a
     // later overload's, so its survivors are a contiguous prefix of `deduped`.
     let mut first_overload_len = 0;
@@ -370,17 +429,26 @@ pub fn expand_signatures(
             continue;
         }
         let rendered = render(sig, overloads[*overload].body_scope);
-        if seen_rendered.contains(&rendered) {
+        if let Some(pos) = seen_rendered.iter().position(|r| *r == rendered) {
+            // A duplicate that differs only in literal values is an arm of
+            // the kept signature rather than a dropped one.
+            match (literal_arm(&deduped[pos], sig, *overload), &mut arms[pos]) {
+                (Some(arm), Some(arms)) => arms.push(arm),
+                (None, slot) => *slot = None,
+                _ => {}
+            }
             continue;
         }
         seen_concrete.push(sig);
         seen_rendered.push(rendered);
         deduped.push(sig.clone());
         origins.push(*overload);
+        arms.push(literal_cohorts.then(|| literal_arm(sig, sig, *overload).into_iter().collect()));
         if i < first_overload_sigs {
             first_overload_len += 1;
         }
     }
+    let mut arms: Vec<Vec<LiteralArm>> = arms.into_iter().map(Option::unwrap_or_default).collect();
 
     // Phase 3: Suffix — compute `_with_X` disambiguators across the cohort.
     // The base name goes to the first overload's shortest expansion, or to
@@ -392,17 +460,91 @@ pub fn expand_signatures(
     if let Some(primary) = primary_expansion(&deduped, first_overload_len) {
         deduped[..=primary].rotate_right(1);
         origins[..=primary].rotate_right(1);
+        arms[..=primary].rotate_right(1);
     }
-    compute_suffixes(&deduped)
+    // A literal-keyed cohort is named as if the literal parameters were
+    // not there: its wrappers take the remaining parameters, so the
+    // suffix is the one those parameters would earn among the plain
+    // expansions. The plain expansions are suffixed among themselves.
+    let keyed: Vec<bool> = arms.iter().map(|a| a.len() > 1).collect();
+    let plain: Vec<Vec<ConcreteParam>> = deduped
+        .iter()
+        .zip(&keyed)
+        .filter(|(_, k)| !**k)
+        .map(|(sig, _)| sig.clone())
+        .collect();
+    let mut plain_suffixes = compute_suffixes(&plain).into_iter();
+    let suffixes: Vec<String> = deduped
+        .iter()
+        .zip(&keyed)
+        .zip(&arms)
+        .map(|((sig, keyed), arms)| {
+            if !*keyed {
+                return plain_suffixes.next().unwrap_or_default();
+            }
+            let positions: Vec<usize> = arms[0].values.iter().map(|(i, _)| *i).collect();
+            let stripped: Vec<ConcreteParam> = sig
+                .iter()
+                .enumerate()
+                .filter(|(i, _)| !positions.contains(i))
+                .map(|(_, p)| p.clone())
+                .collect();
+            suffix_among(&plain, stripped)
+        })
+        .collect();
+    suffixes
         .into_iter()
         .zip(deduped)
         .zip(origins)
-        .map(|((name_suffix, params), overload)| ExpandedSignature {
-            overload,
-            name_suffix,
-            params,
-        })
+        .zip(arms)
+        .map(
+            |(((name_suffix, params), overload), literal_arms)| ExpandedSignature {
+                overload,
+                name_suffix,
+                params,
+                literal_arms,
+            },
+        )
         .collect()
+}
+
+/// The suffix `extra` would get as a member of `cohort`: its sibling's
+/// when a sibling has the same parameters, else what the naming pass
+/// assigns it appended to the cohort.
+fn suffix_among(cohort: &[Vec<ConcreteParam>], extra: Vec<ConcreteParam>) -> String {
+    if let Some(pos) = cohort.iter().position(|s| concrete_params_eq(s, &extra)) {
+        return compute_suffixes(cohort).swap_remove(pos);
+    }
+    let mut all = cohort.to_vec();
+    all.push(extra);
+    compute_suffixes(&all).pop().unwrap_or_default()
+}
+
+/// `candidate` as a literal arm of `kept`: both carry string literals at
+/// the same positions and agree everywhere else. `None` when `kept` has
+/// no literal parameter or the shapes differ.
+fn literal_arm(
+    kept: &[ConcreteParam],
+    candidate: &[ConcreteParam],
+    index: usize,
+) -> Option<LiteralArm> {
+    if kept.len() != candidate.len() {
+        return None;
+    }
+    let mut values = Vec::new();
+    for (i, (k, c)) in kept.iter().zip(candidate).enumerate() {
+        match (&k.type_ref, &c.type_ref) {
+            (TypeRef::StringLiteral(_), TypeRef::StringLiteral(lit)) if k.name == c.name => {
+                values.push((i, lit.clone()));
+            }
+            _ if k.name == c.name && k.type_ref == c.type_ref && k.variadic == c.variadic => {}
+            _ => return None,
+        }
+    }
+    (!values.is_empty()).then_some(LiteralArm {
+        values,
+        overload: index,
+    })
 }
 
 /// Index of the expansion that owns the unsuffixed name; see the Phase 3
@@ -494,7 +636,7 @@ pub fn build_signatures(
     let base = spec
         .rust_name
         .map_or_else(|| base_rust_name(spec.js_name, spec.kind), ident_chars);
-    let expansions = expand_signatures(spec.overloads, cgctx);
+    let expansions = expand_signatures(spec.overloads, cgctx, spec.kind.allows_literal_cohort());
 
     // Under the `fallible` policy the primary binding itself catches, so
     // the `try_` companion has nothing to add.
@@ -502,8 +644,71 @@ pub fn build_signatures(
     let per_mono = CodegenContext::generic_mono(cgctx);
     let mut out = Vec::with_capacity(expansions.len());
 
+    // One emitted binding per expansion, except a literal-keyed cohort,
+    // which emits one binding per distinct return type among its arms,
+    // each wrapped once per arm. Wrapper names bake the literal in after
+    // the base name (`get_json`, `get_json_with_array`).
+    struct Unit {
+        params: Vec<ConcreteParam>,
+        overload: usize,
+        primary_name: String,
+        literal: Option<LiteralSpec>,
+    }
+    let mut units: Vec<Unit> = Vec::new();
     for exp in expansions {
-        let overload = spec.overloads[exp.overload];
+        if exp.literal_arms.len() < 2 {
+            let primary_candidate = public_rust_name(&format!("{base}{}", exp.name_suffix));
+            units.push(Unit {
+                params: exp.params,
+                overload: exp.overload,
+                primary_name: names.declare(&primary_candidate, Suffix::Snake),
+                literal: None,
+            });
+            continue;
+        }
+        let positions: Vec<usize> = exp.literal_arms[0].values.iter().map(|(i, _)| *i).collect();
+        let mut params = exp.params;
+        for &i in &positions {
+            params[i].type_ref = TypeRef::String;
+        }
+        type Arms = Vec<(Vec<String>, String)>;
+        let mut groups: Vec<(&TypeRef, usize, Arms)> = Vec::new();
+        for arm in &exp.literal_arms {
+            let ret = spec.overloads[arm.overload].return_type;
+            let literals: Vec<String> = arm.values.iter().map(|(_, v)| v.clone()).collect();
+            let tag = literals
+                .iter()
+                .map(|l| to_snake_case(l))
+                .collect::<Vec<_>>()
+                .join("_");
+            let candidate = public_rust_name(&format!("{base}_{tag}{}", exp.name_suffix));
+            let name = names.declare(&candidate, Suffix::Snake);
+            match groups.iter_mut().find(|(r, _, _)| *r == ret) {
+                Some((_, _, arms)) => arms.push((literals, name)),
+                None => groups.push((ret, arm.overload, vec![(literals, name)])),
+            }
+        }
+        for (_, overload, arms) in groups {
+            units.push(Unit {
+                params: params.clone(),
+                overload,
+                primary_name: arms[0].1.clone(),
+                literal: Some(LiteralSpec {
+                    positions: positions.clone(),
+                    arms,
+                }),
+            });
+        }
+    }
+
+    for unit in units {
+        let Unit {
+            params: exp_params,
+            overload,
+            primary_name,
+            literal,
+        } = unit;
+        let overload = spec.overloads[overload];
         let scope = overload.body_scope;
         // `Throws::Never` suppresses every fallible form — except for
         // constructors, which always catch (`new` can always throw in JS).
@@ -522,8 +727,10 @@ pub fn build_signatures(
             (true, false) | (false, true) => 2,
             (false, false) => 1,
         });
-        let primary_candidate = public_rust_name(&format!("{base}{}", exp.name_suffix));
-        let primary_name = names.declare(&primary_candidate, Suffix::Snake);
+        let derive = |names: &mut LocalScope, f: &dyn Fn(&str) -> String| {
+            literal.as_ref().map(|spec| spec.derive(names, f))
+        };
+        let primary_literal = literal.clone();
 
         // Primary variant catches when:
         // * the kind always catches (constructors), OR
@@ -534,7 +741,7 @@ pub fn build_signatures(
         let primary = FunctionSignature {
             rust_name: primary_name.clone(),
             js_name: spec.js_name.to_string(),
-            params: exp.params.clone(),
+            params: exp_params.clone(),
             catch: primary_catches,
             is_async,
             return_type: return_type.clone(),
@@ -546,6 +753,7 @@ pub fn build_signatures(
             },
             doc: overload.doc.clone(),
             body_scope: scope,
+            literal: primary_literal,
         };
         push_with_js_string_return(&mut out, primary, names, cgctx, scope);
 
@@ -556,12 +764,16 @@ pub fn build_signatures(
         // returned promise; `catch` here covers only a synchronous
         // throw, which the sync-callable policy decides.
         if is_async {
-            let promise_name = names.declare(&format!("{primary_name}_promise"), Suffix::Snake);
+            let promise_literal = derive(names, &|n| format!("{n}_promise"));
+            let promise_name = match &promise_literal {
+                Some(l) => l.arms[0].1.clone(),
+                None => names.declare(&format!("{primary_name}_promise"), Suffix::Snake),
+            };
             let promise_catches = !nothrow && fallible && spec.kind.allows_try_variant();
             out.push(FunctionSignature {
                 rust_name: promise_name,
                 js_name: spec.js_name.to_string(),
-                params: exp.params.clone(),
+                params: exp_params.clone(),
                 catch: promise_catches,
                 is_async: false,
                 return_type: overload.return_type.clone(),
@@ -573,15 +785,20 @@ pub fn build_signatures(
                 },
                 doc: overload.doc.clone(),
                 body_scope: scope,
+                literal: promise_literal,
             });
         }
 
         if allow_try {
-            let try_name = names.declare(&format!("try_{primary_name}"), Suffix::Snake);
+            let try_literal = derive(names, &|n| format!("try_{n}"));
+            let try_name = match &try_literal {
+                Some(l) => l.arms[0].1.clone(),
+                None => names.declare(&format!("try_{primary_name}"), Suffix::Snake),
+            };
             let try_sig = FunctionSignature {
                 rust_name: try_name,
                 js_name: spec.js_name.to_string(),
-                params: exp.params,
+                params: exp_params,
                 catch: true,
                 is_async: false,
                 return_type: return_type.clone(),
@@ -589,6 +806,7 @@ pub fn build_signatures(
                 error_type: error_type.cloned(),
                 doc: overload.doc.clone(),
                 body_scope: scope,
+                literal: try_literal,
             };
             push_with_js_string_return(&mut out, try_sig, names, cgctx, scope);
         }
@@ -611,7 +829,17 @@ fn push_with_js_string_return(
     out.push(sig.clone());
     if has_js_return {
         let mut js_sig = sig;
-        js_sig.rust_name = names.declare(&format!("{}_js_string", js_sig.rust_name), Suffix::Snake);
+        let js_string = |n: &str| format!("{n}_js_string");
+        match js_sig.literal.take() {
+            Some(spec) => {
+                let spec = spec.derive(names, &js_string);
+                js_sig.rust_name = spec.arms[0].1.clone();
+                js_sig.literal = Some(spec);
+            }
+            None => {
+                js_sig.rust_name = names.declare(&js_string(&js_sig.rust_name), Suffix::Snake);
+            }
+        }
         js_sig.js_string_return = true;
         out.push(js_sig);
     }
@@ -2870,6 +3098,124 @@ mod tests {
         assert_eq!(non_try.len(), 2);
         assert_eq!(non_try[0].rust_name, "foo");
         assert_eq!(non_try[1].rust_name, "foo_with_promise");
+    }
+
+    fn lit(name: &str, value: &str) -> Param {
+        typed_param(name, TypeRef::StringLiteral(value.to_string()))
+    }
+
+    #[test]
+    fn literal_only_overloads_form_a_cohort_per_return_type() {
+        let (gctx, scope) = test_ctx();
+        let cgctx = CodegenContext::empty(&gctx, scope);
+        let mut used = no_used();
+        let plain = [typed_param("key", TypeRef::String)];
+        let text = [typed_param("key", TypeRef::String), lit("type", "text")];
+        let json = [typed_param("key", TypeRef::String), lit("type", "json")];
+        let buf = [
+            typed_param("key", TypeRef::String),
+            lit("type", "arrayBuffer"),
+        ];
+        let keys = [
+            typed_param("key", TypeRef::Array(Box::new(TypeRef::String))),
+            lit("type", "text"),
+        ];
+        let returns = [
+            TypeRef::String,
+            TypeRef::String,
+            TypeRef::Any,
+            TypeRef::String,
+            TypeRef::Any,
+        ];
+        let params: [&[Param]; 5] = [&plain, &text, &json, &buf, &keys];
+        let overloads: Vec<Overload> = params
+            .iter()
+            .zip(&returns)
+            .map(|(params, return_type)| Overload {
+                params,
+                return_type,
+                body_scope: scope,
+                throws: &Throws::Never,
+                doc: &None,
+            })
+            .collect();
+        let sigs = build_signatures(
+            &CallableSpec {
+                js_name: "get",
+                rust_name: None,
+                kind: SignatureKind::Method,
+                overloads: &overloads,
+            },
+            &mut used,
+            Some(&cgctx),
+        );
+        let names: Vec<&str> = sigs.iter().map(|s| s.rust_name.as_str()).collect();
+        // `text` and `arrayBuffer` share a return and so one extern; `json`
+        // gets its own. The `string[]` form has a single literal arm, so it
+        // is not a cohort and keeps the plain `&str` binding.
+        assert_eq!(
+            names,
+            ["get", "get_text", "get_json", "get_with_slice_and_type"]
+        );
+        assert!(sigs[0].literal.is_none());
+        let text_spec = sigs[1].literal.as_ref().unwrap();
+        assert_eq!(text_spec.positions, [1]);
+        assert_eq!(
+            text_spec.arms,
+            [
+                (vec!["text".to_string()], "get_text".to_string()),
+                (
+                    vec!["arrayBuffer".to_string()],
+                    "get_array_buffer".to_string()
+                ),
+            ]
+        );
+        assert_eq!(sigs[1].params[1].type_ref, TypeRef::String);
+        assert_eq!(sigs[2].return_type, TypeRef::Any);
+        assert!(sigs[3].literal.is_none());
+    }
+
+    #[test]
+    fn lone_literal_and_absorbed_plain_string_stay_a_str_binding() {
+        let mut used = no_used();
+        let only = [lit("name", "Set-Cookie")];
+        let sigs = expand_overloads(
+            "getAll",
+            &[&only],
+            &TypeRef::Void,
+            SignatureKind::Method,
+            &None,
+            &mut used,
+        );
+        assert_eq!(sigs[0].rust_name, "get_all");
+        assert!(sigs[0].literal.is_none());
+
+        let mut used = no_used();
+        let a = [lit("mode", "a")];
+        let b = [lit("mode", "b")];
+        let any = [typed_param("mode", TypeRef::String)];
+        let sigs = expand_overloads(
+            "setMode",
+            &[&a, &b, &any],
+            &TypeRef::Void,
+            SignatureKind::Method,
+            &None,
+            &mut used,
+        );
+        assert_eq!(sigs[0].rust_name, "set_mode");
+        assert!(sigs[0].literal.is_none());
+
+        let mut used = no_used();
+        let sigs = expand_overloads(
+            "disposition",
+            &[&[lit("val", "inline")], &[lit("val", "attachment")]],
+            &TypeRef::Void,
+            SignatureKind::Setter,
+            &None,
+            &mut used,
+        );
+        assert_eq!(sigs[0].rust_name, "set_disposition");
+        assert!(sigs[0].literal.is_none());
     }
 
     #[test]
