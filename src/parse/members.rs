@@ -70,6 +70,66 @@ pub(crate) fn apply_slice_hints(
     }
 }
 
+/// Apply `@rust <type>` to the member's own type and `@rust <param>:
+/// <type>` to the named parameters. Unknown scalars, incompatible
+/// leaves and unknown parameter names are error diagnostics (fatal in
+/// an `--annotate` side file), not silent no-ops.
+pub(crate) fn apply_rust_tags(
+    info: &JsDocInfo,
+    own: Option<&mut TypeRef>,
+    params: &mut [Param],
+    member: &str,
+    ctx: &mut ParseCtx<'_, '_>,
+) {
+    use crate::ir::RustScalar;
+    if let Some(name) = &info.rust_type {
+        match (RustScalar::parse(name), own) {
+            (Some(scalar), Some(ty)) => match ty.with_rust_scalar(scalar) {
+                Some(forced) => *ty = forced,
+                None => ctx.diag.error(incompatible(name, member, ty)),
+            },
+            (Some(_), None) => ctx.diag.error(format!(
+                "`@rust {name}` on `{member}` has no type to apply to"
+            )),
+            (None, _) => ctx
+                .diag
+                .error(format!("`@rust {name}` on `{member}`: unknown scalar type")),
+        }
+    }
+    for (param, name) in &info.rust_params {
+        let Some(scalar) = RustScalar::parse(name) else {
+            ctx.diag.error(format!(
+                "`@rust {param}: {name}` on `{member}`: unknown scalar type"
+            ));
+            continue;
+        };
+        // IR parameter names are already snake_case; tags use the TS name.
+        let ir_name = to_snake_case(param);
+        match params.iter_mut().find(|p| p.name == ir_name) {
+            Some(p) => match p.type_ref.with_rust_scalar(scalar) {
+                Some(forced) => p.type_ref = forced,
+                None => ctx.diag.error(incompatible(
+                    name,
+                    &format!("{member}({param})"),
+                    &p.type_ref,
+                )),
+            },
+            None => ctx.diag.error(format!(
+                "`@rust {param}: {name}` on `{member}`: no such parameter"
+            )),
+        }
+    }
+}
+
+/// Diagnostic for a `@rust` scalar whose target type cannot carry it.
+pub(crate) fn incompatible(scalar: &str, member: &str, ty: &TypeRef) -> String {
+    format!(
+        "`@rust {scalar}` on `{member}`: `{}` cannot cross as `{scalar}` (u64/i64 need \
+         `bigint`, other scalars `number`)",
+        ty.format_ts()
+    )
+}
+
 /// Push the given type parameters into a fresh child of `parent_scope`
 /// and return the new scope. Used by every member converter that
 /// declares its own `<T, U, ...>` — methods, free functions, hoisted
@@ -801,11 +861,12 @@ fn convert_property_signature(
     let (doc, info) = split_info(ctx.docs.info_for_span(prop.span.start));
     let slice_mode = slice_hint(info.slice_mode.as_deref(), &js_name, ctx.diag);
 
-    let type_ref = prop
+    let mut type_ref = prop
         .type_annotation
         .as_ref()
         .map(|ann| convert_ts_type_scoped(&ann.type_annotation, parent_scope, ctx))
         .unwrap_or(TypeRef::Any);
+    apply_rust_tags(&info, Some(&mut type_ref), &mut [], &js_name, ctx);
 
     let mut members = vec![Member::Getter(GetterMember {
         scope: parent_scope,
@@ -869,6 +930,7 @@ fn convert_method_signature(
         (Some(rt), _) => convert_ts_type_scoped(&rt.type_annotation, body_scope, ctx),
         (None, _) => TypeRef::Void,
     };
+    apply_rust_tags(&info, Some(&mut return_type), &mut params, &js_name, ctx);
 
     // Hoist top-level `Iterable<T>` / `AsyncIterable<T>` returns into
     // synthesized wrapper interfaces with a `[Symbol.iterator]` method.
@@ -989,6 +1051,7 @@ fn convert_class_method(
         (Some(rt), _) => convert_ts_type_scoped(&rt.type_annotation, body_scope, ctx),
         (None, _) => TypeRef::Void,
     };
+    apply_rust_tags(&info, Some(&mut return_type), &mut params, &js_name, ctx);
 
     // Same iterable hoisting as `convert_method_signature`. Skip for
     // constructors — they don't have a meaningful return type.
@@ -1101,11 +1164,12 @@ fn convert_class_property(
     let (doc, info) = split_info(ctx.docs.info_for_span(prop.span.start));
     let slice_mode = slice_hint(info.slice_mode.as_deref(), &js_name, ctx.diag);
 
-    let type_ref = prop
+    let mut type_ref = prop
         .type_annotation
         .as_ref()
         .map(|ann| convert_ts_type_scoped(&ann.type_annotation, parent_scope, ctx))
         .unwrap_or(TypeRef::Any);
+    apply_rust_tags(&info, Some(&mut type_ref), &mut [], &js_name, ctx);
 
     if prop.r#static {
         let mut members = vec![Member::StaticGetter(StaticGetterMember {

@@ -37,6 +37,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
   * [`toString()` is `Display`](#tostring-is-display)
 * [`Promise<T>` returns become `async fn`](#promiset-returns-become-async-fn)
 * [`@throws` JSDoc → typed error](#throws-jsdoc--typed-error)
+* [`@rust` JSDoc → Rust scalar](#rust-jsdoc--rust-scalar)
 * [Subtyping LUB across unions](#subtyping-lub-across-unions)
 * [Module declarations and namespace nesting](#module-declarations-and-namespace-nesting)
 * [Type aliases and `export { X as Y }`](#type-aliases-and-export--x-as-y-)
@@ -3388,6 +3389,56 @@ impl CompressionStream {
 * Setters are exempt: `set_disposition("inline")` takes the value. A
   setter taking a named union alias is wrapped like any binding
   (`set_relative_to(&self, val: impl Into<ZonedDateTimeLike>)`).
+
+## `@rust` JSDoc → Rust scalar
+
+TS `number` lowers to `f64`, which is wrong-shaped for most of the
+numbers a platform API actually carries (`status: number` is a `u16`,
+`port: number` a `u16`, `limit: number` a `u32`). A `@rust` tag forces
+the Rust scalar; wasm-bindgen converts the JS number at the boundary:
+
+```ts
+interface Response {
+  /** @rust u16 */
+  readonly status: number;
+  /**
+   * @rust status: u16
+   * @rust u32
+   */
+  withStatus(status: number, reason?: string): number;
+  /** @rust u32 */
+  count(): Promise<number>;
+}
+```
+
+```rust
+pub fn status(this: &Response) -> u16;
+pub fn with_status(this: &Response, status: u16) -> u32;
+pub async fn count(this: &Response) -> Result<u32, JsValue>;
+```
+
+* `@rust <type>` applies to the member's own type: a property (getter,
+  setter and builder method alike) or a callable's return.
+* `@rust <param>: <type>` applies to the named parameter of a method,
+  constructor or function; several tags may be stacked.
+* The scalar replaces the leaf through `| null` / `| undefined` and an
+  optional declaration (read as `Nullable<u16>` / `Option<u16>`), `T[]`
+  (`Vec<u8>` / `&[u8]`) and `Promise<…>` (`Result<u32, _>`).
+* Accepted scalars: `u8 u16 u32 u64 i8 i16 i32 i64 f32 f64 usize`.
+  wasm-bindgen crosses `u64`/`i64` as a JS `BigInt`, so they apply only
+  to a `bigint` leaf; every other scalar applies only to a `number`
+  leaf. A `@rust u64` on a `number` would make the JS glue reject the
+  value at runtime, so it is refused: sizes beyond `u32` stay `f64`
+  (exact to 2^53). An unknown scalar, an incompatible leaf, or a
+  parameter name that does not exist is an error diagnostic and the
+  tag is ignored.
+
+Why a JSDoc tag rather than a branded alias (`type u16 = number`): the
+alias form needs the upstream declaration to *use* the alias, which an
+upstream file never does, so annotations would still have to be
+layered on — and a tag reads as what it is, a Rust-side refinement,
+while a `u16` alias in `.d.ts` suggests a TS-level distinction that
+does not exist.
 
 ## Subtyping LUB across unions
 
