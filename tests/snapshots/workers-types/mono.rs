@@ -14958,9 +14958,19 @@ impl WebSocketAcceptOptionsBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[allow(non_upper_case_globals)]
-    #[wasm_bindgen(thread_local_v2, js_name = "WebSocketPair")]
-    pub static web_socket_pair: Object;
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type WebSocketPair;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<WebSocketPair, JsValue>;
+    #[wasm_bindgen(method, getter, js_name = "0")]
+    pub fn _0(this: &WebSocketPair) -> WebSocket;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_0(this: &WebSocketPair, val: &WebSocket);
+    #[wasm_bindgen(method, getter, js_name = "1")]
+    pub fn _1(this: &WebSocketPair) -> WebSocket;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_1(this: &WebSocketPair, val: &WebSocket);
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -40731,7 +40741,7 @@ pub mod cloudflare {
         use super::*;
         #[wasm_bindgen(module = "cloudflare:email", experimental_generic_mono)]
         extern "C" {
-            # [wasm_bindgen (extends = Object)]
+            # [wasm_bindgen (extends = EmailMessage , extends = Object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type EmailMessage;
             #[wasm_bindgen(constructor, catch)]
