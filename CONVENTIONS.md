@@ -3486,6 +3486,16 @@ ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
   file fails the run rather than being skipped, as does a bare name
   that the input declares more than once (globally and inside a
   module), since names are matched without scope.
+* A side declaration's type-parameter defaults replace the input's, by
+  parameter name: upstream's `Request<CfHostMetadata, Cf =
+  CfProperties<CfHostMetadata>>` defaults `Cf` to a union of the incoming
+  and outgoing shapes, which erases, so the side file's `interface
+  Request<CfHostMetadata = unknown, Cf = IncomingRequestCfProperties<
+  CfHostMetadata>> {}` makes the bare `Request` read `cf()` as the
+  incoming properties. An alias in the side file may do the same for its
+  own parameters (`type RequestInfo<…, Cf = IncomingRequestCfProperties<…>>
+  = …`, whose target is ignored). A default for a parameter the input
+  lacks fails the run.
 * The side file may use `interface` for a class and need not repeat
   type parameters or parameter types other than tagged ones; only names
   matter.
