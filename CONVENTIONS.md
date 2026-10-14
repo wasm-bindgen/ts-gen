@@ -547,6 +547,39 @@ Interfaces are classified by shape (see `parse/classify.rs`):
 Multiple interface declarations with the same name + module context merge:
 their members union, their `extends` lists merge.
 
+### Inherited members
+
+Every `extends` parent becomes a wasm-bindgen `extends =`, but
+wasm-bindgen derefs to the *first* one only; the others are reachable
+through `AsRef` alone. So the members of every parent beyond the first
+(and of their ancestors) are declared on the child itself, with the
+parent's type parameters substituted by the arguments the `extends`
+clause passes. A member the child redeclares wins; between siblings
+that declare the same member, the earliest parent in `extends` order
+provides it.
+
+```ts
+interface Base { a: string; }
+interface Geo { country?: string; }
+interface Child extends Base, Geo { c: number; }
+interface Named extends Tagged, Box<string> {}
+```
+
+```rust
+#[wasm_bindgen(extends = Base, extends = Geo, extends = Object)]
+pub type Child;
+pub fn country(this: &Child) -> Option<String>;   // from Geo
+pub fn c(this: &Child) -> f64;
+pub fn value(this: &Named) -> String;             // Box<T>.value with T = string
+```
+
+`Child.a()` is reached through the deref to `Base`. A dictionary's
+factory sets the fields of all its parents, first chain included:
+`Child::new(a, c)`, `Child::builder(a, c).country(..)`. Classification
+also looks through the parents: an interface with no members of its own
+that extends dictionaries is a dictionary, one that extends a class-like
+parent is class-like.
+
 ## Dictionary builders
 
 Required properties go in via the constructor; optional properties chain
@@ -947,7 +980,11 @@ named reference in the intersection is an `extends` parent and every
 inline literal contributes own members. The result then flows through
 the regular interface pipeline, including `extends = A, extends = B`
 on the wasm-bindgen side and the dictionary builder for the own
-members. This is what makes the common required-field refinement
+members. Through [inherited members](#inherited-members) every part's
+members are reachable on the result: `cf.country()` resolves on
+`IncomingRequestCfProperties`, and `EmailMessageBuilder =
+EmailReplyMessageBuilder & EmailDestinations` gets a factory over both
+parts' fields. This is what makes the common required-field refinement
 produce a usable type:
 
 ```ts

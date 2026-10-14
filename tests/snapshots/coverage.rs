@@ -87,6 +87,18 @@ extern "C" {
     # [wasm_bindgen (extends = HasName , extends = HasAge , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Person;
+    #[wasm_bindgen(method, getter)]
+    pub fn age(this: &Person) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_age(this: &Person, val: f64);
+}
+impl Person {
+    pub fn new(name: &str, age: f64) -> Person {
+        let inner: Person = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_name(name);
+        inner.set_age(age);
+        inner
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -103,6 +115,10 @@ extern "C" {
     # [wasm_bindgen (extends = Person , extends = Serializable , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SerializablePerson;
+    #[wasm_bindgen(method)]
+    pub fn serialize(this: &SerializablePerson) -> String;
+    #[wasm_bindgen(method, catch, js_name = "serialize")]
+    pub fn try_serialize(this: &SerializablePerson) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -382,17 +398,14 @@ extern "C" {
     # [wasm_bindgen (extends = Serializable , extends = GlobalMixin , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type MultiExtend;
+    #[wasm_bindgen(method, js_name = "customMethod")]
+    pub fn custom_method(this: &MultiExtend);
+    #[wasm_bindgen(method, catch, js_name = "customMethod")]
+    pub fn try_custom_method(this: &MultiExtend) -> Result<(), JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn id(this: &MultiExtend) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_id(this: &MultiExtend, val: &str);
-}
-impl MultiExtend {
-    pub fn new(id: &str) -> MultiExtend {
-        let inner: MultiExtend = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_id(id);
-        inner
-    }
 }
 #[wasm_bindgen]
 extern "C" {
