@@ -1191,66 +1191,54 @@ impl ServiceWorkerGlobalScope {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
-    pub fn add_event_listener<Type>(
-        r#type: Type,
+    pub fn add_event_listener(
+        r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerOrEventListenerObject,
-    ) -> Result<(), JsValue>
-    where
-        Type: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
-    pub fn add_event_listener_with_event_target_add_event_listener_options<Type>(
-        r#type: Type,
+    pub fn add_event_listener_with_event_target_add_event_listener_options(
+        r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerOrEventListenerObject,
         options: &EventTargetAddEventListenerOptions,
-    ) -> Result<(), JsValue>
-    where
-        Type: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "addEventListener")]
-    pub fn add_event_listener_with_bool<Type>(
-        r#type: Type,
+    pub fn add_event_listener_with_bool(
+        r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerOrEventListenerObject,
         options: bool,
-    ) -> Result<(), JsValue>
-    where
-        Type: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
-    pub fn remove_event_listener<Type>(
-        r#type: Type,
+    pub fn remove_event_listener(
+        r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerOrEventListenerObject,
-    ) -> Result<(), JsValue>
-    where
-        Type: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_event_target_event_listener_options<Type>(
-        r#type: Type,
+    pub fn remove_event_listener_with_event_target_event_listener_options(
+        r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerOrEventListenerObject,
         options: &EventTargetEventListenerOptions,
-    ) -> Result<(), JsValue>
-    where
-        Type: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_bool<Type>(
-        r#type: Type,
+    pub fn remove_event_listener_with_bool(
+        r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerOrEventListenerObject,
         options: bool,
-    ) -> Result<(), JsValue>
-    where
-        Type: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -3393,72 +3381,60 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
-    pub fn add_event_listener<EventMap, Type>(
+    pub fn add_event_listener<EventMap>(
         this: &EventTarget<EventMap>,
-        r#type: Type,
+        r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerOrEventListenerObject,
-    ) -> Result<(), JsValue>
-    where
-        Type: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<(), JsValue>;
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
-    pub fn add_event_listener_with_event_target_add_event_listener_options<EventMap, Type>(
+    pub fn add_event_listener_with_event_target_add_event_listener_options<EventMap>(
         this: &EventTarget<EventMap>,
-        r#type: Type,
+        r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerOrEventListenerObject,
         options: &EventTargetAddEventListenerOptions,
-    ) -> Result<(), JsValue>
-    where
-        Type: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<(), JsValue>;
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "addEventListener")]
-    pub fn add_event_listener_with_bool<EventMap, Type>(
+    pub fn add_event_listener_with_bool<EventMap>(
         this: &EventTarget<EventMap>,
-        r#type: Type,
+        r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerOrEventListenerObject,
         options: bool,
-    ) -> Result<(), JsValue>
-    where
-        Type: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<(), JsValue>;
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
-    pub fn remove_event_listener<EventMap, Type>(
+    pub fn remove_event_listener<EventMap>(
         this: &EventTarget<EventMap>,
-        r#type: Type,
+        r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerOrEventListenerObject,
-    ) -> Result<(), JsValue>
-    where
-        Type: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<(), JsValue>;
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_event_target_event_listener_options<EventMap, Type>(
+    pub fn remove_event_listener_with_event_target_event_listener_options<EventMap>(
         this: &EventTarget<EventMap>,
-        r#type: Type,
+        r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerOrEventListenerObject,
         options: &EventTargetEventListenerOptions,
-    ) -> Result<(), JsValue>
-    where
-        Type: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<(), JsValue>;
     #[doc = " The **`removeEventListener()`** method of the EventTarget interface removes an event listener previously registered with EventTarget.addEventListener() from the target."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/removeEventListener)"]
     #[wasm_bindgen(method, catch, js_name = "removeEventListener")]
-    pub fn remove_event_listener_with_bool<EventMap, Type>(
+    pub fn remove_event_listener_with_bool<EventMap>(
         this: &EventTarget<EventMap>,
-        r#type: Type,
+        r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &EventListenerOrEventListenerObject,
         options: bool,
-    ) -> Result<(), JsValue>
-    where
-        Type: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<(), JsValue>;
     #[doc = " The **`dispatchEvent()`** method of the EventTarget sends an Event to the object, (synchronously) invoking the affected event listeners in the appropriate order."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/dispatchEvent)"]
@@ -8461,47 +8437,43 @@ pub type Fetcher = JsValue;
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type KVNamespaceListKey<Metadata, Key>;
+    pub type KVNamespaceListKey<Metadata>;
     #[wasm_bindgen(method, getter)]
-    pub fn name<Metadata, Key>(this: &KVNamespaceListKey<Metadata, Key>) -> Key
-    where
-        Key: ::wasm_bindgen::convert::FromWasmAbi;
+    pub fn name<Metadata>(this: &KVNamespaceListKey<Metadata>) -> String;
+    #[wasm_bindgen(method, getter, js_name = "name")]
+    pub fn name_js_string<Metadata>(this: &KVNamespaceListKey<Metadata>) -> JsString;
     #[wasm_bindgen(method, setter)]
-    pub fn set_name<Metadata, Key>(this: &KVNamespaceListKey<Metadata, Key>, val: Key)
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    pub fn set_name<Metadata>(
+        this: &KVNamespaceListKey<Metadata>,
+        val: impl ::wasm_bindgen::JsStringLike,
+    );
     #[wasm_bindgen(method, getter)]
-    pub fn expiration<Metadata, Key>(this: &KVNamespaceListKey<Metadata, Key>) -> Option<f64>;
+    pub fn expiration<Metadata>(this: &KVNamespaceListKey<Metadata>) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_expiration<Metadata, Key>(this: &KVNamespaceListKey<Metadata, Key>, val: f64);
+    pub fn set_expiration<Metadata>(this: &KVNamespaceListKey<Metadata>, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn metadata<Metadata, Key>(this: &KVNamespaceListKey<Metadata, Key>) -> Option<Metadata>
+    pub fn metadata<Metadata>(this: &KVNamespaceListKey<Metadata>) -> Option<Metadata>
     where
         Metadata: ::wasm_bindgen::convert::OptionFromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_metadata<Metadata, Key>(this: &KVNamespaceListKey<Metadata, Key>, val: Metadata)
+    pub fn set_metadata<Metadata>(this: &KVNamespaceListKey<Metadata>, val: Metadata)
     where
         Metadata: ::wasm_bindgen::convert::IntoWasmAbi;
 }
-impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi, Key: ::wasm_bindgen::convert::IntoWasmAbi>
-    KVNamespaceListKey<Metadata, Key>
-{
-    pub fn new(name: Key) -> KVNamespaceListKey<Metadata, Key> {
+impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> KVNamespaceListKey<Metadata> {
+    pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> KVNamespaceListKey<Metadata> {
         Self::builder(name).build()
     }
-    pub fn builder(name: Key) -> KVNamespaceListKeyBuilder<Metadata, Key> {
-        let inner: KVNamespaceListKey<Metadata, Key> =
-            JsCast::unchecked_into(js_sys::Object::new());
+    pub fn builder(name: impl ::wasm_bindgen::JsStringLike) -> KVNamespaceListKeyBuilder<Metadata> {
+        let inner: KVNamespaceListKey<Metadata> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         KVNamespaceListKeyBuilder { inner }
     }
 }
-pub struct KVNamespaceListKeyBuilder<Metadata, Key> {
-    inner: KVNamespaceListKey<Metadata, Key>,
+pub struct KVNamespaceListKeyBuilder<Metadata> {
+    inner: KVNamespaceListKey<Metadata>,
 }
-impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi, Key: ::wasm_bindgen::convert::IntoWasmAbi>
-    KVNamespaceListKeyBuilder<Metadata, Key>
-{
+impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> KVNamespaceListKeyBuilder<Metadata> {
     pub fn expiration(self, val: f64) -> Self {
         self.inner.set_expiration(val);
         self
@@ -8510,7 +8482,7 @@ impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi, Key: ::wasm_bindgen::conver
         self.inner.set_metadata(val);
         self
     }
-    pub fn build(self) -> KVNamespaceListKey<Metadata, Key> {
+    pub fn build(self) -> KVNamespaceListKey<Metadata> {
         self.inner
     }
 }
@@ -8518,71 +8490,64 @@ impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi, Key: ::wasm_bindgen::conver
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type KVNamespaceListResult<Metadata, Key>;
+    pub type KVNamespaceListResult<Metadata>;
     #[wasm_bindgen(method, getter)]
-    pub fn list_complete<Metadata, Key>(this: &KVNamespaceListResult<Metadata, Key>) -> bool;
+    pub fn list_complete<Metadata>(this: &KVNamespaceListResult<Metadata>) -> bool;
     #[wasm_bindgen(method, setter)]
-    pub fn set_list_complete<Metadata, Key>(this: &KVNamespaceListResult<Metadata, Key>, val: bool);
+    pub fn set_list_complete<Metadata>(this: &KVNamespaceListResult<Metadata>, val: bool);
     #[wasm_bindgen(method, getter)]
-    pub fn keys<Metadata, Key>(
-        this: &KVNamespaceListResult<Metadata, Key>,
-    ) -> Vec<KVNamespaceListKey<Metadata, Key>>
+    pub fn keys<Metadata>(
+        this: &KVNamespaceListResult<Metadata>,
+    ) -> Vec<KVNamespaceListKey<Metadata>>
     where
-        Vec<KVNamespaceListKey<Metadata, Key>>: ::wasm_bindgen::convert::FromWasmAbi;
+        Vec<KVNamespaceListKey<Metadata>>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_keys<Metadata, Key>(
-        this: &KVNamespaceListResult<Metadata, Key>,
-        val: &[KVNamespaceListKey<Metadata, Key>],
+    pub fn set_keys<Metadata>(
+        this: &KVNamespaceListResult<Metadata>,
+        val: &[KVNamespaceListKey<Metadata>],
     ) where
-        KVNamespaceListKey<Metadata, Key>: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+        KVNamespaceListKey<Metadata>: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
     #[wasm_bindgen(method, getter)]
-    pub fn cursor<Metadata, Key>(this: &KVNamespaceListResult<Metadata, Key>) -> Option<String>;
+    pub fn cursor<Metadata>(this: &KVNamespaceListResult<Metadata>) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "cursor")]
-    pub fn cursor_js_string<Metadata, Key>(
-        this: &KVNamespaceListResult<Metadata, Key>,
-    ) -> Option<JsString>;
+    pub fn cursor_js_string<Metadata>(this: &KVNamespaceListResult<Metadata>) -> Option<JsString>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_cursor<Metadata, Key>(
-        this: &KVNamespaceListResult<Metadata, Key>,
+    pub fn set_cursor<Metadata>(
+        this: &KVNamespaceListResult<Metadata>,
         val: impl ::wasm_bindgen::JsStringLike,
     );
     #[wasm_bindgen(method, getter, js_name = "cacheStatus")]
-    pub fn cache_status<Metadata, Key>(
-        this: &KVNamespaceListResult<Metadata, Key>,
-    ) -> Nullable<String>;
+    pub fn cache_status<Metadata>(this: &KVNamespaceListResult<Metadata>) -> Nullable<String>;
     #[wasm_bindgen(method, getter, js_name = "cacheStatus")]
-    pub fn cache_status_js_string<Metadata, Key>(
-        this: &KVNamespaceListResult<Metadata, Key>,
+    pub fn cache_status_js_string<Metadata>(
+        this: &KVNamespaceListResult<Metadata>,
     ) -> Nullable<JsString>;
     #[wasm_bindgen(method, setter, js_name = "cacheStatus")]
-    pub fn set_cache_status<Metadata, Key>(
-        this: &KVNamespaceListResult<Metadata, Key>,
+    pub fn set_cache_status<Metadata>(
+        this: &KVNamespaceListResult<Metadata>,
         val: impl ::wasm_bindgen::JsStringLike,
     );
     #[wasm_bindgen(method, setter, js_name = "cacheStatus")]
-    fn set_cache_status_with_null_js<Metadata, Key>(
-        this: &KVNamespaceListResult<Metadata, Key>,
+    fn set_cache_status_with_null_js<Metadata>(
+        this: &KVNamespaceListResult<Metadata>,
         val: &::wasm_bindgen::JsValue,
     );
 }
-impl<Metadata, Key> KVNamespaceListResult<Metadata, Key> {
+impl<Metadata> KVNamespaceListResult<Metadata> {
     pub fn set_cache_status_with_null(&self) {
         self.set_cache_status_with_null_js(&::wasm_bindgen::JsValue::NULL)
     }
 }
-impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi, Key: ::wasm_bindgen::convert::IntoWasmAbi>
-    KVNamespaceListResult<Metadata, Key>
-{
+impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> KVNamespaceListResult<Metadata> {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `list_complete: false`"]
     pub fn new_false(
-        keys: &[KVNamespaceListKey<Metadata, Key>],
+        keys: &[KVNamespaceListKey<Metadata>],
         cursor: impl ::wasm_bindgen::JsStringLike,
         cache_status: impl ::wasm_bindgen::JsStringLike,
-    ) -> KVNamespaceListResult<Metadata, Key> {
-        let inner: KVNamespaceListResult<Metadata, Key> =
-            JsCast::unchecked_into(js_sys::Object::new());
+    ) -> KVNamespaceListResult<Metadata> {
+        let inner: KVNamespaceListResult<Metadata> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_list_complete(false);
         inner.set_keys(keys);
         inner.set_cursor(cursor);
@@ -8593,11 +8558,10 @@ impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi, Key: ::wasm_bindgen::conver
     #[doc = ""]
     #[doc = " * `list_complete: false`"]
     pub fn new_false_with_null(
-        keys: &[KVNamespaceListKey<Metadata, Key>],
+        keys: &[KVNamespaceListKey<Metadata>],
         cursor: impl ::wasm_bindgen::JsStringLike,
-    ) -> KVNamespaceListResult<Metadata, Key> {
-        let inner: KVNamespaceListResult<Metadata, Key> =
-            JsCast::unchecked_into(js_sys::Object::new());
+    ) -> KVNamespaceListResult<Metadata> {
+        let inner: KVNamespaceListResult<Metadata> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_list_complete(false);
         inner.set_keys(keys);
         inner.set_cursor(cursor);
@@ -8608,28 +8572,27 @@ impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi, Key: ::wasm_bindgen::conver
     #[doc = ""]
     #[doc = " * `list_complete: true`"]
     pub fn new_true(
-        keys: &[KVNamespaceListKey<Metadata, Key>],
+        keys: &[KVNamespaceListKey<Metadata>],
         cache_status: impl ::wasm_bindgen::JsStringLike,
-    ) -> KVNamespaceListResult<Metadata, Key> {
+    ) -> KVNamespaceListResult<Metadata> {
         Self::builder_true(keys, cache_status).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `list_complete: true`"]
     pub fn new_true_with_null(
-        keys: &[KVNamespaceListKey<Metadata, Key>],
-    ) -> KVNamespaceListResult<Metadata, Key> {
+        keys: &[KVNamespaceListKey<Metadata>],
+    ) -> KVNamespaceListResult<Metadata> {
         Self::builder_true_with_null(keys).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `list_complete: true`"]
     pub fn builder_true(
-        keys: &[KVNamespaceListKey<Metadata, Key>],
+        keys: &[KVNamespaceListKey<Metadata>],
         cache_status: impl ::wasm_bindgen::JsStringLike,
-    ) -> KVNamespaceListResultBuilder<Metadata, Key> {
-        let inner: KVNamespaceListResult<Metadata, Key> =
-            JsCast::unchecked_into(js_sys::Object::new());
+    ) -> KVNamespaceListResultBuilder<Metadata> {
+        let inner: KVNamespaceListResult<Metadata> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_list_complete(true);
         inner.set_keys(keys);
         inner.set_cache_status(cache_status);
@@ -8639,27 +8602,24 @@ impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi, Key: ::wasm_bindgen::conver
     #[doc = ""]
     #[doc = " * `list_complete: true`"]
     pub fn builder_true_with_null(
-        keys: &[KVNamespaceListKey<Metadata, Key>],
-    ) -> KVNamespaceListResultBuilder<Metadata, Key> {
-        let inner: KVNamespaceListResult<Metadata, Key> =
-            JsCast::unchecked_into(js_sys::Object::new());
+        keys: &[KVNamespaceListKey<Metadata>],
+    ) -> KVNamespaceListResultBuilder<Metadata> {
+        let inner: KVNamespaceListResult<Metadata> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_list_complete(true);
         inner.set_keys(keys);
         inner.set_cache_status_with_null();
         KVNamespaceListResultBuilder { inner }
     }
 }
-pub struct KVNamespaceListResultBuilder<Metadata, Key> {
-    inner: KVNamespaceListResult<Metadata, Key>,
+pub struct KVNamespaceListResultBuilder<Metadata> {
+    inner: KVNamespaceListResult<Metadata>,
 }
-impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi, Key: ::wasm_bindgen::convert::IntoWasmAbi>
-    KVNamespaceListResultBuilder<Metadata, Key>
-{
+impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> KVNamespaceListResultBuilder<Metadata> {
     pub fn cursor(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_cursor(val);
         self
     }
-    pub fn build(self) -> KVNamespaceListResult<Metadata, Key> {
+    pub fn build(self) -> KVNamespaceListResult<Metadata> {
         self.inner
     }
 }
@@ -8667,506 +8627,418 @@ impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi, Key: ::wasm_bindgen::conver
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type KVNamespace<Key>;
+    pub type KVNamespace;
     #[wasm_bindgen(method, catch)]
-    pub async fn get<Key>(this: &KVNamespace<Key>, key: Key) -> Result<Nullable<String>, JsValue>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    pub async fn get(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Nullable<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_js_string<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
-    ) -> Result<Nullable<JsString>, JsValue>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    pub async fn get_js_string(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Nullable<JsString>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_promise<Key>(this: &KVNamespace<Key>, key: Key) -> Promise<Nullable<JsString>>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    pub fn get_promise(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<Nullable<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_key_and_partial_kv_namespace_get_options_undefined<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub async fn get_with_str_and_partial_kv_namespace_get_options_undefined(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         options: &PartialKvNamespaceGetOptionsUndefined,
-    ) -> Result<Nullable<String>, JsValue>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<Nullable<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_key_and_partial_kv_namespace_get_options_undefined_js_string<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub async fn get_with_str_and_partial_kv_namespace_get_options_undefined_js_string(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         options: &PartialKvNamespaceGetOptionsUndefined,
-    ) -> Result<Nullable<JsString>, JsValue>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<Nullable<JsString>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_key_and_partial_kv_namespace_get_options_undefined_promise<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub fn get_with_str_and_partial_kv_namespace_get_options_undefined_promise(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         options: &PartialKvNamespaceGetOptionsUndefined,
-    ) -> Promise<Nullable<JsString>>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Promise<Nullable<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_key_and_type<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub async fn get_with_str_and_type(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Nullable<String>, JsValue>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<Nullable<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_key_and_type_js_string<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub async fn get_with_str_and_type_js_string(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Nullable<JsString>, JsValue>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<Nullable<JsString>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_key_and_type_promise<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub fn get_with_str_and_type_promise(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Nullable<JsString>>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Promise<Nullable<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_key_and_kv_namespace_get_options<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub async fn get_with_str_and_kv_namespace_get_options(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
-    ) -> Result<Nullable<String>, JsValue>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<Nullable<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_key_and_kv_namespace_get_options_js_string<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub async fn get_with_str_and_kv_namespace_get_options_js_string(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
-    ) -> Result<Nullable<JsString>, JsValue>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<Nullable<JsString>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_key_and_kv_namespace_get_options_promise<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub fn get_with_str_and_kv_namespace_get_options_promise(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
-    ) -> Promise<Nullable<JsString>>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Promise<Nullable<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_slice_and_type<Key>(
-        this: &KVNamespace<Key>,
-        #[wasm_bindgen(slice = "array")] key: &[Key],
+    pub async fn get_with_slice_and_type(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
         r#type: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Map<JsString, JsNullable<JsString>>, JsValue>
-    where
-        Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+    ) -> Result<Map<JsString, JsNullable<JsString>>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_slice_and_type_promise<Key>(
-        this: &KVNamespace<Key>,
-        #[wasm_bindgen(slice = "array")] key: &[Key],
+    pub fn get_with_slice_and_type_promise(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
         r#type: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Map<JsString, JsNullable<JsString>>>
-    where
-        Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+    ) -> Promise<Map<JsString, JsNullable<JsString>>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_slice<Key>(
-        this: &KVNamespace<Key>,
-        #[wasm_bindgen(slice = "array")] key: &[Key],
-    ) -> Result<Map<JsString, JsNullable<JsString>>, JsValue>
-    where
-        Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+    pub async fn get_with_slice(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<Map<JsString, JsNullable<JsString>>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_slice_promise<Key>(
-        this: &KVNamespace<Key>,
-        #[wasm_bindgen(slice = "array")] key: &[Key],
-    ) -> Promise<Map<JsString, JsNullable<JsString>>>
-    where
-        Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+    pub fn get_with_slice_promise(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Promise<Map<JsString, JsNullable<JsString>>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_slice_and_partial_kv_namespace_get_options_undefined<Key>(
-        this: &KVNamespace<Key>,
-        #[wasm_bindgen(slice = "array")] key: &[Key],
+    pub async fn get_with_slice_and_partial_kv_namespace_get_options_undefined(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
         options: &PartialKvNamespaceGetOptionsUndefined,
-    ) -> Result<Map<JsString, JsNullable<JsString>>, JsValue>
-    where
-        Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+    ) -> Result<Map<JsString, JsNullable<JsString>>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_slice_and_partial_kv_namespace_get_options_undefined_promise<Key>(
-        this: &KVNamespace<Key>,
-        #[wasm_bindgen(slice = "array")] key: &[Key],
+    pub fn get_with_slice_and_partial_kv_namespace_get_options_undefined_promise(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
         options: &PartialKvNamespaceGetOptionsUndefined,
-    ) -> Promise<Map<JsString, JsNullable<JsString>>>
-    where
-        Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+    ) -> Promise<Map<JsString, JsNullable<JsString>>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_slice_and_kv_namespace_get_options<Key>(
-        this: &KVNamespace<Key>,
-        #[wasm_bindgen(slice = "array")] key: &[Key],
+    pub async fn get_with_slice_and_kv_namespace_get_options(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
-    ) -> Result<Map<JsString, JsNullable<JsString>>, JsValue>
-    where
-        Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+    ) -> Result<Map<JsString, JsNullable<JsString>>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_slice_and_kv_namespace_get_options_promise<Key>(
-        this: &KVNamespace<Key>,
-        #[wasm_bindgen(slice = "array")] key: &[Key],
+    pub fn get_with_slice_and_kv_namespace_get_options_promise(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
-    ) -> Promise<Map<JsString, JsNullable<JsString>>>
-    where
-        Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+    ) -> Promise<Map<JsString, JsNullable<JsString>>>;
     #[wasm_bindgen(method, catch)]
-    pub async fn list<Key, Metadata>(
-        this: &KVNamespace<Key>,
-    ) -> Result<KVNamespaceListResult<Metadata, Key>, JsValue>
+    pub async fn list<Metadata>(
+        this: &KVNamespace,
+    ) -> Result<KVNamespaceListResult<Metadata>, JsValue>
     where
-        Metadata: 'static,
-        Key: 'static;
-    #[wasm_bindgen(method, js_name = "list")]
-    pub fn list_promise<Key, Metadata>(
-        this: &KVNamespace<Key>,
-    ) -> Promise<KVNamespaceListResult<Metadata, Key>>;
+        Metadata: 'static;
     #[wasm_bindgen(method, catch, js_name = "list")]
-    pub async fn list_with_options<Key, Metadata>(
-        this: &KVNamespace<Key>,
-        options: &KVNamespaceListOptions,
-    ) -> Result<KVNamespaceListResult<Metadata, Key>, JsValue>
+    pub async fn list_js_string<Metadata>(
+        this: &KVNamespace,
+    ) -> Result<KVNamespaceListResult<Metadata, JsString>, JsValue>
     where
-        Metadata: 'static,
-        Key: 'static;
+        Metadata: 'static;
     #[wasm_bindgen(method, js_name = "list")]
-    pub fn list_with_options_promise<Key, Metadata>(
-        this: &KVNamespace<Key>,
+    pub fn list_promise<Metadata>(this: &KVNamespace) -> Promise<KVNamespaceListResult<Metadata>>;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub async fn list_with_options<Metadata>(
+        this: &KVNamespace,
         options: &KVNamespaceListOptions,
-    ) -> Promise<KVNamespaceListResult<Metadata, Key>>;
+    ) -> Result<KVNamespaceListResult<Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub async fn list_with_options_js_string<Metadata>(
+        this: &KVNamespace,
+        options: &KVNamespaceListOptions,
+    ) -> Result<KVNamespaceListResult<Metadata, JsString>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "list")]
+    pub fn list_with_options_promise<Metadata>(
+        this: &KVNamespace,
+        options: &KVNamespaceListOptions,
+    ) -> Promise<KVNamespaceListResult<Metadata>>;
     #[wasm_bindgen(method, catch)]
-    pub async fn put<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub async fn put(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<(), JsValue>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_promise<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub fn put_promise(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Undefined>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_array_buffer<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub async fn put_with_array_buffer(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         value: &ArrayBuffer,
-    ) -> Result<(), JsValue>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_array_buffer_promise<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub fn put_with_array_buffer_promise(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         value: &ArrayBuffer,
-    ) -> Promise<Undefined>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_typed_array<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub async fn put_with_typed_array(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         value: &Object,
-    ) -> Result<(), JsValue>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_typed_array_promise<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub fn put_with_typed_array_promise(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         value: &Object,
-    ) -> Promise<Undefined>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_readable_stream<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub async fn put_with_readable_stream(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         value: &ReadableStream,
-    ) -> Result<(), JsValue>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_readable_stream_promise<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub fn put_with_readable_stream_promise(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         value: &ReadableStream,
-    ) -> Promise<Undefined>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_str_and_options<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub async fn put_with_str_and_options(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespacePutOptions,
-    ) -> Result<(), JsValue>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_str_and_options_promise<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub fn put_with_str_and_options_promise(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespacePutOptions,
-    ) -> Promise<Undefined>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_array_buffer_and_options<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub async fn put_with_array_buffer_and_options(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         value: &ArrayBuffer,
         options: &KVNamespacePutOptions,
-    ) -> Result<(), JsValue>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_array_buffer_and_options_promise<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub fn put_with_array_buffer_and_options_promise(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         value: &ArrayBuffer,
         options: &KVNamespacePutOptions,
-    ) -> Promise<Undefined>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_typed_array_and_options<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub async fn put_with_typed_array_and_options(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         value: &Object,
         options: &KVNamespacePutOptions,
-    ) -> Result<(), JsValue>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_typed_array_and_options_promise<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub fn put_with_typed_array_and_options_promise(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         value: &Object,
         options: &KVNamespacePutOptions,
-    ) -> Promise<Undefined>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_readable_stream_and_options<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub async fn put_with_readable_stream_and_options(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         value: &ReadableStream,
         options: &KVNamespacePutOptions,
-    ) -> Result<(), JsValue>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_readable_stream_and_options_promise<Key>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub fn put_with_readable_stream_and_options_promise(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         value: &ReadableStream,
         options: &KVNamespacePutOptions,
-    ) -> Promise<Undefined>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata<Key, Metadata>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub async fn get_with_metadata<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<KVNamespaceGetWithMetadataResult<String, Metadata>, JsValue>
     where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi,
         Metadata: 'static;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_js_string<Key, Metadata>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub async fn get_with_metadata_js_string<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>
     where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi,
         Metadata: 'static;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_promise<Key, Metadata>(
-        this: &KVNamespace<Key>,
-        key: Key,
-    ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    pub fn get_with_metadata_promise<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_key_and_partial_kv_namespace_get_options_undefined<
-        Key,
+    pub async fn get_with_metadata_with_str_and_partial_kv_namespace_get_options_undefined<
         Metadata,
     >(
-        this: &KVNamespace<Key>,
-        key: Key,
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Result<KVNamespaceGetWithMetadataResult<String, Metadata>, JsValue>
     where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi,
         Metadata: 'static;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_key_and_partial_kv_namespace_get_options_undefined_js_string<
-        Key,
+    pub async fn get_with_metadata_with_str_and_partial_kv_namespace_get_options_undefined_js_string<
         Metadata,
     >(
-        this: &KVNamespace<Key>,
-        key: Key,
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>
     where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi,
         Metadata: 'static;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_with_key_and_partial_kv_namespace_get_options_undefined_promise<
-        Key,
+    pub fn get_with_metadata_with_str_and_partial_kv_namespace_get_options_undefined_promise<
         Metadata,
     >(
-        this: &KVNamespace<Key>,
-        key: Key,
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         options: &PartialKvNamespaceGetOptionsUndefined,
-    ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_key_and_type<Key, Metadata>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub async fn get_with_metadata_with_str_and_type<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<KVNamespaceGetWithMetadataResult<String, Metadata>, JsValue>
     where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi,
         Metadata: 'static;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_key_and_type_js_string<Key, Metadata>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub async fn get_with_metadata_with_str_and_type_js_string<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>
     where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi,
         Metadata: 'static;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_with_key_and_type_promise<Key, Metadata>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub fn get_with_metadata_with_str_and_type_promise<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_key_and_kv_namespace_get_options<Key, Metadata>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub async fn get_with_metadata_with_str_and_kv_namespace_get_options<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Result<KVNamespaceGetWithMetadataResult<String, Metadata>, JsValue>
     where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi,
         Metadata: 'static;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_key_and_kv_namespace_get_options_js_string<Key, Metadata>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub async fn get_with_metadata_with_str_and_kv_namespace_get_options_js_string<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>
     where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi,
         Metadata: 'static;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_with_key_and_kv_namespace_get_options_promise<Key, Metadata>(
-        this: &KVNamespace<Key>,
-        key: Key,
+    pub fn get_with_metadata_with_str_and_kv_namespace_get_options_promise<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
-    ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_slice_and_type<Key, Metadata>(
-        this: &KVNamespace<Key>,
-        #[wasm_bindgen(slice = "array")] key: &[Key],
+    pub async fn get_with_metadata_with_slice_and_type<Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>, JsValue>
     where
-        Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,
         Metadata: 'static;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_with_slice_and_type_promise<Key, Metadata>(
-        this: &KVNamespace<Key>,
-        #[wasm_bindgen(slice = "array")] key: &[Key],
+    pub fn get_with_metadata_with_slice_and_type_promise<Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
         r#type: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>>
-    where
-        Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_slice<Key, Metadata>(
-        this: &KVNamespace<Key>,
-        #[wasm_bindgen(slice = "array")] key: &[Key],
+    pub async fn get_with_metadata_with_slice<Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>, JsValue>
     where
-        Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,
         Metadata: 'static;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_with_slice_promise<Key, Metadata>(
-        this: &KVNamespace<Key>,
-        #[wasm_bindgen(slice = "array")] key: &[Key],
-    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>>
-    where
-        Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+    pub fn get_with_metadata_with_slice_promise<Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     pub async fn get_with_metadata_with_slice_and_partial_kv_namespace_get_options_undefined<
-        Key,
         Metadata,
     >(
-        this: &KVNamespace<Key>,
-        #[wasm_bindgen(slice = "array")] key: &[Key],
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>, JsValue>
     where
-        Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,
         Metadata: 'static;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
     pub fn get_with_metadata_with_slice_and_partial_kv_namespace_get_options_undefined_promise<
-        Key,
         Metadata,
     >(
-        this: &KVNamespace<Key>,
-        #[wasm_bindgen(slice = "array")] key: &[Key],
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
         options: &PartialKvNamespaceGetOptionsUndefined,
-    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>>
-    where
-        Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_slice_and_kv_namespace_get_options<Key, Metadata>(
-        this: &KVNamespace<Key>,
-        #[wasm_bindgen(slice = "array")] key: &[Key],
+    pub async fn get_with_metadata_with_slice_and_kv_namespace_get_options<Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
     ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>, JsValue>
     where
-        Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,
         Metadata: 'static;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_with_slice_and_kv_namespace_get_options_promise<Key, Metadata>(
-        this: &KVNamespace<Key>,
-        #[wasm_bindgen(slice = "array")] key: &[Key],
+    pub fn get_with_metadata_with_slice_and_kv_namespace_get_options_promise<Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
-    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>>
-    where
-        Key: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<String, Metadata>>>;
     #[wasm_bindgen(method, catch)]
-    pub async fn delete<Key>(this: &KVNamespace<Key>, key: Key) -> Result<(), JsValue>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    pub async fn delete(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
-    pub fn delete_promise<Key>(this: &KVNamespace<Key>, key: Key) -> Promise<Undefined>
-    where
-        Key: ::wasm_bindgen::convert::IntoWasmAbi;
+    pub fn delete_promise(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<Undefined>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -32011,43 +31883,39 @@ extern "C" {
         autorag_id: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<AutoRAG, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn run<AiModelList, Name, InputOptions>(
+    pub async fn run<AiModelList, InputOptions>(
         this: &Ai<AiModelList>,
-        model: Name,
+        model: impl ::wasm_bindgen::JsStringLike,
         inputs: InputOptions,
     ) -> Result<JsValue, JsValue>
     where
-        Name: ::wasm_bindgen::convert::IntoWasmAbi,
         InputOptions: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, js_name = "run")]
-    pub fn run_promise<AiModelList, Name, InputOptions>(
+    pub fn run_promise<AiModelList, InputOptions>(
         this: &Ai<AiModelList>,
-        model: Name,
+        model: impl ::wasm_bindgen::JsStringLike,
         inputs: InputOptions,
     ) -> Promise
     where
-        Name: ::wasm_bindgen::convert::IntoWasmAbi,
         InputOptions: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "run")]
-    pub async fn run_with_options<AiModelList, Name, InputOptions, Options>(
+    pub async fn run_with_options<AiModelList, InputOptions, Options>(
         this: &Ai<AiModelList>,
-        model: Name,
+        model: impl ::wasm_bindgen::JsStringLike,
         inputs: InputOptions,
         options: Options,
     ) -> Result<JsValue, JsValue>
     where
-        Name: ::wasm_bindgen::convert::IntoWasmAbi,
         InputOptions: ::wasm_bindgen::convert::IntoWasmAbi,
         Options: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, js_name = "run")]
-    pub fn run_with_options_promise<AiModelList, Name, InputOptions, Options>(
+    pub fn run_with_options_promise<AiModelList, InputOptions, Options>(
         this: &Ai<AiModelList>,
-        model: Name,
+        model: impl ::wasm_bindgen::JsStringLike,
         inputs: InputOptions,
         options: Options,
     ) -> Promise
     where
-        Name: ::wasm_bindgen::convert::IntoWasmAbi,
         InputOptions: ::wasm_bindgen::convert::IntoWasmAbi,
         Options: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, catch)]
@@ -40403,78 +40271,75 @@ pub type Params = Object;
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type EventContext<Env, P, Data>;
+    pub type EventContext<Env, Data>;
     #[wasm_bindgen(method, getter)]
-    pub fn request<Env, P, Data>(
-        this: &EventContext<Env, P, Data>,
+    pub fn request<Env, Data>(
+        this: &EventContext<Env, Data>,
     ) -> Request<JsValue, IncomingRequestCfProperties<JsValue>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_request<Env, P, Data>(
-        this: &EventContext<Env, P, Data>,
+    pub fn set_request<Env, Data>(
+        this: &EventContext<Env, Data>,
         val: &Request<JsValue, IncomingRequestCfProperties<JsValue>>,
     );
     #[wasm_bindgen(method, getter, js_name = "functionPath")]
-    pub fn function_path<Env, P, Data>(this: &EventContext<Env, P, Data>) -> String;
+    pub fn function_path<Env, Data>(this: &EventContext<Env, Data>) -> String;
     #[wasm_bindgen(method, getter, js_name = "functionPath")]
-    pub fn function_path_js_string<Env, P, Data>(this: &EventContext<Env, P, Data>) -> JsString;
+    pub fn function_path_js_string<Env, Data>(this: &EventContext<Env, Data>) -> JsString;
     #[wasm_bindgen(method, setter, js_name = "functionPath")]
-    pub fn set_function_path<Env, P, Data>(
-        this: &EventContext<Env, P, Data>,
+    pub fn set_function_path<Env, Data>(
+        this: &EventContext<Env, Data>,
         val: impl ::wasm_bindgen::JsStringLike,
     );
     #[wasm_bindgen(method, getter, js_name = "waitUntil")]
-    pub fn wait_until<Env, P, Data>(
-        this: &EventContext<Env, P, Data>,
+    pub fn wait_until<Env, Data>(
+        this: &EventContext<Env, Data>,
     ) -> Function<fn(Promise) -> Undefined>;
     #[wasm_bindgen(method, setter, js_name = "waitUntil")]
-    pub fn set_wait_until<Env, P, Data>(
-        this: &EventContext<Env, P, Data>,
+    pub fn set_wait_until<Env, Data>(
+        this: &EventContext<Env, Data>,
         val: &Function<fn(Promise) -> Undefined>,
     );
     #[wasm_bindgen(method, getter, js_name = "passThroughOnException")]
-    pub fn pass_through_on_exception<Env, P, Data>(
-        this: &EventContext<Env, P, Data>,
+    pub fn pass_through_on_exception<Env, Data>(
+        this: &EventContext<Env, Data>,
     ) -> Function<fn() -> Undefined>;
     #[wasm_bindgen(method, setter, js_name = "passThroughOnException")]
-    pub fn set_pass_through_on_exception<Env, P, Data>(
-        this: &EventContext<Env, P, Data>,
+    pub fn set_pass_through_on_exception<Env, Data>(
+        this: &EventContext<Env, Data>,
         val: &Function<fn() -> Undefined>,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn next<Env, P, Data>(
-        this: &EventContext<Env, P, Data>,
+    pub fn next<Env, Data>(
+        this: &EventContext<Env, Data>,
     ) -> Function<fn(JsValue, RequestInit) -> Promise<Response>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_next<Env, P, Data>(
-        this: &EventContext<Env, P, Data>,
+    pub fn set_next<Env, Data>(
+        this: &EventContext<Env, Data>,
         val: &Function<fn(JsValue, RequestInit) -> Promise<Response>>,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn env<Env, P, Data>(this: &EventContext<Env, P, Data>) -> Env
+    pub fn env<Env, Data>(this: &EventContext<Env, Data>) -> Env
     where
         Env: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_env<Env, P, Data>(this: &EventContext<Env, P, Data>, val: Env)
+    pub fn set_env<Env, Data>(this: &EventContext<Env, Data>, val: Env)
     where
         Env: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, getter)]
-    pub fn params<Env, P, Data>(this: &EventContext<Env, P, Data>) -> Params;
+    pub fn params<Env, Data>(this: &EventContext<Env, Data>) -> Params;
     #[wasm_bindgen(method, setter)]
-    pub fn set_params<Env, P, Data>(this: &EventContext<Env, P, Data>, val: &Params);
+    pub fn set_params<Env, Data>(this: &EventContext<Env, Data>, val: &Params);
     #[wasm_bindgen(method, getter)]
-    pub fn data<Env, P, Data>(this: &EventContext<Env, P, Data>) -> Data
+    pub fn data<Env, Data>(this: &EventContext<Env, Data>) -> Data
     where
         Data: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_data<Env, P, Data>(this: &EventContext<Env, P, Data>, val: Data)
+    pub fn set_data<Env, Data>(this: &EventContext<Env, Data>, val: Data)
     where
         Data: ::wasm_bindgen::convert::IntoWasmAbi;
 }
-impl<
-        Env: ::wasm_bindgen::convert::IntoWasmAbi,
-        P: ::wasm_bindgen::convert::IntoWasmAbi,
-        Data: ::wasm_bindgen::convert::IntoWasmAbi,
-    > EventContext<Env, P, Data>
+impl<Env: ::wasm_bindgen::convert::IntoWasmAbi, Data: ::wasm_bindgen::convert::IntoWasmAbi>
+    EventContext<Env, Data>
 {
     pub fn new(
         request: &Request<JsValue, IncomingRequestCfProperties<JsValue>>,
@@ -40485,8 +40350,8 @@ impl<
         env: Env,
         params: &Params,
         data: Data,
-    ) -> EventContext<Env, P, Data> {
-        let inner: EventContext<Env, P, Data> = JsCast::unchecked_into(js_sys::Object::new());
+    ) -> EventContext<Env, Data> {
+        let inner: EventContext<Env, Data> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_request(request);
         inner.set_function_path(function_path);
         inner.set_wait_until(wait_until);
@@ -40499,114 +40364,109 @@ impl<
     }
 }
 #[allow(dead_code)]
-pub type PagesFunction<Env = JsValue, Params = JsValue, Data = Object> =
-    Function<fn(EventContext<Env, Params, Data>) -> JsValue>;
+pub type PagesFunction<Env = JsValue, Data = Object> =
+    Function<fn(EventContext<Env, Data>) -> JsValue>;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type EventPluginContext<Env, P, Data, PluginArgs>;
+    pub type EventPluginContext<Env, Data, PluginArgs>;
     #[wasm_bindgen(method, getter)]
-    pub fn request<Env, P, Data, PluginArgs>(
-        this: &EventPluginContext<Env, P, Data, PluginArgs>,
+    pub fn request<Env, Data, PluginArgs>(
+        this: &EventPluginContext<Env, Data, PluginArgs>,
     ) -> Request<JsValue, IncomingRequestCfProperties<JsValue>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_request<Env, P, Data, PluginArgs>(
-        this: &EventPluginContext<Env, P, Data, PluginArgs>,
+    pub fn set_request<Env, Data, PluginArgs>(
+        this: &EventPluginContext<Env, Data, PluginArgs>,
         val: &Request<JsValue, IncomingRequestCfProperties<JsValue>>,
     );
     #[wasm_bindgen(method, getter, js_name = "functionPath")]
-    pub fn function_path<Env, P, Data, PluginArgs>(
-        this: &EventPluginContext<Env, P, Data, PluginArgs>,
+    pub fn function_path<Env, Data, PluginArgs>(
+        this: &EventPluginContext<Env, Data, PluginArgs>,
     ) -> String;
     #[wasm_bindgen(method, getter, js_name = "functionPath")]
-    pub fn function_path_js_string<Env, P, Data, PluginArgs>(
-        this: &EventPluginContext<Env, P, Data, PluginArgs>,
+    pub fn function_path_js_string<Env, Data, PluginArgs>(
+        this: &EventPluginContext<Env, Data, PluginArgs>,
     ) -> JsString;
     #[wasm_bindgen(method, setter, js_name = "functionPath")]
-    pub fn set_function_path<Env, P, Data, PluginArgs>(
-        this: &EventPluginContext<Env, P, Data, PluginArgs>,
+    pub fn set_function_path<Env, Data, PluginArgs>(
+        this: &EventPluginContext<Env, Data, PluginArgs>,
         val: impl ::wasm_bindgen::JsStringLike,
     );
     #[wasm_bindgen(method, getter, js_name = "waitUntil")]
-    pub fn wait_until<Env, P, Data, PluginArgs>(
-        this: &EventPluginContext<Env, P, Data, PluginArgs>,
+    pub fn wait_until<Env, Data, PluginArgs>(
+        this: &EventPluginContext<Env, Data, PluginArgs>,
     ) -> Function<fn(Promise) -> Undefined>;
     #[wasm_bindgen(method, setter, js_name = "waitUntil")]
-    pub fn set_wait_until<Env, P, Data, PluginArgs>(
-        this: &EventPluginContext<Env, P, Data, PluginArgs>,
+    pub fn set_wait_until<Env, Data, PluginArgs>(
+        this: &EventPluginContext<Env, Data, PluginArgs>,
         val: &Function<fn(Promise) -> Undefined>,
     );
     #[wasm_bindgen(method, getter, js_name = "passThroughOnException")]
-    pub fn pass_through_on_exception<Env, P, Data, PluginArgs>(
-        this: &EventPluginContext<Env, P, Data, PluginArgs>,
+    pub fn pass_through_on_exception<Env, Data, PluginArgs>(
+        this: &EventPluginContext<Env, Data, PluginArgs>,
     ) -> Function<fn() -> Undefined>;
     #[wasm_bindgen(method, setter, js_name = "passThroughOnException")]
-    pub fn set_pass_through_on_exception<Env, P, Data, PluginArgs>(
-        this: &EventPluginContext<Env, P, Data, PluginArgs>,
+    pub fn set_pass_through_on_exception<Env, Data, PluginArgs>(
+        this: &EventPluginContext<Env, Data, PluginArgs>,
         val: &Function<fn() -> Undefined>,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn next<Env, P, Data, PluginArgs>(
-        this: &EventPluginContext<Env, P, Data, PluginArgs>,
+    pub fn next<Env, Data, PluginArgs>(
+        this: &EventPluginContext<Env, Data, PluginArgs>,
     ) -> Function<fn(JsValue, RequestInit) -> Promise<Response>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_next<Env, P, Data, PluginArgs>(
-        this: &EventPluginContext<Env, P, Data, PluginArgs>,
+    pub fn set_next<Env, Data, PluginArgs>(
+        this: &EventPluginContext<Env, Data, PluginArgs>,
         val: &Function<fn(JsValue, RequestInit) -> Promise<Response>>,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn env<Env, P, Data, PluginArgs>(
-        this: &EventPluginContext<Env, P, Data, PluginArgs>,
-    ) -> Env
+    pub fn env<Env, Data, PluginArgs>(this: &EventPluginContext<Env, Data, PluginArgs>) -> Env
     where
         Env: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_env<Env, P, Data, PluginArgs>(
-        this: &EventPluginContext<Env, P, Data, PluginArgs>,
+    pub fn set_env<Env, Data, PluginArgs>(
+        this: &EventPluginContext<Env, Data, PluginArgs>,
         val: Env,
     ) where
         Env: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, getter)]
-    pub fn params<Env, P, Data, PluginArgs>(
-        this: &EventPluginContext<Env, P, Data, PluginArgs>,
+    pub fn params<Env, Data, PluginArgs>(
+        this: &EventPluginContext<Env, Data, PluginArgs>,
     ) -> Params;
     #[wasm_bindgen(method, setter)]
-    pub fn set_params<Env, P, Data, PluginArgs>(
-        this: &EventPluginContext<Env, P, Data, PluginArgs>,
+    pub fn set_params<Env, Data, PluginArgs>(
+        this: &EventPluginContext<Env, Data, PluginArgs>,
         val: &Params,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn data<Env, P, Data, PluginArgs>(
-        this: &EventPluginContext<Env, P, Data, PluginArgs>,
-    ) -> Data
+    pub fn data<Env, Data, PluginArgs>(this: &EventPluginContext<Env, Data, PluginArgs>) -> Data
     where
         Data: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_data<Env, P, Data, PluginArgs>(
-        this: &EventPluginContext<Env, P, Data, PluginArgs>,
+    pub fn set_data<Env, Data, PluginArgs>(
+        this: &EventPluginContext<Env, Data, PluginArgs>,
         val: Data,
     ) where
         Data: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, getter, js_name = "pluginArgs")]
-    pub fn plugin_args<Env, P, Data, PluginArgs>(
-        this: &EventPluginContext<Env, P, Data, PluginArgs>,
+    pub fn plugin_args<Env, Data, PluginArgs>(
+        this: &EventPluginContext<Env, Data, PluginArgs>,
     ) -> PluginArgs
     where
         PluginArgs: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter, js_name = "pluginArgs")]
-    pub fn set_plugin_args<Env, P, Data, PluginArgs>(
-        this: &EventPluginContext<Env, P, Data, PluginArgs>,
+    pub fn set_plugin_args<Env, Data, PluginArgs>(
+        this: &EventPluginContext<Env, Data, PluginArgs>,
         val: PluginArgs,
     ) where
         PluginArgs: ::wasm_bindgen::convert::IntoWasmAbi;
 }
 impl<
         Env: ::wasm_bindgen::convert::IntoWasmAbi,
-        P: ::wasm_bindgen::convert::IntoWasmAbi,
         Data: ::wasm_bindgen::convert::IntoWasmAbi,
         PluginArgs: ::wasm_bindgen::convert::IntoWasmAbi,
-    > EventPluginContext<Env, P, Data, PluginArgs>
+    > EventPluginContext<Env, Data, PluginArgs>
 {
     pub fn new(
         request: &Request<JsValue, IncomingRequestCfProperties<JsValue>>,
@@ -40618,8 +40478,8 @@ impl<
         params: &Params,
         data: Data,
         plugin_args: PluginArgs,
-    ) -> EventPluginContext<Env, P, Data, PluginArgs> {
-        let inner: EventPluginContext<Env, P, Data, PluginArgs> =
+    ) -> EventPluginContext<Env, Data, PluginArgs> {
+        let inner: EventPluginContext<Env, Data, PluginArgs> =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_request(request);
         inner.set_function_path(function_path);
@@ -40634,8 +40494,8 @@ impl<
     }
 }
 #[allow(dead_code)]
-pub type PagesPluginFunction<Env = JsValue, Params = JsValue, Data = Object, PluginArgs = JsValue> =
-    Function<fn(EventPluginContext<Env, Params, Data, PluginArgs>) -> JsValue>;
+pub type PagesPluginFunction<Env = JsValue, Data = Object, PluginArgs = JsValue> =
+    Function<fn(EventPluginContext<Env, Data, PluginArgs>) -> JsValue>;
 pub mod assets {
     #[allow(unused_imports)]
     use super::*;
@@ -40643,8 +40503,7 @@ pub mod assets {
     extern "C" {
         #[allow(non_upper_case_globals)]
         #[wasm_bindgen(thread_local_v2, js_name = "onRequest")]
-        pub static on_request:
-            Function<fn(super::EventContext<JsValue, JsValue, Object>) -> JsValue>;
+        pub static on_request: Function<fn(super::EventContext<JsValue, Object>) -> JsValue>;
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -40882,7 +40741,7 @@ pub mod rpc {
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "Rpc")]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type Provider<T, Reserved>;
+        pub type Provider<T>;
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -46837,15 +46696,6 @@ impl WorkflowInstanceSendEvent {
         inner.set_payload(payload);
         inner
     }
-}
-#[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum KeyOfWorkerGlobalScopeEventMap {
-    Fetch = "fetch",
-    Scheduled = "scheduled",
-    Queue = "queue",
-    Unhandledrejection = "unhandledrejection",
-    Rejectionhandled = "rejectionhandled",
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

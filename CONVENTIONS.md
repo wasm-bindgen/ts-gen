@@ -2138,6 +2138,37 @@ impl<T: ::wasm_bindgen::JsGeneric> EvaluationDetailsBuilder<T> {
 }
 ```
 
+### Primitive-constrained parameters erase
+
+A type parameter whose constraint is a primitive — `string`, `number`,
+`boolean`, `bigint`, a union of literals of one of those, or `keyof X`
+(a union of property names, read as `string`) — can only be
+instantiated with subtypes that share the primitive's ABI, so a Rust
+generic would only ever be `JsString` under another name. The
+parameter is dropped from the declaration and reads as the primitive;
+references that pass an argument for it drop that argument so the
+remaining ones line up:
+
+```ts
+interface KVNamespace<Key extends string = string> {
+  get(key: Key): Promise<string | null>;
+  list<Metadata = unknown>(): Promise<KVNamespaceListResult<Metadata, Key>>;
+}
+interface Env { TYPED: KVNamespace<"a" | "b">; }
+```
+
+```rust
+pub type KVNamespace;
+pub async fn get(this: &KVNamespace, key: &str) -> Result<JsOption<JsString>, JsValue>;
+pub async fn list<Metadata: ::wasm_bindgen::JsGeneric>(
+    this: &KVNamespace,
+) -> Result<KVNamespaceListResult<Metadata>, JsValue>;
+pub fn typed(this: &Env) -> KVNamespace;
+```
+
+Method-level parameters follow the same rule
+(`tag<Level extends "info" | "warn">(level: Level)` → `level: &str`).
+
 ### Primitive union arguments
 
 In per-monomorphization mode, primitive union arguments expand per member

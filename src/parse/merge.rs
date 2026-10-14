@@ -140,8 +140,9 @@ pub fn extract_var_members(
                     None => (None, crate::parse::docs::JsDocInfo::default()),
                 };
                 let name = to_snake_case(&js_name);
-                let type_params = convert_type_params(method.type_parameters.as_ref(), ctx.diag);
-                let body_scope = create_body_scope(&type_params, parent_scope, ctx);
+                let mut type_params =
+                    convert_type_params(method.type_parameters.as_ref(), ctx.diag);
+                let body_scope = create_body_scope(&mut type_params, parent_scope, ctx);
                 let params = convert_formal_params_scoped(&method.params, body_scope, ctx);
                 let return_type = method
                     .return_type

@@ -521,12 +521,14 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
 
         let type_params = convert_type_params(alias.type_parameters.as_ref(), self.diag);
         // The alias's body scope holds its own type parameters so the
-        // target type can resolve them lexically.
-        let body_scope = crate::parse::members::create_body_scope(
-            &type_params,
-            dcx.scope,
-            &mut self.parse_ctx(),
-        );
+        // target type can resolve them lexically. They stay live even when
+        // constrained to a primitive: evaluation instantiates the alias at
+        // its arguments (`{ [P in K]: boolean }` at `K = "x" | "y"`), which
+        // erasing `K` to `string` would lose.
+        let body_scope = self.scopes.create_child(dcx.scope);
+        for tp in &type_params {
+            self.scopes.insert_type_param(body_scope, tp.name.clone());
+        }
         let target =
             convert_ts_type_scoped(&alias.type_annotation, body_scope, &mut self.parse_ctx());
         declarations.push(dcx.decl(
@@ -787,9 +789,9 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                 _ => return Vec::new(),
             };
             let mut pcx = self.parse_ctx();
-            let type_params = convert_type_params(sig.type_parameters.as_ref(), pcx.diag);
+            let mut type_params = convert_type_params(sig.type_parameters.as_ref(), pcx.diag);
             let body_scope =
-                crate::parse::members::create_body_scope(&type_params, scope, &mut pcx);
+                crate::parse::members::create_body_scope(&mut type_params, scope, &mut pcx);
             let params = crate::parse::types::convert_formal_params_scoped(
                 &sig.params,
                 body_scope,

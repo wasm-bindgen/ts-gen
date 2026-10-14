@@ -972,6 +972,7 @@ impl<'a> CodegenContext<'a> {
                 .target
                 .as_ident()
                 .and_then(|name| alias.type_params.iter().position(|tp| tp.name == name));
+            let generic_args = self.live_generic_args(id, generic_args);
             match param {
                 Some(i) => match (generic_args.get(i), &alias.type_params[i].default) {
                     (Some(arg), _) => ty = std::borrow::Cow::Owned(arg.clone()),
@@ -1025,6 +1026,33 @@ impl<'a> CodegenContext<'a> {
             }
         }
         Some((target, alias.body_scope))
+    }
+
+    /// `generic_args` of a reference to `type_id` with the arguments for
+    /// erased type parameters removed, so they line up with the
+    /// declaration's remaining parameters.
+    pub(crate) fn live_generic_args(
+        &self,
+        type_id: TypeId,
+        generic_args: &[ir::TypeRef],
+    ) -> Vec<ir::TypeRef> {
+        let body_scope = match &self.gctx.get_type(type_id).kind {
+            TypeKind::Class(c) => c.body_scope,
+            TypeKind::Interface(i) => i.body_scope,
+            TypeKind::DiscriminatedUnion(d) => d.body_scope,
+            TypeKind::TypeAlias(a) => a.body_scope,
+            _ => return generic_args.to_vec(),
+        };
+        let erased = self.gctx.scopes.erased_positions(body_scope);
+        if erased.is_empty() {
+            return generic_args.to_vec();
+        }
+        generic_args
+            .iter()
+            .enumerate()
+            .filter(|(i, _)| !erased.contains(i))
+            .map(|(_, a)| a.clone())
+            .collect()
     }
 
     /// Emit an error diagnostic during code generation.
@@ -2013,9 +2041,15 @@ fn with_generic_args(
         }
         return base;
     }
-    let generic_args = match ctx.and_then(|c| c.alias_args(name, scope, generic_args)) {
+    let live_args = ctx
+        .and_then(|c| {
+            let id = c.gctx.resolve_path(scope, name)?;
+            Some(c.live_generic_args(id, generic_args))
+        })
+        .unwrap_or_else(|| generic_args.to_vec());
+    let generic_args = match ctx.and_then(|c| c.alias_args(name, scope, &live_args)) {
         Some(args) => args,
-        None => generic_args.to_vec(),
+        None => live_args,
     };
     if generic_args.is_empty() {
         return base;

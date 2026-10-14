@@ -806,6 +806,31 @@ pub struct TypeParam {
     pub default: Option<TypeRef>,
 }
 
+impl TypeParam {
+    /// A parameter constrained to a primitive (`Key extends string`, or a
+    /// union of literals of one primitive) can only be instantiated with
+    /// subtypes that share the primitive's ABI, so it has no useful Rust
+    /// generic form and reads as the primitive itself.
+    pub fn erasure(&self) -> Option<crate::parse::scope::Erasure> {
+        use crate::parse::scope::Erasure;
+        fn of(ty: &TypeRef) -> Option<Erasure> {
+            match ty {
+                TypeRef::String | TypeRef::StringLiteral(_) => Some(Erasure::String),
+                TypeRef::Number | TypeRef::NumberLiteral(_) => Some(Erasure::Number),
+                TypeRef::Boolean | TypeRef::BooleanLiteral(_) => Some(Erasure::Boolean),
+                TypeRef::BigInt => Some(Erasure::BigInt),
+                TypeRef::Union(items) => {
+                    let mut iter = items.members().iter().map(of);
+                    let first = iter.next()??;
+                    iter.all(|e| e == Some(first)).then_some(first)
+                }
+                _ => None,
+            }
+        }
+        of(self.constraint.as_ref()?)
+    }
+}
+
 // ─── Top-level Module ────────────────────────────────────────────────
 
 /// A parsed module — references types and scopes in the `GlobalContext`.

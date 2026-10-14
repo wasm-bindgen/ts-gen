@@ -16,7 +16,7 @@ use oxc_ast::ast::*;
 
 use crate::ir::TypeRef;
 use crate::parse::ctx::ParseCtx;
-use crate::parse::scope::{ScopeArena, ScopeId};
+use crate::parse::scope::{Binding, ScopeArena, ScopeId};
 use crate::util::diagnostics::DiagnosticCollector;
 use crate::util::naming::to_snake_case;
 
@@ -337,9 +337,15 @@ fn convert_type_reference(
         }
     }
 
-    // The lexical scope is not consulted here — codegen disambiguates
-    // declared types from in-scope generic parameters at emit time.
-    let _ = scope;
+    // Declared types are not resolved here — codegen disambiguates them
+    // from in-scope generic parameters at emit time. Erased type
+    // parameters are the exception: they are bound before their body is
+    // converted and read as their primitive from the IR onwards.
+    if segments.is_empty() && type_args.is_empty() {
+        if let Some(Binding::Erased(erasure)) = scopes.resolve_binding(scope, &head) {
+            return erasure.type_ref();
+        }
+    }
     let mut path = vec![head];
     path.extend(segments);
     TypeRef::Reference {
@@ -406,11 +412,10 @@ fn convert_function_type(
     scopes: &mut ScopeArena,
     diag: &mut DiagnosticCollector,
 ) -> crate::ir::FunctionSig {
-    let inner_scope = if let Some(tp) = &func.type_parameters {
+    let inner_scope = if func.type_parameters.is_some() {
         let child = scopes.create_child(scope);
-        for p in &tp.params {
-            scopes.insert_type_param(child, p.name.name.to_string());
-        }
+        let mut type_params = convert_type_params(func.type_parameters.as_ref(), diag);
+        scopes.bind_type_params(child, &mut type_params);
         child
     } else {
         scope
@@ -569,7 +574,16 @@ pub fn convert_type_params(
                 .iter()
                 .map(|p| crate::ir::TypeParam {
                     name: p.name.to_string(),
-                    constraint: p.constraint.as_ref().map(|c| convert_ts_type(c, diag)),
+                    constraint: p.constraint.as_ref().map(|c| match c {
+                        // `keyof X` is a union of property names; the
+                        // string reading is what every JS API does with it.
+                        TSType::TSTypeOperatorType(op)
+                            if op.operator == TSTypeOperatorOperator::Keyof =>
+                        {
+                            TypeRef::String
+                        }
+                        _ => convert_ts_type(c, diag),
+                    }),
                     default: p.default.as_ref().map(|d| convert_ts_type(d, diag)),
                 })
                 .collect()
