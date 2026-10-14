@@ -2157,8 +2157,8 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
         }
         TypeRef::generic(config.rust_name.clone(), args)
     };
-    // Constructors always return the constructed type, wrapped in Result
-    // when `catch` (which is always-true here per `SignatureKind::Constructor`).
+    // Constructors return the constructed type, wrapped in `Result` when
+    // `catch` (the default; `@throws {never}` opts out).
     // The class is named from its own body, wherever the params resolve.
     let ret = to_return_type(
         &return_type,
