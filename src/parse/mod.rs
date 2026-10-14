@@ -1133,7 +1133,7 @@ fn declaration_name(kind: &crate::ir::TypeKind) -> Option<String> {
 
 /// Merge two member lists, deduplicating by (kind, name).
 /// Members from `incoming` override same-named members in `base`.
-fn merge_members(base: &mut Vec<crate::ir::Member>, incoming: Vec<crate::ir::Member>) {
+pub(crate) fn merge_members(base: &mut Vec<crate::ir::Member>, incoming: Vec<crate::ir::Member>) {
     use std::collections::HashMap;
 
     // Build a map of existing members by key

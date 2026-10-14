@@ -33,6 +33,11 @@ type Range<R = any> = { offset?: number; value: R };
 
 type ReadResult<R = any> = { done: false; value: R } | { done: true; value?: undefined };
 
+type Listing = {
+  objects: string[];
+  truncated: boolean;
+} & ({ truncated: true; cursor: string } | { truncated: false });
+
 // `Pick<V, …> & Omit<V, …>` both read as `V`, which is named once.
 interface Vector {
   id: string;
