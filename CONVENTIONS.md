@@ -893,6 +893,15 @@ EmailAttachment::new_attachment(content: &str, filename: &str, type_: &str)
 EmailAttachment::new_attachment_with_array_buffer(content: &ArrayBuffer, filename: &str, type_: &str)
 ```
 
+A required field whose type is a *single* literal (`certPresented:
+"0"`) offers no choice: the literal is baked into every factory, but
+the field does not contribute to the name — only fields with several
+options do. A dictionary whose required fields are all single literals
+therefore gets a plain `new()`. The branches of a discriminated union
+each pin one literal, but across branches the field is the choice, so
+it still names each branch's factory (`new_inline` / `new_attachment`
+above).
+
 A number literal is baked in as a float literal matching the `f64`
 setter, and names its factory with `.` and a leading `-` spelled out
 (`scale: -1 | 0.5` → `new_neg_1()` setting `-1.0`, `new_0_5()` setting

@@ -12050,13 +12050,13 @@ impl UnderlyingByteSource {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"bytes\"`"]
-    pub fn new_bytes() -> UnderlyingByteSource {
-        Self::builder_bytes().build()
+    pub fn new() -> UnderlyingByteSource {
+        Self::builder().build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"bytes\"`"]
-    pub fn builder_bytes() -> UnderlyingByteSourceBuilder {
+    pub fn builder() -> UnderlyingByteSourceBuilder {
         let inner: UnderlyingByteSource = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("bytes");
         UnderlyingByteSourceBuilder { inner }
@@ -12757,7 +12757,7 @@ impl ReadableStreamGetReaderOptions {
     #[doc = " * `mode: \"byob\"` - Creates a ReadableStreamBYOBReader and locks the stream to the new reader."]
     #[doc = ""]
     #[doc = " This call behaves the same way as the no-argument variant, except that it only works on readable byte streams, i.e. streams which were constructed specifically with the ability to handle \"bring your own buffer\" reading. The returned BYOB reader provides the ability to directly read individual chunks from the stream via its read() method, into developer-supplied buffers, allowing more precise control over allocation."]
-    pub fn new_byob() -> ReadableStreamGetReaderOptions {
+    pub fn new() -> ReadableStreamGetReaderOptions {
         let inner: ReadableStreamGetReaderOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_mode("byob");
         inner
@@ -17785,7 +17785,7 @@ impl AiTextGenerationToolOutput {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    pub fn new_function(
+    pub fn new(
         id: impl ::wasm_bindgen::JsStringLike,
         function: &Object,
     ) -> AiTextGenerationToolOutput {
@@ -19075,43 +19075,43 @@ impl ResponsesFunctionTool {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    pub fn new_function(
+    pub fn new(
         name: impl ::wasm_bindgen::JsStringLike,
         parameters: &Object,
         strict: bool,
     ) -> ResponsesFunctionTool {
-        Self::builder_function(name, parameters, strict).build()
+        Self::builder(name, parameters, strict).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    pub fn new_function_with_strict_null(
+    pub fn new_with_strict_null(
         name: impl ::wasm_bindgen::JsStringLike,
         parameters: &Object,
     ) -> ResponsesFunctionTool {
-        Self::builder_function_with_strict_null(name, parameters).build()
+        Self::builder_with_strict_null(name, parameters).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    pub fn new_function_with_parameters_null(
+    pub fn new_with_parameters_null(
         name: impl ::wasm_bindgen::JsStringLike,
         strict: bool,
     ) -> ResponsesFunctionTool {
-        Self::builder_function_with_parameters_null(name, strict).build()
+        Self::builder_with_parameters_null(name, strict).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    pub fn new_function_with_parameters_null_and_strict_null(
+    pub fn new_with_parameters_null_and_strict_null(
         name: impl ::wasm_bindgen::JsStringLike,
     ) -> ResponsesFunctionTool {
-        Self::builder_function_with_parameters_null_and_strict_null(name).build()
+        Self::builder_with_parameters_null_and_strict_null(name).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    pub fn builder_function(
+    pub fn builder(
         name: impl ::wasm_bindgen::JsStringLike,
         parameters: &Object,
         strict: bool,
@@ -19126,7 +19126,7 @@ impl ResponsesFunctionTool {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    pub fn builder_function_with_strict_null(
+    pub fn builder_with_strict_null(
         name: impl ::wasm_bindgen::JsStringLike,
         parameters: &Object,
     ) -> ResponsesFunctionToolBuilder {
@@ -19140,7 +19140,7 @@ impl ResponsesFunctionTool {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    pub fn builder_function_with_parameters_null(
+    pub fn builder_with_parameters_null(
         name: impl ::wasm_bindgen::JsStringLike,
         strict: bool,
     ) -> ResponsesFunctionToolBuilder {
@@ -19154,7 +19154,7 @@ impl ResponsesFunctionTool {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    pub fn builder_function_with_parameters_null_and_strict_null(
+    pub fn builder_with_parameters_null_and_strict_null(
         name: impl ::wasm_bindgen::JsStringLike,
     ) -> ResponsesFunctionToolBuilder {
         let inner: ResponsesFunctionTool = JsCast::unchecked_into(js_sys::Object::new());
@@ -19384,9 +19384,7 @@ impl ResponseContentReasoningText {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"reasoning_text\"`"]
-    pub fn new_reasoning_text(
-        text: impl ::wasm_bindgen::JsStringLike,
-    ) -> ResponseContentReasoningText {
+    pub fn new(text: impl ::wasm_bindgen::JsStringLike) -> ResponseContentReasoningText {
         let inner: ResponseContentReasoningText = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("reasoning_text");
@@ -19436,7 +19434,7 @@ impl ResponseCreatedEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.created\"`"]
-    pub fn new_responsecreated(response: &Response, sequence_number: f64) -> ResponseCreatedEvent {
+    pub fn new(response: &Response, sequence_number: f64) -> ResponseCreatedEvent {
         let inner: ResponseCreatedEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
         inner.set_sequence_number(sequence_number);
@@ -19478,25 +19476,25 @@ impl ResponseCustomToolCallOutput {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
-    pub fn new_custom_tool_call_output(
+    pub fn new(
         call_id: impl ::wasm_bindgen::JsStringLike,
         output: impl ::wasm_bindgen::JsStringLike,
     ) -> ResponseCustomToolCallOutput {
-        Self::builder_custom_tool_call_output(call_id, output).build()
+        Self::builder(call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
-    pub fn new_custom_tool_call_output_with_slice(
+    pub fn new_with_slice(
         call_id: impl ::wasm_bindgen::JsStringLike,
         output: &[JsValue],
     ) -> ResponseCustomToolCallOutput {
-        Self::builder_custom_tool_call_output_with_slice(call_id, output).build()
+        Self::builder_with_slice(call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
-    pub fn builder_custom_tool_call_output(
+    pub fn builder(
         call_id: impl ::wasm_bindgen::JsStringLike,
         output: impl ::wasm_bindgen::JsStringLike,
     ) -> ResponseCustomToolCallOutputBuilder {
@@ -19509,7 +19507,7 @@ impl ResponseCustomToolCallOutput {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
-    pub fn builder_custom_tool_call_output_with_slice(
+    pub fn builder_with_slice(
         call_id: impl ::wasm_bindgen::JsStringLike,
         output: &[JsValue],
     ) -> ResponseCustomToolCallOutputBuilder {
@@ -19609,7 +19607,7 @@ impl ResponseErrorEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"error\"`"]
-    pub fn new_error(
+    pub fn new(
         code: impl ::wasm_bindgen::JsStringLike,
         message: impl ::wasm_bindgen::JsStringLike,
         param: impl ::wasm_bindgen::JsStringLike,
@@ -19626,7 +19624,7 @@ impl ResponseErrorEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"error\"`"]
-    pub fn new_error_with_param_null(
+    pub fn new_with_param_null(
         code: impl ::wasm_bindgen::JsStringLike,
         message: impl ::wasm_bindgen::JsStringLike,
         sequence_number: f64,
@@ -19642,7 +19640,7 @@ impl ResponseErrorEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"error\"`"]
-    pub fn new_error_with_code_null(
+    pub fn new_with_code_null(
         message: impl ::wasm_bindgen::JsStringLike,
         param: impl ::wasm_bindgen::JsStringLike,
         sequence_number: f64,
@@ -19658,7 +19656,7 @@ impl ResponseErrorEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"error\"`"]
-    pub fn new_error_with_code_null_and_param_null(
+    pub fn new_with_code_null_and_param_null(
         message: impl ::wasm_bindgen::JsStringLike,
         sequence_number: f64,
     ) -> ResponseErrorEvent {
@@ -19695,7 +19693,7 @@ impl ResponseFailedEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.failed\"`"]
-    pub fn new_responsefailed(response: &Response, sequence_number: f64) -> ResponseFailedEvent {
+    pub fn new(response: &Response, sequence_number: f64) -> ResponseFailedEvent {
         let inner: ResponseFailedEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
         inner.set_sequence_number(sequence_number);
@@ -19719,7 +19717,7 @@ impl ResponseFormatText {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"text\"`"]
-    pub fn new_text() -> ResponseFormatText {
+    pub fn new() -> ResponseFormatText {
         let inner: ResponseFormatText = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("text");
         inner
@@ -19741,7 +19739,7 @@ impl ResponseFormatJSONObject {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"json_object\"`"]
-    pub fn new_json_object() -> ResponseFormatJSONObject {
+    pub fn new() -> ResponseFormatJSONObject {
         let inner: ResponseFormatJSONObject = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("json_object");
         inner
@@ -19804,16 +19802,16 @@ impl ResponseFormatTextJSONSchemaConfig {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"json_schema\"`"]
-    pub fn new_json_schema(
+    pub fn new(
         name: impl ::wasm_bindgen::JsStringLike,
         schema: &Object,
     ) -> ResponseFormatTextJSONSchemaConfig {
-        Self::builder_json_schema(name, schema).build()
+        Self::builder(name, schema).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"json_schema\"`"]
-    pub fn builder_json_schema(
+    pub fn builder(
         name: impl ::wasm_bindgen::JsStringLike,
         schema: &Object,
     ) -> ResponseFormatTextJSONSchemaConfigBuilder {
@@ -19890,7 +19888,7 @@ impl ResponseFunctionCallArgumentsDeltaEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.function_call_arguments.delta\"`"]
-    pub fn new_responsefunction_call_argumentsdelta(
+    pub fn new(
         delta: impl ::wasm_bindgen::JsStringLike,
         item_id: impl ::wasm_bindgen::JsStringLike,
         output_index: f64,
@@ -19960,7 +19958,7 @@ impl ResponseFunctionCallArgumentsDoneEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.function_call_arguments.done\"`"]
-    pub fn new_responsefunction_call_argumentsdone(
+    pub fn new(
         arguments: impl ::wasm_bindgen::JsStringLike,
         item_id: impl ::wasm_bindgen::JsStringLike,
         name: impl ::wasm_bindgen::JsStringLike,
@@ -20026,17 +20024,17 @@ impl ResponseFunctionToolCall {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call\"`"]
-    pub fn new_function_call(
+    pub fn new(
         arguments: impl ::wasm_bindgen::JsStringLike,
         call_id: impl ::wasm_bindgen::JsStringLike,
         name: impl ::wasm_bindgen::JsStringLike,
     ) -> ResponseFunctionToolCall {
-        Self::builder_function_call(arguments, call_id, name).build()
+        Self::builder(arguments, call_id, name).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call\"`"]
-    pub fn builder_function_call(
+    pub fn builder(
         arguments: impl ::wasm_bindgen::JsStringLike,
         call_id: impl ::wasm_bindgen::JsStringLike,
         name: impl ::wasm_bindgen::JsStringLike,
@@ -20081,18 +20079,18 @@ impl ResponseFunctionToolCallItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call\"`"]
-    pub fn new_function_call(
+    pub fn new(
         arguments: impl ::wasm_bindgen::JsStringLike,
         call_id: impl ::wasm_bindgen::JsStringLike,
         name: impl ::wasm_bindgen::JsStringLike,
         id: impl ::wasm_bindgen::JsStringLike,
     ) -> ResponseFunctionToolCallItem {
-        Self::builder_function_call(arguments, call_id, name, id).build()
+        Self::builder(arguments, call_id, name, id).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call\"`"]
-    pub fn builder_function_call(
+    pub fn builder(
         arguments: impl ::wasm_bindgen::JsStringLike,
         call_id: impl ::wasm_bindgen::JsStringLike,
         name: impl ::wasm_bindgen::JsStringLike,
@@ -20169,27 +20167,27 @@ impl ResponseFunctionToolCallOutputItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn new_function_call_output(
+    pub fn new(
         id: impl ::wasm_bindgen::JsStringLike,
         call_id: impl ::wasm_bindgen::JsStringLike,
         output: impl ::wasm_bindgen::JsStringLike,
     ) -> ResponseFunctionToolCallOutputItem {
-        Self::builder_function_call_output(id, call_id, output).build()
+        Self::builder(id, call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn new_function_call_output_with_slice(
+    pub fn new_with_slice(
         id: impl ::wasm_bindgen::JsStringLike,
         call_id: impl ::wasm_bindgen::JsStringLike,
         output: &[JsValue],
     ) -> ResponseFunctionToolCallOutputItem {
-        Self::builder_function_call_output_with_slice(id, call_id, output).build()
+        Self::builder_with_slice(id, call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn builder_function_call_output(
+    pub fn builder(
         id: impl ::wasm_bindgen::JsStringLike,
         call_id: impl ::wasm_bindgen::JsStringLike,
         output: impl ::wasm_bindgen::JsStringLike,
@@ -20205,7 +20203,7 @@ impl ResponseFunctionToolCallOutputItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn builder_function_call_output_with_slice(
+    pub fn builder_with_slice(
         id: impl ::wasm_bindgen::JsStringLike,
         call_id: impl ::wasm_bindgen::JsStringLike,
         output: &[JsValue],
@@ -20261,10 +20259,7 @@ impl ResponseIncompleteEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.incomplete\"`"]
-    pub fn new_responseincomplete(
-        response: &Response,
-        sequence_number: f64,
-    ) -> ResponseIncompleteEvent {
+    pub fn new(response: &Response, sequence_number: f64) -> ResponseIncompleteEvent {
         let inner: ResponseIncompleteEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
         inner.set_sequence_number(sequence_number);
@@ -20312,28 +20307,28 @@ impl ResponseInputImage {
     #[doc = ""]
     #[doc = " * `detail: \"low\"`"]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn new_low_input_image() -> ResponseInputImage {
-        Self::builder_low_input_image().build()
+    pub fn new_low() -> ResponseInputImage {
+        Self::builder_low().build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `detail: \"high\"`"]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn new_high_input_image() -> ResponseInputImage {
-        Self::builder_high_input_image().build()
+    pub fn new_high() -> ResponseInputImage {
+        Self::builder_high().build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `detail: \"auto\"`"]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn new_auto_input_image() -> ResponseInputImage {
-        Self::builder_auto_input_image().build()
+    pub fn new_auto() -> ResponseInputImage {
+        Self::builder_auto().build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `detail: \"low\"`"]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn builder_low_input_image() -> ResponseInputImageBuilder {
+    pub fn builder_low() -> ResponseInputImageBuilder {
         let inner: ResponseInputImage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_detail(DetailKind::Low);
         inner.set_type("input_image");
@@ -20343,7 +20338,7 @@ impl ResponseInputImage {
     #[doc = ""]
     #[doc = " * `detail: \"high\"`"]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn builder_high_input_image() -> ResponseInputImageBuilder {
+    pub fn builder_high() -> ResponseInputImageBuilder {
         let inner: ResponseInputImage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_detail(DetailKind::High);
         inner.set_type("input_image");
@@ -20353,7 +20348,7 @@ impl ResponseInputImage {
     #[doc = ""]
     #[doc = " * `detail: \"auto\"`"]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn builder_auto_input_image() -> ResponseInputImageBuilder {
+    pub fn builder_auto() -> ResponseInputImageBuilder {
         let inner: ResponseInputImage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_detail(DetailKind::Auto);
         inner.set_type("input_image");
@@ -20416,13 +20411,13 @@ impl ResponseInputImageContent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn new_input_image() -> ResponseInputImageContent {
-        Self::builder_input_image().build()
+    pub fn new() -> ResponseInputImageContent {
+        Self::builder().build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn builder_input_image() -> ResponseInputImageContentBuilder {
+    pub fn builder() -> ResponseInputImageContentBuilder {
         let inner: ResponseInputImageContent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("input_image");
         ResponseInputImageContentBuilder { inner }
@@ -20524,25 +20519,25 @@ impl ResponseInputItemFunctionCallOutput {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn new_function_call_output(
+    pub fn new(
         call_id: impl ::wasm_bindgen::JsStringLike,
         output: impl ::wasm_bindgen::JsStringLike,
     ) -> ResponseInputItemFunctionCallOutput {
-        Self::builder_function_call_output(call_id, output).build()
+        Self::builder(call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn new_function_call_output_with_slice(
+    pub fn new_with_slice(
         call_id: impl ::wasm_bindgen::JsStringLike,
         output: &[JsValue],
     ) -> ResponseInputItemFunctionCallOutput {
-        Self::builder_function_call_output_with_slice(call_id, output).build()
+        Self::builder_with_slice(call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn builder_function_call_output(
+    pub fn builder(
         call_id: impl ::wasm_bindgen::JsStringLike,
         output: impl ::wasm_bindgen::JsStringLike,
     ) -> ResponseInputItemFunctionCallOutputBuilder {
@@ -20556,7 +20551,7 @@ impl ResponseInputItemFunctionCallOutput {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn builder_function_call_output_with_slice(
+    pub fn builder_with_slice(
         call_id: impl ::wasm_bindgen::JsStringLike,
         output: &[JsValue],
     ) -> ResponseInputItemFunctionCallOutputBuilder {
@@ -20817,7 +20812,7 @@ impl ResponseInputText {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"input_text\"`"]
-    pub fn new_input_text(text: impl ::wasm_bindgen::JsStringLike) -> ResponseInputText {
+    pub fn new(text: impl ::wasm_bindgen::JsStringLike) -> ResponseInputText {
         let inner: ResponseInputText = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("input_text");
@@ -20846,7 +20841,7 @@ impl ResponseInputTextContent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"input_text\"`"]
-    pub fn new_input_text(text: impl ::wasm_bindgen::JsStringLike) -> ResponseInputTextContent {
+    pub fn new(text: impl ::wasm_bindgen::JsStringLike) -> ResponseInputTextContent {
         let inner: ResponseInputTextContent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("input_text");
@@ -20895,7 +20890,7 @@ impl ResponseOutputItemAddedEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.added\"`"]
-    pub fn new_responseoutput_itemadded(
+    pub fn new(
         item: &ResponseOutputMessage,
         output_index: f64,
         sequence_number: f64,
@@ -20910,7 +20905,7 @@ impl ResponseOutputItemAddedEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.added\"`"]
-    pub fn new_responseoutput_itemadded_with_response_function_tool_call(
+    pub fn new_with_response_function_tool_call(
         item: &ResponseFunctionToolCall,
         output_index: f64,
         sequence_number: f64,
@@ -20925,7 +20920,7 @@ impl ResponseOutputItemAddedEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.added\"`"]
-    pub fn new_responseoutput_itemadded_with_response_reasoning_item(
+    pub fn new_with_response_reasoning_item(
         item: &ResponseReasoningItem,
         output_index: f64,
         sequence_number: f64,
@@ -20976,7 +20971,7 @@ impl ResponseOutputItemDoneEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.done\"`"]
-    pub fn new_responseoutput_itemdone(
+    pub fn new(
         item: &ResponseOutputMessage,
         output_index: f64,
         sequence_number: f64,
@@ -20991,7 +20986,7 @@ impl ResponseOutputItemDoneEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.done\"`"]
-    pub fn new_responseoutput_itemdone_with_response_function_tool_call(
+    pub fn new_with_response_function_tool_call(
         item: &ResponseFunctionToolCall,
         output_index: f64,
         sequence_number: f64,
@@ -21006,7 +21001,7 @@ impl ResponseOutputItemDoneEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.done\"`"]
-    pub fn new_responseoutput_itemdone_with_response_reasoning_item(
+    pub fn new_with_response_reasoning_item(
         item: &ResponseReasoningItem,
         output_index: f64,
         sequence_number: f64,
@@ -21057,7 +21052,7 @@ impl ResponseOutputMessage {
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"in_progress\"`"]
     #[doc = " * `type: \"message\"`"]
-    pub fn new_assistant_in_progress_message(
+    pub fn new_in_progress(
         id: impl ::wasm_bindgen::JsStringLike,
         content: &[JsValue],
     ) -> ResponseOutputMessage {
@@ -21074,7 +21069,7 @@ impl ResponseOutputMessage {
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"completed\"`"]
     #[doc = " * `type: \"message\"`"]
-    pub fn new_assistant_completed_message(
+    pub fn new_completed(
         id: impl ::wasm_bindgen::JsStringLike,
         content: &[JsValue],
     ) -> ResponseOutputMessage {
@@ -21091,7 +21086,7 @@ impl ResponseOutputMessage {
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"incomplete\"`"]
     #[doc = " * `type: \"message\"`"]
-    pub fn new_assistant_incomplete_message(
+    pub fn new_incomplete(
         id: impl ::wasm_bindgen::JsStringLike,
         content: &[JsValue],
     ) -> ResponseOutputMessage {
@@ -21126,7 +21121,7 @@ impl ResponseOutputRefusal {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"refusal\"`"]
-    pub fn new_refusal(refusal: impl ::wasm_bindgen::JsStringLike) -> ResponseOutputRefusal {
+    pub fn new(refusal: impl ::wasm_bindgen::JsStringLike) -> ResponseOutputRefusal {
         let inner: ResponseOutputRefusal = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_refusal(refusal);
         inner.set_type("refusal");
@@ -21159,15 +21154,13 @@ impl ResponseOutputText {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"output_text\"`"]
-    pub fn new_output_text(text: impl ::wasm_bindgen::JsStringLike) -> ResponseOutputText {
-        Self::builder_output_text(text).build()
+    pub fn new(text: impl ::wasm_bindgen::JsStringLike) -> ResponseOutputText {
+        Self::builder(text).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"output_text\"`"]
-    pub fn builder_output_text(
-        text: impl ::wasm_bindgen::JsStringLike,
-    ) -> ResponseOutputTextBuilder {
+    pub fn builder(text: impl ::wasm_bindgen::JsStringLike) -> ResponseOutputTextBuilder {
         let inner: ResponseOutputText = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("output_text");
@@ -21239,16 +21232,16 @@ impl ResponseReasoningItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"reasoning\"`"]
-    pub fn new_reasoning(
+    pub fn new(
         id: impl ::wasm_bindgen::JsStringLike,
         summary: &[ResponseReasoningSummaryItem],
     ) -> ResponseReasoningItem {
-        Self::builder_reasoning(id, summary).build()
+        Self::builder(id, summary).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"reasoning\"`"]
-    pub fn builder_reasoning(
+    pub fn builder(
         id: impl ::wasm_bindgen::JsStringLike,
         summary: &[ResponseReasoningSummaryItem],
     ) -> ResponseReasoningItemBuilder {
@@ -21305,9 +21298,7 @@ impl ResponseReasoningSummaryItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"summary_text\"`"]
-    pub fn new_summary_text(
-        text: impl ::wasm_bindgen::JsStringLike,
-    ) -> ResponseReasoningSummaryItem {
+    pub fn new(text: impl ::wasm_bindgen::JsStringLike) -> ResponseReasoningSummaryItem {
         let inner: ResponseReasoningSummaryItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("summary_text");
@@ -21336,9 +21327,7 @@ impl ResponseReasoningContentItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"reasoning_text\"`"]
-    pub fn new_reasoning_text(
-        text: impl ::wasm_bindgen::JsStringLike,
-    ) -> ResponseReasoningContentItem {
+    pub fn new(text: impl ::wasm_bindgen::JsStringLike) -> ResponseReasoningContentItem {
         let inner: ResponseReasoningContentItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("reasoning_text");
@@ -21391,7 +21380,7 @@ impl ResponseReasoningTextDeltaEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.reasoning_text.delta\"`"]
-    pub fn new_responsereasoning_textdelta(
+    pub fn new(
         content_index: f64,
         delta: impl ::wasm_bindgen::JsStringLike,
         item_id: impl ::wasm_bindgen::JsStringLike,
@@ -21451,7 +21440,7 @@ impl ResponseReasoningTextDoneEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.reasoning_text.done\"`"]
-    pub fn new_responsereasoning_textdone(
+    pub fn new(
         content_index: f64,
         item_id: impl ::wasm_bindgen::JsStringLike,
         output_index: f64,
@@ -21508,7 +21497,7 @@ impl ResponseRefusalDeltaEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.refusal.delta\"`"]
-    pub fn new_responserefusaldelta(
+    pub fn new(
         content_index: f64,
         delta: impl ::wasm_bindgen::JsStringLike,
         item_id: impl ::wasm_bindgen::JsStringLike,
@@ -21565,7 +21554,7 @@ impl ResponseRefusalDoneEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.refusal.done\"`"]
-    pub fn new_responserefusaldone(
+    pub fn new(
         content_index: f64,
         item_id: impl ::wasm_bindgen::JsStringLike,
         output_index: f64,
@@ -21618,10 +21607,7 @@ impl ResponseCompletedEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.completed\"`"]
-    pub fn new_responsecompleted(
-        response: &Response,
-        sequence_number: f64,
-    ) -> ResponseCompletedEvent {
+    pub fn new(response: &Response, sequence_number: f64) -> ResponseCompletedEvent {
         let inner: ResponseCompletedEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
         inner.set_sequence_number(sequence_number);
@@ -21746,7 +21732,7 @@ impl ResponseTextDeltaEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_text.delta\"`"]
-    pub fn new_responseoutput_textdelta(
+    pub fn new(
         content_index: f64,
         delta: impl ::wasm_bindgen::JsStringLike,
         item_id: impl ::wasm_bindgen::JsStringLike,
@@ -21809,7 +21795,7 @@ impl ResponseTextDoneEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_text.done\"`"]
-    pub fn new_responseoutput_textdone(
+    pub fn new(
         content_index: f64,
         item_id: impl ::wasm_bindgen::JsStringLike,
         logprobs: &[Logprob],
@@ -21964,7 +21950,7 @@ impl ToolChoiceFunction {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    pub fn new_function(name: impl ::wasm_bindgen::JsStringLike) -> ToolChoiceFunction {
+    pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> ToolChoiceFunction {
         let inner: ToolChoiceFunction = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         inner.set_type("function");
@@ -31294,17 +31280,15 @@ impl Ai_Cf_Deepgram_Flux_Input {
     #[doc = " * `encoding: \"linear16\"` - Encoding of the audio stream. Currently only supports raw signed little-endian 16-bit PCM."]
     #[doc = ""]
     #[doc = " * `sample_rate` - Sample rate of the audio stream in Hz."]
-    pub fn new_linear16(
-        sample_rate: impl ::wasm_bindgen::JsStringLike,
-    ) -> Ai_Cf_Deepgram_Flux_Input {
-        Self::builder_linear16(sample_rate).build()
+    pub fn new(sample_rate: impl ::wasm_bindgen::JsStringLike) -> Ai_Cf_Deepgram_Flux_Input {
+        Self::builder(sample_rate).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `encoding: \"linear16\"` - Encoding of the audio stream. Currently only supports raw signed little-endian 16-bit PCM."]
     #[doc = ""]
     #[doc = " * `sample_rate` - Sample rate of the audio stream in Hz."]
-    pub fn builder_linear16(
+    pub fn builder(
         sample_rate: impl ::wasm_bindgen::JsStringLike,
     ) -> Ai_Cf_Deepgram_Flux_InputBuilder {
         let inner: Ai_Cf_Deepgram_Flux_Input = JsCast::unchecked_into(js_sys::Object::new());
@@ -34176,13 +34160,13 @@ impl AutoRagAiSearchRequestStreaming {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `stream: true`"]
-    pub fn new_true(query: impl ::wasm_bindgen::JsStringLike) -> AutoRagAiSearchRequestStreaming {
-        Self::builder_true(query).build()
+    pub fn new(query: impl ::wasm_bindgen::JsStringLike) -> AutoRagAiSearchRequestStreaming {
+        Self::builder(query).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `stream: true`"]
-    pub fn builder_true(
+    pub fn builder(
         query: impl ::wasm_bindgen::JsStringLike,
     ) -> AutoRagAiSearchRequestStreamingBuilder {
         let inner: AutoRagAiSearchRequestStreaming = JsCast::unchecked_into(js_sys::Object::new());
@@ -34270,7 +34254,7 @@ impl AutoRagSearchResponse {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `object: \"vector_store.search_results.page\"`"]
-    pub fn new_vector_storesearch_resultspage(
+    pub fn new(
         search_query: impl ::wasm_bindgen::JsStringLike,
         data: &[Object],
         has_more: bool,
@@ -34287,7 +34271,7 @@ impl AutoRagSearchResponse {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `object: \"vector_store.search_results.page\"`"]
-    pub fn new_vector_storesearch_resultspage_with_null(
+    pub fn new_with_null(
         search_query: impl ::wasm_bindgen::JsStringLike,
         data: &[Object],
         has_more: bool,
@@ -34319,7 +34303,7 @@ impl AutoRagAiSearchResponse {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `object: \"vector_store.search_results.page\"`"]
-    pub fn new_vector_storesearch_resultspage(
+    pub fn new(
         search_query: impl ::wasm_bindgen::JsStringLike,
         data: &[Object],
         has_more: bool,
@@ -34338,7 +34322,7 @@ impl AutoRagAiSearchResponse {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `object: \"vector_store.search_results.page\"`"]
-    pub fn new_vector_storesearch_resultspage_with_null(
+    pub fn new_with_null(
         search_query: impl ::wasm_bindgen::JsStringLike,
         data: &[Object],
         has_more: bool,
@@ -39080,7 +39064,7 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
     #[doc = " * `cert_not_after` - The effective expiration date of the certificate"]
     #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
-    pub fn new_1_1(
+    pub fn new_1(
         cert_verified: ExcludeCertVerificationStatusNone,
         cert_issuer_dn: impl ::wasm_bindgen::JsStringLike,
         cert_subject_dn: impl ::wasm_bindgen::JsStringLike,
@@ -39167,7 +39151,7 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
     #[doc = " * `cert_not_after` - The effective expiration date of the certificate"]
     #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
-    pub fn new_1_0(
+    pub fn new_0(
         cert_verified: ExcludeCertVerificationStatusNone,
         cert_issuer_dn: impl ::wasm_bindgen::JsStringLike,
         cert_subject_dn: impl ::wasm_bindgen::JsStringLike,
@@ -39432,7 +39416,7 @@ impl IncomingRequestCfPropertiesTLSClientAuthPlaceholder {
     #[doc = " * `certFingerprintSHA256: \"\"`"]
     #[doc = " * `certNotBefore: \"\"`"]
     #[doc = " * `certNotAfter: \"\"`"]
-    pub fn new_0_none_0______________() -> IncomingRequestCfPropertiesTLSClientAuthPlaceholder {
+    pub fn new() -> IncomingRequestCfPropertiesTLSClientAuthPlaceholder {
         let inner: IncomingRequestCfPropertiesTLSClientAuthPlaceholder =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cert_presented("0");
@@ -39890,13 +39874,13 @@ impl D1Response {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `success: true`"]
-    pub fn new_true(meta: &JsValue) -> D1Response {
-        Self::builder_true(meta).build()
+    pub fn new(meta: &JsValue) -> D1Response {
+        Self::builder(meta).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `success: true`"]
-    pub fn builder_true(meta: &JsValue) -> D1ResponseBuilder {
+    pub fn builder(meta: &JsValue) -> D1ResponseBuilder {
         let inner: D1Response = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_success(true);
         inner.set_meta(meta);
@@ -39933,13 +39917,13 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> D1Result<T> {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `success: true`"]
-    pub fn new_true(meta: &JsValue, results: &[T]) -> D1Result<T> {
-        Self::builder_true(meta, results).build()
+    pub fn new(meta: &JsValue, results: &[T]) -> D1Result<T> {
+        Self::builder(meta, results).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `success: true`"]
-    pub fn builder_true(meta: &JsValue, results: &[T]) -> D1ResultBuilder<T> {
+    pub fn builder(meta: &JsValue, results: &[T]) -> D1ResultBuilder<T> {
         let inner: D1Result<T> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_success(true);
         inner.set_meta(meta);
@@ -40173,7 +40157,7 @@ impl D1PreparedStatementOptions {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `columnNames: true`"]
-    pub fn new_true() -> D1PreparedStatementOptions {
+    pub fn new() -> D1PreparedStatementOptions {
         let inner: D1PreparedStatementOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_column_names(true);
         inner
