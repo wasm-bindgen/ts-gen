@@ -31,5 +31,5 @@ interface NoErasure {
   readonly name: string;
 }
 
-/** Async function with an inner-erased Promise — no enum synthesis. */
+/** The awaited value is a top-level return: the enum is synthesised. */
 declare function fetchValue(): Promise<32 | "foo">;

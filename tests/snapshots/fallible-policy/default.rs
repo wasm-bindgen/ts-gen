@@ -38,7 +38,7 @@ extern "C" {
     pub fn has(this: &Headers, name: &str) -> bool;
     #[doc = " Async — unchanged: already a single `Result` form."]
     #[wasm_bindgen(method, catch)]
-    pub async fn text(this: &Headers) -> Result<JsString, crate::Error>;
+    pub async fn text(this: &Headers) -> Result<String, crate::Error>;
     #[doc = " Async — unchanged: already a single `Result` form."]
     #[wasm_bindgen(method, js_name = "text")]
     pub fn text_promise(this: &Headers) -> Promise<JsString>;

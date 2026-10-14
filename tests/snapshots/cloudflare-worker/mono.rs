@@ -477,7 +477,7 @@ extern "C" {
         controller: &ScheduledController,
         env: E,
         ctx: &ExecutionContext,
-    ) -> Result<Undefined, JsValue>
+    ) -> Result<(), JsValue>
     where
         E: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "scheduled")]

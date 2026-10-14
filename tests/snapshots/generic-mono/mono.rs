@@ -271,7 +271,9 @@ extern "C" {
         default_value: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise<Pair<String, String>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getStringArray")]
-    pub async fn get_string_array(this: &Flags) -> Result<Array<JsString>, JsValue>;
+    pub async fn get_string_array(this: &Flags) -> Result<Vec<String>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "getStringArray")]
+    pub async fn get_string_array_js_string(this: &Flags) -> Result<Array<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getStringArray")]
     pub fn get_string_array_promise(this: &Flags) -> Result<Promise<Array<JsString>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getStringMap")]

@@ -156,7 +156,7 @@ extern "C" {
 extern "C" {
     #[doc = " `lookup`, resolved asynchronously."]
     #[wasm_bindgen(catch, js_name = "lookupAsync")]
-    pub async fn lookup_async(key: &str) -> Result<Option<Nullable<JsString>>, JsValue>;
+    pub async fn lookup_async(key: &str) -> Result<Option<Nullable<String>>, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable")]
 extern "C" {

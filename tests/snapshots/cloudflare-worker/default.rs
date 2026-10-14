@@ -103,7 +103,7 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "arrayBuffer")]
     pub fn array_buffer_promise(this: &Request) -> Promise<ArrayBuffer>;
     #[wasm_bindgen(method, catch)]
-    pub async fn text(this: &Request) -> Result<JsString, JsValue>;
+    pub async fn text(this: &Request) -> Result<String, JsValue>;
     #[wasm_bindgen(method, js_name = "text")]
     pub fn text_promise(this: &Request) -> Promise<JsString>;
     #[wasm_bindgen(method, catch)]
@@ -329,7 +329,7 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "arrayBuffer")]
     pub fn array_buffer_promise(this: &Response) -> Promise<ArrayBuffer>;
     #[wasm_bindgen(method, catch)]
-    pub async fn text(this: &Response) -> Result<JsString, JsValue>;
+    pub async fn text(this: &Response) -> Result<String, JsValue>;
     #[wasm_bindgen(method, js_name = "text")]
     pub fn text_promise(this: &Response) -> Promise<JsString>;
     #[wasm_bindgen(method, catch, js_name = "json")]
@@ -458,7 +458,7 @@ extern "C" {
         controller: &ScheduledController,
         env: &E,
         ctx: &ExecutionContext,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "scheduled")]
     pub fn scheduled_promise<E: ::wasm_bindgen::JsGeneric>(
         this: &ExportedHandler<E>,

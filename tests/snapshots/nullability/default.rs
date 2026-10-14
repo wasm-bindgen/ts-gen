@@ -1425,7 +1425,7 @@ extern "C" {
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchOptional")]
-    pub async fn fetch_optional() -> Result<Option<Number>, JsValue>;
+    pub async fn fetch_optional() -> Result<Option<f64>, JsValue>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
@@ -1435,7 +1435,7 @@ extern "C" {
 #[wasm_bindgen(module = "nullability")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchBoth")]
-    pub async fn fetch_both() -> Result<Option<Nullable<JsString>>, JsValue>;
+    pub async fn fetch_both() -> Result<Option<Nullable<String>>, JsValue>;
 }
 #[wasm_bindgen(module = "nullability")]
 extern "C" {

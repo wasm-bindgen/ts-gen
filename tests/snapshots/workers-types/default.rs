@@ -2999,7 +2999,7 @@ extern "C" {
         this: &DurableObjectTransaction,
         key: &str,
         value: &T,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectTransaction,
@@ -3012,7 +3012,7 @@ extern "C" {
         key: &str,
         value: &T,
         options: &DurableObjectPutOptions,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_key_and_value_and_options_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectTransaction,
@@ -3024,7 +3024,7 @@ extern "C" {
     pub async fn put_with_entries<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectTransaction,
         entries: &Object<T>,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_entries_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectTransaction,
@@ -3035,7 +3035,7 @@ extern "C" {
         this: &DurableObjectTransaction,
         entries: &Object<T>,
         options: &DurableObjectPutOptions,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_entries_and_options_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectTransaction,
@@ -3043,7 +3043,7 @@ extern "C" {
         options: &DurableObjectPutOptions,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch)]
-    pub async fn delete(this: &DurableObjectTransaction, key: &str) -> Result<Boolean, JsValue>;
+    pub async fn delete(this: &DurableObjectTransaction, key: &str) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_promise(this: &DurableObjectTransaction, key: &str) -> Promise<Boolean>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
@@ -3051,7 +3051,7 @@ extern "C" {
         this: &DurableObjectTransaction,
         key: &str,
         options: &DurableObjectPutOptions,
-    ) -> Result<Boolean, JsValue>;
+    ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_with_key_and_options_promise(
         this: &DurableObjectTransaction,
@@ -3062,7 +3062,7 @@ extern "C" {
     pub async fn delete_with_keys(
         this: &DurableObjectTransaction,
         keys: &[String],
-    ) -> Result<Number, JsValue>;
+    ) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_with_keys_promise(
         this: &DurableObjectTransaction,
@@ -3073,7 +3073,7 @@ extern "C" {
         this: &DurableObjectTransaction,
         keys: &[String],
         options: &DurableObjectPutOptions,
-    ) -> Result<Number, JsValue>;
+    ) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_with_keys_and_options_promise(
         this: &DurableObjectTransaction,
@@ -3085,14 +3085,14 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "rollback")]
     pub fn try_rollback(this: &DurableObjectTransaction) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getAlarm")]
-    pub async fn get_alarm(this: &DurableObjectTransaction) -> Result<Nullable<Number>, JsValue>;
+    pub async fn get_alarm(this: &DurableObjectTransaction) -> Result<Nullable<f64>, JsValue>;
     #[wasm_bindgen(method, js_name = "getAlarm")]
     pub fn get_alarm_promise(this: &DurableObjectTransaction) -> Promise<JsNullable<Number>>;
     #[wasm_bindgen(method, catch, js_name = "getAlarm")]
     pub async fn get_alarm_with_options(
         this: &DurableObjectTransaction,
         options: &DurableObjectGetAlarmOptions,
-    ) -> Result<Nullable<Number>, JsValue>;
+    ) -> Result<Nullable<f64>, JsValue>;
     #[wasm_bindgen(method, js_name = "getAlarm")]
     pub fn get_alarm_with_options_promise(
         this: &DurableObjectTransaction,
@@ -3102,7 +3102,7 @@ extern "C" {
     pub async fn set_alarm(
         this: &DurableObjectTransaction,
         scheduled_time: f64,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "setAlarm")]
     pub fn set_alarm_promise(
         this: &DurableObjectTransaction,
@@ -3112,7 +3112,7 @@ extern "C" {
     pub async fn set_alarm_with_date(
         this: &DurableObjectTransaction,
         scheduled_time: &Date,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "setAlarm")]
     pub fn set_alarm_with_date_promise(
         this: &DurableObjectTransaction,
@@ -3123,7 +3123,7 @@ extern "C" {
         this: &DurableObjectTransaction,
         scheduled_time: f64,
         options: &DurableObjectSetAlarmOptions,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "setAlarm")]
     pub fn set_alarm_with_f64_and_options_promise(
         this: &DurableObjectTransaction,
@@ -3135,7 +3135,7 @@ extern "C" {
         this: &DurableObjectTransaction,
         scheduled_time: &Date,
         options: &DurableObjectSetAlarmOptions,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "setAlarm")]
     pub fn set_alarm_with_date_and_options_promise(
         this: &DurableObjectTransaction,
@@ -3143,14 +3143,14 @@ extern "C" {
         options: &DurableObjectSetAlarmOptions,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "deleteAlarm")]
-    pub async fn delete_alarm(this: &DurableObjectTransaction) -> Result<Undefined, JsValue>;
+    pub async fn delete_alarm(this: &DurableObjectTransaction) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "deleteAlarm")]
     pub fn delete_alarm_promise(this: &DurableObjectTransaction) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "deleteAlarm")]
     pub async fn delete_alarm_with_options(
         this: &DurableObjectTransaction,
         options: &DurableObjectSetAlarmOptions,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "deleteAlarm")]
     pub fn delete_alarm_with_options_promise(
         this: &DurableObjectTransaction,
@@ -3233,7 +3233,7 @@ extern "C" {
         this: &DurableObjectStorage,
         key: &str,
         value: &T,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectStorage,
@@ -3246,7 +3246,7 @@ extern "C" {
         key: &str,
         value: &T,
         options: &DurableObjectPutOptions,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_key_and_value_and_options_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectStorage,
@@ -3258,7 +3258,7 @@ extern "C" {
     pub async fn put_with_entries<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectStorage,
         entries: &Object<T>,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_entries_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectStorage,
@@ -3269,7 +3269,7 @@ extern "C" {
         this: &DurableObjectStorage,
         entries: &Object<T>,
         options: &DurableObjectPutOptions,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_entries_and_options_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectStorage,
@@ -3277,7 +3277,7 @@ extern "C" {
         options: &DurableObjectPutOptions,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch)]
-    pub async fn delete(this: &DurableObjectStorage, key: &str) -> Result<Boolean, JsValue>;
+    pub async fn delete(this: &DurableObjectStorage, key: &str) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_promise(this: &DurableObjectStorage, key: &str) -> Promise<Boolean>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
@@ -3285,7 +3285,7 @@ extern "C" {
         this: &DurableObjectStorage,
         key: &str,
         options: &DurableObjectPutOptions,
-    ) -> Result<Boolean, JsValue>;
+    ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_with_key_and_options_promise(
         this: &DurableObjectStorage,
@@ -3296,7 +3296,7 @@ extern "C" {
     pub async fn delete_with_keys(
         this: &DurableObjectStorage,
         keys: &[String],
-    ) -> Result<Number, JsValue>;
+    ) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_with_keys_promise(
         this: &DurableObjectStorage,
@@ -3307,7 +3307,7 @@ extern "C" {
         this: &DurableObjectStorage,
         keys: &[String],
         options: &DurableObjectPutOptions,
-    ) -> Result<Number, JsValue>;
+    ) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_with_keys_and_options_promise(
         this: &DurableObjectStorage,
@@ -3315,14 +3315,14 @@ extern "C" {
         options: &DurableObjectPutOptions,
     ) -> Promise<Number>;
     #[wasm_bindgen(method, catch, js_name = "deleteAll")]
-    pub async fn delete_all(this: &DurableObjectStorage) -> Result<Undefined, JsValue>;
+    pub async fn delete_all(this: &DurableObjectStorage) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "deleteAll")]
     pub fn delete_all_promise(this: &DurableObjectStorage) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "deleteAll")]
     pub async fn delete_all_with_options(
         this: &DurableObjectStorage,
         options: &DurableObjectPutOptions,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "deleteAll")]
     pub fn delete_all_with_options_promise(
         this: &DurableObjectStorage,
@@ -3339,24 +3339,22 @@ extern "C" {
         closure: &Function<fn(DurableObjectTransaction) -> Promise<T>>,
     ) -> Promise<T>;
     #[wasm_bindgen(method, catch, js_name = "getAlarm")]
-    pub async fn get_alarm(this: &DurableObjectStorage) -> Result<Nullable<Number>, JsValue>;
+    pub async fn get_alarm(this: &DurableObjectStorage) -> Result<Nullable<f64>, JsValue>;
     #[wasm_bindgen(method, js_name = "getAlarm")]
     pub fn get_alarm_promise(this: &DurableObjectStorage) -> Promise<JsNullable<Number>>;
     #[wasm_bindgen(method, catch, js_name = "getAlarm")]
     pub async fn get_alarm_with_options(
         this: &DurableObjectStorage,
         options: &DurableObjectGetAlarmOptions,
-    ) -> Result<Nullable<Number>, JsValue>;
+    ) -> Result<Nullable<f64>, JsValue>;
     #[wasm_bindgen(method, js_name = "getAlarm")]
     pub fn get_alarm_with_options_promise(
         this: &DurableObjectStorage,
         options: &DurableObjectGetAlarmOptions,
     ) -> Promise<JsNullable<Number>>;
     #[wasm_bindgen(method, catch, js_name = "setAlarm")]
-    pub async fn set_alarm(
-        this: &DurableObjectStorage,
-        scheduled_time: f64,
-    ) -> Result<Undefined, JsValue>;
+    pub async fn set_alarm(this: &DurableObjectStorage, scheduled_time: f64)
+        -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "setAlarm")]
     pub fn set_alarm_promise(
         this: &DurableObjectStorage,
@@ -3366,7 +3364,7 @@ extern "C" {
     pub async fn set_alarm_with_date(
         this: &DurableObjectStorage,
         scheduled_time: &Date,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "setAlarm")]
     pub fn set_alarm_with_date_promise(
         this: &DurableObjectStorage,
@@ -3377,7 +3375,7 @@ extern "C" {
         this: &DurableObjectStorage,
         scheduled_time: f64,
         options: &DurableObjectSetAlarmOptions,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "setAlarm")]
     pub fn set_alarm_with_f64_and_options_promise(
         this: &DurableObjectStorage,
@@ -3389,7 +3387,7 @@ extern "C" {
         this: &DurableObjectStorage,
         scheduled_time: &Date,
         options: &DurableObjectSetAlarmOptions,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "setAlarm")]
     pub fn set_alarm_with_date_and_options_promise(
         this: &DurableObjectStorage,
@@ -3397,21 +3395,21 @@ extern "C" {
         options: &DurableObjectSetAlarmOptions,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "deleteAlarm")]
-    pub async fn delete_alarm(this: &DurableObjectStorage) -> Result<Undefined, JsValue>;
+    pub async fn delete_alarm(this: &DurableObjectStorage) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "deleteAlarm")]
     pub fn delete_alarm_promise(this: &DurableObjectStorage) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "deleteAlarm")]
     pub async fn delete_alarm_with_options(
         this: &DurableObjectStorage,
         options: &DurableObjectSetAlarmOptions,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "deleteAlarm")]
     pub fn delete_alarm_with_options_promise(
         this: &DurableObjectStorage,
         options: &DurableObjectSetAlarmOptions,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch)]
-    pub async fn sync(this: &DurableObjectStorage) -> Result<Undefined, JsValue>;
+    pub async fn sync(this: &DurableObjectStorage) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "sync")]
     pub fn sync_promise(this: &DurableObjectStorage) -> Promise<Undefined>;
     #[wasm_bindgen(method, getter)]
@@ -3433,14 +3431,14 @@ extern "C" {
         closure: &Function<fn() -> T>,
     ) -> Result<T, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getCurrentBookmark")]
-    pub async fn get_current_bookmark(this: &DurableObjectStorage) -> Result<JsString, JsValue>;
+    pub async fn get_current_bookmark(this: &DurableObjectStorage) -> Result<String, JsValue>;
     #[wasm_bindgen(method, js_name = "getCurrentBookmark")]
     pub fn get_current_bookmark_promise(this: &DurableObjectStorage) -> Promise<JsString>;
     #[wasm_bindgen(method, catch, js_name = "getBookmarkForTime")]
     pub async fn get_bookmark_for_time(
         this: &DurableObjectStorage,
         timestamp: f64,
-    ) -> Result<JsString, JsValue>;
+    ) -> Result<String, JsValue>;
     #[wasm_bindgen(method, js_name = "getBookmarkForTime")]
     pub fn get_bookmark_for_time_promise(
         this: &DurableObjectStorage,
@@ -3450,7 +3448,7 @@ extern "C" {
     pub async fn get_bookmark_for_time_with_date(
         this: &DurableObjectStorage,
         timestamp: &Date,
-    ) -> Result<JsString, JsValue>;
+    ) -> Result<String, JsValue>;
     #[wasm_bindgen(method, js_name = "getBookmarkForTime")]
     pub fn get_bookmark_for_time_with_date_promise(
         this: &DurableObjectStorage,
@@ -3460,7 +3458,7 @@ extern "C" {
     pub async fn on_next_session_restore_bookmark(
         this: &DurableObjectStorage,
         bookmark: &str,
-    ) -> Result<JsString, JsValue>;
+    ) -> Result<String, JsValue>;
     #[wasm_bindgen(method, js_name = "onNextSessionRestoreBookmark")]
     pub fn on_next_session_restore_bookmark_promise(
         this: &DurableObjectStorage,
@@ -4388,7 +4386,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Scheduler;
     #[wasm_bindgen(method, catch)]
-    pub async fn wait(this: &Scheduler, delay: f64) -> Result<Undefined, JsValue>;
+    pub async fn wait(this: &Scheduler, delay: f64) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "wait")]
     pub fn wait_promise(this: &Scheduler, delay: f64) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "wait")]
@@ -4396,7 +4394,7 @@ extern "C" {
         this: &Scheduler,
         delay: f64,
         maybe_options: &SchedulerWaitOptions,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "wait")]
     pub fn wait_with_maybe_options_promise(
         this: &Scheduler,
@@ -4625,7 +4623,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/text)"]
     #[wasm_bindgen(method, catch)]
-    pub async fn text(this: &Blob) -> Result<JsString, JsValue>;
+    pub async fn text(this: &Blob) -> Result<String, JsValue>;
     #[doc = " The **`text()`** method of the string containing the contents of the blob, interpreted as UTF-8."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/text)"]
@@ -4765,18 +4763,18 @@ extern "C" {
     pub async fn delete(
         this: &Cache,
         request: &Request<JsValue, CfProperties>,
-    ) -> Result<Boolean, JsValue>;
+    ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_promise(
         this: &Cache,
         request: &Request<JsValue, CfProperties>,
     ) -> Promise<Boolean>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
-    pub async fn delete_with_str(this: &Cache, request: &str) -> Result<Boolean, JsValue>;
+    pub async fn delete_with_str(this: &Cache, request: &str) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_with_str_promise(this: &Cache, request: &str) -> Promise<Boolean>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
-    pub async fn delete_with_url(this: &Cache, request: &URL) -> Result<Boolean, JsValue>;
+    pub async fn delete_with_url(this: &Cache, request: &URL) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_with_url_promise(this: &Cache, request: &URL) -> Promise<Boolean>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
@@ -4784,7 +4782,7 @@ extern "C" {
         this: &Cache,
         request: &Request<JsValue, CfProperties>,
         options: &CacheQueryOptions,
-    ) -> Result<Boolean, JsValue>;
+    ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_with_request_and_options_promise(
         this: &Cache,
@@ -4796,7 +4794,7 @@ extern "C" {
         this: &Cache,
         request: &str,
         options: &CacheQueryOptions,
-    ) -> Result<Boolean, JsValue>;
+    ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_with_str_and_options_promise(
         this: &Cache,
@@ -4808,7 +4806,7 @@ extern "C" {
         this: &Cache,
         request: &URL,
         options: &CacheQueryOptions,
-    ) -> Result<Boolean, JsValue>;
+    ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_with_url_and_options_promise(
         this: &Cache,
@@ -4874,7 +4872,7 @@ extern "C" {
         this: &Cache,
         request: &Request<JsValue, CfProperties>,
         response: &Response,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_promise(
         this: &Cache,
@@ -4886,7 +4884,7 @@ extern "C" {
         this: &Cache,
         request: &str,
         response: &Response,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_str_promise(
         this: &Cache,
@@ -4898,7 +4896,7 @@ extern "C" {
         this: &Cache,
         request: &URL,
         response: &Response,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_url_promise(
         this: &Cache,
@@ -5234,7 +5232,7 @@ extern "C" {
         key: &CryptoKey,
         signature: &ArrayBuffer,
         data: &ArrayBuffer,
-    ) -> Result<Boolean, JsValue>;
+    ) -> Result<bool, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
@@ -5256,7 +5254,7 @@ extern "C" {
         key: &CryptoKey,
         signature: &ArrayBuffer,
         data: &ArrayBuffer,
-    ) -> Result<Boolean, JsValue>;
+    ) -> Result<bool, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
@@ -5278,7 +5276,7 @@ extern "C" {
         key: &CryptoKey,
         signature: &Object,
         data: &ArrayBuffer,
-    ) -> Result<Boolean, JsValue>;
+    ) -> Result<bool, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
@@ -5300,7 +5298,7 @@ extern "C" {
         key: &CryptoKey,
         signature: &Object,
         data: &ArrayBuffer,
-    ) -> Result<Boolean, JsValue>;
+    ) -> Result<bool, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
@@ -5322,7 +5320,7 @@ extern "C" {
         key: &CryptoKey,
         signature: &ArrayBuffer,
         data: &Object,
-    ) -> Result<Boolean, JsValue>;
+    ) -> Result<bool, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
@@ -5344,7 +5342,7 @@ extern "C" {
         key: &CryptoKey,
         signature: &ArrayBuffer,
         data: &Object,
-    ) -> Result<Boolean, JsValue>;
+    ) -> Result<bool, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
@@ -5366,7 +5364,7 @@ extern "C" {
         key: &CryptoKey,
         signature: &Object,
         data: &Object,
-    ) -> Result<Boolean, JsValue>;
+    ) -> Result<bool, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
@@ -5388,7 +5386,7 @@ extern "C" {
         key: &CryptoKey,
         signature: &Object,
         data: &Object,
-    ) -> Result<Boolean, JsValue>;
+    ) -> Result<bool, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
@@ -5481,7 +5479,7 @@ extern "C" {
         algorithm: &str,
         extractable: bool,
         key_usages: &[String],
-    ) -> Result<JsValue, JsValue>;
+    ) -> Result<GenerateKeyReturnKind, JsValue>;
     #[doc = " The **`generateKey()`** method of the SubtleCrypto interface is used to generate a new key (for symmetric algorithms) or key pair (for public-key algorithms)."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey)"]
@@ -5501,7 +5499,7 @@ extern "C" {
         algorithm: &SubtleCryptoGenerateKeyAlgorithm,
         extractable: bool,
         key_usages: &[String],
-    ) -> Result<JsValue, JsValue>;
+    ) -> Result<GenerateKeyReturnKind, JsValue>;
     #[doc = " The **`generateKey()`** method of the SubtleCrypto interface is used to generate a new key (for symmetric algorithms) or key pair (for public-key algorithms)."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey)"]
@@ -5864,7 +5862,7 @@ extern "C" {
         this: &SubtleCrypto,
         format: &str,
         key: &CryptoKey,
-    ) -> Result<JsValue, JsValue>;
+    ) -> Result<ExportKeyReturnKind, JsValue>;
     #[doc = " The **`exportKey()`** method of the SubtleCrypto interface exports a key: that is, it takes as input a CryptoKey object and gives you the key in an external, portable format."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/exportKey)"]
@@ -8773,7 +8771,7 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "bytes")]
     pub fn bytes_promise(this: &Body) -> Promise<Uint8Array>;
     #[wasm_bindgen(method, catch)]
-    pub async fn text(this: &Body) -> Result<JsString, JsValue>;
+    pub async fn text(this: &Body) -> Result<String, JsValue>;
     #[wasm_bindgen(method, js_name = "text")]
     pub fn text_promise(this: &Body) -> Promise<JsString>;
     #[wasm_bindgen(method, catch)]
@@ -9701,7 +9699,7 @@ extern "C" {
     pub async fn get<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
         key: &Key,
-    ) -> Result<Nullable<JsString>, JsValue>;
+    ) -> Result<Nullable<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
@@ -9714,7 +9712,7 @@ extern "C" {
         this: &KVNamespace<Key>,
         key: &Key,
         options: &PartialKvNamespaceGetOptionsUndefined,
-    ) -> Result<Nullable<JsString>, JsValue>;
+    ) -> Result<Nullable<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_with_key_and_partial_kv_namespace_get_options_undefined_promise<
         Key: ::wasm_bindgen::JsGeneric,
@@ -9728,7 +9726,7 @@ extern "C" {
         this: &KVNamespace<Key>,
         key: &Key,
         r#type: &str,
-    ) -> Result<Nullable<JsString>, JsValue>;
+    ) -> Result<Nullable<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_with_key_and_type_promise<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
@@ -9740,7 +9738,7 @@ extern "C" {
         this: &KVNamespace<Key>,
         key: &Key,
         options: &KVNamespaceGetOptions<JsString>,
-    ) -> Result<Nullable<JsString>, JsValue>;
+    ) -> Result<Nullable<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_with_key_and_kv_namespace_get_options_promise<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
@@ -9826,7 +9824,7 @@ extern "C" {
         this: &KVNamespace<Key>,
         key: &Key,
         value: &str,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_promise<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
@@ -9838,7 +9836,7 @@ extern "C" {
         this: &KVNamespace<Key>,
         key: &Key,
         value: &ArrayBuffer,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_array_buffer_promise<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
@@ -9850,7 +9848,7 @@ extern "C" {
         this: &KVNamespace<Key>,
         key: &Key,
         value: &Object,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_typed_array_promise<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
@@ -9862,7 +9860,7 @@ extern "C" {
         this: &KVNamespace<Key>,
         key: &Key,
         value: &ReadableStream,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_readable_stream_promise<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
@@ -9875,7 +9873,7 @@ extern "C" {
         key: &Key,
         value: &str,
         options: &KVNamespacePutOptions,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_str_and_options_promise<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
@@ -9889,7 +9887,7 @@ extern "C" {
         key: &Key,
         value: &ArrayBuffer,
         options: &KVNamespacePutOptions,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_array_buffer_and_options_promise<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
@@ -9903,7 +9901,7 @@ extern "C" {
         key: &Key,
         value: &Object,
         options: &KVNamespacePutOptions,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_typed_array_and_options_promise<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
@@ -9917,7 +9915,7 @@ extern "C" {
         key: &Key,
         value: &ReadableStream,
         options: &KVNamespacePutOptions,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
     pub fn put_with_readable_stream_and_options_promise<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
@@ -10069,7 +10067,7 @@ extern "C" {
     pub async fn delete<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
         key: &Key,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_promise<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
@@ -10414,7 +10412,7 @@ extern "C" {
     pub async fn send<Body: ::wasm_bindgen::JsGeneric>(
         this: &Queue<Body>,
         message: &Body,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "send")]
     pub fn send_promise<Body: ::wasm_bindgen::JsGeneric>(
         this: &Queue<Body>,
@@ -10425,7 +10423,7 @@ extern "C" {
         this: &Queue<Body>,
         message: &Body,
         options: &QueueSendOptions,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "send")]
     pub fn send_with_options_promise<Body: ::wasm_bindgen::JsGeneric>(
         this: &Queue<Body>,
@@ -10436,7 +10434,7 @@ extern "C" {
     pub async fn send_batch<Body: ::wasm_bindgen::JsGeneric>(
         this: &Queue<Body>,
         messages: &JsValue,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "sendBatch")]
     pub fn send_batch_promise<Body: ::wasm_bindgen::JsGeneric>(
         this: &Queue<Body>,
@@ -10447,7 +10445,7 @@ extern "C" {
         this: &Queue<Body>,
         messages: &JsValue,
         options: &QueueSendBatchOptions,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "sendBatch")]
     pub fn send_batch_with_options_promise<Body: ::wasm_bindgen::JsGeneric>(
         this: &Queue<Body>,
@@ -11121,11 +11119,11 @@ extern "C" {
         upload_id: &str,
     ) -> Result<R2MultipartUpload, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn delete(this: &R2Bucket, keys: &str) -> Result<Undefined, JsValue>;
+    pub async fn delete(this: &R2Bucket, keys: &str) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_promise(this: &R2Bucket, keys: &str) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
-    pub async fn delete_with_slice(this: &R2Bucket, keys: &[String]) -> Result<Undefined, JsValue>;
+    pub async fn delete_with_slice(this: &R2Bucket, keys: &[String]) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_with_slice_promise(this: &R2Bucket, keys: &[String]) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch)]
@@ -11375,7 +11373,7 @@ extern "C" {
         options: &R2UploadPartOptions,
     ) -> Promise<R2UploadedPart>;
     #[wasm_bindgen(method, catch)]
-    pub async fn abort(this: &R2MultipartUpload) -> Result<Undefined, JsValue>;
+    pub async fn abort(this: &R2MultipartUpload) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "abort")]
     pub fn abort_promise(this: &R2MultipartUpload) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch)]
@@ -11463,7 +11461,7 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "bytes")]
     pub fn bytes_promise(this: &R2ObjectBody) -> Promise<Uint8Array>;
     #[wasm_bindgen(method, catch)]
-    pub async fn text(this: &R2ObjectBody) -> Result<JsString, JsValue>;
+    pub async fn text(this: &R2ObjectBody) -> Result<String, JsValue>;
     #[wasm_bindgen(method, js_name = "text")]
     pub fn text_promise(this: &R2ObjectBody) -> Promise<JsString>;
     #[wasm_bindgen(method, catch)]
@@ -12738,7 +12736,7 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn cancel<R: ::wasm_bindgen::JsGeneric>(
         this: &ReadableStream<R>,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[doc = " The **`cancel()`** method of the ReadableStream interface returns a Promise that resolves when the stream is canceled."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/cancel)"]
@@ -12753,7 +12751,7 @@ extern "C" {
     pub async fn cancel_with_reason<R: ::wasm_bindgen::JsGeneric>(
         this: &ReadableStream<R>,
         reason: &JsValue,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[doc = " The **`cancel()`** method of the ReadableStream interface returns a Promise that resolves when the stream is canceled."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/cancel)"]
@@ -12836,7 +12834,7 @@ extern "C" {
     pub async fn pipe_to<R: ::wasm_bindgen::JsGeneric>(
         this: &ReadableStream<R>,
         destination: &WritableStream<R>,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[doc = " The **`pipeTo()`** method of the ReadableStream interface pipes the current `ReadableStream` to a given WritableStream and returns a Promise that fulfills when the piping process completes successfully, or rejects if any errors were encountered."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/pipeTo)"]
@@ -12853,7 +12851,7 @@ extern "C" {
         this: &ReadableStream<R>,
         destination: &WritableStream<R>,
         options: &StreamPipeOptions,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[doc = " The **`pipeTo()`** method of the ReadableStream interface pipes the current `ReadableStream` to a given WritableStream and returns a Promise that fulfills when the piping process completes successfully, or rejects if any errors were encountered."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/pipeTo)"]
@@ -12910,7 +12908,7 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn cancel<R: ::wasm_bindgen::JsGeneric>(
         this: &ReadableStreamDefaultReader<R>,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "cancel")]
     pub fn cancel_promise<R: ::wasm_bindgen::JsGeneric>(
         this: &ReadableStreamDefaultReader<R>,
@@ -12919,7 +12917,7 @@ extern "C" {
     pub async fn cancel_with_reason<R: ::wasm_bindgen::JsGeneric>(
         this: &ReadableStreamDefaultReader<R>,
         reason: &JsValue,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "cancel")]
     pub fn cancel_with_reason_promise<R: ::wasm_bindgen::JsGeneric>(
         this: &ReadableStreamDefaultReader<R>,
@@ -12962,14 +12960,14 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn closed(this: &ReadableStreamBYOBReader) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch)]
-    pub async fn cancel(this: &ReadableStreamBYOBReader) -> Result<Undefined, JsValue>;
+    pub async fn cancel(this: &ReadableStreamBYOBReader) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "cancel")]
     pub fn cancel_promise(this: &ReadableStreamBYOBReader) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "cancel")]
     pub async fn cancel_with_reason(
         this: &ReadableStreamBYOBReader,
         reason: &JsValue,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "cancel")]
     pub fn cancel_with_reason_promise(
         this: &ReadableStreamBYOBReader,
@@ -13424,7 +13422,7 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn abort<W: ::wasm_bindgen::JsGeneric>(
         this: &WritableStream<W>,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[doc = " The **`abort()`** method of the WritableStream interface aborts the stream, signaling that the producer can no longer successfully write to the stream and it is to be immediately moved to an error state, with any queued writes discarded."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/abort)"]
@@ -13439,7 +13437,7 @@ extern "C" {
     pub async fn abort_with_reason<W: ::wasm_bindgen::JsGeneric>(
         this: &WritableStream<W>,
         reason: &JsValue,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[doc = " The **`abort()`** method of the WritableStream interface aborts the stream, signaling that the producer can no longer successfully write to the stream and it is to be immediately moved to an error state, with any queued writes discarded."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/abort)"]
@@ -13454,7 +13452,7 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn close<W: ::wasm_bindgen::JsGeneric>(
         this: &WritableStream<W>,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[doc = " The **`close()`** method of the WritableStream interface closes the associated stream."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/close)"]
@@ -13513,7 +13511,7 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn abort<W: ::wasm_bindgen::JsGeneric>(
         this: &WritableStreamDefaultWriter<W>,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[doc = " The **`abort()`** method of the the producer can no longer successfully write to the stream and it is to be immediately moved to an error state, with any queued writes discarded."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/abort)"]
@@ -13528,7 +13526,7 @@ extern "C" {
     pub async fn abort_with_reason<W: ::wasm_bindgen::JsGeneric>(
         this: &WritableStreamDefaultWriter<W>,
         reason: &JsValue,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[doc = " The **`abort()`** method of the the producer can no longer successfully write to the stream and it is to be immediately moved to an error state, with any queued writes discarded."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/abort)"]
@@ -13543,7 +13541,7 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn close<W: ::wasm_bindgen::JsGeneric>(
         this: &WritableStreamDefaultWriter<W>,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[doc = " The **`close()`** method of the stream."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/close)"]
@@ -13557,7 +13555,7 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn write<W: ::wasm_bindgen::JsGeneric>(
         this: &WritableStreamDefaultWriter<W>,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[doc = " The **`write()`** method of the operation."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/write)"]
@@ -13572,7 +13570,7 @@ extern "C" {
     pub async fn write_with_chunk<W: ::wasm_bindgen::JsGeneric>(
         this: &WritableStreamDefaultWriter<W>,
         chunk: &W,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[doc = " The **`write()`** method of the operation."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/write)"]
@@ -15501,7 +15499,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "secureTransport")]
     pub fn secure_transport(this: &Socket) -> SecureTransportKind;
     #[wasm_bindgen(method, catch)]
-    pub async fn close(this: &Socket) -> Result<Undefined, JsValue>;
+    pub async fn close(this: &Socket) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "close")]
     pub fn close_promise(this: &Socket) -> Promise<Undefined>;
     #[wasm_bindgen(method, js_name = "startTls")]
@@ -15779,18 +15777,15 @@ extern "C" {
         options: &ContainerStartupOptions,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn monitor(this: &Container) -> Result<Undefined, JsValue>;
+    pub async fn monitor(this: &Container) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "monitor")]
     pub fn monitor_promise(this: &Container) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch)]
-    pub async fn destroy(this: &Container) -> Result<Undefined, JsValue>;
+    pub async fn destroy(this: &Container) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "destroy")]
     pub fn destroy_promise(this: &Container) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "destroy")]
-    pub async fn destroy_with_error(
-        this: &Container,
-        error: &JsValue,
-    ) -> Result<Undefined, JsValue>;
+    pub async fn destroy_with_error(this: &Container, error: &JsValue) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "destroy")]
     pub fn destroy_with_error_promise(this: &Container, error: &JsValue) -> Promise<Undefined>;
     #[wasm_bindgen(method)]
@@ -15802,10 +15797,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "getTcpPort")]
     pub fn try_get_tcp_port(this: &Container, port: f64) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "setInactivityTimeout")]
-    pub async fn set_inactivity_timeout(
-        this: &Container,
-        duration_ms: f64,
-    ) -> Result<Undefined, JsValue>;
+    pub async fn set_inactivity_timeout(this: &Container, duration_ms: f64) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "setInactivityTimeout")]
     pub fn set_inactivity_timeout_promise(this: &Container, duration_ms: f64)
         -> Promise<Undefined>;
@@ -15813,7 +15805,7 @@ extern "C" {
     pub async fn set_inactivity_timeout_with_big_int(
         this: &Container,
         duration_ms: &BigInt,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "setInactivityTimeout")]
     pub fn set_inactivity_timeout_with_big_int_promise(
         this: &Container,
@@ -15824,7 +15816,7 @@ extern "C" {
         this: &Container,
         addr: &str,
         binding: &JsValue,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "interceptOutboundHttp")]
     pub fn intercept_outbound_http_promise(
         this: &Container,
@@ -15835,7 +15827,7 @@ extern "C" {
     pub async fn intercept_all_outbound_http(
         this: &Container,
         binding: &JsValue,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "interceptAllOutboundHttp")]
     pub fn intercept_all_outbound_http_promise(
         this: &Container,
@@ -16825,7 +16817,7 @@ extern "C" {
     pub async fn chat_completions(
         this: &AiSearchInstanceService,
         params: &AiSearchChatCompletionsRequest,
-    ) -> Result<JsValue, JsValue>;
+    ) -> Result<ChatCompletionsReturnKind, JsValue>;
     #[doc = " Generate chat completions with AI Search context."]
     #[doc = ""]
     #[doc = " * `params` - Chat completions request with optional streaming"]
@@ -16838,7 +16830,7 @@ extern "C" {
     ) -> Promise;
     #[doc = " Delete this AI Search instance."]
     #[wasm_bindgen(method, catch)]
-    pub async fn delete(this: &AiSearchInstanceService) -> Result<Undefined, JsValue>;
+    pub async fn delete(this: &AiSearchInstanceService) -> Result<(), JsValue>;
     #[doc = " Delete this AI Search instance."]
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_promise(this: &AiSearchInstanceService) -> Promise<Undefined>;
@@ -16852,7 +16844,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " Returns: Array of AI Search instances"]
     #[wasm_bindgen(method, catch)]
-    pub async fn list(this: &AiSearchAccountService) -> Result<Array<Object>, JsValue>;
+    pub async fn list(this: &AiSearchAccountService) -> Result<Vec<Object>, JsValue>;
     #[doc = " List all AI Search instances in the account."]
     #[doc = ""]
     #[doc = " Returns: Array of AI Search instances"]
@@ -31903,7 +31895,7 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn models<AiModelList: ::wasm_bindgen::JsGeneric>(
         this: &Ai<AiModelList>,
-    ) -> Result<Array<AiModelsSearchObject>, JsValue>;
+    ) -> Result<Vec<AiModelsSearchObject>, JsValue>;
     #[wasm_bindgen(method, js_name = "models")]
     pub fn models_promise<AiModelList: ::wasm_bindgen::JsGeneric>(
         this: &Ai<AiModelList>,
@@ -31912,7 +31904,7 @@ extern "C" {
     pub async fn models_with_params<AiModelList: ::wasm_bindgen::JsGeneric>(
         this: &Ai<AiModelList>,
         params: &AiModelsSearchParams,
-    ) -> Result<Array<AiModelsSearchObject>, JsValue>;
+    ) -> Result<Vec<AiModelsSearchObject>, JsValue>;
     #[wasm_bindgen(method, js_name = "models")]
     pub fn models_with_params_promise<AiModelList: ::wasm_bindgen::JsGeneric>(
         this: &Ai<AiModelList>,
@@ -31930,7 +31922,7 @@ extern "C" {
     pub async fn to_markdown_with_slice<AiModelList: ::wasm_bindgen::JsGeneric>(
         this: &Ai<AiModelList>,
         files: &[MarkdownDocument],
-    ) -> Result<Array<ConversionResponse>, JsValue>;
+    ) -> Result<Vec<ConversionResponse>, JsValue>;
     #[wasm_bindgen(method, js_name = "toMarkdown")]
     pub fn to_markdown_with_slice_promise<AiModelList: ::wasm_bindgen::JsGeneric>(
         this: &Ai<AiModelList>,
@@ -31941,7 +31933,7 @@ extern "C" {
         this: &Ai<AiModelList>,
         files: &[MarkdownDocument],
         options: &ConversionRequestOptions,
-    ) -> Result<Array<ConversionResponse>, JsValue>;
+    ) -> Result<Vec<ConversionResponse>, JsValue>;
     #[wasm_bindgen(method, js_name = "toMarkdown")]
     pub fn to_markdown_with_slice_and_options_promise<AiModelList: ::wasm_bindgen::JsGeneric>(
         this: &Ai<AiModelList>,
@@ -32662,7 +32654,7 @@ extern "C" {
         this: &AiGateway,
         log_id: &str,
         data: &AiGatewayPatchLog,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "patchLog")]
     pub fn patch_log_promise(
         this: &AiGateway,
@@ -32715,21 +32707,21 @@ extern "C" {
         options: &AiGatewayOptions,
     ) -> Promise<Response>;
     #[wasm_bindgen(method, catch, js_name = "getUrl")]
-    pub async fn get_url(this: &AiGateway) -> Result<JsString, JsValue>;
+    pub async fn get_url(this: &AiGateway) -> Result<String, JsValue>;
     #[wasm_bindgen(method, js_name = "getUrl")]
     pub fn get_url_promise(this: &AiGateway) -> Promise<JsString>;
     #[wasm_bindgen(method, catch, js_name = "getUrl")]
     pub async fn get_url_with_ai_gateway_providers(
         this: &AiGateway,
         provider: AIGatewayProviders,
-    ) -> Result<JsString, JsValue>;
+    ) -> Result<String, JsValue>;
     #[wasm_bindgen(method, js_name = "getUrl")]
     pub fn get_url_with_ai_gateway_providers_promise(
         this: &AiGateway,
         provider: AIGatewayProviders,
     ) -> Promise<JsString>;
     #[wasm_bindgen(method, catch, js_name = "getUrl")]
-    pub async fn get_url_with_str(this: &AiGateway, provider: &str) -> Result<JsString, JsValue>;
+    pub async fn get_url_with_str(this: &AiGateway, provider: &str) -> Result<String, JsValue>;
     #[wasm_bindgen(method, js_name = "getUrl")]
     pub fn get_url_with_str_promise(this: &AiGateway, provider: &str) -> Promise<JsString>;
 }
@@ -33340,7 +33332,7 @@ extern "C" {
     #[doc = " @deprecated Use `env.AI.aiSearch.list()` instead."]
     #[doc = " @see AiSearchAccountService.list"]
     #[wasm_bindgen(method, catch)]
-    pub async fn list(this: &AutoRAG) -> Result<Array<Object>, JsValue>;
+    pub async fn list(this: &AutoRAG) -> Result<Vec<Object>, JsValue>;
     #[doc = " @deprecated Use `env.AI.aiSearch.list()` instead."]
     #[doc = " @see AiSearchAccountService.list"]
     #[wasm_bindgen(method, js_name = "list")]
@@ -37331,7 +37323,7 @@ pub mod cloudflare {
             pub async fn send<T: ::wasm_bindgen::JsGeneric>(
                 this: &Pipeline<T>,
                 records: &[T],
-            ) -> Result<Undefined, JsValue>;
+            ) -> Result<(), JsValue>;
             #[doc = " The Pipeline interface represents the type of a binding to a Pipeline"]
             #[doc = ""]
             #[doc = " * `records` - The records to send to the pipeline"]
@@ -38081,7 +38073,7 @@ extern "C" {
     pub fn get_promise(this: &HelloWorldBinding) -> Promise<Object>;
     #[doc = " Set a new stored value"]
     #[wasm_bindgen(method, catch)]
-    pub async fn set(this: &HelloWorldBinding, value: &str) -> Result<Undefined, JsValue>;
+    pub async fn set(this: &HelloWorldBinding, value: &str) -> Result<(), JsValue>;
     #[doc = " Set a new stored value"]
     #[wasm_bindgen(method, js_name = "set")]
     pub fn set_promise(this: &HelloWorldBinding, value: &str) -> Promise<Undefined>;
@@ -39117,7 +39109,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " Returns: True if deleted, false if not found"]
     #[wasm_bindgen(method, catch)]
-    pub async fn delete(this: &HostedImagesBinding, image_id: &str) -> Result<Boolean, JsValue>;
+    pub async fn delete(this: &HostedImagesBinding, image_id: &str) -> Result<bool, JsValue>;
     #[doc = " Delete a hosted image"]
     #[doc = ""]
     #[doc = " * `imageId` - The ID of the image"]
@@ -39655,7 +39647,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " Returns: A promise containing the content type string (e.g., 'image/jpeg', 'video/mp4')"]
     #[wasm_bindgen(method, catch, js_name = "contentType")]
-    pub async fn content_type(this: &MediaTransformationResult) -> Result<JsString, JsValue>;
+    pub async fn content_type(this: &MediaTransformationResult) -> Result<String, JsValue>;
     #[doc = " Returns the MIME type of the transformed media."]
     #[doc = ""]
     #[doc = " Returns: A promise containing the content type string (e.g., 'image/jpeg', 'video/mp4')"]
@@ -40470,7 +40462,7 @@ extern "C" {
     #[doc = " Get a secret from the Secrets Store, returning a string of the secret value"]
     #[doc = " if it exists, or throws an error if it does not exist"]
     #[wasm_bindgen(method, catch)]
-    pub async fn get(this: &SecretsStoreSecret) -> Result<JsString, JsValue>;
+    pub async fn get(this: &SecretsStoreSecret) -> Result<String, JsValue>;
     #[doc = " Get a secret from the Secrets Store, returning a string of the secret value"]
     #[doc = " if it exists, or throws an error if it does not exist"]
     #[wasm_bindgen(method, js_name = "get")]
@@ -40716,7 +40708,7 @@ extern "C" {
     #[doc = " * `NotFoundError` — if the video is not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn delete(this: &StreamVideoHandle) -> Result<Undefined, StreamError>;
+    pub async fn delete(this: &StreamVideoHandle) -> Result<(), StreamError>;
     #[doc = " Deletes a video and its copies from Cloudflare Stream."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves when deletion completes."]
@@ -40735,7 +40727,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `InternalError` — if the signing key cannot be retrieved or the token cannot be signed"]
     #[wasm_bindgen(method, catch, js_name = "generateToken")]
-    pub async fn generate_token(this: &StreamVideoHandle) -> Result<JsString, InternalError>;
+    pub async fn generate_token(this: &StreamVideoHandle) -> Result<String, InternalError>;
     #[doc = " Creates a signed URL token for a video."]
     #[doc = ""]
     #[doc = " Returns: The signed token that was created."]
@@ -41939,7 +41931,7 @@ extern "C" {
     #[doc = " * `NotFoundError` — if the video or caption is not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn list(this: &StreamScopedCaptions) -> Result<Array<StreamCaption>, StreamError>;
+    pub async fn list(this: &StreamScopedCaptions) -> Result<Vec<StreamCaption>, StreamError>;
     #[doc = " Lists the captions or subtitles."]
     #[doc = " Use the language parameter to filter by a specific language."]
     #[doc = ""]
@@ -41968,7 +41960,7 @@ extern "C" {
     pub async fn list_with_language(
         this: &StreamScopedCaptions,
         language: &str,
-    ) -> Result<Array<StreamCaption>, StreamError>;
+    ) -> Result<Vec<StreamCaption>, StreamError>;
     #[doc = " Lists the captions or subtitles."]
     #[doc = " Use the language parameter to filter by a specific language."]
     #[doc = ""]
@@ -41996,10 +41988,7 @@ extern "C" {
     #[doc = " * `NotFoundError` — if the video or caption is not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn delete(
-        this: &StreamScopedCaptions,
-        language: &str,
-    ) -> Result<Undefined, StreamError>;
+    pub async fn delete(this: &StreamScopedCaptions, language: &str) -> Result<(), StreamError>;
     #[doc = " Removes the captions or subtitles from a video."]
     #[doc = ""]
     #[doc = " * `language` - The BCP 47 language tag to remove."]
@@ -42124,7 +42113,7 @@ extern "C" {
     #[doc = " * `NotFoundError` — if the video or downloads are not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn delete(this: &StreamScopedDownloads) -> Result<Undefined, StreamError>;
+    pub async fn delete(this: &StreamScopedDownloads) -> Result<(), StreamError>;
     #[doc = " Delete the downloads for a video. Available types are `default` and `audio`."]
     #[doc = " Defaults to `default` when omitted."]
     #[doc = ""]
@@ -42153,7 +42142,7 @@ extern "C" {
     pub async fn delete_with_download_type(
         this: &StreamScopedDownloads,
         download_type: StreamDownloadType,
-    ) -> Result<Undefined, StreamError>;
+    ) -> Result<(), StreamError>;
     #[doc = " Delete the downloads for a video. Available types are `default` and `audio`."]
     #[doc = " Defaults to `default` when omitted."]
     #[doc = ""]
@@ -42185,7 +42174,7 @@ extern "C" {
     #[doc = " * `BadRequestError` — if the parameters are invalid"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn list(this: &StreamVideos) -> Result<Array<StreamVideo>, StreamError>;
+    pub async fn list(this: &StreamVideos) -> Result<Vec<StreamVideo>, StreamError>;
     #[doc = " Lists all videos in a users account."]
     #[doc = ""]
     #[doc = " Returns: The list of videos."]
@@ -42208,7 +42197,7 @@ extern "C" {
     pub async fn list_with_params(
         this: &StreamVideos,
         params: &StreamVideosListParams,
-    ) -> Result<Array<StreamVideo>, StreamError>;
+    ) -> Result<Vec<StreamVideo>, StreamError>;
     #[doc = " Lists all videos in a users account."]
     #[doc = ""]
     #[doc = " Returns: The list of videos."]
@@ -42316,7 +42305,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn list(this: &StreamWatermarks) -> Result<Array<StreamWatermark>, InternalError>;
+    pub async fn list(this: &StreamWatermarks) -> Result<Vec<StreamWatermark>, InternalError>;
     #[doc = " Lists all watermark profiles for an account."]
     #[doc = ""]
     #[doc = " Returns: The list of watermark profiles."]
@@ -42364,10 +42353,7 @@ extern "C" {
     #[doc = " * `NotFoundError` — if the watermark is not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
-    pub async fn delete(
-        this: &StreamWatermarks,
-        watermark_id: &str,
-    ) -> Result<Undefined, StreamError>;
+    pub async fn delete(this: &StreamWatermarks, watermark_id: &str) -> Result<(), StreamError>;
     #[doc = " Deletes a watermark profile."]
     #[doc = ""]
     #[doc = " * `watermarkId` - The watermark profile identifier."]
@@ -43560,7 +43546,7 @@ extern "C" {
     pub async fn transform(
         this: &ToMarkdownService,
         files: &[MarkdownDocument],
-    ) -> Result<Array<ConversionResponse>, JsValue>;
+    ) -> Result<Vec<ConversionResponse>, JsValue>;
     #[wasm_bindgen(method, js_name = "transform")]
     pub fn transform_promise(
         this: &ToMarkdownService,
@@ -43571,7 +43557,7 @@ extern "C" {
         this: &ToMarkdownService,
         files: &[MarkdownDocument],
         options: &ConversionRequestOptions,
-    ) -> Result<Array<ConversionResponse>, JsValue>;
+    ) -> Result<Vec<ConversionResponse>, JsValue>;
     #[wasm_bindgen(method, js_name = "transform")]
     pub fn transform_with_slice_and_options_promise(
         this: &ToMarkdownService,
@@ -43601,8 +43587,7 @@ extern "C" {
         options: &ConversionRequestOptions,
     ) -> Promise<ConversionResponse>;
     #[wasm_bindgen(method, catch)]
-    pub async fn supported(this: &ToMarkdownService)
-        -> Result<Array<SupportedFileFormat>, JsValue>;
+    pub async fn supported(this: &ToMarkdownService) -> Result<Vec<SupportedFileFormat>, JsValue>;
     #[wasm_bindgen(method, js_name = "supported")]
     pub fn supported_promise(this: &ToMarkdownService) -> Promise<Array<SupportedFileFormat>>;
 }
@@ -45066,7 +45051,7 @@ extern "C" {
     pub async fn get_by_ids(
         this: &VectorizeIndex,
         ids: &[String],
-    ) -> Result<Array<VectorizeVector>, JsValue>;
+    ) -> Result<Vec<VectorizeVector>, JsValue>;
     #[doc = " Get a list of vectors with a matching id."]
     #[doc = ""]
     #[doc = " * `ids` - List of vector ids that should be returned."]
@@ -45340,7 +45325,7 @@ extern "C" {
     pub async fn get_by_ids(
         this: &Vectorize,
         ids: &[String],
-    ) -> Result<Array<VectorizeVector>, JsValue>;
+    ) -> Result<Vec<VectorizeVector>, JsValue>;
     #[doc = " Get a list of vectors with a matching id."]
     #[doc = ""]
     #[doc = " * `ids` - List of vector ids that should be returned."]
@@ -45635,7 +45620,7 @@ extern "C" {
     pub async fn create_batch<PARAMS: ::wasm_bindgen::JsGeneric>(
         this: &Workflow<PARAMS>,
         batch: &[WorkflowInstanceCreateOptions<PARAMS>],
-    ) -> Result<Array<WorkflowInstance>, JsValue>;
+    ) -> Result<Vec<WorkflowInstance>, JsValue>;
     #[doc = " Create a batch of instances and return handle for all of them. If a provided id exists, an error will be thrown."]
     #[doc = " `createBatch` is limited at 100 instances at a time or when the RPC limit for the batch (1MiB) is reached."]
     #[doc = ""]
@@ -45939,25 +45924,25 @@ extern "C" {
     pub fn set_id(this: &WorkflowInstance, val: &str);
     #[doc = " Pause the instance."]
     #[wasm_bindgen(method, catch)]
-    pub async fn pause(this: &WorkflowInstance) -> Result<Undefined, JsValue>;
+    pub async fn pause(this: &WorkflowInstance) -> Result<(), JsValue>;
     #[doc = " Pause the instance."]
     #[wasm_bindgen(method, js_name = "pause")]
     pub fn pause_promise(this: &WorkflowInstance) -> Promise<Undefined>;
     #[doc = " Resume the instance. If it is already running, an error will be thrown."]
     #[wasm_bindgen(method, catch)]
-    pub async fn resume(this: &WorkflowInstance) -> Result<Undefined, JsValue>;
+    pub async fn resume(this: &WorkflowInstance) -> Result<(), JsValue>;
     #[doc = " Resume the instance. If it is already running, an error will be thrown."]
     #[wasm_bindgen(method, js_name = "resume")]
     pub fn resume_promise(this: &WorkflowInstance) -> Promise<Undefined>;
     #[doc = " Terminate the instance. If it is errored, terminated or complete, an error will be thrown."]
     #[wasm_bindgen(method, catch)]
-    pub async fn terminate(this: &WorkflowInstance) -> Result<Undefined, JsValue>;
+    pub async fn terminate(this: &WorkflowInstance) -> Result<(), JsValue>;
     #[doc = " Terminate the instance. If it is errored, terminated or complete, an error will be thrown."]
     #[wasm_bindgen(method, js_name = "terminate")]
     pub fn terminate_promise(this: &WorkflowInstance) -> Promise<Undefined>;
     #[doc = " Restart the instance."]
     #[wasm_bindgen(method, catch)]
-    pub async fn restart(this: &WorkflowInstance) -> Result<Undefined, JsValue>;
+    pub async fn restart(this: &WorkflowInstance) -> Result<(), JsValue>;
     #[doc = " Restart the instance."]
     #[wasm_bindgen(method, js_name = "restart")]
     pub fn restart_promise(this: &WorkflowInstance) -> Promise<Undefined>;
@@ -45972,7 +45957,7 @@ extern "C" {
     pub async fn send_event(
         this: &WorkflowInstance,
         arg0: &WorkflowInstanceSendEvent,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[doc = " Send an event to this instance."]
     #[wasm_bindgen(method, js_name = "sendEvent")]
     pub fn send_event_promise(
@@ -46519,6 +46504,16 @@ pub enum FetchReturnKind {
     Promise(Promise<Response>),
 }
 #[wasm_bindgen(private)]
+pub enum GenerateKeyReturnKind {
+    CryptoKey(CryptoKey),
+    CryptoKeyPair(CryptoKeyPair),
+}
+#[wasm_bindgen(private)]
+pub enum ExportKeyReturnKind {
+    ArrayBuffer(ArrayBuffer),
+    JsonWebKey(JsonWebKey),
+}
+#[wasm_bindgen(private)]
 pub enum AlgorithmKind {
     CryptoKeyKeyAlgorithm(CryptoKeyKeyAlgorithm),
     CryptoKeyAesKeyAlgorithm(CryptoKeyAesKeyAlgorithm),
@@ -46616,6 +46611,11 @@ pub enum SecureTransportKind {
 pub enum AiSearchConfigTypeKind {
     R2 = "r2",
     WebCrawler = "web-crawler",
+}
+#[wasm_bindgen(private)]
+pub enum ChatCompletionsReturnKind {
+    Response(Response),
+    Object(Object),
 }
 #[wasm_bindgen(private)]
 pub enum TextKind {

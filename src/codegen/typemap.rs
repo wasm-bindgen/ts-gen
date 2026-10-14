@@ -2137,6 +2137,14 @@ pub(crate) fn needs_js_name(ident: &syn::Ident, js_name: &str) -> bool {
 /// Map an IR `TypeRef` to the type used in a wasm_bindgen return position,
 /// wrapping in `Result<T, ErrTy>` when `catch` is true.
 ///
+/// The awaited value of an `async fn` import crosses the boundary through
+/// `JsFuture<T>`'s resolve closure, whose argument only needs
+/// `FromWasmAbi`, so async returns lower exactly like sync ones: bare
+/// primitives, the read carriers (`Option<T>`, `Nullable<T>`,
+/// `Option<Nullable<T>>`), `Vec<T>` and synthesized return unions. A list
+/// over a type parameter is the exception (see [`is_generic_rust_list`]).
+/// Only the un-awaited `Promise<T>` form keeps the inside-generic lowering.
+///
 /// `error_ty`, when supplied, replaces the default `JsValue` error type —
 /// callers pass the simplified throws union here. Resolution goes through
 /// the same `to_syn_type` path as any other type, so e.g. `js_sys::TypeError`
@@ -2153,47 +2161,33 @@ pub fn to_return_type(
     from_module: &ModuleContext,
     anchor: ReturnAnchor<'_>,
 ) -> TokenStream {
-    // Async returns are `Promise<T>` JS-side. `wasm-bindgen` requires
-    // `T: JsGeneric` for `Promise<T>` / `JsFuture<T>`, which bare Rust
-    // primitives don't satisfy. Routing through `to_inner()` reuses
-    // the inside-generic Canon path in `to_syn_type`: primitives lower
-    // to `js_sys` wrappers (`Boolean` / `Number` / `JsString` /
-    // `Undefined`). Callers recover primitives via `.value_of()`
-    // (`Boolean` / `Number`) or `String::from(_)` (`JsString`). The
-    // awaited value is read like a sync return, so its empties take the
-    // exact carrier around that form (`Nullable<JsString>`).
-    //
-    // Top-level (non-`is_async`) returns also participate in
-    // dynamic-union synthesis — see [`maybe_synthesise_return_union`].
-    let mono_native_return = is_async
-        && ctx.is_some_and(|c| {
-            c.experimental_generic_mono && is_mono_native_return_shape(ty, c, scope)
-        });
     // `js_string_return` is only set by `build_signatures` in per-mono mode,
     // which implies a context; without one, fall through to the plain lowering.
     let js_string_ctx = ctx.filter(|_| js_string_return);
+    let generic_list = is_async && ctx.is_some_and(|c| is_generic_rust_list(ty, c, scope));
     let inner = if let Some(ctx) = js_string_ctx {
         to_mono_js_string_return_type(ty, ctx, scope, from_module)
-    } else if !is_async || mono_native_return {
+    } else if generic_list {
+        // The list keeps its `Array<T>` handle; the awaited value's own
+        // empties still take the read carriers around it.
+        match split_empties_in(ty, ctx, scope) {
+            Some((core, n, scope)) => nullable_carrier(
+                to_syn_type(
+                    &core,
+                    TypePosition::RETURN.to_inner(),
+                    ctx,
+                    scope,
+                    from_module,
+                ),
+                n,
+            ),
+            None => to_syn_type(ty, TypePosition::RETURN.to_inner(), ctx, scope, from_module),
+        }
+    } else {
         match maybe_synthesise_return_union(ty, ctx, scope, from_module, anchor) {
             Some(tokens) => tokens,
             None => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
         }
-    } else if let Some((core, n, scope)) = split_empties_in(ty, ctx, scope) {
-        let inner_ty = to_syn_type(
-            &core,
-            TypePosition::RETURN.to_inner(),
-            ctx,
-            scope,
-            from_module,
-        );
-        if is_jsvalue_arg(&inner_ty) {
-            inner_ty
-        } else {
-            nullable_carrier(inner_ty, n)
-        }
-    } else {
-        to_syn_type(ty, TypePosition::RETURN.to_inner(), ctx, scope, from_module)
     };
 
     if catch {
@@ -2224,6 +2218,24 @@ pub fn error_type_tokens(
         Some(ty) => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
         None => default_error_type(ctx),
     }
+}
+
+/// Whether an awaited value is a list (after its empties) whose element
+/// mentions an in-scope type parameter. A sync import erases such a `T`
+/// to its concrete representation, but an `async` import converts the
+/// awaited value through `<Vec<T> as FromWasmAbi>`, which `T: JsGeneric`
+/// does not supply, so it keeps the `Array<T>` handle.
+fn is_generic_rust_list(ty: &TypeRef, ctx: &CodegenContext<'_>, scope: ScopeId) -> bool {
+    let (core, scope) = match split_empties_in(ty, Some(ctx), scope) {
+        Some((core, _, scope)) => (core, scope),
+        None => (ty.clone(), scope),
+    };
+    let TypeRef::Array(element) = &core else {
+        return false;
+    };
+    let mut names = Vec::new();
+    crate::codegen::signatures::collect_type_params(element, ctx, scope, &mut names);
+    !names.is_empty()
 }
 
 /// Per-monomorphization walkers.
@@ -2370,29 +2382,6 @@ fn to_mono_user_generic_arg_impl(
             scope,
             from_module,
         ),
-    }
-}
-
-/// Whether an async per-monomorphization return should keep Rust-native
-/// lowering instead of using the wrapper-only mapping required inside
-/// built-in JS containers.
-fn is_mono_native_return_shape(ty: &TypeRef, ctx: &CodegenContext<'_>, scope: ScopeId) -> bool {
-    is_mono_native_return_shape_impl(ty, ctx, scope, &mut HashSet::new())
-}
-
-fn is_mono_native_return_shape_impl(
-    ty: &TypeRef,
-    ctx: &CodegenContext<'_>,
-    scope: ScopeId,
-    visited: &mut HashSet<TypeId>,
-) -> bool {
-    let (peeled, peeled_scope) = peel_mono(ty, ctx, scope, visited);
-    match peeled.as_ref() {
-        t if is_mono_native_leaf(t, ctx, peeled_scope) => true,
-        t if let Some((inner, _, s)) = split_empties_in(t, Some(ctx), peeled_scope) => {
-            is_mono_native_return_shape_impl(&inner, ctx, s, visited)
-        }
-        t => local_generic_args(t, ctx, peeled_scope).is_some(),
     }
 }
 
@@ -2994,10 +2983,10 @@ fn mono_string_like(
     }
 }
 
-/// Whether a sync return is a string list, which has both a list-of-elements
-/// form (`Vec<String>`) and a list-as-handle form (`Array<JsString>`), so it
-/// gets a `_js_string` variant like a string return. An awaited list already
-/// lowers to the handle.
+/// Whether a return (sync or awaited) is a string list, which has both a
+/// list-of-elements form (`Vec<String>`) and a list-as-handle form
+/// (`Array<JsString>`), so it gets a `_js_string` variant like a string
+/// return.
 pub(crate) fn is_mono_string_list_return(
     ty: &TypeRef,
     ctx: &CodegenContext<'_>,
@@ -4323,21 +4312,6 @@ mod tests {
                 ),
                 "Array < JsString >"
             );
-        });
-    }
-
-    #[test]
-    fn mono_native_return_shape() {
-        with_mono_ctx(MONO_SRC, |ctx, scope| {
-            let native = |ty: &TypeRef| is_mono_native_return_shape(ty, ctx, scope);
-            assert!(native(&TypeRef::String));
-            assert!(native(&TypeRef::ident("MaybeId")));
-            assert!(native(&holder(TypeRef::Number)));
-            assert!(native(&TypeRef::ident("ModeAlias")));
-            assert!(native(&TypeRef::ident("Level")));
-            assert!(!native(&TypeRef::generic("Array", vec![TypeRef::String])));
-            assert!(!native(&TypeRef::ident("Plain")));
-            assert!(!native(&TypeRef::ident("Loop")));
         });
     }
 

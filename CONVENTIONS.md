@@ -117,12 +117,16 @@ value of an async function use the carriers exactly. A read admits
 | TS                                  | Rust read                                       |
 | ----------------------------------- | ----------------------------------------------- |
 | `get(key): Promise<R2ObjectBody \| null>` | `async fn get(..) -> Result<Nullable<R2ObjectBody>, JsValue>` |
+| `get(key): Promise<string \| null>` | `async fn get(..) -> Result<Nullable<String>, JsValue>` |
 | `f(): Promise<number \| undefined>` | `async fn f() -> Result<Option<f64>, JsValue>`  |
 | `f<T>(): Promise<T \| null>`        | `async fn f<T>() -> Result<Nullable<T>, JsValue>` |
 | `readonly x?: string \| null`       | `fn x(&self) -> Option<Nullable<String>>`       |
 
-An awaited carrier around a type parameter bounds it through the
-carrier's trait (`T: NullableFromWasmAbi`, `T: OptionFromWasmAbi`).
+The awaited value [lowers like a sync return](#awaited-values-lower-like-sync-returns),
+so the carrier holds the read form (`String`, `f64`, an enum), not the
+`JsString` / `Number` handle. An awaited carrier around a type
+parameter bounds it through the carrier's trait
+(`T: NullableFromWasmAbi`, `T: OptionFromWasmAbi`).
 
 ### Writes
 
@@ -187,7 +191,8 @@ factories expand the union instead: each empty is an arm.
 
 ### Inner positions
 
-A position inside a generic container (`Promise<T | null>`,
+A position inside a generic container (a `Promise<T | null>` argument
+or [`_promise` form](#name_promise--the-un-awaited-form) return,
 `Array<T | undefined>`, a callback's arguments and return value) cannot
 expand, and needs a `JsGeneric` handle: `JsNullable<T>` when `null` is
 admitted (`T | null | undefined` too; `is_empty` covers both),
@@ -1663,7 +1668,8 @@ default.
 function fetch(url: string): Promise<Response>;
 ```
 
-emits a single async signature with `catch`:
+emits an async signature with `catch` (beside the sync
+[`_promise` form](#name_promise--the-un-awaited-form)):
 
 ```rust
 #[wasm_bindgen(catch)]
@@ -1707,30 +1713,44 @@ relying on `IntoFuture`, was rejected: the future's error is always
 async binding, and under `--fallible` a sync throw and a rejection would need
 `?.await?`.
 
-### Async return primitives lower to `js_sys` wrappers
+### Awaited values lower like sync returns
 
-Primitive types behave differently in `Promise<T>` than they do in
-sync returns or arguments:
+The resolved value of an `async fn` import does not cross the boundary
+as a `Promise<T>` payload: wasm-bindgen awaits the promise through
+`JsFuture<T>`, whose resolve closure takes `T` by `FromWasmAbi`, the
+same conversion a sync return gets. Async returns therefore use the
+top-level return lowering, and only the `_promise` form, which hands
+out the JS promise object itself, keeps the inside-generic wrappers:
 
-| TypeScript                     | Async return                  |
-| ------------------------------ | ----------------------------- |
-| `Promise<boolean>`             | `Result<Boolean, JsValue>`    |
-| `Promise<number>`              | `Result<Number, JsValue>`     |
-| `Promise<string>`              | `Result<JsString, JsValue>`   |
-| `Promise<void>`                | `Result<Undefined, JsValue>`  |
-| `Promise<T \| null>`           | `Result<Nullable<T>, JsValue>`  |
-| `Promise<number \| undefined>`  | `Result<Option<Number>, JsValue>`|
-| `Promise<Foo>` (named JS type) | `Result<Foo, JsValue>`        |
+| TypeScript                      | `async fn`                    | `_promise` form              |
+| ------------------------------- | ----------------------------- | ---------------------------- |
+| `Promise<boolean>`              | `Result<bool, E>`             | `Promise<Boolean>`           |
+| `Promise<number>`               | `Result<f64, E>`              | `Promise<Number>`            |
+| `Promise<string>`               | `Result<String, E>`           | `Promise<JsString>`          |
+| `Promise<void>`                 | `Result<(), E>`               | `Promise<Undefined>`         |
+| `Promise<string \| null>`       | `Result<Nullable<String>, E>` | `Promise<JsNullable<JsString>>` |
+| `Promise<number \| undefined>`  | `Result<Option<f64>, E>`      | `Promise<JsOption<Number>>`  |
+| `Promise<Foo[]>`                | `Result<Vec<Foo>, E>`         | `Promise<Array<Foo>>`        |
+| `Promise<A \| B>` (erased)      | `Result<<name>ReturnKind, E>` | `Promise<JsValue>`           |
+| `Promise<Foo>` (named JS type)  | `Result<Foo, E>`              | `Promise<Foo>`               |
 
-`wasm-bindgen`'s typed `Promise<T>` / `JsFuture<T>` require
-`T: JsGeneric` — an externref-backed type — which bare Rust
-primitives aren't. The `js_sys` wrappers are. The awaited value's own
-empties use the [read carriers](#reads) around that handle. Callers recover Rust
-primitives via `value_of()` (for `Boolean` / `Number`) or
-`String::from(_)` / `.into()` (for `JsString`).
+The awaited value's own empties use the exact [read carriers](#reads)
+(`Option<T>`, `Nullable<T>`, `Option<Nullable<T>>`) around that form;
+the `_promise` form's are an [inner position](#inner-positions), which
+per-monomorphization gives the carrier (`Promise<Nullable<JsString>>`,
+see [the table](#per-monomorphization)). The
+exception is a list over an in-scope type parameter: `get<T>():
+Promise<T[]>` stays `Result<Array<T>, E>`, because an `async` import
+converts the awaited value through `<Vec<T> as FromWasmAbi>`, which
+`T: JsGeneric` does not provide, whereas a sync import erases `T` to
+its concrete representation first. A JS value that contradicts the
+declaration (a number where `Promise<string>` was declared) aborts at
+the conversion, exactly as a sync `-> String` import would.
 
-Sync returns, arguments, and properties keep the bare-primitive
-lowering.
+The `_promise` form keeps JS-typed parameters because the promise is a
+JS object that flows into JS APIs (`waitUntil`, `Promise.race`), which
+need `T: JsGeneric` to upcast it to `Promise<JsValue>`; `Promise<String>`
+would await fine but could not be handed back to JS as a typed promise.
 
 ## `Iterator<T>` / `IterableIterator<T>` map to `js_sys::Iterator<T>`
 
@@ -1911,7 +1931,8 @@ pub fn flag_key_js_string<T>(this: &EvaluationDetails<T>) -> JsString;
 ```
 
 No variant is generated when the return's only string leaves are inside
-built-in containers (`Promise<Array<string>>` keeps its single binding),
+built-in containers (a `Promise<Array<string>>` getter or
+[`_promise` form](#name_promise--the-un-awaited-form) keeps its single binding),
 except for a top-level string list (below), or when a top-level union becomes
 a [dynamic-union enum](#erased-return-position-unions-become-dynamic-union-enums):
 `"a" | "b"` returns its enum only.
@@ -1927,9 +1948,10 @@ handles accept `JsString` elements, and also `String` under
 (`Array<String>`, `Set<String>`). A variadic rest array, a constructor's
 included, lowers like any other list argument (`...parts: string[]` takes
 `&[impl JsStringLike]`, `...values: number[]` takes `&[f64]`), since
-wasm-bindgen spreads any sequence. A sync string list return gets a
+wasm-bindgen spreads any sequence. A string list return, sync or awaited,
+and its carriers (`Option<Vec<String>>`, `Nullable<Vec<String>>`) get a
 `_js_string` variant returning the list as one handle rather than decoding
-every element; an awaited list is already the handle:
+every element:
 
 ```rust
 pub fn set_tags(tags: &[impl ::wasm_bindgen::JsStringLike]);
@@ -1941,19 +1963,26 @@ pub fn join(parts: &[impl ::wasm_bindgen::JsStringLike]) -> String;
 pub fn get_tags() -> Vec<String>;
 #[wasm_bindgen(js_name = "getTags")]
 pub fn get_tags_js_string() -> Array<JsString>;
+pub async fn fetch_tags() -> Result<Vec<String>, JsValue>;
+#[wasm_bindgen(js_name = "fetchTags")]
+pub async fn fetch_tags_js_string() -> Result<Array<JsString>, JsValue>;
 ```
 
-Async returns use native Rust values in this mode when the resolved type is
-a primitive, a nullable primitive, or a locally declared generic type:
+Async returns use the top-level return lowering in both modes, so this mode
+only adds the `_js_string` variant, on the same terms as a sync return:
 
 | TypeScript | Default | `--experimental-generic-mono` |
 |---|---|---|
-| `Promise<string>` | `Result<JsString, _>` | `Result<String, _>` + `_js_string` |
-| `Promise<number>` | `Result<Number, _>` | `Result<f64, _>` |
-| `Promise<boolean>` | `Result<Boolean, _>` | `Result<bool, _>` |
-| `Promise<string \| undefined>` | `Result<Option<JsString>, _>` | `Result<Option<String>, _>` + `_js_string` |
+| `Promise<string>` | `Result<String, _>` | `Result<String, _>` + `_js_string` |
+| `Promise<string \| undefined>` | `Result<Option<String>, _>` | `Result<Option<String>, _>` + `_js_string` |
 | `Promise<Details<string>>` | `Result<Details<JsString>, _>` | `Result<Details<String>, _>` + `_js_string` |
-| `Promise<Array<string>>` | `Result<Array<JsString>, _>` | unchanged |
+| `Promise<Array<string>>` | `Result<Vec<String>, _>` | `Result<Vec<String>, _>` + `_js_string` |
+| `Promise<string[] \| null>` | `Result<Nullable<Vec<String>>, _>` | `Result<Nullable<Vec<String>>, _>` + `_js_string` |
+
+The `_js_string` variant of an awaited value resolves the `JsString` form
+(`Result<Array<JsString>, _>`, `Result<Nullable<Array<JsString>>, _>`). The
+`_promise` form gets no variant: its string leaves are already inside the
+`Promise` handle (`Promise<Array<JsString>>`).
 
 This can increase code size because wasm-bindgen generates a separate shim and
 descriptor for every instantiation. The option is experimental and tracks the
@@ -2126,9 +2155,9 @@ emits
 
 ```rust
 // default
-pub async fn upload(this: &Foo, file: &File) -> Result<Undefined, JsValue>;
+pub async fn upload(this: &Foo, file: &File) -> Result<(), JsValue>;
 // with --error-type crate::Error
-pub async fn upload(this: &Foo, file: &File) -> Result<Undefined, crate::Error>;
+pub async fn upload(this: &Foo, file: &File) -> Result<(), crate::Error>;
 ```
 
 The path is emitted verbatim, so it is resolved from the generated
@@ -2293,7 +2322,8 @@ pub fn try_frobnicate(this: &Foo) -> Result<String, JsValue>;
   the primary drops its `catch` and returns `T` directly.
 * **Async callables** (returning `Promise<T>`) drop the `Result<T, _>`
   wrapper and the `catch` attribute. The binding becomes
-  `pub async fn foo() -> T`.
+  `pub async fn foo() -> T`; its `foo_promise` form is plain under
+  every policy.
 * **Constructors** always catch per JS `new` semantics —
   `@throws {never}` on a constructor is silently ignored.
 * **Setters** never throw and never get `try_` variants regardless,
@@ -2451,11 +2481,14 @@ to `boolean`, then three layered rules decide:
    `TypeError | RangeError` keep the `Error` ancestor; mixed
    `string | ArrayBuffer | ArrayBufferView` synthesises.
 
-Nested unions inside generics (e.g. `Promise<32 | "foo">`,
-`Array<32 | "foo">`) still go through the inner-position lowering —
-the synthesised-enum path doesn't reach into generic containers
-because wasm-bindgen requires `T: JsGeneric` for `Promise<T>` /
-`Map<K, V>` / etc. and a synthesised enum doesn't qualify.
+Nested unions inside generics (e.g. `Array<32 | "foo">`, a
+`_promise` form's `Promise<32 | "foo">`) still go through the
+inner-position lowering — the synthesised-enum path doesn't reach into
+generic containers because wasm-bindgen requires `T: JsGeneric` for
+`Promise<T>` / `Map<K, V>` / etc. and a synthesised enum doesn't
+qualify. The awaited value of an `async fn` is a top-level return and
+does synthesise (`fetchValue(): Promise<32 | "foo">` →
+`Result<FetchValueReturnKind, E>`).
 
 #### Variant kinds and naming
 
@@ -2829,7 +2862,7 @@ pub mod cloudflare {
             pub type SendEmail;
             #[wasm_bindgen(method, catch)]
             pub async fn send(this: &SendEmail, message: &super::email::EmailMessage)
-                -> Result<Undefined, JsValue>;
+                -> Result<(), JsValue>;
         }
     }
 }

@@ -634,8 +634,7 @@ fn push_with_js_string_return(
     let has_js_return = cgctx.is_some_and(|ctx| {
         ctx.experimental_generic_mono
             && (typemap::has_mono_js_string_return(&sig.return_type, ctx, scope)
-                || (!sig.is_async
-                    && typemap::is_mono_string_list_return(&sig.return_type, ctx, scope)))
+                || typemap::is_mono_string_list_return(&sig.return_type, ctx, scope))
     });
     out.push(sig.clone());
     if has_js_return {

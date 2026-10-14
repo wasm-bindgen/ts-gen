@@ -134,11 +134,15 @@ fn nullability_signatures_compile(
     let _: Holder<JsOption<Number>> = holder(holder_value);
 }
 
-// The awaited value of an async binding takes its read carrier.
+// The awaited value of an async binding takes its read carrier around
+// the sync return form; the `_promise` form's is an inner position.
 #[allow(dead_code)]
 async fn nullability_async_compile() {
     let _: Result<Nullable<Registry>, _> = fetch_null().await;
-    let _: Result<Option<Number>, _> = fetch_optional().await;
-    let _: Result<Option<Nullable<JsString>>, _> = fetch_both().await;
+    let _: Result<Option<f64>, _> = fetch_optional().await;
+    let _: Result<Option<Nullable<String>>, _> = fetch_both().await;
     let _: Result<Nullable<JsString>, _> = fetch_generic::<JsString>().await;
+    let _: Result<JsNullable<Registry>, _> = fetch_null_promise().await;
+    let _: Result<JsOption<Number>, _> = fetch_optional_promise().await;
+    let _: Result<JsNullable<JsString>, _> = fetch_both_promise().await;
 }

@@ -57,7 +57,7 @@ extern "C" {
         default_value: f64,
     ) -> Promise<DefaultDetails<Number>>;
     #[wasm_bindgen(method, catch, js_name = "getStringArray")]
-    pub async fn get_string_array(this: &DefaultFlags) -> Result<Array<JsString>, JsValue>;
+    pub async fn get_string_array(this: &DefaultFlags) -> Result<Vec<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "getStringArray")]
     pub fn get_string_array_promise(this: &DefaultFlags) -> Promise<Array<JsString>>;
 }

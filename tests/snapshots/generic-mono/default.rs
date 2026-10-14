@@ -171,7 +171,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Flags;
     #[wasm_bindgen(method, catch, js_name = "getStringValue")]
-    pub async fn get_string_value(this: &Flags, default_value: &str) -> Result<JsString, JsValue>;
+    pub async fn get_string_value(this: &Flags, default_value: &str) -> Result<String, JsValue>;
     #[wasm_bindgen(method, js_name = "getStringValue")]
     pub fn get_string_value_promise(this: &Flags, default_value: &str) -> Promise<JsString>;
     #[wasm_bindgen(method, catch, js_name = "getStringDetails")]
@@ -208,7 +208,7 @@ extern "C" {
     pub async fn get_nullable_string(
         this: &Flags,
         default_value: &str,
-    ) -> Result<Option<JsString>, JsValue>;
+    ) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "getNullableString")]
     pub fn get_nullable_string_promise(
         this: &Flags,
@@ -225,7 +225,7 @@ extern "C" {
         default_value: &str,
     ) -> Promise<Pair<JsString, JsString>>;
     #[wasm_bindgen(method, catch, js_name = "getStringArray")]
-    pub async fn get_string_array(this: &Flags) -> Result<Array<JsString>, JsValue>;
+    pub async fn get_string_array(this: &Flags) -> Result<Vec<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "getStringArray")]
     pub fn get_string_array_promise(this: &Flags) -> Promise<Array<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "getStringMap")]

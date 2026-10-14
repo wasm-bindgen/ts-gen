@@ -528,7 +528,7 @@ extern "C" {
         this: &Cache,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &Map<impl ::wasm_bindgen::JsStringLike, Array<impl ::wasm_bindgen::JsStringLike>>,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "set")]
     pub fn set_promise(
         this: &Cache,

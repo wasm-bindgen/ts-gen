@@ -80,7 +80,7 @@ extern "C" {
     #[doc = " * `QuotaError` — when over quota"]
     #[doc = " * `Error` — otherwise"]
     #[wasm_bindgen(method, catch)]
-    pub async fn grow(this: &Store, bytes: f64) -> Result<Undefined, JsException>;
+    pub async fn grow(this: &Store, bytes: f64) -> Result<(), JsException>;
     #[doc = " Multiple `@throws` lines aggregate; a user subclass sorts before its"]
     #[doc = " parents."]
     #[doc = ""]

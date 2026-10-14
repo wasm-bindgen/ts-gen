@@ -21,6 +21,7 @@ export const getTags = () => ["a", "b"];
 export const getMaybeTags = () => undefined;
 export const getFlags = () => [true, false];
 export const fetchTags = async () => ["x"];
+export const fetchMaybeTags = async () => ["y", "z"];
 export const getValue = () => [true, false];
 export class Labels {
   constructor() {

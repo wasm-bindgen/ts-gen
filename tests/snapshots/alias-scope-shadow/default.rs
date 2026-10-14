@@ -181,7 +181,7 @@ pub mod shadow {
     #[wasm_bindgen]
     extern "C" {
         #[wasm_bindgen(catch, js_namespace = "Shadow")]
-        pub async fn next() -> Result<JsString, JsValue>;
+        pub async fn next() -> Result<super::Mode, JsValue>;
     }
     #[wasm_bindgen]
     extern "C" {

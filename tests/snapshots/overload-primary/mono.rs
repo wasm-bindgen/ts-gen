@@ -154,7 +154,7 @@ extern "C" {
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_promise(
         this: &Store,
@@ -167,7 +167,7 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_key_and_value_and_options_promise(
         this: &Store,
@@ -176,10 +176,7 @@ extern "C" {
         options: &GetOptions,
     ) -> Result<Promise<Undefined>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_entries(
-        this: &Store,
-        entries: &Object<JsString>,
-    ) -> Result<Undefined, JsValue>;
+    pub async fn put_with_entries(this: &Store, entries: &Object<JsString>) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_entries_promise(
         this: &Store,
@@ -190,7 +187,7 @@ extern "C" {
         this: &Store,
         entries: &Object<JsString>,
         options: &GetOptions,
-    ) -> Result<Undefined, JsValue>;
+    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_entries_and_options_promise(
         this: &Store,

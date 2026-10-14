@@ -44,7 +44,8 @@ async fn generic_mono_signatures_compile(flags: &Flags, js_string: &JsString) {
     let _: Result<Pair<JsString, JsString>, JsValue> =
         flags.get_string_pair_js_string("default").await;
 
-    let _: Result<Array<JsString>, JsValue> = flags.get_string_array().await;
+    let _: Result<Vec<String>, JsValue> = flags.get_string_array().await;
+    let _: Result<Array<JsString>, JsValue> = flags.get_string_array_js_string().await;
     let _: Result<Map<JsString, JsString>, JsValue> = flags.get_string_map().await;
     let _: Result<ArrayTuple<(JsString, JsString)>, JsValue> = flags.get_string_tuple().await;
     let _: Result<Function<fn(JsString) -> JsString>, JsValue> = flags.get_string_callback().await;
