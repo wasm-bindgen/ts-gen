@@ -46,7 +46,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [Duplicate identifiers](#duplicate-identifiers)
 * [External type mapping and web platform defaults](#external-type-mapping-and-web-platform-defaults)
 * [Provided functions (`--provides`)](#provided-functions---provides)
-* [Wasm ABI (`--target wat`)](#wasm-abi---target-wat)
+* [Wasm ABI (`--target wat` / `embed`)](#wasm-abi---target-wat--embed)
 
 ---
 
@@ -5023,14 +5023,15 @@ Two files are written next to the output:
   (`app.rs`), only if absent: the same signatures with the TS JSDoc as
   doc comments and placeholder bodies, for the author to fill in.
 
-## Wasm ABI (`--target wat`)
+## Wasm ABI (`--target wat` / `embed`)
 
 Besides the default `--target rust` output (wasm-bindgen extern
 blocks), ts-gen can emit a lower-level **Wasm ABI** suitable for
 languages that compile directly to WebAssembly without wasm-bindgen.
 `--target wat` prints it as an import template: every ABI function as
 an import from `./bindings.wasm`, with its TS declaration alongside,
-and a stub export per provided function.
+and a stub export per provided function. `ts-gen embed` implements
+the ABI for a module written against it.
 
 The ABI covers what the Rust bindings emit: each
 [export](#the-export-map) of the files and modules `--export` selects,
@@ -5043,7 +5044,7 @@ class reached that way with only its instance members (see
 | TypeScript         | Wasm type    | Notes                                |
 | ------------------ | ------------ | ------------------------------------ |
 | `number`           | `f64`        |                                      |
-| `boolean`          | `i32`        | `0` = false, non-zero = true         |
+| `boolean`          | `i32`        | `0` = false, non-zero = true; `embed` writes them to JS through `Boolean()` so JS sees `true`/`false`, not `1`/`0` |
 | `bigint`           | `i64`        |                                      |
 | everything else    | `externref`  | strings, objects, null, undefined, numeric enums, `never` |
 
@@ -5111,6 +5112,27 @@ the provided functions then wraps each with `WebAssembly.promising`,
 so a handler may suspend and JS receives a promise of its result.
 Without the import a handler returns a promise (or a plain value)
 itself, and the published functions are the raw exports.
+
+### Reference types
+
+The template uses `externref` for all JS values. `embed` validates
+each reference position (each param, the result) independently and
+accepts, per position:
+
+* `externref` or `anyref` (GC languages emit `anyref` for `@external`
+  parameters and `externref` for results; any mix is fine);
+* `(ref extern)` or `(ref any)` wherever it is sound. Positions the
+  module itself produces (its import arguments, its handler results)
+  may always be narrowed: that is the module's own promise. Positions
+  JS produces (import results, handler parameters, the `await` result)
+  may be narrowed unless the TS type admits `null`; `undefined` is a
+  non-null reference, so `T | undefined` qualifies. The bindings export
+  the exact type and wrap a narrowed result in `ref.as_non_null`, so a
+  JS `null` where TS promised a value traps rather than crossing. A
+  non-null reference on a `null`-admitting JS-produced position is
+  rejected with an error naming it.
+
+The generated bindings mirror the module's exact types.
 
 ### Export naming
 
@@ -5266,6 +5288,24 @@ values and import nothing. A scalar `const` or `let` that is itself an
 export takes its scalar type, as any other value does: `export const
 count: number` is `(func (result f64))`.
 
+`embed` reaches them through the merged module's own
+ESM imports, one immutable `externref` global per export (ESM
+integration coerces a non-`WebAssembly.Global` export into one):
+
+```wat
+(import "cloudflare:sockets" "connect" (global $m:connect externref))
+(import "cloudflare:sockets" "Socket" (global $m:Socket externref))
+```
+
+A module's free function is called with `globalThis` as `this`; a
+class export is constructed with `call_new`, and its statics and
+nested namespaces are read with `reflect_get` as for globals. A
+`const`/`let` export is the global's value, under the per-position
+reference rule above (`anyref` converts, `(ref extern)` narrows).
+Module exports are references and immutable, so a scalar-typed one is
+an error in the model, and assigning a module export is rejected by
+`embed`.
+
 ### Provided functions in the ABI
 
 The [`--provides`](#provided-functions---provides) spec is lowered to
@@ -5287,13 +5327,80 @@ path:
   unreachable)
 ```
 
+`embed` publishes the module namespace: each distinct first path
+segment becomes an exported externref global holding the function
+itself (`version`) or an object tree (`default.fetch`,
+`api.math.add`), built with `reflect_set` at start. The module's raw
+function exports are stripped after the merge; any other module
+export named like a published segment (a raw `version` beside
+`version.get`, a raw `default`) would survive it as a duplicate and
+is an error. Without `--provides` the wrapper is empty and the
+module's own exports pass through.
+
+### JSPI detection
+
+Importing `await` from `builtins.js` opts into JSPI (JavaScript
+Promise Integration) mode:
+
+```wat
+(import "./builtins.js" "await" (func $await (param externref) (result externref)))
+```
+
+Each position is independently `externref` or `anyref`; the result
+stays nullable since a promise may resolve to `null`. In JSPI mode,
+`embed` wraps each provided function with `WebAssembly.promising` so
+it can suspend on Promise results; since only provided functions are
+wrapped, `await` without `--provides` is an error. Without the
+import, handlers must return Promises directly (or non-Promise
+values).
+
+### The three artifacts
+
+`ts-gen embed` reads a language module written against the template
+(given the same `--export`s, so it binds the same surface) and produces:
+
+1. **`bindings.wasm`** — implements each `Type.member` import using
+   the JS primitives in `builtins.js`.
+2. **`wrapper.wasm`** — imports the language module's provided
+   functions and publishes the module namespace: one exported
+   externref global per first path segment (`default`, `version`,
+   `api`), each wrapped with `WebAssembly.promising` in JSPI mode.
+3. **`builtins.js`** — the fixed primitive set both modules import:
+   `global` (globalThis), `reflect_get`, `reflect_set`,
+   `reflect_apply`, `call0..8`, `call_new0..8`, `is_undefined`,
+   `undefined`, and `await`. Beyond eight arguments, and for
+   variadics, the arguments are gathered into a JS array for
+   `Reflect.apply` / `Reflect.construct`.
+
+### Single-module output
+
+`embed` links the three modules into a single `.wasm` that imports
+only `builtins.js`, the js-string-builtins string constants module
+and each `declare module` specifier the module uses. Binaryen's
+`wasm-merge` is required for this step: `--wasm-merge`, then
+`$WASM_MERGE`, then `PATH`.
+
+After merging, the bindings' `Type.member` functions and the module's
+raw export functions are stripped, leaving the published namespace
+globals plus any other exports the module had.
+
+The result is loaded as an ES module: compiled with
+`importedStringConstants: "wasm:js/string-constants"` and the
+`js-string` builtins, with `./builtins.js` and the `declare module`
+specifiers resolved by the host. The published exports are
+`WebAssembly.Global`s; ESM integration (the `wasm_esm_integration_builtins`
+runtime in workerd) presents their values as the module's exports,
+so `export default` is the handler object. Instantiated by hand, read
+`exports.default.value`.
+
 ### Limitations
 
 **Variadics** (`...rest: T[]`) become a Wasm GC array parameter
 `(ref null $anyrefs)` where `$anyrefs` is `(type $anyrefs (array (mut
 anyref)))`. The `anyref` element type lets GC languages build the
-array natively. Fixed parameters before the rest are allowed. This
-requires Wasm GC, not just reference-types.
+array natively. Fixed parameters before the rest are allowed; the
+bindings copy the GC array into a JS array and call `Reflect.apply`.
+This requires Wasm GC, not just reference-types.
 
 **Duplicate names.** Within one module, or among the globals, a
 declaration merged from several `.d.ts` statements contributes each

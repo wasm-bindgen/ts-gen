@@ -300,6 +300,10 @@ fn check_stale_snapshots(fixtures: &[String]) -> Vec<String> {
     {
         let path = entry.path();
         let name = entry.file_name().to_string_lossy().to_string();
+        // The embed harness (`tests/embed.rs`) keeps its own snapshots.
+        if name == "embed" {
+            continue;
+        }
         if !path.is_dir() || !fixtures.contains(&format!("{name}.d.ts")) {
             stale.push(path.display().to_string());
             continue;
