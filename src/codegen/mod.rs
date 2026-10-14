@@ -7,6 +7,7 @@ pub mod classes;
 pub mod discriminated_unions;
 pub mod enums;
 pub mod functions;
+pub(crate) mod inline_wrappers;
 pub(crate) mod null_arms;
 pub mod signatures;
 pub mod subtyping;
@@ -156,6 +157,7 @@ pub fn generate_with_options(
     let mut file = syn::parse2::<syn::File>(tokens.clone()).map_err(|e| {
         anyhow::anyhow!("generated tokens are not valid syn:\n{e}\n\nTokens:\n{tokens}")
     })?;
+    inline_wrappers::apply(&mut file);
     split_unshared_views(&mut file.items);
     signatures::state_abi_bounds(&mut file.items);
     null_arms::apply(&mut file.items);
@@ -485,7 +487,7 @@ fn dynamic_union_variant_name(ty: &TypeRef) -> String {
     match ty {
         T::Boolean | T::BooleanLiteral(_) => "Bool".to_string(),
         T::Number | T::NumberLiteral(_) => "F64".to_string(),
-        T::RustScalar(s) => s.as_str().to_uppercase(),
+        T::RustScalar(s) | T::WideScalar(s) => s.as_str().to_uppercase(),
         T::String | T::StringLiteral(_) => "String".to_string(),
         T::BigInt => "BigInt".to_string(),
         T::Void | T::Undefined => "Undefined".to_string(),
