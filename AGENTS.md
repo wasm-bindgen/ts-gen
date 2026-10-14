@@ -39,12 +39,17 @@ src/
 │   ├── signatures.rs          # parameter expansion + per-callable layer
 │   ├── subtyping.rs           # builtin parents + `lub_types` (LUB)
 │   └── typemap.rs             # TypeRef → syn tokens, `to_return_type`, externals
+├── abi/                       # Wasm ABI layer (--target wat)
+│   ├── mod.rs                 # ABI model, `build()`
+│   └── wat.rs                 # import template generator
 └── util/                      # naming, diagnostics, dedup helpers
 
 tests/
 ├── fixtures/*.d.ts            # input declarations
 ├── snapshots/*.rs             # expected generated output (BLESS=1 to update)
-└── snapshot.rs                # the snapshot harness
+├── snapshots/*.wat            # --target wat output
+├── snapshots/*.wat.err        # --target wat error, for a fixture the ABI rejects
+└── snapshot.rs                # the Rust and WAT snapshot harness
 
 integration-tests/
 ├── tests/*.rs                 # hand-written integration tests
