@@ -77,3 +77,8 @@ impl<T: ::wasm_bindgen::JsGeneric> OptionsBuilder<T> {
         self.inner
     }
 }
+impl<T: ::wasm_bindgen::JsGeneric> From<Options<T>> for OptionsBuilder<T> {
+    fn from(inner: Options<T>) -> Self {
+        Self { inner }
+    }
+}

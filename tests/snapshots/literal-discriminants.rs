@@ -76,6 +76,11 @@ impl OptionsBuilder {
         self.inner
     }
 }
+impl From<Options> for OptionsBuilder {
+    fn from(inner: Options) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "literal-discriminants")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]

@@ -70,6 +70,11 @@ impl AttachmentBuilder {
         self.inner
     }
 }
+impl From<Attachment> for AttachmentBuilder {
+    fn from(inner: Attachment) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "discriminated-union-enum")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -134,6 +139,11 @@ impl ReplyBuilder {
     }
     pub fn build(self) -> Reply {
         self.inner
+    }
+}
+impl From<Reply> for ReplyBuilder {
+    fn from(inner: Reply) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(module = "discriminated-union-enum")]

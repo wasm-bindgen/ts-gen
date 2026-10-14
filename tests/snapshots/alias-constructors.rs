@@ -85,6 +85,11 @@ impl PointBuilder {
         self.inner
     }
 }
+impl From<Point> for PointBuilder {
+    fn from(inner: Point) -> Self {
+        Self { inner }
+    }
+}
 #[allow(dead_code)]
 pub type Pt = Point;
 #[wasm_bindgen(module = "alias-constructors")]

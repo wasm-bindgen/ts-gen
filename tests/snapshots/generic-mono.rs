@@ -80,6 +80,13 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> EvaluationDetailsBuilder<T> {
         self.inner
     }
 }
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> From<EvaluationDetails<T>>
+    for EvaluationDetailsBuilder<T>
+{
+    fn from(inner: EvaluationDetails<T>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "generic-mono", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -145,6 +152,11 @@ impl TypedArrayOptionsBuilder {
     }
     pub fn build(self) -> TypedArrayOptions {
         self.inner
+    }
+}
+impl From<TypedArrayOptions> for TypedArrayOptionsBuilder {
+    fn from(inner: TypedArrayOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(module = "generic-mono", experimental_generic_mono)]

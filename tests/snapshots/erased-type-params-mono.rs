@@ -42,6 +42,11 @@ impl<M: ::wasm_bindgen::convert::IntoWasmAbi> EntryBuilder<M> {
         self.inner
     }
 }
+impl<M: ::wasm_bindgen::convert::IntoWasmAbi> From<Entry<M>> for EntryBuilder<M> {
+    fn from(inner: Entry<M>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -102,6 +107,11 @@ impl<M: ::wasm_bindgen::convert::IntoWasmAbi> ListResultBuilder<M> {
     }
     pub fn build(self) -> ListResult<M> {
         self.inner
+    }
+}
+impl<M: ::wasm_bindgen::convert::IntoWasmAbi> From<ListResult<M>> for ListResultBuilder<M> {
+    fn from(inner: ListResult<M>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]

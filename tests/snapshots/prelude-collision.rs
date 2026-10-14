@@ -63,6 +63,11 @@ impl DefaultBuilder {
         self.inner
     }
 }
+impl From<Default_> for DefaultBuilder {
+    fn from(inner: Default_) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "prelude-collision")]
 extern "C" {
     # [wasm_bindgen (extends = Object , js_name = "Vec")]
