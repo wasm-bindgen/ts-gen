@@ -1659,7 +1659,11 @@ pub fn to_syn_type(
             } else {
                 to_syn_type(&sig.return_type, inner_pos, ctx, scope, from_module)
             };
-            let base = if params.iter().all(is_jsvalue_arg) && is_jsvalue_arg(&ret) {
+            // A `fn` pointer type has fixed arity, so a rest parameter
+            // cannot be spelled; the untyped `Function` accepts any
+            // closure, which is what `(...args: any[]) => void` means.
+            let variadic = sig.params.iter().any(|p| p.variadic);
+            let base = if variadic || params.iter().all(is_jsvalue_arg) && is_jsvalue_arg(&ret) {
                 quote! { Function }
             } else {
                 quote! { Function<fn(#(#params),*) -> #ret> }
