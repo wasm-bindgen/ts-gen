@@ -1541,7 +1541,10 @@ For every JS callable, `ts-gen`:
    [primitive union arguments](#primitive-union-arguments)).
 2. **Cross-overload dedup**: When multiple overloads expand to the same
    concrete parameter list, drop the duplicates. Two overloads that
-   both truncate to `(callback)` produce only one binding.
+   both truncate to `(callback)` produce only one binding. Duplicates
+   that differ only in the value of string-literal parameters are kept
+   as arms of one binding instead (see
+   [literal-keyed overloads](#inline-wrappers)).
 3. **Suffix assignment**: Across all surviving expansions, compute
    `_with_X` / `_with_X_and_Y` suffixes that disambiguate them. The
    primary variant gets `""`; the others are named after the
@@ -2513,7 +2516,8 @@ is emitted under a private name and a non-extern `pub fn` of the public
 name converts over it. The rule is narrow on purpose: a wrapper is
 never emitted for ergonomics, only where no extern signature can carry
 the type, and the extern form stays reachable (within the module) under
-`<name>_js`.
+`<name>_js`. Two constructs qualify today: 64-bit integers on a JS
+number, and overloads keyed by a string literal.
 
 **`@rust u64` / `i64` on a `number`.** wasm-bindgen passes 64-bit
 integers as `BigInt`, so a `u64` extern parameter or return would make
@@ -2570,6 +2574,75 @@ impl R2Object {
   call the wrapper setter, so `R2PutOptions::builder().size(5)` reads as
   declared.
 * Doc comments move to the wrapper; the extern binding is not `pub`.
+
+**Overloads distinguished only by a string literal.** Rust has no
+literal types, so `get(key, type: "json")` and `get(key, type:
+"arrayBuffer")` both lower to `(key: &str, type: &str)` and used to
+collapse into one binding with the first overload's return type. The
+extern ABI cannot carry the literal; the wrapper can:
+
+```ts
+interface KVNamespace {
+  get(key: string): Promise<string | null>;
+  get(key: string, type: "text"): Promise<string | null>;
+  get(key: string, type: "json"): Promise<any>;
+  get(key: string, type: "arrayBuffer"): Promise<ArrayBuffer | null>;
+  get(key: string[], type: "text"): Promise<Map<string, string | null>>;
+  get(key: string[], type: "json"): Promise<Map<string, any>>;
+}
+declare class CompressionStream {
+  constructor(format: "gzip" | "deflate" | "deflate-raw");
+}
+```
+
+```rust
+extern "C" {
+    pub async fn get(this: &KVNamespace, key: &str) -> Result<Option<String>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn get_text_js(this: &KVNamespace, key: &str, r#type: &str) -> Result<Option<String>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn get_json_js(this: &KVNamespace, key: &str, r#type: &str) -> Result<JsValue, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn get_array_buffer_js(this: &KVNamespace, key: &str, r#type: &str) -> Result<Option<ArrayBuffer>, JsValue>;
+    // …
+    #[wasm_bindgen(constructor, catch)]
+    fn new_gzip_js(format: &str) -> Result<CompressionStream, JsValue>;
+}
+impl KVNamespace {
+    pub async fn get_text(&self, key: &str) -> Result<Option<String>, JsValue> {
+        self.get_text_js(key, "text").await
+    }
+    pub async fn get_json(&self, key: &str) -> Result<JsValue, JsValue> { /* "json" */ }
+    pub async fn get_array_buffer(&self, key: &str) -> Result<Option<ArrayBuffer>, JsValue> { /* … */ }
+    pub async fn get_text_with_slice(&self, key: &[String]) -> Result<Map<JsString, JsNullable<JsString>>, JsValue> { /* … */ }
+    pub async fn get_json_with_slice(&self, key: &[String]) -> Result<Map<JsString, JsValue>, JsValue> { /* … */ }
+}
+impl CompressionStream {
+    pub fn new_gzip() -> Result<CompressionStream, JsValue> { Self::new_gzip_js("gzip") }
+    pub fn new_deflate() -> Result<CompressionStream, JsValue> { Self::new_gzip_js("deflate") }
+    pub fn new_deflate_raw() -> Result<CompressionStream, JsValue> { /* "deflate-raw" */ }
+}
+```
+
+* A **cohort** is a set of two or more expansions that agree on every
+  parameter except string-literal ones at the same positions. The arms
+  come from separate overloads or from one overload's literal union
+  (`"gzip" | "deflate" | "deflate-raw"`); a lone literal
+  (`getAll(name: "Set-Cookie")`) is not a cohort and keeps the plain
+  `&str` binding, as does a cohort that also absorbed a plain `string`
+  arm (`"a" | "b" | string`), since the plain form already covers it.
+* Each wrapper is named `<base>_<literal>` in snake case, followed by
+  the `_with_` suffix the remaining parameters earn among the plain
+  expansions (`get_json`, `get_json_with_slice`). Every arm is named
+  explicitly; no arm takes the bare base name, which stays with the
+  literal-free overload (`get(key)`) when there is one.
+* Arms with the same return type share one extern binding, named after
+  the first arm (`get_text_js` also serves nothing else here, but
+  `new_gzip_js` serves all three formats); a different return type gets
+  its own, since the extern return is what wasm-bindgen converts.
+* The `_promise` and `try_` companions follow per arm
+  (`get_json_promise`, `try_describe_raw`) over their own extern.
+* Setters are exempt: `set_disposition("inline")` takes the value.
 
 ## `--annotate` side files
 
