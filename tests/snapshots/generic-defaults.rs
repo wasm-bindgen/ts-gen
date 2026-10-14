@@ -6,15 +6,15 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "generic-defaults")]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , js_name = "Box")]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Box<T: ::wasm_bindgen::JsGeneric = JsValue>;
+    pub type Box_<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter)]
-    pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &Box<T>) -> T;
+    pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &Box_<T>) -> T;
     #[wasm_bindgen(method)]
-    pub fn set<T: ::wasm_bindgen::JsGeneric>(this: &Box<T>, value: &T);
+    pub fn set<T: ::wasm_bindgen::JsGeneric>(this: &Box_<T>, value: &T);
     #[wasm_bindgen(method, catch, js_name = "set")]
-    pub fn try_set<T: ::wasm_bindgen::JsGeneric>(this: &Box<T>, value: &T) -> Result<(), JsValue>;
+    pub fn try_set<T: ::wasm_bindgen::JsGeneric>(this: &Box_<T>, value: &T) -> Result<(), JsValue>;
 }
 #[allow(dead_code)]
 pub type Loose = JsValue;
@@ -22,7 +22,10 @@ pub type Loose = JsValue;
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Holder<T: ::wasm_bindgen::JsGeneric = JsValue, U: ::wasm_bindgen::JsGeneric = Box<T>>;
+    pub type Holder<
+        T: ::wasm_bindgen::JsGeneric = JsValue,
+        U: ::wasm_bindgen::JsGeneric = Box_<T>,
+    >;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Holder, JsValue>;
     #[wasm_bindgen(method)]
@@ -46,7 +49,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Options<T: ::wasm_bindgen::JsGeneric = Box<JsString>>;
+    pub type Options<T: ::wasm_bindgen::JsGeneric = Box_<JsString>>;
     #[wasm_bindgen(method, getter)]
     pub fn initial<T: ::wasm_bindgen::JsGeneric>(this: &Options<T>) -> Option<T>;
     #[wasm_bindgen(method, setter)]
