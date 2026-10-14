@@ -30,3 +30,6 @@ interface Console {
 
 /** @rust i32 */
 declare function setTimeout(callback: () => void, ms?: number): number;
+
+interface Request<Meta = unknown, Cf = Incoming> {}
+type RequestInfo<Meta = unknown, Cf = Incoming> = Request<Meta, Cf> | string;

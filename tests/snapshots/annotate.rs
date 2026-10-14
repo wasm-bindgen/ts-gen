@@ -149,3 +149,83 @@ extern "C" {
         ms: f64,
     ) -> Result<i32, JsValue>;
 }
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Incoming;
+    #[wasm_bindgen(method, getter)]
+    pub fn colo(this: &Incoming) -> String;
+}
+impl Incoming {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Incoming {
+        #[allow(unused_unsafe)]
+        unsafe {
+            JsValue::from(js_sys::Object::new()).unchecked_into()
+        }
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Outgoing;
+    #[wasm_bindgen(method, getter, js_name = "cacheTtl")]
+    pub fn cache_ttl(this: &Outgoing) -> f64;
+}
+impl Outgoing {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Outgoing {
+        #[allow(unused_unsafe)]
+        unsafe {
+            JsValue::from(js_sys::Object::new()).unchecked_into()
+        }
+    }
+}
+#[allow(dead_code)]
+pub type CfProperties = JsValue;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Request<
+        Meta: ::wasm_bindgen::JsGeneric = JsValue,
+        Cf: ::wasm_bindgen::JsGeneric = Incoming,
+    >;
+    #[wasm_bindgen(method, getter)]
+    pub fn cf<Meta: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
+        this: &Request<Meta, Cf>,
+    ) -> Option<Cf>;
+}
+impl<Meta: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric> Request<Meta, Cf> {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Request<Meta, Cf> {
+        #[allow(unused_unsafe)]
+        unsafe {
+            JsValue::from(js_sys::Object::new()).unchecked_into()
+        }
+    }
+}
+#[allow(dead_code)]
+pub type RequestInfo = JsValue;
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub async fn fetch(input: &Request<JsValue, Incoming>) -> Result<Request, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "fetch")]
+    pub fn fetch_promise(input: &Request<JsValue, Incoming>) -> Promise<Request>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "fetch")]
+    pub async fn fetch_with_str(input: &str) -> Result<Request, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "fetch")]
+    pub fn fetch_with_str_promise(input: &str) -> Promise<Request>;
+}

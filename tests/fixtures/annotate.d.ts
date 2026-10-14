@@ -33,3 +33,18 @@ interface Console {
 declare const console: Console;
 
 declare function setTimeout(callback: () => void, ms?: number): number;
+
+// A side declaration's type-parameter defaults replace the input's: the
+// bare `Request` reads `cf` as `Incoming` rather than the erased union.
+interface Incoming {
+  readonly colo: string;
+}
+interface Outgoing {
+  readonly cacheTtl: number;
+}
+type CfProperties = Incoming | Outgoing;
+interface Request<Meta = unknown, Cf = CfProperties> {
+  readonly cf?: Cf;
+}
+type RequestInfo<Meta = unknown, Cf = CfProperties> = Request<Meta, Cf> | string;
+declare function fetch(input: RequestInfo): Promise<Request>;
