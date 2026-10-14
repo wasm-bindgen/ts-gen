@@ -1800,8 +1800,10 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
     // which its arguments may mention and its return instantiates.
     let generics = render_generic_bounds(&generic_bounds_for_method(config, sig));
 
+    let literal = super::inline_wrappers::literal_attr(sig);
     quote! {
         #doc
+        #literal
         #[wasm_bindgen(#(#wb_parts),*)]
         pub fn #rust_ident #generics (#params) -> #ret;
     }
@@ -1866,8 +1868,10 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
     let method_generics = render_generic_bounds(&generic_bounds_for_method(config, sig));
     let this_generics = config.type_generics_args();
 
+    let literal = super::inline_wrappers::literal_attr(sig);
     quote! {
         #doc
+        #literal
         #[wasm_bindgen(#(#wb_parts),*)]
         pub #async_kw fn #rust_ident #method_generics (this: &#this_type #this_generics, #params) #ret;
     }
@@ -1929,8 +1933,10 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
 
     let generics = render_generic_bounds(&generic_bounds_for_method(config, sig));
 
+    let literal = super::inline_wrappers::literal_attr(sig);
     quote! {
         #doc
+        #literal
         #[wasm_bindgen(#(#wb_parts),*)]
         pub #async_kw fn #rust_ident #generics (#params) #ret;
     }
