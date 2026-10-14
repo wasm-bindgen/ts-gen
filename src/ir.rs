@@ -127,6 +127,11 @@ pub enum TypeRef {
     /// is `f64`; declarations that know better (`status: number` is a
     /// `u16`) say so here, and wasm-bindgen converts at the boundary.
     RustScalar(RustScalar),
+    /// A 64-bit scalar (`@rust u64` / `i64`) on a `number` leaf. The
+    /// extern ABI crosses 64-bit integers as `BigInt`, so the binding
+    /// carries `f64` and an inline wrapper converts with `as` (see
+    /// `codegen::inline_wrappers`).
+    WideScalar(RustScalar),
 
     // === Syntactic constructs ===
     /// `T[]` — the syntactic array shortcut. Distinct from
@@ -305,13 +310,17 @@ impl RustScalar {
         })
     }
 
-    /// Whether a TS leaf type can cross the boundary as this scalar.
-    /// wasm-bindgen passes `u64`/`i64` as `BigInt`, so they need a
-    /// `bigint`; every other scalar is a JS `number`.
-    pub fn accepts(self, leaf: &TypeRef) -> bool {
-        match self {
-            Self::U64 | Self::I64 => matches!(leaf, TypeRef::BigInt),
-            _ => matches!(leaf, TypeRef::Number),
+    /// How a TS leaf type carries this scalar, if it can. wasm-bindgen
+    /// passes `u64`/`i64` as `BigInt`, so on a `bigint` they cross
+    /// natively; on a `number` the binding stays `f64` and an inline
+    /// wrapper converts. Every other scalar is a JS `number`.
+    pub fn apply_to(self, leaf: &TypeRef) -> Option<TypeRef> {
+        match (self, leaf) {
+            (Self::U64 | Self::I64, TypeRef::BigInt) => Some(TypeRef::RustScalar(self)),
+            (Self::U64 | Self::I64, TypeRef::Number) => Some(TypeRef::WideScalar(self)),
+            (Self::U64 | Self::I64, _) => None,
+            (_, TypeRef::Number) => Some(TypeRef::RustScalar(self)),
+            _ => None,
         }
     }
 
@@ -347,7 +356,7 @@ impl TypeRef {
     /// Replace the scalar leaf of `self` (through `Nullable`, `Promise`,
     /// and `T[]`) with `scalar`, i.e. what a `@rust` tag applies to.
     /// `None` when the leaf cannot carry `scalar` (see
-    /// [`RustScalar::accepts`]).
+    /// [`RustScalar::apply_to`]).
     pub fn with_rust_scalar(&self, scalar: RustScalar) -> Option<TypeRef> {
         Some(match self {
             TypeRef::Nullable(inner, n) => {
@@ -360,15 +369,14 @@ impl TypeRef {
             } if segments.len() == 1 && segments[0] == "Promise" && generic_args.len() == 1 => {
                 TypeRef::generic("Promise", vec![generic_args[0].with_rust_scalar(scalar)?])
             }
-            leaf if scalar.accepts(leaf) => TypeRef::RustScalar(scalar),
-            _ => return None,
+            leaf => scalar.apply_to(leaf)?,
         })
     }
 
     /// Whether a `@rust` scalar appears anywhere in `self`.
     pub fn has_rust_scalar(&self) -> bool {
         match self {
-            TypeRef::RustScalar(_) => true,
+            TypeRef::RustScalar(_) | TypeRef::WideScalar(_) => true,
             TypeRef::Nullable(inner, _) | TypeRef::Array(inner) => inner.has_rust_scalar(),
             TypeRef::Reference { generic_args, .. } => {
                 generic_args.iter().any(TypeRef::has_rust_scalar)
@@ -504,7 +512,7 @@ impl TypeRef {
             TypeRef::PropertyKey => "PropertyKey".into(),
             TypeRef::TypedSlice(e, _) if e.is_bigint() => "bigint[]".into(),
             TypeRef::TypedSlice(..) => "number[]".into(),
-            TypeRef::RustScalar(s) => s.as_str().into(),
+            TypeRef::RustScalar(s) | TypeRef::WideScalar(s) => s.as_str().into(),
             TypeRef::Array(inner) => {
                 // Wrap composite inner types in parens so e.g.
                 // `(A | B)[]` doesn't render as the wrong-precedence

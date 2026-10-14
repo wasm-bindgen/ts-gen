@@ -314,6 +314,7 @@ pub fn collect_type_params(
         | TypeRef::PropertyKey
         | TypeRef::TypedSlice(..)
         | TypeRef::RustScalar(_)
+        | TypeRef::WideScalar(_)
         | TypeRef::StringLiteral(_)
         | TypeRef::NumberLiteral(_)
         | TypeRef::BooleanLiteral(_)

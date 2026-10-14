@@ -373,7 +373,7 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
         TypeRef::ArrayBufferView => buf.push_str("ArrayBufferView"),
         TypeRef::PropertyKey => buf.push_str("PropertyKey"),
         TypeRef::TypedSlice(e, _) => write!(buf, "slice:{}", e.typed_array()).unwrap(),
-        TypeRef::RustScalar(s) => buf.push_str(s.as_str()),
+        TypeRef::RustScalar(s) | TypeRef::WideScalar(s) => buf.push_str(s.as_str()),
         TypeRef::StringLiteral(s) => write!(buf, "lit:{s:?}").unwrap(),
         TypeRef::NumberLiteral(n) => write!(buf, "lit:{n}").unwrap(),
         TypeRef::BooleanLiteral(b) => write!(buf, "lit:{b}").unwrap(),
@@ -1494,6 +1494,9 @@ pub fn to_syn_type(
             let ident = syn::Ident::new(s.as_str(), proc_macro2::Span::call_site());
             quote! { #ident }
         }
+        // A marker the inline-wrapper pass rewrites: `f64` in the extern
+        // binding, the scalar in the wrapper it emits over it.
+        TypeRef::WideScalar(s) => super::inline_wrappers::marker_tokens(*s),
 
         // === TS-only synthetic ===
         // `ArrayBufferView` is a TS-only union alias (typed-array
@@ -3078,6 +3081,7 @@ fn is_native_array_element(
             | TypeRef::Number
             | TypeRef::NumberLiteral(_)
             | TypeRef::RustScalar(_)
+            | TypeRef::WideScalar(_)
     )
 }
 
@@ -3090,7 +3094,10 @@ fn is_numeric_array_element(
 ) -> bool {
     matches!(
         native_array_leaf(elem, ctx, scope).as_ref(),
-        TypeRef::Number | TypeRef::NumberLiteral(_) | TypeRef::RustScalar(_)
+        TypeRef::Number
+            | TypeRef::NumberLiteral(_)
+            | TypeRef::RustScalar(_)
+            | TypeRef::WideScalar(_)
     )
 }
 
