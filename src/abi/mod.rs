@@ -1,9 +1,16 @@
 //! The Wasm-level ABI derived from a `.d.ts`: one function per member, all
 //! JS values as `externref`, scalars as Wasm numeric types.
 //!
-//! [`wat`] prints the ABI as an import template a language module is
-//! written against (`--target wat`).
+//! Two emitters consume this model:
+//!
+//! * [`wat`] prints the ABI as an import template a language module is
+//!   written against (`--target wat`).
+//! * [`embed`] implements the ABI for a given language module: a
+//!   `bindings.wasm` built on a fixed set of JS primitives, a
+//!   `wrapper.wasm` that presents the module's handlers as a Worker, and
+//!   the `builtins.js` those two import.
 
+pub mod embed;
 pub mod wat;
 
 use std::collections::{HashMap, HashSet};
@@ -43,9 +50,12 @@ pub enum WasmType {
     },
     /// Only used by the wrapper to hand a Wasm function to JS as a function object.
     FuncRef,
-    /// Used in builtin import signatures for variadic array elements. GC languages
-    /// use `anyref` arrays, and JS-bound anyref values convert at the import boundary.
-    AnyRef,
+    /// A JS value a GC language holds as `anyref`: variadic array elements
+    /// in the ABI, and any reference position of a module written that
+    /// way. `null` as for [`WasmType::ExternRef`].
+    AnyRef {
+        null: bool,
+    },
 }
 
 impl WasmType {
@@ -56,7 +66,7 @@ impl WasmType {
             WasmType::F64 => "f64",
             WasmType::ExternRef { .. } => "externref",
             WasmType::FuncRef => "funcref",
-            WasmType::AnyRef => "anyref",
+            WasmType::AnyRef { .. } => "anyref",
         }
     }
 
@@ -76,7 +86,7 @@ impl WasmType {
     pub fn admits_null(self) -> bool {
         matches!(
             self,
-            WasmType::ExternRef { null: true, .. } | WasmType::AnyRef
+            WasmType::ExternRef { null: true, .. } | WasmType::AnyRef { null: true }
         )
     }
 }
