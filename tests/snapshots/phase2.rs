@@ -84,6 +84,16 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
+    #[wasm_bindgen(js_name = "fetch")]
+    pub fn fetch_promise(input: &str) -> Promise<Response>;
+}
+#[wasm_bindgen]
+extern "C" {
     #[wasm_bindgen(catch, js_name = "fetch")]
     pub async fn fetch_with_request(input: &Request) -> Result<Response, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "fetch")]
+    pub fn fetch_with_request_promise(input: &Request) -> Promise<Response>;
 }

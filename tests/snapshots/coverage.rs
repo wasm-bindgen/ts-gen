@@ -131,6 +131,11 @@ pub mod my_module {
     }
     #[wasm_bindgen(module = "my-module")]
     extern "C" {
+        #[wasm_bindgen(js_name = "doWork")]
+        pub fn do_work_promise(input: &str) -> Promise<JsString>;
+    }
+    #[wasm_bindgen(module = "my-module")]
+    extern "C" {
         # [wasm_bindgen (extends = Object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type WorkResult;
@@ -201,6 +206,8 @@ extern "C" {
     pub fn new(config: &Object) -> Result<DefaultProcessor, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn process(this: &DefaultProcessor, input: &str) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, js_name = "process")]
+    pub fn process_promise(this: &DefaultProcessor, input: &str) -> Promise<JsString>;
     #[wasm_bindgen(method, getter)]
     pub fn name(this: &DefaultProcessor) -> String;
 }
@@ -432,12 +439,23 @@ extern "C" {
         this: &Cache,
         key: &str,
     ) -> Result<JsNullable<Map<JsString, Array<JsString>>>, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_promise(
+        this: &Cache,
+        key: &str,
+    ) -> Promise<JsNullable<Map<JsString, Array<JsString>>>>;
     #[wasm_bindgen(method, catch)]
     pub async fn set(
         this: &Cache,
         key: &str,
         value: &Map<JsString, Array<JsString>>,
     ) -> Result<Undefined, JsValue>;
+    #[wasm_bindgen(method, js_name = "set")]
+    pub fn set_promise(
+        this: &Cache,
+        key: &str,
+        value: &Map<JsString, Array<JsString>>,
+    ) -> Promise<Undefined>;
 }
 #[wasm_bindgen]
 extern "C" {

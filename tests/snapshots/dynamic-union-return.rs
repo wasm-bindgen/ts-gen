@@ -52,6 +52,12 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchValue")]
     pub async fn fetch_value() -> Result<JsValue, JsValue>;
 }
+#[wasm_bindgen]
+extern "C" {
+    #[doc = " Async function with an inner-erased Promise — no enum synthesis."]
+    #[wasm_bindgen(js_name = "fetchValue")]
+    pub fn fetch_value_promise() -> Promise;
+}
 #[wasm_bindgen(private)]
 pub enum ContentKind {
     String(String),

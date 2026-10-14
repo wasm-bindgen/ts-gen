@@ -18,6 +18,9 @@ extern "C" {
     #[doc = " Async method — `Result<T, Error>` instead of `Result<T, JsValue>`."]
     #[wasm_bindgen(method, catch)]
     pub async fn baz(this: &Foo) -> Result<Number, ::js_sys::Error>;
+    #[doc = " Async method — `Result<T, Error>` instead of `Result<T, JsValue>`."]
+    #[wasm_bindgen(method, js_name = "baz")]
+    pub fn baz_promise(this: &Foo) -> Promise<Number>;
     #[doc = " Method with explicit `@throws` — the typed error wins regardless"]
     #[doc = " of the flag."]
     #[doc = ""]
@@ -49,4 +52,10 @@ extern "C" {
     #[doc = " Free function — same default-error rule."]
     #[wasm_bindgen(catch, js_name = "fetchData")]
     pub async fn fetch_data(url: &str) -> Result<JsString, ::js_sys::Error>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[doc = " Free function — same default-error rule."]
+    #[wasm_bindgen(js_name = "fetchData")]
+    pub fn fetch_data_promise(url: &str) -> Promise<JsString>;
 }
