@@ -10,7 +10,7 @@ use JsValue as Readonly;
 extern "C" {
     #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2)]
-    pub static onmessage: JsValue;
+    pub static onmessage: Undefined;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -15428,11 +15428,13 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SqlStorageCursor<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method)]
-    pub fn next<T: ::wasm_bindgen::JsGeneric>(this: &SqlStorageCursor<T>) -> NextReturnKind;
+    pub fn next<T: ::wasm_bindgen::JsGeneric>(
+        this: &SqlStorageCursor<T>,
+    ) -> SqlStorageCursorNextReturn<T>;
     #[wasm_bindgen(method, catch, js_name = "next")]
     pub fn try_next<T: ::wasm_bindgen::JsGeneric>(
         this: &SqlStorageCursor<T>,
-    ) -> Result<NextReturnKind, JsValue>;
+    ) -> Result<SqlStorageCursorNextReturn<T>, JsValue>;
     #[wasm_bindgen(method, js_name = "toArray")]
     pub fn to_array<T: ::wasm_bindgen::JsGeneric>(this: &SqlStorageCursor<T>) -> Vec<T>;
     #[wasm_bindgen(method, catch, js_name = "toArray")]
@@ -15462,6 +15464,50 @@ extern "C" {
     pub fn rows_read<T: ::wasm_bindgen::JsGeneric>(this: &SqlStorageCursor<T>) -> f64;
     #[wasm_bindgen(method, getter, js_name = "rowsWritten")]
     pub fn rows_written<T: ::wasm_bindgen::JsGeneric>(this: &SqlStorageCursor<T>) -> f64;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type SqlStorageCursorNextReturn<T: ::wasm_bindgen::JsGeneric = JsValue>;
+    #[wasm_bindgen(method, getter)]
+    pub fn done<T: ::wasm_bindgen::JsGeneric>(this: &SqlStorageCursorNextReturn<T>)
+        -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_done<T: ::wasm_bindgen::JsGeneric>(this: &SqlStorageCursorNextReturn<T>, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &SqlStorageCursorNextReturn<T>) -> Option<T>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_value<T: ::wasm_bindgen::JsGeneric>(
+        this: &SqlStorageCursorNextReturn<T>,
+        val: Option<T>,
+    );
+}
+impl<T: ::wasm_bindgen::JsGeneric> SqlStorageCursorNextReturn<T> {
+    pub fn new() -> SqlStorageCursorNextReturn<T> {
+        Self::builder().build()
+    }
+    pub fn builder() -> SqlStorageCursorNextReturnBuilder<T> {
+        SqlStorageCursorNextReturnBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+pub struct SqlStorageCursorNextReturnBuilder<T: ::wasm_bindgen::JsGeneric> {
+    inner: SqlStorageCursorNextReturn<T>,
+}
+impl<T: ::wasm_bindgen::JsGeneric> SqlStorageCursorNextReturnBuilder<T> {
+    pub fn done(self, val: bool) -> Self {
+        self.inner.set_done(val);
+        self
+    }
+    pub fn value(self, val: Option<T>) -> Self {
+        self.inner.set_value(val);
+        self
+    }
+    pub fn build(self) -> SqlStorageCursorNextReturn<T> {
+        self.inner
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -22847,9 +22893,9 @@ extern "C" {
     pub fn set_functions(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages, val: &[Object]);
     #[doc = " A list of tools available for the assistant to use."]
     #[wasm_bindgen(method, getter)]
-    pub fn tools(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages) -> Option<Vec<JsValue>>;
+    pub fn tools(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages) -> Option<Vec<Object>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages, val: &[JsValue]);
+    pub fn set_tools(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages, val: &[Object]);
     #[doc = " If true, the response will be streamed back incrementally."]
     #[wasm_bindgen(method, getter)]
     pub fn stream(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages) -> Option<bool>;
@@ -22939,7 +22985,7 @@ impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesBuilder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &[JsValue]) -> Self {
+    pub fn tools(self, val: &[Object]) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -23284,11 +23330,10 @@ extern "C" {
     );
     #[doc = " A list of tools available for the assistant to use."]
     #[wasm_bindgen(method, getter)]
-    pub fn tools(
-        this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages,
-    ) -> Option<Vec<JsValue>>;
+    pub fn tools(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages)
+        -> Option<Vec<Object>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages, val: &[JsValue]);
+    pub fn set_tools(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages, val: &[Object]);
     #[wasm_bindgen(method, getter)]
     pub fn response_format(
         this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages,
@@ -23387,7 +23432,7 @@ impl Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_MessagesBuilder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &[JsValue]) -> Self {
+    pub fn tools(self, val: &[Object]) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -24087,9 +24132,9 @@ extern "C" {
     pub fn set_functions(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages, val: &[Object]);
     #[doc = " A list of tools available for the assistant to use."]
     #[wasm_bindgen(method, getter)]
-    pub fn tools(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages) -> Option<Vec<JsValue>>;
+    pub fn tools(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages) -> Option<Vec<Object>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages, val: &[JsValue]);
+    pub fn set_tools(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages, val: &[Object]);
     #[wasm_bindgen(method, getter)]
     pub fn response_format(
         this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages,
@@ -24172,7 +24217,7 @@ impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_MessagesBuilder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &[JsValue]) -> Self {
+    pub fn tools(self, val: &[Object]) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -24494,9 +24539,9 @@ extern "C" {
     pub fn set_functions(this: &Ai_Cf_Qwen_Qwq_32B_Messages, val: &[Object]);
     #[doc = " A list of tools available for the assistant to use."]
     #[wasm_bindgen(method, getter)]
-    pub fn tools(this: &Ai_Cf_Qwen_Qwq_32B_Messages) -> Option<Vec<JsValue>>;
+    pub fn tools(this: &Ai_Cf_Qwen_Qwq_32B_Messages) -> Option<Vec<Object>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(this: &Ai_Cf_Qwen_Qwq_32B_Messages, val: &[JsValue]);
+    pub fn set_tools(this: &Ai_Cf_Qwen_Qwq_32B_Messages, val: &[Object]);
     #[doc = " JSON schema that should be fulfilled for the response."]
     #[wasm_bindgen(method, getter)]
     pub fn guided_json(this: &Ai_Cf_Qwen_Qwq_32B_Messages) -> Option<Object>;
@@ -24573,7 +24618,7 @@ impl Ai_Cf_Qwen_Qwq_32B_MessagesBuilder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &[JsValue]) -> Self {
+    pub fn tools(self, val: &[Object]) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -24876,11 +24921,11 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn tools(
         this: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages,
-    ) -> Option<Vec<JsValue>>;
+    ) -> Option<Vec<Object>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_tools(
         this: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages,
-        val: &[JsValue],
+        val: &[Object],
     );
     #[doc = " JSON schema that should be fulfilled for the response."]
     #[wasm_bindgen(method, getter)]
@@ -24988,7 +25033,7 @@ impl Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_MessagesBuilder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &[JsValue]) -> Self {
+    pub fn tools(self, val: &[Object]) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -25271,9 +25316,9 @@ extern "C" {
     pub fn set_functions(this: &Ai_Cf_Google_Gemma_3_12B_It_Messages, val: &[Object]);
     #[doc = " A list of tools available for the assistant to use."]
     #[wasm_bindgen(method, getter)]
-    pub fn tools(this: &Ai_Cf_Google_Gemma_3_12B_It_Messages) -> Option<Vec<JsValue>>;
+    pub fn tools(this: &Ai_Cf_Google_Gemma_3_12B_It_Messages) -> Option<Vec<Object>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(this: &Ai_Cf_Google_Gemma_3_12B_It_Messages, val: &[JsValue]);
+    pub fn set_tools(this: &Ai_Cf_Google_Gemma_3_12B_It_Messages, val: &[Object]);
     #[doc = " JSON schema that should be fulfilled for the response."]
     #[wasm_bindgen(method, getter)]
     pub fn guided_json(this: &Ai_Cf_Google_Gemma_3_12B_It_Messages) -> Option<Object>;
@@ -25351,7 +25396,7 @@ impl Ai_Cf_Google_Gemma_3_12B_It_MessagesBuilder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &[JsValue]) -> Self {
+    pub fn tools(self, val: &[Object]) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -25703,10 +25748,9 @@ extern "C" {
     pub fn set_functions(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages, val: &[Object]);
     #[doc = " A list of tools available for the assistant to use."]
     #[wasm_bindgen(method, getter)]
-    pub fn tools(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages)
-        -> Option<Vec<JsValue>>;
+    pub fn tools(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages) -> Option<Vec<Object>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages, val: &[JsValue]);
+    pub fn set_tools(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages, val: &[Object]);
     #[wasm_bindgen(method, getter)]
     pub fn response_format(
         this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages,
@@ -25811,7 +25855,7 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_MessagesBuilder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &[JsValue]) -> Self {
+    pub fn tools(self, val: &[Object]) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -26088,11 +26132,11 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn tools(
         this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner,
-    ) -> Option<Vec<JsValue>>;
+    ) -> Option<Vec<Object>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_tools(
         this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner,
-        val: &[JsValue],
+        val: &[Object],
     );
     #[wasm_bindgen(method, getter)]
     pub fn response_format(
@@ -26212,7 +26256,7 @@ impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_InnerBuilder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &[JsValue]) -> Self {
+    pub fn tools(self, val: &[Object]) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -26562,9 +26606,9 @@ extern "C" {
     pub fn set_functions(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages, val: &[Object]);
     #[doc = " A list of tools available for the assistant to use."]
     #[wasm_bindgen(method, getter)]
-    pub fn tools(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages) -> Option<Vec<JsValue>>;
+    pub fn tools(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages) -> Option<Vec<Object>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages, val: &[JsValue]);
+    pub fn set_tools(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages, val: &[Object]);
     #[wasm_bindgen(method, getter)]
     pub fn response_format(
         this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages,
@@ -26646,7 +26690,7 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_MessagesBuilder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &[JsValue]) -> Self {
+    pub fn tools(self, val: &[Object]) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -26966,9 +27010,9 @@ extern "C" {
     pub fn set_functions(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1, val: &[Object]);
     #[doc = " A list of tools available for the assistant to use."]
     #[wasm_bindgen(method, getter)]
-    pub fn tools(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1) -> Option<Vec<JsValue>>;
+    pub fn tools(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1) -> Option<Vec<Object>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1, val: &[JsValue]);
+    pub fn set_tools(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1, val: &[Object]);
     #[wasm_bindgen(method, getter)]
     pub fn response_format(
         this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1,
@@ -27050,7 +27094,7 @@ impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1Builder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &[JsValue]) -> Self {
+    pub fn tools(self, val: &[Object]) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -28753,11 +28797,10 @@ extern "C" {
     );
     #[doc = " A list of tools available for the assistant to use."]
     #[wasm_bindgen(method, getter)]
-    pub fn tools(
-        this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages,
-    ) -> Option<Vec<JsValue>>;
+    pub fn tools(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages)
+        -> Option<Vec<Object>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages, val: &[JsValue]);
+    pub fn set_tools(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages, val: &[Object]);
     #[wasm_bindgen(method, getter)]
     pub fn response_format(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages,
@@ -28856,7 +28899,7 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_MessagesBuilder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &[JsValue]) -> Self {
+    pub fn tools(self, val: &[Object]) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -29216,9 +29259,9 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn tools(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1,
-    ) -> Option<Vec<JsValue>>;
+    ) -> Option<Vec<Object>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1, val: &[JsValue]);
+    pub fn set_tools(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1, val: &[Object]);
     #[wasm_bindgen(method, getter)]
     pub fn response_format(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1,
@@ -29318,7 +29361,7 @@ impl Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1Builder {
         self.inner.set_functions(val);
         self
     }
-    pub fn tools(self, val: &[JsValue]) -> Self {
+    pub fn tools(self, val: &[Object]) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -31888,7 +31931,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "cf-aig-metadata")]
     pub fn set_cf_aig_metadata_with_str(this: &AIGatewayHeaders, val: &str);
     #[wasm_bindgen(method, getter, js_name = "cf-aig-custom-cost")]
-    pub fn cf_aig_custom_cost(this: &AIGatewayHeaders) -> CfAigCustomCostKind;
+    pub fn cf_aig_custom_cost(this: &AIGatewayHeaders) -> AudioKind;
     #[wasm_bindgen(method, setter, js_name = "cf-aig-custom-cost")]
     pub fn set_cf_aig_custom_cost(this: &AIGatewayHeaders, val: &Object);
     #[wasm_bindgen(method, setter, js_name = "cf-aig-custom-cost")]
@@ -33364,7 +33407,7 @@ extern "C" {
     #[doc = " width takes dpr into account, and can be specified either using a single"]
     #[doc = " width property, or individually for each side."]
     #[wasm_bindgen(method, getter)]
-    pub fn border(this: &RequestInitCfPropertiesImage) -> Option<NextReturnKind>;
+    pub fn border(this: &RequestInitCfPropertiesImage) -> Option<Object>;
     #[wasm_bindgen(method, setter)]
     pub fn set_border(this: &RequestInitCfPropertiesImage, val: &Object);
     #[doc = " Increase brightness by a factor. A value of 1.0 equals no change, a value"]
@@ -37704,9 +37747,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_meta(this: &D1Response, val: &JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn error(this: &D1Response) -> JsValue;
+    pub fn error(this: &D1Response) -> Option<Undefined>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_error(this: &D1Response, val: &JsValue);
+    pub fn set_error(this: &D1Response, val: &Undefined);
 }
 impl D1Response {
     #[doc = " ## Inlined fields"]
@@ -37729,7 +37772,7 @@ pub struct D1ResponseBuilder {
     inner: D1Response,
 }
 impl D1ResponseBuilder {
-    pub fn error(self, val: &JsValue) -> Self {
+    pub fn error(self, val: &Undefined) -> Self {
         self.inner.set_error(val);
         self
     }
@@ -37769,7 +37812,7 @@ pub struct D1ResultBuilder<T: ::wasm_bindgen::JsGeneric> {
     inner: D1Result<T>,
 }
 impl<T: ::wasm_bindgen::JsGeneric> D1ResultBuilder<T> {
-    pub fn error(self, val: &JsValue) -> Self {
+    pub fn error(self, val: &Undefined) -> Self {
         self.inner.set_error(val);
         self
     }
@@ -38604,9 +38647,43 @@ pub mod cloudflare {
             pub fn try_listen(this: &NodeStyleServer, args: &[JsValue])
                 -> Result<JsValue, JsValue>;
             #[wasm_bindgen(method)]
-            pub fn address(this: &NodeStyleServer) -> Object;
+            pub fn address(this: &NodeStyleServer) -> NodeStyleServerAddressReturn;
             #[wasm_bindgen(method, catch, js_name = "address")]
-            pub fn try_address(this: &NodeStyleServer) -> Result<Object, JsValue>;
+            pub fn try_address(
+                this: &NodeStyleServer,
+            ) -> Result<NodeStyleServerAddressReturn, JsValue>;
+        }
+        #[wasm_bindgen(module = "cloudflare:node")]
+        extern "C" {
+            # [wasm_bindgen (extends = Object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type NodeStyleServerAddressReturn;
+            #[wasm_bindgen(method, getter)]
+            pub fn port(this: &NodeStyleServerAddressReturn) -> Option<f64>;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_port(this: &NodeStyleServerAddressReturn, val: Option<&JsNullable<Number>>);
+        }
+        impl NodeStyleServerAddressReturn {
+            pub fn new() -> NodeStyleServerAddressReturn {
+                Self::builder().build()
+            }
+            pub fn builder() -> NodeStyleServerAddressReturnBuilder {
+                NodeStyleServerAddressReturnBuilder {
+                    inner: JsCast::unchecked_into(js_sys::Object::new()),
+                }
+            }
+        }
+        pub struct NodeStyleServerAddressReturnBuilder {
+            inner: NodeStyleServerAddressReturn,
+        }
+        impl NodeStyleServerAddressReturnBuilder {
+            pub fn port(self, val: Option<&JsNullable<Number>>) -> Self {
+                self.inner.set_port(val);
+                self
+            }
+            pub fn build(self) -> NodeStyleServerAddressReturn {
+                self.inner
+            }
         }
         #[wasm_bindgen(module = "cloudflare:node")]
         extern "C" {
@@ -39664,7 +39741,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_blur(this: &ImageTransform, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn border(this: &ImageTransform) -> Option<NextReturnKind>;
+    pub fn border(this: &ImageTransform) -> Option<Object>;
     #[wasm_bindgen(method, setter)]
     pub fn set_border(this: &ImageTransform, val: &Object);
     #[wasm_bindgen(method, getter)]
@@ -47085,11 +47162,6 @@ pub enum BinaryTypeKind {
     Arraybuffer = "arraybuffer",
 }
 #[wasm_bindgen(private)]
-pub enum NextReturnKind {
-    Object(Object),
-    Object2(Object),
-}
-#[wasm_bindgen(private)]
 pub enum SecureTransportKind {
     On = "on",
     Off = "off",
@@ -47452,12 +47524,6 @@ pub enum FeedbackKind {
 #[wasm_bindgen(private)]
 pub enum CfAigMetadataKind {
     Record(Object),
-    String(String),
-}
-#[wasm_bindgen(private)]
-pub enum CfAigCustomCostKind {
-    Object(Object),
-    Object2(Object),
     String(String),
 }
 #[wasm_bindgen(private)]
