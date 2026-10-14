@@ -5281,9 +5281,9 @@ extern "C" {
         this: &SubtleCryptoDeriveKeyAlgorithm,
         val: &SubtleCryptoHashAlgorithm,
     );
-    #[wasm_bindgen(method, getter)]
+    #[wasm_bindgen(method, getter, js_name = "$public")]
     pub fn public(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<CryptoKey>;
-    #[wasm_bindgen(method, setter)]
+    #[wasm_bindgen(method, setter, js_name = "$public")]
     pub fn set_public(this: &SubtleCryptoDeriveKeyAlgorithm, val: &CryptoKey);
     #[wasm_bindgen(method, getter)]
     pub fn info(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<SaltKind>;
@@ -28075,9 +28075,9 @@ extern "C" {
     pub fn cfbaaibge_base_en_v_15(this: &AiModels) -> Base_Ai_Cf_Baai_Bge_Base_En_V1_5;
     #[wasm_bindgen(method, setter, js_name = "@cf/baai/bge-base-en-v1.5")]
     pub fn set_cfbaaibge_base_en_v_15(this: &AiModels, val: &Base_Ai_Cf_Baai_Bge_Base_En_V1_5);
-    #[wasm_bindgen(method, getter)]
+    #[wasm_bindgen(method, getter, js_name = "@cf/openai/whisper")]
     pub fn cfopenaiwhisper(this: &AiModels) -> Base_Ai_Cf_Openai_Whisper;
-    #[wasm_bindgen(method, setter)]
+    #[wasm_bindgen(method, setter, js_name = "@cf/openai/whisper")]
     pub fn set_cfopenaiwhisper(this: &AiModels, val: &Base_Ai_Cf_Openai_Whisper);
     #[wasm_bindgen(method, getter, js_name = "@cf/meta/m2m100-1.2b")]
     pub fn cfmetam2_m100_12_b(this: &AiModels) -> Base_Ai_Cf_Meta_M2M100_1_2B;
@@ -28260,9 +28260,9 @@ extern "C" {
         this: &AiModels,
         val: &Base_Ai_Cf_Pfnet_Plamo_Embedding_1B,
     );
-    #[wasm_bindgen(method, getter)]
+    #[wasm_bindgen(method, getter, js_name = "@cf/deepgram/flux")]
     pub fn cfdeepgramflux(this: &AiModels) -> Base_Ai_Cf_Deepgram_Flux;
-    #[wasm_bindgen(method, setter)]
+    #[wasm_bindgen(method, setter, js_name = "@cf/deepgram/flux")]
     pub fn set_cfdeepgramflux(this: &AiModels, val: &Base_Ai_Cf_Deepgram_Flux);
     #[wasm_bindgen(method, getter, js_name = "@cf/deepgram/aura-2-en")]
     pub fn cfdeepgramaura2_en(this: &AiModels) -> Base_Ai_Cf_Deepgram_Aura_2_En;

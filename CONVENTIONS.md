@@ -222,6 +222,11 @@ the setter is named `set_<snake_case>`.
   ident, so `wasm-bindgen` binds to the correct runtime name.
 * Reserved Rust keywords (e.g. `type`, `match`, `move`) are emitted as raw
   identifiers (`r#type`).
+* Names that are not valid Rust identifiers are sanitised (`0` → `_0`,
+  `$public` → `public`, `@cf/openai/whisper` → `cfopenaiwhisper`). Both
+  the getter and the `set_` setter carry `js_name` with the original key
+  whenever the emitted ident no longer spells it, so `WebSocketPair`'s
+  `0` / `1` and `$public` bind to the real properties.
 
 ## JS-name collisions with `js_sys` glob imports
 

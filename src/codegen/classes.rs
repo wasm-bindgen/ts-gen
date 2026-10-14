@@ -1604,7 +1604,9 @@ fn generate_getter(
     );
 
     let mut wb_parts: Vec<TokenStream> = vec![quote! { method }, quote! { getter }];
-    if rust_name != getter.js_name {
+    // Compare the emitted ident, not the pre-sanitised name: a numeric key
+    // like `0` becomes `_0`, which wasm-bindgen would otherwise bind to `_0`.
+    if rust_ident != getter.js_name {
         let js_name = &getter.js_name;
         wb_parts.push(quote! { js_name = #js_name });
     }
@@ -1721,7 +1723,7 @@ fn generate_setter(
             if super::typemap::needs_slice_to_array(&sig.params) {
                 wb_parts.push(quote! { slice_to_array });
             }
-            if sig.rust_name != format!("set_{}", setter.js_name) {
+            if rust_ident != format!("set_{}", setter.js_name) {
                 let js_name = &setter.js_name;
                 wb_parts.push(quote! { js_name = #js_name });
             }
@@ -1765,7 +1767,7 @@ fn generate_static_getter(
         quote! { static_method_of = #class_ident },
         quote! { getter },
     ];
-    if rust_name != getter.js_name {
+    if rust_ident != getter.js_name {
         let js_name = &getter.js_name;
         wb_parts.push(quote! { js_name = #js_name });
     }
@@ -1862,7 +1864,7 @@ fn generate_static_setter(
             if super::typemap::needs_slice_to_array(&sig.params) {
                 wb_parts.push(quote! { slice_to_array });
             }
-            if sig.rust_name != format!("set_{}", setter.js_name) {
+            if rust_ident != format!("set_{}", setter.js_name) {
                 let js_name = &setter.js_name;
                 wb_parts.push(quote! { js_name = #js_name });
             }
