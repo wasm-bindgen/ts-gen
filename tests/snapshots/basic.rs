@@ -137,6 +137,14 @@ extern "C" {
     #[doc = " Creates a clone of this response."]
     #[wasm_bindgen(method, catch, js_name = "clone")]
     pub fn try_clone(this: &Response) -> Result<Response, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn text(this: &Response) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "text")]
+    pub fn text_promise(this: &Response) -> Promise<JsString>;
+    #[wasm_bindgen(method, catch, js_name = "text")]
+    pub async fn text_with_encoding(this: &Response, encoding: &str) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "text")]
+    pub fn text_with_encoding_promise(this: &Response, encoding: &str) -> Promise<JsString>;
     #[doc = " The HTTP status code."]
     #[wasm_bindgen(method, getter)]
     pub fn status(this: &Response) -> f64;
