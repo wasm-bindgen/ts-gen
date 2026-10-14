@@ -1501,6 +1501,57 @@ The non-`try_` form panics on JS throw; the `try_` form returns `Result`.
 Setters and constructors don't get a `try_` companion (setters never
 catch; constructors always catch).
 
+### `--fallible` — one `Result` binding per callable
+
+The two-binding shape exists so that code which never expects a JS
+throw can call the short name. Code written as `fn handler() ->
+Result<_, Error>` with `?` on every binding call wants the opposite:
+exactly one binding per JS member that never aborts. `--fallible`
+(library: `GenerateOptions::fallible`) switches to that policy. It is
+off by default so existing users keep their surface.
+
+Under the policy:
+
+* **Methods, static methods, free functions and constructors** emit a
+  single `catch` binding under the primary name, returning `Result<T,
+  E>` where `E` is the `@throws` type or the configured default
+  (`--error-type`, else `JsValue`). No panicking variant, no `try_`
+  prefix. Async callables are unchanged — they already had this shape.
+* **`@throws {never}`** makes a method or function plain (`-> T`, no
+  `catch`), as without the flag. Constructors still always catch.
+* **Getters and setters** stay infallible: property access in JS does
+  not normally throw, and a `Result` on every field read would be
+  noise. A getter annotated `@throws {X}` is the exception — it emits
+  `#[wasm_bindgen(method, getter, catch)]` returning `Result<T, X>`.
+  This getter rule applies regardless of `--fallible`: there is no
+  `try_` form for getters, so an explicit annotation has only one
+  possible lowering. Setters never catch.
+
+```ts
+declare class Headers {
+  get(name: string): string | null;
+  /** @throws {TypeError} on an invalid header name */
+  set(name: string, value: string): void;
+  /** @throws {never} */
+  has(name: string): boolean;
+  /** @throws {RangeError} when the body was already consumed */
+  readonly consumedText: string;
+}
+```
+
+emits with `--fallible --error-type crate::Error`:
+
+```rust
+#[wasm_bindgen(method, catch)]
+pub fn get(this: &Headers, name: &str) -> Result<Option<String>, crate::Error>;
+#[wasm_bindgen(method, catch)]
+pub fn set(this: &Headers, name: &str, value: &str) -> Result<(), TypeError>;
+#[wasm_bindgen(method)]
+pub fn has(this: &Headers, name: &str) -> bool;
+#[wasm_bindgen(method, getter, js_name = "consumedText", catch)]
+pub fn consumed_text(this: &Headers) -> Result<String, RangeError>;
+```
+
 ## `Promise<T>` returns become `async fn`
 
 ```ts
@@ -1979,7 +2030,8 @@ pub fn try_frobnicate(this: &Foo) -> Result<String, JsValue>;
 #### Rules
 
 * **Sync callables** with `@throws {never}` get *only* the primary
-  binding — no `try_<name>` companion is emitted.
+  binding — no `try_<name>` companion is emitted. Under `--fallible`
+  the primary drops its `catch` and returns `T` directly.
 * **Async callables** (returning `Promise<T>`) drop the `Result<T, _>`
   wrapper and the `catch` attribute. The binding becomes
   `pub async fn foo() -> T`.

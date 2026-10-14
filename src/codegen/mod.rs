@@ -68,6 +68,19 @@ pub struct GenerateOptions {
     /// (`throw "oops"`) is an unchecked cast at the FFI boundary.
     error_type: Option<String>,
 
+    /// Emit sync methods, free functions and constructors as a single
+    /// `Result`-returning binding under the primary name, with no
+    /// panicking variant and no `try_` prefix. Getters and setters stay
+    /// infallible unless annotated `@throws {X}`; `@throws {never}`
+    /// makes a callable plain.
+    ///
+    /// Off by default: the panicking-primary + `try_` shape is what
+    /// existing users have. A project whose code is written as
+    /// `handler() -> Result<_, Error>` with `?` on every call turns
+    /// this on so there is exactly one binding per JS member and it
+    /// never aborts on a JS throw.
+    fallible: bool,
+
     /// Opt generic imports into wasm-bindgen's experimental
     /// per-monomorphization codegen. Type parameters are emitted without
     /// `JsGeneric` bounds and cross the ABI at their concrete Rust types.
@@ -109,6 +122,13 @@ impl GenerateOptions {
     /// `::js_sys::Error`; `false` restores the `JsValue` default.
     pub fn errors_as_error(mut self, enabled: bool) -> Self {
         self.error_type = enabled.then(|| "::js_sys::Error".to_string());
+        self
+    }
+
+    /// Emit every sync callable as one `Result`-returning binding
+    /// instead of a panicking primary plus `try_` companion.
+    pub fn fallible(mut self, enabled: bool) -> Self {
+        self.fallible = enabled;
         self
     }
 

@@ -209,6 +209,10 @@ pub struct CodegenContext<'a> {
     /// `None` is `JsValue`. See
     /// [`crate::codegen::GenerateOptions::error_type`].
     pub error_type: Option<syn::Type>,
+    /// Sync callables emit one `Result`-returning binding instead of a
+    /// panicking primary plus `try_` companion. See
+    /// [`crate::codegen::GenerateOptions::fallible`].
+    pub fallible: bool,
     /// Whether generic imports use wasm-bindgen's experimental
     /// per-monomorphization codegen rather than type erasure.
     pub experimental_generic_mono: bool,
@@ -702,6 +706,7 @@ impl<'a> CodegenContext<'a> {
             diagnostics: RefCell::new(DiagnosticCollector::new()),
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
             error_type,
+            fallible: options.fallible,
             experimental_generic_mono: options.experimental_generic_mono,
             exported_modules,
             externalised_modules,
@@ -744,6 +749,7 @@ impl<'a> CodegenContext<'a> {
             diagnostics: RefCell::new(DiagnosticCollector::new()),
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
             error_type: None,
+            fallible: false,
             experimental_generic_mono: false,
             exported_modules: HashSet::new(),
             externalised_modules: HashSet::new(),
@@ -2129,13 +2135,24 @@ pub fn to_return_type(
     };
 
     if catch {
-        let err = match error_ty {
-            Some(ty) => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
-            None => default_error_type(ctx),
-        };
+        let err = error_type_tokens(error_ty, ctx, scope, from_module);
         quote! { Result<#inner, #err> }
     } else {
         inner
+    }
+}
+
+/// The `E` of a fallible binding's `Result<T, E>`: the `@throws` type
+/// when one is given, else the configured default.
+pub fn error_type_tokens(
+    error_ty: Option<&TypeRef>,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+) -> TokenStream {
+    match error_ty {
+        Some(ty) => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
+        None => default_error_type(ctx),
     }
 }
 

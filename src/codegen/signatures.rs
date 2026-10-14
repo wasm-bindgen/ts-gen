@@ -493,6 +493,9 @@ pub fn build_signatures(
         .map_or_else(|| base_rust_name(spec.js_name, spec.kind), ident_chars);
     let expansions = expand_signatures(spec.overloads, cgctx);
 
+    // Under the `fallible` policy the primary binding itself catches, so
+    // the `try_` companion has nothing to add.
+    let fallible = cgctx.is_some_and(|c| c.fallible);
     let per_mono = CodegenContext::generic_mono(cgctx);
     let mut out = Vec::with_capacity(expansions.len());
 
@@ -510,7 +513,7 @@ pub fn build_signatures(
             (Some(inner), true) => (true, inner.clone()),
             _ => (false, overload.return_type.clone()),
         };
-        let allow_try = !is_async && !nothrow && spec.kind.allows_try_variant();
+        let allow_try = !is_async && !nothrow && !fallible && spec.kind.allows_try_variant();
         out.reserve(match (allow_try, per_mono) {
             (true, true) => 4,
             (true, false) | (false, true) => 2,
@@ -521,8 +524,10 @@ pub fn build_signatures(
 
         // Primary variant catches when:
         // * the kind always catches (constructors), OR
-        // * it's async — *unless* `Throws::Never` opts out.
-        let primary_catches = spec.kind.always_catches() || (is_async && !nothrow);
+        // * it's async, or sync under the `fallible` policy — *unless*
+        //   `Throws::Never` opts out. Setters never catch.
+        let primary_catches = spec.kind.always_catches()
+            || (!nothrow && (is_async || (fallible && spec.kind.allows_try_variant())));
         let primary = FunctionSignature {
             rust_name: primary_name.clone(),
             js_name: spec.js_name.to_string(),
@@ -1786,6 +1791,61 @@ mod tests {
             .unwrap();
         assert_eq!(js.js_name, "value");
         assert_eq!(js.params.len(), 1);
+    }
+
+    fn fallible_sigs(
+        kind: SignatureKind,
+        throws: &Throws,
+        ret: &TypeRef,
+    ) -> Vec<FunctionSignature> {
+        let (gctx, scope) = test_ctx();
+        let mut cgctx = CodegenContext::empty(&gctx, scope);
+        cgctx.fallible = true;
+        build_signatures(
+            &CallableSpec {
+                js_name: "op",
+                rust_name: None,
+                kind,
+                overloads: &[Overload {
+                    params: &[],
+                    return_type: ret,
+                    body_scope: scope,
+                    throws,
+                    doc: &None,
+                }],
+            },
+            &mut no_used(),
+            Some(&cgctx),
+        )
+    }
+
+    #[test]
+    fn fallible_policy_emits_one_catching_primary() {
+        for kind in [
+            SignatureKind::Method,
+            SignatureKind::StaticMethod,
+            SignatureKind::Function,
+            SignatureKind::Constructor,
+        ] {
+            let sigs = fallible_sigs(kind, &Throws::None, &TypeRef::String);
+            assert_eq!(sigs.len(), 1, "{kind:?}");
+            assert!(sigs[0].catch && !sigs[0].rust_name.starts_with("try_"));
+        }
+        let never = fallible_sigs(SignatureKind::Method, &Throws::Never, &TypeRef::String);
+        assert_eq!(never.len(), 1);
+        assert!(!never[0].catch);
+        let ctor_never =
+            fallible_sigs(SignatureKind::Constructor, &Throws::Never, &TypeRef::String);
+        assert!(ctor_never[0].catch);
+        let setter = fallible_sigs(SignatureKind::Setter, &Throws::None, &TypeRef::Void);
+        assert_eq!(setter.len(), 1);
+        assert!(!setter[0].catch);
+        let typed = fallible_sigs(
+            SignatureKind::Method,
+            &Throws::Type(TypeRef::ident("TypeError")),
+            &TypeRef::Void,
+        );
+        assert_eq!(typed[0].error_type, Some(TypeRef::ident("TypeError")));
     }
 
     #[test]

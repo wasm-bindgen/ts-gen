@@ -63,6 +63,14 @@ struct Cli {
     )]
     error_type: Option<String>,
 
+    /// Emit sync methods, free functions and constructors as a single
+    /// `Result`-returning binding under the primary name: no panicking
+    /// variant, no `try_` prefix. Getters and setters stay infallible
+    /// unless annotated `@throws {X}`; `@throws {never}` makes a
+    /// callable plain. For code that `?`s every binding call.
+    #[arg(long = "fallible")]
+    fallible: bool,
+
     /// Shorthand for `--error-type ::js_sys::Error`.
     ///
     /// Useful in environments that prefer the typed `Error` API
@@ -242,6 +250,7 @@ fn main() -> Result<()> {
 
     let mut options = ts_gen::codegen::GenerateOptions::new()
         .errors_as_error(cli.errors_as_error)
+        .fallible(cli.fallible)
         .experimental_generic_mono(cli.experimental_generic_mono)
         .exports(exports);
     if let Some(path) = &cli.error_type {
