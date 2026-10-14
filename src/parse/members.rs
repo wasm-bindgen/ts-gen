@@ -76,15 +76,17 @@ pub(crate) fn apply_slice_hints(
 /// interfaces, type aliases. The resulting scope ID is what the IR
 /// node stores as its `body_scope`, so codegen can resolve `T`
 /// against the same chain.
+///
+/// Parameters that erase to a primitive (see [`TypeParam::erasure`]) are
+/// bound as that primitive and removed from `type_params`, so the
+/// declaration they belong to is emitted without them.
 pub(crate) fn create_body_scope(
-    type_params: &[TypeParam],
+    type_params: &mut Vec<TypeParam>,
     parent_scope: ScopeId,
     ctx: &mut ParseCtx<'_, '_>,
 ) -> ScopeId {
     let body_scope = ctx.scopes.create_child(parent_scope);
-    for tp in type_params {
-        ctx.scopes.insert_type_param(body_scope, tp.name.clone());
-    }
+    ctx.scopes.bind_type_params(body_scope, type_params);
     body_scope
 }
 
@@ -185,7 +187,7 @@ pub(crate) fn try_synthesize_iterable_return(
     // return becomes `<Parent><member><T>` rather than erasing `T`.
     let mut tp_names = Vec::new();
     collect_in_scope_type_params(&item_type, enclosing_scope, ctx.scopes, &mut tp_names);
-    let synth_type_params: Vec<TypeParam> = tp_names
+    let mut synth_type_params: Vec<TypeParam> = tp_names
         .into_iter()
         .map(|name| TypeParam {
             name,
@@ -198,7 +200,7 @@ pub(crate) fn try_synthesize_iterable_return(
 
     // Body scope of the synthesized wrapper inherits the parent
     // method's scope and binds the wrapper's own type parameters.
-    let body_scope = create_body_scope(&synth_type_params, enclosing_scope, ctx);
+    let body_scope = create_body_scope(&mut synth_type_params, enclosing_scope, ctx);
 
     // wasm-bindgen's `js_name` syntax for symbol-keyed methods is the
     // bracketed `[Symbol.foo]` form (matching JS computed-property
@@ -428,11 +430,11 @@ pub(crate) struct SynthesizedInline {
 pub(crate) fn synthesize_inline(
     shape: &InlineShape<'_, '_>,
     name: String,
-    type_params: Vec<TypeParam>,
+    mut type_params: Vec<TypeParam>,
     parent_scope: ScopeId,
     ctx: &mut ParseCtx<'_, '_>,
 ) -> Option<SynthesizedInline> {
-    let body_scope = create_body_scope(&type_params, parent_scope, ctx);
+    let body_scope = create_body_scope(&mut type_params, parent_scope, ctx);
     let (literals, mode, extends, unions) = match shape {
         InlineShape::Literal(lit) => (vec![*lit], MergeMode::Join, Vec::new(), &[][..]),
         InlineShape::Union(lits) => (lits.clone(), MergeMode::Join, Vec::new(), &[][..]),
@@ -552,7 +554,9 @@ fn is_extendable_in(
 ) -> bool {
     let id = match ctx.scopes.resolve_binding(scope, name) {
         Some(crate::parse::scope::Binding::Declared(id)) => id,
-        Some(crate::parse::scope::Binding::TypeParam) => return false,
+        Some(crate::parse::scope::Binding::TypeParam | crate::parse::scope::Binding::Erased(_)) => {
+            return false
+        }
         None => return true,
     };
     // A cycle is not a valid TS type, so never hoists.
@@ -774,13 +778,13 @@ fn convert_method_signature(
     };
     let (doc, info) = split_info(ctx.docs.info_for_span(method.span.start));
 
-    let type_params = convert_type_params(method.type_parameters.as_ref(), ctx.diag);
+    let mut type_params = convert_type_params(method.type_parameters.as_ref(), ctx.diag);
 
     // The method's own type parameters live in a child scope of the
     // enclosing type's body. Type conversion below resolves names
     // against this scope so `T` and friends bind to the local
     // declaration first.
-    let body_scope = create_body_scope(&type_params, parent_scope, ctx);
+    let body_scope = create_body_scope(&mut type_params, parent_scope, ctx);
 
     // Hoist anonymous `{ ... }` parameter types into named interfaces
     // when we know the surrounding parent name. Without `parent` we
@@ -885,13 +889,13 @@ fn convert_class_method(
     let (doc, info) = split_info(ctx.docs.info_for_span(method.span.start));
 
     let func = &method.value;
-    let type_params = convert_type_params(func.type_parameters.as_ref(), ctx.diag);
+    let mut type_params = convert_type_params(func.type_parameters.as_ref(), ctx.diag);
 
     // Constructors don't introduce their own type parameter scope —
     // they use the class body scope directly. Other class methods do.
     let body_scope = match method.kind {
         MethodDefinitionKind::Constructor => parent_scope,
-        _ => create_body_scope(&type_params, parent_scope, ctx),
+        _ => create_body_scope(&mut type_params, parent_scope, ctx),
     };
 
     let params = match parent {

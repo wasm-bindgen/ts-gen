@@ -508,11 +508,11 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
             return;
         }
 
-        let type_params = convert_type_params(alias.type_parameters.as_ref(), self.diag);
+        let mut type_params = convert_type_params(alias.type_parameters.as_ref(), self.diag);
         // The alias's body scope holds its own type parameters so the
         // target type can resolve them lexically.
         let body_scope = crate::parse::members::create_body_scope(
-            &type_params,
+            &mut type_params,
             dcx.scope,
             &mut self.parse_ctx(),
         );
@@ -815,9 +815,9 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                 _ => return Vec::new(),
             };
             let mut pcx = self.parse_ctx();
-            let type_params = convert_type_params(sig.type_parameters.as_ref(), pcx.diag);
+            let mut type_params = convert_type_params(sig.type_parameters.as_ref(), pcx.diag);
             let body_scope =
-                crate::parse::members::create_body_scope(&type_params, scope, &mut pcx);
+                crate::parse::members::create_body_scope(&mut type_params, scope, &mut pcx);
             let params = crate::parse::types::convert_formal_params_scoped(
                 &sig.params,
                 body_scope,
