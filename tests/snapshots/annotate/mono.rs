@@ -182,3 +182,127 @@ extern "C" {
         n: u32,
     ) -> Result<u32, JsValue>;
 }
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Incoming;
+    #[wasm_bindgen(method, getter)]
+    pub fn colo(this: &Incoming) -> String;
+    #[wasm_bindgen(method, getter, js_name = "colo")]
+    pub fn colo_js_string(this: &Incoming) -> JsString;
+}
+impl Incoming {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Incoming {
+        #[allow(unused_unsafe)]
+        unsafe {
+            JsValue::from(js_sys::Object::new()).unchecked_into()
+        }
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Outgoing;
+    #[wasm_bindgen(method, getter, js_name = "cacheTtl")]
+    pub fn cache_ttl(this: &Outgoing) -> f64;
+}
+impl Outgoing {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Outgoing {
+        #[allow(unused_unsafe)]
+        unsafe {
+            JsValue::from(js_sys::Object::new()).unchecked_into()
+        }
+    }
+}
+#[diagnostic::on_unimplemented(
+    message = "`{Self}` is not a `CfProperties`",
+    label = "expected Incoming or Outgoing"
+)]
+pub trait CfProperties: ::wasm_bindgen::convert::IntoWasmAbi {}
+impl CfProperties for Incoming {}
+impl CfProperties for &Incoming {}
+impl CfProperties for Outgoing {}
+impl CfProperties for &Outgoing {}
+impl CfProperties for CfPropertiesKind {}
+#[wasm_bindgen(private)]
+#[derive(Clone, Debug)]
+pub enum CfPropertiesKind {
+    Incoming(Incoming),
+    Outgoing(Outgoing),
+}
+impl ::core::convert::From<Incoming> for CfPropertiesKind {
+    fn from(value: Incoming) -> Self {
+        Self::Incoming(value)
+    }
+}
+impl ::core::convert::From<&Incoming> for CfPropertiesKind {
+    fn from(value: &Incoming) -> Self {
+        Self::Incoming(value.clone())
+    }
+}
+impl ::core::convert::From<Outgoing> for CfPropertiesKind {
+    fn from(value: Outgoing) -> Self {
+        Self::Outgoing(value)
+    }
+}
+impl ::core::convert::From<&Outgoing> for CfPropertiesKind {
+    fn from(value: &Outgoing) -> Self {
+        Self::Outgoing(value.clone())
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Request<Meta = JsValue, Cf = Incoming>;
+    #[wasm_bindgen(method, getter)]
+    pub fn cf<Meta, Cf>(this: &Request<Meta, Cf>) -> Option<Cf>
+    where
+        Option<Cf>: ::wasm_bindgen::convert::FromWasmAbi;
+}
+impl<Meta: ::wasm_bindgen::convert::IntoWasmAbi, Cf: ::wasm_bindgen::convert::IntoWasmAbi>
+    Request<Meta, Cf>
+{
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Request<Meta, Cf> {
+        #[allow(unused_unsafe)]
+        unsafe {
+            JsValue::from(js_sys::Object::new()).unchecked_into()
+        }
+    }
+}
+impl<Meta: ::wasm_bindgen::convert::IntoWasmAbi, Cf: ::wasm_bindgen::convert::IntoWasmAbi> Default
+    for Request<Meta, Cf>
+{
+    fn default() -> Self {
+        Self::new()
+    }
+}
+#[allow(dead_code)]
+pub type RequestInfo = JsValue;
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub async fn fetch(input: &Request) -> Result<Request, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "fetch")]
+    pub fn fetch_promise(input: &Request) -> Promise<Request>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "fetch")]
+    pub async fn fetch_with_str(
+        input: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Request, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "fetch")]
+    pub fn fetch_with_str_promise(input: impl ::wasm_bindgen::JsStringLike) -> Promise<Request>;
+}

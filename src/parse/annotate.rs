@@ -5,7 +5,9 @@
 //! re-declares only the annotated members does.
 
 use crate::context::{GlobalContext, TypeId};
-use crate::ir::{FunctionDecl, Member, Module, Param, RustScalar, Throws, TypeKind, TypeRef};
+use crate::ir::{
+    FunctionDecl, Member, Module, Param, RustScalar, Throws, TypeKind, TypeParam, TypeRef,
+};
 
 /// Apply every tag found in `annotations` to the matching declarations
 /// of `module`. Returns one message per declaration, member or
@@ -19,11 +21,17 @@ pub fn apply(
     let mut errors = Vec::new();
     for &aid in &annotations.types {
         let adecl = agctx.get_type(aid);
-        let (name, members) = match &adecl.kind {
-            TypeKind::Class(c) => (&c.name, &c.members),
-            TypeKind::Interface(i) => (&i.name, &i.members),
+        let (name, members, type_params) = match &adecl.kind {
+            TypeKind::Class(c) => (&c.name, &c.members, &c.type_params),
+            TypeKind::Interface(i) => (&i.name, &i.members, &i.type_params),
             TypeKind::Function(f) => {
                 apply_function(gctx, module, adecl.doc.as_deref(), f, &mut errors);
+                continue;
+            }
+            // An alias carries no members; only its type-parameter
+            // defaults can be overridden (`RequestInfo<…, Cf = …>`).
+            TypeKind::TypeAlias(a) if a.type_params.iter().any(|tp| tp.default.is_some()) => {
+                apply_type_param_defaults(gctx, module, &a.name, &a.type_params, &mut errors);
                 continue;
             }
             // The side file is a curated list: a declaration this pass
@@ -38,6 +46,7 @@ pub fn apply(
             }
         };
         apply_members(gctx, module, name, members, &mut errors);
+        apply_type_param_defaults(gctx, module, name, type_params, &mut errors);
     }
     errors
 }
@@ -119,6 +128,40 @@ fn apply_function(
     }
 }
 
+/// A side declaration's type-parameter defaults replace the input's, by
+/// parameter name. The input's default is a TypeScript choice that may
+/// erase (`Request<…, Cf = CfProperties<…>>`, a union of the incoming and
+/// outgoing shapes); the side file picks the Rust default for the bare
+/// name (`Cf = IncomingRequestCfProperties<CfHostMetadata>`). Only
+/// parameters that declare a default in the side file are touched.
+fn apply_type_param_defaults(
+    gctx: &mut GlobalContext,
+    module: &Module,
+    name: &str,
+    side: &[TypeParam],
+    errors: &mut Vec<String>,
+) {
+    if side.iter().all(|tp| tp.default.is_none()) {
+        return;
+    }
+    let Ok(id) = find_decl(gctx, module, name) else {
+        return;
+    };
+    let targets: &mut Vec<TypeParam> = match &mut gctx.get_type_mut(id).kind {
+        TypeKind::Class(c) => &mut c.type_params,
+        TypeKind::Interface(i) => &mut i.type_params,
+        TypeKind::DiscriminatedUnion(d) => &mut d.type_params,
+        TypeKind::TypeAlias(a) => &mut a.type_params,
+        _ => return,
+    };
+    for tp in side.iter().filter(|tp| tp.default.is_some()) {
+        match targets.iter_mut().find(|t| t.name == tp.name) {
+            Some(target) => target.default = tp.default.clone(),
+            None => errors.push(format!("`{name}` has no type parameter `{}`", tp.name)),
+        }
+    }
+}
+
 /// The input declaration a side name targets. A name declared more than
 /// once (globally and in a module) cannot be targeted by bare name.
 fn find_decl(gctx: &GlobalContext, module: &Module, name: &str) -> Result<TypeId, String> {
@@ -132,6 +175,7 @@ fn find_decl(gctx: &GlobalContext, module: &Module, name: &str) -> Result<TypeId
                 TypeKind::Class(c) => c.name == name,
                 TypeKind::Interface(i) => i.name == name,
                 TypeKind::DiscriminatedUnion(d) => d.name == name,
+                TypeKind::TypeAlias(a) => a.name == name,
                 TypeKind::Function(f) => f.js_name == name,
                 _ => false,
             }
@@ -500,6 +544,34 @@ mod tests {
         let errs = errors(INPUT, side);
         assert_eq!(errs.len(), 1);
         assert!(errs[0].starts_with("`NS`: only classes"), "{errs:?}");
+    }
+
+    #[test]
+    fn type_param_default_replaces_input() {
+        let input = "
+            interface Incoming { readonly colo: string; }
+            interface Outgoing { readonly cacheTtl: number; }
+            type Cf = Incoming | Outgoing;
+            interface Request<Meta = unknown, Props = Cf> { readonly cf?: Props; }
+        ";
+        let side = "interface Request<Meta = unknown, Props = Incoming> {}";
+        let (module, mut gctx) = crate::parse::parse_single_source(input, None).unwrap();
+        let (annotations, agctx) = crate::parse::parse_single_source(side, None).unwrap();
+        assert!(apply(&mut gctx, &module, &annotations, &agctx).is_empty());
+        let id = module.types.iter().copied().find(|&id| {
+            matches!(&gctx.get_type(id).kind, crate::ir::TypeKind::Interface(i) if i.name == "Request")
+        }).unwrap();
+        let crate::ir::TypeKind::Interface(req) = &gctx.get_type(id).kind else {
+            unreachable!()
+        };
+        assert_eq!(
+            req.type_params[1].default.as_ref().unwrap().format_ts(),
+            "Incoming"
+        );
+        let bad = "interface Request<Nope = Incoming> {}";
+        let (annotations, agctx) = crate::parse::parse_single_source(bad, None).unwrap();
+        let errs = apply(&mut gctx, &module, &annotations, &agctx);
+        assert_eq!(errs, ["`Request` has no type parameter `Nope`"]);
     }
 
     #[test]

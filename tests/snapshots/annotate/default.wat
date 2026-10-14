@@ -77,6 +77,27 @@
   ;; size(keys: string[], n: u32): u32
   (import "./bindings.wasm" "size_with_keys_and_n" (func $size_with_keys_and_n (param $keys externref) (param $n externref) (result externref)))
 
+  ;; Incoming
+  ;; {} as Incoming
+  (import "./bindings.wasm" "Incoming.new" (func $Incoming.new (result externref)))
+  ;; colo: string
+  (import "./bindings.wasm" "Incoming.colo" (func $Incoming.colo (param $this externref) (result externref)))
+
+  ;; Outgoing
+  ;; {} as Outgoing
+  (import "./bindings.wasm" "Outgoing.new" (func $Outgoing.new (result externref)))
+  ;; cacheTtl: number
+  (import "./bindings.wasm" "Outgoing.cache_ttl" (func $Outgoing.cache_ttl (param $this externref) (result f64)))
+
+  ;; Request
+  ;; {} as Request
+  (import "./bindings.wasm" "Request.new" (func $Request.new (result externref)))
+  ;; cf?: Cf
+  (import "./bindings.wasm" "Request.cf" (func $Request.cf (param $this externref) (result externref)))
+
+  ;; fetch(input: RequestInfo): Promise<Request>
+  (import "./bindings.wasm" "fetch" (func $fetch (param $input externref) (result externref)))
+
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
 
