@@ -12383,13 +12383,13 @@ impl UnderlyingByteSource {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"bytes\"`"]
-    pub fn new_bytes() -> UnderlyingByteSource {
-        Self::builder_bytes().build()
+    pub fn new() -> UnderlyingByteSource {
+        Self::builder().build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"bytes\"`"]
-    pub fn builder_bytes() -> UnderlyingByteSourceBuilder {
+    pub fn builder() -> UnderlyingByteSourceBuilder {
         let inner: UnderlyingByteSource = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("bytes");
         UnderlyingByteSourceBuilder { inner }
@@ -13120,7 +13120,7 @@ impl ReadableStreamGetReaderOptions {
     #[doc = " * `mode: \"byob\"` - Creates a ReadableStreamBYOBReader and locks the stream to the new reader."]
     #[doc = ""]
     #[doc = " This call behaves the same way as the no-argument variant, except that it only works on readable byte streams, i.e. streams which were constructed specifically with the ability to handle \"bring your own buffer\" reading. The returned BYOB reader provides the ability to directly read individual chunks from the stream via its read() method, into developer-supplied buffers, allowing more precise control over allocation."]
-    pub fn new_byob() -> ReadableStreamGetReaderOptions {
+    pub fn new() -> ReadableStreamGetReaderOptions {
         let inner: ReadableStreamGetReaderOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_mode("byob");
         inner
@@ -18076,7 +18076,7 @@ impl AiTextGenerationToolOutput {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    pub fn new_function(id: &str, function: &Object) -> AiTextGenerationToolOutput {
+    pub fn new(id: &str, function: &Object) -> AiTextGenerationToolOutput {
         let inner: AiTextGenerationToolOutput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_type("function");
@@ -19060,17 +19060,17 @@ impl ResponsesFunctionTool {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    pub fn new_function(
+    pub fn new(
         name: &str,
         parameters: &JsNullable<Object>,
         strict: &JsNullable<Boolean>,
     ) -> ResponsesFunctionTool {
-        Self::builder_function(name, parameters, strict).build()
+        Self::builder(name, parameters, strict).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    pub fn builder_function(
+    pub fn builder(
         name: &str,
         parameters: &JsNullable<Object>,
         strict: &JsNullable<Boolean>,
@@ -19239,7 +19239,7 @@ impl ResponseContentReasoningText {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"reasoning_text\"`"]
-    pub fn new_reasoning_text(text: &str) -> ResponseContentReasoningText {
+    pub fn new(text: &str) -> ResponseContentReasoningText {
         let inner: ResponseContentReasoningText = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("reasoning_text");
@@ -19285,7 +19285,7 @@ impl ResponseCreatedEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.created\"`"]
-    pub fn new_responsecreated(response: &Response, sequence_number: f64) -> ResponseCreatedEvent {
+    pub fn new(response: &Response, sequence_number: f64) -> ResponseCreatedEvent {
         let inner: ResponseCreatedEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
         inner.set_sequence_number(sequence_number);
@@ -19321,28 +19321,19 @@ impl ResponseCustomToolCallOutput {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
-    pub fn new_custom_tool_call_output(
-        call_id: &str,
-        output: &str,
-    ) -> ResponseCustomToolCallOutput {
-        Self::builder_custom_tool_call_output(call_id, output).build()
+    pub fn new(call_id: &str, output: &str) -> ResponseCustomToolCallOutput {
+        Self::builder(call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
-    pub fn new_custom_tool_call_output_with_slice(
-        call_id: &str,
-        output: &[JsValue],
-    ) -> ResponseCustomToolCallOutput {
-        Self::builder_custom_tool_call_output_with_slice(call_id, output).build()
+    pub fn new_with_slice(call_id: &str, output: &[JsValue]) -> ResponseCustomToolCallOutput {
+        Self::builder_with_slice(call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
-    pub fn builder_custom_tool_call_output(
-        call_id: &str,
-        output: &str,
-    ) -> ResponseCustomToolCallOutputBuilder {
+    pub fn builder(call_id: &str, output: &str) -> ResponseCustomToolCallOutputBuilder {
         let inner: ResponseCustomToolCallOutput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_call_id(call_id);
         inner.set_output(output);
@@ -19352,7 +19343,7 @@ impl ResponseCustomToolCallOutput {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
-    pub fn builder_custom_tool_call_output_with_slice(
+    pub fn builder_with_slice(
         call_id: &str,
         output: &[JsValue],
     ) -> ResponseCustomToolCallOutputBuilder {
@@ -19427,7 +19418,7 @@ impl ResponseErrorEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"error\"`"]
-    pub fn new_error(
+    pub fn new(
         code: &JsNullable<JsString>,
         message: &str,
         param: &JsNullable<JsString>,
@@ -19464,7 +19455,7 @@ impl ResponseFailedEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.failed\"`"]
-    pub fn new_responsefailed(response: &Response, sequence_number: f64) -> ResponseFailedEvent {
+    pub fn new(response: &Response, sequence_number: f64) -> ResponseFailedEvent {
         let inner: ResponseFailedEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
         inner.set_sequence_number(sequence_number);
@@ -19486,7 +19477,7 @@ impl ResponseFormatText {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"text\"`"]
-    pub fn new_text() -> ResponseFormatText {
+    pub fn new() -> ResponseFormatText {
         let inner: ResponseFormatText = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("text");
         inner
@@ -19506,7 +19497,7 @@ impl ResponseFormatJSONObject {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"json_object\"`"]
-    pub fn new_json_object() -> ResponseFormatJSONObject {
+    pub fn new() -> ResponseFormatJSONObject {
         let inner: ResponseFormatJSONObject = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("json_object");
         inner
@@ -19544,16 +19535,13 @@ impl ResponseFormatTextJSONSchemaConfig {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"json_schema\"`"]
-    pub fn new_json_schema(name: &str, schema: &Object) -> ResponseFormatTextJSONSchemaConfig {
-        Self::builder_json_schema(name, schema).build()
+    pub fn new(name: &str, schema: &Object) -> ResponseFormatTextJSONSchemaConfig {
+        Self::builder(name, schema).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"json_schema\"`"]
-    pub fn builder_json_schema(
-        name: &str,
-        schema: &Object,
-    ) -> ResponseFormatTextJSONSchemaConfigBuilder {
+    pub fn builder(name: &str, schema: &Object) -> ResponseFormatTextJSONSchemaConfigBuilder {
         let inner: ResponseFormatTextJSONSchemaConfig =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
@@ -19608,7 +19596,7 @@ impl ResponseFunctionCallArgumentsDeltaEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.function_call_arguments.delta\"`"]
-    pub fn new_responsefunction_call_argumentsdelta(
+    pub fn new(
         delta: &str,
         item_id: &str,
         output_index: f64,
@@ -19658,7 +19646,7 @@ impl ResponseFunctionCallArgumentsDoneEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.function_call_arguments.done\"`"]
-    pub fn new_responsefunction_call_argumentsdone(
+    pub fn new(
         arguments: &str,
         item_id: &str,
         name: &str,
@@ -19714,21 +19702,13 @@ impl ResponseFunctionToolCall {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call\"`"]
-    pub fn new_function_call(
-        arguments: &str,
-        call_id: &str,
-        name: &str,
-    ) -> ResponseFunctionToolCall {
-        Self::builder_function_call(arguments, call_id, name).build()
+    pub fn new(arguments: &str, call_id: &str, name: &str) -> ResponseFunctionToolCall {
+        Self::builder(arguments, call_id, name).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call\"`"]
-    pub fn builder_function_call(
-        arguments: &str,
-        call_id: &str,
-        name: &str,
-    ) -> ResponseFunctionToolCallBuilder {
+    pub fn builder(arguments: &str, call_id: &str, name: &str) -> ResponseFunctionToolCallBuilder {
         let inner: ResponseFunctionToolCall = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_arguments(arguments);
         inner.set_call_id(call_id);
@@ -19802,27 +19782,23 @@ impl ResponseFunctionToolCallOutputItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn new_function_call_output(
-        id: &str,
-        call_id: &str,
-        output: &str,
-    ) -> ResponseFunctionToolCallOutputItem {
-        Self::builder_function_call_output(id, call_id, output).build()
+    pub fn new(id: &str, call_id: &str, output: &str) -> ResponseFunctionToolCallOutputItem {
+        Self::builder(id, call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn new_function_call_output_with_slice(
+    pub fn new_with_slice(
         id: &str,
         call_id: &str,
         output: &[JsValue],
     ) -> ResponseFunctionToolCallOutputItem {
-        Self::builder_function_call_output_with_slice(id, call_id, output).build()
+        Self::builder_with_slice(id, call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn builder_function_call_output(
+    pub fn builder(
         id: &str,
         call_id: &str,
         output: &str,
@@ -19838,7 +19814,7 @@ impl ResponseFunctionToolCallOutputItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn builder_function_call_output_with_slice(
+    pub fn builder_with_slice(
         id: &str,
         call_id: &str,
         output: &[JsValue],
@@ -19892,10 +19868,7 @@ impl ResponseIncompleteEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.incomplete\"`"]
-    pub fn new_responseincomplete(
-        response: &Response,
-        sequence_number: f64,
-    ) -> ResponseIncompleteEvent {
+    pub fn new(response: &Response, sequence_number: f64) -> ResponseIncompleteEvent {
         let inner: ResponseIncompleteEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
         inner.set_sequence_number(sequence_number);
@@ -19931,28 +19904,28 @@ impl ResponseInputImage {
     #[doc = ""]
     #[doc = " * `detail: \"low\"`"]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn new_low_input_image() -> ResponseInputImage {
-        Self::builder_low_input_image().build()
+    pub fn new_low() -> ResponseInputImage {
+        Self::builder_low().build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `detail: \"high\"`"]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn new_high_input_image() -> ResponseInputImage {
-        Self::builder_high_input_image().build()
+    pub fn new_high() -> ResponseInputImage {
+        Self::builder_high().build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `detail: \"auto\"`"]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn new_auto_input_image() -> ResponseInputImage {
-        Self::builder_auto_input_image().build()
+    pub fn new_auto() -> ResponseInputImage {
+        Self::builder_auto().build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `detail: \"low\"`"]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn builder_low_input_image() -> ResponseInputImageBuilder {
+    pub fn builder_low() -> ResponseInputImageBuilder {
         let inner: ResponseInputImage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_detail(DetailKind::Low);
         inner.set_type("input_image");
@@ -19962,7 +19935,7 @@ impl ResponseInputImage {
     #[doc = ""]
     #[doc = " * `detail: \"high\"`"]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn builder_high_input_image() -> ResponseInputImageBuilder {
+    pub fn builder_high() -> ResponseInputImageBuilder {
         let inner: ResponseInputImage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_detail(DetailKind::High);
         inner.set_type("input_image");
@@ -19972,7 +19945,7 @@ impl ResponseInputImage {
     #[doc = ""]
     #[doc = " * `detail: \"auto\"`"]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn builder_auto_input_image() -> ResponseInputImageBuilder {
+    pub fn builder_auto() -> ResponseInputImageBuilder {
         let inner: ResponseInputImage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_detail(DetailKind::Auto);
         inner.set_type("input_image");
@@ -20014,13 +19987,13 @@ impl ResponseInputImageContent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn new_input_image() -> ResponseInputImageContent {
-        Self::builder_input_image().build()
+    pub fn new() -> ResponseInputImageContent {
+        Self::builder().build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn builder_input_image() -> ResponseInputImageContentBuilder {
+    pub fn builder() -> ResponseInputImageContentBuilder {
         let inner: ResponseInputImageContent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("input_image");
         ResponseInputImageContentBuilder { inner }
@@ -20078,28 +20051,22 @@ impl ResponseInputItemFunctionCallOutput {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn new_function_call_output(
-        call_id: &str,
-        output: &str,
-    ) -> ResponseInputItemFunctionCallOutput {
-        Self::builder_function_call_output(call_id, output).build()
+    pub fn new(call_id: &str, output: &str) -> ResponseInputItemFunctionCallOutput {
+        Self::builder(call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn new_function_call_output_with_slice(
+    pub fn new_with_slice(
         call_id: &str,
         output: &[JsValue],
     ) -> ResponseInputItemFunctionCallOutput {
-        Self::builder_function_call_output_with_slice(call_id, output).build()
+        Self::builder_with_slice(call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn builder_function_call_output(
-        call_id: &str,
-        output: &str,
-    ) -> ResponseInputItemFunctionCallOutputBuilder {
+    pub fn builder(call_id: &str, output: &str) -> ResponseInputItemFunctionCallOutputBuilder {
         let inner: ResponseInputItemFunctionCallOutput =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_call_id(call_id);
@@ -20110,7 +20077,7 @@ impl ResponseInputItemFunctionCallOutput {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn builder_function_call_output_with_slice(
+    pub fn builder_with_slice(
         call_id: &str,
         output: &[JsValue],
     ) -> ResponseInputItemFunctionCallOutputBuilder {
@@ -20335,7 +20302,7 @@ impl ResponseInputText {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"input_text\"`"]
-    pub fn new_input_text(text: &str) -> ResponseInputText {
+    pub fn new(text: &str) -> ResponseInputText {
         let inner: ResponseInputText = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("input_text");
@@ -20360,7 +20327,7 @@ impl ResponseInputTextContent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"input_text\"`"]
-    pub fn new_input_text(text: &str) -> ResponseInputTextContent {
+    pub fn new(text: &str) -> ResponseInputTextContent {
         let inner: ResponseInputTextContent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("input_text");
@@ -20407,7 +20374,7 @@ impl ResponseOutputItemAddedEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.added\"`"]
-    pub fn new_responseoutput_itemadded(
+    pub fn new(
         item: &ResponseOutputMessage,
         output_index: f64,
         sequence_number: f64,
@@ -20422,7 +20389,7 @@ impl ResponseOutputItemAddedEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.added\"`"]
-    pub fn new_responseoutput_itemadded_with_response_function_tool_call(
+    pub fn new_with_response_function_tool_call(
         item: &ResponseFunctionToolCall,
         output_index: f64,
         sequence_number: f64,
@@ -20437,7 +20404,7 @@ impl ResponseOutputItemAddedEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.added\"`"]
-    pub fn new_responseoutput_itemadded_with_response_reasoning_item(
+    pub fn new_with_response_reasoning_item(
         item: &ResponseReasoningItem,
         output_index: f64,
         sequence_number: f64,
@@ -20486,7 +20453,7 @@ impl ResponseOutputItemDoneEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.done\"`"]
-    pub fn new_responseoutput_itemdone(
+    pub fn new(
         item: &ResponseOutputMessage,
         output_index: f64,
         sequence_number: f64,
@@ -20501,7 +20468,7 @@ impl ResponseOutputItemDoneEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.done\"`"]
-    pub fn new_responseoutput_itemdone_with_response_function_tool_call(
+    pub fn new_with_response_function_tool_call(
         item: &ResponseFunctionToolCall,
         output_index: f64,
         sequence_number: f64,
@@ -20516,7 +20483,7 @@ impl ResponseOutputItemDoneEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.done\"`"]
-    pub fn new_responseoutput_itemdone_with_response_reasoning_item(
+    pub fn new_with_response_reasoning_item(
         item: &ResponseReasoningItem,
         output_index: f64,
         sequence_number: f64,
@@ -20561,10 +20528,7 @@ impl ResponseOutputMessage {
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"in_progress\"`"]
     #[doc = " * `type: \"message\"`"]
-    pub fn new_assistant_in_progress_message(
-        id: &str,
-        content: &[JsValue],
-    ) -> ResponseOutputMessage {
+    pub fn new_in_progress(id: &str, content: &[JsValue]) -> ResponseOutputMessage {
         let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
@@ -20578,7 +20542,7 @@ impl ResponseOutputMessage {
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"completed\"`"]
     #[doc = " * `type: \"message\"`"]
-    pub fn new_assistant_completed_message(id: &str, content: &[JsValue]) -> ResponseOutputMessage {
+    pub fn new_completed(id: &str, content: &[JsValue]) -> ResponseOutputMessage {
         let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
@@ -20592,10 +20556,7 @@ impl ResponseOutputMessage {
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"incomplete\"`"]
     #[doc = " * `type: \"message\"`"]
-    pub fn new_assistant_incomplete_message(
-        id: &str,
-        content: &[JsValue],
-    ) -> ResponseOutputMessage {
+    pub fn new_incomplete(id: &str, content: &[JsValue]) -> ResponseOutputMessage {
         let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
@@ -20623,7 +20584,7 @@ impl ResponseOutputRefusal {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"refusal\"`"]
-    pub fn new_refusal(refusal: &str) -> ResponseOutputRefusal {
+    pub fn new(refusal: &str) -> ResponseOutputRefusal {
         let inner: ResponseOutputRefusal = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_refusal(refusal);
         inner.set_type("refusal");
@@ -20652,13 +20613,13 @@ impl ResponseOutputText {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"output_text\"`"]
-    pub fn new_output_text(text: &str) -> ResponseOutputText {
-        Self::builder_output_text(text).build()
+    pub fn new(text: &str) -> ResponseOutputText {
+        Self::builder(text).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"output_text\"`"]
-    pub fn builder_output_text(text: &str) -> ResponseOutputTextBuilder {
+    pub fn builder(text: &str) -> ResponseOutputTextBuilder {
         let inner: ResponseOutputText = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("output_text");
@@ -20711,16 +20672,13 @@ impl ResponseReasoningItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"reasoning\"`"]
-    pub fn new_reasoning(
-        id: &str,
-        summary: &[ResponseReasoningSummaryItem],
-    ) -> ResponseReasoningItem {
-        Self::builder_reasoning(id, summary).build()
+    pub fn new(id: &str, summary: &[ResponseReasoningSummaryItem]) -> ResponseReasoningItem {
+        Self::builder(id, summary).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"reasoning\"`"]
-    pub fn builder_reasoning(
+    pub fn builder(
         id: &str,
         summary: &[ResponseReasoningSummaryItem],
     ) -> ResponseReasoningItemBuilder {
@@ -20769,7 +20727,7 @@ impl ResponseReasoningSummaryItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"summary_text\"`"]
-    pub fn new_summary_text(text: &str) -> ResponseReasoningSummaryItem {
+    pub fn new(text: &str) -> ResponseReasoningSummaryItem {
         let inner: ResponseReasoningSummaryItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("summary_text");
@@ -20794,7 +20752,7 @@ impl ResponseReasoningContentItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"reasoning_text\"`"]
-    pub fn new_reasoning_text(text: &str) -> ResponseReasoningContentItem {
+    pub fn new(text: &str) -> ResponseReasoningContentItem {
         let inner: ResponseReasoningContentItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("reasoning_text");
@@ -20835,7 +20793,7 @@ impl ResponseReasoningTextDeltaEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.reasoning_text.delta\"`"]
-    pub fn new_responsereasoning_textdelta(
+    pub fn new(
         content_index: f64,
         delta: &str,
         item_id: &str,
@@ -20886,7 +20844,7 @@ impl ResponseReasoningTextDoneEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.reasoning_text.done\"`"]
-    pub fn new_responsereasoning_textdone(
+    pub fn new(
         content_index: f64,
         item_id: &str,
         output_index: f64,
@@ -20937,7 +20895,7 @@ impl ResponseRefusalDeltaEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.refusal.delta\"`"]
-    pub fn new_responserefusaldelta(
+    pub fn new(
         content_index: f64,
         delta: &str,
         item_id: &str,
@@ -20988,7 +20946,7 @@ impl ResponseRefusalDoneEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.refusal.done\"`"]
-    pub fn new_responserefusaldone(
+    pub fn new(
         content_index: f64,
         item_id: &str,
         output_index: f64,
@@ -21039,10 +20997,7 @@ impl ResponseCompletedEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.completed\"`"]
-    pub fn new_responsecompleted(
-        response: &Response,
-        sequence_number: f64,
-    ) -> ResponseCompletedEvent {
+    pub fn new(response: &Response, sequence_number: f64) -> ResponseCompletedEvent {
         let inner: ResponseCompletedEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
         inner.set_sequence_number(sequence_number);
@@ -21150,7 +21105,7 @@ impl ResponseTextDeltaEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_text.delta\"`"]
-    pub fn new_responseoutput_textdelta(
+    pub fn new(
         content_index: f64,
         delta: &str,
         item_id: &str,
@@ -21207,7 +21162,7 @@ impl ResponseTextDoneEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_text.done\"`"]
-    pub fn new_responseoutput_textdone(
+    pub fn new(
         content_index: f64,
         item_id: &str,
         logprobs: &[Logprob],
@@ -21354,7 +21309,7 @@ impl ToolChoiceFunction {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    pub fn new_function(name: &str) -> ToolChoiceFunction {
+    pub fn new(name: &str) -> ToolChoiceFunction {
         let inner: ToolChoiceFunction = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         inner.set_type("function");
@@ -29962,15 +29917,15 @@ impl Ai_Cf_Deepgram_Flux_Input {
     #[doc = " * `encoding: \"linear16\"` - Encoding of the audio stream. Currently only supports raw signed little-endian 16-bit PCM."]
     #[doc = ""]
     #[doc = " * `sample_rate` - Sample rate of the audio stream in Hz."]
-    pub fn new_linear16(sample_rate: &str) -> Ai_Cf_Deepgram_Flux_Input {
-        Self::builder_linear16(sample_rate).build()
+    pub fn new(sample_rate: &str) -> Ai_Cf_Deepgram_Flux_Input {
+        Self::builder(sample_rate).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `encoding: \"linear16\"` - Encoding of the audio stream. Currently only supports raw signed little-endian 16-bit PCM."]
     #[doc = ""]
     #[doc = " * `sample_rate` - Sample rate of the audio stream in Hz."]
-    pub fn builder_linear16(sample_rate: &str) -> Ai_Cf_Deepgram_Flux_InputBuilder {
+    pub fn builder(sample_rate: &str) -> Ai_Cf_Deepgram_Flux_InputBuilder {
         let inner: Ai_Cf_Deepgram_Flux_Input = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_encoding("linear16");
         inner.set_sample_rate(sample_rate);
@@ -32610,7 +32565,7 @@ impl AutoRagAiSearchRequestStreaming {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `stream: true`"]
-    pub fn new_true() -> AutoRagAiSearchRequestStreaming {
+    pub fn new() -> AutoRagAiSearchRequestStreaming {
         let inner: AutoRagAiSearchRequestStreaming = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_stream(true);
         inner
@@ -32646,7 +32601,7 @@ impl AutoRagSearchResponse {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `object: \"vector_store.search_results.page\"`"]
-    pub fn new_vector_storesearch_resultspage(
+    pub fn new(
         search_query: &str,
         data: &[Object],
         has_more: bool,
@@ -34909,7 +34864,7 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
     #[doc = " * `cert_not_after` - The effective expiration date of the certificate"]
     #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
-    pub fn new_1_1(
+    pub fn new_1(
         cert_verified: CertVerificationStatus,
         cert_issuer_dn: &str,
         cert_subject_dn: &str,
@@ -34996,7 +34951,7 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
     #[doc = " * `cert_not_after` - The effective expiration date of the certificate"]
     #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
-    pub fn new_1_0(
+    pub fn new_0(
         cert_verified: CertVerificationStatus,
         cert_issuer_dn: &str,
         cert_subject_dn: &str,
@@ -35181,7 +35136,7 @@ impl IncomingRequestCfPropertiesTLSClientAuthPlaceholder {
     #[doc = " * `certFingerprintSHA256: \"\"`"]
     #[doc = " * `certNotBefore: \"\"`"]
     #[doc = " * `certNotAfter: \"\"`"]
-    pub fn new_0_none_0______________() -> IncomingRequestCfPropertiesTLSClientAuthPlaceholder {
+    pub fn new() -> IncomingRequestCfPropertiesTLSClientAuthPlaceholder {
         let inner: IncomingRequestCfPropertiesTLSClientAuthPlaceholder =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cert_presented("0");
@@ -35633,13 +35588,13 @@ impl D1Response {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `success: true`"]
-    pub fn new_true(meta: &JsValue) -> D1Response {
-        Self::builder_true(meta).build()
+    pub fn new(meta: &JsValue) -> D1Response {
+        Self::builder(meta).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `success: true`"]
-    pub fn builder_true(meta: &JsValue) -> D1ResponseBuilder {
+    pub fn builder(meta: &JsValue) -> D1ResponseBuilder {
         let inner: D1Response = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_success(true);
         inner.set_meta(meta);
@@ -35911,7 +35866,7 @@ impl D1PreparedStatementOptions {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `columnNames: true`"]
-    pub fn new_true() -> D1PreparedStatementOptions {
+    pub fn new() -> D1PreparedStatementOptions {
         let inner: D1PreparedStatementOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_column_names(true);
         inner
@@ -41942,7 +41897,7 @@ impl InternalError {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"InternalError\"`"]
-    pub fn new_internal_error() -> InternalError {
+    pub fn new() -> InternalError {
         let inner: InternalError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("InternalError");
         inner
@@ -41962,7 +41917,7 @@ impl BadRequestError {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"BadRequestError\"`"]
-    pub fn new_bad_request_error() -> BadRequestError {
+    pub fn new() -> BadRequestError {
         let inner: BadRequestError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("BadRequestError");
         inner
@@ -41982,7 +41937,7 @@ impl NotFoundError {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"NotFoundError\"`"]
-    pub fn new_not_found_error() -> NotFoundError {
+    pub fn new() -> NotFoundError {
         let inner: NotFoundError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("NotFoundError");
         inner
@@ -42002,7 +41957,7 @@ impl ForbiddenError {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"ForbiddenError\"`"]
-    pub fn new_forbidden_error() -> ForbiddenError {
+    pub fn new() -> ForbiddenError {
         let inner: ForbiddenError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("ForbiddenError");
         inner
@@ -42022,7 +41977,7 @@ impl RateLimitedError {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"RateLimitedError\"`"]
-    pub fn new_rate_limited_error() -> RateLimitedError {
+    pub fn new() -> RateLimitedError {
         let inner: RateLimitedError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("RateLimitedError");
         inner
@@ -42042,7 +41997,7 @@ impl QuotaReachedError {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"QuotaReachedError\"`"]
-    pub fn new_quota_reached_error() -> QuotaReachedError {
+    pub fn new() -> QuotaReachedError {
         let inner: QuotaReachedError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("QuotaReachedError");
         inner
@@ -42062,7 +42017,7 @@ impl MaxFileSizeError {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"MaxFileSizeError\"`"]
-    pub fn new_max_file_size_error() -> MaxFileSizeError {
+    pub fn new() -> MaxFileSizeError {
         let inner: MaxFileSizeError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("MaxFileSizeError");
         inner
@@ -42082,7 +42037,7 @@ impl InvalidURLError {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"InvalidURLError\"`"]
-    pub fn new_invalid_url_error() -> InvalidURLError {
+    pub fn new() -> InvalidURLError {
         let inner: InvalidURLError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("InvalidURLError");
         inner
@@ -42102,7 +42057,7 @@ impl AlreadyUploadedError {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"AlreadyUploadedError\"`"]
-    pub fn new_already_uploaded_error() -> AlreadyUploadedError {
+    pub fn new() -> AlreadyUploadedError {
         let inner: AlreadyUploadedError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("AlreadyUploadedError");
         inner
@@ -42122,7 +42077,7 @@ impl TooManyWatermarksError {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"TooManyWatermarksError\"`"]
-    pub fn new_too_many_watermarks_error() -> TooManyWatermarksError {
+    pub fn new() -> TooManyWatermarksError {
         let inner: TooManyWatermarksError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("TooManyWatermarksError");
         inner
