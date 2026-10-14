@@ -1,0 +1,17 @@
+// The typed handler main.zena (generated) delegates to. Replies with the
+// request's method, URL and `x-zena` header, the GREETING binding and
+// the body. `text()` returns a Promise; `await_` suspends on it through
+// JSPI. TS strings are `String`s over the JS strings, and literals are
+// JS string constants, so nothing is copied.
+import { Env, ExecutionContext, Request, Response, await_ } from './bindings.zena';
+
+export function fetch(request: Request, env: Env, ctx: ExecutionContext): Response {
+  let header = request.headers.get("x-zena");
+  let text = await_(request.text());
+  let body = if (text == null) "" else String.fromHandle(text);
+  let reply = request.method + " " + request.url + "\n" +
+    "x-zena: " + (if (header == null) "(none)" else header) + "\n" +
+    "GREETING: " + env.greeting + "\n" +
+    "body: " + body + "\n";
+  return Response.create_with_body(reply.handle);
+}

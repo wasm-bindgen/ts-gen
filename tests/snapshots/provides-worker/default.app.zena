@@ -1,0 +1,10 @@
+import { ExecutionContext, Request, Response } from './bindings.zena';
+
+// Handles a request.
+export function fetch(request: Request, env: externref, ctx: ExecutionContext): Response { throw new Error("not implemented"); }
+
+// Receives trace events.
+export function tail(events: externref, env: externref, ctx: ExecutionContext): externref | null { return null; }
+
+// Always provided: a plain method with an optional parameter.
+export function health(verbose: boolean): String { return ""; }

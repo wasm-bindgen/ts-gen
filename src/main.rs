@@ -109,17 +109,20 @@ struct Cli {
     /// implements, with optional members listed to include them. Writes
     /// `provides.rs` (wasm-bindgen exports delegating to the app module)
     /// and, if absent, the app module's scaffold, next to the output;
-    /// `--target wat` emits a stub per provided function.
+    /// `--target wat` emits a stub per provided function; `--target zena`
+    /// writes `main.zena` and an `app.zena` scaffold.
     #[arg(long)]
     provides: Option<String>,
 
     /// Module path the `--provides` wrapper delegates to, relative to the
     /// wrapper's parent; its last segment names the scaffold file.
-    #[arg(long, default_value = "super::app")]
-    provides_app: String,
+    /// Defaults to `super::app`. `--target rust` only.
+    #[arg(long)]
+    provides_app: Option<String>,
 
     /// Module path of the generated bindings, for the `--provides` wrapper.
     /// Defaults to `super::<output file stem>`, with `-` and `.` replaced by `_`.
+    /// `--target rust` only.
     #[arg(long)]
     provides_bindings: Option<String>,
 }
@@ -188,12 +191,15 @@ enum Target {
     Rust,
     /// Import template for the externref Wasm ABI; see `embed`.
     Wat,
+    /// Zena declarations for the same ABI.
+    Zena,
 }
 
 #[derive(clap::Subcommand, Debug)]
 enum Command {
     /// Implement the Wasm ABI for a module written against the `--target wat`
-    /// template: emits `bindings.wasm`, `wrapper.wasm` and `builtins.js`.
+    /// template or `--target zena` bindings: emits `bindings.wasm`,
+    /// `wrapper.wasm` and `builtins.js`.
     Embed(EmbedArgs),
 }
 
@@ -242,6 +248,10 @@ fn main() -> Result<()> {
         return embed(args);
     }
     let output = cli.output.clone().expect("required without a subcommand");
+    if cli.target != Target::Rust && (cli.provides_app.is_some() || cli.provides_bindings.is_some())
+    {
+        bail!("--provides-app and --provides-bindings apply to --target rust only");
+    }
 
     // Resolve input files
     let input_files = resolve_input_files(&cli.input)?;
@@ -292,6 +302,28 @@ fn main() -> Result<()> {
         Target::Wat => {
             ts_gen::abi::wat::generate(&ts_gen::abi::build(&module, &gctx, &options, &provided))
         }
+        Target::Zena => {
+            let abi = ts_gen::abi::build(&module, &gctx, &options, &provided);
+            let file = output
+                .file_name()
+                .and_then(|f| f.to_str())
+                .with_context(|| format!("{} has no file name", output.display()))?;
+            if !provided.is_empty() && matches!(file, "main.zena" | "app.zena") {
+                bail!("-o {file}: --provides writes main.zena and app.zena next to the output");
+            }
+            let zena = ts_gen::abi::zena::generate(&abi, file)?;
+            if let Some((main, app)) = &zena.provides {
+                let dir = output.parent().map(Path::to_path_buf).unwrap_or_default();
+                write_file(&dir.join("main.zena"), main)?;
+                let app_file = dir.join("app.zena");
+                if app_file.exists() {
+                    eprintln!("[ts-gen] Kept existing {}", app_file.display());
+                } else {
+                    write_file(&app_file, app)?;
+                }
+            }
+            zena.bindings
+        }
     };
 
     write_file(&output, &source)?;
@@ -301,8 +333,9 @@ fn main() -> Result<()> {
             .provides_bindings
             .clone()
             .unwrap_or_else(|| default_bindings_path(&output));
-        let app: syn::Path = syn::parse_str(&cli.provides_app)
-            .with_context(|| format!("--provides-app {:?} is not a path", cli.provides_app))?;
+        let app_path = cli.provides_app.as_deref().unwrap_or("super::app");
+        let app: syn::Path = syn::parse_str(app_path)
+            .with_context(|| format!("--provides-app {app_path:?} is not a path"))?;
         let app_file_stem = app
             .segments
             .last()

@@ -95,12 +95,32 @@ primary plus a `try_<name>` companion:
 ts-gen --input types.d.ts --output src/bindings.rs --fallible
 ```
 
+Flags:
+
+| Flag | Description |
+|------|-------------|
+| `-i`, `--input` | `.d.ts` files or directories to read |
+| `-o`, `--output` | The output file |
+| `--target` | What to generate (see below) |
+| `-E`, `--export` | Files, module specifiers and declaration names the output covers (default: every input file) |
+| `-e`, `--external` | External type mappings, `Foo=::path::Foo` or `node:*=node_sys::*` |
+| `--lib-name` | JS module specifier, required when the `.d.ts` has top-level exports |
+| `--no-web-sys` | Don't map web platform types to `web_sys` by default |
+| `--error-type` | Rust error type for bindings without `@throws`, replacing `JsValue` |
+| `--error-enum` | One enum (default `JsException`) over every `@throws` type |
+| `--errors-as-error` | Shorthand for `--error-type ::js_sys::Error` |
+| `--fallible` | One `Result` form per sync callable instead of a `try_<name>` companion |
+| `--experimental-generic-mono` | Per-monomorphization codegen for generic imports |
+| `--provides`, `--provides-app`, `--provides-bindings` | See below |
+| `-v`, `--verbose` | Print the parsed IR |
+
 ### Targets (`--target`)
 
 | Value  | Output |
 |--------|--------|
 | `rust` | wasm-bindgen extern blocks (the default) |
 | `wat`  | The Wasm ABI as a WAT import template |
+| `zena` | The Wasm ABI as Zena declarations, with a class per type |
 
 ### Wasm ABI template (`--target wat`)
 
@@ -130,8 +150,27 @@ ts-gen --input worker.d.ts --output src/bindings.rs --provides ExportedHandler.f
 | Flag | Description |
 |------|-------------|
 | `--provides` | A `.d.ts` export surface, or `Name[.member,...]` |
-| `--provides-app` | Module path the wrapper delegates to; its last segment names the scaffold (default `super::app`) |
-| `--provides-bindings` | Module path of the bindings (default `super::<output stem>`, with `-` and `.` replaced by `_`) |
+| `--provides-app` | Module path the wrapper delegates to; its last segment names the scaffold (default `super::app`). `--target rust` only |
+| `--provides-bindings` | Module path of the bindings (default `super::<output stem>`, with `-` and `.` replaced by `_`). `--target rust` only |
+
+### Zena bindings (`--target zena`)
+
+For [Zena](https://github.com/elematic/zena), emit the ABI as `@external`
+declarations, one per import the `wat` template lists, plus a wrapper class
+per type with TS strings as Zena `String`s. With `--provides`, `main.zena`
+(the compile entry, importing the bindings by the output's file name) and
+an `app.zena` scaffold are written next to the output. Compile the entry
+and embed it:
+
+```sh
+ts-gen --input worker.d.ts --output bindings.zena --target zena --provides ExportedHandler.fetch
+zena build main.zena -t js --imported-string-constants wasm:js/string-constants -o main.wasm
+ts-gen embed -i worker.d.ts --provides ExportedHandler.fetch -m main.wasm -o out/
+```
+
+The bindings need a Zena compiler with `declare let` value imports and
+`ref.null` emission for `externref | null`, which no Zena release has yet.
+See `examples/zena-worker/` for a worker run in workerd.
 
 ### Embedding (`ts-gen embed`)
 

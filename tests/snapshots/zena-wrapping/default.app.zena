@@ -1,0 +1,5 @@
+import { Item } from './bindings.zena';
+
+export function handle(item: Item | null, name: String | null, label: String): Item | null { return null; }
+
+export function pick(item: Item, flag: boolean): String | null { return null; }
