@@ -991,6 +991,10 @@ pub struct MethodMember {
 #[derive(Clone, Debug)]
 
 pub struct ConstructorMember {
+    /// Own type parameters of a construct signature (`new <T>(…)`),
+    /// as in the `declare var Foo: { new <T>(…): Foo<T> }` pattern.
+    /// Class `constructor(…)` members have none.
+    pub type_params: Vec<TypeParam>,
     pub params: Vec<Param>,
     pub doc: Option<String>,
     /// Failure-mode info from `@throws` — see [`Throws`].
@@ -999,6 +1003,9 @@ pub struct ConstructorMember {
     /// `Throws::Never` here is effectively a no-op for codegen — only
     /// `Throws::Type` (custom error type) changes behavior.
     pub throws: Throws,
+    /// Scope holding `type_params`; the parent's body scope when the
+    /// constructor declares none.
+    pub body_scope: crate::parse::scope::ScopeId,
 }
 
 #[derive(Clone, Debug)]

@@ -1151,6 +1151,7 @@ fn merge_class_pairs(
                         }
                         if new_class.type_params.is_empty() {
                             new_class.type_params = iface.type_params.clone();
+                            new_class.body_scope = iface.body_scope;
                         }
                     }
                     result[iface_idx] = TypeDeclaration {
@@ -1180,6 +1181,7 @@ fn merge_class_pairs(
                         }
                         if class.type_params.is_empty() {
                             class.type_params = iface_decl.type_params.clone();
+                            class.body_scope = iface_decl.body_scope;
                         }
                     }
                     continue;
