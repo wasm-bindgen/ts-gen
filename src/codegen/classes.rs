@@ -401,6 +401,48 @@ impl<'a> ClassConfig<'a> {
         render_generic_bounds(&self.type_param_bounds())
     }
 
+    /// The `pub type` declaration's generics: the type-level bounds plus a
+    /// `= Default` for every parameter that declares one. Rust accepts
+    /// defaults only on the type definition itself, so methods and helper
+    /// impls keep the plain form.
+    fn type_decl_generics(&self) -> TokenStream {
+        let bounds = self
+            .type_params
+            .iter()
+            .map(|tp| {
+                let decl = CodegenContext::type_param_decl(self.cgctx, &tp.name);
+                match &tp.default {
+                    Some(default) => {
+                        let ty = self.type_param_default(default);
+                        quote! { #decl = #ty }
+                    }
+                    None => decl,
+                }
+            })
+            .collect::<Vec<_>>();
+        render_generic_bounds(&bounds)
+    }
+
+    /// Lowers a type-parameter default. When the target itself erases to
+    /// `JsValue` (an alias of a union, an unresolved name) its type arguments
+    /// go with it: `CfProperties<CfHostMetadata>` is just `JsValue`.
+    fn type_param_default(&self, default: &TypeRef) -> TokenStream {
+        let tokens = super::typemap::to_syn_type(
+            default,
+            TypePosition::ARGUMENT.to_inner(),
+            self.cgctx,
+            self.scope,
+            &self.from_module(),
+        );
+        if let (TypeRef::Reference { segments, .. }, Some(ctx)) = (default, self.cgctx) {
+            let uses = ctx.external_uses.borrow();
+            if uses.get(&segments[0]).is_some_and(|v| v == "JsValue") {
+                return quote! { JsValue };
+            }
+        }
+        tokens
+    }
+
     /// Generic declaration for Rust helper impls and builder structs. The
     /// erased path keeps the extern declaration's `JsGeneric` bound. The
     /// per-monomorphization path instead needs `IntoWasmAbi` because helper
@@ -1692,7 +1734,7 @@ fn generate_type_decl(config: &ClassConfig) -> TokenStream {
         quote! { #[wasm_bindgen(#(#wb_parts),*)] }
     };
 
-    let generics_decl = config.type_generics_decl();
+    let generics_decl = config.type_decl_generics();
 
     quote! {
         #wb_attr
