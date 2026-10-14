@@ -36,8 +36,8 @@ extern "C" {
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn offset(this: &Response) -> u64;
-    #[wasm_bindgen(method, getter)]
-    pub fn size(this: &Response) -> f64;
+    #[wasm_bindgen(method, getter, js_name = "size")]
+    fn size_js(this: &Response) -> f64;
     #[wasm_bindgen(method, getter, js_name = "statusText")]
     pub fn status_text(this: &Response) -> String;
     #[wasm_bindgen(method, getter, js_name = "statusText")]
@@ -56,6 +56,11 @@ extern "C" {
     pub fn codes(this: &Response) -> Result<Vec<JsNullable<Number>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "setCodes")]
     pub fn set_codes(this: &Response, codes: &[JsNullable<Number>]) -> Result<(), JsValue>;
+}
+impl Response {
+    pub fn size(&self) -> u64 {
+        self.size_js() as u64
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
