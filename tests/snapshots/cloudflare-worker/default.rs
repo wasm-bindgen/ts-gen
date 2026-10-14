@@ -259,6 +259,11 @@ impl RequestInitBuilder {
         self.inner
     }
 }
+impl From<RequestInit> for RequestInitBuilder {
+    fn from(inner: RequestInit) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
 pub enum BodyInit {
@@ -504,6 +509,11 @@ impl ResponseInitBuilder {
         self.inner
     }
 }
+impl From<ResponseInit> for ResponseInitBuilder {
+    fn from(inner: ResponseInit) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -692,6 +702,11 @@ impl FlagsBuilder {
     }
     pub fn build(self) -> Flags {
         self.inner
+    }
+}
+impl From<Flags> for FlagsBuilder {
+    fn from(inner: Flags) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen]

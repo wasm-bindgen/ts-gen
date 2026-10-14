@@ -46,6 +46,13 @@ impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> ListKeyBuilder<Metadata> {
         self.inner
     }
 }
+impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> From<ListKey<Metadata>>
+    for ListKeyBuilder<Metadata>
+{
+    fn from(inner: ListKey<Metadata>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]

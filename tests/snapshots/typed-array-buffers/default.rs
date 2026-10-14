@@ -104,3 +104,8 @@ impl FrameBuilder {
         self.inner
     }
 }
+impl From<Frame> for FrameBuilder {
+    fn from(inner: Frame) -> Self {
+        Self { inner }
+    }
+}

@@ -41,6 +41,11 @@ impl ChecksumsBuilder {
         self.inner
     }
 }
+impl From<Checksums> for ChecksumsBuilder {
+    fn from(inner: Checksums) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -78,6 +83,11 @@ impl ConditionalBuilder {
         self.inner
     }
 }
+impl From<Conditional> for ConditionalBuilder {
+    fn from(inner: Conditional) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -113,6 +123,11 @@ impl GetOptionsBuilder {
     }
     pub fn build(self) -> GetOptions {
         self.inner
+    }
+}
+impl From<GetOptions> for GetOptionsBuilder {
+    fn from(inner: GetOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen]
@@ -217,6 +232,11 @@ impl ListDefaultsBuilder {
         self.inner
     }
 }
+impl From<ListDefaults> for ListDefaultsBuilder {
+    fn from(inner: ListDefaults) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = "listBuckets")]
@@ -289,6 +309,11 @@ impl SocketOptionsBuilder {
     }
     pub fn build(self) -> SocketOptions {
         self.inner
+    }
+}
+impl From<SocketOptions> for SocketOptionsBuilder {
+    fn from(inner: SocketOptions) -> Self {
+        Self { inner }
     }
 }
 pub mod cloudflare {

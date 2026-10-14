@@ -56,6 +56,11 @@ impl OptionsBuilder {
         self.inner
     }
 }
+impl From<Options> for OptionsBuilder {
+    fn from(inner: Options) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
     #[doc = " `null` disables the fallback; `undefined` takes the default `\"anon\"`."]

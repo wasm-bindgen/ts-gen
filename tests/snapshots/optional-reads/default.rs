@@ -108,6 +108,11 @@ impl SettingsBuilder {
         self.inner
     }
 }
+impl From<Settings> for SettingsBuilder {
+    fn from(inner: Settings) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "optional-reads")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]

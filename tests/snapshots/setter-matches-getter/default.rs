@@ -47,6 +47,11 @@ impl DigitsOptionsBuilder {
         self.inner
     }
 }
+impl From<DigitsOptions> for DigitsOptionsBuilder {
+    fn from(inner: DigitsOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -117,6 +122,11 @@ impl RequiredDigitsBuilder {
         self.inner
     }
 }
+impl From<RequiredDigits> for RequiredDigitsBuilder {
+    fn from(inner: RequiredDigits) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -175,6 +185,11 @@ impl ToggleBuilder {
     }
     pub fn build(self) -> Toggle {
         self.inner
+    }
+}
+impl From<Toggle> for ToggleBuilder {
+    fn from(inner: Toggle) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(private)]

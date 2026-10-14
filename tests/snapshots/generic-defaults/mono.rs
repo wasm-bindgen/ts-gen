@@ -129,6 +129,11 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> OptionsBuilder<T> {
         self.inner
     }
 }
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> From<Options<T>> for OptionsBuilder<T> {
+    fn from(inner: Options<T>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "generic-defaults", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "looseBox")]

@@ -199,6 +199,11 @@ impl CollideInitBuilder {
         self.inner
     }
 }
+impl From<CollideInit> for CollideInitBuilder {
+    fn from(inner: CollideInit) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -392,6 +397,11 @@ impl ReservedInitBuilder {
     }
     pub fn build(self) -> ReservedInit {
         self.inner
+    }
+}
+impl From<ReservedInit> for ReservedInitBuilder {
+    fn from(inner: ReservedInit) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(module = "sanitised-keys", experimental_generic_mono)]

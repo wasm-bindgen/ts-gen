@@ -47,6 +47,11 @@ impl ConditionalBuilder {
         self.inner
     }
 }
+impl From<Conditional> for ConditionalBuilder {
+    fn from(inner: Conditional) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -92,6 +97,11 @@ impl GetOptionsBuilder {
     }
     pub fn build(self) -> GetOptions {
         self.inner
+    }
+}
+impl From<GetOptions> for GetOptionsBuilder {
+    fn from(inner: GetOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
@@ -263,6 +273,11 @@ impl StoreOptionsBuilder {
         self.inner
     }
 }
+impl From<StoreOptions> for StoreOptionsBuilder {
+    fn from(inner: StoreOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -344,6 +359,11 @@ impl RefinedBuilder {
     }
     pub fn build(self) -> Refined {
         self.inner
+    }
+}
+impl From<Refined> for RefinedBuilder {
+    fn from(inner: Refined) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
@@ -506,6 +526,11 @@ impl MessageBuilder {
     }
     pub fn build(self) -> Message {
         self.inner
+    }
+}
+impl From<Message> for MessageBuilder {
+    fn from(inner: Message) -> Self {
+        Self { inner }
     }
 }
 #[allow(dead_code)]

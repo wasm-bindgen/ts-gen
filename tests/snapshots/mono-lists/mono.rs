@@ -317,6 +317,11 @@ impl LabelOptionsBuilder {
         self.inner
     }
 }
+impl From<LabelOptions> for LabelOptionsBuilder {
+    fn from(inner: LabelOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "describeOptions")]

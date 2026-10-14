@@ -58,6 +58,11 @@ impl GeoBuilder {
         self.inner
     }
 }
+impl From<Geo> for GeoBuilder {
+    fn from(inner: Geo) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Base , extends = Geo , extends = Object , is_type_of = JsValue :: is_object)]
@@ -93,6 +98,11 @@ impl ChildBuilder {
     }
     pub fn build(self) -> Child {
         self.inner
+    }
+}
+impl From<Child> for ChildBuilder {
+    fn from(inner: Child) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen]
@@ -140,6 +150,11 @@ impl DestinationsBuilder {
         self.inner
     }
 }
+impl From<Destinations> for DestinationsBuilder {
+    fn from(inner: Destinations) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Base , extends = Destinations , extends = Object , is_type_of = JsValue :: is_object)]
@@ -178,6 +193,11 @@ impl MessageBuilder {
     }
     pub fn build(self) -> Message {
         self.inner
+    }
+}
+impl From<Message> for MessageBuilder {
+    fn from(inner: Message) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen]
