@@ -12,9 +12,13 @@ struct Cli {
     #[arg(short, long, required = true, num_args = 1..)]
     input: Vec<PathBuf>,
 
-    /// Output file path for the generated .rs file (e.g., `src/bindings.rs`).
+    /// Output file path for the generated file (e.g., `src/bindings.rs`).
     #[arg(short, long)]
     output: PathBuf,
+
+    /// What to generate from the declarations.
+    #[arg(long, value_enum, default_value_t = Target::Rust)]
+    target: Target,
 
     /// Output surface: files and/or JS module specifiers to emit. The
     /// `--input` set defines the full type universe for resolution;
@@ -136,7 +140,8 @@ struct Cli {
     /// `Name[.member,...]`: an input interface the default export
     /// implements, with optional members listed to include them. Writes
     /// `provides.rs` (wasm-bindgen exports delegating to the app module)
-    /// and, if absent, the app module's scaffold, next to the output.
+    /// and, if absent, the app module's scaffold, next to the output;
+    /// `--target wat` emits a stub per provided function.
     #[arg(long)]
     provides: Option<String>,
 
@@ -149,6 +154,14 @@ struct Cli {
     /// Defaults to `super::<output file stem>`, with `-` and `.` replaced by `_`.
     #[arg(long)]
     provides_bindings: Option<String>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, clap::ValueEnum)]
+enum Target {
+    /// wasm-bindgen extern declarations.
+    Rust,
+    /// Import template for the externref Wasm ABI.
+    Wat,
 }
 
 fn main() -> Result<()> {
@@ -233,11 +246,16 @@ fn main() -> Result<()> {
     if let Some(name) = &cli.error_enum {
         options = options.error_enum(name);
     }
-    let source = ts_gen::codegen::generate_with_options(&module, &gctx, &options)?;
+    let source = match cli.target {
+        Target::Rust => ts_gen::codegen::generate_with_options(&module, &gctx, &options)?,
+        Target::Wat => {
+            ts_gen::abi::wat::generate(&ts_gen::abi::build(&module, &gctx, &options, &provided)?)
+        }
+    };
 
     write_file(&cli.output, &source)?;
 
-    if !provided.is_empty() {
+    if cli.target == Target::Rust && !provided.is_empty() {
         let bindings = cli
             .provides_bindings
             .clone()

@@ -7,6 +7,18 @@
 //! side in one directory makes the effect of a flag on a fixture a plain
 //! `diff` between siblings.
 //!
+//! The harness also runs `--target wat` for each fixture and configuration,
+//! producing a `tests/snapshots/<name>/<config>.wat` alongside the `.rs`. The
+//! WAT output is validated with `wat::parse_str` and `wasmparser` to ensure it
+//! assembles and passes validation. A fixture the ABI rejects pins the error
+//! instead, as `<config>.wat.err`; exactly one of the two exists.
+//!
+//! The harness also runs `--target wat` for each fixture, producing a
+//! `tests/snapshots/<name>.wat` alongside the `.rs`. The WAT output is
+//! validated with `wat::parse_str` and `wasmparser` to ensure it assembles
+//! and passes validation. A fixture the ABI rejects pins the error instead,
+//! as `tests/snapshots/<name>.wat.err`; exactly one of the two exists.
+//!
 //! Fixtures can include `//! @ts-gen <args>` directive comments at the top.
 //! The args after `//! @ts-gen` are passed **verbatim** to the CLI, so any
 //! flags the CLI supports (e.g. `--lib-name`, `--external`) just work. Flags
@@ -152,7 +164,9 @@ fn assert_snapshot(snap_path: &Path, actual: &str) {
 }
 
 /// Run the `ts-gen` CLI on a `.d.ts` fixture under every configuration and
-/// compare each generated Rust output against its blessed snapshot.
+/// compare each generated Rust output against its blessed snapshot. Also runs
+/// `--target wat` and validates the generated WAT assembles and passes Wasm
+/// validation.
 fn snapshot_test(fixture_name: &str) {
     let root = crate_root();
     let fixture = root.join("tests/fixtures").join(fixture_name);
@@ -221,6 +235,92 @@ fn snapshot_test(fixture_name: &str) {
                 assert_snapshot(&snap_dir.join(format!("{config_name}.{file}")), &code);
             }
         }
+
+        // Run --target wat
+        let out_file_wat = config_dir.join("bindings.wat");
+        let snap_path_wat = snap_dir.join(format!("{config_name}.wat"));
+        let snap_path_wat_err = snap_dir.join(format!("{config_name}.wat.err"));
+        let output_wat = Command::new(ts_gen_bin())
+            .arg("--input")
+            .arg(&fixture)
+            .arg("--output")
+            .arg(&out_file_wat)
+            .arg("--target")
+            .arg("wat")
+            .args(&extra_args)
+            .args(*config_args)
+            // An error's text is snapshotted; a backtrace would follow it.
+            .env_remove("RUST_BACKTRACE")
+            .env_remove("RUST_LIB_BACKTRACE")
+            .output()
+            .expect("Failed to execute ts-gen binary for WAT");
+
+        if !output_wat.status.success() {
+            let stderr = String::from_utf8_lossy(&output_wat.stderr);
+            let stdout = String::from_utf8_lossy(&output_wat.stdout);
+            // Earlier stderr lines are diagnostics carrying absolute paths; the
+            // error itself is what the ABI rejected.
+            let Some(start) = stderr.find("Error: ") else {
+                panic!(
+                    "ts-gen --target wat failed for {fixture_name} ({config_name}) without an error:\n\
+                     exit code: {:?}\n\
+                     stderr:\n{stderr}\n\
+                     stdout:\n{stdout}",
+                    output_wat.status.code()
+                );
+            };
+            assert_sole_snapshot(&snap_path_wat_err, &snap_path_wat);
+            assert_snapshot(&snap_path_wat_err, &stderr[start..]);
+            continue;
+        }
+
+        let wat_code = std::fs::read_to_string(&out_file_wat).unwrap_or_else(|e| {
+            panic!(
+                "Failed to read generated WAT output {}: {e}",
+                out_file_wat.display()
+            )
+        });
+
+        // Validate the WAT assembles and passes Wasm validation
+        validate_wat(&wat_code, fixture_name);
+
+        assert_sole_snapshot(&snap_path_wat, &snap_path_wat_err);
+        assert_snapshot(&snap_path_wat, &wat_code);
+    }
+}
+
+/// `actual` is the snapshot this run produces and `other` the alternative
+/// outcome's, which must not linger: blessing removes it, otherwise its
+/// presence means the outcome changed.
+fn assert_sole_snapshot(actual: &Path, other: &Path) {
+    if !other.exists() {
+        return;
+    }
+    if std::env::var("BLESS").is_ok_and(|v| v == "1" || v == "true") {
+        std::fs::remove_file(other)
+            .unwrap_or_else(|e| panic!("Failed to remove {}: {e}", other.display()));
+        eprintln!("  removed: {}", other.display());
+        return;
+    }
+    panic!(
+        "{} exists, but this run produced {}.\n\
+         Run `BLESS=1 cargo test -p ts-gen` to update.",
+        other.display(),
+        actual.display()
+    );
+}
+
+/// Validate that WAT text assembles and passes Wasm validation.
+fn validate_wat(wat_text: &str, fixture_name: &str) {
+    let bytes = match wat::parse_str(wat_text) {
+        Ok(b) => b,
+        Err(e) => panic!("WAT parse failed for {fixture_name}:\n{e}\n\nSource:\n{wat_text}"),
+    };
+    let mut validator = wasmparser::Validator::new_with_features(
+        wasmparser::WasmFeatures::default() | wasmparser::WasmFeatures::GC,
+    );
+    if let Err(e) = validator.validate_all(&bytes) {
+        panic!("Wasm validation failed for {fixture_name}:\n{e}\n\nSource:\n{wat_text}");
     }
 }
 
