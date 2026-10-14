@@ -18,6 +18,7 @@ use std::collections::{HashMap, HashSet};
 use proc_macro2::TokenStream;
 use quote::quote;
 
+use crate::codegen::GenerateOptions;
 use crate::context::{GlobalContext, TypeId};
 use crate::ir::{self, ModuleContext, TypeKind, TypeRef};
 use crate::parse::scope::ScopeId;
@@ -201,10 +202,10 @@ pub struct CodegenContext<'a> {
     /// members share a single enum. Callers reach into this through
     /// [`CodegenContext::synthesise_dynamic_union`].
     pub dynamic_unions: RefCell<DynamicUnionRegistry>,
-    /// When `true`, the default error type for fallible bindings is
-    /// `Error` rather than `JsValue`. See
-    /// [`crate::codegen::GenerateOptions::errors_as_error`].
-    pub errors_as_error: bool,
+    /// Default error type for fallible bindings without `@throws`;
+    /// `None` is `JsValue`. See
+    /// [`crate::codegen::GenerateOptions::error_type`].
+    pub error_type: Option<syn::Type>,
     /// Whether generic imports use wasm-bindgen's experimental
     /// per-monomorphization codegen rather than type erasure.
     pub experimental_generic_mono: bool,
@@ -655,18 +656,27 @@ impl<'a> CodegenContext<'a> {
     /// Build a `CodegenContext` from a parsed IR module + global context.
     /// Used by tests and library callers that don't customise codegen.
     pub fn from_module(module: &ir::Module, gctx: &'a GlobalContext) -> Self {
-        Self::from_module_full(module, gctx, false, false, HashSet::new())
+        Self::from_module_full(module, gctx, &GenerateOptions::default(), HashSet::new())
+            .expect("default options are valid")
     }
 
-    /// Build a `CodegenContext` with the full set of per-codegen options
-    /// including the set of emitted JS module specifiers.
+    /// Build a `CodegenContext` from the full set of per-codegen options
+    /// and the JS module specifiers with an emitted declaration. Fails
+    /// when an option carries an unparseable Rust path.
     pub fn from_module_full(
         module: &ir::Module,
         gctx: &'a GlobalContext,
-        errors_as_error: bool,
-        experimental_generic_mono: bool,
+        options: &GenerateOptions,
         exported_modules: HashSet<String>,
-    ) -> Self {
+    ) -> anyhow::Result<Self> {
+        let error_type = options
+            .error_type
+            .as_deref()
+            .map(|path| {
+                syn::parse_str::<syn::Type>(path)
+                    .map_err(|e| anyhow::anyhow!("invalid --error-type `{path}`: {e}"))
+            })
+            .transpose()?;
         let externalised_modules = externalised_modules(module, gctx);
 
         let mut ctx = CodegenContext {
@@ -686,8 +696,8 @@ impl<'a> CodegenContext<'a> {
             external_uses: RefCell::new(HashMap::new()),
             diagnostics: RefCell::new(DiagnosticCollector::new()),
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
-            errors_as_error,
-            experimental_generic_mono,
+            error_type,
+            experimental_generic_mono: options.experimental_generic_mono,
             exported_modules,
             externalised_modules,
             unresolved_module_refs: RefCell::new(HashSet::new()),
@@ -705,7 +715,7 @@ impl<'a> CodegenContext<'a> {
             ctx.collect_declaration(type_id, &path);
         }
         ctx.resolve_collisions();
-        ctx
+        Ok(ctx)
     }
 
     /// Create an empty context (for tests). Requires a valid root scope.
@@ -727,7 +737,7 @@ impl<'a> CodegenContext<'a> {
             external_uses: RefCell::new(HashMap::new()),
             diagnostics: RefCell::new(DiagnosticCollector::new()),
             dynamic_unions: RefCell::new(DynamicUnionRegistry::default()),
-            errors_as_error: false,
+            error_type: None,
             experimental_generic_mono: false,
             exported_modules: HashSet::new(),
             externalised_modules: HashSet::new(),
@@ -2362,19 +2372,14 @@ fn to_mono_js_string_return_type_impl(
 }
 
 /// The default error type used when a fallible binding has no
-/// `@throws` annotation. Either `JsValue` (the wasm-bindgen default)
-/// or `Error` (when [`GenerateOptions::errors_as_error`][1] is set).
+/// `@throws` annotation: `JsValue` unless
+/// [`GenerateOptions::error_type`][1] names a path.
 ///
-/// `Error` is the `js_sys::Error` re-export — already in scope via
-/// the codegen preamble's `use js_sys::*` glob, so no extra alias
-/// is needed.
-///
-/// [1]: crate::codegen::GenerateOptions::errors_as_error
+/// [1]: crate::codegen::GenerateOptions::error_type
 fn default_error_type(ctx: Option<&CodegenContext<'_>>) -> TokenStream {
-    if ctx.is_some_and(|c| c.errors_as_error) {
-        quote! { Error }
-    } else {
-        quote! { JsValue }
+    match ctx.and_then(|c| c.error_type.as_ref()) {
+        Some(ty) => quote! { #ty },
+        None => quote! { JsValue },
     }
 }
 
@@ -3154,7 +3159,9 @@ mod tests {
         };
         let ts = TypeRef::Array(Box::new(TypeRef::ident("T")));
         let modes = |mono: bool| {
-            let ctx = CodegenContext::from_module_full(&module, &gctx, false, mono, HashSet::new());
+            let options = GenerateOptions::new().experimental_generic_mono(mono);
+            let ctx =
+                CodegenContext::from_module_full(&module, &gctx, &options, HashSet::new()).unwrap();
             [
                 param_slice_mode(&cp("xs", ts.clone()), Some(&ctx), holder.body_scope),
                 param_slice_mode(
@@ -3637,7 +3644,9 @@ mod tests {
     /// to the source file, so aliases and local generics resolve.
     fn with_mono_ctx(src: &str, f: impl FnOnce(&CodegenContext<'_>, ScopeId)) {
         let (module, gctx) = crate::parse_source(src, None).unwrap();
-        let ctx = CodegenContext::from_module_full(&module, &gctx, false, true, HashSet::new());
+        let options = GenerateOptions::new().experimental_generic_mono(true);
+        let ctx =
+            CodegenContext::from_module_full(&module, &gctx, &options, HashSet::new()).unwrap();
         let scope = *module.file_scopes.first().expect("file scope");
         f(&ctx, scope);
     }
@@ -3952,7 +3961,13 @@ mod tests {
             declare namespace Codes { type Region = "eu" | "us"; }
         "#;
         let (module, gctx) = crate::parse_source(src, None).unwrap();
-        let ctx = CodegenContext::from_module_full(&module, &gctx, false, false, HashSet::new());
+        let ctx = CodegenContext::from_module_full(
+            &module,
+            &gctx,
+            &GenerateOptions::new(),
+            HashSet::new(),
+        )
+        .unwrap();
         let scope = *module.file_scopes.first().expect("file scope");
         let lower = |ty: &TypeRef, pos: TypePosition| {
             to_syn_type(ty, pos, Some(&ctx), scope, &ModuleContext::Global).to_string()
@@ -4010,7 +4025,13 @@ mod tests {
             }
         "#;
         let (module, gctx) = crate::parse_source(src, Some("m")).unwrap();
-        let ctx = CodegenContext::from_module_full(&module, &gctx, false, false, HashSet::new());
+        let ctx = CodegenContext::from_module_full(
+            &module,
+            &gctx,
+            &GenerateOptions::new(),
+            HashSet::new(),
+        )
+        .unwrap();
         let scope = *module.file_scopes.first().expect("file scope");
         let outer = match &gctx
             .get_type(gctx.resolve_path(scope, "Outer").unwrap())
@@ -4045,7 +4066,13 @@ mod tests {
             }
         "#;
         let (module, gctx) = crate::parse_source(src, None).unwrap();
-        let ctx = CodegenContext::from_module_full(&module, &gctx, false, false, HashSet::new());
+        let ctx = CodegenContext::from_module_full(
+            &module,
+            &gctx,
+            &GenerateOptions::new(),
+            HashSet::new(),
+        )
+        .unwrap();
         let file = module.file_scopes[0];
         let events = gctx.scopes.get(file).namespace("Events").unwrap();
         let inner = gctx.scopes.get(events).namespace("Inner").unwrap();
@@ -4076,5 +4103,21 @@ mod tests {
             lower("Events.Inner.Handle", file, &["other"]),
             "super :: events :: inner :: Handle"
         );
+    }
+
+    #[test]
+    fn error_type_option_is_validated() {
+        let (module, gctx) =
+            crate::parse_source("declare function f(): Promise<void>;", None).unwrap();
+        let bad = GenerateOptions::new().error_type("not a type");
+        let err = CodegenContext::from_module_full(&module, &gctx, &bad, HashSet::new())
+            .err()
+            .expect("unparseable path is rejected");
+        assert!(err.to_string().contains("invalid --error-type"));
+
+        let good = GenerateOptions::new().error_type("crate::Error");
+        let ctx = CodegenContext::from_module_full(&module, &gctx, &good, HashSet::new()).unwrap();
+        assert_eq!(default_error_type(Some(&ctx)).to_string(), "crate :: Error");
+        assert_eq!(default_error_type(None).to_string(), "JsValue");
     }
 }

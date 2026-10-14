@@ -49,15 +49,25 @@ struct Cli {
     #[arg(short, long)]
     verbose: bool,
 
-    /// Use `js_sys::Error` as the default error type for fallible
-    /// bindings instead of `JsValue`.
+    /// Rust path of the default error type for fallible bindings,
+    /// replacing `JsValue` (e.g. `crate::Error`).
     ///
-    /// Applies only when a binding has no `@throws` annotation;
-    /// `@throws {SomeError}` still emits the typed error. Useful in
-    /// environments that prefer the typed `Error` API (`message`,
-    /// `name`, `cause`, …). Note: JS code that throws a non-Error
-    /// value (e.g. `throw "oops"`) will produce a runtime conversion
-    /// error rather than passing through silently.
+    /// The type must implement `From<JsValue>`: wasm-bindgen's `catch`
+    /// converts the caught exception with `?`. Applies only when a
+    /// binding has no `@throws` annotation; `@throws {SomeError}`
+    /// still emits the typed error.
+    #[arg(
+        long = "error-type",
+        value_name = "PATH",
+        conflicts_with = "errors_as_error"
+    )]
+    error_type: Option<String>,
+
+    /// Shorthand for `--error-type ::js_sys::Error`.
+    ///
+    /// Useful in environments that prefer the typed `Error` API
+    /// (`message`, `name`, `cause`, …). Note: JS code that throws a
+    /// non-Error value (e.g. `throw "oops"`) is cast unchecked.
     #[arg(long = "errors-as-error")]
     errors_as_error: bool,
 
@@ -230,10 +240,13 @@ fn main() -> Result<()> {
         }
     }
 
-    let options = ts_gen::codegen::GenerateOptions::new()
+    let mut options = ts_gen::codegen::GenerateOptions::new()
         .errors_as_error(cli.errors_as_error)
         .experimental_generic_mono(cli.experimental_generic_mono)
         .exports(exports);
+    if let Some(path) = &cli.error_type {
+        options = options.error_type(path);
+    }
     let source = match cli.target {
         Target::Rust => ts_gen::codegen::generate_with_options(&module, &gctx, &options)?,
         Target::Wat => {
