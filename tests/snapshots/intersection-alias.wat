@@ -78,6 +78,22 @@
   ;; set value(value: R)
   (import "./bindings.wasm" "Range.set_value" (func $Range.set_value (param $this externref) (param $value externref)))
 
+  ;; Listing
+  ;; {} as Listing
+  (import "./bindings.wasm" "Listing.new" (func $Listing.new (result externref)))
+  ;; truncated: boolean
+  (import "./bindings.wasm" "Listing.truncated" (func $Listing.truncated (param $this externref) (result i32)))
+  ;; set truncated(value: boolean)
+  (import "./bindings.wasm" "Listing.set_truncated" (func $Listing.set_truncated (param $this externref) (param $value i32)))
+  ;; cursor?: string
+  (import "./bindings.wasm" "Listing.cursor" (func $Listing.cursor (param $this externref) (result externref)))
+  ;; set cursor(value: string)
+  (import "./bindings.wasm" "Listing.set_cursor" (func $Listing.set_cursor (param $this externref) (param $value externref)))
+  ;; objects: string[]
+  (import "./bindings.wasm" "Listing.objects" (func $Listing.objects (param $this externref) (result externref)))
+  ;; set objects(value: string[])
+  (import "./bindings.wasm" "Listing.set_objects" (func $Listing.set_objects (param $this externref) (param $value externref)))
+
   ;; Vector
   ;; {} as Vector
   (import "./bindings.wasm" "Vector.new" (func $Vector.new (result externref)))

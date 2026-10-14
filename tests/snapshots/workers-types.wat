@@ -3156,6 +3156,14 @@
   ;; R2Objects
   ;; {} as R2Objects
   (import "./bindings.wasm" "R2Objects.new" (func $R2Objects.new (result externref)))
+  ;; truncated: true | false
+  (import "./bindings.wasm" "R2Objects.truncated" (func $R2Objects.truncated (param $this externref) (result externref)))
+  ;; set truncated(value: true)
+  (import "./bindings.wasm" "R2Objects.set_truncated" (func $R2Objects.set_truncated (param $this externref) (param $value i32)))
+  ;; cursor?: string
+  (import "./bindings.wasm" "R2Objects.cursor" (func $R2Objects.cursor (param $this externref) (result externref)))
+  ;; set cursor(value: string)
+  (import "./bindings.wasm" "R2Objects.set_cursor" (func $R2Objects.set_cursor (param $this externref) (param $value externref)))
   ;; objects: R2Object[]
   (import "./bindings.wasm" "R2Objects.objects" (func $R2Objects.objects (param $this externref) (result externref)))
   ;; set objects(value: R2Object[])
