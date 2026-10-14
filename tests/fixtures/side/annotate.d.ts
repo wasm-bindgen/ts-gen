@@ -43,3 +43,6 @@ declare function setInterval(callback: () => void, ms?: number): number;
 declare function size(key: string): number;
 /** @rust n: u32 */
 declare function size(keys: string[], n: number): number;
+
+interface Request<Meta = unknown, Cf = Incoming> {}
+type RequestInfo<Meta = unknown, Cf = Incoming> = Request<Meta, Cf> | string;
