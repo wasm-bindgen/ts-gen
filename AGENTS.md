@@ -43,12 +43,17 @@ src/
 │   ├── surface.rs             # output surface: export roots, `--export <Name>`, closure
 │   ├── type_params.rs         # erase method type params no argument infers
 │   └── typemap.rs             # TypeRef → syn tokens, `to_return_type`, externals
+├── abi/                       # Wasm ABI layer (--target wat)
+│   ├── mod.rs                 # ABI model, `build()`
+│   └── wat.rs                 # import template generator
 └── util/                      # naming, diagnostics, dedup helpers
 
 tests/
 ├── fixtures/*.d.ts            # input declarations
 ├── snapshots/<name>/*.rs      # expected output per CLI configuration (default, mono)
-└── snapshot.rs                # the snapshot harness
+├── snapshots/<name>/*.wat     # --target wat output per configuration
+├── snapshots/<name>/*.wat.err # --target wat error, for a fixture the ABI rejects
+└── snapshot.rs                # the Rust and WAT snapshot harness
 
 integration-tests/
 ├── tests/*.rs                 # hand-written integration tests

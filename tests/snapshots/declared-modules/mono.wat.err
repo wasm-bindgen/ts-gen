@@ -1,0 +1,1 @@
+Error: ABI name "constants.O_RDONLY" is declared both in module "declared-modules/fs" and in module "declared-modules/os"
