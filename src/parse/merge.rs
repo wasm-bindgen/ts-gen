@@ -73,11 +73,12 @@ pub fn convert_construct_signature(
     let mut type_params =
         crate::parse::types::convert_type_params(ctor.type_parameters.as_ref(), ctx.diag);
     let scope = crate::parse::members::create_body_scope(&mut type_params, parent_scope, ctx);
-    let params = convert_formal_params_scoped(&ctor.params, scope, ctx);
+    let mut params = convert_formal_params_scoped(&ctor.params, scope, ctx);
     let (doc, info) = match ctx.docs.info_for_span(ctor.span.start) {
         Some((d, i)) => (Some(d), i),
         None => (None, crate::parse::docs::JsDocInfo::default()),
     };
+    crate::parse::members::apply_rust_tags(&info, None, &mut params, "constructor", ctx);
     ConstructorMember {
         scope,
         type_params,

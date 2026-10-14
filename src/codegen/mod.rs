@@ -551,6 +551,7 @@ fn dynamic_union_variant_name(ty: &TypeRef) -> String {
     match ty {
         T::Boolean | T::BooleanLiteral(_) => "Bool".to_string(),
         T::Number | T::NumberLiteral(_) => "F64".to_string(),
+        T::RustScalar(s) => s.as_str().to_uppercase(),
         T::String | T::StringLiteral(_) => "String".to_string(),
         T::BigInt => "BigInt".to_string(),
         T::Void | T::Undefined => "Undefined".to_string(),
