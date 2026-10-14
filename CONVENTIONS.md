@@ -729,6 +729,32 @@ If every property is required (no optionals), the builder would carry
 only `build()` and is suppressed — only `new(reqs)` is emitted, with
 construction inlined.
 
+### Continuing from an existing dictionary
+
+`build()` consumes the builder and the builder has no getters, so a
+helper that needs to read what was set so far (append to a `headers`
+field, apply a preset) would otherwise have to rebuild the object field
+by field. Every builder therefore implements `From<Dict>`:
+
+```rust
+impl From<ResponseInit> for ResponseInitBuilder {
+    fn from(inner: ResponseInit) -> Self { Self { inner } }
+}
+```
+
+The dictionary's generated getters and setters are the read/modify step,
+and `.into()` resumes chaining:
+
+```rust
+fn header(builder: ResponseInitBuilder, name: &str, value: &str) -> ResponseInitBuilder {
+    let init = builder.build();
+    let headers = /* normalize init.headers() */;
+    headers.set(name, value);
+    init.set_headers(&headers);
+    init.into()
+}
+```
+
 ### Required-property cartesian product across union types
 
 When a required property has union-typed setter overloads (e.g.

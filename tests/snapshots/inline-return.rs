@@ -68,6 +68,11 @@ impl<T: ::wasm_bindgen::JsGeneric> CursorNextReturnBuilder<T> {
         self.inner
     }
 }
+impl<T: ::wasm_bindgen::JsGeneric> From<CursorNextReturn<T>> for CursorNextReturnBuilder<T> {
+    fn from(inner: CursorNextReturn<T>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -120,6 +125,11 @@ impl ImageOptionsBuilder {
     }
     pub fn build(self) -> ImageOptions {
         self.inner
+    }
+}
+impl From<ImageOptions> for ImageOptionsBuilder {
+    fn from(inner: ImageOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(private)]
