@@ -172,17 +172,17 @@ impl MessageBuilder {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Object , js_name = "Box")]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Box<T: ::wasm_bindgen::JsGeneric = JsValue>;
+    pub type Box_<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter)]
-    pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &Box<T>) -> T;
+    pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &Box_<T>) -> T;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<T: ::wasm_bindgen::JsGeneric>(this: &Box<T>, val: &T);
+    pub fn set_value<T: ::wasm_bindgen::JsGeneric>(this: &Box_<T>, val: &T);
     #[wasm_bindgen(method)]
-    pub fn unwrap<T: ::wasm_bindgen::JsGeneric>(this: &Box<T>) -> T;
+    pub fn unwrap<T: ::wasm_bindgen::JsGeneric>(this: &Box_<T>) -> T;
     #[wasm_bindgen(method, catch, js_name = "unwrap")]
-    pub fn try_unwrap<T: ::wasm_bindgen::JsGeneric>(this: &Box<T>) -> Result<T, JsValue>;
+    pub fn try_unwrap<T: ::wasm_bindgen::JsGeneric>(this: &Box_<T>) -> Result<T, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -203,7 +203,7 @@ impl Tagged {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Tagged , extends = Box , extends = Object)]
+    # [wasm_bindgen (extends = Tagged , extends = Box_ , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Named;
     #[wasm_bindgen(method, getter)]
