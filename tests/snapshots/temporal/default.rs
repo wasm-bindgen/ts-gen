@@ -4136,22 +4136,22 @@ pub mod temporal {
         #[wasm_bindgen(method, catch, js_name = "startOfDay")]
         pub fn try_start_of_day(this: &ZonedDateTime) -> Result<ZonedDateTime, JsValue>;
         #[wasm_bindgen(method, js_name = "getTimeZoneTransition")]
-        pub fn get_time_zone_transition(
+        fn get_time_zone_transition_next_2_js(
             this: &ZonedDateTime,
             direction: &str,
         ) -> Nullable<ZonedDateTime>;
         #[wasm_bindgen(method, catch, js_name = "getTimeZoneTransition")]
-        pub fn try_get_time_zone_transition(
+        fn try_get_time_zone_transition_next_2_js(
             this: &ZonedDateTime,
             direction: &str,
         ) -> Result<Nullable<ZonedDateTime>, JsValue>;
         #[wasm_bindgen(method, js_name = "getTimeZoneTransition")]
-        pub fn get_time_zone_transition_with_transition_options(
+        pub fn get_time_zone_transition(
             this: &ZonedDateTime,
             direction: &TransitionOptions,
         ) -> Nullable<ZonedDateTime>;
         #[wasm_bindgen(method, catch, js_name = "getTimeZoneTransition")]
-        pub fn try_get_time_zone_transition_with_transition_options(
+        pub fn try_get_time_zone_transition(
             this: &ZonedDateTime,
             direction: &TransitionOptions,
         ) -> Result<Nullable<ZonedDateTime>, JsValue>;
@@ -4171,6 +4171,24 @@ pub mod temporal {
         pub fn to_plain_date_time(this: &ZonedDateTime) -> PlainDateTime;
         #[wasm_bindgen(method, catch, js_name = "toPlainDateTime")]
         pub fn try_to_plain_date_time(this: &ZonedDateTime) -> Result<PlainDateTime, JsValue>;
+    }
+    impl ZonedDateTime {
+        pub fn get_time_zone_transition_next_2(&self) -> Nullable<ZonedDateTime> {
+            self.get_time_zone_transition_next_2_js("next")
+        }
+        pub fn get_time_zone_transition_previous_2(&self) -> Nullable<ZonedDateTime> {
+            self.get_time_zone_transition_next_2_js("previous")
+        }
+        pub fn try_get_time_zone_transition_next_2(
+            &self,
+        ) -> Result<Nullable<ZonedDateTime>, JsValue> {
+            self.try_get_time_zone_transition_next_2_js("next")
+        }
+        pub fn try_get_time_zone_transition_previous_2(
+            &self,
+        ) -> Result<Nullable<ZonedDateTime>, JsValue> {
+            self.try_get_time_zone_transition_next_2_js("previous")
+        }
     }
     #[wasm_bindgen]
     extern "C" {
