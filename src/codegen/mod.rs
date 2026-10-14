@@ -565,7 +565,7 @@ fn generate_declaration(
             Some(cgctx),
             decl.scope_id,
         )),
-        TypeKind::Interface(i) => match i.classification {
+        TypeKind::Interface(i) => match classes::effective_classification(i, Some(cgctx)) {
             InterfaceClassification::ClassLike | InterfaceClassification::Unclassified => {
                 Some(classes::generate_class_like_interface(
                     i,
@@ -894,7 +894,7 @@ fn generate_ns_declaration(
             Some(cgctx),
             decl.scope_id,
         )),
-        TypeKind::Interface(i) => match i.classification {
+        TypeKind::Interface(i) => match classes::effective_classification(i, Some(cgctx)) {
             InterfaceClassification::ClassLike | InterfaceClassification::Unclassified => {
                 Some(classes::generate_class_like_interface(
                     i,

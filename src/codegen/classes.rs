@@ -36,7 +36,7 @@ use crate::codegen::typemap::{to_return_type, CodegenContext, TypePosition};
 use crate::ir::{
     ClassDecl, GetterMember, InterfaceClassification, InterfaceDecl, Member, MethodMember,
     ModuleContext, SetterMember, StaticGetterMember, StaticMethodMember, StaticSetterMember,
-    TypeRef,
+    TypeKind, TypeRef,
 };
 use crate::parse::scope::ScopeId;
 use crate::util::naming::{naming_priority, to_snake_case, LocalScope, Suffix};
@@ -85,7 +85,7 @@ enum MemberKind {
 type MemberKey = (MemberKind, String);
 
 /// The names a type's members are emitted under; see [`member_names`].
-#[derive(Default)]
+#[derive(Default, Clone)]
 struct MemberNames {
     /// The snake_case base of each property and method: a method's and a
     /// getter's own name, and a dictionary's factory parameter.
@@ -345,6 +345,9 @@ impl<'a> ClassConfig<'a> {
             ModuleContext::Global => None,
         };
 
+        let inherited = inherited_members(&decl.extends, cgctx);
+        let members = inherit_into(inherited.beyond_first, &decl.members);
+
         ClassConfig {
             rust_name: decl.name.clone(),
             js_name: decl.js_name.clone(),
@@ -352,14 +355,33 @@ impl<'a> ClassConfig<'a> {
             module,
             js_namespace: Vec::new(),
             is_abstract: false,
-            members: decl.members.clone(),
-            member_names: member_names(
-                &decl.members,
-                generated_names(&decl.members, false, dictionary),
-            ),
+            member_names: member_names(&members, generated_names(&members, false, dictionary)),
+            members,
             type_params: decl.type_params.clone(),
             cgctx,
             scope,
+        }
+    }
+
+    /// The config with the first parent chain's members merged in as well,
+    /// for building the dictionary factory: wasm-bindgen derefs to the
+    /// first parent so its accessors are not re-declared, but the factory
+    /// has to set its fields.
+    fn with_first_parent_members(&self, decl: &InterfaceDecl) -> Self {
+        let inherited = inherited_members(&decl.extends, self.cgctx);
+        let members = inherit_into(inherited.first_chain, &self.members);
+        ClassConfig {
+            rust_name: self.rust_name.clone(),
+            js_name: self.js_name.clone(),
+            extends: self.extends.clone(),
+            module: self.module.clone(),
+            js_namespace: self.js_namespace.clone(),
+            is_abstract: self.is_abstract,
+            members,
+            member_names: self.member_names.clone(),
+            type_params: self.type_params.clone(),
+            cgctx: self.cgctx,
+            scope: self.scope,
         }
     }
 
@@ -532,14 +554,6 @@ pub fn generate_class_like_interface(
     js_namespace: &[String],
     scope: ScopeId,
 ) -> TokenStream {
-    debug_assert!(
-        matches!(
-            decl.classification,
-            InterfaceClassification::ClassLike | InterfaceClassification::Unclassified
-        ),
-        "expected ClassLike or Unclassified, got {:?}",
-        decl.classification
-    );
     let mut config = ClassConfig::from_interface(decl, ctx, cgctx, scope, false);
     config.js_namespace = js_namespace.to_vec();
     generate_extern_block(&config)
@@ -571,7 +585,7 @@ pub fn generate_dictionary_extern(
     config.js_namespace = js_namespace.to_vec();
 
     let extern_block = generate_extern_block(&config);
-    let factory = generate_dictionary_factory(&config);
+    let factory = generate_dictionary_factory(&config.with_first_parent_members(decl));
 
     quote! {
         #extern_block
@@ -2299,6 +2313,161 @@ fn read_type(ty: &TypeRef, optional: bool) -> TypeRef {
 }
 
 /// Convert concrete params to `fn` parameter token stream.
+/// Classification over the interface's own and inherited members: an
+/// interface declaring nothing of its own but extending dictionaries
+/// (`type EmailMessageBuilder = EmailReplyMessageBuilder & EmailDestinations`)
+/// is a dictionary; one extending a class-like parent is class-like.
+pub(crate) fn effective_classification(
+    decl: &InterfaceDecl,
+    cgctx: Option<&CodegenContext<'_>>,
+) -> InterfaceClassification {
+    if decl.extends.is_empty() {
+        return decl.classification.clone();
+    }
+    let inherited = inherited_members(&decl.extends, cgctx);
+    let members = inherit_into(inherited.first_chain, &inherited.beyond_first);
+    let members = inherit_into(members, &decl.members);
+    crate::parse::classify::classify_interface(&members)
+}
+
+/// Members a type inherits through `extends`, with the parents' type
+/// parameters substituted by the arguments the `extends` clause passes.
+struct Inherited {
+    /// From the first parent and its ancestors. wasm-bindgen derefs to
+    /// the first `extends =` target, so these are reachable without
+    /// re-declaring them.
+    first_chain: Vec<Member>,
+    /// From every other parent (and their ancestors). Only `AsRef`
+    /// reaches those, so the child declares them itself.
+    beyond_first: Vec<Member>,
+}
+
+fn inherited_members(
+    extends: &[crate::ir::Heritage],
+    cgctx: Option<&CodegenContext<'_>>,
+) -> Inherited {
+    let mut out = Inherited {
+        first_chain: Vec::new(),
+        beyond_first: Vec::new(),
+    };
+    let Some(c) = cgctx else {
+        return out;
+    };
+    for (i, parent) in extends.iter().enumerate() {
+        let mut members = Vec::new();
+        let mut visited = HashSet::new();
+        collect_parent_members(
+            &parent.type_ref,
+            c,
+            parent.scope,
+            &mut members,
+            &mut visited,
+        );
+        if i == 0 {
+            out.first_chain = members;
+        } else {
+            extend_missing(&mut out.beyond_first, members);
+        }
+    }
+    out
+}
+
+/// Append the members of `later` whose key no earlier sibling parent
+/// already provides: siblings in `extends` order, first wins.
+fn extend_missing(members: &mut Vec<Member>, later: Vec<Member>) {
+    let present: HashSet<_> = members.iter().map(crate::parse::member_key).collect();
+    members.extend(
+        later
+            .into_iter()
+            .filter(|m| !present.contains(&crate::parse::member_key(m))),
+    );
+}
+
+/// `inherited` followed by `own`, dropping inherited members that `own`
+/// redeclares. Overloads share a key, so `own` is appended whole rather
+/// than merged entry by entry.
+fn inherit_into(inherited: Vec<Member>, own: &[Member]) -> Vec<Member> {
+    let own_keys: HashSet<_> = own.iter().map(crate::parse::member_key).collect();
+    let mut members: Vec<Member> = inherited
+        .into_iter()
+        .filter(|m| !own_keys.contains(&crate::parse::member_key(m)))
+        .collect();
+    members.extend(own.iter().cloned());
+    members
+}
+
+fn collect_parent_members(
+    parent: &TypeRef,
+    c: &CodegenContext<'_>,
+    scope: ScopeId,
+    out: &mut Vec<Member>,
+    visited: &mut HashSet<crate::context::TypeId>,
+) {
+    let TypeRef::Reference {
+        segments,
+        generic_args,
+    } = parent
+    else {
+        return;
+    };
+    let Some(id) = c.gctx.resolve_path(scope, &segments.join(".")) else {
+        return;
+    };
+    if !visited.insert(id) {
+        return;
+    }
+    let (type_params, parent_extends, members) = match &c.gctx.get_type(id).kind {
+        TypeKind::Interface(i) => (&i.type_params, i.extends.clone(), &i.members),
+        TypeKind::Class(k) => (
+            &k.type_params,
+            k.extends.iter().cloned().collect(),
+            &k.members,
+        ),
+        _ => return,
+    };
+    let args = c.live_generic_args(id, generic_args);
+    let map: HashMap<String, TypeRef> = type_params
+        .iter()
+        .enumerate()
+        .map(|(i, tp)| {
+            let arg = args
+                .get(i)
+                .cloned()
+                .or_else(|| tp.default.clone())
+                .unwrap_or(TypeRef::Any);
+            (tp.name.clone(), arg)
+        })
+        .collect();
+    // Ancestors first so a parent's redeclaration overrides theirs.
+    let mut ancestors = Vec::new();
+    for grand in &parent_extends {
+        collect_parent_members(
+            &grand.type_ref.substitute(&map),
+            c,
+            grand.scope,
+            &mut ancestors,
+            visited,
+        );
+    }
+    let own: Vec<Member> = members
+        .iter()
+        .map(|m| {
+            let m = m.substitute(&map);
+            // A method without its own `<T>` resolves everything in the
+            // child's scope once the parent's parameters are substituted.
+            match m {
+                Member::Method(mut mm) if mm.type_params.is_empty() => {
+                    mm.body_scope = scope;
+                    Member::Method(mm)
+                }
+                other => other,
+            }
+        })
+        .collect();
+    let members = inherit_into(ancestors, &own);
+    *out = inherit_into(std::mem::take(out), &members);
+}
+
 /// Lower the `extends` parents of a declaration. A parent that erases to
 /// `JsValue` is dropped rather than replaced: `JsValue` is implicit, and
 /// a stand-in `Object` would take the first slot, which wasm-bindgen
