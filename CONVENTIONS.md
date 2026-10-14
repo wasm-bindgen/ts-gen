@@ -65,6 +65,9 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 position vs return position. Argument-position container types are
 borrowed by reference; return-position container types are owned.
 
+`never` is dropped from a union, so a merged `value: T` /
+`value?: never` property is `Option<T>`.
+
 TypeScript's built-in `PropertyKey` is recognised without a declaration
 and lowers exactly like `string | number | symbol`.
 
@@ -977,7 +980,7 @@ pub fn set_level(this: &Options, val: LevelKind);
 An inline `{ … }` type — or a union or intersection built from `{ … }`
 types and named references — that appears in a position where a named
 interface would do is promoted to a real `InterfaceDecl` so consumers
-get a typed builder rather than an opaque `Object`. Two positions
+get a typed builder rather than an opaque `Object`. Three positions
 trigger synthesis:
 
 ### Parameter position
@@ -1009,6 +1012,22 @@ interface SendEmail {
 }
 ```
 
+### Method return position
+
+```ts
+declare class Cursor<T> {
+  next(): { done?: false; value: T } | { done: true; value?: never };
+}
+```
+
+is treated as if the user had written `interface CursorNextReturn<T>
+{ done?: boolean; value?: T }` and `next(): CursorNextReturn<T>`. The
+name takes the `Return` segment used by synthesized return enums.
+Enclosing type parameters that the literal mentions become the hoisted
+interface's own parameters, instantiated at the reference, so its
+getters and builder bind them. Free functions have no parent name and
+keep the `Object` erasure, as their parameters do.
+
 ### Type-alias position
 
 ```ts
@@ -1032,7 +1051,7 @@ doesn't merge into it (see [Duplicate identifiers](#duplicate-identifiers)).
 
 When every branch of a union is itself an inline literal, the branches
 are **structurally merged** into a single member set. The merge
-covers both positions above:
+covers all three positions above:
 
 ```ts
 type EmailAttachment =
@@ -1161,6 +1180,10 @@ Only **directly-inline** type literals (or unions of such) are
 synthesized. Anonymous types nested inside a generic, an array,
 `Record<…>`, or a property of another object literal are not hoisted
 — they follow the regular type-mapping rules and erase to `Object`.
+Union members that erase to the same type are one member, so a
+property typed `{ … } | { … }` is `Option<Object>`, and `{ … } | { … }
+| string` is a two-variant `Object` / `String` dynamic union rather
+than carrying an unreachable duplicate variant.
 Inline literals inside the *body* of a hoisted interface are themselves
 hoisted recursively, using the synthesized parent's name.
 
@@ -2533,8 +2556,10 @@ Derived & Unrelated                  -> JsValue     (no member subtypes the othe
 ```
 
 In argument position the bound accepts slightly more than TypeScript
-does; in return position the literal's extra fields are not reachable.
-Neither is unsound at the ABI.
+does; in a return position that does not hoist (a free function, a
+property; a method's `A & { … }` return is hoisted, see
+[Method return position](#method-return-position)) the literal's extra
+fields are not reachable. Neither is unsound at the ABI.
 
 ### Erased return-position unions become dynamic-union enums
 

@@ -14499,7 +14499,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SqlStorageCursor<T>;
     #[wasm_bindgen(method, catch)]
-    pub fn next<T>(this: &SqlStorageCursor<T>) -> Result<Object, JsValue>;
+    pub fn next<T>(this: &SqlStorageCursor<T>) -> Result<SqlStorageCursorNextReturn<T>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "toArray")]
     pub fn to_array<T>(this: &SqlStorageCursor<T>) -> Result<Vec<T>, JsValue>
     where
@@ -14523,6 +14523,50 @@ extern "C" {
     pub fn rows_read<T>(this: &SqlStorageCursor<T>) -> f64;
     #[wasm_bindgen(method, getter, js_name = "rowsWritten")]
     pub fn rows_written<T>(this: &SqlStorageCursor<T>) -> f64;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type SqlStorageCursorNextReturn<T>;
+    #[wasm_bindgen(method, getter)]
+    pub fn done<T>(this: &SqlStorageCursorNextReturn<T>) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_done<T>(this: &SqlStorageCursorNextReturn<T>, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn value<T>(this: &SqlStorageCursorNextReturn<T>) -> Option<T>
+    where
+        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_value<T>(this: &SqlStorageCursorNextReturn<T>, val: T)
+    where
+        T: ::wasm_bindgen::convert::IntoWasmAbi;
+}
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> SqlStorageCursorNextReturn<T> {
+    pub fn new() -> SqlStorageCursorNextReturn<T> {
+        Self::builder().build()
+    }
+    pub fn builder() -> SqlStorageCursorNextReturnBuilder<T> {
+        SqlStorageCursorNextReturnBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+pub struct SqlStorageCursorNextReturnBuilder<T> {
+    inner: SqlStorageCursorNextReturn<T>,
+}
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> SqlStorageCursorNextReturnBuilder<T> {
+    pub fn done(self, val: bool) -> Self {
+        self.inner.set_done(val);
+        self
+    }
+    pub fn value(self, val: T) -> Self {
+        self.inner.set_value(val);
+        self
+    }
+    pub fn build(self) -> SqlStorageCursorNextReturn<T> {
+        self.inner
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -40206,7 +40250,54 @@ pub mod cloudflare {
             #[wasm_bindgen(method, variadic, catch)]
             pub fn listen(this: &NodeStyleServer, args: &[JsValue]) -> Result<JsValue, JsValue>;
             #[wasm_bindgen(method, catch)]
-            pub fn address(this: &NodeStyleServer) -> Result<Object, JsValue>;
+            pub fn address(this: &NodeStyleServer)
+                -> Result<NodeStyleServerAddressReturn, JsValue>;
+        }
+        #[wasm_bindgen(module = "cloudflare:node", experimental_generic_mono)]
+        extern "C" {
+            # [wasm_bindgen (extends = Object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type NodeStyleServerAddressReturn;
+            #[wasm_bindgen(method, getter)]
+            pub fn port(this: &NodeStyleServerAddressReturn) -> Option<Nullable<f64>>;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_port(this: &NodeStyleServerAddressReturn, val: f64);
+            #[wasm_bindgen(method, setter, js_name = "port")]
+            fn set_port_with_null_js(
+                this: &NodeStyleServerAddressReturn,
+                val: &::wasm_bindgen::JsValue,
+            );
+        }
+        impl NodeStyleServerAddressReturn {
+            pub fn set_port_with_null(&self) {
+                self.set_port_with_null_js(&::wasm_bindgen::JsValue::NULL)
+            }
+        }
+        impl NodeStyleServerAddressReturn {
+            pub fn new() -> NodeStyleServerAddressReturn {
+                Self::builder().build()
+            }
+            pub fn builder() -> NodeStyleServerAddressReturnBuilder {
+                NodeStyleServerAddressReturnBuilder {
+                    inner: JsCast::unchecked_into(js_sys::Object::new()),
+                }
+            }
+        }
+        pub struct NodeStyleServerAddressReturnBuilder {
+            inner: NodeStyleServerAddressReturn,
+        }
+        impl NodeStyleServerAddressReturnBuilder {
+            pub fn port(self, val: f64) -> Self {
+                self.inner.set_port(val);
+                self
+            }
+            pub fn port_with_null(self) -> Self {
+                self.inner.set_port_with_null();
+                self
+            }
+            pub fn build(self) -> NodeStyleServerAddressReturn {
+                self.inner
+            }
         }
         #[wasm_bindgen(module = "cloudflare:node", experimental_generic_mono)]
         extern "C" {
