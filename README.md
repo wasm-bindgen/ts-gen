@@ -70,6 +70,13 @@ primary plus `try_` companion, for code that `?`s every call:
 ts-gen --input types.d.ts --output src/bindings.rs --fallible --error-type crate::Error
 ```
 
+Keep `@throws {A | B}` unions as a generated `JsException` enum instead of
+collapsing them to their common ancestor:
+
+```sh
+ts-gen --input types.d.ts --output src/bindings.rs --error-enum
+```
+
 Opt generic imports into wasm-bindgen's experimental per-monomorphization
 codegen:
 

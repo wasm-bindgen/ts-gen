@@ -1980,6 +1980,69 @@ throwing a non-Error value (`throw "oops"`) yields an `Error` whose
 accessors misbehave; if you can't audit your sources for that, stay
 with `JsValue` or use an enum with a checked `From<JsValue>`.
 
+### `--error-enum [NAME]` — `@throws` types become one enum
+
+Without the flag, `@throws {TypeError | RangeError}` lowers through the
+[subtyping LUB](#subtyping-lub-across-unions) to `Result<T, Error>`, and
+the caller can no longer tell the two apart without `dyn_ref`. The
+`js_sys` error classes' `From<JsValue>` are unchecked casts, so no
+single `js_sys` type can carry a union faithfully. `--error-enum`
+(library: `GenerateOptions::error_enum(name)`; the CLI default name is
+`JsException`) instead collects every type named in any `@throws` across
+the output — union members flattened — and emits one enum:
+
+```rust
+#[derive(Debug, Clone)]
+pub enum JsException {
+    QuotaError(QuotaError),
+    TypeError(TypeError),
+    RangeError(RangeError),
+    DOMException(DOMException),
+    Error(Error),
+    Other(JsValue),
+}
+```
+
+with `From<JsValue>` (a chain of `dyn_into` checks ending in `Other`),
+`From<JsException> for JsValue`, `AsRef<JsValue>`, `Display` and
+`std::error::Error`. `Display` is the `message` of an `Error` instance;
+for any other throwable it is `String(value)` (`42`, `null`,
+`[object Object]`), falling back to `Debug` if that conversion throws
+(an object without `toString`). It never panics.
+
+Rules:
+
+* Variants are ordered **most derived first**: a class precedes every
+  ancestor in its chain (builtin table plus user `extends`), deeper
+  chains go first, ties keep source order. A class whose ancestry is
+  not visible (an `--external` mapping with no `extends` in the input)
+  goes before every builtin-rooted class, since an external error class
+  almost certainly extends `Error` and the `Error` arm would otherwise
+  swallow it. Declare `extends` on such a class to place it exactly.
+* Every binding with a `@throws` type returns `Result<T, JsException>`:
+  unions and single types alike. A single type could keep its precise
+  `Result<T, TypeError>`, but then a `?`-style caller needs a `From`
+  per class; one enum everywhere means one `?`-able type, and the
+  variant still identifies the class. The trade-off is that the static
+  signature no longer says which classes a given call can throw — the
+  rendered `## Errors` doc section still does.
+* Bindings without a `@throws` type keep the `--error-type` default
+  (or `JsValue`). A project that wants a single error type overall
+  wraps both: `enum Error { Js(JsException), … }` with `From<JsException>` and
+  `From<JsValue>`, and passes `--error-type crate::Error`.
+* A `@throws` name must be declared in the input, a `js_sys` error
+  class (`Error`, `TypeError`, `RangeError`, `SyntaxError`,
+  `ReferenceError`, `EvalError`, `UriError`), or mapped with
+  `--external`. Anything else is an error diagnostic and is omitted
+  from the enum; values of that class land in `Other`.
+* The enum is emitted whenever the flag is given, even when no
+  `@throws` exists, so downstream code can reference it
+  unconditionally. A name that collides with a declared type is an
+  error. The default is `JsException` rather than `JsError` because
+  `wasm_bindgen::prelude::*` already exports a `JsError`, and a file
+  that globs both the bindings and the prelude would find the name
+  ambiguous.
+
 ### `@throws {never}` — opting out of fallible variants
 
 `@throws {never}` is the explicit "this never throws" annotation. It
@@ -2073,6 +2136,8 @@ The lattice is built from:
 When the deepest common ancestor is `Object` (no useful narrowing), the
 union erases to `JsValue` — the existing default. This rule is universal:
 it applies to `@throws` unions and to any TS union return type.
+[`--error-enum`](#--error-enum-name--throws-types-become-one-enum) opts
+`@throws` unions out of the LUB in favour of a generated enum.
 
 This LUB rule applies when lowering an actual union type. It does not
 make generic containers distributive: `Array<TypeError | RangeError>`
