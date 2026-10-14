@@ -440,7 +440,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type ExportedHandler<E: ::wasm_bindgen::JsGeneric>;
+    pub type ExportedHandler<E: ::wasm_bindgen::JsGeneric = Env>;
     #[wasm_bindgen(method, catch)]
     pub async fn fetch<E: ::wasm_bindgen::JsGeneric>(
         this: &ExportedHandler<E>,

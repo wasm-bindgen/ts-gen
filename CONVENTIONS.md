@@ -34,6 +34,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [Methods + the `try_<name>` companion](#methods--the-try_name-companion)
   * [`--fallible` — single `Result` form](#--fallible--single-result-form)
 * [`Promise<T>` returns become `async fn`](#promiset-returns-become-async-fn)
+* [Type-parameter defaults](#type-parameter-defaults)
 * [`@throws` JSDoc → typed error](#throws-jsdoc--typed-error)
 * [Subtyping LUB across unions](#subtyping-lub-across-unions)
 * [Module declarations and namespace nesting](#module-declarations-and-namespace-nesting)
@@ -2327,6 +2328,39 @@ The `js_sys` primitive-union marker traits (`JsNumberOrStringLike` and
 the rest) are not emitted. Return positions are unchanged: an erased
 union still becomes a
 [dynamic-union enum](#erased-return-position-unions-become-dynamic-union-enums).
+
+## Type-parameter defaults
+
+A TypeScript default (`interface MessageBatch<Body = unknown>`) becomes a
+Rust default on the `pub type` declaration, so the bare name is a complete
+type in handler signatures and constructor returns:
+
+```ts
+interface Box<T = unknown> { readonly value: T; }
+declare class Holder<T = Box<string>> {
+  constructor();
+  get(): T;
+}
+```
+
+becomes:
+
+```rust
+pub type Box<T: ::wasm_bindgen::JsGeneric = JsValue>;
+pub type Holder<T: ::wasm_bindgen::JsGeneric = Box<JsString>>;
+
+pub fn new() -> Result<Holder, JsValue>;
+pub fn get<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>) -> T;
+```
+
+The default lowers like an inner type argument (`unknown`/`any` → `JsValue`,
+`string` → `JsString`, named types by reference, earlier parameters by name).
+Rust accepts defaults only on the type definition, so methods, dictionary
+builders and helper `impl`s keep the plain `<T: JsGeneric>` form; a builder
+for a defaulted dictionary is named with explicit arguments
+(`Options::<Box<JsString>>::builder()`). When the default's target erases to
+`JsValue` (an unresolved name, an alias of an erased union), the whole
+default is `JsValue`, type arguments included.
 
 ## `@throws` JSDoc → typed error
 
