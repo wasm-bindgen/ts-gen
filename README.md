@@ -121,7 +121,8 @@ ts-gen --input types.d.ts --output template.wat --target wat
 
 The template lists every ABI function as an import, from `./bindings.wasm`
 for a global and from its specifier for a `declare module` declaration,
-and, with `--provides`, a stub export per provided function.
+and, with `--provides`, a stub export per provided function. Write your
+module against it, then use `embed` to generate the runtime artifacts.
 
 ### Provided functions (`--provides`)
 
@@ -140,6 +141,50 @@ ts-gen --input worker.d.ts --output src/bindings.rs --provides ExportedHandler.f
 | `--provides` | A `.d.ts` export surface, or `Name[.member,...]` |
 | `--provides-app` | Module path the wrapper delegates to; its last segment names the scaffold (default `super::app`) |
 | `--provides-bindings` | Module path of the bindings (default `super::<output stem>`, with `-` and `.` replaced by `_`) |
+
+### Embedding (`ts-gen embed`)
+
+Given a module written against the template, produce the bridging modules:
+
+```sh
+ts-gen embed -i types.d.ts --provides ExportedHandler.fetch -m hello.wasm -o out/
+```
+
+This creates `out/hello.wasm` (merged), `out/builtins.js`, and optionally
+`out/bindings.wat` / `out/wrapper.wat` with `--text`. The merged module
+imports only `builtins.js`, the js-string-builtins string constants and
+any `declare module` specifiers the `.d.ts` declares.
+
+Flags:
+
+| Flag | Description |
+|------|-------------|
+| `-i`, `--input` | The `.d.ts` files the module was written against |
+| `-m`, `--module` | The compiled language module |
+| `-o`, `--out-dir` | Output directory |
+| `--text` | Also write `.wat` text for debugging |
+| `--wasm-merge` | Path to binaryen's `wasm-merge` (required; defaults to `$WASM_MERGE`, then `PATH`) |
+| `--module-specifier` | Specifier `wrapper.wasm` imports the module under (default `./<module file name>`) |
+| `--provides` | What the module provides, as for the main command |
+| `--lib-name` | JS module specifier, required when the `.d.ts` has top-level exports |
+| `-E`, `--export` | What the template covers, as for the main command; pass the same values |
+
+Hello-world flow:
+
+```sh
+# 1. Generate the template
+ts-gen --input worker.d.ts --output template.wat --target wat --provides ExportedHandler.fetch
+
+# 2. Write your module against it (e.g. hello.wat)
+# 3. Assemble it
+wasm-tools parse hello.wat -o hello.wasm
+
+# 4. Embed
+ts-gen embed -i worker.d.ts --provides ExportedHandler.fetch -m hello.wasm -o out/
+
+# 5. Run (e.g. with workerd)
+workerd serve config.capnp
+```
 
 ### Library API
 

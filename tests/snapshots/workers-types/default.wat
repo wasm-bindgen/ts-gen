@@ -2,8 +2,8 @@
 ;;
 ;; Scalars: number -> f64, boolean -> i32, bigint -> i64.
 ;; All other values (strings, objects, null/undefined) are externref,
-;; as JS produced them. A position whose TS type never admits null
-;; may be taken as (ref extern).
+;; as JS produced them. Per position, embed also accepts anyref, and
+;; (ref extern) / (ref any) where the TS type never admits null.
 ;;
 ;; Import names: Type.member with _with_x suffixes for overloads.
 ;; Dictionary constructors: Type.new creates {} (empty object).
@@ -11,7 +11,7 @@
 ;;
 ;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
-;; Import only what you use; unused entries need not be deleted.
+;; Unused imports need not be deleted; embed prunes to what you use.
 (module
   ;; GC array type for variadic parameters (anyref for GC language compat).
   (type $anyrefs (array (mut anyref)))
@@ -13857,7 +13857,7 @@
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
 
-  ;; JSPI: suspends on a Promise and returns its value. A module that
-  ;; imports this has its provided functions wrapped with promising.
+  ;; JSPI: suspends on a Promise and returns its value. Importing this
+  ;; selects JSPI mode in `embed`, which wraps the handlers with promising.
   (import "./builtins.js" "await" (func $await (param externref) (result externref)))
 )
