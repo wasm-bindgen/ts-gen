@@ -103,6 +103,11 @@ impl ResponseInitBuilder {
         self.inner
     }
 }
+impl From<ResponseInit> for ResponseInitBuilder {
+    fn from(inner: ResponseInit) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setTimeout")]

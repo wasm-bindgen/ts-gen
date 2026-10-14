@@ -274,6 +274,11 @@ impl FromOptionsBuilder {
         self.inner
     }
 }
+impl From<FromOptions> for FromOptionsBuilder {
+    fn from(inner: FromOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(private, fallback)]
 #[derive(Clone, Debug)]
 pub enum ZonedLike {
@@ -647,6 +652,11 @@ impl RelativeOptionsBuilder {
         self.inner
     }
 }
+impl From<RelativeOptions> for RelativeOptionsBuilder {
+    fn from(inner: RelativeOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "union-alias-reads")]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -689,6 +699,11 @@ impl SpanBuilder {
     }
     pub fn build(self) -> Span {
         self.inner
+    }
+}
+impl From<Span> for SpanBuilder {
+    fn from(inner: Span) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(module = "union-alias-reads")]

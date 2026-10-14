@@ -139,6 +139,11 @@ impl TaggedBuilder {
         self.inner
     }
 }
+impl From<Tagged> for TaggedBuilder {
+    fn from(inner: Tagged) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(private)]
 pub enum LookupReturnKind {
     String(String),

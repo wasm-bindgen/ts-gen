@@ -91,6 +91,11 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> DetailsBuilder<T> {
         self.inner
     }
 }
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> From<Details<T>> for DetailsBuilder<T> {
+    fn from(inner: Details<T>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "enum-positions", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]

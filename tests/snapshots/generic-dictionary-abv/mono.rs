@@ -77,6 +77,11 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> GenAbvBuilder<T> {
         self.inner
     }
 }
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> From<GenAbv<T>> for GenAbvBuilder<T> {
+    fn from(inner: GenAbv<T>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]

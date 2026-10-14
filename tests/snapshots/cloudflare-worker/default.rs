@@ -259,6 +259,11 @@ impl RequestInitBuilder {
         self.inner
     }
 }
+impl From<RequestInit> for RequestInitBuilder {
+    fn from(inner: RequestInit) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(private)]
 #[derive(Clone, Debug)]
 pub enum BodyInit {
@@ -502,6 +507,11 @@ impl ResponseInitBuilder {
     }
     pub fn build(self) -> ResponseInit {
         self.inner
+    }
+}
+impl From<ResponseInit> for ResponseInitBuilder {
+    fn from(inner: ResponseInit) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen]

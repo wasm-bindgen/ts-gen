@@ -53,3 +53,8 @@ impl<T: ::wasm_bindgen::JsGeneric> EvaluationDetailsBuilder<T> {
         self.inner
     }
 }
+impl<T: ::wasm_bindgen::JsGeneric> From<EvaluationDetails<T>> for EvaluationDetailsBuilder<T> {
+    fn from(inner: EvaluationDetails<T>) -> Self {
+        Self { inner }
+    }
+}

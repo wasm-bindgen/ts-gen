@@ -104,6 +104,11 @@ impl SizedBuilder {
         self.inner
     }
 }
+impl From<Sized_> for SizedBuilder {
+    fn from(inner: Sized_) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Minute {
@@ -200,6 +205,11 @@ impl MixedBuilder {
         self.inner
     }
 }
+impl From<Mixed> for MixedBuilder {
+    fn from(inner: Mixed) -> Self {
+        Self { inner }
+    }
+}
 #[allow(dead_code)]
 pub type Loose = JsValue;
 #[allow(dead_code)]
@@ -278,6 +288,11 @@ impl<U: ::wasm_bindgen::convert::IntoWasmAbi> RoundingBuilder<U> {
     }
     pub fn build(self) -> Rounding<U> {
         self.inner
+    }
+}
+impl<U: ::wasm_bindgen::convert::IntoWasmAbi> From<Rounding<U>> for RoundingBuilder<U> {
+    fn from(inner: Rounding<U>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
@@ -414,6 +429,11 @@ pub mod scoped {
             self.inner
         }
     }
+    impl From<Settings> for SettingsBuilder {
+        fn from(inner: Settings) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch, js_namespace = "Scoped")]
@@ -462,6 +482,11 @@ pub mod scoped {
         }
         pub fn build(self) -> PartialSettings {
             self.inner
+        }
+    }
+    impl From<PartialSettings> for PartialSettingsBuilder {
+        fn from(inner: PartialSettings) -> Self {
+            Self { inner }
         }
     }
 }
@@ -632,6 +657,11 @@ impl PickOptionsNameOrSizeBuilder {
         self.inner
     }
 }
+impl From<PickOptionsNameOrSize> for PickOptionsNameOrSizeBuilder {
+    fn from(inner: PickOptionsNameOrSize) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -745,6 +775,11 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> PartialBoxBuilder<T> {
     }
     pub fn build(self) -> PartialBox<T> {
         self.inner
+    }
+}
+impl<T: ::wasm_bindgen::convert::IntoWasmAbi> From<PartialBox<T>> for PartialBoxBuilder<T> {
+    fn from(inner: PartialBox<T>) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(private)]

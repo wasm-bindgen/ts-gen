@@ -178,6 +178,11 @@ pub mod intl {
             self.inner
         }
     }
+    impl From<CollatorOptions> for CollatorOptionsBuilder {
+        fn from(inner: CollatorOptions) -> Self {
+            Self { inner }
+        }
+    }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         #[allow(non_upper_case_globals)]

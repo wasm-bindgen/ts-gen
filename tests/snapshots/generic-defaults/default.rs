@@ -120,6 +120,11 @@ impl<T: ::wasm_bindgen::JsGeneric> OptionsBuilder<T> {
         self.inner
     }
 }
+impl<T: ::wasm_bindgen::JsGeneric> From<Options<T>> for OptionsBuilder<T> {
+    fn from(inner: Options<T>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "generic-defaults")]
 extern "C" {
     #[wasm_bindgen(js_name = "looseBox")]
