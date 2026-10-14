@@ -612,6 +612,18 @@ impl<'a> CodegenContext<'a> {
         self.resolve_alias_impl(name, scope, &mut visited)
     }
 
+    /// Whether `name` resolves to a string or numeric enum. Those lower to
+    /// `Copy` Rust enums, which wasm-bindgen only converts by value, so they
+    /// are never borrowed in argument position.
+    pub fn is_enum(&self, name: &str, scope: ScopeId) -> bool {
+        self.gctx.scopes.resolve(scope, name).is_some_and(|id| {
+            matches!(
+                self.gctx.get_type(id).kind,
+                TypeKind::StringEnum(_) | TypeKind::NumericEnum(_)
+            )
+        })
+    }
+
     fn resolve_alias_impl<'b>(
         &'b self,
         name: &str,
@@ -1077,6 +1089,16 @@ pub fn to_syn_type(
                     if let Some(target) = c.resolve_alias(&segments[0], scope) {
                         let target = target.clone();
                         return to_syn_type(&target, pos, ctx, scope, from_module);
+                    }
+                    if c.is_enum(&segments[0], scope) {
+                        return lower_reference(
+                            segments,
+                            generic_args,
+                            pos,
+                            ctx,
+                            scope,
+                            from_module,
+                        );
                     }
                 }
             }

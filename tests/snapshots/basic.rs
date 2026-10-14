@@ -226,14 +226,10 @@ impl ResponseInitBuilder {
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum QueueContentType {
-    #[wasm_bindgen(js_name = "text")]
-    Text,
-    #[wasm_bindgen(js_name = "bytes")]
-    Bytes,
-    #[wasm_bindgen(js_name = "json")]
-    Json,
-    #[wasm_bindgen(js_name = "v8")]
-    V8,
+    Text = "text",
+    Bytes = "bytes",
+    Json = "json",
+    V8 = "v8",
 }
 #[allow(dead_code)]
 pub type BodyInit = JsValue;

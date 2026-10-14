@@ -1841,13 +1841,29 @@ yet supported.
 
 ```ts
 enum Color { Red = "red", Green = "green" }
+type Kind = "text" | "bytes";
 ```
 
-emits a `pub enum Color { Red, Green }` plus serde-aware `to_string` /
-`try_from_str` impls. `wasm-bindgen` doesn't handle string enums
-natively, so we lower these to Rust-side enums + a `JsValue` round-trip.
+Both a string `enum` and a type alias over string literals emit a
+wasm-bindgen string enum, whose variant discriminants are the JS
+string values:
 
-Numeric enums lower similarly with explicit discriminant values.
+```rust
+#[wasm_bindgen]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Color {
+    Red = "red",
+    Green = "green",
+}
+```
+
+wasm-bindgen converts these by value only, so unlike other named types
+they are not borrowed in argument position: `fn send(kind: Kind)`,
+`fn set_kind(this: &Opts, val: Kind)`, and optional properties still
+read back as `Option<Kind>`.
+
+Numeric enums lower similarly with explicit discriminant values and a
+`#[repr(u32)]` / `#[repr(i32)]` chosen from the value range.
 
 ## Multiple-context name resolution
 
