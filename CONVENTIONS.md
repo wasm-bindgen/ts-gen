@@ -1649,8 +1649,10 @@ unchanged: `@throws {T}` → `T`, otherwise `JsValue`, or `js_sys::Error`
 under `--errors-as-error`, so the two flags compose. `@throws {never}`
 keeps a sync binding infallible (no `catch`, plain `T`) and is the only
 way to get one under the flag. Async callables, constructors (always
-catch), setters (never catch) and property getters are not affected.
-Without the flag, output is identical to the default.
+catch), setters (never catch) and property getters are not affected
+(a getter annotated `@throws {X}` catches under either policy; see
+[`@throws {X}` on getters](#throws-x-on-getters)). Without the flag,
+output is identical to the default.
 
 ## `Promise<T>` returns become `async fn`
 
@@ -2105,6 +2107,30 @@ throwing a non-Error value (`throw "oops"`) yields an `Error` whose
 accessors misbehave; if you can't audit your sources for that, stay
 with `JsValue` or use an enum with a checked `From<JsValue>`.
 
+### `@throws {X}` on getters
+
+Getters and setters are infallible: property access in JS does not
+normally throw, and a `Result` on every field read would be noise. A
+getter annotated `@throws {X}` is the exception. It emits `getter,
+catch` returning `Result<T, X>`, for instance and static getters alike.
+This applies with or without `--fallible`: there is no `try_` form for a
+getter, so an explicit annotation has only one possible lowering.
+Setters never catch.
+
+```ts
+declare class Body {
+  /** @throws {RangeError} when the body was already consumed */
+  readonly consumedText: string;
+}
+```
+
+emits
+
+```rust
+#[wasm_bindgen(method, getter, js_name = "consumedText", catch)]
+pub fn consumed_text(this: &Body) -> Result<String, RangeError>;
+```
+
 ### `@throws {never}` — opting out of fallible variants
 
 `@throws {never}` is the explicit "this never throws" annotation. It
@@ -2155,7 +2181,8 @@ pub fn try_frobnicate(this: &Foo) -> Result<String, JsValue>;
 #### Rules
 
 * **Sync callables** with `@throws {never}` get *only* the primary
-  binding — no `try_<name>` companion is emitted.
+  binding — no `try_<name>` companion is emitted. Under `--fallible`
+  the primary drops its `catch` and returns `T` directly.
 * **Async callables** (returning `Promise<T>`) drop the `Result<T, _>`
   wrapper and the `catch` attribute. The binding becomes
   `pub async fn foo() -> T`.

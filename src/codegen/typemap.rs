@@ -2162,13 +2162,24 @@ pub fn to_return_type(
     };
 
     if catch {
-        let err = match error_ty {
-            Some(ty) => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
-            None => default_error_type(ctx),
-        };
+        let err = error_type_tokens(error_ty, ctx, scope, from_module);
         quote! { Result<#inner, #err> }
     } else {
         inner
+    }
+}
+
+/// The `E` of a fallible binding's `Result<T, E>`: the `@throws` type
+/// when one is given, else the configured default.
+pub fn error_type_tokens(
+    error_ty: Option<&TypeRef>,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+) -> TokenStream {
+    match error_ty {
+        Some(ty) => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
+        None => default_error_type(ctx),
     }
 }
 
