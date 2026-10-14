@@ -27,8 +27,8 @@
   (import "./bindings.wasm" "Storage.get_with_keys" (func $Storage.get_with_keys (param $this externref) (param $keys externref) (result externref)))
   ;; fetch(key: string): Promise<T>
   (import "./bindings.wasm" "Storage.fetch" (func $Storage.fetch (param $this externref) (param $key externref) (result externref)))
-  ;; fetch(keys: string[]): Promise<T>
-  (import "./bindings.wasm" "Storage.fetch_with_keys" (func $Storage.fetch_with_keys (param $this externref) (param $keys externref) (result externref)))
+  ;; fetch(keys: string[], fallback: U): Promise<T>
+  (import "./bindings.wasm" "Storage.fetch_with_keys_and_fallback" (func $Storage.fetch_with_keys_and_fallback (param $this externref) (param $keys externref) (param $fallback externref) (result externref)))
   ;; first(): string
   (import "./bindings.wasm" "Storage.first" (func $Storage.first (param $this externref) (result externref)))
   ;; first(column: string): string
