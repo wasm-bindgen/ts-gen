@@ -777,24 +777,24 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "setTimeout")]
     pub fn set_timeout(
         this: &ServiceWorkerGlobalScope,
-        callback: &Function<fn(Array) -> Undefined>,
+        callback: &Function,
     ) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "setTimeout")]
     pub fn set_timeout_with_function_and_ms_delay(
         this: &ServiceWorkerGlobalScope,
-        callback: &Function<fn(Array) -> Undefined>,
+        callback: &Function,
         ms_delay: f64,
     ) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, variadic, catch, js_name = "setTimeout")]
     pub fn set_timeout_with_function_and_args<Args>(
         this: &ServiceWorkerGlobalScope,
-        callback: &Function<fn(Args) -> Undefined>,
+        callback: &Function,
         args: &[JsValue],
     ) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, variadic, catch, js_name = "setTimeout")]
     pub fn set_timeout_with_function_and_ms_delay_and_args<Args>(
         this: &ServiceWorkerGlobalScope,
-        callback: &Function<fn(Args) -> Undefined>,
+        callback: &Function,
         ms_delay: f64,
         args: &[JsValue],
     ) -> Result<f64, JsValue>;
@@ -808,24 +808,24 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "setInterval")]
     pub fn set_interval(
         this: &ServiceWorkerGlobalScope,
-        callback: &Function<fn(Array) -> Undefined>,
+        callback: &Function,
     ) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "setInterval")]
     pub fn set_interval_with_function_and_ms_delay(
         this: &ServiceWorkerGlobalScope,
-        callback: &Function<fn(Array) -> Undefined>,
+        callback: &Function,
         ms_delay: f64,
     ) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, variadic, catch, js_name = "setInterval")]
     pub fn set_interval_with_function_and_args<Args>(
         this: &ServiceWorkerGlobalScope,
-        callback: &Function<fn(Args) -> Undefined>,
+        callback: &Function,
         args: &[JsValue],
     ) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, variadic, catch, js_name = "setInterval")]
     pub fn set_interval_with_function_and_ms_delay_and_args<Args>(
         this: &ServiceWorkerGlobalScope,
-        callback: &Function<fn(Args) -> Undefined>,
+        callback: &Function,
         ms_delay: f64,
         args: &[JsValue],
     ) -> Result<f64, JsValue>;
@@ -1297,13 +1297,13 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setTimeout")]
-    pub fn set_timeout(callback: &Function<fn(Array) -> Undefined>) -> Result<f64, JsValue>;
+    pub fn set_timeout(callback: &Function) -> Result<f64, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setTimeout")]
     pub fn set_timeout_with_function_and_ms_delay(
-        callback: &Function<fn(Array) -> Undefined>,
+        callback: &Function,
         ms_delay: f64,
     ) -> Result<f64, JsValue>;
 }
@@ -1311,7 +1311,7 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(variadic, catch, js_name = "setTimeout")]
     pub fn set_timeout_with_function_and_args<Args>(
-        callback: &Function<fn(Args) -> Undefined>,
+        callback: &Function,
         args: &[JsValue],
     ) -> Result<f64, JsValue>;
 }
@@ -1319,7 +1319,7 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(variadic, catch, js_name = "setTimeout")]
     pub fn set_timeout_with_function_and_ms_delay_and_args<Args>(
-        callback: &Function<fn(Args) -> Undefined>,
+        callback: &Function,
         ms_delay: f64,
         args: &[JsValue],
     ) -> Result<f64, JsValue>;
@@ -1340,13 +1340,13 @@ pub fn clear_timeout_with_null() -> Result<(), JsValue> {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setInterval")]
-    pub fn set_interval(callback: &Function<fn(Array) -> Undefined>) -> Result<f64, JsValue>;
+    pub fn set_interval(callback: &Function) -> Result<f64, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setInterval")]
     pub fn set_interval_with_function_and_ms_delay(
-        callback: &Function<fn(Array) -> Undefined>,
+        callback: &Function,
         ms_delay: f64,
     ) -> Result<f64, JsValue>;
 }
@@ -1354,7 +1354,7 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(variadic, catch, js_name = "setInterval")]
     pub fn set_interval_with_function_and_args<Args>(
-        callback: &Function<fn(Args) -> Undefined>,
+        callback: &Function,
         args: &[JsValue],
     ) -> Result<f64, JsValue>;
 }
@@ -1362,7 +1362,7 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(variadic, catch, js_name = "setInterval")]
     pub fn set_interval_with_function_and_ms_delay_and_args<Args>(
-        callback: &Function<fn(Args) -> Undefined>,
+        callback: &Function,
         ms_delay: f64,
         args: &[JsValue],
     ) -> Result<f64, JsValue>;

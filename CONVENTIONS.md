@@ -18,6 +18,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [Primitive types](#primitive-types)
 * [Optional and nullable types](#optional-and-nullable-types)
 * [Array and slice types](#array-and-slice-types)
+* [Function types](#function-types)
 * [Outer-type ABI fan-out](#outer-type-abi-fan-out)
 * [Property accessors](#property-accessors)
 * [Naming conversion](#naming-conversion)
@@ -429,6 +430,33 @@ generic over their buffer (`Uint8Array<ArrayBuffer>`,
 `Float64Array<ArrayBufferLike>`). The js-sys types aren't, so the
 argument is dropped in every position without a warning, and
 `Uint8Array<ArrayBuffer>` lowers exactly like `Uint8Array`.
+
+## Function types
+
+A function type lowers to wasm-bindgen's typed `Function<fn(P…) -> R>`,
+with parameters and return in their inside-generic forms (`Number`,
+`JsString`, `Boolean`, `Undefined` for `void`), borrowed in argument
+position:
+
+```ts
+onTick(callback: (tick: number, label: string) => boolean): void;
+```
+
+```rust
+pub fn on_tick(this: &Timer, callback: &Function<fn(Number, JsString) -> Boolean>);
+```
+
+Two shapes lower to the untyped `Function` instead, which any
+`js_sys::Function` (a `Promise` executor's `resolve`, a `Closure`'s
+`as_ref()`) satisfies without a cast:
+
+* A signature whose parameters and return are all `any` / `unknown`
+  carries no type information.
+* A signature with a rest parameter (`(...args: any[]) => void`,
+  `(first: string, ...rest: number[]) => void`): a `fn` pointer type
+  has fixed arity, so there is no typed spelling of it.
+
+Parameters beyond the eighth are dropped from the typed form.
 
 ## Outer-type ABI fan-out
 
