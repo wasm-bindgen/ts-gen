@@ -38,6 +38,14 @@ declare class Headers {
 
   /** Writable property — the setter never catches. */
   label: string;
+}
+
+declare class Signal {
+  /**
+   * Constructor declared infallible — plain `Signal`, no `catch`.
+   * @throws {never}
+   */
+  constructor();
 
   /** Static method — same rule as instance methods. */
   static parse(raw: string): Headers;
