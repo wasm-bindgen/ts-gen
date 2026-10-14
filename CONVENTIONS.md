@@ -554,8 +554,11 @@ pub mod web_assembly {
 Consumers always write `web_assembly::Global`. The `_` suffix is an
 internal detail.
 
-The bindings also spell the prelude's `Option`, `Result`, `String` and
-`Vec` bare, so a declaration with one of those names is suffixed the same
+The bindings also spell the Rust prelude bare (`Result<T, JsValue>` on
+every fallible binding, `String`, `Option<T>`, `From`/`Default`/`Clone`
+in impls), so a declaration named like anything the 2021 prelude exports
+(`Result`, `Option`, `Box`, `Default`, `From`, …; the full list is
+`RUST_PRELUDE_RESERVED` in `codegen/typemap.rs`) is suffixed the same
 way. It is not re-exported, since `pub use Result_ as Result;` would
 shadow the prelude `Result` again, so consumers write `Result_`.
 
