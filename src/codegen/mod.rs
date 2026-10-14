@@ -55,17 +55,18 @@ pub(crate) fn doc_tokens(doc: &Option<String>) -> TokenStream {
 /// Options for controlling code generation output.
 #[derive(Debug, Clone, Default)]
 pub struct GenerateOptions {
-    /// When `true`, the default error type for fallible bindings
-    /// (`@throws`-less callables that catch JS exceptions) is
-    /// `js_sys::Error` rather than `JsValue`. Bindings whose
-    /// `@throws` JSDoc names a specific type still use that type.
+    /// Rust path of the default error type for fallible bindings
+    /// (`@throws`-less callables that catch JS exceptions); `None`
+    /// means wasm-bindgen's `JsValue`. Bindings whose `@throws`
+    /// JSDoc names a specific type still use that type.
     ///
-    /// Useful in environments that prefer the typed `Error` API
-    /// (`message`, `name`, `cause`, …) over raw `JsValue`. The
-    /// trade-off is that JS code returning a non-Error throwable
-    /// (e.g. `throw "oops"`) now produces a runtime conversion
-    /// error rather than the silent `JsValue` pass-through.
-    errors_as_error: bool,
+    /// wasm-bindgen's `catch` lowers to `take_last_exception()?`, so
+    /// any type implementing `From<JsValue>` works here: a project's
+    /// own error enum, or `::js_sys::Error` for the typed `Error`
+    /// API (`message`, `name`, `cause`, …). The trade-off with a
+    /// `js_sys` class is that JS code throwing a non-Error value
+    /// (`throw "oops"`) is an unchecked cast at the FFI boundary.
+    error_type: Option<String>,
 
     /// Opt generic imports into wasm-bindgen's experimental
     /// per-monomorphization codegen. Type parameters are emitted without
@@ -97,9 +98,17 @@ impl GenerateOptions {
         Self::default()
     }
 
-    /// Configure whether untyped caught exceptions use `js_sys::Error`.
+    /// Set the default error type for fallible bindings to a Rust path
+    /// such as `crate::Error`. The type must implement `From<JsValue>`.
+    pub fn error_type(mut self, path: impl Into<String>) -> Self {
+        self.error_type = Some(path.into());
+        self
+    }
+
+    /// Shorthand for [`error_type`](Self::error_type) with
+    /// `::js_sys::Error`; `false` restores the `JsValue` default.
     pub fn errors_as_error(mut self, enabled: bool) -> Self {
-        self.errors_as_error = enabled;
+        self.error_type = enabled.then(|| "::js_sys::Error".to_string());
         self
     }
 
@@ -139,7 +148,7 @@ pub fn generate_with_options(
     gctx: &crate::context::GlobalContext,
     options: &GenerateOptions,
 ) -> anyhow::Result<String> {
-    let tokens = generate_tokens(module, gctx, options);
+    let tokens = generate_tokens(module, gctx, options)?;
     // Validate that the tokens are valid Rust syntax.
     let mut file = syn::parse2::<syn::File>(tokens.clone()).map_err(|e| {
         anyhow::anyhow!("generated tokens are not valid syn:\n{e}\n\nTokens:\n{tokens}")
@@ -237,13 +246,7 @@ pub fn generate_provides(
     paths: &provides::ProvidesPaths,
 ) -> anyhow::Result<(String, String)> {
     let surface = surface::Surface::build(module, gctx, options);
-    let cgctx = CodegenContext::from_module_full(
-        module,
-        gctx,
-        options.errors_as_error,
-        options.experimental_generic_mono,
-        Some(&surface),
-    );
+    let cgctx = CodegenContext::from_module_full(module, gctx, options, Some(&surface))?;
     let wrapper = provides::generate_wrapper(fns, &cgctx, paths)?;
     let app = provides::generate_app(fns, &cgctx, paths)?;
     cgctx.diagnostics.borrow().emit();
@@ -301,15 +304,9 @@ fn generate_tokens(
     module: &Module,
     gctx: &crate::context::GlobalContext,
     options: &GenerateOptions,
-) -> TokenStream {
+) -> anyhow::Result<TokenStream> {
     let surface = surface::Surface::build(module, gctx, options);
-    let cgctx = CodegenContext::from_module_full(
-        module,
-        gctx,
-        options.errors_as_error,
-        options.experimental_generic_mono,
-        Some(&surface),
-    );
+    let cgctx = CodegenContext::from_module_full(module, gctx, options, Some(&surface))?;
 
     let preamble = quote! {
         #[allow(unused_imports)]
@@ -375,12 +372,12 @@ fn generate_tokens(
 
     cgctx.take_diagnostics().emit();
 
-    quote! {
+    Ok(quote! {
         #preamble
         #external_uses
         #(#global_items)*
         #dynamic_unions
-    }
+    })
 }
 
 /// Emit the synthesised dynamic-union enums collected on `cgctx`
