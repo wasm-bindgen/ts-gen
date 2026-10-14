@@ -1,0 +1,1 @@
+Error: ABI name "DurableObject.alarm" is declared both globally and in module "cloudflare:workers"

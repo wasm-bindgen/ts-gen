@@ -1,0 +1,1 @@
+Error: __: a scalar `const __: number` exported from module "sanitised-keys" cannot be read; a module export is a reference
