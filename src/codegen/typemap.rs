@@ -1038,6 +1038,33 @@ impl<'a> CodegenContext<'a> {
         Some(target)
     }
 
+    /// `generic_args` of a reference to `type_id` with the arguments for
+    /// erased type parameters removed, so they line up with the
+    /// declaration's remaining parameters.
+    pub(crate) fn live_generic_args(
+        &self,
+        type_id: TypeId,
+        generic_args: &[ir::TypeRef],
+    ) -> Vec<ir::TypeRef> {
+        let body_scope = match &self.gctx.get_type(type_id).kind {
+            TypeKind::Class(c) => c.body_scope,
+            TypeKind::Interface(i) => i.body_scope,
+            TypeKind::DiscriminatedUnion(d) => d.body_scope,
+            TypeKind::TypeAlias(a) => a.body_scope,
+            _ => return generic_args.to_vec(),
+        };
+        let erased = self.gctx.scopes.erased_positions(body_scope);
+        if erased.is_empty() {
+            return generic_args.to_vec();
+        }
+        generic_args
+            .iter()
+            .enumerate()
+            .filter(|(i, _)| !erased.contains(i))
+            .map(|(_, a)| a.clone())
+            .collect()
+    }
+
     /// Chase a generic alias instantiation: `Foo<A, B>` where `Foo` is
     /// `type Foo<T, U> = …` yields the target with `T`/`U` substituted.
     /// Missing arguments take the parameter default, else `any`. Bare
@@ -1053,7 +1080,11 @@ impl<'a> CodegenContext<'a> {
             return None;
         };
         if segments.len() != 1 {
-            return self.resolve_qualified_alias_instance(segments, generic_args, scope);
+            let generic_args = match self.gctx.resolve_path(scope, &segments.join(".")) {
+                Some(id) => self.live_generic_args(id, generic_args),
+                None => generic_args.to_vec(),
+            };
+            return self.resolve_qualified_alias_instance(segments, &generic_args, scope);
         }
         let type_id = self.gctx.scopes.resolve(scope, &segments[0])?;
         let TypeKind::TypeAlias(alias) = &self.gctx.get_type(type_id).kind else {
@@ -1064,7 +1095,10 @@ impl<'a> CodegenContext<'a> {
                 .resolve_alias(&segments[0], scope)
                 .map(std::borrow::Cow::into_owned);
         }
-        Some(alias_instance(alias, generic_args))
+        Some(alias_instance(
+            alias,
+            &self.live_generic_args(type_id, generic_args),
+        ))
     }
 
     /// [`Self::resolve_alias_instance`] for `Ns.Alias<A, B>`. The result
@@ -2189,9 +2223,15 @@ fn with_generic_args(
         }
         return base;
     }
-    let generic_args = match ctx.and_then(|c| c.alias_args(name, scope, generic_args)) {
+    let live_args = ctx
+        .and_then(|c| {
+            let id = c.gctx.resolve_path(scope, name)?;
+            Some(c.live_generic_args(id, generic_args))
+        })
+        .unwrap_or_else(|| generic_args.to_vec());
+    let generic_args = match ctx.and_then(|c| c.alias_args(name, scope, &live_args)) {
         Some(args) => args,
-        None => generic_args.to_vec(),
+        None => live_args,
     };
     if generic_args.is_empty() {
         return base;

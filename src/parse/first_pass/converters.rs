@@ -25,7 +25,7 @@ pub fn convert_class_decl(
     let name = class.id.as_ref()?.name.to_string();
     let js_name = name.clone();
 
-    let type_params = convert_type_params(class.type_parameters.as_ref(), ctx.diag);
+    let mut type_params = convert_type_params(class.type_parameters.as_ref(), ctx.diag);
 
     let extends =
         class
@@ -49,7 +49,7 @@ pub fn convert_class_decl(
     let is_abstract = class.r#abstract;
 
     // Class body scope holds the class's own `<T, ...>` parameters.
-    let body_scope = create_body_scope(&type_params, parent_scope, ctx);
+    let body_scope = create_body_scope(&mut type_params, parent_scope, ctx);
 
     let members: Vec<ir::Member> = class
         .body
@@ -105,7 +105,7 @@ pub fn convert_interface_decl(
 /// nothing diverges.
 pub fn interface_from_signatures(
     name: String,
-    type_params: Vec<ir::TypeParam>,
+    mut type_params: Vec<ir::TypeParam>,
     extends: Vec<ir::TypeRef>,
     signatures: &[ast::TSSignature<'_>],
     parent_scope: ScopeId,
@@ -113,7 +113,7 @@ pub fn interface_from_signatures(
 ) -> ir::InterfaceDecl {
     let js_name = name.clone();
     let parent = name.clone();
-    let body_scope = create_body_scope(&type_params, parent_scope, ctx);
+    let body_scope = create_body_scope(&mut type_params, parent_scope, ctx);
     let members: Vec<ir::Member> = signatures
         .iter()
         .flat_map(|sig| convert_ts_signature(sig, Some(&parent), body_scope, ctx))
@@ -140,8 +140,8 @@ pub fn convert_function_decl(
     let js_name = name.clone();
     let rust_name = to_snake_case(&name);
 
-    let type_params = convert_type_params(func.type_parameters.as_ref(), ctx.diag);
-    let body_scope = create_body_scope(&type_params, parent_scope, ctx);
+    let mut type_params = convert_type_params(func.type_parameters.as_ref(), ctx.diag);
+    let body_scope = create_body_scope(&mut type_params, parent_scope, ctx);
 
     let params = convert_formal_params_scoped(&func.params, body_scope, ctx);
     let return_type = func
