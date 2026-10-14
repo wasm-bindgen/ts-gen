@@ -6,23 +6,36 @@
 //! `syn::File`, rewrites the extern signature and emits the wrappers
 //! beside its block.
 //!
-//! This module handles overloads distinguished only by a string-literal
-//! argument (a lone `null` arm is [`null_arms`](super::null_arms)'): the
-//! extern takes `&str` and the signature layer tags it (see
-//! [`literal_attr`]) with one wrapper per literal, each baking its value in.
-//! A cohort of `null` arms (`f(kind: "a" | "b", x: T | null)`) also drops
-//! the `null` parameter here, and its union alias arguments convert here
-//! (see [`into_target`]), since the arm wrappers are already the public
-//! face of the extern.
+//! wasm-bindgen crosses `u64` / `i64` as a JS `BigInt`, so a `@rust u64` on
+//! a `number` cannot be the extern type: the binding keeps `f64` and the
+//! wrapper converts with `as` on the way in and out (exact to 2^53, as the
+//! JS number is). The type emitters mark such leaves with a placeholder
+//! path (see [`marker_tokens`]); this pass rewrites the extern signature,
+//! emits the wrapper and resolves every remaining marker (builder methods,
+//! factories) to the public scalar. A marker in a position the wrapper
+//! cannot convert (a callback's `Function<fn(f64)>`) is simply `f64`: those
+//! forms are JS-typed by design.
+//!
+//! Overloads distinguished only by a string-literal argument are the second
+//! use (a lone `null` arm is [`null_arms`](super::null_arms)'): the extern
+//! takes `&str` and the signature layer tags it (see [`literal_attr`]) with
+//! one wrapper per literal, each baking its value in. A cohort of `null`
+//! arms (`f(kind: "a" | "b", x: T | null)`) also drops the `null` parameter
+//! here, and its union alias arguments convert here (see [`into_target`]),
+//! since the arm wrappers are already the public face of the extern.
 
 use super::null_arms;
-use proc_macro2::TokenStream;
+use proc_macro2::{Span, TokenStream};
 use quote::{format_ident, quote, ToTokens};
+use syn::visit_mut::VisitMut;
 use syn::{
     FnArg, ForeignItem, ForeignItemFn, GenericArgument, GenericParam, Generics, Ident, ImplItem,
     Item, ItemForeignMod, Pat, PathArguments, ReturnType, Signature, Type, WherePredicate,
 };
 
+use crate::ir::RustScalar;
+
+const MARKER_PREFIX: &str = "__TsGenWide";
 const LITERAL_ATTR: &str = "ts_gen_literal";
 /// Names the extern a wrapper calls, so [`copy_abi_bounds`] can find it.
 const WRAPS_ATTR: &str = "ts_gen_wraps";
@@ -150,6 +163,155 @@ pub(crate) fn bind_into_targets(sig: &mut Signature) -> bool {
 
 fn is_literal_keyed(item: &ForeignItemFn) -> bool {
     item.attrs.iter().any(|a| a.path().is_ident(LITERAL_ATTR))
+}
+
+/// The placeholder type the emitters use for a 64-bit scalar on a `number`.
+pub(crate) fn marker_tokens(scalar: RustScalar) -> TokenStream {
+    let ident = format_ident!("{MARKER_PREFIX}{}", scalar.as_str().to_uppercase());
+    quote! { #ident }
+}
+
+fn marker_scalar(ty: &Type) -> Option<RustScalar> {
+    let Type::Path(p) = ty else { return None };
+    let seg = p.path.segments.last()?;
+    if p.path.segments.len() != 1 || !seg.arguments.is_none() {
+        return None;
+    }
+    let name = seg.ident.to_string();
+    let rest = name.strip_prefix(MARKER_PREFIX)?;
+    RustScalar::parse(&rest.to_lowercase())
+}
+
+fn scalar_ident(scalar: RustScalar) -> Ident {
+    Ident::new(scalar.as_str(), Span::call_site())
+}
+
+/// How a type converts between its public and extern spelling.
+enum Shape {
+    Marker(RustScalar),
+    /// `Option<T>` or `Nullable<T>`, the read carriers of `T | undefined`
+    /// and `T | null`, which both convert through `map`.
+    Option(Box<Shape>),
+    Vec(Box<Shape>),
+    /// `&[T]` in parameter position.
+    Slice(Box<Shape>),
+    Result(Box<Shape>),
+    /// No convertible marker inside; any marker is just `f64`.
+    Plain,
+}
+
+impl Shape {
+    fn converts(&self) -> bool {
+        !matches!(self, Shape::Plain)
+    }
+}
+
+fn shape(ty: &Type) -> Shape {
+    if let Some(s) = marker_scalar(ty) {
+        return Shape::Marker(s);
+    }
+    match ty {
+        Type::Reference(r) => {
+            if let Type::Slice(slice) = &*r.elem {
+                let inner = shape(&slice.elem);
+                return if inner.converts() {
+                    Shape::Slice(Box::new(inner))
+                } else {
+                    Shape::Plain
+                };
+            }
+            Shape::Plain
+        }
+        Type::Path(p) => {
+            let Some(seg) = p.path.segments.last() else {
+                return Shape::Plain;
+            };
+            let PathArguments::AngleBracketed(args) = &seg.arguments else {
+                return Shape::Plain;
+            };
+            let first = args.args.iter().find_map(|a| match a {
+                GenericArgument::Type(t) => Some(t),
+                _ => None,
+            });
+            let Some(first) = first else {
+                return Shape::Plain;
+            };
+            let inner = shape(first);
+            if !inner.converts() {
+                return Shape::Plain;
+            }
+            match seg.ident.to_string().as_str() {
+                "Option" | "Nullable" => Shape::Option(Box::new(inner)),
+                "Vec" => Shape::Vec(Box::new(inner)),
+                "Result" => Shape::Result(Box::new(inner)),
+                _ => Shape::Plain,
+            }
+        }
+        _ => Shape::Plain,
+    }
+}
+
+/// `expr` of the public type → the extern type.
+fn to_extern(expr: TokenStream, shape: &Shape) -> TokenStream {
+    match shape {
+        Shape::Marker(_) => quote! { #expr as f64 },
+        Shape::Option(inner) => {
+            let body = to_extern(quote! { v }, inner);
+            quote! { #expr.map(|v| #body) }
+        }
+        Shape::Vec(inner) => {
+            let body = to_extern(quote! { v }, inner);
+            quote! { #expr.into_iter().map(|v| #body).collect::<Vec<_>>() }
+        }
+        Shape::Slice(inner) => {
+            let body = to_extern(quote! { *v }, inner);
+            quote! { &#expr.iter().map(|v| #body).collect::<Vec<_>>() }
+        }
+        Shape::Result(_) | Shape::Plain => expr,
+    }
+}
+
+/// `expr` of the extern type → the public type.
+fn from_extern(expr: TokenStream, shape: &Shape) -> TokenStream {
+    match shape {
+        Shape::Marker(s) => {
+            let s = scalar_ident(*s);
+            quote! { #expr as #s }
+        }
+        Shape::Option(inner) | Shape::Result(inner) => {
+            let body = from_extern(quote! { v }, inner);
+            quote! { #expr.map(|v| #body) }
+        }
+        Shape::Vec(inner) => {
+            let body = from_extern(quote! { v }, inner);
+            quote! { #expr.into_iter().map(|v| #body).collect::<Vec<_>>() }
+        }
+        Shape::Slice(_) | Shape::Plain => expr,
+    }
+}
+
+/// Resolves every marker to `f64` (the extern side) or its scalar.
+struct Resolve {
+    to_f64: bool,
+}
+
+impl VisitMut for Resolve {
+    fn visit_type_mut(&mut self, ty: &mut Type) {
+        if let Some(s) = marker_scalar(ty) {
+            let ident = if self.to_f64 {
+                Ident::new("f64", Span::call_site())
+            } else {
+                scalar_ident(s)
+            };
+            *ty = syn::parse_quote!(#ident);
+            return;
+        }
+        syn::visit_mut::visit_type_mut(self, ty);
+    }
+}
+
+fn mentions_marker(tokens: &impl ToTokens) -> bool {
+    tokens.to_token_stream().to_string().contains(MARKER_PREFIX)
 }
 
 fn mentions_literal(block: &ItemForeignMod) -> bool {
@@ -311,13 +473,29 @@ struct Wrapper {
 }
 
 fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
-    let Some(literal) = take_literal_attr(item) else {
-        return Vec::new();
-    };
+    let literal = take_literal_attr(item);
     let Some((attr_idx, binding)) = read_binding(item) else {
         return Vec::new();
     };
+    let return_shape = match &item.sig.output {
+        ReturnType::Default => Shape::Plain,
+        ReturnType::Type(_, ty) => shape(ty),
+    };
     let skip = if binding.method { 1 } else { 0 };
+    let param_shapes: Vec<Shape> = item
+        .sig
+        .inputs
+        .iter()
+        .skip(skip)
+        .filter_map(|arg| match arg {
+            FnArg::Typed(pat) => Some(shape(&pat.ty)),
+            FnArg::Receiver(_) => None,
+        })
+        .collect();
+    let converts = return_shape.converts() || param_shapes.iter().any(Shape::converts);
+    if !converts && literal.is_none() {
+        return Vec::new();
+    }
     let is_null_arm =
         |arg: &FnArg| matches!(arg, FnArg::Typed(pat) if null_arms::is_marker(&pat.ty));
     // Parameters that can only be `null`, indexed like the literal
@@ -356,7 +534,12 @@ fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
         .collect();
 
     let public_name = item.sig.ident.clone();
-    let extern_name = literal.binding.clone();
+    // A literal cohort names its binding; a scalar wrapper alone is
+    // `__<name>` like any other inline wrapper's extern.
+    let extern_name = match &literal {
+        Some(l) => l.binding.clone(),
+        None => format_ident!("__{}", public_name),
+    };
     let doc_attrs: Vec<_> = item
         .attrs
         .iter()
@@ -364,12 +547,21 @@ fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
         .cloned()
         .collect();
 
+    // Public signature: convertible positions resolve to the scalar; a
+    // marker the wrapper cannot convert (inside a callback type, a
+    // `Promise<…>`) stays `f64` on both sides.
     // Parameter attributes (`slice = ..`) are the extern binding's.
     let mut public_sig = item.sig.clone();
     for arg in public_sig.inputs.iter_mut() {
         if let FnArg::Typed(pat) = arg {
             pat.attrs.clear();
+            let to_f64 = !shape(&pat.ty).converts();
+            Resolve { to_f64 }.visit_type_mut(&mut pat.ty);
         }
+    }
+    if let ReturnType::Type(_, ty) = &mut public_sig.output {
+        let to_f64 = !return_shape.converts();
+        Resolve { to_f64 }.visit_type_mut(ty);
     }
     if !null_positions.is_empty() {
         // Type parameters only the `null` parameter mentioned go with it,
@@ -394,8 +586,9 @@ fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
 
     bind_into_targets(&mut item.sig);
 
-    // Extern binding: private name, explicit JS name since wasm-bindgen
-    // would otherwise infer it from the new ident.
+    // Extern binding: markers resolve to f64, private name, explicit JS
+    // name since wasm-bindgen would otherwise infer it from the new ident.
+    Resolve { to_f64: true }.visit_signature_mut(&mut item.sig);
     item.sig.ident = extern_name.clone();
     item.vis = syn::Visibility::Inherited;
     if !binding.has_js_name && !binding.constructor {
@@ -487,16 +680,30 @@ fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
         (Target::Free, quote! { #extern_name })
     };
 
-    // One wrapper per literal arm: the literal and `null` parameters
-    // dropped from the public signature, their values passed through.
+    // One wrapper per literal arm (the literal and `null` parameters
+    // dropped from the public signature, their values passed through),
+    // else one wrapper converting the scalars.
+    let arms: Vec<(Vec<(usize, String)>, Ident)> = match &literal {
+        Some(l) => l
+            .arms
+            .iter()
+            .map(|(lits, name)| {
+                (
+                    l.positions
+                        .iter()
+                        .copied()
+                        .zip(lits.iter().cloned())
+                        .collect(),
+                    name.clone(),
+                )
+            })
+            .collect(),
+        None => vec![(Vec::new(), public_name.clone())],
+    };
     let typed_inputs: Vec<FnArg> = public_sig.inputs.iter().skip(skip).cloned().collect();
     let receiver: Vec<FnArg> = public_sig.inputs.iter().take(skip).cloned().collect();
-    literal
-        .arms
-        .into_iter()
-        .map(|(lits, name)| {
-            let values: Vec<(usize, String)> =
-                literal.positions.iter().copied().zip(lits).collect();
+    arms.into_iter()
+        .map(|(values, name)| {
             let call_args = param_names.iter().enumerate().map(|(i, pname)| {
                 match values.iter().find(|(pos, _)| *pos == i) {
                     Some((_, lit)) => quote! { #lit },
@@ -504,10 +711,11 @@ fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
                         quote! { &::wasm_bindgen::JsValue::NULL }
                     }
                     None if into_positions.contains(&i) => quote! { #pname.into() },
-                    None => quote! { #pname },
+                    None => to_extern(quote! { #pname }, &param_shapes[i]),
                 }
             });
-            let body = quote! { #callee(#(#call_args),*)#await_tokens };
+            let call = quote! { #callee(#(#call_args),*)#await_tokens };
+            let body = from_extern(call, &return_shape);
             let mut sig = public_sig.clone();
             sig.ident = name;
             sig.inputs = receiver
@@ -547,19 +755,23 @@ fn process_items(items: &mut Vec<Item>) {
                 }
                 out.push(item);
             }
-            Item::ForeignMod(block) if mentions_literal(block) => {
+            Item::ForeignMod(block) if mentions_marker(block) || mentions_literal(block) => {
                 let mut wrappers = Vec::new();
                 for fi in block.items.iter_mut() {
                     if let ForeignItem::Fn(f) = fi {
-                        if is_literal_keyed(f) {
+                        if mentions_marker(&f.sig) || is_literal_keyed(f) {
                             wrappers.extend(wrap(f));
                         }
                     }
                 }
+                Resolve { to_f64: true }.visit_item_foreign_mod_mut(block);
                 out.push(item);
                 out.extend(render_wrappers(wrappers));
             }
-            _ => out.push(item),
+            _ => {
+                Resolve { to_f64: false }.visit_item_mut(&mut item);
+                out.push(item);
+            }
         }
     }
     *items = out;
@@ -595,10 +807,11 @@ fn render_wrappers(wrappers: Vec<Wrapper>) -> Vec<Item> {
     items
 }
 
-/// Emit the wrappers for every extern fn in `file` that needs one.
+/// Rewrite every marker in `file`, emitting wrappers for extern fns that
+/// carry one in a convertible position or a literal cohort.
 pub(crate) fn apply(file: &mut syn::File) {
     let text = file.to_token_stream().to_string();
-    if !text.contains(LITERAL_ATTR) {
+    if !text.contains(MARKER_PREFIX) && !text.contains(LITERAL_ATTR) {
         return;
     }
     process_items(&mut file.items);
@@ -687,6 +900,101 @@ mod tests {
         apply(&mut file);
         copy_abi_bounds(&mut file.items);
         prettyplease::unparse(&file)
+    }
+
+    #[test]
+    fn getter_and_setter_wrap_and_keep_the_js_name() {
+        let out = run("#[wasm_bindgen] extern \"C\" {
+                pub type Foo;
+                #[wasm_bindgen(method, getter)]
+                pub fn size(this: &Foo) -> __TsGenWideU64;
+                #[wasm_bindgen(method, setter)]
+                pub fn set_size(this: &Foo, val: __TsGenWideU64);
+            }");
+        assert!(out.contains("#[wasm_bindgen(method, getter, js_name = \"size\")]"));
+        assert!(out.contains("fn __size(this: &Foo) -> f64;"));
+        assert!(out.contains("#[wasm_bindgen(method, setter, js_name = \"size\")]"));
+        assert!(out.contains("fn __set_size(this: &Foo, val: f64);"));
+        assert!(out.contains("pub fn size(&self) -> u64 {\n        self.__size() as u64\n    }"));
+        assert!(out.contains(
+            "pub fn set_size(&self, val: u64) {\n        self.__set_size(val as f64)\n    }"
+        ));
+        assert!(!out.contains("__TsGenWide"));
+    }
+
+    #[test]
+    fn containers_convert_elementwise() {
+        let out = run("#[wasm_bindgen] extern \"C\" {
+                pub type Foo;
+                #[wasm_bindgen(method, catch)]
+                pub fn sizes(this: &Foo, parts: &[__TsGenWideI64], n: Option<__TsGenWideU64>)
+                    -> Result<Vec<__TsGenWideU64>, JsValue>;
+            }");
+        assert!(out.contains("parts: &[f64], n: Option<f64>"));
+        assert!(out.contains("parts: &[i64], n: Option<u64>"));
+        assert!(out.contains("&parts.iter().map(|v| *v as f64).collect::<Vec<_>>()"));
+        assert!(out.contains("n.map(|v| v as f64)"));
+        assert!(out.contains(".map(|v| v.into_iter().map(|v| v as u64).collect::<Vec<_>>())"));
+    }
+
+    #[test]
+    fn nullable_reads_convert_through_map() {
+        let out = run("#[wasm_bindgen] extern \"C\" {
+                pub type Foo;
+                #[wasm_bindgen(method, getter)]
+                pub fn at(this: &Foo) -> Nullable<__TsGenWideU64>;
+                #[wasm_bindgen(method, getter)]
+                pub fn maybe_at(this: &Foo) -> Option<Nullable<__TsGenWideU64>>;
+            }");
+        assert!(out.contains("fn __at(this: &Foo) -> Nullable<f64>;"));
+        assert!(out.contains(
+            "pub fn at(&self) -> Nullable<u64> {\n        self.__at().map(|v| v as u64)"
+        ));
+        assert!(out.contains("pub fn maybe_at(&self) -> Option<Nullable<u64>>"));
+        assert!(out.contains("self.__maybe_at().map(|v| v.map(|v| v as u64))"));
+    }
+
+    #[test]
+    fn unconvertible_positions_resolve_to_f64_without_a_wrapper() {
+        let out = run("#[wasm_bindgen] extern \"C\" {
+                pub type Foo;
+                #[wasm_bindgen(method)]
+                pub fn count_promise(this: &Foo) -> Promise<__TsGenWideU64>;
+            }
+            impl FooBuilder {
+                pub fn size(self, val: __TsGenWideU64) -> Self { self }
+            }");
+        assert!(out.contains("pub fn count_promise(this: &Foo) -> Promise<f64>;"));
+        assert!(!out.contains("__count_promise"));
+        assert!(out.contains("pub fn size(self, val: u64) -> Self"));
+    }
+
+    #[test]
+    fn scalar_static_constructor_and_free_forms() {
+        let out = run(
+            "#[wasm_bindgen] extern \"C\" {
+                pub type Foo<T: ::wasm_bindgen::JsGeneric = JsValue>;
+                #[wasm_bindgen(static_method_of = Foo, js_name = \"maxSize\")]
+                pub fn max_size() -> __TsGenWideU64;
+                #[wasm_bindgen(constructor, catch)]
+                pub fn new<T: ::wasm_bindgen::JsGeneric>(n: __TsGenWideU64) -> Result<Foo<T>, JsValue>;
+            }
+            #[wasm_bindgen] extern \"C\" {
+                pub fn now() -> __TsGenWideU64;
+            }",
+        );
+        assert!(out.contains("impl<T: ::wasm_bindgen::JsGeneric> Foo<T>"));
+        // A static not returning its type binds the type's defaults.
+        assert!(out.contains("impl Foo {\n    pub fn max_size() -> u64 {\n        Self::__max_size() as u64\n    }"), "{out}");
+        assert!(out.contains("pub fn new(n: u64) -> Result<Foo<T>, JsValue> {\n        Self::__new(n as f64)\n    }"), "{out}");
+        assert!(
+            out.contains("#[wasm_bindgen(js_name = \"now\")]\n    fn __now() -> f64;"),
+            "{out}"
+        );
+        assert!(
+            out.contains("pub fn now() -> u64 {\n    __now() as u64\n}"),
+            "{out}"
+        );
     }
 
     #[test]

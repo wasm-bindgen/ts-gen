@@ -125,7 +125,7 @@ pub(crate) fn apply_rust_tags(
 pub(crate) fn incompatible(scalar: &str, member: &str, ty: &TypeRef) -> String {
     format!(
         "`@rust {scalar}` on `{member}`: `{}` cannot cross as `{scalar}` (u64/i64 need \
-         `bigint`, other scalars `number`)",
+         `number` or `bigint`, other scalars `number`)",
         ty.format_ts()
     )
 }
