@@ -45,6 +45,10 @@
   ;; set max(value: number)
   (import "fallible" "Counter.set_max" (func $fallible:Counter.set_max (param $this externref) (param $value f64)))
 
+  ;; Signal
+  ;; constructor()
+  (import "fallible" "Signal.new" (func $fallible:Signal.new (result externref)))
+
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
 
