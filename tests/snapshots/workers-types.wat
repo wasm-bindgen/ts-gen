@@ -642,17 +642,17 @@
   ;; set HTMLRewriter(value: typeof query)
   (import "./bindings.wasm" "ServiceWorkerGlobalScope.set_html_rewriter" (func $ServiceWorkerGlobalScope.set_html_rewriter (param $this externref) (param $value externref)))
 
-  ;; addEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>): void
+  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>): void
   (import "./bindings.wasm" "addEventListener" (func $addEventListener (param $type externref) (param $handler externref)))
-  ;; addEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>, options: EventTargetAddEventListenerOptions): void
+  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: EventTargetAddEventListenerOptions): void
   (import "./bindings.wasm" "addEventListener_with_event_target_add_event_listener_options" (func $addEventListener_with_event_target_add_event_listener_options (param $type externref) (param $handler externref) (param $options externref)))
-  ;; addEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>, options: boolean): void
+  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: boolean): void
   (import "./bindings.wasm" "addEventListener_with_bool" (func $addEventListener_with_bool (param $type externref) (param $handler externref) (param $options i32)))
-  ;; removeEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>): void
+  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>): void
   (import "./bindings.wasm" "removeEventListener" (func $removeEventListener (param $type externref) (param $handler externref)))
-  ;; removeEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>, options: EventTargetEventListenerOptions): void
+  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: EventTargetEventListenerOptions): void
   (import "./bindings.wasm" "removeEventListener_with_event_target_event_listener_options" (func $removeEventListener_with_event_target_event_listener_options (param $type externref) (param $handler externref) (param $options externref)))
-  ;; removeEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>, options: boolean): void
+  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: boolean): void
   (import "./bindings.wasm" "removeEventListener_with_bool" (func $removeEventListener_with_bool (param $type externref) (param $handler externref) (param $options i32)))
   ;; dispatchEvent(event: indexed access type): boolean
   (import "./bindings.wasm" "dispatchEvent" (func $dispatchEvent (param $event externref) (result i32)))
@@ -1216,17 +1216,17 @@
   ;; EventTarget
   ;; constructor()
   (import "./bindings.wasm" "EventTarget.new" (func $EventTarget.new (result externref)))
-  ;; addEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>): void
+  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>): void
   (import "./bindings.wasm" "EventTarget.add_event_listener" (func $EventTarget.add_event_listener (param $this externref) (param $type externref) (param $handler externref)))
-  ;; addEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>, options: EventTargetAddEventListenerOptions): void
+  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: EventTargetAddEventListenerOptions): void
   (import "./bindings.wasm" "EventTarget.add_event_listener_with_event_target_add_event_listener_options" (func $EventTarget.add_event_listener_with_event_target_add_event_listener_options (param $this externref) (param $type externref) (param $handler externref) (param $options externref)))
-  ;; addEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>, options: boolean): void
+  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: boolean): void
   (import "./bindings.wasm" "EventTarget.add_event_listener_with_bool" (func $EventTarget.add_event_listener_with_bool (param $this externref) (param $type externref) (param $handler externref) (param $options i32)))
-  ;; removeEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>): void
+  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>): void
   (import "./bindings.wasm" "EventTarget.remove_event_listener" (func $EventTarget.remove_event_listener (param $this externref) (param $type externref) (param $handler externref)))
-  ;; removeEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>, options: EventTargetEventListenerOptions): void
+  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: EventTargetEventListenerOptions): void
   (import "./bindings.wasm" "EventTarget.remove_event_listener_with_event_target_event_listener_options" (func $EventTarget.remove_event_listener_with_event_target_event_listener_options (param $this externref) (param $type externref) (param $handler externref) (param $options externref)))
-  ;; removeEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>, options: boolean): void
+  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: boolean): void
   (import "./bindings.wasm" "EventTarget.remove_event_listener_with_bool" (func $EventTarget.remove_event_listener_with_bool (param $this externref) (param $type externref) (param $handler externref) (param $options i32)))
   ;; dispatchEvent(event: indexed access type): boolean
   (import "./bindings.wasm" "EventTarget.dispatch_event" (func $EventTarget.dispatch_event (param $this externref) (param $event externref) (result i32)))
@@ -2556,9 +2556,9 @@
   ;; KVNamespaceListKey
   ;; {} as KVNamespaceListKey
   (import "./bindings.wasm" "KVNamespaceListKey.new" (func $KVNamespaceListKey.new (result externref)))
-  ;; name: Key
+  ;; name: string
   (import "./bindings.wasm" "KVNamespaceListKey.name" (func $KVNamespaceListKey.name (param $this externref) (result externref)))
-  ;; set name(value: Key)
+  ;; set name(value: string)
   (import "./bindings.wasm" "KVNamespaceListKey.set_name" (func $KVNamespaceListKey.set_name (param $this externref) (param $value externref)))
   ;; expiration?: number
   (import "./bindings.wasm" "KVNamespaceListKey.expiration" (func $KVNamespaceListKey.expiration (param $this externref) (result externref)))
@@ -2570,51 +2570,51 @@
   (import "./bindings.wasm" "KVNamespaceListKey.set_metadata" (func $KVNamespaceListKey.set_metadata (param $this externref) (param $value externref)))
 
   ;; KVNamespace
-  ;; get(key: Key): Promise<string | null>
+  ;; get(key: string): Promise<string | null>
   (import "./bindings.wasm" "KVNamespace.get" (func $KVNamespace.get (param $this externref) (param $key externref) (result externref)))
-  ;; get(key: Key, options: KVNamespaceGetOptions<undefined>): Promise<string | null>
-  (import "./bindings.wasm" "KVNamespace.get_with_key_and_options" (func $KVNamespace.get_with_key_and_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
-  ;; get(key: Key, type: "text"): Promise<string | null>
-  (import "./bindings.wasm" "KVNamespace.get_with_key_and_type" (func $KVNamespace.get_with_key_and_type (param $this externref) (param $key externref) (param $type externref) (result externref)))
-  ;; get(key: Key[], type: "text"): Promise<Map<string, string | null>>
+  ;; get(key: string, options: KVNamespaceGetOptions<undefined>): Promise<string | null>
+  (import "./bindings.wasm" "KVNamespace.get_with_str_and_options" (func $KVNamespace.get_with_str_and_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
+  ;; get(key: string, type: "text"): Promise<string | null>
+  (import "./bindings.wasm" "KVNamespace.get_with_str_and_type" (func $KVNamespace.get_with_str_and_type (param $this externref) (param $key externref) (param $type externref) (result externref)))
+  ;; get(key: string[], type: "text"): Promise<Map<string, string | null>>
   (import "./bindings.wasm" "KVNamespace.get_with_slice_and_type" (func $KVNamespace.get_with_slice_and_type (param $this externref) (param $key externref) (param $type externref) (result externref)))
-  ;; get(key: Key[]): Promise<Map<string, string | null>>
+  ;; get(key: string[]): Promise<Map<string, string | null>>
   (import "./bindings.wasm" "KVNamespace.get_with_slice" (func $KVNamespace.get_with_slice (param $this externref) (param $key externref) (result externref)))
-  ;; get(key: Key[], options: KVNamespaceGetOptions<undefined>): Promise<Map<string, string | null>>
+  ;; get(key: string[], options: KVNamespaceGetOptions<undefined>): Promise<Map<string, string | null>>
   (import "./bindings.wasm" "KVNamespace.get_with_slice_and_options" (func $KVNamespace.get_with_slice_and_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
-  ;; list(): Promise<KVNamespaceListResult<Metadata, Key>>
+  ;; list(): Promise<KVNamespaceListResult<Metadata, string>>
   (import "./bindings.wasm" "KVNamespace.list" (func $KVNamespace.list (param $this externref) (result externref)))
-  ;; list(options: KVNamespaceListOptions): Promise<KVNamespaceListResult<Metadata, Key>>
+  ;; list(options: KVNamespaceListOptions): Promise<KVNamespaceListResult<Metadata, string>>
   (import "./bindings.wasm" "KVNamespace.list_with_options" (func $KVNamespace.list_with_options (param $this externref) (param $options externref) (result externref)))
-  ;; put(key: Key, value: string): Promise<void>
+  ;; put(key: string, value: string): Promise<void>
   (import "./bindings.wasm" "KVNamespace.put" (func $KVNamespace.put (param $this externref) (param $key externref) (param $value externref) (result externref)))
-  ;; put(key: Key, value: ArrayBuffer): Promise<void>
+  ;; put(key: string, value: ArrayBuffer): Promise<void>
   (import "./bindings.wasm" "KVNamespace.put_with_array_buffer" (func $KVNamespace.put_with_array_buffer (param $this externref) (param $key externref) (param $value externref) (result externref)))
-  ;; put(key: Key, value: ArrayBufferView): Promise<void>
+  ;; put(key: string, value: ArrayBufferView): Promise<void>
   (import "./bindings.wasm" "KVNamespace.put_with_typed_array" (func $KVNamespace.put_with_typed_array (param $this externref) (param $key externref) (param $value externref) (result externref)))
-  ;; put(key: Key, value: ReadableStream): Promise<void>
+  ;; put(key: string, value: ReadableStream): Promise<void>
   (import "./bindings.wasm" "KVNamespace.put_with_readable_stream" (func $KVNamespace.put_with_readable_stream (param $this externref) (param $key externref) (param $value externref) (result externref)))
-  ;; put(key: Key, value: string, options: KVNamespacePutOptions): Promise<void>
+  ;; put(key: string, value: string, options: KVNamespacePutOptions): Promise<void>
   (import "./bindings.wasm" "KVNamespace.put_with_str_and_options" (func $KVNamespace.put_with_str_and_options (param $this externref) (param $key externref) (param $value externref) (param $options externref) (result externref)))
-  ;; put(key: Key, value: ArrayBuffer, options: KVNamespacePutOptions): Promise<void>
+  ;; put(key: string, value: ArrayBuffer, options: KVNamespacePutOptions): Promise<void>
   (import "./bindings.wasm" "KVNamespace.put_with_array_buffer_and_options" (func $KVNamespace.put_with_array_buffer_and_options (param $this externref) (param $key externref) (param $value externref) (param $options externref) (result externref)))
-  ;; put(key: Key, value: ArrayBufferView, options: KVNamespacePutOptions): Promise<void>
+  ;; put(key: string, value: ArrayBufferView, options: KVNamespacePutOptions): Promise<void>
   (import "./bindings.wasm" "KVNamespace.put_with_typed_array_and_options" (func $KVNamespace.put_with_typed_array_and_options (param $this externref) (param $key externref) (param $value externref) (param $options externref) (result externref)))
-  ;; put(key: Key, value: ReadableStream, options: KVNamespacePutOptions): Promise<void>
+  ;; put(key: string, value: ReadableStream, options: KVNamespacePutOptions): Promise<void>
   (import "./bindings.wasm" "KVNamespace.put_with_readable_stream_and_options" (func $KVNamespace.put_with_readable_stream_and_options (param $this externref) (param $key externref) (param $value externref) (param $options externref) (result externref)))
-  ;; getWithMetadata(key: Key): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>
+  ;; getWithMetadata(key: string): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>
   (import "./bindings.wasm" "KVNamespace.get_with_metadata" (func $KVNamespace.get_with_metadata (param $this externref) (param $key externref) (result externref)))
-  ;; getWithMetadata(key: Key, options: KVNamespaceGetOptions<undefined>): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>
-  (import "./bindings.wasm" "KVNamespace.get_with_metadata_with_key_and_options" (func $KVNamespace.get_with_metadata_with_key_and_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
-  ;; getWithMetadata(key: Key, type: "text"): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>
-  (import "./bindings.wasm" "KVNamespace.get_with_metadata_with_key_and_type" (func $KVNamespace.get_with_metadata_with_key_and_type (param $this externref) (param $key externref) (param $type externref) (result externref)))
-  ;; getWithMetadata(key: Key[], type: "text"): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>
+  ;; getWithMetadata(key: string, options: KVNamespaceGetOptions<undefined>): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>
+  (import "./bindings.wasm" "KVNamespace.get_with_metadata_with_str_and_options" (func $KVNamespace.get_with_metadata_with_str_and_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
+  ;; getWithMetadata(key: string, type: "text"): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>
+  (import "./bindings.wasm" "KVNamespace.get_with_metadata_with_str_and_type" (func $KVNamespace.get_with_metadata_with_str_and_type (param $this externref) (param $key externref) (param $type externref) (result externref)))
+  ;; getWithMetadata(key: string[], type: "text"): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>
   (import "./bindings.wasm" "KVNamespace.get_with_metadata_with_slice_and_type" (func $KVNamespace.get_with_metadata_with_slice_and_type (param $this externref) (param $key externref) (param $type externref) (result externref)))
-  ;; getWithMetadata(key: Key[]): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>
+  ;; getWithMetadata(key: string[]): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>
   (import "./bindings.wasm" "KVNamespace.get_with_metadata_with_slice" (func $KVNamespace.get_with_metadata_with_slice (param $this externref) (param $key externref) (result externref)))
-  ;; getWithMetadata(key: Key[], options: KVNamespaceGetOptions<undefined>): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>
+  ;; getWithMetadata(key: string[], options: KVNamespaceGetOptions<undefined>): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>
   (import "./bindings.wasm" "KVNamespace.get_with_metadata_with_slice_and_options" (func $KVNamespace.get_with_metadata_with_slice_and_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
-  ;; delete(key: Key): Promise<void>
+  ;; delete(key: string): Promise<void>
   (import "./bindings.wasm" "KVNamespace.delete" (func $KVNamespace.delete (param $this externref) (param $key externref) (result externref)))
 
   ;; KVNamespaceListOptions
@@ -10008,9 +10008,9 @@
   (import "./bindings.wasm" "Ai.ai_search" (func $Ai.ai_search (param $this externref) (result externref)))
   ;; autorag(autorag_id: string): AutoRAG
   (import "./bindings.wasm" "Ai.autorag" (func $Ai.autorag (param $this externref) (param $autorag_id externref) (result externref)))
-  ;; run(model: Name, inputs: InputOptions): Promise<conditional type>
+  ;; run(model: string, inputs: InputOptions): Promise<conditional type>
   (import "./bindings.wasm" "Ai.run" (func $Ai.run (param $this externref) (param $model externref) (param $inputs externref) (result externref)))
-  ;; run(model: Name, inputs: InputOptions, options: Options): Promise<conditional type>
+  ;; run(model: string, inputs: InputOptions, options: Options): Promise<conditional type>
   (import "./bindings.wasm" "Ai.run_with_options" (func $Ai.run_with_options (param $this externref) (param $model externref) (param $inputs externref) (param $options externref) (result externref)))
   ;; models(): Promise<AiModelsSearchObject[]>
   (import "./bindings.wasm" "Ai.models" (func $Ai.models (param $this externref) (result externref)))
@@ -11753,9 +11753,9 @@
   (import "./bindings.wasm" "EventContext.env" (func $EventContext.env (param $this externref) (result externref)))
   ;; set env(value: Env)
   (import "./bindings.wasm" "EventContext.set_env" (func $EventContext.set_env (param $this externref) (param $value externref)))
-  ;; params: Params<P>
+  ;; params: Params<string>
   (import "./bindings.wasm" "EventContext.params" (func $EventContext.params (param $this externref) (result externref)))
-  ;; set params(value: Params<P>)
+  ;; set params(value: Params<string>)
   (import "./bindings.wasm" "EventContext.set_params" (func $EventContext.set_params (param $this externref) (param $value externref)))
   ;; data: Data
   (import "./bindings.wasm" "EventContext.data" (func $EventContext.data (param $this externref) (result externref)))
@@ -11789,9 +11789,9 @@
   (import "./bindings.wasm" "EventPluginContext.env" (func $EventPluginContext.env (param $this externref) (result externref)))
   ;; set env(value: Env)
   (import "./bindings.wasm" "EventPluginContext.set_env" (func $EventPluginContext.set_env (param $this externref) (param $value externref)))
-  ;; params: Params<P>
+  ;; params: Params<string>
   (import "./bindings.wasm" "EventPluginContext.params" (func $EventPluginContext.params (param $this externref) (result externref)))
-  ;; set params(value: Params<P>)
+  ;; set params(value: Params<string>)
   (import "./bindings.wasm" "EventPluginContext.set_params" (func $EventPluginContext.set_params (param $this externref) (param $value externref)))
   ;; data: Data
   (import "./bindings.wasm" "EventPluginContext.data" (func $EventPluginContext.data (param $this externref) (result externref)))

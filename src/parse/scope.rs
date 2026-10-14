@@ -57,6 +57,30 @@ pub enum Binding {
     Declared(TypeId),
     /// An in-scope generic type parameter.
     TypeParam,
+    /// A type parameter constrained to a primitive (`Key extends string`),
+    /// which has no Rust generic form and reads as the primitive itself.
+    Erased(Erasure),
+}
+
+/// The primitive a constrained type parameter erases to.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Erasure {
+    String,
+    Number,
+    Boolean,
+    BigInt,
+}
+
+impl Erasure {
+    pub fn type_ref(self) -> crate::ir::TypeRef {
+        use crate::ir::TypeRef;
+        match self {
+            Erasure::String => TypeRef::String,
+            Erasure::Number => TypeRef::Number,
+            Erasure::Boolean => TypeRef::Boolean,
+            Erasure::BigInt => TypeRef::BigInt,
+        }
+    }
 }
 
 /// A single level of type scope.
@@ -101,12 +125,17 @@ impl TypeScope {
         self.names.insert(name, Binding::TypeParam);
     }
 
+    /// Bind a type parameter that reads as a primitive.
+    pub fn insert_erased_type_param(&mut self, name: String, erasure: Erasure) {
+        self.names.insert(name, Binding::Erased(erasure));
+    }
+
     /// Look up a declared-type binding in this scope only (not parent
     /// scopes). Returns `None` for type-parameter bindings.
     pub fn get(&self, name: &str) -> Option<TypeId> {
         match self.names.get(name)? {
             Binding::Declared(id) => Some(*id),
-            Binding::TypeParam => None,
+            Binding::TypeParam | Binding::Erased(_) => None,
         }
     }
 
@@ -121,7 +150,7 @@ impl TypeScope {
     pub fn iter(&self) -> impl Iterator<Item = (&String, TypeId)> {
         self.names.iter().filter_map(|(k, v)| match v {
             Binding::Declared(id) => Some((k, *id)),
-            Binding::TypeParam => None,
+            Binding::TypeParam | Binding::Erased(_) => None,
         })
     }
 }
@@ -131,11 +160,15 @@ impl TypeScope {
 #[derive(Clone, Debug)]
 pub struct ScopeArena {
     scopes: Vec<TypeScope>,
+    erased_positions: HashMap<ScopeId, Vec<usize>>,
 }
 
 impl ScopeArena {
     pub fn new() -> Self {
-        Self { scopes: Vec::new() }
+        Self {
+            scopes: Vec::new(),
+            erased_positions: HashMap::new(),
+        }
     }
 
     /// Create a root scope (no parent).
@@ -212,6 +245,57 @@ impl ScopeArena {
         chain
     }
 
+    /// Bind an erased type parameter and remember its position in the
+    /// declaration's parameter list, so references with explicit
+    /// arguments can drop the argument at that position.
+    pub fn insert_erased_type_param(
+        &mut self,
+        scope: ScopeId,
+        name: String,
+        erasure: Erasure,
+        position: usize,
+    ) {
+        self.get_mut(scope).insert_erased_type_param(name, erasure);
+        self.erased_positions
+            .entry(scope)
+            .or_default()
+            .push(position);
+    }
+
+    /// Bind `type_params` in `scope`. Parameters that erase to a primitive
+    /// (see [`crate::ir::TypeParam::erasure`]) are bound as that primitive
+    /// and removed from the list, so the owning declaration is emitted
+    /// without them.
+    pub fn bind_type_params(
+        &mut self,
+        scope: ScopeId,
+        type_params: &mut Vec<crate::ir::TypeParam>,
+    ) {
+        let mut position = 0;
+        type_params.retain(|tp| {
+            let keep = match tp.erasure() {
+                Some(erasure) => {
+                    self.insert_erased_type_param(scope, tp.name.clone(), erasure, position);
+                    false
+                }
+                None => {
+                    self.insert_type_param(scope, tp.name.clone());
+                    true
+                }
+            };
+            position += 1;
+            keep
+        });
+    }
+
+    /// Positions (in declaration order) of the type parameters of the
+    /// declaration owning `body_scope` that erased to primitives.
+    pub fn erased_positions(&self, body_scope: ScopeId) -> &[usize] {
+        self.erased_positions
+            .get(&body_scope)
+            .map_or(&[], |v| v.as_slice())
+    }
+
     /// Resolve a simple name to a declared `TypeId` by walking up the
     /// scope chain. Type-parameter bindings *shadow* declarations: if
     /// the closest binding is a type parameter, this returns `None`
@@ -221,7 +305,7 @@ impl ScopeArena {
     pub fn resolve(&self, scope: ScopeId, name: &str) -> Option<TypeId> {
         match self.resolve_binding(scope, name)? {
             Binding::Declared(id) => Some(id),
-            Binding::TypeParam => None,
+            Binding::TypeParam | Binding::Erased(_) => None,
         }
     }
 
