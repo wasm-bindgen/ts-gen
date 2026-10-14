@@ -81,7 +81,19 @@ pub fn convert_interface_decl(
     let extends: Vec<ir::TypeRef> = iface
         .extends
         .iter()
-        .map(|ext| convert_ts_type_name_to_ref(&ext.type_name))
+        .map(|ext| {
+            let mut ty = convert_ts_type_name_to_ref(&ext.type_name);
+            if let (ir::TypeRef::Reference { generic_args, .. }, Some(args)) =
+                (&mut ty, ext.type_arguments.as_ref())
+            {
+                *generic_args = args
+                    .params
+                    .iter()
+                    .map(|t| crate::parse::types::convert_ts_type(t, ctx.diag))
+                    .collect();
+            }
+            ty
+        })
         .collect();
     interface_from_signatures(
         name,
