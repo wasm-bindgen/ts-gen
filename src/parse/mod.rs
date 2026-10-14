@@ -437,33 +437,14 @@ fn populate_builtin_scope(gctx: &mut GlobalContext, scope: ScopeId) {
         gctx.builtin_type_ids.insert(type_id);
     }
 
-    // Web platform built-in types (ReadableStream, Request, etc.).
-    // Registered as opaque interfaces — codegen emits them as bare identifiers.
-    // Users provide actual definitions via --external or input files.
-    for name in &[
-        "ReadableStream",
-        "WritableStream",
-        "TransformStream",
-        "Request",
-        "Response",
-        "Headers",
-        "Blob",
-        "File",
-        "FormData",
-        "URL",
-        "URLSearchParams",
-        "Event",
-        "EventTarget",
-        "AbortController",
-        "AbortSignal",
-        "WebSocket",
-        "Worker",
-        "Crypto",
-        "CryptoKey",
-        "SubtleCrypto",
-        "TextEncoder",
-        "TextDecoder",
-    ] {
+    // Web platform built-in types (ReadableStream, Request, etc.) and
+    // js_sys classes spelled differently in Rust. Registered as opaque
+    // interfaces — codegen emits them as bare identifiers aliased through
+    // the external map's defaults, `--external`, or input files.
+    let defaults = crate::external_map::WEB_SYS_DEFAULTS
+        .iter()
+        .chain(crate::external_map::JS_SYS_RENAMES);
+    for (name, _) in defaults {
         let type_id = gctx.insert_type(crate::ir::TypeDeclaration {
             kind: crate::ir::TypeKind::Interface(crate::ir::InterfaceDecl {
                 name: name.to_string(),

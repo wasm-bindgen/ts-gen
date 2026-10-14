@@ -32,12 +32,17 @@ pub struct ExternalMap {
     /// Wildcard module mappings: `"node:" → "node_sys"`
     /// Stored as (prefix, rust_crate) pairs.
     wildcard_map: Vec<(String, String)>,
-    /// Built-in defaults (web platform types → `::web_sys::...`). Checked
-    /// last, so any user-supplied mapping (explicit or module-based)
-    /// wins. Populated by `new()`; cleared in test contexts where bare
+    /// Built-in defaults (web platform types → `::web_sys::...`, plus the
+    /// `js_sys` names whose Rust spelling differs from TS). Checked last,
+    /// so any user-supplied mapping (explicit or module-based) wins.
+    /// Populated by `new()`; cleared in test contexts where bare
     /// behaviour is needed.
     default_type_map: HashMap<String, String>,
 }
+
+/// `js_sys` classes whose Rust name is not the TS name, so the
+/// `use js_sys::*` glob cannot supply them under the TS spelling.
+pub const JS_SYS_RENAMES: &[(&str, &str)] = &[("URIError", "::js_sys::UriError")];
 
 /// Default mappings for the web platform types declared in the TS lib.
 /// Anything in this list resolves to its `web_sys::` equivalent unless the
@@ -49,6 +54,7 @@ pub const WEB_SYS_DEFAULTS: &[(&str, &str)] = &[
     ("Blob", "::web_sys::Blob"),
     ("Crypto", "::web_sys::Crypto"),
     ("CryptoKey", "::web_sys::CryptoKey"),
+    ("DOMException", "::web_sys::DomException"),
     ("Event", "::web_sys::Event"),
     ("EventTarget", "::web_sys::EventTarget"),
     ("File", "::web_sys::File"),
@@ -71,7 +77,7 @@ pub const WEB_SYS_DEFAULTS: &[(&str, &str)] = &[
 impl ExternalMap {
     pub fn new() -> Self {
         let mut map = Self::default();
-        for &(name, path) in WEB_SYS_DEFAULTS {
+        for &(name, path) in WEB_SYS_DEFAULTS.iter().chain(JS_SYS_RENAMES) {
             map.default_type_map
                 .insert(name.to_string(), path.to_string());
         }
@@ -86,9 +92,12 @@ impl ExternalMap {
 
     /// Drop the built-in web platform defaults. Used by the
     /// `--no-web-sys` CLI flag for environments that don't link
-    /// `web_sys` (Node-only runtimes, custom JS hosts, …).
+    /// `web_sys` (Node-only runtimes, custom JS hosts, …). The `js_sys`
+    /// renames stay: they need nothing beyond the prelude.
     pub fn clear_defaults(&mut self) {
-        self.default_type_map.clear();
+        for &(name, _) in WEB_SYS_DEFAULTS {
+            self.default_type_map.remove(name);
+        }
     }
 
     /// Parse a CLI external mapping string.
@@ -304,6 +313,10 @@ mod tests {
         map.clear_defaults();
         assert!(map.resolve("Blob", "any").is_none());
         assert!(map.resolve_type("Headers").is_none());
+        assert_eq!(
+            map.resolve_type("URIError").unwrap().path,
+            "::js_sys::UriError"
+        );
     }
 
     #[test]

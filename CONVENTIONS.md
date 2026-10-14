@@ -1787,7 +1787,7 @@ site is:
    (`node:buffer=node_buffer_sys`) > wildcard module maps
    (`node:*=node_sys::*`).
 3. **Built-in web platform defaults**: `Blob`, `Event`, `Headers`,
-   `ReadableStream`, `Response`, `URL`, `URLSearchParams`,
+   `DOMException`, `ReadableStream`, `Response`, `URL`, `URLSearchParams`,
    `WebSocket`, … all map to their `::web_sys::*` equivalents
    automatically. The full list lives in
    `external_map::WEB_SYS_DEFAULTS`. Run with `--no-web-sys` to
@@ -1799,4 +1799,7 @@ site is:
 
 User mappings always override the defaults. The `js_sys` short-circuit
 is unaffected by `--no-web-sys` — those names are part of the
-generated file's `use js_sys::*;` prelude.
+generated file's `use js_sys::*;` prelude. The one `js_sys` class whose
+Rust spelling differs from TS, `URIError`, is aliased from
+`::js_sys::UriError` through the same default-mapping path
+(`external_map::JS_SYS_RENAMES`) and likewise survives `--no-web-sys`.
