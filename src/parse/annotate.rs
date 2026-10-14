@@ -465,7 +465,8 @@ fn apply_members(
 
 fn mismatch(scalar: RustScalar, what: &str, ty: &TypeRef) -> String {
     format!(
-        "{what} `{}` cannot cross as `@rust {}` (u64/i64 need `bigint`, other scalars `number`)",
+        "{what} `{}` cannot cross as `@rust {}` (u64/i64 need `number` or `bigint`, other \
+         scalars `number`)",
         ty.format_ts(),
         scalar.as_str()
     )
@@ -474,7 +475,7 @@ fn mismatch(scalar: RustScalar, what: &str, ty: &TypeRef) -> String {
 /// The `@rust` scalar an annotated type carries, if any.
 fn scalar_leaf(ty: &TypeRef) -> Option<RustScalar> {
     match ty {
-        TypeRef::RustScalar(s) => Some(*s),
+        TypeRef::RustScalar(s) | TypeRef::WideScalar(s) => Some(*s),
         TypeRef::Nullable(inner, _) | TypeRef::Array(inner) => scalar_leaf(inner),
         TypeRef::Reference { generic_args, .. } => generic_args.iter().find_map(scalar_leaf),
         _ => None,

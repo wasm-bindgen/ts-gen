@@ -35,6 +35,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [`Promise<T>` returns become `async fn`](#promiset-returns-become-async-fn)
 * [`@throws` JSDoc → typed error](#throws-jsdoc--typed-error)
 * [`@rust` JSDoc → Rust scalar](#rust-jsdoc--rust-scalar)
+* [Inline wrappers](#inline-wrappers)
 * [`--annotate` side files](#--annotate-side-files)
 * [Subtyping LUB across unions](#subtyping-lub-across-unions)
 * [Module declarations and namespace nesting](#module-declarations-and-namespace-nesting)
@@ -2493,13 +2494,12 @@ pub async fn count(this: &Response) -> Result<u32, JsValue>;
 * The scalar replaces the leaf through `?` / `| null` (`Option<u16>`),
   `T[]` (`Vec<u8>` / `&[u8]`) and `Promise<…>` (`Result<u32, _>`).
 * Accepted scalars: `u8 u16 u32 u64 i8 i16 i32 i64 f32 f64 usize`.
-  wasm-bindgen crosses `u64`/`i64` as a JS `BigInt`, so they apply only
-  to a `bigint` leaf; every other scalar applies only to a `number`
-  leaf. A `@rust u64` on a `number` would make the JS glue reject the
-  value at runtime, so it is refused: sizes beyond `u32` stay `f64`
-  (exact to 2^53). An unknown scalar, an incompatible leaf, or a
-  parameter name that does not exist is an error diagnostic and the
-  tag is ignored.
+  wasm-bindgen crosses `u64`/`i64` as a JS `BigInt`, so on a `bigint`
+  leaf they are the extern type directly; on a `number` leaf the
+  extern binding stays `f64` and an [inline wrapper](#inline-wrappers)
+  converts. Every other scalar applies only to a `number` leaf. An
+  unknown scalar, an incompatible leaf, or a parameter name that does
+  not exist is an error diagnostic and the tag is ignored.
 
 Why a JSDoc tag rather than a branded alias (`type u16 = number`): the
 alias form needs the upstream declaration to *use* the alias, which an
@@ -2507,6 +2507,72 @@ upstream file never does, so annotations would still have to be
 layered on — and a tag reads as what it is, a Rust-side refinement,
 while a `u16` alias in `.d.ts` suggests a TS-level distinction that
 does not exist.
+
+## Inline wrappers
+
+Everything ts-gen emits is an `extern "C"` binding, except where the
+extern ABI cannot express the declared type. There, the extern binding
+is emitted under a private name and a non-extern `pub fn` of the public
+name converts over it. The rule is narrow on purpose: a wrapper is
+never emitted for ergonomics, only where no extern signature can carry
+the type, and the extern form stays reachable (within the module) under
+`<name>_js`.
+
+**`@rust u64` / `i64` on a `number`.** wasm-bindgen passes 64-bit
+integers as `BigInt`, so a `u64` extern parameter or return would make
+the glue reject a JS number. The binding keeps `f64`; the wrapper
+converts with `as`, which is exact to 2^53 (the range a JS number
+represents exactly) and saturates beyond it:
+
+```ts
+interface R2Object {
+  /** @rust u64 */
+  readonly size: number;
+  /** @rust limit: u64 */
+  list(limit: number): Promise<R2Object[]>;
+  /** @rust u64 */
+  count(): Promise<number>;
+}
+interface R2PutOptions {
+  /** @rust u64 */
+  size?: number;
+}
+```
+
+```rust
+extern "C" {
+    #[wasm_bindgen(method, getter, js_name = "size")]
+    fn size_js(this: &R2Object) -> f64;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    async fn list_js(this: &R2Object, limit: f64) -> Result<Vec<R2Object>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "count")]
+    async fn count_js(this: &R2Object) -> Result<f64, JsValue>;
+}
+impl R2Object {
+    pub fn size(&self) -> u64 { self.size_js() as u64 }
+    pub async fn list(&self, limit: u64) -> Result<Vec<R2Object>, JsValue> {
+        self.list_js(limit as f64).await
+    }
+    pub async fn count(&self) -> Result<u64, JsValue> {
+        self.count_js().await.map(|v| v as u64)
+    }
+}
+```
+
+* Applies to getters, setters, parameters, sync and async returns,
+  static methods, constructors and free functions; the public
+  signature is exactly what the scalar would have been, through
+  `Option<_>` (`?` / `| null`), `Vec<_>` / `&[_]` (`T[]`) and
+  `Result<_, E>`. A `@rust u64` on a `bigint` needs no wrapper.
+* A generic receiver (`Box<T>`) gives `impl<T: JsGeneric> Box<T>`; the
+  method's own type parameters stay on the wrapper fn.
+* The `_promise` companion is handed to JS (`waitUntil`, `Promise.race`),
+  so it keeps `Promise<f64>` and gets no wrapper. The same holds for a
+  scalar inside a callback type.
+* Dictionary factories and builder methods take the public scalar and
+  call the wrapper setter, so `R2PutOptions::builder().size(5)` reads as
+  declared.
+* Doc comments move to the wrapper; the extern binding is not `pub`.
 
 ## `--annotate` side files
 
