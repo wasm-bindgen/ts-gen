@@ -13,6 +13,10 @@
 //! A marker in a position the wrapper cannot convert (`Promise<f64>` in a
 //! `_promise` companion, a callback's `Function<fn(f64)>`) is simply `f64`:
 //! those forms are JS-typed by design.
+//!
+//! Overloads distinguished only by a string-literal argument are the second
+//! use: the extern takes `&str` and the signature layer tags it (see
+//! [`literal_attr`]) with one wrapper per literal, each baking its value in.
 
 use proc_macro2::{Span, TokenStream};
 use quote::{format_ident, quote, ToTokens};
@@ -25,6 +29,83 @@ use syn::{
 use crate::ir::RustScalar;
 
 const MARKER_PREFIX: &str = "__TsGenWide";
+const LITERAL_ATTR: &str = "ts_gen_literal";
+
+/// The attribute the signature layer puts on a literal-keyed extern fn:
+/// `#[ts_gen_literal(positions(1), arm("text", get_text), arm("json", get_json))]`.
+/// Positions index the parameters after `this`.
+pub(crate) fn literal_attr(sig: &crate::codegen::signatures::FunctionSignature) -> TokenStream {
+    let Some(spec) = &sig.literal else {
+        return quote! {};
+    };
+    let attr = format_ident!("{LITERAL_ATTR}");
+    let positions = spec
+        .positions
+        .iter()
+        .map(|p| proc_macro2::Literal::usize_unsuffixed(*p));
+    let arms = spec.arms.iter().map(|(lits, name)| {
+        let name = format_ident!("{name}");
+        quote! { arm(#(#lits),*, #name) }
+    });
+    quote! { #[#attr(positions(#(#positions),*), #(#arms),*)] }
+}
+
+struct LiteralArms {
+    positions: Vec<usize>,
+    arms: Vec<(Vec<String>, Ident)>,
+}
+
+fn take_literal_attr(item: &mut ForeignItemFn) -> Option<LiteralArms> {
+    let idx = item
+        .attrs
+        .iter()
+        .position(|a| a.path().is_ident(LITERAL_ATTR))?;
+    let attr = item.attrs.remove(idx);
+    let syn::Meta::List(list) = attr.meta else {
+        return None;
+    };
+    let parsed: LiteralArmsTokens = syn::parse2(list.tokens).ok()?;
+    Some(LiteralArms {
+        positions: parsed.positions,
+        arms: parsed.arms,
+    })
+}
+
+struct LiteralArmsTokens {
+    positions: Vec<usize>,
+    arms: Vec<(Vec<String>, Ident)>,
+}
+
+impl syn::parse::Parse for LiteralArmsTokens {
+    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
+        let mut positions = Vec::new();
+        let mut arms = Vec::new();
+        while !input.is_empty() {
+            let key: Ident = input.parse()?;
+            let content;
+            syn::parenthesized!(content in input);
+            if key == "positions" {
+                let list = content.parse_terminated(syn::LitInt::parse, syn::Token![,])?;
+                for lit in list {
+                    positions.push(lit.base10_parse()?);
+                }
+            } else {
+                let mut lits = Vec::new();
+                while content.peek(syn::LitStr) {
+                    let lit: syn::LitStr = content.parse()?;
+                    lits.push(lit.value());
+                    content.parse::<syn::Token![,]>()?;
+                }
+                let name: Ident = content.parse()?;
+                arms.push((lits, name));
+            }
+            if input.peek(syn::Token![,]) {
+                input.parse::<syn::Token![,]>()?;
+            }
+        }
+        Ok(Self { positions, arms })
+    }
+}
 
 /// The placeholder type the emitters use for a 64-bit scalar on a `number`.
 pub(crate) fn marker_tokens(scalar: RustScalar) -> TokenStream {
@@ -170,6 +251,13 @@ impl VisitMut for Resolve {
 
 fn mentions_marker(tokens: &impl ToTokens) -> bool {
     tokens.to_token_stream().to_string().contains(MARKER_PREFIX)
+}
+
+fn mentions_literal(block: &ItemForeignMod) -> bool {
+    block.items.iter().any(|i| match i {
+        ForeignItem::Fn(f) => f.attrs.iter().any(|a| a.path().is_ident(LITERAL_ATTR)),
+        _ => false,
+    })
 }
 
 /// What the extern fn binds, read off its `#[wasm_bindgen(...)]` attribute.
@@ -318,6 +406,7 @@ fn generic_args(generics: &Generics) -> TokenStream {
 }
 
 /// Where a wrapper lands.
+#[derive(Clone)]
 enum Target {
     /// `impl<G> Ty<Args> { pub fn f(&self, ..) }`
     Method {
@@ -339,8 +428,11 @@ struct Wrapper {
     item: TokenStream,
 }
 
-fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn) -> Option<Wrapper> {
-    let (attr_idx, binding) = read_binding(item)?;
+fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn) -> Vec<Wrapper> {
+    let literal = take_literal_attr(item);
+    let Some((attr_idx, binding)) = read_binding(item) else {
+        return Vec::new();
+    };
     let return_shape = match &item.sig.output {
         ReturnType::Default => Shape::Plain,
         ReturnType::Type(_, ty) => shape(ty),
@@ -359,8 +451,9 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn) -> Option<Wrapper> {
             FnArg::Receiver(_) => None,
         })
         .collect();
-    if !return_shape.converts() && !param_shapes.iter().any(|(_, s)| s.converts()) {
-        return None;
+    let converts = return_shape.converts() || param_shapes.iter().any(|(_, s)| s.converts());
+    if !converts && literal.is_none() {
+        return Vec::new();
     }
 
     let public_name = item.sig.ident.clone();
@@ -406,7 +499,7 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn) -> Option<Wrapper> {
         };
         let attr = &mut item.attrs[attr_idx];
         let syn::Meta::List(list) = &mut attr.meta else {
-            return None;
+            return Vec::new();
         };
         let extra = if list.tokens.is_empty() {
             quote! { js_name = #js_name }
@@ -417,17 +510,19 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn) -> Option<Wrapper> {
     }
     item.attrs.retain(|a| !a.path().is_ident("doc"));
 
-    let call_args = param_shapes
-        .iter()
-        .map(|(name, s)| to_extern(quote! { #name }, s));
     let is_async = public_sig.asyncness.is_some();
     let await_tokens = is_async.then(|| quote! { .await });
-    let (target, call) = if binding.method {
-        let (ty, args) = type_head(this_type(item)?)?;
+    let (target, callee) = if binding.method {
+        let Some((ty, args)) = this_type(item).and_then(type_head) else {
+            return Vec::new();
+        };
         let (on_impl, on_fn) = split_generics(&public_sig.generics, &args);
         public_sig.generics = on_fn;
         let self_arg: FnArg = syn::parse_quote!(&self);
-        *public_sig.inputs.first_mut()? = self_arg;
+        match public_sig.inputs.first_mut() {
+            Some(first) => *first = self_arg,
+            None => return Vec::new(),
+        }
         let args_tokens = generic_args(&on_impl);
         (
             Target::Method {
@@ -435,20 +530,22 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn) -> Option<Wrapper> {
                 generics: on_impl,
                 args: args_tokens,
             },
-            quote! { self.#extern_name(#(#call_args),*)#await_tokens },
+            quote! { self.#extern_name },
         )
     } else if let Some(ty) = binding.static_of {
         let generics = declared_generics(block, &ty).unwrap_or_default();
         let args = generic_args(&generics);
         (
             Target::Associated { ty, generics, args },
-            quote! { Self::#extern_name(#(#call_args),*)#await_tokens },
+            quote! { Self::#extern_name },
         )
     } else if binding.constructor {
         let ReturnType::Type(_, ret) = &public_sig.output else {
-            return None;
+            return Vec::new();
         };
-        let (ty, args) = type_head(result_ok(ret))?;
+        let Some((ty, args)) = type_head(result_ok(ret)) else {
+            return Vec::new();
+        };
         let (on_impl, on_fn) = split_generics(&public_sig.generics, &args);
         public_sig.generics = on_fn;
         let args_tokens = generic_args(&on_impl);
@@ -458,20 +555,66 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn) -> Option<Wrapper> {
                 generics: on_impl,
                 args: args_tokens,
             },
-            quote! { Self::#extern_name(#(#call_args),*)#await_tokens },
+            quote! { Self::#extern_name },
         )
     } else {
-        (
-            Target::Free,
-            quote! { #extern_name(#(#call_args),*)#await_tokens },
-        )
+        (Target::Free, quote! { #extern_name })
     };
-    let body = from_extern(call, &return_shape);
-    let item = quote! {
-        #(#doc_attrs)*
-        pub #public_sig { #body }
+
+    // One wrapper per literal arm (the literal parameters dropped from
+    // the public signature, their values passed through), else one.
+    let arms: Vec<(Vec<(usize, String)>, Ident)> = match &literal {
+        Some(l) => l
+            .arms
+            .iter()
+            .map(|(lits, name)| {
+                (
+                    l.positions
+                        .iter()
+                        .copied()
+                        .zip(lits.iter().cloned())
+                        .collect(),
+                    name.clone(),
+                )
+            })
+            .collect(),
+        None => vec![(Vec::new(), public_name.clone())],
     };
-    Some(Wrapper { target, item })
+    let typed_inputs: Vec<FnArg> = public_sig.inputs.iter().skip(skip).cloned().collect();
+    let receiver: Vec<FnArg> = public_sig.inputs.iter().take(skip).cloned().collect();
+    arms.into_iter()
+        .map(|(values, name)| {
+            let call_args = param_shapes.iter().enumerate().map(|(i, (pname, s))| {
+                match values.iter().find(|(pos, _)| *pos == i) {
+                    Some((_, lit)) => quote! { #lit },
+                    None => to_extern(quote! { #pname }, s),
+                }
+            });
+            let call = quote! { #callee(#(#call_args),*)#await_tokens };
+            let body = from_extern(call, &return_shape);
+            let mut sig = public_sig.clone();
+            sig.ident = name;
+            sig.inputs = receiver
+                .iter()
+                .cloned()
+                .chain(
+                    typed_inputs
+                        .iter()
+                        .enumerate()
+                        .filter(|(i, _)| !values.iter().any(|(pos, _)| pos == i))
+                        .map(|(_, a)| a.clone()),
+                )
+                .collect();
+            let item = quote! {
+                #(#doc_attrs)*
+                pub #sig { #body }
+            };
+            Wrapper {
+                target: target.clone(),
+                item,
+            }
+        })
+        .collect()
 }
 
 fn process_items(items: &mut Vec<Item>) {
@@ -484,15 +627,15 @@ fn process_items(items: &mut Vec<Item>) {
                 }
                 out.push(item);
             }
-            Item::ForeignMod(block) if mentions_marker(block) => {
+            Item::ForeignMod(block) if mentions_marker(block) || mentions_literal(block) => {
                 let snapshot = block.clone();
                 let mut wrappers = Vec::new();
                 for fi in block.items.iter_mut() {
                     if let ForeignItem::Fn(f) = fi {
-                        if mentions_marker(&f.sig) {
-                            if let Some(w) = wrap(&snapshot, f) {
-                                wrappers.push(w);
-                            }
+                        if mentions_marker(&f.sig)
+                            || f.attrs.iter().any(|a| a.path().is_ident(LITERAL_ATTR))
+                        {
+                            wrappers.extend(wrap(&snapshot, f));
                         }
                     }
                 }
@@ -542,7 +685,8 @@ fn render_wrappers(wrappers: Vec<Wrapper>) -> Vec<Item> {
 /// Rewrite every marker in `file`, emitting wrappers for extern fns that
 /// carry one in a convertible position.
 pub(crate) fn apply(file: &mut syn::File) {
-    if !mentions_marker(file) {
+    let text = file.to_token_stream().to_string();
+    if !text.contains(MARKER_PREFIX) && !text.contains(LITERAL_ATTR) {
         return;
     }
     process_items(&mut file.items);
@@ -606,6 +750,26 @@ mod tests {
         assert!(out.contains("pub fn count_promise(this: &Foo) -> Promise<f64>;"));
         assert!(!out.contains("count_promise_js"));
         assert!(out.contains("pub fn size(self, val: u64) -> Self"));
+    }
+
+    #[test]
+    fn literal_arms_drop_the_parameter_and_bake_the_value() {
+        let out = run(
+            "#[wasm_bindgen] extern \"C\" {
+                pub type Kv;
+                #[ts_gen_literal(positions(1), arm(\"text\", get_text), arm(\"arrayBuffer\", get_array_buffer))]
+                #[wasm_bindgen(method, catch, js_name = \"get\")]
+                pub async fn get_text(this: &Kv, key: &str, r#type: &str) -> Result<JsValue, JsValue>;
+                #[ts_gen_literal(positions(0), arm(\"gzip\", new_gzip), arm(\"deflate-raw\", new_deflate_raw))]
+                #[wasm_bindgen(constructor, catch)]
+                pub fn new_gzip(format: &str) -> Result<Kv, JsValue>;
+            }",
+        );
+        assert!(!out.contains("ts_gen_literal"));
+        assert!(out.contains("async fn get_text_js(this: &Kv, key: &str, r#type: &str)"));
+        assert!(out.contains("pub async fn get_text(&self, key: &str) -> Result<JsValue, JsValue> {\n        self.get_text_js(key, \"text\").await\n    }"));
+        assert!(out.contains("pub async fn get_array_buffer(&self, key: &str) -> Result<JsValue, JsValue> {\n        self.get_text_js(key, \"arrayBuffer\").await\n    }"));
+        assert!(out.contains("pub fn new_deflate_raw() -> Result<Kv, JsValue> {\n        Self::new_gzip_js(\"deflate-raw\")\n    }"));
     }
 
     #[test]

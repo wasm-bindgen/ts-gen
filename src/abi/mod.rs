@@ -15,7 +15,7 @@ pub mod wat;
 
 use std::collections::{HashMap, HashSet};
 
-use crate::codegen::signatures::{base_rust_name, expand_signatures, SignatureKind};
+use crate::codegen::signatures::{base_rust_name, expand_signatures_scoped, SignatureKind};
 use crate::codegen::surface::Surface;
 use crate::codegen::GenerateOptions;
 use crate::context::GlobalContext;
@@ -1087,7 +1087,8 @@ fn push_callable(
     // externref view, so arms that only differ in reference type survive
     // as separately named aliases of one signature. That keeps names
     // aligned with the Rust bindings.
-    for sig in expand_signatures(overloads, None, scope) {
+    let scopes = vec![scope; overloads.len()];
+    for sig in expand_signatures_scoped(overloads, None, &scopes, kind.allows_literal_cohort()) {
         let variant = used.declare(&format!("{member}{}", sig.name_suffix), Suffix::Snake);
         let name = match owner {
             Some(o) => format!("{o}.{variant}"),

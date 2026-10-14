@@ -2567,11 +2567,11 @@
   ;; get(key: string, options: KVNamespaceGetOptions<undefined>): Promise<string | null>
   (import "./bindings.wasm" "KVNamespace.get_with_str_and_options" (func $KVNamespace.get_with_str_and_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
   ;; get(key: string, type: "text"): Promise<string | null>
-  (import "./bindings.wasm" "KVNamespace.get_with_str_and_type" (func $KVNamespace.get_with_str_and_type (param $this externref) (param $key externref) (param $type externref) (result externref)))
+  (import "./bindings.wasm" "KVNamespace.get_2" (func $KVNamespace.get_2 (param $this externref) (param $key externref) (param $type externref) (result externref)))
   ;; get(key: string[], type: "text"): Promise<string | null>
-  (import "./bindings.wasm" "KVNamespace.get_with_slice_and_type" (func $KVNamespace.get_with_slice_and_type (param $this externref) (param $key externref) (param $type externref) (result externref)))
+  (import "./bindings.wasm" "KVNamespace.get_with_slice" (func $KVNamespace.get_with_slice (param $this externref) (param $key externref) (param $type externref) (result externref)))
   ;; get(key: string[]): Promise<string | null>
-  (import "./bindings.wasm" "KVNamespace.get_with_slice" (func $KVNamespace.get_with_slice (param $this externref) (param $key externref) (result externref)))
+  (import "./bindings.wasm" "KVNamespace.get_with_slice_2" (func $KVNamespace.get_with_slice_2 (param $this externref) (param $key externref) (result externref)))
   ;; get(key: string[], options: KVNamespaceGetOptions<undefined>): Promise<string | null>
   (import "./bindings.wasm" "KVNamespace.get_with_slice_and_options" (func $KVNamespace.get_with_slice_and_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
   ;; list(): Promise<KVNamespaceListResult<Metadata, string>>
@@ -2599,11 +2599,11 @@
   ;; getWithMetadata(key: string, options: KVNamespaceGetOptions<undefined>): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>
   (import "./bindings.wasm" "KVNamespace.get_with_metadata_with_str_and_options" (func $KVNamespace.get_with_metadata_with_str_and_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
   ;; getWithMetadata(key: string, type: "text"): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>
-  (import "./bindings.wasm" "KVNamespace.get_with_metadata_with_str_and_type" (func $KVNamespace.get_with_metadata_with_str_and_type (param $this externref) (param $key externref) (param $type externref) (result externref)))
+  (import "./bindings.wasm" "KVNamespace.get_with_metadata_2" (func $KVNamespace.get_with_metadata_2 (param $this externref) (param $key externref) (param $type externref) (result externref)))
   ;; getWithMetadata(key: string[], type: "text"): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>
-  (import "./bindings.wasm" "KVNamespace.get_with_metadata_with_slice_and_type" (func $KVNamespace.get_with_metadata_with_slice_and_type (param $this externref) (param $key externref) (param $type externref) (result externref)))
+  (import "./bindings.wasm" "KVNamespace.get_with_metadata_with_slice" (func $KVNamespace.get_with_metadata_with_slice (param $this externref) (param $key externref) (param $type externref) (result externref)))
   ;; getWithMetadata(key: string[]): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>
-  (import "./bindings.wasm" "KVNamespace.get_with_metadata_with_slice" (func $KVNamespace.get_with_metadata_with_slice (param $this externref) (param $key externref) (result externref)))
+  (import "./bindings.wasm" "KVNamespace.get_with_metadata_with_slice_2" (func $KVNamespace.get_with_metadata_with_slice_2 (param $this externref) (param $key externref) (result externref)))
   ;; getWithMetadata(key: string[], options: KVNamespaceGetOptions<undefined>): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>
   (import "./bindings.wasm" "KVNamespace.get_with_metadata_with_slice_and_options" (func $KVNamespace.get_with_metadata_with_slice_and_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
   ;; delete(key: string): Promise<void>
