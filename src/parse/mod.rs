@@ -1,5 +1,6 @@
 //! Parser orchestration: parse `.d.ts` files into IR.
 
+pub mod annotate;
 pub mod classify;
 pub mod ctx;
 pub mod docs;
@@ -1271,7 +1272,7 @@ fn is_value(kind: &crate::ir::TypeKind) -> bool {
 }
 
 /// Extract the name from a declaration kind, if it has one.
-fn declaration_name(kind: &crate::ir::TypeKind) -> Option<String> {
+pub(crate) fn declaration_name(kind: &crate::ir::TypeKind) -> Option<String> {
     use crate::ir::TypeKind;
     match kind {
         TypeKind::Class(c) => Some(c.name.clone()),

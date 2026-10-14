@@ -19,6 +19,7 @@ src/
 ├── context.rs                 # GlobalContext (scopes, registry, externals)
 ├── external_map.rs            # `--external Foo=::path::Bar` resolution
 ├── parse/                     # .d.ts → IR
+│   ├── annotate.rs            # `--annotate` side files: layer @rust/@throws by name
 │   ├── docs.rs                # JSDoc extraction (incl. @throws, @rust)
 │   ├── members.rs             # interface / class member converters
 │   ├── merge.rs               # var + interface merging
