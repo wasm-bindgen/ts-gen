@@ -41,10 +41,14 @@
   (import "./bindings.wasm" "Headers.label" (func $Headers.label (param $this externref) (result externref)))
   ;; set label(value: string)
   (import "./bindings.wasm" "Headers.set_label" (func $Headers.set_label (param $this externref) (param $value externref)))
+
+  ;; Signal
+  ;; constructor()
+  (import "./bindings.wasm" "Signal.new" (func $Signal.new (result externref)))
   ;; parse(raw: string): Headers
-  (import "./bindings.wasm" "Headers.parse" (func $Headers.parse (param $raw externref) (result externref)))
+  (import "./bindings.wasm" "Signal.parse" (func $Signal.parse (param $raw externref) (result externref)))
   ;; static defaults: Headers
-  (import "./bindings.wasm" "Headers.defaults" (func $Headers.defaults (result externref)))
+  (import "./bindings.wasm" "Signal.defaults" (func $Signal.defaults (result externref)))
 
   ;; compute(x: number): number
   (import "./bindings.wasm" "compute" (func $compute (param $x f64) (result f64)))

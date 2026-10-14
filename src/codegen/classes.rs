@@ -1612,9 +1612,6 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 // Use the first overload's `@throws` (if any) as the error
                 // type for the constructor — TS overloads conventionally
                 // share semantics, and the first one carries the doc.
-                // Constructors always catch per JS `new` semantics, so
-                // `Throws::Never` here is a no-op — `build_signatures` still
-                // emits `catch` with the default `JsValue` error type.
                 let empty_throws = crate::ir::Throws::None;
                 let throws = constructor_overloads
                     .first()
@@ -1936,8 +1933,8 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
     );
     let doc = super::doc_tokens(&sig.doc);
 
-    // Constructors always return the constructed type, wrapped in Result
-    // when `catch` (which is always-true here per `SignatureKind::Constructor`).
+    // Constructors return the constructed type, wrapped in `Result` when
+    // `catch` (the default; `@throws {never}` opts out).
     // Type parameters the arguments mention — the class's own or the
     // construct signature's. A constructor-level `<T>` of the same
     // name as a class-level one (the `declare var` pattern) binds the
