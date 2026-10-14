@@ -81,6 +81,15 @@ ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts --output src/bi
   --export Request --export Response --export KVNamespace --export cloudflare:workers
 ```
 
+Layer `@rust` / `@throws` tags onto a large declaration file from a side
+file (see `CONVENTIONS.md`, "`--annotate` side files"):
+
+```sh
+ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
+  --output src/bindings.rs \
+  --annotate types/annotations.d.ts
+```
+
 Opt generic imports into wasm-bindgen's experimental per-monomorphization
 codegen:
 
