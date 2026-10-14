@@ -24,7 +24,7 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
-  ;; var onmessage: any
+  ;; var onmessage: undefined
   (import "./bindings.wasm" "onmessage" (func $onmessage (result externref)))
 
   ;; DOMException
@@ -2944,11 +2944,11 @@
   ;; R2Range
   ;; {} as R2Range
   (import "./bindings.wasm" "R2Range.new" (func $R2Range.new (result externref)))
-  ;; offset?: number | number
+  ;; offset?: number
   (import "./bindings.wasm" "R2Range.offset" (func $R2Range.offset (param $this externref) (result externref)))
   ;; set offset(value: number)
   (import "./bindings.wasm" "R2Range.set_offset" (func $R2Range.set_offset (param $this externref) (param $value f64)))
-  ;; length?: number | number
+  ;; length?: number
   (import "./bindings.wasm" "R2Range.length" (func $R2Range.length (param $this externref) (result externref)))
   ;; set length(value: number)
   (import "./bindings.wasm" "R2Range.set_length" (func $R2Range.set_length (param $this externref) (param $value f64)))
@@ -4270,7 +4270,7 @@
   (import "./bindings.wasm" "SqlStorage.set_statement" (func $SqlStorage.set_statement (param $this externref) (param $value externref)))
 
   ;; SqlStorageCursor
-  ;; next(): object | object
+  ;; next(): SqlStorageCursorNextReturn<T>
   (import "./bindings.wasm" "SqlStorageCursor.next" (func $SqlStorageCursor.next (param $this externref) (result externref)))
   ;; toArray(): T[]
   (import "./bindings.wasm" "SqlStorageCursor.to_array" (func $SqlStorageCursor.to_array (param $this externref) (result externref)))
@@ -4286,6 +4286,18 @@
   (import "./bindings.wasm" "SqlStorageCursor.rows_read" (func $SqlStorageCursor.rows_read (param $this externref) (result f64)))
   ;; rowsWritten: number
   (import "./bindings.wasm" "SqlStorageCursor.rows_written" (func $SqlStorageCursor.rows_written (param $this externref) (result f64)))
+
+  ;; SqlStorageCursorNextReturn
+  ;; {} as SqlStorageCursorNextReturn
+  (import "./bindings.wasm" "SqlStorageCursorNextReturn.new" (func $SqlStorageCursorNextReturn.new (result externref)))
+  ;; done?: false | true
+  (import "./bindings.wasm" "SqlStorageCursorNextReturn.done" (func $SqlStorageCursorNextReturn.done (param $this externref) (result externref)))
+  ;; set done(value: false)
+  (import "./bindings.wasm" "SqlStorageCursorNextReturn.set_done" (func $SqlStorageCursorNextReturn.set_done (param $this externref) (param $value i32)))
+  ;; value?: T
+  (import "./bindings.wasm" "SqlStorageCursorNextReturn.value" (func $SqlStorageCursorNextReturn.value (param $this externref) (result externref)))
+  ;; set value(value: T | undefined)
+  (import "./bindings.wasm" "SqlStorageCursorNextReturn.set_value" (func $SqlStorageCursorNextReturn.set_value (param $this externref) (param $value externref)))
 
   ;; Socket
   ;; readable: ReadableStream
@@ -7016,9 +7028,9 @@
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages.functions" (func $Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages.set_functions" (func $Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages.tools" (func $Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages.set_tools" (func $Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages.set_tools (param $this externref) (param $value externref)))
   ;; stream?: boolean
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages.stream" (func $Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages.stream (param $this externref) (result externref)))
@@ -7158,9 +7170,9 @@
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages.functions" (func $Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages.set_functions" (func $Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages.tools" (func $Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages.set_tools" (func $Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages.set_tools (param $this externref) (param $value externref)))
   ;; response_format?: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages.response_format" (func $Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages.response_format (param $this externref) (result externref)))
@@ -7410,9 +7422,9 @@
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages.functions" (func $Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages.set_functions" (func $Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages.tools" (func $Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages.set_tools" (func $Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages.set_tools (param $this externref) (param $value externref)))
   ;; response_format?: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages.response_format" (func $Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages.response_format (param $this externref) (result externref)))
@@ -7560,9 +7572,9 @@
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwq_32B_Messages.functions" (func $Ai_Cf_Qwen_Qwq_32B_Messages.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwq_32B_Messages.set_functions" (func $Ai_Cf_Qwen_Qwq_32B_Messages.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwq_32B_Messages.tools" (func $Ai_Cf_Qwen_Qwq_32B_Messages.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwq_32B_Messages.set_tools" (func $Ai_Cf_Qwen_Qwq_32B_Messages.set_tools (param $this externref) (param $value externref)))
   ;; guided_json?: object
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwq_32B_Messages.guided_json" (func $Ai_Cf_Qwen_Qwq_32B_Messages.guided_json (param $this externref) (result externref)))
@@ -7698,9 +7710,9 @@
   (import "./bindings.wasm" "Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages.functions" (func $Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages.set_functions" (func $Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages.tools" (func $Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages.set_tools" (func $Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages.set_tools (param $this externref) (param $value externref)))
   ;; guided_json?: object
   (import "./bindings.wasm" "Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages.guided_json" (func $Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages.guided_json (param $this externref) (result externref)))
@@ -7836,9 +7848,9 @@
   (import "./bindings.wasm" "Ai_Cf_Google_Gemma_3_12B_It_Messages.functions" (func $Ai_Cf_Google_Gemma_3_12B_It_Messages.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Google_Gemma_3_12B_It_Messages.set_functions" (func $Ai_Cf_Google_Gemma_3_12B_It_Messages.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Google_Gemma_3_12B_It_Messages.tools" (func $Ai_Cf_Google_Gemma_3_12B_It_Messages.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Google_Gemma_3_12B_It_Messages.set_tools" (func $Ai_Cf_Google_Gemma_3_12B_It_Messages.set_tools (param $this externref) (param $value externref)))
   ;; guided_json?: object
   (import "./bindings.wasm" "Ai_Cf_Google_Gemma_3_12B_It_Messages.guided_json" (func $Ai_Cf_Google_Gemma_3_12B_It_Messages.guided_json (param $this externref) (result externref)))
@@ -7990,9 +8002,9 @@
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages.functions" (func $Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages.set_functions" (func $Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages.tools" (func $Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages.set_tools" (func $Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages.set_tools (param $this externref) (param $value externref)))
   ;; response_format?: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages.response_format" (func $Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages.response_format (param $this externref) (result externref)))
@@ -8118,9 +8130,9 @@
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner.functions" (func $Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner.set_functions" (func $Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner.tools" (func $Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner.set_tools" (func $Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner.set_tools (param $this externref) (param $value externref)))
   ;; response_format?: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner.response_format" (func $Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner.response_format (param $this externref) (result externref)))
@@ -8276,9 +8288,9 @@
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages.functions" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages.set_functions" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages.tools" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages.set_tools" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages.set_tools (param $this externref) (param $value externref)))
   ;; response_format?: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages.response_format" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages.response_format (param $this externref) (result externref)))
@@ -8424,9 +8436,9 @@
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1.functions" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1.set_functions" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1.tools" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1.set_tools" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1.set_tools (param $this externref) (param $value externref)))
   ;; response_format?: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1.response_format" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1.response_format (param $this externref) (result externref)))
@@ -9074,9 +9086,9 @@
   (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages.functions" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages.set_functions" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages.tools" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages.set_tools" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages.set_tools (param $this externref) (param $value externref)))
   ;; response_format?: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1
   (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages.response_format" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages.response_format (param $this externref) (result externref)))
@@ -9222,9 +9234,9 @@
   (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1.functions" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1.set_functions" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1.tools" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1.set_tools" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1.set_tools (param $this externref) (param $value externref)))
   ;; response_format?: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3
   (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1.response_format" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1.response_format (param $this externref) (result externref)))
@@ -10214,7 +10226,7 @@
   (import "./bindings.wasm" "AIGatewayHeaders.set_cf_aig_metadata" (func $AIGatewayHeaders.set_cf_aig_metadata (param $this externref) (param $value externref)))
   ;; set cf-aig-metadata(value: string)
   (import "./bindings.wasm" "AIGatewayHeaders.set_cf_aig_metadata_with_str" (func $AIGatewayHeaders.set_cf_aig_metadata_with_str (param $this externref) (param $value externref)))
-  ;; cf-aig-custom-cost: object | object | string
+  ;; cf-aig-custom-cost: object | string
   (import "./bindings.wasm" "AIGatewayHeaders.cf_aig_custom_cost" (func $AIGatewayHeaders.cf_aig_custom_cost (param $this externref) (result externref)))
   ;; set cf-aig-custom-cost(value: object)
   (import "./bindings.wasm" "AIGatewayHeaders.set_cf_aig_custom_cost" (func $AIGatewayHeaders.set_cf_aig_custom_cost (param $this externref) (param $value externref)))
@@ -10638,7 +10650,7 @@
   (import "./bindings.wasm" "RequestInitCfPropertiesImage.origin_auth" (func $RequestInitCfPropertiesImage.origin_auth (param $this externref) (result externref)))
   ;; set origin-auth(value: "share-publicly")
   (import "./bindings.wasm" "RequestInitCfPropertiesImage.set_origin_auth" (func $RequestInitCfPropertiesImage.set_origin_auth (param $this externref) (param $value externref)))
-  ;; border?: object | object
+  ;; border?: object
   (import "./bindings.wasm" "RequestInitCfPropertiesImage.border" (func $RequestInitCfPropertiesImage.border (param $this externref) (result externref)))
   ;; set border(value: object)
   (import "./bindings.wasm" "RequestInitCfPropertiesImage.set_border" (func $RequestInitCfPropertiesImage.set_border (param $this externref) (param $value externref)))
@@ -11076,9 +11088,9 @@
   (import "./bindings.wasm" "D1Response.meta" (func $D1Response.meta (param $this externref) (result externref)))
   ;; set meta(value: D1Meta & Record<string, unknown>)
   (import "./bindings.wasm" "D1Response.set_meta" (func $D1Response.set_meta (param $this externref) (param $value externref)))
-  ;; error?: any
+  ;; error?: undefined
   (import "./bindings.wasm" "D1Response.error" (func $D1Response.error (param $this externref) (result externref)))
-  ;; set error(value: any)
+  ;; set error(value: undefined)
   (import "./bindings.wasm" "D1Response.set_error" (func $D1Response.set_error (param $this externref) (param $value externref)))
 
   ;; D1Result
@@ -11326,7 +11338,7 @@
   (import "./bindings.wasm" "ImageTransform.blur" (func $ImageTransform.blur (param $this externref) (result externref)))
   ;; set blur(value: number)
   (import "./bindings.wasm" "ImageTransform.set_blur" (func $ImageTransform.set_blur (param $this externref) (param $value f64)))
-  ;; border?: object | object
+  ;; border?: object
   (import "./bindings.wasm" "ImageTransform.border" (func $ImageTransform.border (param $this externref) (result externref)))
   ;; set border(value: object)
   (import "./bindings.wasm" "ImageTransform.set_border" (func $ImageTransform.set_border (param $this externref) (param $value externref)))
@@ -11710,8 +11722,16 @@
   ;; NodeStyleServer
   ;; listen(...args: unknown[]): this
   (import "cloudflare:node" "NodeStyleServer.listen" (func $cloudflare:node:NodeStyleServer.listen (param $this externref) (param $args (ref null $anyrefs)) (result externref)))
-  ;; address(): object
+  ;; address(): NodeStyleServerAddressReturn
   (import "cloudflare:node" "NodeStyleServer.address" (func $cloudflare:node:NodeStyleServer.address (param $this externref) (result externref)))
+
+  ;; NodeStyleServerAddressReturn
+  ;; {} as NodeStyleServerAddressReturn
+  (import "cloudflare:node" "NodeStyleServerAddressReturn.new" (func $cloudflare:node:NodeStyleServerAddressReturn.new (result externref)))
+  ;; port?: number | null
+  (import "cloudflare:node" "NodeStyleServerAddressReturn.port" (func $cloudflare:node:NodeStyleServerAddressReturn.port (param $this externref) (result externref)))
+  ;; set port(value: number | null | undefined)
+  (import "cloudflare:node" "NodeStyleServerAddressReturn.set_port" (func $cloudflare:node:NodeStyleServerAddressReturn.set_port (param $this externref) (param $value externref)))
 
   ;; httpServerHandler(port: number): ExportedHandler
   (import "cloudflare:node" "httpServerHandler" (func $cloudflare:node:httpServerHandler (param $port f64) (result externref)))

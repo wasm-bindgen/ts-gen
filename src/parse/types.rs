@@ -71,7 +71,8 @@ pub(crate) fn convert_ts_type_with_arena(
         TSType::TSAnyKeyword(_) => TypeRef::Any,
         TSType::TSBooleanKeyword(_) => TypeRef::Boolean,
         TSType::TSBigIntKeyword(_) => TypeRef::BigInt,
-        TSType::TSNeverKeyword(_) => TypeRef::Any, // erase `never` to `any`
+        // A `never`-typed slot can only ever read back `undefined` (`value?: never`).
+        TSType::TSNeverKeyword(_) => TypeRef::Undefined,
         TSType::TSNullKeyword(_) => TypeRef::Null,
         TSType::TSNumberKeyword(_) => TypeRef::Number,
         TSType::TSObjectKeyword(_) => TypeRef::Object,
@@ -498,6 +499,10 @@ pub(crate) fn simplify_union(types: Vec<TypeRef>) -> TypeRef {
                 *n = n.union(m);
                 sort(*inner, n, rest);
             }
+            // Members that lowered to the same `TypeRef` (two inline
+            // object literals are both `Object`) are one member; a
+            // duplicate dynamic-union variant could never be dispatched.
+            other if rest.contains(&other) => {}
             other => rest.push(other),
         }
     }

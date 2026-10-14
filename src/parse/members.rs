@@ -346,6 +346,21 @@ fn unique_type_name(parent: &str, member: &str, used: &mut LocalScope) -> String
     )
 }
 
+/// Hoist a method's inline `{ … }` return type (or union of such) the
+/// way parameters are hoisted, named `<Parent><Member>Return` to match
+/// the `Return` anchor of synthesized return enums.
+fn convert_return_type_with_synthesis(
+    ts_type: &TSType<'_>,
+    parent_name: &str,
+    member_name: &str,
+    scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
+) -> TypeRef {
+    let segment = format!("{member_name}Return");
+    try_synthesize_inline_param(ts_type, parent_name, &segment, scope, ctx)
+        .unwrap_or_else(|| convert_ts_type_scoped(ts_type, scope, ctx))
+}
+
 /// An inline type that promotes to a named declaration. Detected
 /// syntactically by [`inline_shape`]; both the parameter and the
 /// type-alias hoists go through [`synthesize_inline`] with it.
@@ -621,8 +636,58 @@ fn try_synthesize_inline_param(
         ctx.used_type_names.release(&synth_name);
         return None;
     };
-    ctx.synth.push(synth.iface);
-    Some(TypeRef::ident(synth_name))
+    let mut iface = synth.iface;
+
+    // Enclosing type parameters the literal mentions (`value: T` inside
+    // a method of `Cursor<T>`) become the hoisted interface's own, so
+    // its getters and builder bind them and the reference instantiates
+    // them: `CursorNextReturn<T>`.
+    let mut tp_names = Vec::new();
+    for member in &iface.members {
+        for ty in member_type_refs(member) {
+            collect_in_scope_type_params(ty, scope, ctx.scopes, &mut tp_names);
+        }
+    }
+    for name in &tp_names {
+        ctx.scopes.insert_type_param(iface.body_scope, name.clone());
+    }
+    iface.type_params = tp_names
+        .iter()
+        .map(|name| TypeParam {
+            name: name.clone(),
+            constraint: None,
+            default: None,
+        })
+        .collect();
+    let reference = TypeRef::Reference {
+        segments: vec![iface.name.clone()],
+        generic_args: tp_names.into_iter().map(TypeRef::ident).collect(),
+    };
+    ctx.synth.push(iface);
+    Some(reference)
+}
+
+fn member_type_refs(member: &Member) -> Vec<&TypeRef> {
+    match member {
+        Member::Getter(g) => vec![&g.type_ref],
+        Member::Setter(s) => vec![&s.type_ref],
+        Member::StaticGetter(g) => vec![&g.type_ref],
+        Member::StaticSetter(s) => vec![&s.type_ref],
+        Member::Method(m) => m
+            .params
+            .iter()
+            .map(|p| &p.type_ref)
+            .chain(std::iter::once(&m.return_type))
+            .collect(),
+        Member::StaticMethod(m) => m
+            .params
+            .iter()
+            .map(|p| &p.type_ref)
+            .chain(std::iter::once(&m.return_type))
+            .collect(),
+        Member::Constructor(c) => c.params.iter().map(|p| &p.type_ref).collect(),
+        Member::IndexSignature(i) => vec![&i.value_type],
+    }
 }
 
 /// Return true when every entry in a union is a type literal — the
@@ -786,11 +851,13 @@ fn convert_method_signature(
     apply_slice_hints(&mut params, &info, &js_name, ctx.diag);
     let slice_mode = slice_hint(info.slice_mode.as_deref(), &js_name, ctx.diag)
         .or_else(|| params.first().and_then(|p| p.slice_mode));
-    let mut return_type = method
-        .return_type
-        .as_ref()
-        .map(|rt| convert_ts_type_scoped(&rt.type_annotation, body_scope, ctx))
-        .unwrap_or(TypeRef::Void);
+    let mut return_type = match (&method.return_type, parent) {
+        (Some(rt), Some(p)) if method.kind == TSMethodSignatureKind::Method => {
+            convert_return_type_with_synthesis(&rt.type_annotation, p, &js_name, body_scope, ctx)
+        }
+        (Some(rt), _) => convert_ts_type_scoped(&rt.type_annotation, body_scope, ctx),
+        (None, _) => TypeRef::Void,
+    };
 
     // Hoist top-level `Iterable<T>` / `AsyncIterable<T>` returns into
     // synthesized wrapper interfaces with a `[Symbol.iterator]` method.
@@ -900,11 +967,13 @@ fn convert_class_method(
     apply_slice_hints(&mut params, &info, &js_name, ctx.diag);
     let slice_mode = slice_hint(info.slice_mode.as_deref(), &js_name, ctx.diag)
         .or_else(|| params.first().and_then(|p| p.slice_mode));
-    let mut return_type = func
-        .return_type
-        .as_ref()
-        .map(|rt| convert_ts_type_scoped(&rt.type_annotation, body_scope, ctx))
-        .unwrap_or(TypeRef::Void);
+    let mut return_type = match (&func.return_type, parent) {
+        (Some(rt), Some(p)) if method.kind == MethodDefinitionKind::Method => {
+            convert_return_type_with_synthesis(&rt.type_annotation, p, &js_name, body_scope, ctx)
+        }
+        (Some(rt), _) => convert_ts_type_scoped(&rt.type_annotation, body_scope, ctx),
+        (None, _) => TypeRef::Void,
+    };
 
     // Same iterable hoisting as `convert_method_signature`. Skip for
     // constructors — they don't have a meaningful return type.
