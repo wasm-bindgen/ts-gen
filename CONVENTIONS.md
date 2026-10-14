@@ -1764,6 +1764,10 @@ yet supported.
 * `export { Local as Public };` (sourceless) → recorded in
   `TypeRegistry::export_renames`. The local declaration is published
   under the public name, and any redundant alias stub is suppressed.
+  For a function or constructor variable the public name is also the
+  binding's `js_name`, since it is the only name the module exports:
+  `function _connect(...); export { _connect as connect };` emits
+  `pub fn connect(...)` bound to the JS export `connect`.
 * `export { X as Y } from "...";` (with source) → registered as an import
   from the named module.
 

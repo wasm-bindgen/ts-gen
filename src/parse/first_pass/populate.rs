@@ -226,7 +226,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                             .is_some_and(|renamed| renamed == &exported_name)
                         && matches!(
                             self.registry.types.get(&local).map(|info| &info.kind),
-                            Some(ir::RegisteredKind::Variable)
+                            Some(ir::RegisteredKind::Variable | ir::RegisteredKind::Function)
                         )
                     {
                         continue;
@@ -570,7 +570,14 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         declarations: &mut Vec<ir::TypeDeclaration>,
     ) {
         let (doc, throws) = self.lookup_callable_doc(dcx.export_span_start, func.span.start);
-        if let Some(d) = convert_function_decl(func, throws, dcx.scope, &mut self.parse_ctx()) {
+        if let Some(mut d) = convert_function_decl(func, throws, dcx.scope, &mut self.parse_ctx()) {
+            // `export { _connect as connect }` publishes the function under the
+            // public name; that is the name JS consumers import, so it is the
+            // binding's js_name, not an alias over the local one.
+            if let Some(public) = self.registry.export_renames.get(&d.js_name) {
+                d.name = to_snake_case(public);
+                d.js_name = public.clone();
+            }
             declarations.push(dcx.decl(ir::TypeKind::Function(d), doc));
         }
     }

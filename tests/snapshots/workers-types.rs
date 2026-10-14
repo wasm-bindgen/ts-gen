@@ -36607,32 +36607,31 @@ extern "C" {
 }
 #[wasm_bindgen(module = "cloudflare:sockets")]
 extern "C" {
-    #[wasm_bindgen(js_name = "_connect")]
     pub fn connect(address: &str) -> Socket;
 }
 #[wasm_bindgen(module = "cloudflare:sockets")]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "_connect")]
+    #[wasm_bindgen(catch, js_name = "connect")]
     pub fn try_connect(address: &str) -> Result<Socket, JsValue>;
 }
 #[wasm_bindgen(module = "cloudflare:sockets")]
 extern "C" {
-    #[wasm_bindgen(js_name = "_connect")]
+    #[wasm_bindgen(js_name = "connect")]
     pub fn connect_with_socket_address(address: &SocketAddress) -> Socket;
 }
 #[wasm_bindgen(module = "cloudflare:sockets")]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "_connect")]
+    #[wasm_bindgen(catch, js_name = "connect")]
     pub fn try_connect_with_socket_address(address: &SocketAddress) -> Result<Socket, JsValue>;
 }
 #[wasm_bindgen(module = "cloudflare:sockets")]
 extern "C" {
-    #[wasm_bindgen(js_name = "_connect")]
+    #[wasm_bindgen(js_name = "connect")]
     pub fn connect_with_str_and_options(address: &str, options: &SocketOptions) -> Socket;
 }
 #[wasm_bindgen(module = "cloudflare:sockets")]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "_connect")]
+    #[wasm_bindgen(catch, js_name = "connect")]
     pub fn try_connect_with_str_and_options(
         address: &str,
         options: &SocketOptions,
@@ -36640,7 +36639,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "cloudflare:sockets")]
 extern "C" {
-    #[wasm_bindgen(js_name = "_connect")]
+    #[wasm_bindgen(js_name = "connect")]
     pub fn connect_with_socket_address_and_options(
         address: &SocketAddress,
         options: &SocketOptions,
@@ -36648,7 +36647,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "cloudflare:sockets")]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "_connect")]
+    #[wasm_bindgen(catch, js_name = "connect")]
     pub fn try_connect_with_socket_address_and_options(
         address: &SocketAddress,
         options: &SocketOptions,
