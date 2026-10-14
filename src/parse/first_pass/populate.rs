@@ -44,9 +44,21 @@ struct PopulateCtx<'a, 'docs> {
     scopes: &'a mut ScopeArena,
     diag: &'a mut DiagnosticCollector,
     docs: &'a DocComments<'docs>,
+    file_scope: ScopeId,
 }
 
 impl<'a, 'docs> PopulateCtx<'a, 'docs> {
+    /// Public names an `export { local as public }` in `scope` gives the
+    /// binding `local` declares there; empty when it is not renamed.
+    fn export_names(&self, scope: ScopeId, local: &str) -> &'a [String] {
+        let registry = self.registry;
+        self.scopes
+            .get(scope)
+            .get(local)
+            .and_then(|type_id| registry.export_names.get(&type_id))
+            .map_or(&[], Vec::as_slice)
+    }
+
     /// Build a fresh `ParseCtx` reborrowing this struct's mutable
     /// fields. Use within a method to thread through to converters.
     fn parse_ctx<'b>(&'b mut self) -> ParseCtx<'b, 'docs> {
@@ -104,6 +116,7 @@ pub fn populate_declarations<'a, 'docs>(
         scopes,
         diag,
         docs,
+        file_scope: scope,
     };
 
     for stmt in &program.body {
@@ -117,6 +130,18 @@ pub fn populate_declarations<'a, 'docs>(
     }
 
     declarations
+}
+
+/// `(rust_name, js_name)` for each name a value binding is imported by: its
+/// own name, or else every public name its module exports it under.
+fn value_bindings(local: &str, public_names: &[String]) -> Vec<(String, String)> {
+    if public_names.is_empty() {
+        return vec![(to_snake_case(local), local.to_string())];
+    }
+    public_names
+        .iter()
+        .map(|public| (to_snake_case(public), public.clone()))
+        .collect()
 }
 
 /// Per-declaration context passed to `populate_declaration`.
@@ -186,7 +211,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                         s,
                         &ir::ModuleContext::Global,
                         declarations,
-                        scope,
+                        self.file_scope,
                         true,
                     );
                 }
@@ -214,20 +239,16 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                     if exported_name == local && export.source.is_none() {
                         continue;
                     }
-                    // If `local` was promoted from a constructor-shaped variable to a
-                    // class published under `exported_name` (recorded in phase 1's
-                    // `export_renames`), the class itself already carries the public
-                    // name — emitting an alias here would be self-referential.
+                    // Functions and variables are emitted under each public name
+                    // directly, so an alias stub would only shadow them.
                     if export.source.is_none()
-                        && self
-                            .registry
-                            .export_renames
-                            .get(&local)
-                            .is_some_and(|renamed| renamed == &exported_name)
-                        && matches!(
-                            self.registry.types.get(&local).map(|info| &info.kind),
-                            Some(ir::RegisteredKind::Variable | ir::RegisteredKind::Function)
-                        )
+                        && self.export_names(scope, &local).contains(&exported_name)
+                        && self.scopes.get(scope).get(&local).is_some_and(|type_id| {
+                            matches!(
+                                self.type_arena[type_id.index()].kind,
+                                ir::TypeKind::Function(_) | ir::TypeKind::Variable(_)
+                            )
+                        })
                     {
                         continue;
                     }
@@ -365,7 +386,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                         s,
                         &ir::ModuleContext::Global,
                         declarations,
-                        scope,
+                        self.file_scope,
                         true,
                     );
                 }
@@ -386,7 +407,12 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         let module_context = dcx.module_context.clone();
         let scope = dcx.scope;
         let class_decl = convert_class_decl(class, &module_context, scope, &mut self.parse_ctx());
-        if let Some(d) = class_decl {
+        if let Some(mut d) = class_decl {
+            // The local name stays the Rust type name since the module refers
+            // to the class by it; the public names reach Rust as alias stubs.
+            if let Some(public) = self.export_names(scope, &d.name).first() {
+                d.js_name = public.clone();
+            }
             declarations.push(dcx.decl(ir::TypeKind::Class(d), doc));
             declarations.extend(self.drain_synth(&module_context, scope));
         }
@@ -570,15 +596,16 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         declarations: &mut Vec<ir::TypeDeclaration>,
     ) {
         let (doc, throws) = self.lookup_callable_doc(dcx.export_span_start, func.span.start);
-        if let Some(mut d) = convert_function_decl(func, throws, dcx.scope, &mut self.parse_ctx()) {
-            // `export { _connect as connect }` publishes the function under the
-            // public name; that is the name JS consumers import, so it is the
-            // binding's js_name, not an alias over the local one.
-            if let Some(public) = self.registry.export_renames.get(&d.js_name) {
-                d.name = to_snake_case(public);
-                d.js_name = public.clone();
+        if let Some(d) = convert_function_decl(func, throws, dcx.scope, &mut self.parse_ctx()) {
+            let names = self.export_names(dcx.scope, &d.js_name);
+            for (name, js_name) in value_bindings(&d.js_name, names) {
+                let d = ir::FunctionDecl {
+                    name,
+                    js_name,
+                    ..d.clone()
+                };
+                declarations.push(dcx.decl(ir::TypeKind::Function(d), doc.clone()));
             }
-            declarations.push(dcx.decl(ir::TypeKind::Function(d), doc));
         }
     }
 
@@ -618,23 +645,19 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                             }
                             members.extend(static_members);
 
-                            // Resolve the public-facing class name. For module-scoped
-                            // constructor vars, prefer the export rename (the JS name
-                            // consumers see) when one was recorded in phase 1.
-                            let public_name = self
-                                .registry
-                                .export_renames
-                                .get(&name)
-                                .cloned()
-                                .unwrap_or_else(|| name.clone());
+                            // The variable is a value, not a type, so nothing refers
+                            // to the class by its local name: the class takes its
+                            // first public name and further ones alias it.
+                            let mut public_names = self.export_names(dcx.scope, &name).iter();
+                            let class_name = public_names.next().unwrap_or(&name).clone();
 
                             // Var-promoted classes have no surface
                             // type parameters; body scope = enclosing.
                             let body_scope = dcx.scope;
                             declarations.push(dcx.decl(
                                 ir::TypeKind::Class(ir::ClassDecl {
-                                    name: public_name.clone(),
-                                    js_name: public_name,
+                                    name: class_name.clone(),
+                                    js_name: class_name.clone(),
                                     type_params: vec![],
                                     extends: None,
                                     implements: vec![],
@@ -645,6 +668,18 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                                 }),
                                 doc.clone(),
                             ));
+                            for alias in public_names {
+                                declarations.push(dcx.decl(
+                                    ir::TypeKind::TypeAlias(ir::TypeAliasDecl {
+                                        name: alias.clone(),
+                                        type_params: vec![],
+                                        target: ir::TypeRef::ident(class_name.clone()),
+                                        from_module: None,
+                                        body_scope,
+                                    }),
+                                    None,
+                                ));
+                            }
                             continue;
                         }
                     }
@@ -662,36 +697,40 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                     })
                     .unwrap_or(ir::TypeRef::Any);
 
+                let bindings = value_bindings(&name, self.export_names(dcx.scope, &name));
                 if let ir::TypeRef::Function(sig) = type_ref {
-                    // Var-as-function bindings have no surface type
-                    // parameters; their body scope is the enclosing.
-                    let body_scope = dcx.scope;
-                    declarations.push(dcx.decl(
-                        ir::TypeKind::Function(ir::FunctionDecl {
-                            name: to_snake_case(&name),
-                            js_name: name,
-                            type_params: vec![],
-                            params: sig.params,
-                            return_type: *sig.return_type,
-                            overloads: vec![],
-                            // Variable-as-function form (`var foo: () => T`) doesn't
-                            // typically carry @throws JSDoc; leave empty.
-                            throws: ir::Throws::None,
-                            body_scope,
-                        }),
-                        doc.clone(),
-                    ));
+                    for (name, js_name) in bindings {
+                        declarations.push(dcx.decl(
+                            ir::TypeKind::Function(ir::FunctionDecl {
+                                name,
+                                js_name,
+                                type_params: vec![],
+                                params: sig.params.clone(),
+                                return_type: (*sig.return_type).clone(),
+                                overloads: vec![],
+                                // Variable-as-function form (`var foo: () => T`) doesn't
+                                // typically carry @throws JSDoc; leave empty.
+                                throws: ir::Throws::None,
+                                // Var-as-function bindings have no surface type
+                                // parameters; their body scope is the enclosing.
+                                body_scope: dcx.scope,
+                            }),
+                            doc.clone(),
+                        ));
+                    }
                 } else {
                     let is_const = matches!(var_decl.kind, ast::VariableDeclarationKind::Const);
-                    declarations.push(dcx.decl(
-                        ir::TypeKind::Variable(ir::VariableDecl {
-                            name: to_snake_case(&name),
-                            js_name: name,
-                            type_ref,
-                            is_const,
-                        }),
-                        doc.clone(),
-                    ));
+                    for (name, js_name) in bindings {
+                        declarations.push(dcx.decl(
+                            ir::TypeKind::Variable(ir::VariableDecl {
+                                name,
+                                js_name,
+                                type_ref: type_ref.clone(),
+                                is_const,
+                            }),
+                            doc.clone(),
+                        ));
+                    }
                 }
             }
         }
@@ -709,9 +748,16 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         match &module.id {
             ast::TSModuleDeclarationName::StringLiteral(s) => {
                 let module_ctx = ir::ModuleContext::Module(s.value.as_str().into());
+                let module_scope = self.registry.module_scopes[s.value.as_str()];
                 if let Some(ast::TSModuleDeclarationBody::TSModuleBlock(block)) = &module.body {
                     for stmt in &block.body {
-                        self.populate_statement(stmt, &module_ctx, declarations, scope, false);
+                        self.populate_statement(
+                            stmt,
+                            &module_ctx,
+                            declarations,
+                            module_scope,
+                            false,
+                        );
                     }
                 }
             }

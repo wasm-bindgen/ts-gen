@@ -809,8 +809,8 @@ References from elsewhere use the bare `EmailMessage` ident. See
 nesting](#module-declarations-and-namespace-nesting) for the
 `--export` / `--external` knobs.
 
-The `export { _EmailMessage as EmailMessage }` rename is captured in the
-`TypeRegistry::export_renames` map and applied to the public name.
+The `export { _EmailMessage as EmailMessage }` rename gives the class its
+public name; see [Type aliases and `export { X as Y }`](#type-aliases-and-export--x-as-y-).
 
 ## Signature flattening
 
@@ -1660,7 +1660,10 @@ decl's source file is in `--export`, otherwise skip.
 Qualification keys off the *resolved* declaration's `module_context`,
 not the textual name, so a global `interface Foo` and a module-scoped
 `class Foo` resolve independently — scope-chain resolution at the use
-site picks the visible one.
+site picks the visible one. Each module body is a child scope of its
+file, as in TypeScript: its declarations see the file's globals, but
+are not visible to the file or to other modules, and repeated
+`declare module "<spec>"` blocks in one file share a scope.
 
 ### Output surface: `--export` and `--input`
 
@@ -1761,13 +1764,25 @@ yet supported.
 
 * `type Foo = Bar;` → `pub type Foo = Bar;` if `Bar` is a recognised
   type, or chases the alias chain to its terminal during codegen.
-* `export { Local as Public };` (sourceless) → recorded in
-  `TypeRegistry::export_renames`. The local declaration is published
-  under the public name, and any redundant alias stub is suppressed.
-  For a function or constructor variable the public name is also the
-  binding's `js_name`, since it is the only name the module exports:
-  `function _connect(...); export { _connect as connect };` emits
-  `pub fn connect(...)` bound to the JS export `connect`.
+* `export { Local as Public };` (sourceless) → names the binding `Local`
+  declares in the exporting scope, recorded against its `TypeId` in
+  `TypeRegistry::export_names`. Each `declare module "x"` body is its own
+  scope, so the same local name in another module or at global scope is a
+  different binding and keeps its own name. The public names are what the
+  module exports, so value bindings import by them:
+  * Functions and variables are emitted once per public name, with no
+    alias stub: `function _connect(...); export { _connect as connect };`
+    emits `pub fn connect(...)` bound to the JS export `connect`.
+  * A constructor variable's class takes the first public name; any
+    further names alias it.
+  * A class keeps its local name as the Rust type, since the module refers
+    to it by that name, but binds `js_name` to the first public name. Each
+    public name gets an alias stub (`pub type Server = _Server;`).
+  * Types without a runtime binding (interfaces, type aliases, enums) get
+    an alias stub only.
+
+  A `Local` declared outside the exporting scope is left alone and only
+  aliased.
 * `export { X as Y } from "...";` (with source) → registered as an import
   from the named module.
 

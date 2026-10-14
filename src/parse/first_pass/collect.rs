@@ -18,6 +18,11 @@ struct CollectCtx<'a> {
     registry: &'a mut ir::TypeRegistry,
     gctx: &'a mut crate::context::GlobalContext,
     diag: &'a mut DiagnosticCollector,
+    file_scope: ScopeId,
+    /// `(scope, local, public)` for each source-less export specifier.
+    /// Resolved once the whole file is collected, since a specifier may
+    /// precede the declaration it names.
+    export_specifiers: Vec<(ScopeId, String, String)>,
 }
 
 /// Walk the AST and collect all type names into the registry and scope arena.
@@ -34,10 +39,24 @@ pub fn collect_type_names(
         registry: &mut registry,
         gctx,
         diag,
+        file_scope: root_scope,
+        export_specifiers: Vec::new(),
     };
 
     for stmt in &program.body {
         ccx.collect_statement(stmt, &ir::ModuleContext::Global, root_scope, false);
+    }
+
+    for (scope, local, public) in std::mem::take(&mut ccx.export_specifiers) {
+        // Only a binding declared directly in the exporting scope takes the
+        // public name; an outer one is re-exported through an alias stub.
+        if let Some(type_id) = ccx.gctx.scopes.get(scope).get(&local) {
+            ccx.registry
+                .export_names
+                .entry(type_id)
+                .or_default()
+                .push(public);
+        }
     }
 
     registry
@@ -89,7 +108,7 @@ impl<'a> CollectCtx<'a> {
             }
             ast::Statement::TSGlobalDeclaration(global) => {
                 for s in &global.body.body {
-                    self.collect_statement(s, &ir::ModuleContext::Global, scope, true);
+                    self.collect_statement(s, &ir::ModuleContext::Global, self.file_scope, true);
                 }
             }
 
@@ -114,15 +133,11 @@ impl<'a> CollectCtx<'a> {
                         self.register_import(&exported_name, &imported, &source, scope);
                     }
                 } else {
-                    // `export { local as exported }` without a source — record the
-                    // local→export rename so populate can use the public name when
-                    // emitting the local declaration (e.g. promoting a constructor
-                    // variable to a class). Skip identity renames.
                     for spec in &export.specifiers {
                         let exported_name = spec.exported.name().to_string();
                         let local = spec.local.name().to_string();
                         if exported_name != local {
-                            self.registry.export_renames.insert(local, exported_name);
+                            self.export_specifiers.push((scope, local, exported_name));
                         }
                     }
                 }
@@ -246,7 +261,7 @@ impl<'a> CollectCtx<'a> {
             }
             ast::Declaration::TSGlobalDeclaration(global) => {
                 for s in &global.body.body {
-                    self.collect_statement(s, &ir::ModuleContext::Global, scope, true);
+                    self.collect_statement(s, &ir::ModuleContext::Global, self.file_scope, true);
                 }
             }
             ast::Declaration::TSImportEqualsDeclaration(_) => {}
@@ -320,9 +335,14 @@ impl<'a> CollectCtx<'a> {
         match &module.id {
             ast::TSModuleDeclarationName::StringLiteral(s) => {
                 let module_ctx = ir::ModuleContext::Module(s.value.as_str().into());
+                let module_scope = *self
+                    .registry
+                    .module_scopes
+                    .entry(s.value.to_string())
+                    .or_insert_with(|| self.gctx.scopes.create_child(scope));
                 if let Some(ast::TSModuleDeclarationBody::TSModuleBlock(block)) = &module.body {
                     for stmt in &block.body {
-                        self.collect_statement(stmt, &module_ctx, scope, false);
+                        self.collect_statement(stmt, &module_ctx, module_scope, false);
                     }
                 }
             }

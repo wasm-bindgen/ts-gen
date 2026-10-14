@@ -61,6 +61,9 @@ pub struct GlobalContext {
     /// emission; treating them as "unresolved" would alias them to
     /// `JsValue` even though `js_sys` already provides them.
     pub builtin_type_ids: std::collections::HashSet<TypeId>,
+    /// Body scopes of every `declare module "x"`, by specifier, one per
+    /// declaring file.
+    pub ambient_module_scopes: std::collections::HashMap<String, Vec<ScopeId>>,
     types: Vec<TypeDeclaration>,
     modules: Vec<ParsedModule>,
     /// Map from module specifier to ModuleId for fast lookup.
@@ -75,6 +78,7 @@ impl GlobalContext {
             external_map: ExternalMap::new(),
             pending_imports: Vec::new(),
             builtin_type_ids: std::collections::HashSet::new(),
+            ambient_module_scopes: std::collections::HashMap::new(),
             types: Vec::new(),
             modules: Vec::new(),
             module_index: std::collections::HashMap::new(),

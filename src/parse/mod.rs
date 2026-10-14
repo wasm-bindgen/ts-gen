@@ -141,6 +141,12 @@ fn parse_single_file(
     let mut diag = std::mem::take(&mut gctx.diagnostics);
     let registry = first_pass::collect_type_names(program, lib_name, &mut diag, gctx, file_scope);
     gctx.diagnostics = diag;
+    for (specifier, &scope) in &registry.module_scopes {
+        gctx.ambient_module_scopes
+            .entry(specifier.clone())
+            .or_default()
+            .push(scope);
+    }
 
     gctx.info(format!(
         "Collected {} type names from {}",
@@ -203,14 +209,16 @@ fn parse_single_file(
                 decl.exported = true;
             }
             let name = declaration_name(&decl.kind);
+            let decl_scope = decl.scope_id;
             let type_id = gctx.insert_type(decl);
             // Insert/upgrade the type in the scope so codegen can resolve it.
             if let Some(ref name) = name {
-                gctx.scopes.insert(file_scope, name.clone(), type_id);
+                gctx.scopes.insert(decl_scope, name.clone(), type_id);
             }
             // Script files: hoist global declarations to the builtin scope
             // so they're visible across all files (TypeScript "script" semantics).
-            if is_script {
+            // Ambient module bodies stay private to their module scope.
+            if is_script && decl_scope == file_scope {
                 if let Some(parent) = gctx.scopes.get(file_scope).parent {
                     if let Some(name) = name {
                         gctx.scopes.insert(parent, name, type_id);
@@ -896,6 +904,54 @@ mod tests {
             panic!("expected merged class");
         };
         assert_eq!(c.members.len(), 2);
+    }
+
+    #[test]
+    fn test_ambient_module_scope_and_export_names() {
+        let src = r#"
+            declare function _open(): void;
+            declare module "a" {
+                interface Private {}
+                function _open(): void;
+                export { _open as open, _open as start };
+            }
+            declare module "b" {
+                export function _open(): void;
+            }
+        "#;
+        let (module, gctx) = crate::parse_source(src, None).unwrap();
+
+        let mut bindings: Vec<(String, String)> = module
+            .types
+            .iter()
+            .filter_map(|&id| {
+                let decl = gctx.get_type(id);
+                let TypeKind::Function(f) = &decl.kind else {
+                    return None;
+                };
+                let ctx = match &decl.module_context {
+                    ModuleContext::Global => "global".to_string(),
+                    ModuleContext::Module(m) => m.to_string(),
+                };
+                Some((ctx, f.js_name.clone()))
+            })
+            .collect();
+        bindings.sort();
+        let expected = [
+            ("a", "open"),
+            ("a", "start"),
+            ("b", "_open"),
+            ("global", "_open"),
+        ];
+        assert_eq!(
+            bindings,
+            expected.map(|(m, n)| (m.to_string(), n.to_string()))
+        );
+
+        let file_scope = module.file_scopes[0];
+        let a_scope = gctx.ambient_module_scopes["a"][0];
+        assert!(gctx.scopes.resolve(a_scope, "Private").is_some());
+        assert!(gctx.scopes.resolve(file_scope, "Private").is_none());
     }
 
     #[test]

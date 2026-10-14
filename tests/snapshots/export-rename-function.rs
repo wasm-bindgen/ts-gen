@@ -13,6 +13,73 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "connect")]
     pub fn try_connect(address: &str) -> Result<Socket, JsValue>;
 }
+#[wasm_bindgen(module = "node:thing")]
+extern "C" {
+    pub fn serve(port: f64);
+}
+#[wasm_bindgen(module = "node:thing")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "serve")]
+    pub fn try_serve(port: f64) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "node:thing")]
+extern "C" {
+    #[wasm_bindgen(js_name = "listenOn")]
+    pub fn listen_on(port: f64);
+}
+#[wasm_bindgen(module = "node:thing")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "listenOn")]
+    pub fn try_listen_on(port: f64) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "node:thing")]
+extern "C" {
+    pub fn shutdown();
+}
+#[wasm_bindgen(module = "node:thing")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "shutdown")]
+    pub fn try_shutdown() -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "node:thing")]
+extern "C" {
+    #[wasm_bindgen(thread_local_v2)]
+    pub static version: String;
+}
+#[wasm_bindgen(module = "node:thing")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , js_name = "Server")]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type _Server;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new(port: f64) -> Result<_Server, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn stop(this: &_Server);
+    #[wasm_bindgen(method, catch, js_name = "stop")]
+    pub fn try_stop(this: &_Server) -> Result<(), JsValue>;
+}
+#[allow(dead_code)]
+pub type Server = _Server;
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "_listen")]
+    pub fn listen(host: &str);
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "_listen")]
+    pub fn try_listen(host: &str) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "node:other")]
+extern "C" {
+    #[wasm_bindgen(js_name = "_close")]
+    pub fn close() -> bool;
+}
+#[wasm_bindgen(module = "node:other")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "_close")]
+    pub fn try_close() -> Result<bool, JsValue>;
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]

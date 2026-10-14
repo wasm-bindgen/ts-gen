@@ -1157,14 +1157,23 @@ fn emit_type_name(
     ctx: &CodegenContext<'_>,
     from_module: &ModuleContext,
 ) -> TokenStream {
-    // Resolve through scope
-    let resolved = ctx.file_scopes.iter().find_map(|&scope| {
-        if name.contains('.') {
-            ctx.gctx.resolve_path(scope, name)
-        } else {
-            ctx.gctx.scopes.resolve(scope, name)
-        }
-    });
+    // A use site inside an ambient module also sees that module's private
+    // declarations, which live in its body scopes rather than a file scope.
+    let module_scopes = match from_module {
+        ModuleContext::Module(m) => ctx.gctx.ambient_module_scopes.get(m.as_ref()),
+        ModuleContext::Global => None,
+    };
+    let resolved = module_scopes
+        .into_iter()
+        .flatten()
+        .chain(&ctx.file_scopes)
+        .find_map(|&scope| {
+            if name.contains('.') {
+                ctx.gctx.resolve_path(scope, name)
+            } else {
+                ctx.gctx.scopes.resolve(scope, name)
+            }
+        });
 
     // Canonical ident name (last segment for dotted paths)
     let ident_name = name.rsplit('.').next().unwrap_or(name);

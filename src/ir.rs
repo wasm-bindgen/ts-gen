@@ -746,12 +746,14 @@ pub struct StaticMethodMember {
 
 pub struct TypeRegistry {
     pub types: HashMap<String, TypeInfo>,
-    /// Local-name → public export name for `export { local as exported }` forms
-    /// (the source-less rename pattern, e.g. `export { _EmailMessage as EmailMessage }`).
-    ///
-    /// Phase 2 consults this to give renamed declarations their public-facing
-    /// type name and to suppress redundant alias emission.
-    pub export_renames: HashMap<String, String>,
+    /// Body scope of each `declare module "x"` in the file. Repeated blocks
+    /// for one specifier share a scope, as TypeScript merges them.
+    pub module_scopes: HashMap<String, crate::parse::scope::ScopeId>,
+    /// Public names given by source-less `export { local as public }`,
+    /// keyed by the Phase 1 `TypeId` that `local` binds directly in the
+    /// exporting scope. A same-named declaration in any other scope is a
+    /// different binding and keeps its own name.
+    pub export_names: HashMap<crate::context::TypeId, Vec<String>>,
 }
 
 #[derive(Clone, Debug)]
