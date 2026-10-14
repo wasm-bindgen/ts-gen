@@ -1251,7 +1251,7 @@ pub(crate) fn merge_members(base: &mut Vec<crate::ir::Member>, incoming: Vec<cra
 /// Getters and setters for the same JS property name get distinct keys,
 /// since they are independent bindings that should not overwrite each other.
 #[derive(Debug, PartialEq, Eq, Hash)]
-enum MemberKey {
+pub(crate) enum MemberKey {
     Constructor,
     StaticMethod(String),
     StaticGetter(String),
@@ -1261,7 +1261,7 @@ enum MemberKey {
     ProtoSetter(String),
 }
 
-fn member_key(member: &crate::ir::Member) -> MemberKey {
+pub(crate) fn member_key(member: &crate::ir::Member) -> MemberKey {
     match member {
         crate::ir::Member::Constructor(_) => MemberKey::Constructor,
         crate::ir::Member::StaticMethod(m) => MemberKey::StaticMethod(m.name.clone()),

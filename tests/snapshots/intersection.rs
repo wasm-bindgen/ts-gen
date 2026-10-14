@@ -108,8 +108,9 @@ extern "C" {
     pub fn set_extra(this: &Derived, val: &str);
 }
 impl Derived {
-    pub fn new(extra: &str) -> Derived {
+    pub fn new(id: &str, extra: &str) -> Derived {
         let inner: Derived = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_id(id);
         inner.set_extra(extra);
         inner
     }
@@ -210,9 +211,24 @@ extern "C" {
 }
 impl StoreOptions {
     pub fn new(only_if: &Conditional) -> StoreOptions {
+        Self::builder(only_if).build()
+    }
+    pub fn builder(only_if: &Conditional) -> StoreOptionsBuilder {
         let inner: StoreOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_only_if(only_if);
-        inner
+        StoreOptionsBuilder { inner }
+    }
+}
+pub struct StoreOptionsBuilder {
+    inner: StoreOptions,
+}
+impl StoreOptionsBuilder {
+    pub fn range(self, val: &str) -> Self {
+        self.inner.set_range(val);
+        self
+    }
+    pub fn build(self) -> StoreOptions {
+        self.inner
     }
 }
 #[wasm_bindgen(module = "intersection")]
@@ -244,6 +260,19 @@ extern "C" {
     # [wasm_bindgen (extends = Derived , extends = Unrelated , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Both;
+    #[wasm_bindgen(method, getter)]
+    pub fn other(this: &Both) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_other(this: &Both, val: &str);
+}
+impl Both {
+    pub fn new(id: &str, extra: &str, other: &str) -> Both {
+        let inner: Both = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_id(id);
+        inner.set_extra(extra);
+        inner.set_other(other);
+        inner
+    }
 }
 #[wasm_bindgen(module = "intersection")]
 extern "C" {
@@ -257,9 +286,24 @@ extern "C" {
 }
 impl Refined {
     pub fn new(only_if: &Conditional) -> Refined {
+        Self::builder(only_if).build()
+    }
+    pub fn builder(only_if: &Conditional) -> RefinedBuilder {
         let inner: Refined = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_only_if(only_if);
-        inner
+        RefinedBuilder { inner }
+    }
+}
+pub struct RefinedBuilder {
+    inner: Refined,
+}
+impl RefinedBuilder {
+    pub fn range(self, val: &str) -> Self {
+        self.inner.set_range(val);
+        self
+    }
+    pub fn build(self) -> Refined {
+        self.inner
     }
 }
 #[wasm_bindgen(module = "intersection")]
@@ -280,15 +324,6 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn id(this: &Stub) -> String;
 }
-impl Stub {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Stub {
-        #[allow(unused_unsafe)]
-        unsafe {
-            JsValue::from(js_sys::Object::new()).unchecked_into()
-        }
-    }
-}
 #[wasm_bindgen(module = "intersection")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -304,34 +339,30 @@ extern "C" {
     # [wasm_bindgen (extends = Provider , extends = Fetcher , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type GenericStub<T: ::wasm_bindgen::JsGeneric = JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn fetch<T: ::wasm_bindgen::JsGeneric>(
+        this: &GenericStub<T>,
+        input: &str,
+    ) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "fetch")]
+    pub fn fetch_promise<T: ::wasm_bindgen::JsGeneric>(
+        this: &GenericStub<T>,
+        input: &str,
+    ) -> Promise<JsString>;
     #[wasm_bindgen(method, getter)]
     pub fn id<T: ::wasm_bindgen::JsGeneric>(this: &GenericStub<T>) -> String;
-}
-impl<T: ::wasm_bindgen::JsGeneric> GenericStub<T> {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> GenericStub<T> {
-        #[allow(unused_unsafe)]
-        unsafe {
-            JsValue::from(js_sys::Object::new()).unchecked_into()
-        }
-    }
 }
 #[wasm_bindgen(module = "intersection")]
 extern "C" {
     # [wasm_bindgen (extends = Fetcher , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Unknown;
+    #[wasm_bindgen(method, catch)]
+    pub async fn fetch(this: &Unknown, input: &str) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "fetch")]
+    pub fn fetch_promise(this: &Unknown, input: &str) -> Promise<JsString>;
     #[wasm_bindgen(method, getter)]
     pub fn id(this: &Unknown) -> String;
-}
-impl Unknown {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Unknown {
-        #[allow(unused_unsafe)]
-        unsafe {
-            JsValue::from(js_sys::Object::new()).unchecked_into()
-        }
-    }
 }
 #[wasm_bindgen(module = "intersection")]
 extern "C" {

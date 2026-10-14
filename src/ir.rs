@@ -979,6 +979,58 @@ pub enum Member {
     StaticMethod(StaticMethodMember),
 }
 
+impl Member {
+    /// The member with the parent's type parameters replaced, for
+    /// inheriting it through `extends Parent<Arg>`.
+    pub fn substitute(&self, map: &HashMap<String, TypeRef>) -> Member {
+        let params = |ps: &[Param]| -> Vec<Param> {
+            ps.iter()
+                .map(|p| Param {
+                    type_ref: p.type_ref.substitute(map),
+                    ..p.clone()
+                })
+                .collect()
+        };
+        match self {
+            Member::Getter(g) => Member::Getter(GetterMember {
+                type_ref: g.type_ref.substitute(map),
+                ..g.clone()
+            }),
+            Member::Setter(st) => Member::Setter(SetterMember {
+                type_ref: st.type_ref.substitute(map),
+                ..st.clone()
+            }),
+            Member::Method(m) => Member::Method(MethodMember {
+                params: params(&m.params),
+                return_type: m.return_type.substitute(map),
+                ..m.clone()
+            }),
+            Member::Constructor(c) => Member::Constructor(ConstructorMember {
+                params: params(&c.params),
+                ..c.clone()
+            }),
+            Member::IndexSignature(i) => Member::IndexSignature(IndexSigMember {
+                key_type: i.key_type.substitute(map),
+                value_type: i.value_type.substitute(map),
+                ..i.clone()
+            }),
+            Member::StaticGetter(g) => Member::StaticGetter(StaticGetterMember {
+                type_ref: g.type_ref.substitute(map),
+                ..g.clone()
+            }),
+            Member::StaticSetter(st) => Member::StaticSetter(StaticSetterMember {
+                type_ref: st.type_ref.substitute(map),
+                ..st.clone()
+            }),
+            Member::StaticMethod(m) => Member::StaticMethod(StaticMethodMember {
+                params: params(&m.params),
+                return_type: m.return_type.substitute(map),
+                ..m.clone()
+            }),
+        }
+    }
+}
+
 /// Instance property getter binding.
 ///
 /// Emits: `fn <name>(this: &T) -> R;` with `#[wasm_bindgen(method, getter)]`.
