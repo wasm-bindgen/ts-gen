@@ -27,6 +27,9 @@ declare var Response: {
 interface Response extends Body {
   /** Creates a clone of this response. */
   clone(): Response;
+  // Overloads survive the var + interface merge as a group.
+  text(): Promise<string>;
+  text(encoding: string): Promise<string>;
   /** The HTTP status code. */
   readonly status: number;
   readonly statusText: string;

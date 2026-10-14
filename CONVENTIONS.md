@@ -545,7 +545,10 @@ Interfaces are classified by shape (see `parse/classify.rs`):
   bindings, the builder just calls them. See [Dictionary builders](#dictionary-builders).
 
 Multiple interface declarations with the same name + module context merge:
-their members union, their `extends` lists merge.
+their members union, their `extends` lists merge. A member the incoming
+declaration redeclares replaces the base's as a whole overload group, so
+`text()` beside `text(encoding)` on the interface keeps both when it merges
+into its constructor variable.
 
 ### Inherited members
 
