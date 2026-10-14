@@ -2607,7 +2607,7 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Fetcher , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObjectStub<T: ::wasm_bindgen::JsGeneric = Undefined>;
     #[wasm_bindgen(method, getter)]
@@ -9307,11 +9307,11 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn fetcher<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
         this: &Request<CfHostMetadata, Cf>,
-    ) -> JsValue;
+    ) -> Option<Fetcher>;
     #[wasm_bindgen(method, setter)]
     pub fn set_fetcher<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
         this: &Request<CfHostMetadata, Cf>,
-        val: &JsValue,
+        val: &JsNullable<Fetcher>,
     );
     #[doc = " The read-only **`signal`** property of the Request interface returns the AbortSignal associated with the request."]
     #[doc = ""]
@@ -9441,9 +9441,12 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_redirect<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn fetcher<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>) -> JsValue;
+    pub fn fetcher<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>) -> Option<Fetcher>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_fetcher<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>, val: &JsValue);
+    pub fn set_fetcher<Cf: ::wasm_bindgen::JsGeneric>(
+        this: &RequestInit<Cf>,
+        val: &JsNullable<Fetcher>,
+    );
     #[wasm_bindgen(method, getter)]
     pub fn cf<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>) -> Option<Cf>;
     #[wasm_bindgen(method, setter)]
@@ -9539,7 +9542,7 @@ impl<Cf: ::wasm_bindgen::JsGeneric> RequestInitBuilder<Cf> {
         self.inner.set_redirect(val);
         self
     }
-    pub fn fetcher(self, val: &JsValue) -> Self {
+    pub fn fetcher(self, val: &JsNullable<Fetcher>) -> Self {
         self.inner.set_fetcher(val);
         self
     }
@@ -9569,8 +9572,161 @@ impl<Cf: ::wasm_bindgen::JsGeneric> RequestInitBuilder<Cf> {
 }
 #[allow(dead_code)]
 pub type Service = JsValue;
-#[allow(dead_code)]
-pub type Fetcher = JsValue;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Fetcher<
+        T: ::wasm_bindgen::JsGeneric = Undefined,
+        Reserved: ::wasm_bindgen::JsGeneric = JsValue,
+    >;
+    #[wasm_bindgen(method, catch)]
+    pub async fn fetch<T: ::wasm_bindgen::JsGeneric, Reserved: ::wasm_bindgen::JsGeneric>(
+        this: &Fetcher<T, Reserved>,
+        input: &Request<JsValue, JsValue>,
+    ) -> Result<Response, JsValue>;
+    #[wasm_bindgen(method, js_name = "fetch")]
+    pub fn fetch_promise<T: ::wasm_bindgen::JsGeneric, Reserved: ::wasm_bindgen::JsGeneric>(
+        this: &Fetcher<T, Reserved>,
+        input: &Request<JsValue, JsValue>,
+    ) -> Promise<Response>;
+    #[wasm_bindgen(method, catch, js_name = "fetch")]
+    pub async fn fetch_with_str<T: ::wasm_bindgen::JsGeneric, Reserved: ::wasm_bindgen::JsGeneric>(
+        this: &Fetcher<T, Reserved>,
+        input: &str,
+    ) -> Result<Response, JsValue>;
+    #[wasm_bindgen(method, js_name = "fetch")]
+    pub fn fetch_with_str_promise<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        input: &str,
+    ) -> Promise<Response>;
+    #[wasm_bindgen(method, catch, js_name = "fetch")]
+    pub async fn fetch_with_url<T: ::wasm_bindgen::JsGeneric, Reserved: ::wasm_bindgen::JsGeneric>(
+        this: &Fetcher<T, Reserved>,
+        input: &URL,
+    ) -> Result<Response, JsValue>;
+    #[wasm_bindgen(method, js_name = "fetch")]
+    pub fn fetch_with_url_promise<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        input: &URL,
+    ) -> Promise<Response>;
+    #[wasm_bindgen(method, catch, js_name = "fetch")]
+    pub async fn fetch_with_request_and_init<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        input: &Request<JsValue, JsValue>,
+        init: &RequestInit,
+    ) -> Result<Response, JsValue>;
+    #[wasm_bindgen(method, js_name = "fetch")]
+    pub fn fetch_with_request_and_init_promise<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        input: &Request<JsValue, JsValue>,
+        init: &RequestInit,
+    ) -> Promise<Response>;
+    #[wasm_bindgen(method, catch, js_name = "fetch")]
+    pub async fn fetch_with_str_and_init<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        input: &str,
+        init: &RequestInit,
+    ) -> Result<Response, JsValue>;
+    #[wasm_bindgen(method, js_name = "fetch")]
+    pub fn fetch_with_str_and_init_promise<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        input: &str,
+        init: &RequestInit,
+    ) -> Promise<Response>;
+    #[wasm_bindgen(method, catch, js_name = "fetch")]
+    pub async fn fetch_with_url_and_init<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        input: &URL,
+        init: &RequestInit,
+    ) -> Result<Response, JsValue>;
+    #[wasm_bindgen(method, js_name = "fetch")]
+    pub fn fetch_with_url_and_init_promise<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        input: &URL,
+        init: &RequestInit,
+    ) -> Promise<Response>;
+    #[wasm_bindgen(method)]
+    pub fn connect<T: ::wasm_bindgen::JsGeneric, Reserved: ::wasm_bindgen::JsGeneric>(
+        this: &Fetcher<T, Reserved>,
+        address: &SocketAddress,
+    ) -> Socket;
+    #[wasm_bindgen(method, catch, js_name = "connect")]
+    pub fn try_connect<T: ::wasm_bindgen::JsGeneric, Reserved: ::wasm_bindgen::JsGeneric>(
+        this: &Fetcher<T, Reserved>,
+        address: &SocketAddress,
+    ) -> Result<Socket, JsValue>;
+    #[wasm_bindgen(method, js_name = "connect")]
+    pub fn connect_with_str<T: ::wasm_bindgen::JsGeneric, Reserved: ::wasm_bindgen::JsGeneric>(
+        this: &Fetcher<T, Reserved>,
+        address: &str,
+    ) -> Socket;
+    #[wasm_bindgen(method, catch, js_name = "connect")]
+    pub fn try_connect_with_str<T: ::wasm_bindgen::JsGeneric, Reserved: ::wasm_bindgen::JsGeneric>(
+        this: &Fetcher<T, Reserved>,
+        address: &str,
+    ) -> Result<Socket, JsValue>;
+    #[wasm_bindgen(method, js_name = "connect")]
+    pub fn connect_with_socket_address_and_options<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        address: &SocketAddress,
+        options: &SocketOptions,
+    ) -> Socket;
+    #[wasm_bindgen(method, catch, js_name = "connect")]
+    pub fn try_connect_with_socket_address_and_options<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        address: &SocketAddress,
+        options: &SocketOptions,
+    ) -> Result<Socket, JsValue>;
+    #[wasm_bindgen(method, js_name = "connect")]
+    pub fn connect_with_str_and_options<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        address: &str,
+        options: &SocketOptions,
+    ) -> Socket;
+    #[wasm_bindgen(method, catch, js_name = "connect")]
+    pub fn try_connect_with_str_and_options<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        address: &str,
+        options: &SocketOptions,
+    ) -> Result<Socket, JsValue>;
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -11014,16 +11170,19 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_with_slice_promise(this: &R2Bucket, keys: &[String]) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch)]
-    pub async fn list(this: &R2Bucket) -> Result<JsValue, JsValue>;
+    pub async fn list(this: &R2Bucket) -> Result<R2Objects, JsValue>;
     #[wasm_bindgen(method, js_name = "list")]
-    pub fn list_promise(this: &R2Bucket) -> Promise;
+    pub fn list_promise(this: &R2Bucket) -> Promise<R2Objects>;
     #[wasm_bindgen(method, catch, js_name = "list")]
     pub async fn list_with_options(
         this: &R2Bucket,
         options: &R2ListOptions,
-    ) -> Result<JsValue, JsValue>;
+    ) -> Result<R2Objects, JsValue>;
     #[wasm_bindgen(method, js_name = "list")]
-    pub fn list_with_options_promise(this: &R2Bucket, options: &R2ListOptions) -> Promise;
+    pub fn list_with_options_promise(
+        this: &R2Bucket,
+        options: &R2ListOptions,
+    ) -> Promise<R2Objects>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -11899,8 +12058,28 @@ impl R2HTTPMetadataBuilder {
         self.inner
     }
 }
-#[allow(dead_code)]
-pub type R2Objects = JsValue;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type R2Objects;
+    #[wasm_bindgen(method, getter)]
+    pub fn objects(this: &R2Objects) -> Vec<R2Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_objects(this: &R2Objects, val: &[R2Object]);
+    #[wasm_bindgen(method, getter, js_name = "delimitedPrefixes")]
+    pub fn delimited_prefixes(this: &R2Objects) -> Vec<String>;
+    #[wasm_bindgen(method, setter, js_name = "delimitedPrefixes")]
+    pub fn set_delimited_prefixes(this: &R2Objects, val: &[String]);
+}
+impl R2Objects {
+    pub fn new(objects: &[R2Object], delimited_prefixes: &[String]) -> R2Objects {
+        let inner: R2Objects = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_objects(objects);
+        inner.set_delimited_prefixes(delimited_prefixes);
+        inner
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -15545,9 +15724,9 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "withCredentials")]
     pub fn set_with_credentials(this: &EventSourceEventSourceInit, val: bool);
     #[wasm_bindgen(method, getter)]
-    pub fn fetcher(this: &EventSourceEventSourceInit) -> JsValue;
+    pub fn fetcher(this: &EventSourceEventSourceInit) -> Option<Fetcher>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_fetcher(this: &EventSourceEventSourceInit, val: &JsValue);
+    pub fn set_fetcher(this: &EventSourceEventSourceInit, val: &Fetcher);
 }
 impl EventSourceEventSourceInit {
     pub fn new() -> EventSourceEventSourceInit {
@@ -15567,7 +15746,7 @@ impl EventSourceEventSourceInitBuilder {
         self.inner.set_with_credentials(val);
         self
     }
-    pub fn fetcher(self, val: &JsValue) -> Self {
+    pub fn fetcher(self, val: &Fetcher) -> Self {
         self.inner.set_fetcher(val);
         self
     }
@@ -15610,9 +15789,9 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "signal")]
     pub fn try_signal(this: &Container, signo: f64) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "getTcpPort")]
-    pub fn get_tcp_port(this: &Container, port: f64) -> JsValue;
+    pub fn get_tcp_port(this: &Container, port: f64) -> Fetcher;
     #[wasm_bindgen(method, catch, js_name = "getTcpPort")]
-    pub fn try_get_tcp_port(this: &Container, port: f64) -> Result<JsValue, JsValue>;
+    pub fn try_get_tcp_port(this: &Container, port: f64) -> Result<Fetcher, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "setInactivityTimeout")]
     pub async fn set_inactivity_timeout(this: &Container, duration_ms: f64) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "setInactivityTimeout")]
@@ -15632,23 +15811,23 @@ extern "C" {
     pub async fn intercept_outbound_http(
         this: &Container,
         addr: &str,
-        binding: &JsValue,
+        binding: &Fetcher,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "interceptOutboundHttp")]
     pub fn intercept_outbound_http_promise(
         this: &Container,
         addr: &str,
-        binding: &JsValue,
+        binding: &Fetcher,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "interceptAllOutboundHttp")]
     pub async fn intercept_all_outbound_http(
         this: &Container,
-        binding: &JsValue,
+        binding: &Fetcher,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "interceptAllOutboundHttp")]
     pub fn intercept_all_outbound_http_promise(
         this: &Container,
-        binding: &JsValue,
+        binding: &Fetcher,
     ) -> Promise<Undefined>;
 }
 #[wasm_bindgen]
@@ -15847,10 +16026,18 @@ impl MessagePortPostMessageOptionsBuilder {
 }
 #[allow(dead_code)]
 pub type LoopbackForExport = JsValue;
-#[allow(dead_code)]
-pub type LoopbackServiceStub = JsValue;
-#[allow(dead_code)]
-pub type LoopbackDurableObjectClass = JsValue;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Fetcher , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type LoopbackServiceStub<T: ::wasm_bindgen::JsGeneric = Undefined>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = DurableObjectClass , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type LoopbackDurableObjectClass<T: ::wasm_bindgen::JsGeneric = Undefined>;
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -15986,33 +16173,33 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WorkerStub;
     #[wasm_bindgen(method, js_name = "getEntrypoint")]
-    pub fn get_entrypoint<T: ::wasm_bindgen::JsGeneric>(this: &WorkerStub) -> JsValue;
+    pub fn get_entrypoint<T: ::wasm_bindgen::JsGeneric>(this: &WorkerStub) -> Fetcher<T>;
     #[wasm_bindgen(method, catch, js_name = "getEntrypoint")]
     pub fn try_get_entrypoint<T: ::wasm_bindgen::JsGeneric>(
         this: &WorkerStub,
-    ) -> Result<JsValue, JsValue>;
+    ) -> Result<Fetcher<T>, JsValue>;
     #[wasm_bindgen(method, js_name = "getEntrypoint")]
     pub fn get_entrypoint_with_name<T: ::wasm_bindgen::JsGeneric>(
         this: &WorkerStub,
         name: &str,
-    ) -> JsValue;
+    ) -> Fetcher<T>;
     #[wasm_bindgen(method, catch, js_name = "getEntrypoint")]
     pub fn try_get_entrypoint_with_name<T: ::wasm_bindgen::JsGeneric>(
         this: &WorkerStub,
         name: &str,
-    ) -> Result<JsValue, JsValue>;
+    ) -> Result<Fetcher<T>, JsValue>;
     #[wasm_bindgen(method, js_name = "getEntrypoint")]
     pub fn get_entrypoint_with_name_and_options<T: ::wasm_bindgen::JsGeneric>(
         this: &WorkerStub,
         name: &str,
         options: &WorkerStubEntrypointOptions,
-    ) -> JsValue;
+    ) -> Fetcher<T>;
     #[wasm_bindgen(method, catch, js_name = "getEntrypoint")]
     pub fn try_get_entrypoint_with_name_and_options<T: ::wasm_bindgen::JsGeneric>(
         this: &WorkerStub,
         name: &str,
         options: &WorkerStubEntrypointOptions,
-    ) -> Result<JsValue, JsValue>;
+    ) -> Result<Fetcher<T>, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -16171,17 +16358,17 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_env(this: &WorkerLoaderWorkerCode, val: &JsValue);
     #[wasm_bindgen(method, getter, js_name = "globalOutbound")]
-    pub fn global_outbound(this: &WorkerLoaderWorkerCode) -> JsValue;
+    pub fn global_outbound(this: &WorkerLoaderWorkerCode) -> Option<Fetcher>;
     #[wasm_bindgen(method, setter, js_name = "globalOutbound")]
-    pub fn set_global_outbound(this: &WorkerLoaderWorkerCode, val: &JsValue);
+    pub fn set_global_outbound(this: &WorkerLoaderWorkerCode, val: &JsNullable<Fetcher>);
     #[wasm_bindgen(method, getter)]
-    pub fn tails(this: &WorkerLoaderWorkerCode) -> Option<Vec<JsValue>>;
+    pub fn tails(this: &WorkerLoaderWorkerCode) -> Option<Vec<Fetcher>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tails(this: &WorkerLoaderWorkerCode, val: &[JsValue]);
+    pub fn set_tails(this: &WorkerLoaderWorkerCode, val: &[Fetcher]);
     #[wasm_bindgen(method, getter, js_name = "streamingTails")]
-    pub fn streaming_tails(this: &WorkerLoaderWorkerCode) -> Option<Vec<JsValue>>;
+    pub fn streaming_tails(this: &WorkerLoaderWorkerCode) -> Option<Vec<Fetcher>>;
     #[wasm_bindgen(method, setter, js_name = "streamingTails")]
-    pub fn set_streaming_tails(this: &WorkerLoaderWorkerCode, val: &[JsValue]);
+    pub fn set_streaming_tails(this: &WorkerLoaderWorkerCode, val: &[Fetcher]);
 }
 impl WorkerLoaderWorkerCode {
     pub fn new(
@@ -16219,15 +16406,15 @@ impl WorkerLoaderWorkerCodeBuilder {
         self.inner.set_env(val);
         self
     }
-    pub fn global_outbound(self, val: &JsValue) -> Self {
+    pub fn global_outbound(self, val: &JsNullable<Fetcher>) -> Self {
         self.inner.set_global_outbound(val);
         self
     }
-    pub fn tails(self, val: &[JsValue]) -> Self {
+    pub fn tails(self, val: &[Fetcher]) -> Self {
         self.inner.set_tails(val);
         self
     }
-    pub fn streaming_tails(self, val: &[JsValue]) -> Self {
+    pub fn streaming_tails(self, val: &[Fetcher]) -> Self {
         self.inner.set_streaming_tails(val);
         self
     }
@@ -44151,7 +44338,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * If the Worker script does not exist in this dispatch namespace, an error will be thrown."]
     #[wasm_bindgen(method)]
-    pub fn get(this: &DispatchNamespace, name: &str) -> JsValue;
+    pub fn get(this: &DispatchNamespace, name: &str) -> Fetcher;
     #[doc = " * `name` - Name of the Worker script."]
     #[doc = " * `args` - Arguments to Worker script."]
     #[doc = " * `options` - Options for Dynamic Dispatch invocation."]
@@ -44162,7 +44349,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * If the Worker script does not exist in this dispatch namespace, an error will be thrown."]
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get(this: &DispatchNamespace, name: &str) -> Result<JsValue, JsValue>;
+    pub fn try_get(this: &DispatchNamespace, name: &str) -> Result<Fetcher, JsValue>;
     #[doc = " * `name` - Name of the Worker script."]
     #[doc = " * `args` - Arguments to Worker script."]
     #[doc = " * `options` - Options for Dynamic Dispatch invocation."]
@@ -44177,7 +44364,7 @@ extern "C" {
         this: &DispatchNamespace,
         name: &str,
         args: &DispatchNamespaceArgs,
-    ) -> JsValue;
+    ) -> Fetcher;
     #[doc = " * `name` - Name of the Worker script."]
     #[doc = " * `args` - Arguments to Worker script."]
     #[doc = " * `options` - Options for Dynamic Dispatch invocation."]
@@ -44192,7 +44379,7 @@ extern "C" {
         this: &DispatchNamespace,
         name: &str,
         args: &DispatchNamespaceArgs,
-    ) -> Result<JsValue, JsValue>;
+    ) -> Result<Fetcher, JsValue>;
     #[doc = " * `name` - Name of the Worker script."]
     #[doc = " * `args` - Arguments to Worker script."]
     #[doc = " * `options` - Options for Dynamic Dispatch invocation."]
@@ -44208,7 +44395,7 @@ extern "C" {
         name: &str,
         args: &DispatchNamespaceArgs,
         options: &DynamicDispatchOptions,
-    ) -> JsValue;
+    ) -> Fetcher;
     #[doc = " * `name` - Name of the Worker script."]
     #[doc = " * `args` - Arguments to Worker script."]
     #[doc = " * `options` - Options for Dynamic Dispatch invocation."]
@@ -44224,7 +44411,7 @@ extern "C" {
         name: &str,
         args: &DispatchNamespaceArgs,
         options: &DynamicDispatchOptions,
-    ) -> Result<JsValue, JsValue>;
+    ) -> Result<Fetcher, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {

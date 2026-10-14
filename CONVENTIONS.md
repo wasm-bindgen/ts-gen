@@ -976,10 +976,14 @@ refuses too. A generic alias whose target mentions its own type
 parameters (`type Branded<T> = T & { … }`, `type Same<T> = T`,
 `type Of<T> = Provider<T>`) is refused, since its arguments are not
 substituted into the target. Imported and `--external` names have no local binding and
-are allowed through. A parent that erases at codegen (a conditional
-type, or a name that never resolves and is reported) is dropped from
-`extends` rather than replaced, so the first real parent stays the
-`Deref` target; the literal's own members survive either way. A generic first parent is
+are allowed through. A part that only narrows in TS (a conditional
+or indexed-access type or a union, parenthesised or not) has no
+structural reading and is dropped with a warning, and `object` / `unknown` add
+nothing, so `(T extends X ? … : unknown) & { fetch(): … }` is still an
+interface with `fetch`. A parent that erases at codegen (a name that
+never resolves and is reported) is dropped from `extends` rather than
+replaced, so the first real parent stays the `Deref` target; the
+literal's own members survive either way. A generic first parent is
 spelled bare in `extends`, which wasm-bindgen reads as
 `Parent<JsValue>`; the type still derives `Eq` (see
 [Type-level generics](#type-level-generics-propagate-to-every-binding-site)).

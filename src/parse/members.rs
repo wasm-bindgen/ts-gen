@@ -359,6 +359,10 @@ pub(crate) enum InlineShape<'a, 'b> {
     Intersection {
         parents: Vec<&'a TSType<'b>>,
         literals: Vec<&'a TSTypeLiteral<'b>>,
+        /// Parts that only narrow in TS (a conditional or indexed-access
+        /// type, a union) and have no structural reading; dropped with a
+        /// warning.
+        dropped: Vec<&'static str>,
     },
 }
 
@@ -382,14 +386,27 @@ pub(crate) fn inline_shape<'a, 'b>(ts_type: &'a TSType<'b>) -> Option<InlineShap
         TSType::TSIntersectionType(inter) => {
             let mut parents = Vec::new();
             let mut literals = Vec::new();
+            let mut dropped = Vec::new();
             for t in &inter.types {
+                let t = t.without_parenthesized();
                 match t {
                     TSType::TSTypeLiteral(lit) => literals.push(&**lit),
                     TSType::TSTypeReference(_) => parents.push(t),
+                    TSType::TSObjectKeyword(_) | TSType::TSUnknownKeyword(_) => {}
+                    TSType::TSConditionalType(_) => dropped.push("conditional type"),
+                    TSType::TSUnionType(_) => dropped.push("union"),
+                    TSType::TSIndexedAccessType(_) => dropped.push("indexed access type"),
                     _ => return None,
                 }
             }
-            Some(InlineShape::Intersection { parents, literals })
+            if parents.is_empty() && literals.is_empty() {
+                return None;
+            }
+            Some(InlineShape::Intersection {
+                parents,
+                literals,
+                dropped,
+            })
         }
         _ => None,
     }
@@ -419,7 +436,11 @@ pub(crate) fn synthesize_inline(
     let (literals, mode, extends) = match shape {
         InlineShape::Literal(lit) => (vec![*lit], MergeMode::Join, Vec::new()),
         InlineShape::Union(lits) => (lits.clone(), MergeMode::Join, Vec::new()),
-        InlineShape::Intersection { parents, literals } => {
+        InlineShape::Intersection {
+            parents,
+            literals,
+            dropped,
+        } => {
             let mut extends: Vec<TypeRef> = Vec::new();
             for parent in parents {
                 let converted = convert_ts_type_scoped(parent, body_scope, ctx);
@@ -442,6 +463,11 @@ pub(crate) fn synthesize_inline(
                     }
                     _ => return None,
                 }
+            }
+            for kind in dropped {
+                ctx.diag.warn(format!(
+                    "Intersection `{name}`: dropping a {kind} part (no structural reading)"
+                ));
             }
             (literals.clone(), MergeMode::Meet, extends)
         }

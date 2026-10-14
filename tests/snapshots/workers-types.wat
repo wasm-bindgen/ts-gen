@@ -2539,6 +2539,20 @@
   ;; set encodeResponseBody(value: "automatic")
   (import "./bindings.wasm" "RequestInit.set_encode_response_body" (func $RequestInit.set_encode_response_body (param $this externref) (param $value externref)))
 
+  ;; Fetcher
+  ;; fetch(input: RequestInfo): Promise<Response>
+  (import "./bindings.wasm" "Fetcher.fetch" (func $Fetcher.fetch (param $this externref) (param $input externref) (result externref)))
+  ;; fetch(input: RequestInfo, init: RequestInit): Promise<Response>
+  (import "./bindings.wasm" "Fetcher.fetch_with_init" (func $Fetcher.fetch_with_init (param $this externref) (param $input externref) (param $init externref) (result externref)))
+  ;; connect(address: SocketAddress): Socket
+  (import "./bindings.wasm" "Fetcher.connect" (func $Fetcher.connect (param $this externref) (param $address externref) (result externref)))
+  ;; connect(address: string): Socket
+  (import "./bindings.wasm" "Fetcher.connect_with_str" (func $Fetcher.connect_with_str (param $this externref) (param $address externref) (result externref)))
+  ;; connect(address: SocketAddress, options: SocketOptions): Socket
+  (import "./bindings.wasm" "Fetcher.connect_with_socket_address_and_options" (func $Fetcher.connect_with_socket_address_and_options (param $this externref) (param $address externref) (param $options externref) (result externref)))
+  ;; connect(address: string, options: SocketOptions): Socket
+  (import "./bindings.wasm" "Fetcher.connect_with_str_and_options" (func $Fetcher.connect_with_str_and_options (param $this externref) (param $address externref) (param $options externref) (result externref)))
+
   ;; KVNamespaceListKey
   ;; {} as KVNamespaceListKey
   (import "./bindings.wasm" "KVNamespaceListKey.new" (func $KVNamespaceListKey.new (result externref)))
@@ -3146,6 +3160,18 @@
   (import "./bindings.wasm" "R2HTTPMetadata.cache_expiry" (func $R2HTTPMetadata.cache_expiry (param $this externref) (result externref)))
   ;; set cacheExpiry(value: Date)
   (import "./bindings.wasm" "R2HTTPMetadata.set_cache_expiry" (func $R2HTTPMetadata.set_cache_expiry (param $this externref) (param $value externref)))
+
+  ;; R2Objects
+  ;; {} as R2Objects
+  (import "./bindings.wasm" "R2Objects.new" (func $R2Objects.new (result externref)))
+  ;; objects: R2Object[]
+  (import "./bindings.wasm" "R2Objects.objects" (func $R2Objects.objects (param $this externref) (result externref)))
+  ;; set objects(value: R2Object[])
+  (import "./bindings.wasm" "R2Objects.set_objects" (func $R2Objects.set_objects (param $this externref) (param $value externref)))
+  ;; delimitedPrefixes: string[]
+  (import "./bindings.wasm" "R2Objects.delimited_prefixes" (func $R2Objects.delimited_prefixes (param $this externref) (result externref)))
+  ;; set delimitedPrefixes(value: string[])
+  (import "./bindings.wasm" "R2Objects.set_delimited_prefixes" (func $R2Objects.set_delimited_prefixes (param $this externref) (param $value externref)))
 
   ;; R2UploadPartOptions
   ;; {} as R2UploadPartOptions
