@@ -39,6 +39,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [String and numeric enums](#string-and-numeric-enums)
 * [Multiple-context name resolution](#multiple-context-name-resolution)
 * [External type mapping and web platform defaults](#external-type-mapping-and-web-platform-defaults)
+* [Provided functions (`--provides`)](#provided-functions---provides)
 
 ---
 
@@ -2973,3 +2974,72 @@ generated file's `use js_sys::*;` prelude. The one `js_sys` class whose
 Rust spelling differs from TS, `URIError`, is aliased from
 `::js_sys::UriError` through the same default-mapping path
 (`external_map::JS_SYS_RENAMES`) and likewise survives `--no-web-sys`.
+
+## Provided functions (`--provides`)
+
+Everything above binds JS *into* Rust. `--provides` is the reverse
+direction, wasm-bindgen's export side: what the module provides to JS.
+The spec is one of
+
+* a `.d.ts` whose export surface *is* the module's: `export function
+  fetch(...)`, `export const api: { math: { add(a: number, b: number):
+  number } }` (nested object literals), `export const f: (x: T) => U`,
+  and `export default handler` where `declare const handler: T` in the
+  same file (`T` an interface, possibly with type arguments, or an
+  object literal). Optional members of an interface default are
+  selected with a JSDoc `@provides fetch, tail` on the `export default`.
+* `Name[.member,...]`: an interface from the inputs that the default
+  export implements, with optional members (`fetch?`) listed to
+  include them.
+
+Interface members may be methods or properties of function type,
+through type aliases including generic instantiations
+(`fetch?: ExportedHandlerFetchHandler<Env, Cf>` in workers-types). The
+interface's type parameters take the given arguments, else their
+declared defaults, else `unknown`. Required members are always
+provided; an unselected optional member is skipped with a warning
+naming it, and a selected member that is not a function is an error.
+Generic functions and non-function properties warn and skip;
+overloads, variadic parameters and other export forms are errors. A
+spec that resolves to nothing is an error.
+
+Each provided function sits at a JS path (`default.fetch`, `fetch`,
+`api.math.add`). Its Rust name is the path in snake case
+(`api_math_add`); a `default.` member drops the prefix (`fetch`) unless
+another provider already has that name, in which case it keeps it
+(`default_add` beside a top-level `add`). Any remaining clash
+(`foo.bar` beside `foo_bar`) is an error naming both paths. Parameters
+are received **by value** (`Request`, not `&Request`; `JsValue` for
+`any`), an optional parameter as `Option<T>`, and results are owned.
+A nullable parameter is `Option<T>` too: in this direction the glue
+reads both `null` and `undefined` as `None`, unlike import arguments.
+A `Promise<T>` or `T | Promise<T>` result is `async fn -> Result<T,
+JsValue>`. The wrapper and scaffold import `js_sys::*` alongside the
+bindings, so `Record<string, number>` (`Object<Number>`), callbacks
+(`Function<fn(..)>`), `symbol`, `bigint` and object literals lower as
+in the bindings.
+
+Two files are written next to the output:
+
+* `provides.rs` (regenerated): one `#[wasm_bindgen]` function per
+  provided function, delegating to the app module (`--provides-app`,
+  default `super::app`) and importing types from the bindings module
+  (`--provides-bindings`, default `super::<output stem>`).
+
+  ```rust
+  #[wasm_bindgen(js_namespace = default, js_name = "fetch")]
+  pub async fn fetch(request: Request, env: Env, ctx: ExecutionContext)
+      -> Result<Response, JsValue> {
+      super::app::fetch(request, env, ctx).await
+  }
+  ```
+
+  wasm-bindgen's `js_namespace` on an exported function spells the
+  path: `default` produces `export default { fetch }`, `["api",
+  "math"]` the nested object. The integration tests run wasm-bindgen
+  over the built crate and check the resulting module in node:
+  `m.version()`, `m.api.math.add`, `m.default.issue`. wasm-bindgen's
+  `web` target reserves the default export for its init function.
+* the app scaffold, named after the last segment of `--provides-app`
+  (`app.rs`), only if absent: the same signatures with the TS JSDoc as
+  doc comments and placeholder bodies, for the author to fill in.
