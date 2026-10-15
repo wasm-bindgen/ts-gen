@@ -144,8 +144,8 @@ impl DiagnosticCollector {
     pub fn emit(&self) {
         let mut seen = std::collections::HashSet::new();
         for diag in &self.diagnostics {
-            // Dedupe key: level + message (ignore location for dedup)
-            let key = format!("{:?}:{}", diag.level, diag.message);
+            let location = diag.location.as_ref().map(|l| l.to_string());
+            let key = format!("{:?}:{location:?}:{}", diag.level, diag.message);
             if !seen.insert(key) {
                 continue;
             }
