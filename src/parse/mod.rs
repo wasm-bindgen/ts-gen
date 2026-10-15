@@ -308,6 +308,23 @@ fn resolve_imports(
         let mut still_pending = Vec::new();
 
         for import in pending {
+            // A `declare module "x"` block in any parsed file can satisfy
+            // the import. Its bindings live in the module's own scopes,
+            // which aren't on the importer's scope chain. A name the
+            // blocks don't declare falls through to file resolution, as
+            // the block may only augment a module backed by a file.
+            let ambient = gctx
+                .ambient_module_scopes
+                .get(&import.from_module)
+                .into_iter()
+                .flatten()
+                .find_map(|&scope| gctx.scopes.get(scope).get(&import.original_name));
+            if let Some(type_id) = ambient {
+                gctx.scopes
+                    .insert(import.scope, import.local_name.clone(), type_id);
+                continue;
+            }
+
             // Check if we already have this module registered
             if let Some(module_id) = gctx.find_module(&import.from_module) {
                 // Look up the name in the target module's scope
@@ -954,6 +971,38 @@ mod tests {
         let a_scope = gctx.ambient_module_scopes["a"][0];
         assert!(gctx.scopes.resolve(a_scope, "Private").is_some());
         assert!(gctx.scopes.resolve(file_scope, "Private").is_none());
+    }
+
+    #[test]
+    fn test_import_from_ambient_module_in_other_file() {
+        let dir =
+            std::env::temp_dir().join(format!("ts-gen-ambient-import-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let decls = dir.join("decls.d.ts");
+        let user = dir.join("user.d.ts");
+        std::fs::write(
+            &decls,
+            r#"declare module "node:x" { export type Id = string; export class Thing {} }"#,
+        )
+        .unwrap();
+        std::fs::write(
+            &user,
+            r#"
+                import { Id, Thing } from "node:x";
+                export declare function useIt(id: Id, t: Thing): void;
+            "#,
+        )
+        .unwrap();
+        let (module, gctx) = parse_dts_files(&[&decls, &user], Some("mylib")).unwrap();
+        std::fs::remove_dir_all(&dir).unwrap();
+
+        let x_scope = gctx.ambient_module_scopes["node:x"][0];
+        let user_scope = module.file_scopes[1];
+        for name in ["Id", "Thing"] {
+            let declared = gctx.scopes.get(x_scope).get(name);
+            assert!(declared.is_some());
+            assert_eq!(gctx.scopes.resolve(user_scope, name), declared);
+        }
     }
 
     #[test]

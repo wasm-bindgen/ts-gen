@@ -1663,7 +1663,9 @@ not the textual name, so a global `interface Foo` and a module-scoped
 site picks the visible one. Each module body is a child scope of its
 file, as in TypeScript: its declarations see the file's globals, but
 are not visible to the file or to other modules, and repeated
-`declare module "<spec>"` blocks in one file share a scope.
+`declare module "<spec>"` blocks in one file share a scope. Another
+file or module reaches them with `import { Foo } from "<spec>"`, which
+resolves against the module's scopes before looking for a file.
 
 ### Output surface: `--export` and `--input`
 
