@@ -25,11 +25,77 @@
 //!     ImportMeta = 3,
 //! }
 //! ```
+//!
+//! A member repeating an earlier member's value is an alias of it. wasm-bindgen
+//! rejects duplicate discriminants, and two string variants with one value
+//! could not be told apart when decoding, so aliases become associated consts
+//! of the first variant with that value:
+//!
+//! ```rust,ignore
+//! impl ImportType {
+//!     #[allow(non_upper_case_globals)]
+//!     pub const Latest: ImportType = ImportType::ImportMeta;
+//! }
+//! ```
+//!
+//! for a declaration ending `ImportMeta = 3, Latest = 3`. The parser has
+//! already evaluated member references and constant expressions
+//! (`Latest = ImportMeta`, `All = Read | Write`) to their values.
+//!
+//! ```rust,ignore
+//! ```
 
 use proc_macro2::TokenStream;
 use quote::quote;
 
+use std::collections::HashMap;
+use std::hash::Hash;
+
 use crate::ir::{NumericEnumDecl, StringEnumDecl};
+
+/// Split members into the variants (first member per value) and the aliases
+/// (later members, paired with the variant they repeat).
+fn split_aliases<V, K: Eq + Hash>(
+    members: &[V],
+    key: impl Fn(&V) -> K,
+) -> (Vec<&V>, Vec<(&V, &V)>) {
+    let mut first: HashMap<K, &V> = HashMap::new();
+    let mut variants = Vec::new();
+    let mut aliases = Vec::new();
+    for m in members {
+        match first.get(&key(m)) {
+            Some(target) => aliases.push((m, *target)),
+            None => {
+                first.insert(key(m), m);
+                variants.push(m);
+            }
+        }
+    }
+    (variants, aliases)
+}
+
+fn alias_impl(
+    name: &syn::Ident,
+    aliases: impl Iterator<Item = (TokenStream, syn::Ident, syn::Ident)>,
+) -> TokenStream {
+    let consts: Vec<_> = aliases
+        .map(|(doc, alias, target)| {
+            quote! {
+                #doc
+                #[allow(non_upper_case_globals)]
+                pub const #alias: #name = #name::#target;
+            }
+        })
+        .collect();
+    if consts.is_empty() {
+        return quote! {};
+    }
+    quote! {
+        impl #name {
+            #(#consts)*
+        }
+    }
+}
 
 /// Generated enums describe JS-side values rather than anything this crate
 /// exports, so they are `private`: wasm-bindgen then keeps them off the JS
@@ -53,8 +119,8 @@ pub fn generate_string_enum(decl: &StringEnumDecl, js_namespace: Option<&str>) -
     let name = super::typemap::make_ident(&decl.name);
     let attr = enum_attr(&decl.name, js_namespace);
 
-    let variants: Vec<_> = decl
-        .variants
+    let (members, aliases) = split_aliases(&decl.variants, |v| v.js_value.clone());
+    let variants: Vec<_> = members
         .iter()
         .map(|v| {
             let rust_name = super::typemap::make_ident(&v.rust_name);
@@ -64,6 +130,16 @@ pub fn generate_string_enum(decl: &StringEnumDecl, js_namespace: Option<&str>) -
             }
         })
         .collect();
+    let aliases = alias_impl(
+        &name,
+        aliases.into_iter().map(|(alias, target)| {
+            (
+                quote! {},
+                super::typemap::make_ident(&alias.rust_name),
+                super::typemap::make_ident(&target.rust_name),
+            )
+        }),
+    );
 
     quote! {
         #attr
@@ -71,6 +147,7 @@ pub fn generate_string_enum(decl: &StringEnumDecl, js_namespace: Option<&str>) -
         pub enum #name {
             #(#variants,)*
         }
+        #aliases
     }
 }
 
@@ -98,8 +175,8 @@ pub fn generate_numeric_enum(decl: &NumericEnumDecl, js_namespace: Option<&str>)
 
     let has_negative = decl.variants.iter().any(|v| v.value < 0);
 
-    let variants: Vec<_> = decl
-        .variants
+    let (members, aliases) = split_aliases(&decl.variants, |v| v.value);
+    let variants: Vec<_> = members
         .iter()
         .map(|v| {
             let rust_name = super::typemap::make_ident(&v.rust_name);
@@ -123,6 +200,16 @@ pub fn generate_numeric_enum(decl: &NumericEnumDecl, js_namespace: Option<&str>)
             }
         })
         .collect();
+    let aliases = alias_impl(
+        &name,
+        aliases.into_iter().map(|(alias, target)| {
+            (
+                crate::codegen::doc_tokens(&alias.doc),
+                super::typemap::make_ident(&alias.rust_name),
+                super::typemap::make_ident(&target.rust_name),
+            )
+        }),
+    );
 
     quote! {
         #attr
@@ -131,5 +218,6 @@ pub fn generate_numeric_enum(decl: &NumericEnumDecl, js_namespace: Option<&str>)
         pub enum #name {
             #(#variants,)*
         }
+        #aliases
     }
 }

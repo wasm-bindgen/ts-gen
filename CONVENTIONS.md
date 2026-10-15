@@ -1873,6 +1873,47 @@ pub enum Color {
 Numeric enums lower similarly with explicit discriminant values and a
 `#[repr(u32)]` / `#[repr(i32)]` chosen from the value range.
 
+### Member aliases and constant initialisers
+
+Member initialisers are evaluated as TypeScript does: numeric and string
+literals, unary and binary constant expressions with JS numeric
+semantics (bitwise operators on int32, `>>>` on uint32), string
+concatenation, and references to earlier members, bare or qualified by
+the enum's own name. A member without an initialiser continues from the
+previous member's evaluated value. An initialiser that is none of these
+takes the next auto-increment with a diagnostic.
+
+A member whose value repeats an earlier member's is an alias, not a
+second variant: wasm-bindgen rejects duplicate discriminants, and two
+string variants with one value could not be told apart when decoding.
+The first member with a value is the variant; later ones become
+associated consts of it, so `Version::Latest == Version::V2` holds and
+both round-trip identically:
+
+```ts
+declare enum Version { V1 = 1, V2 = 2, Latest = 2, Current = V2 }
+declare enum Flags { Read = 1 << 0, Write = 1 << 1, ReadWrite = Read | Write }
+declare enum Kind { Text = "text", Bytes = "bytes", Default = "text" }
+```
+
+```rust
+#[repr(u32)]
+pub enum Version { V1 = 1, V2 = 2 }
+impl Version {
+    #[allow(non_upper_case_globals)]
+    pub const Latest: Version = Version::V2;
+    #[allow(non_upper_case_globals)]
+    pub const Current: Version = Version::V2;
+}
+#[repr(u32)]
+pub enum Flags { Read = 1, Write = 2, ReadWrite = 3 }
+pub enum Kind { Text = "text", Bytes = "bytes" }
+impl Kind {
+    #[allow(non_upper_case_globals)]
+    pub const Default: Kind = Kind::Text;
+}
+```
+
 wasm-bindgen converts both kinds by value only, so unlike other named
 types they are not borrowed in argument position: `fn send(kind: Kind)`,
 `fn set_kind(this: &Opts, val: Kind)`, and optional properties still

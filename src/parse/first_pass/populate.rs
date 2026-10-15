@@ -847,7 +847,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
             let decl = convert_numeric_enum(enum_decl, self.docs, self.diag);
             declarations.push(dcx.decl(ir::TypeKind::NumericEnum(decl), doc));
         } else {
-            let decl = convert_string_ts_enum(enum_decl);
+            let decl = convert_string_ts_enum(enum_decl, self.diag);
             declarations.push(dcx.decl(ir::TypeKind::StringEnum(decl), doc));
         }
     }

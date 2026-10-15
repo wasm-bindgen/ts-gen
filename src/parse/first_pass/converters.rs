@@ -241,23 +241,134 @@ pub fn classify_ts_enum_kind(enum_decl: &ast::TSEnumDeclaration<'_>) -> ir::Regi
     }
 }
 
+/// The value a TS enum member evaluates to.
+#[derive(Clone, Debug, PartialEq)]
+enum EnumValue {
+    Num(f64),
+    Str(String),
+}
+
+/// Evaluate an enum member initialiser the way TypeScript does: literals,
+/// unary and binary constant expressions with JS numeric semantics
+/// (bitwise operators on int32, `>>>` on uint32), string concatenation,
+/// and references to earlier members, bare or qualified by the enum's own
+/// name. `None` for anything else.
+fn eval_enum_expr(
+    expr: &ast::Expression<'_>,
+    enum_name: &str,
+    members: &[(String, EnumValue)],
+) -> Option<EnumValue> {
+    use ast::Expression as E;
+    let lookup = |name: &str| {
+        members
+            .iter()
+            .rev()
+            .find(|(n, _)| n == name)
+            .map(|(_, v)| v.clone())
+    };
+    match expr {
+        E::NumericLiteral(n) => Some(EnumValue::Num(n.value)),
+        E::StringLiteral(s) => Some(EnumValue::Str(s.value.to_string())),
+        E::TemplateLiteral(t) if t.expressions.is_empty() => Some(EnumValue::Str(
+            t.quasis
+                .iter()
+                .filter_map(|q| q.value.cooked.as_ref())
+                .map(|c| c.as_str())
+                .collect(),
+        )),
+        E::ParenthesizedExpression(p) => eval_enum_expr(&p.expression, enum_name, members),
+        E::Identifier(id) => lookup(&id.name),
+        E::StaticMemberExpression(m) => match &m.object {
+            E::Identifier(obj) if obj.name == enum_name => lookup(&m.property.name),
+            _ => None,
+        },
+        E::UnaryExpression(u) => {
+            let EnumValue::Num(v) = eval_enum_expr(&u.argument, enum_name, members)? else {
+                return None;
+            };
+            Some(EnumValue::Num(match u.operator.as_str() {
+                "-" => -v,
+                "+" => v,
+                "~" => f64::from(!to_int32(v)),
+                _ => return None,
+            }))
+        }
+        E::BinaryExpression(b) => {
+            let l = eval_enum_expr(&b.left, enum_name, members)?;
+            let r = eval_enum_expr(&b.right, enum_name, members)?;
+            let op = b.operator.as_str();
+            let (l, r) = match (l, r) {
+                (EnumValue::Str(l), EnumValue::Str(r)) if op == "+" => {
+                    return Some(EnumValue::Str(l + &r));
+                }
+                (EnumValue::Num(l), EnumValue::Num(r)) => (l, r),
+                _ => return None,
+            };
+            let (li, ri) = (to_int32(l), to_int32(r));
+            Some(EnumValue::Num(match op {
+                "+" => l + r,
+                "-" => l - r,
+                "*" => l * r,
+                "/" => l / r,
+                "%" => l % r,
+                "**" => l.powf(r),
+                "&" => f64::from(li & ri),
+                "|" => f64::from(li | ri),
+                "^" => f64::from(li ^ ri),
+                "<<" => f64::from(li.wrapping_shl(ri as u32 & 31)),
+                ">>" => f64::from(li.wrapping_shr(ri as u32 & 31)),
+                ">>>" => f64::from((li as u32).wrapping_shr(ri as u32 & 31)),
+                _ => return None,
+            }))
+        }
+        _ => None,
+    }
+}
+
+/// ECMAScript `ToInt32`: modular wrap, not saturation.
+fn to_int32(v: f64) -> i32 {
+    if !v.is_finite() {
+        return 0;
+    }
+    (v.trunc().rem_euclid(4_294_967_296.0) as u32) as i32
+}
+
+fn enum_member_name(member: &ast::TSEnumMember<'_>) -> Option<String> {
+    match &member.id {
+        ast::TSEnumMemberName::Identifier(id) => Some(id.name.to_string()),
+        ast::TSEnumMemberName::String(s) => Some(s.value.to_string()),
+        _ => None,
+    }
+}
+
 /// Convert a TS enum with string values to our StringEnumDecl IR.
-pub fn convert_string_ts_enum(enum_decl: &ast::TSEnumDeclaration<'_>) -> ir::StringEnumDecl {
+pub fn convert_string_ts_enum(
+    enum_decl: &ast::TSEnumDeclaration<'_>,
+    diag: &mut DiagnosticCollector,
+) -> ir::StringEnumDecl {
     let name = enum_decl.id.name.to_string();
+    let mut values: Vec<(String, EnumValue)> = Vec::new();
+
     let variants: Vec<_> = enum_decl
         .body
         .members
         .iter()
         .filter_map(|member| {
-            let member_name = match &member.id {
-                ast::TSEnumMemberName::Identifier(id) => id.name.to_string(),
-                ast::TSEnumMemberName::String(s) => s.value.to_string(),
-                _ => return None,
+            let member_name = enum_member_name(member)?;
+            let js_value = match member
+                .initializer
+                .as_ref()
+                .and_then(|init| eval_enum_expr(init, &name, &values))
+            {
+                Some(EnumValue::Str(s)) => s,
+                _ => {
+                    diag.warn(format!(
+                        "Enum `{name}::{member_name}` has no string value, using its name"
+                    ));
+                    member_name.clone()
+                }
             };
-            let js_value = match &member.initializer {
-                Some(ast::Expression::StringLiteral(s)) => s.value.to_string(),
-                _ => member_name.clone(),
-            };
+            values.push((member_name.clone(), EnumValue::Str(js_value.clone())));
             let rust_name = crate::util::naming::to_enum_variant(&member_name);
             Some(ir::StringEnumVariant {
                 rust_name,
@@ -288,51 +399,30 @@ pub fn convert_numeric_enum(
 ) -> ir::NumericEnumDecl {
     let name = enum_decl.id.name.to_string();
     let mut next_value: i64 = 0;
+    let mut values: Vec<(String, EnumValue)> = Vec::new();
 
     let variants: Vec<_> = enum_decl
         .body
         .members
         .iter()
         .filter_map(|member| {
-            let member_name = match &member.id {
-                ast::TSEnumMemberName::Identifier(id) => id.name.to_string(),
-                ast::TSEnumMemberName::String(s) => s.value.to_string(),
-                _ => return None,
-            };
+            let member_name = enum_member_name(member)?;
 
             let value = match &member.initializer {
-                Some(ast::Expression::NumericLiteral(n)) => {
-                    let v = f64_to_i64(n.value, &member_name, &name, diag);
-                    next_value = v + 1;
-                    v
-                }
-                Some(ast::Expression::UnaryExpression(unary)) => {
-                    if let ast::Expression::NumericLiteral(n) = &unary.argument {
-                        let raw = f64_to_i64(n.value, &member_name, &name, diag);
-                        let v = match unary.operator.as_str() {
-                            "-" => -raw,
-                            "~" => !raw,
-                            _ => raw,
-                        };
-                        next_value = v + 1;
-                        v
-                    } else {
-                        let v = next_value;
-                        next_value += 1;
-                        v
+                None => next_value,
+                Some(init) => match eval_enum_expr(init, &name, &values) {
+                    Some(EnumValue::Num(v)) => f64_to_i64(v, &member_name, &name, diag),
+                    _ => {
+                        diag.warn(format!(
+                            "Enum `{name}::{member_name}` has an initializer that is not a \
+                             numeric constant expression, using {next_value}"
+                        ));
+                        next_value
                     }
-                }
-                None => {
-                    let v = next_value;
-                    next_value += 1;
-                    v
-                }
-                _ => {
-                    let v = next_value;
-                    next_value += 1;
-                    v
-                }
+                },
             };
+            next_value = value + 1;
+            values.push((member_name.clone(), EnumValue::Num(value as f64)));
 
             let doc = docs.for_span(member.span.start);
             let rust_name = crate::util::naming::to_enum_variant(&member_name);
@@ -455,4 +545,102 @@ fn f64_to_i64(
         ));
     }
     result
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use oxc_allocator::Allocator;
+    use oxc_parser::Parser;
+    use oxc_span::SourceType;
+
+    fn numeric_values(src: &str) -> Vec<(String, i64)> {
+        let allocator = Allocator::default();
+        let program = Parser::new(&allocator, src, SourceType::d_ts()).parse();
+        let docs = DocComments::new(&[], src);
+        let mut diag = DiagnosticCollector::new();
+        let ast::Statement::TSEnumDeclaration(decl) = &program.program.body[0] else {
+            panic!("expected an enum");
+        };
+        convert_numeric_enum(decl, &docs, &mut diag)
+            .variants
+            .into_iter()
+            .map(|v| (v.js_name, v.value))
+            .collect()
+    }
+
+    fn string_values(src: &str) -> Vec<(String, String)> {
+        let allocator = Allocator::default();
+        let program = Parser::new(&allocator, src, SourceType::d_ts()).parse();
+        let mut diag = DiagnosticCollector::new();
+        let ast::Statement::TSEnumDeclaration(decl) = &program.program.body[0] else {
+            panic!("expected an enum");
+        };
+        convert_string_ts_enum(decl, &mut diag)
+            .variants
+            .into_iter()
+            .map(|v| (v.rust_name, v.js_value))
+            .collect()
+    }
+
+    fn pairs<V: Clone>(items: &[(&str, V)]) -> Vec<(String, V)> {
+        items
+            .iter()
+            .map(|(n, v)| (n.to_string(), v.clone()))
+            .collect()
+    }
+
+    #[test]
+    fn member_references_take_the_referenced_value() {
+        let values = numeric_values("declare enum E { A = 1, B = 2, C = B, D = E.A, F }");
+        assert_eq!(
+            values,
+            pairs(&[("A", 1), ("B", 2), ("C", 2), ("D", 1), ("F", 2)])
+        );
+    }
+
+    #[test]
+    fn constant_expressions_use_js_numeric_semantics() {
+        let values = numeric_values(
+            "declare enum F { R = 1 << 0, W = 1 << 1, RW = R | W, All = RW | 4, Mask = ~0, \
+             Neg = -R, Big = 1 << 31, Shr = -8 >> 1, Ushr = -1 >>> 28, Pow = 2 ** 3 }",
+        );
+        assert_eq!(
+            values,
+            pairs(&[
+                ("R", 1),
+                ("W", 2),
+                ("RW", 3),
+                ("All", 7),
+                ("Mask", -1),
+                ("Neg", -1),
+                ("Big", -2147483648),
+                ("Shr", -4),
+                ("Ushr", 15),
+                ("Pow", 8),
+            ])
+        );
+    }
+
+    #[test]
+    fn unknown_initializer_falls_back_to_auto_increment() {
+        let values = numeric_values("declare enum E { A = 5, B = foo(), C }");
+        assert_eq!(values, pairs(&[("A", 5), ("B", 6), ("C", 7)]));
+    }
+
+    #[test]
+    fn string_members_reference_and_concatenate() {
+        let values =
+            string_values("declare enum K { A = \"a\", B = A, C = A + \"c\", D = `d`, E = K.B }");
+        assert_eq!(
+            values,
+            pairs(&[
+                ("A", "a".to_string()),
+                ("B", "a".into()),
+                ("C", "ac".into()),
+                ("D", "d".into()),
+                ("E", "a".into())
+            ])
+        );
+    }
 }
