@@ -14,7 +14,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_mode(this: &BoolOrStrings, val: bool);
     #[wasm_bindgen(method, setter, js_name = "mode")]
-    pub fn set_mode_with_str(this: &BoolOrStrings, val: &str);
+    pub fn set_mode_with_mode_kind(this: &BoolOrStrings, val: ModeKind);
 }
 impl BoolOrStrings {
     #[doc = " ## Inlined fields"]
@@ -30,7 +30,7 @@ impl BoolOrStrings {
     #[doc = " * `mode: \"x\"`"]
     pub fn new_x() -> BoolOrStrings {
         let inner: BoolOrStrings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode_with_str("x");
+        inner.set_mode_with_mode_kind(ModeKind::X);
         inner
     }
     #[doc = " ## Inlined fields"]
@@ -38,7 +38,7 @@ impl BoolOrStrings {
     #[doc = " * `mode: \"y\"`"]
     pub fn new_y() -> BoolOrStrings {
         let inner: BoolOrStrings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode_with_str("y");
+        inner.set_mode_with_mode_kind(ModeKind::Y);
         inner
     }
 }
@@ -52,7 +52,10 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_mode(this: &NumberOrStrings, val: f64);
     #[wasm_bindgen(method, setter, js_name = "mode")]
-    pub fn set_mode_with_str(this: &NumberOrStrings, val: &str);
+    pub fn set_mode_with_number_or_strings_mode_kind(
+        this: &NumberOrStrings,
+        val: NumberOrStringsModeKind,
+    );
 }
 impl NumberOrStrings {
     #[doc = " ## Inlined fields"]
@@ -68,7 +71,7 @@ impl NumberOrStrings {
     #[doc = " * `mode: \"x\"`"]
     pub fn new_x() -> NumberOrStrings {
         let inner: NumberOrStrings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode_with_str("x");
+        inner.set_mode_with_number_or_strings_mode_kind(NumberOrStringsModeKind::X);
         inner
     }
     #[doc = " ## Inlined fields"]
@@ -76,7 +79,7 @@ impl NumberOrStrings {
     #[doc = " * `mode: \"y\"`"]
     pub fn new_y() -> NumberOrStrings {
         let inner: NumberOrStrings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode_with_str("y");
+        inner.set_mode_with_number_or_strings_mode_kind(NumberOrStringsModeKind::Y);
         inner
     }
 }
@@ -88,7 +91,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn mode(this: &Mixed) -> MixedModeKind;
     #[wasm_bindgen(method, setter)]
-    pub fn set_mode(this: &Mixed, val: &str);
+    pub fn set_mode(this: &Mixed, val: MixedModeKind);
     #[wasm_bindgen(method, setter, js_name = "mode")]
     pub fn set_mode_with_f64(this: &Mixed, val: f64);
     #[wasm_bindgen(method, setter, js_name = "mode")]
@@ -100,7 +103,7 @@ impl Mixed {
     #[doc = " * `mode: \"x\"`"]
     pub fn new_x() -> Mixed {
         let inner: Mixed = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode("x");
+        inner.set_mode(MixedModeKind::X);
         inner
     }
     #[doc = " ## Inlined fields"]
@@ -108,7 +111,7 @@ impl Mixed {
     #[doc = " * `mode: \"y\"`"]
     pub fn new_y() -> Mixed {
         let inner: Mixed = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode("y");
+        inner.set_mode(MixedModeKind::Y);
         inner
     }
     #[doc = " ## Inlined fields"]
@@ -136,22 +139,131 @@ impl Mixed {
         inner
     }
 }
-#[wasm_bindgen]
+#[wasm_bindgen(module = "mixed-literal-factory")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Level;
+    #[wasm_bindgen(method, getter)]
+    pub fn level(this: &Level) -> LevelKind;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_level(this: &Level, val: LevelKind);
+}
+impl Level {
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `level: 0`"]
+    pub fn new_0() -> Level {
+        let inner: Level = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_level(LevelKind::N0);
+        inner
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `level: 1`"]
+    pub fn new_1() -> Level {
+        let inner: Level = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_level(LevelKind::N1);
+        inner
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `level: 2`"]
+    pub fn new_2() -> Level {
+        let inner: Level = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_level(LevelKind::N2);
+        inner
+    }
+}
+#[wasm_bindgen(module = "mixed-literal-factory")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Open;
+    #[wasm_bindgen(method, getter)]
+    pub fn mode(this: &Open) -> OpenModeKind;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_mode(this: &Open, val: &str);
+}
+impl Open {
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `mode: \"x\"`"]
+    pub fn new_x() -> Open {
+        let inner: Open = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_mode("x");
+        inner
+    }
+    pub fn new(mode: &str) -> Open {
+        let inner: Open = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_mode(mode);
+        inner
+    }
+}
+#[wasm_bindgen(module = "mixed-literal-factory")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Optional;
+    #[wasm_bindgen(method, getter)]
+    pub fn mode(this: &Optional) -> Option<OptionalModeKind>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_mode(this: &Optional, val: OptionalModeKind);
+}
+impl Optional {
+    pub fn new() -> Optional {
+        Self::builder().build()
+    }
+    pub fn builder() -> OptionalBuilder {
+        OptionalBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+pub struct OptionalBuilder {
+    inner: Optional,
+}
+impl OptionalBuilder {
+    pub fn mode(self, val: OptionalModeKind) -> Self {
+        self.inner.set_mode(val);
+        self
+    }
+    pub fn build(self) -> Optional {
+        self.inner
+    }
+}
+#[wasm_bindgen(private)]
 pub enum ModeKind {
     Bool(bool),
     X = "x",
     Y = "y",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum NumberOrStringsModeKind {
     F64(f64),
     X = "x",
     Y = "y",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum MixedModeKind {
     X = "x",
     Y = "y",
     F64(f64),
     Bool(bool),
+}
+#[wasm_bindgen(private)]
+pub enum LevelKind {
+    N0 = 0,
+    N1 = 1,
+    N2 = 2,
+}
+#[wasm_bindgen(private)]
+pub enum OpenModeKind {
+    X = "x",
+    String(String),
+}
+#[wasm_bindgen(private)]
+pub enum OptionalModeKind {
+    X = "x",
+    Y = "y",
 }

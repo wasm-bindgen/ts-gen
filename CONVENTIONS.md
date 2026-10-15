@@ -485,6 +485,11 @@ setter, and names its factory with `.` and a leading `-` spelled out
 (`scale: -1 | 0.5` → `new_neg_1()` setting `-1.0`, `new_0_5()` setting
 `0.5`).
 
+A literal that the field's [setter takes through the getter's
+enum](#literal-union-setters) is passed as that enum's variant instead
+(`mode: true | "x" | "y"` → `new_x()` calling
+`set_mode_with_mode_kind(ModeKind::X)`).
+
 Mixed unions like `disposition: "inline" | string` produce one variant
 per literal *plus* a generic catch-all that takes the field as a
 parameter:
@@ -554,6 +559,41 @@ interface ResponseInit {
 
 emits builder methods `headers`, `headers_with_slice`,
 `headers_with_record`.
+
+### Literal union setters
+
+A property's getter returns the
+[synthesised enum](#erased-return-position-unions-become-dynamic-union-enums)
+for a union of literals, so its setter takes that enum for the literal
+members the enum keeps as their own variants: string literals, and every
+member of a C-style integer enum. The other members keep their per-type
+overloads. The enum takes the position of its first literal member for
+`_with_<type>` naming, and the getter's value can be passed straight back.
+
+```ts
+interface Options {
+  mode: true | "x" | "y";
+  inline: "x" | "y";
+  level: 0 | 1 | 2;
+}
+```
+
+```rust
+pub fn mode(this: &Options) -> ModeKind;
+pub fn set_mode(this: &Options, val: bool);
+pub fn set_mode_with_mode_kind(this: &Options, val: ModeKind);
+pub fn set_inline(this: &Options, val: InlineKind);
+pub fn set_level(this: &Options, val: LevelKind);
+```
+
+* A widened `&str` or `f64` setter would accept values outside the union,
+  the enum does not.
+* String literals covered by a `string` member stay on the `&str` setter,
+  which is already exact: `mode: "x" | string` keeps `set_mode(&str)`.
+* Number and boolean literals in a mixed union widen inside the enum too
+  (`F64(f64)`, `Bool(bool)`), so they keep their `f64` / `bool` overloads.
+* Unions without literal members keep their per-type overloads.
+* Builder methods for optional fields follow their setter.
 
 ## Anonymous interface synthesis
 
@@ -1368,8 +1408,11 @@ pub fn send_with_number_or_string(to: impl ::js_sys::JsNumberOrStringLike);
   `impl JsBooleanOrStringLike` plus `_with_symbol(&Symbol)`, and
   `string | symbol` stays `impl JsStringLike` plus `&Symbol`.
 * Dictionary factories keep literal members as `new_<literal>` constructors
-  and group only the remaining non-literal members. The field's setter still
-  takes the whole union, so the literal constructors call it.
+  and group only the remaining non-literal members.
+* Setters group the members left after
+  [literal union setters](#literal-union-setters) take their enum, so
+  `level: "low" | "high" | number` is `set_level(LevelKind)` plus
+  `set_level_with_f64(f64)`.
 
 Return positions are unchanged: an erased union still becomes a
 [dynamic-union enum](#erased-return-position-unions-become-dynamic-union-enums).

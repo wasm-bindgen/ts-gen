@@ -563,6 +563,15 @@ impl<'a> CodegenContext<'a> {
         chosen
     }
 
+    /// Whether `name` is a synthesised dynamic-union enum.
+    pub(crate) fn is_synthesised_enum(&self, name: &str) -> bool {
+        self.dynamic_unions
+            .borrow()
+            .by_key
+            .values()
+            .any(|info| info.rust_name == name)
+    }
+
     /// Generate `use` statements for all external type aliases.
     pub fn external_use_tokens(&self) -> TokenStream {
         let uses = self.external_uses.borrow();
@@ -1114,6 +1123,12 @@ pub fn to_syn_type(
                     if let Some(target) = c.resolve_alias(&segments[0], scope) {
                         let target = target.clone();
                         return to_syn_type(&target, pos, ctx, scope, from_module);
+                    }
+                    // Synthesised enum names never collide with declared
+                    // types. wasm-bindgen enums cross the boundary by value.
+                    if c.is_synthesised_enum(&segments[0]) {
+                        let ident = make_ident(&segments[0]);
+                        return quote! { #ident };
                     }
                 }
             }
@@ -2008,6 +2023,96 @@ fn maybe_synthesise_return_union(
     Some(quote! { #ident })
 }
 
+/// The getter's synthesised enum, as seen by the matching setter.
+pub(crate) struct SetterEnum {
+    pub(crate) name: String,
+    /// Each literal member the enum keeps as its own variant, paired with
+    /// that variant's name.
+    pub(crate) variants: Vec<(TypeRef, String)>,
+}
+
+impl SetterEnum {
+    pub(crate) fn variant(&self, literal: &TypeRef) -> Option<&str> {
+        self.variants
+            .iter()
+            .find(|(l, _)| l == literal)
+            .map(|(_, v)| v.as_str())
+    }
+
+    /// `ty` with the enum's literal members replaced by the enum, at the
+    /// position of the first one.
+    pub(crate) fn param_type(&self, ty: &TypeRef) -> TypeRef {
+        match ty {
+            TypeRef::Nullable(inner) => TypeRef::Nullable(Box::new(self.param_type(inner))),
+            TypeRef::Union(members) => {
+                let mut out: Vec<TypeRef> = Vec::with_capacity(members.len());
+                let mut placed = false;
+                for m in members {
+                    if self.variant(m).is_none() {
+                        out.push(m.clone());
+                    } else if !placed {
+                        out.push(TypeRef::ident(self.name.clone()));
+                        placed = true;
+                    }
+                }
+                if out.len() == 1 {
+                    out.pop().unwrap()
+                } else {
+                    TypeRef::Union(out)
+                }
+            }
+            other => other.clone(),
+        }
+    }
+}
+
+/// Setters route the literal members that the getter's enum keeps as their
+/// own variants (string literals, or every member of a C-style integer
+/// enum) through that enum, rather than a widened `&str` / `f64` that
+/// accepts values outside the union. String literals covered by a `string`
+/// member stay on the `&str` setter, which is then exact.
+pub(crate) fn setter_enum(
+    ty: &TypeRef,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+    anchor: ReturnAnchor<'_>,
+) -> Option<SetterEnum> {
+    let cgctx = ctx?;
+    let ty = match ty {
+        TypeRef::Nullable(inner) => inner,
+        other => other,
+    };
+    let TypeRef::Union(members) = ty else {
+        return None;
+    };
+    let members = dynamic_union_members(members, ctx, scope)?;
+    let integer_enum = is_integer_literal_union(&members);
+    let has_string = members.contains(&TypeRef::String);
+    let variant_names = crate::codegen::dynamic_union_variant_names(&members);
+    let variants: Vec<(TypeRef, String)> = members
+        .iter()
+        .zip(variant_names)
+        .filter(|(m, _)| match m {
+            TypeRef::StringLiteral(_) => !has_string,
+            TypeRef::NumberLiteral(_) => integer_enum,
+            _ => false,
+        })
+        .map(|(m, v)| (m.clone(), v))
+        .collect();
+    if variants.is_empty() {
+        return None;
+    }
+    let name = cgctx.synthesise_dynamic_union(
+        &members,
+        &anchor.enum_anchor(),
+        anchor.parent,
+        scope,
+        from_module,
+    );
+    Some(SetterEnum { name, variants })
+}
+
 /// The members a return-position union synthesises its `<Anchor>Kind`
 /// enum from, or `None` when it keeps its regular lowering.
 ///
@@ -2154,6 +2259,39 @@ mod tests {
     use super::*;
 
     use crate::parse::scope::ScopeId;
+
+    #[test]
+    fn setter_enum_replaces_its_literals_at_the_first_position() {
+        let e = SetterEnum {
+            name: "ModeKind".to_string(),
+            variants: vec![
+                (TypeRef::StringLiteral("x".into()), "X".to_string()),
+                (TypeRef::StringLiteral("y".into()), "Y".to_string()),
+            ],
+        };
+        let union = |members: Vec<TypeRef>| TypeRef::Union(members);
+        let x = TypeRef::StringLiteral("x".into());
+        let y = TypeRef::StringLiteral("y".into());
+        assert_eq!(
+            e.param_type(&union(vec![
+                TypeRef::BooleanLiteral(true),
+                x.clone(),
+                TypeRef::NumberLiteral(1.0),
+                y.clone(),
+            ])),
+            union(vec![
+                TypeRef::BooleanLiteral(true),
+                TypeRef::ident("ModeKind"),
+                TypeRef::NumberLiteral(1.0),
+            ])
+        );
+        assert_eq!(
+            e.param_type(&TypeRef::Nullable(Box::new(union(vec![x.clone(), y])))),
+            TypeRef::Nullable(Box::new(TypeRef::ident("ModeKind")))
+        );
+        assert_eq!(e.variant(&x), Some("X"));
+        assert_eq!(e.variant(&TypeRef::String), None);
+    }
 
     // Helper to run to_syn_type with ARGUMENT position
     fn arg_type(ty: &TypeRef) -> String {

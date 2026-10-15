@@ -68,6 +68,39 @@ pub(crate) struct ClassConfig<'a> {
     scope: ScopeId,
 }
 
+impl ClassConfig<'_> {
+    /// The enum a property's setter shares with its getter; see
+    /// [`super::typemap::setter_enum`].
+    fn setter_enum(&self, js_name: &str, ty: &TypeRef) -> Option<super::typemap::SetterEnum> {
+        super::typemap::setter_enum(
+            ty,
+            self.cgctx,
+            self.scope,
+            &self.from_module(),
+            super::typemap::ReturnAnchor {
+                base: js_name,
+                kind: super::typemap::ReturnAnchorKind::Getter,
+                parent: Some(&self.rust_name),
+            },
+        )
+    }
+
+    /// A setter's single parameter, typed so literal members route through
+    /// the getter's enum.
+    fn setter_param(&self, js_name: &str, ty: &TypeRef) -> crate::ir::Param {
+        let type_ref = match self.setter_enum(js_name, ty) {
+            Some(e) => e.param_type(ty),
+            None => ty.clone(),
+        };
+        crate::ir::Param {
+            name: "val".to_string(),
+            type_ref,
+            optional: false,
+            variadic: false,
+        }
+    }
+}
+
 impl<'a> ClassConfig<'a> {
     fn from_class(
         decl: &ClassDecl,
@@ -498,12 +531,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
     // cartesian-product across required fields below to expose every
     // combination as its own `new` / `builder` variant.
     let resolve_setter_sigs = |g: &crate::ir::GetterMember| -> Vec<FunctionSignature> {
-        let setter_param = crate::ir::Param {
-            name: "val".to_string(),
-            type_ref: g.type_ref.clone(),
-            optional: false,
-            variadic: false,
-        };
+        let setter_param = config.setter_param(&g.js_name, &g.type_ref);
         let mut setter_used = HashSet::new();
         let setter_overloads = [&[setter_param][..]];
         let void = crate::ir::TypeRef::Void;
@@ -583,6 +611,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             // via the same `pick_setter` lookup.
             let mut options: Vec<FieldOption> = Vec::new();
             let members = split_union(&g.type_ref);
+            let setter_enum = config.setter_enum(&g.js_name, &g.type_ref);
             let any_literal = members.iter().any(|m| {
                 matches!(
                     m,
@@ -649,30 +678,45 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             // only synthesised one setter for the whole union).
             let default_setter = super::typemap::make_ident(&setters[0].rust_name);
 
+            // A literal the setter routes through the getter's enum is
+            // passed as that enum's variant.
+            let enum_literal = |m: &crate::ir::TypeRef| {
+                let e = setter_enum.as_ref()?;
+                let variant = super::typemap::make_ident(e.variant(m)?);
+                let enum_ident = super::typemap::make_ident(&e.name);
+                let setter_ident = pick_setter(&crate::ir::TypeRef::ident(e.name.clone()))?;
+                Some((setter_ident, quote! { #enum_ident::#variant }))
+            };
             for m in &members {
                 match m {
                     crate::ir::TypeRef::StringLiteral(s) => {
-                        let setter_ident = pick_setter(m).unwrap_or_else(|| default_setter.clone());
+                        let (setter_ident, literal_expr) = enum_literal(m).unwrap_or_else(|| {
+                            let setter = pick_setter(m).unwrap_or_else(|| default_setter.clone());
+                            (setter, quote! { #s })
+                        });
                         options.push(FieldOption::Literal {
                             field_js_name: g.js_name.clone(),
                             field_doc: g.doc.clone(),
                             literal_display: format!("\"{s}\""),
                             suffix: format!("_{}", to_snake_case(s)),
                             setter_ident,
-                            literal_expr: quote! { #s },
+                            literal_expr,
                         });
                     }
                     crate::ir::TypeRef::NumberLiteral(n) => {
-                        let setter_ident = pick_setter(m).unwrap_or_else(|| default_setter.clone());
-                        let lit = proc_macro2::Literal::f64_unsuffixed(n.abs());
-                        let sign = n.is_sign_negative().then(|| quote! { - });
+                        let (setter_ident, literal_expr) = enum_literal(m).unwrap_or_else(|| {
+                            let setter = pick_setter(m).unwrap_or_else(|| default_setter.clone());
+                            let lit = proc_macro2::Literal::f64_unsuffixed(n.abs());
+                            let sign = n.is_sign_negative().then(|| quote! { - });
+                            (setter, quote! { #sign #lit })
+                        });
                         options.push(FieldOption::Literal {
                             field_js_name: g.js_name.clone(),
                             field_doc: g.doc.clone(),
                             literal_display: n.to_string(),
                             suffix: format!("_{}", crate::util::naming::number_literal_snake(*n)),
                             setter_ident,
-                            literal_expr: quote! { #sign #lit },
+                            literal_expr,
                         });
                     }
                     crate::ir::TypeRef::BooleanLiteral(b) => {
@@ -1705,12 +1749,7 @@ fn generate_setter(
     let doc = setter.doc.clone();
 
     // Treat the setter as a single-param method and expand through signatures
-    let param = crate::ir::Param {
-        name: "val".to_string(),
-        type_ref: setter.type_ref.clone(),
-        optional: false,
-        variadic: false,
-    };
+    let param = config.setter_param(&setter.js_name, &setter.type_ref);
 
     let overloads = [&[param][..]];
     let void = crate::ir::TypeRef::Void;
@@ -1844,12 +1883,7 @@ fn generate_static_setter(
     let class_ident = super::typemap::make_ident(&config.effective_rust_name());
     let doc = setter.doc.clone();
 
-    let param = crate::ir::Param {
-        name: "val".to_string(),
-        type_ref: setter.type_ref.clone(),
-        optional: false,
-        variadic: false,
-    };
+    let param = config.setter_param(&setter.js_name, &setter.type_ref);
 
     let overloads = [&[param][..]];
     let void = crate::ir::TypeRef::Void;

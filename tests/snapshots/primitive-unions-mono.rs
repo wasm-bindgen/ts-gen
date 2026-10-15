@@ -232,7 +232,9 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn level(this: &Settings) -> LevelKind;
     #[wasm_bindgen(method, setter)]
-    pub fn set_level(this: &Settings, val: impl ::js_sys::JsNumberOrStringLike);
+    pub fn set_level(this: &Settings, val: LevelKind);
+    #[wasm_bindgen(method, setter, js_name = "level")]
+    pub fn set_level_with_f64(this: &Settings, val: f64);
     #[wasm_bindgen(method, getter)]
     pub fn id(this: &Settings) -> CurrentReturnKind;
     #[wasm_bindgen(method, setter)]
@@ -297,7 +299,7 @@ impl Settings {
     #[doc = " * `level: \"low\"`"]
     pub fn builder_low(id: impl ::js_sys::JsNumberOrStringLike, from: &Target) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_level("low");
+        inner.set_level(LevelKind::Low);
         inner.set_id(id);
         inner.set_from(from);
         SettingsBuilder { inner }
@@ -310,7 +312,7 @@ impl Settings {
         from: impl ::js_sys::JsBooleanOrStringLike,
     ) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_level("low");
+        inner.set_level(LevelKind::Low);
         inner.set_id(id);
         inner.set_from_with_boolean_or_string(from);
         SettingsBuilder { inner }
@@ -320,7 +322,7 @@ impl Settings {
     #[doc = " * `level: \"high\"`"]
     pub fn builder_high(id: impl ::js_sys::JsNumberOrStringLike, from: &Target) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_level("high");
+        inner.set_level(LevelKind::High);
         inner.set_id(id);
         inner.set_from(from);
         SettingsBuilder { inner }
@@ -333,7 +335,7 @@ impl Settings {
         from: impl ::js_sys::JsBooleanOrStringLike,
     ) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_level("high");
+        inner.set_level(LevelKind::High);
         inner.set_id(id);
         inner.set_from_with_boolean_or_string(from);
         SettingsBuilder { inner }
@@ -344,7 +346,7 @@ impl Settings {
         from: &Target,
     ) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_level(level);
+        inner.set_level_with_f64(level);
         inner.set_id(id);
         inner.set_from(from);
         SettingsBuilder { inner }
@@ -355,7 +357,7 @@ impl Settings {
         from: impl ::js_sys::JsBooleanOrStringLike,
     ) -> SettingsBuilder {
         let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_level(level);
+        inner.set_level_with_f64(level);
         inner.set_id(id);
         inner.set_from_with_boolean_or_string(from);
         SettingsBuilder { inner }

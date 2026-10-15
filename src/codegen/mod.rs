@@ -334,52 +334,25 @@ fn generate_dynamic_unions(cgctx: &CodegenContext) -> TokenStream {
         .values()
         .map(|info| {
             let enum_ident = typemap::make_ident(&info.rust_name);
-            // Track variant names within a single enum so that a
-            // `string` arm doesn't collide with another arm whose
-            // payload also lowers to `String`. First-seen wins; the
-            // second is numbered.
-            let mut used_variants: std::collections::HashSet<String> =
-                std::collections::HashSet::new();
-            let mut alloc_variant = |base: &str| -> String {
-                if used_variants.insert(base.to_string()) {
-                    return base.to_string();
-                }
-                let mut i: u32 = 2;
-                loop {
-                    let candidate = format!("{base}{i}");
-                    if used_variants.insert(candidate.clone()) {
-                        return candidate;
-                    }
-                    i += 1;
-                }
-            };
             let variants: Vec<TokenStream> = info
                 .members
                 .iter()
-                .map(|m| {
+                .zip(dynamic_union_variant_names(&info.members))
+                .map(|(m, variant_name)| {
+                    let variant_ident = typemap::make_ident(&variant_name);
                     match m {
                         // Literal members become discriminant variants.
                         // `typemap::dynamic_union_members` only keeps
                         // number literals when every member is a 32-bit
                         // integer literal (a C-style enum), and widens
                         // boolean literals to `boolean`.
-                        T::StringLiteral(s) => {
-                            let variant_name =
-                                alloc_variant(&crate::util::naming::to_pascal_case(s));
-                            let variant_ident = typemap::make_ident(&variant_name);
-                            quote! { #variant_ident = #s }
-                        }
+                        T::StringLiteral(s) => quote! { #variant_ident = #s },
                         T::NumberLiteral(n) if n.fract() == 0.0 => {
-                            let variant_name =
-                                alloc_variant(&crate::util::naming::number_literal_pascal(*n));
-                            let variant_ident = typemap::make_ident(&variant_name);
                             let lit = proc_macro2::Literal::i64_unsuffixed(n.abs() as i64);
                             let sign = (*n < 0.0).then(|| quote! { - });
                             quote! { #variant_ident = #sign #lit }
                         }
                         _ => {
-                            let variant_name = alloc_variant(&dynamic_union_variant_name(m));
-                            let variant_ident = typemap::make_ident(&variant_name);
                             let payload = typemap::to_syn_type(
                                 m,
                                 typemap::TypePosition::RETURN,
@@ -401,6 +374,33 @@ fn generate_dynamic_unions(cgctx: &CodegenContext) -> TokenStream {
         })
         .collect();
     quote! { #(#enums)* }
+}
+
+/// Variant names for the members of a synthesised dynamic union, in member
+/// order. A name already taken in the enum (a `string` arm next to a
+/// `"String"` literal) is numbered, first-seen wins.
+pub(crate) fn dynamic_union_variant_names(members: &[crate::ir::TypeRef]) -> Vec<String> {
+    use crate::ir::TypeRef as T;
+    let mut used = std::collections::HashSet::new();
+    members
+        .iter()
+        .map(|m| {
+            let base = match m {
+                T::StringLiteral(s) => crate::util::naming::to_pascal_case(s),
+                T::NumberLiteral(n) if n.fract() == 0.0 => {
+                    crate::util::naming::number_literal_pascal(*n)
+                }
+                _ => dynamic_union_variant_name(m),
+            };
+            if used.insert(base.clone()) {
+                return base;
+            }
+            (2..)
+                .map(|i| format!("{base}{i}"))
+                .find(|candidate| used.insert(candidate.clone()))
+                .unwrap()
+        })
+        .collect()
 }
 
 /// Pick a Rust variant name for a `TypeRef` member of a synthesised
