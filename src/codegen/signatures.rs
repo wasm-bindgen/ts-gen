@@ -353,13 +353,14 @@ pub fn expand_signatures(
     scope: ScopeId,
 ) -> Vec<ExpandedSignature> {
     // Phase 1: Per-overload expansion — optional truncation + union cartesian product.
-    let mut all_sigs: Vec<(usize, Vec<ConcreteParam>)> = Vec::new();
+    let mut all_sigs: Vec<Vec<ConcreteParam>> = Vec::new();
+    let mut first_overload_sigs = 0;
     for (index, params) in overloads.iter().enumerate() {
-        all_sigs.extend(
-            expand_single_overload(params, cgctx, scope)
-                .into_iter()
-                .map(|sig| (index, sig)),
-        );
+        let sigs = expand_single_overload(params, cgctx, scope);
+        if index == 0 {
+            first_overload_sigs = sigs.len();
+        }
+        all_sigs.extend(sigs);
     }
 
     // Phase 2: Cross-overload dedup — remove signatures that are identical
@@ -378,8 +379,10 @@ pub fn expand_signatures(
     let mut seen_concrete: Vec<&Vec<ConcreteParam>> = Vec::new();
     let mut seen_rendered: Vec<Vec<String>> = Vec::new();
     let mut deduped: Vec<Vec<ConcreteParam>> = Vec::new();
-    let mut indices: Vec<usize> = Vec::new();
-    for (index, sig) in &all_sigs {
+    // The first overload's expansions are never dropped as duplicates of a
+    // later overload's, so its survivors are a contiguous prefix of `deduped`.
+    let mut first_overload_len = 0;
+    for (i, sig) in all_sigs.iter().enumerate() {
         if seen_concrete.iter().any(|s| concrete_params_eq(s, sig)) {
             continue;
         }
@@ -390,7 +393,9 @@ pub fn expand_signatures(
         seen_concrete.push(sig);
         seen_rendered.push(rendered);
         deduped.push(sig.clone());
-        indices.push(*index);
+        if i < first_overload_sigs {
+            first_overload_len += 1;
+        }
     }
 
     // Phase 3: Suffix — compute `_with_X` disambiguators across the cohort.
@@ -400,7 +405,7 @@ pub fn expand_signatures(
     // `(key)` owns `get` rather than the two-arg form. A shorter expansion
     // with different leading params (`put(entries)` next to
     // `put(key, value)`) does not displace the first overload.
-    if let Some(primary) = primary_expansion(&deduped, &indices) {
+    if let Some(primary) = primary_expansion(&deduped, first_overload_len) {
         deduped[..=primary].rotate_right(1);
     }
     compute_suffixes(&deduped)
@@ -414,12 +419,11 @@ pub fn expand_signatures(
 }
 
 /// Index of the expansion that owns the unsuffixed name; see the Phase 3
-/// comment in [`expand_signatures`]. `None` when there is nothing to move.
-fn primary_expansion(sigs: &[Vec<ConcreteParam>], indices: &[usize]) -> Option<usize> {
-    let first_overload = *indices.first()?;
-    let anchor = (0..sigs.len())
-        .filter(|&i| indices[i] == first_overload)
-        .min_by_key(|&i| sigs[i].len())?;
+/// comment in [`expand_signatures`]. The first `first_overload_len` entries
+/// of `sigs` are the first overload's expansions. `None` when there is
+/// nothing to move.
+fn primary_expansion(sigs: &[Vec<ConcreteParam>], first_overload_len: usize) -> Option<usize> {
+    let anchor = (0..first_overload_len).min_by_key(|&i| sigs[i].len())?;
     let is_prefix_of_anchor = |sig: &[ConcreteParam]| {
         sig.len() < sigs[anchor].len() && concrete_params_eq(sig, &sigs[anchor][..sig.len()])
     };
