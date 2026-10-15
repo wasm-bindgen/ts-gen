@@ -1973,7 +1973,7 @@ fn alias_target_with_defaults(alias: &ir::TypeAliasDecl) -> std::borrow::Cow<'_,
 }
 
 /// `ty` with each bare reference to a name in `params` replaced.
-fn substitute_type_params(ty: &TypeRef, params: &HashMap<&str, TypeRef>) -> TypeRef {
+pub(crate) fn substitute_type_params(ty: &TypeRef, params: &HashMap<&str, TypeRef>) -> TypeRef {
     let sub = |t: &TypeRef| substitute_type_params(t, params);
     match ty {
         TypeRef::Reference {

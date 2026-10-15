@@ -11,6 +11,7 @@
     "slice-args": "file:./js/slice-args",
     "slice-args-mono": "file:./js/slice-args-mono",
     "slice-hints": "file:./js/slice-hints",
-    "node-nullable": "file:js/node-nullable"
+    "node-nullable": "file:js/node-nullable",
+    "provides-worker": "file:js/provides-worker"
   }
 }
