@@ -187,6 +187,20 @@ fn snapshot_test(fixture_name: &str) {
     });
 
     assert_snapshot(&snap_path, &rust_code);
+
+    // `--provides` writes a wrapper and an app scaffold next to the output.
+    for file in ["provides.rs", "app.rs"] {
+        let path = out_dir.0.join(file);
+        if path.is_file() {
+            let code = std::fs::read_to_string(&path).unwrap();
+            assert_snapshot(
+                &root
+                    .join("tests/snapshots")
+                    .join(format!("{base_name}.{file}")),
+                &code,
+            );
+        }
+    }
 }
 
 /// Discover all `.d.ts` files in `tests/fixtures/` and run a snapshot test
@@ -199,10 +213,11 @@ fn snapshots() {
         .filter_map(|entry| {
             let entry = entry.ok()?;
             let path = entry.path();
-            if path.extension().and_then(|e| e.to_str()) == Some("ts")
-                && path.to_string_lossy().ends_with(".d.ts")
-            {
-                Some(path.file_name()?.to_string_lossy().to_string())
+            let name = path.file_name()?.to_string_lossy().to_string();
+            // `<fixture>.provides.d.ts` is a fixture's `--provides` surface,
+            // not an input of its own.
+            if name.ends_with(".d.ts") && !name.ends_with(".provides.d.ts") {
+                Some(name)
             } else {
                 None
             }

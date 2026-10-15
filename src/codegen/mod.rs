@@ -8,6 +8,7 @@ pub mod discriminated_unions;
 pub mod enums;
 pub mod functions;
 pub(crate) mod primitive_unions;
+pub mod provides;
 pub mod signatures;
 pub mod subtyping;
 pub mod surface;
@@ -226,9 +227,41 @@ fn with_unshared_views(
     f
 }
 
-/// Format Rust source via `rustfmt`.
-///
-/// Falls back to `prettyplease` if `rustfmt` is not available.
+/// The `--provides` wrapper and app scaffold, as `(provides.rs, app.rs)`
+/// sources.
+pub fn generate_provides(
+    module: &Module,
+    gctx: &crate::context::GlobalContext,
+    options: &GenerateOptions,
+    fns: &[crate::provides::ProvidedFn],
+    paths: &provides::ProvidesPaths,
+) -> anyhow::Result<(String, String)> {
+    let surface = surface::Surface::build(module, gctx, options);
+    let cgctx = CodegenContext::from_module_full(
+        module,
+        gctx,
+        options.errors_as_error,
+        options.experimental_generic_mono,
+        Some(&surface),
+    );
+    let wrapper = provides::generate_wrapper(fns, &cgctx, paths)?;
+    let app = provides::generate_app(fns, &cgctx, paths)?;
+    cgctx.diagnostics.borrow().emit();
+    Ok((wrapper, app))
+}
+
+/// Validate as a `syn::File` and format with prettyplease, which unlike
+/// rustfmt also normalises attribute arguments it cannot parse as meta
+/// (`js_namespace = ["a", "b"]`).
+pub(crate) fn rustfmt_tokens(tokens: &proc_macro2::TokenStream) -> anyhow::Result<String> {
+    let file = syn::parse2::<syn::File>(tokens.clone()).map_err(|e| {
+        anyhow::anyhow!("generated tokens are not valid syn:\n{e}\n\nTokens:\n{tokens}")
+    })?;
+    Ok(prettyplease::unparse(&file))
+}
+
+/// Format Rust source via `rustfmt`, falling back to `prettyplease` if
+/// `rustfmt` is not available.
 fn rustfmt(code: &str) -> anyhow::Result<String> {
     use std::io::Write;
     use std::process::{Command, Stdio};
