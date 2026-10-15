@@ -395,16 +395,13 @@ pub fn expand_signatures(
 
     // Phase 3: Suffix — compute `_with_X` disambiguators across the cohort.
     // The base name goes to the first overload's shortest expansion, or to
-    // a shorter expansion that is a parameter-name prefix of it: with
+    // a shorter expansion that is a prefix of it: with
     // `get(key, options: Required)` declared before `get(key, options?)`,
     // `(key)` owns `get` rather than the two-arg form. A shorter expansion
-    // with different leading names (`put(entries)` next to
+    // with different leading params (`put(entries)` next to
     // `put(key, value)`) does not displace the first overload.
     if let Some(primary) = primary_expansion(&deduped, &indices) {
-        let sig = deduped.remove(primary);
-        let index = indices.remove(primary);
-        deduped.insert(0, sig);
-        indices.insert(0, index);
+        deduped[..=primary].rotate_right(1);
     }
     compute_suffixes(&deduped)
         .into_iter()
@@ -419,13 +416,12 @@ pub fn expand_signatures(
 /// Index of the expansion that owns the unsuffixed name; see the Phase 3
 /// comment in [`expand_signatures`]. `None` when there is nothing to move.
 fn primary_expansion(sigs: &[Vec<ConcreteParam>], indices: &[usize]) -> Option<usize> {
-    let first_overload = *indices.iter().min()?;
+    let first_overload = *indices.first()?;
     let anchor = (0..sigs.len())
         .filter(|&i| indices[i] == first_overload)
         .min_by_key(|&i| sigs[i].len())?;
     let is_prefix_of_anchor = |sig: &[ConcreteParam]| {
-        sig.len() < sigs[anchor].len()
-            && sig.iter().zip(&sigs[anchor]).all(|(a, b)| a.name == b.name)
+        sig.len() < sigs[anchor].len() && concrete_params_eq(sig, &sigs[anchor][..sig.len()])
     };
     let primary = (0..sigs.len())
         .filter(|&i| is_prefix_of_anchor(&sigs[i]))
@@ -2035,6 +2031,88 @@ mod tests {
         assert_eq!(sigs[1].params.len(), 2);
         assert_eq!(sigs[2].rust_name, "new_with_stderr_and_ignore_errors");
         assert_eq!(sigs[2].params.len(), 3);
+    }
+
+    /// `(name, type)` of each param of the signature owning the bare `js`
+    /// name, across `overloads` of one method.
+    fn primary_params(js: &str, overloads: &[&[Param]]) -> Vec<(String, TypeRef)> {
+        let sigs = expand_overloads(
+            js,
+            overloads,
+            &TypeRef::Void,
+            SignatureKind::Method,
+            &None,
+            &mut no_used(),
+        );
+        let primary = sigs.iter().find(|s| s.rust_name == js).unwrap();
+        primary
+            .params
+            .iter()
+            .map(|p| (p.name.clone(), p.type_ref.clone()))
+            .collect()
+    }
+
+    fn named(params: &[(&str, TypeRef)]) -> Vec<(String, TypeRef)> {
+        params
+            .iter()
+            .map(|(name, ty)| (name.to_string(), ty.clone()))
+            .collect()
+    }
+
+    #[test]
+    fn primary_is_shorter_prefix_of_required_options_overload() {
+        let primary = primary_params(
+            "get",
+            &[
+                &[
+                    string_param("key"),
+                    typed_param("options", TypeRef::ident("Conditional")),
+                ],
+                &[
+                    string_param("key"),
+                    opt_typed_param("options", TypeRef::ident("GetOptions")),
+                ],
+            ],
+        );
+        assert_eq!(primary, named(&[("key", TypeRef::String)]));
+    }
+
+    #[test]
+    fn primary_is_later_zero_argument_overload() {
+        let primary = primary_params("first", &[&[string_param("column")], &[]]);
+        assert_eq!(primary, named(&[]));
+    }
+
+    #[test]
+    fn primary_stays_with_first_overload_on_different_leading_names() {
+        let primary = primary_params(
+            "put",
+            &[
+                &[
+                    string_param("key"),
+                    string_param("value"),
+                    opt_param("options"),
+                ],
+                &[param("entries"), opt_param("options")],
+            ],
+        );
+        assert_eq!(
+            primary,
+            named(&[("key", TypeRef::String), ("value", TypeRef::String)])
+        );
+    }
+
+    #[test]
+    fn primary_stays_with_first_overload_on_different_leading_types() {
+        let opts = TypeRef::ident("Options");
+        let primary = primary_params(
+            "find",
+            &[
+                &[string_param("key"), typed_param("opts", opts.clone())],
+                &[typed_param("key", TypeRef::Number)],
+            ],
+        );
+        assert_eq!(primary, named(&[("key", TypeRef::String), ("opts", opts)]));
     }
 
     #[test]

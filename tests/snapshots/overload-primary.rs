@@ -114,4 +114,8 @@ extern "C" {
         entries: &Object<JsString>,
         options: &GetOptions,
     ) -> Result<Undefined, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn find(this: &Store, key: &str, options: &GetOptions) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "find")]
+    pub async fn find_with_f64(this: &Store, key: f64) -> Result<JsString, JsValue>;
 }

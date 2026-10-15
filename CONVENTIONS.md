@@ -850,9 +850,11 @@ For every JS callable, `ts-gen`:
    parameters that distinguish them.
 
    The primary is the first overload's shortest expansion, unless a
-   shorter expansion shares its leading parameter names, in which case
-   that one is the primary. Declaration order alone would let a
-   required-options overload claim the bare name for its longer form:
+   shorter expansion matches its leading parameters (names and types),
+   in which case that one is the primary. An empty expansion matches
+   any prefix, so a zero-argument overload always takes the bare name.
+   Declaration order alone would let a required-options overload claim
+   the bare name for its longer form:
 
    ```ts
    get(key: string, options: Conditional): Promise<string | null>;
