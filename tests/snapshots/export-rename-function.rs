@@ -51,7 +51,7 @@ extern "C" {
     # [wasm_bindgen (extends = Object , js_name = "Server")]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type _Server;
-    #[wasm_bindgen(constructor, catch)]
+    #[wasm_bindgen(constructor, js_class = "Server", catch)]
     pub fn new(port: f64) -> Result<_Server, JsValue>;
     #[wasm_bindgen(method)]
     pub fn stop(this: &_Server);

@@ -158,7 +158,9 @@ fn parse_single_file(
     let import_logs: Vec<String> = gctx
         .pending_imports
         .iter()
-        .filter(|imp| imp.scope == file_scope)
+        .filter(|imp| {
+            imp.scope == file_scope || registry.module_scopes.values().any(|&s| s == imp.scope)
+        })
         .map(|imp| {
             format!(
                 "Import: {} from \"{}\" (pending)",

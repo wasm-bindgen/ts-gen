@@ -748,7 +748,11 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         match &module.id {
             ast::TSModuleDeclarationName::StringLiteral(s) => {
                 let module_ctx = ir::ModuleContext::Module(s.value.as_str().into());
-                let module_scope = self.registry.module_scopes[s.value.as_str()];
+                let module_scope = *self
+                    .registry
+                    .module_scopes
+                    .get(s.value.as_str())
+                    .expect("phase 1 creates a scope for every ambient module");
                 if let Some(ast::TSModuleDeclarationBody::TSModuleBlock(block)) = &module.body {
                     for stmt in &block.body {
                         self.populate_statement(

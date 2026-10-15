@@ -1776,8 +1776,9 @@ yet supported.
   * A constructor variable's class takes the first public name; any
     further names alias it.
   * A class keeps its local name as the Rust type, since the module refers
-    to it by that name, but binds `js_name` to the first public name. Each
-    public name gets an alias stub (`pub type Server = _Server;`).
+    to it by that name, but binds `js_name` to the first public name, and
+    its constructors and static members carry `js_class` with the same
+    name. Each public name gets an alias stub (`pub type Server = _Server;`).
   * Types without a runtime binding (interfaces, type aliases, enums) get
     an alias stub only.
 
