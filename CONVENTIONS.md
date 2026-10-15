@@ -1817,6 +1817,11 @@ through the namespace. A qualified name that resolves to nothing
 erases to `JsValue` with an error rather than matching a local type
 by its last segment.
 
+A namespace merged with a same-named class, function or interface
+(`class Foo {}` + `namespace Foo { interface Options {} }`) leaves
+that declaration as the type `Foo`, while `Foo.Options` resolves
+through the namespace, in either declaration order.
+
 ## Type aliases and `export { X as Y }`
 
 * `type Foo = Bar;` → `pub type Foo = Bar;` if `Bar` is a recognised

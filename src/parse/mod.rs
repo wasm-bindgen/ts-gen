@@ -245,12 +245,24 @@ fn parse_single_file(
                 ),
                 crate::ir::ModuleContext::Global => None,
             };
+            let members = match &decl.kind {
+                crate::ir::TypeKind::Namespace(ns) => Some(ns.child_scope),
+                _ => None,
+            };
             let type_id = gctx.insert_type(decl);
+            // A namespace merged with a same-named class, function or
+            // interface leaves that declaration as the name's type.
+            let merged = members.is_some()
+                && name.as_ref().is_some_and(|name| {
+                    gctx.scopes.get(decl_scope).get(name).is_some_and(|id| {
+                        !matches!(gctx.get_type(id).kind, crate::ir::TypeKind::Namespace(_))
+                    })
+                });
             // Insert/upgrade the type in the scope so codegen can resolve it.
             // Members of a namespace inside a module are flattened into the
             // module but declared in the namespace scope, which also needs the
             // upgrade for `NS.Member` to reach the populated declaration.
-            if let Some(ref name) = name {
+            if let Some(name) = name.as_ref().filter(|_| !merged) {
                 gctx.scopes.insert(decl_scope, name.clone(), type_id);
                 if let Some(flat_scope) = flat_scope.filter(|&s| s != decl_scope) {
                     gctx.scopes.insert(flat_scope, name.clone(), type_id);
@@ -262,7 +274,12 @@ fn parse_single_file(
             if is_script && decl_scope == file_scope {
                 if let Some(parent) = gctx.scopes.get(file_scope).parent {
                     if let Some(name) = name {
-                        gctx.scopes.insert(parent, name, type_id);
+                        if let Some(members) = members {
+                            gctx.scopes.insert_namespace(parent, name.clone(), members);
+                        }
+                        if !merged {
+                            gctx.scopes.insert(parent, name, type_id);
+                        }
                     }
                 }
             }
@@ -1113,6 +1130,46 @@ mod tests {
         match &gctx.get_type(id).kind {
             TypeKind::StringEnum(e) => assert_eq!(e.variants.len(), 2),
             other => panic!("expected a string enum, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn merged_namespaces_resolve_alongside_their_type() {
+        for lib in [None, Some("m")] {
+            let src = r#"
+                export declare class Foo {}
+                export declare namespace Foo { interface Options {} }
+                export declare namespace Bar { type Mode = "on" | "off"; }
+                export declare function Bar(): void;
+                export type Local = "l";
+            "#;
+            let src = if lib.is_some() {
+                src.to_string()
+            } else {
+                src.replace("export ", "")
+            };
+            let (module, gctx) = crate::parse_source(&src, lib).unwrap();
+            let scope = module.file_scopes[0];
+            let kind = |path: &str| {
+                gctx.resolve_path(scope, path)
+                    .map(|id| &gctx.get_type(id).kind)
+            };
+
+            assert!(matches!(kind("Foo"), Some(TypeKind::Class(_))), "{lib:?}");
+            assert!(
+                matches!(kind("Foo.Options"), Some(TypeKind::Interface(_))),
+                "{lib:?}"
+            );
+            assert!(
+                matches!(kind("Bar"), Some(TypeKind::Function(_))),
+                "{lib:?}"
+            );
+            assert!(
+                matches!(kind("Bar.Mode"), Some(TypeKind::StringEnum(_))),
+                "{lib:?}"
+            );
+            // A member lookup does not fall back to the enclosing scope.
+            assert!(kind("Foo.Local").is_none(), "{lib:?}");
         }
     }
 }

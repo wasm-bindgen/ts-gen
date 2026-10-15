@@ -883,12 +883,9 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
     /// Look up the child scope that Phase 1 created for a namespace.
     /// Falls back to the parent scope if not found.
     fn resolve_namespace_scope(&self, ns_name: &str, parent_scope: ScopeId) -> ScopeId {
-        if let Some(type_id) = self.scopes.resolve(parent_scope, ns_name) {
-            let decl = &self.type_arena[type_id.index()];
-            if let ir::TypeKind::Namespace(ref ns) = decl.kind {
-                return ns.child_scope;
-            }
-        }
-        parent_scope
+        self.scopes
+            .get(parent_scope)
+            .namespace(ns_name)
+            .unwrap_or(parent_scope)
     }
 }

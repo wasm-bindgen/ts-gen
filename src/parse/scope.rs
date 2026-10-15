@@ -66,6 +66,10 @@ pub struct TypeScope {
     pub parent: Option<ScopeId>,
     /// Types defined or imported in this scope: name → binding.
     names: HashMap<String, Binding>,
+    /// Namespaces declared in this scope: name → member scope. Kept apart
+    /// from `names` because TS merges a namespace with a same-named class,
+    /// function or interface, which stays the name's type.
+    namespaces: HashMap<String, ScopeId>,
 }
 
 impl TypeScope {
@@ -73,7 +77,13 @@ impl TypeScope {
         Self {
             parent,
             names: HashMap::new(),
+            namespaces: HashMap::new(),
         }
+    }
+
+    /// The member scope of a namespace declared in this scope only.
+    pub fn namespace(&self, name: &str) -> Option<ScopeId> {
+        self.namespaces.get(name).copied()
     }
 
     /// Insert a declared-type binding into this scope.
@@ -155,6 +165,19 @@ impl ScopeArena {
     /// Insert a type-parameter binding into the given scope.
     pub fn insert_type_param(&mut self, scope: ScopeId, name: String) {
         self.get_mut(scope).insert_type_param(name);
+    }
+
+    /// Declare a namespace in `scope` whose members live in `members`.
+    pub fn insert_namespace(&mut self, scope: ScopeId, name: String, members: ScopeId) {
+        self.get_mut(scope).namespaces.insert(name, members);
+    }
+
+    /// Resolve a namespace name to its member scope by walking up the
+    /// scope chain.
+    pub fn resolve_namespace(&self, scope: ScopeId, name: &str) -> Option<ScopeId> {
+        let s = self.get(scope);
+        s.namespace(name)
+            .or_else(|| s.parent.and_then(|p| self.resolve_namespace(p, name)))
     }
 
     /// Resolve a simple name to a declared `TypeId` by walking up the

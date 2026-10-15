@@ -1125,9 +1125,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_performance(this: &ServiceWorkerGlobalScope, val: &Performance);
     #[wasm_bindgen(method, getter, js_name = "Cloudflare")]
-    pub fn cloudflare(this: &ServiceWorkerGlobalScope) -> JsValue;
+    pub fn cloudflare(this: &ServiceWorkerGlobalScope) -> Cloudflare;
     #[wasm_bindgen(method, setter, js_name = "Cloudflare")]
-    pub fn set_cloudflare(this: &ServiceWorkerGlobalScope, val: &JsValue);
+    pub fn set_cloudflare(this: &ServiceWorkerGlobalScope, val: &Cloudflare);
     #[wasm_bindgen(method, getter)]
     pub fn origin(this: &ServiceWorkerGlobalScope) -> String;
     #[wasm_bindgen(method, getter, js_name = "Event")]
@@ -1729,7 +1729,7 @@ extern "C" {
 extern "C" {
     #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2, js_name = "Cloudflare")]
-    pub static cloudflare: JsValue;
+    pub static cloudflare: Cloudflare;
 }
 #[wasm_bindgen]
 extern "C" {

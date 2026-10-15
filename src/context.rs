@@ -5,7 +5,7 @@
 //! then borrowed immutably for codegen.
 
 use crate::external_map::ExternalMap;
-use crate::ir::{TypeDeclaration, TypeKind};
+use crate::ir::TypeDeclaration;
 use crate::parse::scope::{PendingImport, ScopeArena, ScopeId};
 use crate::util::diagnostics::DiagnosticCollector;
 
@@ -157,25 +157,16 @@ impl GlobalContext {
 
     /// Resolve a dotted type path like `"NodeJS.TypedArray"` through namespace scopes.
     ///
-    /// Splits on `.`, resolves the first segment in the starting scope, then
-    /// follows `Namespace` declarations for subsequent segments.
+    /// The first namespace resolves from `scope` up the chain; each later
+    /// segment must be declared directly in the namespace before it.
     pub fn resolve_path(&self, scope: ScopeId, path: &str) -> Option<TypeId> {
-        let mut segments = path.split('.');
-        let first = segments.next()?;
-
-        let mut current_id = self.scopes.resolve(scope, first)?;
-
-        for segment in segments {
-            let decl = self.get_type(current_id);
-            match &decl.kind {
-                TypeKind::Namespace(ns) => {
-                    current_id = self.scopes.resolve(ns.child_scope, segment)?;
-                }
-                _ => return None, // Non-namespace in the middle of a path
-            }
-        }
-
-        Some(current_id)
+        let Some((namespaces, member)) = path.rsplit_once('.') else {
+            return self.scopes.resolve(scope, path);
+        };
+        let mut namespaces = namespaces.split('.');
+        let first = self.scopes.resolve_namespace(scope, namespaces.next()?)?;
+        let members = namespaces.try_fold(first, |ns, name| self.scopes.get(ns).namespace(name))?;
+        self.scopes.get(members).get(member)
     }
 
     /// Iterate all types in the arena.
