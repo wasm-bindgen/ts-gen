@@ -14,7 +14,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_mode(this: &BoolOrStrings, val: bool);
     #[wasm_bindgen(method, setter, js_name = "mode")]
-    pub fn set_mode_with_js_value(this: &BoolOrStrings, val: &str);
+    pub fn set_mode_with_str(this: &BoolOrStrings, val: &str);
 }
 impl BoolOrStrings {
     #[doc = " ## Inlined fields"]
@@ -30,7 +30,7 @@ impl BoolOrStrings {
     #[doc = " * `mode: \"x\"`"]
     pub fn new_x() -> BoolOrStrings {
         let inner: BoolOrStrings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode_with_js_value("x");
+        inner.set_mode_with_str("x");
         inner
     }
     #[doc = " ## Inlined fields"]
@@ -38,7 +38,7 @@ impl BoolOrStrings {
     #[doc = " * `mode: \"y\"`"]
     pub fn new_y() -> BoolOrStrings {
         let inner: BoolOrStrings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode_with_js_value("y");
+        inner.set_mode_with_str("y");
         inner
     }
 }
@@ -52,7 +52,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_mode(this: &NumberOrStrings, val: f64);
     #[wasm_bindgen(method, setter, js_name = "mode")]
-    pub fn set_mode_with_js_value(this: &NumberOrStrings, val: &str);
+    pub fn set_mode_with_str(this: &NumberOrStrings, val: &str);
 }
 impl NumberOrStrings {
     #[doc = " ## Inlined fields"]
@@ -68,7 +68,7 @@ impl NumberOrStrings {
     #[doc = " * `mode: \"x\"`"]
     pub fn new_x() -> NumberOrStrings {
         let inner: NumberOrStrings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode_with_js_value("x");
+        inner.set_mode_with_str("x");
         inner
     }
     #[doc = " ## Inlined fields"]
@@ -76,7 +76,7 @@ impl NumberOrStrings {
     #[doc = " * `mode: \"y\"`"]
     pub fn new_y() -> NumberOrStrings {
         let inner: NumberOrStrings = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode_with_js_value("y");
+        inner.set_mode_with_str("y");
         inner
     }
 }
@@ -90,9 +90,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_mode(this: &Mixed, val: &str);
     #[wasm_bindgen(method, setter, js_name = "mode")]
-    pub fn set_mode_with_js_value(this: &Mixed, val: f64);
+    pub fn set_mode_with_f64(this: &Mixed, val: f64);
     #[wasm_bindgen(method, setter, js_name = "mode")]
-    pub fn set_mode_with_val_js_value(this: &Mixed, val: bool);
+    pub fn set_mode_with_bool(this: &Mixed, val: bool);
 }
 impl Mixed {
     #[doc = " ## Inlined fields"]
@@ -116,7 +116,7 @@ impl Mixed {
     #[doc = " * `mode: 1`"]
     pub fn new_1() -> Mixed {
         let inner: Mixed = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode_with_js_value(1.0);
+        inner.set_mode_with_f64(1.0);
         inner
     }
     #[doc = " ## Inlined fields"]
@@ -124,7 +124,7 @@ impl Mixed {
     #[doc = " * `mode: 2`"]
     pub fn new_2() -> Mixed {
         let inner: Mixed = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode_with_js_value(2.0);
+        inner.set_mode_with_f64(2.0);
         inner
     }
     #[doc = " ## Inlined fields"]
@@ -132,7 +132,7 @@ impl Mixed {
     #[doc = " * `mode: false`"]
     pub fn new_false() -> Mixed {
         let inner: Mixed = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_mode_with_val_js_value(false);
+        inner.set_mode_with_bool(false);
         inner
     }
 }

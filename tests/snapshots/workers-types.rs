@@ -30374,7 +30374,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_repeat(this: &RequestInitCfPropertiesImageDraw, val: bool);
     #[wasm_bindgen(method, setter, js_name = "repeat")]
-    pub fn set_repeat_with_js_value(this: &RequestInitCfPropertiesImageDraw, val: &str);
+    pub fn set_repeat_with_str(this: &RequestInitCfPropertiesImageDraw, val: &str);
     #[doc = " Position of the overlay image relative to a given edge. Each property is"]
     #[doc = " an offset in pixels. 0 aligns exactly to the edge. For example, left: 10"]
     #[doc = " positions left side of the overlay 10 pixels from the left edge of the"]
@@ -30429,8 +30429,8 @@ impl RequestInitCfPropertiesImageDrawBuilder {
         self.inner.set_repeat(val);
         self
     }
-    pub fn repeat_with_js_value(self, val: &str) -> Self {
-        self.inner.set_repeat_with_js_value(val);
+    pub fn repeat_with_str(self, val: &str) -> Self {
+        self.inner.set_repeat_with_str(val);
         self
     }
     pub fn top(self, val: f64) -> Self {
@@ -30491,7 +30491,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_quality(this: &RequestInitCfPropertiesImage, val: f64);
     #[wasm_bindgen(method, setter, js_name = "quality")]
-    pub fn set_quality_with_js_value(this: &RequestInitCfPropertiesImage, val: &str);
+    pub fn set_quality_with_str(this: &RequestInitCfPropertiesImage, val: &str);
     #[doc = " Output format to generate. It can be:"]
     #[doc = "  - avif: generate images in AVIF format."]
     #[doc = "  - webp: generate images in Google WebP format. Set quality to 100 to get"]
@@ -30640,8 +30640,8 @@ impl RequestInitCfPropertiesImageBuilder {
         self.inner.set_quality(val);
         self
     }
-    pub fn quality_with_js_value(self, val: &str) -> Self {
-        self.inner.set_quality_with_js_value(val);
+    pub fn quality_with_str(self, val: &str) -> Self {
+        self.inner.set_quality_with_str(val);
         self
     }
     pub fn format(self, val: &str) -> Self {
@@ -31838,10 +31838,7 @@ extern "C" {
         val: Iso3166Alpha2Code,
     );
     #[wasm_bindgen(method, setter, js_name = "country")]
-    pub fn set_country_with_js_value(
-        this: &IncomingRequestCfPropertiesGeographicInformation,
-        val: &str,
-    );
+    pub fn set_country_with_str(this: &IncomingRequestCfPropertiesGeographicInformation, val: &str);
     #[doc = " If present, this property indicates that the request originated in the EU"]
     #[doc = ""]
     #[doc = " @example \"1\""]
@@ -31939,8 +31936,8 @@ impl IncomingRequestCfPropertiesGeographicInformationBuilder {
         self.inner.set_country(val);
         self
     }
-    pub fn country_with_js_value(self, val: &str) -> Self {
-        self.inner.set_country_with_js_value(val);
+    pub fn country_with_str(self, val: &str) -> Self {
+        self.inner.set_country_with_str(val);
         self
     }
     pub fn is_eu_country(self, val: &str) -> Self {

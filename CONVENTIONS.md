@@ -964,9 +964,9 @@ up with what callers see in the function signature:
 
 | TypeScript      | Rust (arg)       | Suffix          |
 | --------------- | ---------------- | --------------- |
-| `string`        | `&str`           | `_with_str`     |
-| `number`        | `f64`            | `_with_f64`     |
-| `boolean`       | `bool`           | `_with_bool`    |
+| `string` / `"x"` | `&str`          | `_with_str`     |
+| `number` / `1`  | `f64`            | `_with_f64`     |
+| `boolean` / `true` | `bool`        | `_with_bool`    |
 | `bigint`        | `BigInt`         | `_with_big_int` |
 | `symbol`        | `&Symbol`        | `_with_symbol`  |
 | `Array<T>` / `T[]` | `&[T]`        | `_with_slice`   |
