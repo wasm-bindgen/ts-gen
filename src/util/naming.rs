@@ -90,6 +90,26 @@ pub fn to_enum_variant(s: &str) -> String {
     }
 }
 
+/// snake_case identifier fragment for a number literal: `1`, `0_5`, `neg_1`.
+pub(crate) fn number_literal_snake(n: f64) -> String {
+    let abs = n.abs().to_string().replace('.', "_");
+    if n < 0.0 {
+        format!("neg_{abs}")
+    } else {
+        abs
+    }
+}
+
+/// PascalCase enum variant for a number literal: `N1`, `N0_5`, `Neg1`.
+pub(crate) fn number_literal_pascal(n: f64) -> String {
+    let abs = n.abs().to_string().replace('.', "_");
+    if n < 0.0 {
+        format!("Neg{abs}")
+    } else {
+        format!("N{abs}")
+    }
+}
+
 /// Deduplicate names in-place by appending `_2`, `_3`, etc. to collisions.
 ///
 /// Takes a slice of `(name, setter)` pairs where `setter` is a closure that
@@ -127,6 +147,16 @@ mod tests {
         assert_eq!(to_snake_case("Uint8ClampedArray"), "uint8_clamped_array");
         assert_eq!(to_snake_case("BigInt64Array"), "big_int64_array");
         assert_eq!(to_snake_case("Float64"), "float64");
+    }
+
+    #[test]
+    fn test_number_literal_names() {
+        assert_eq!(number_literal_snake(1.0), "1");
+        assert_eq!(number_literal_snake(0.5), "0_5");
+        assert_eq!(number_literal_snake(-1.0), "neg_1");
+        assert_eq!(number_literal_pascal(1.0), "N1");
+        assert_eq!(number_literal_pascal(0.5), "N0_5");
+        assert_eq!(number_literal_pascal(-1.0), "Neg1");
     }
 
     #[test]

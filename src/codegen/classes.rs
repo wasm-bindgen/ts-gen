@@ -644,15 +644,15 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                     }
                     crate::ir::TypeRef::NumberLiteral(n) => {
                         let setter_ident = pick_setter(m).unwrap_or_else(|| default_setter.clone());
-                        let lit =
-                            syn::LitFloat::new(&n.to_string(), proc_macro2::Span::call_site());
+                        let lit = proc_macro2::Literal::f64_unsuffixed(n.abs());
+                        let sign = n.is_sign_negative().then(|| quote! { - });
                         options.push(FieldOption::Literal {
                             field_js_name: g.js_name.clone(),
                             field_doc: g.doc.clone(),
                             literal_display: n.to_string(),
-                            suffix: format!("_{}", n.to_string().replace(['.', '-'], "_")),
+                            suffix: format!("_{}", crate::util::naming::number_literal_snake(*n)),
                             setter_ident,
-                            literal_expr: quote! { #lit },
+                            literal_expr: quote! { #sign #lit },
                         });
                     }
                     crate::ir::TypeRef::BooleanLiteral(b) => {

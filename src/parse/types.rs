@@ -450,7 +450,14 @@ fn convert_literal_type(lit: &TSLiteralType<'_>, _diag: &mut DiagnosticCollector
         TSLiteral::StringLiteral(s) => TypeRef::StringLiteral(s.value.to_string()),
         TSLiteral::BigIntLiteral(_) => TypeRef::BigInt,
         TSLiteral::TemplateLiteral(_) => TypeRef::String,
-        TSLiteral::UnaryExpression(_) => TypeRef::Number,
+        // `-` is the only prefix operator TypeScript allows in a literal type.
+        TSLiteral::UnaryExpression(u) => match &u.argument {
+            Expression::NumericLiteral(n) if u.operator == UnaryOperator::UnaryNegation => {
+                TypeRef::NumberLiteral(-n.value)
+            }
+            Expression::BigIntLiteral(_) => TypeRef::BigInt,
+            _ => TypeRef::Number,
+        },
     }
 }
 

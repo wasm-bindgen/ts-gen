@@ -1058,4 +1058,26 @@ mod tests {
         assert!(gctx.diagnostics.has_warnings());
         assert!(!gctx.diagnostics.has_errors());
     }
+
+    #[test]
+    fn test_negative_literal_types() {
+        let (module, gctx) =
+            crate::parse_source("type A = -1; type B = -0.5; type C = -1n;", None).unwrap();
+        let targets: Vec<TypeRef> = module
+            .types
+            .iter()
+            .map(|id| match &gctx.get_type(*id).kind {
+                TypeKind::TypeAlias(a) => a.target.clone(),
+                other => panic!("expected alias, got {other:?}"),
+            })
+            .collect();
+        assert_eq!(
+            targets,
+            [
+                TypeRef::NumberLiteral(-1.0),
+                TypeRef::NumberLiteral(-0.5),
+                TypeRef::BigInt
+            ]
+        );
+    }
 }

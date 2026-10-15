@@ -1736,7 +1736,7 @@ pub(crate) fn has_mono_js_string_return(
         other => other,
     };
     if let TypeRef::Union(members) = top {
-        if should_synthesise_union(members, Some(ctx), scope) {
+        if dynamic_union_members(members, Some(ctx), scope).is_some() {
             return false;
         }
     }
@@ -1938,12 +1938,9 @@ fn maybe_synthesise_return_union(
     };
     let cgctx = ctx?;
 
-    if !should_synthesise_union(members, ctx, scope) {
-        return None;
-    }
-
+    let members = dynamic_union_members(members, ctx, scope)?;
     let name = cgctx.synthesise_dynamic_union(
-        members,
+        &members,
         &anchor.enum_anchor(),
         anchor.parent,
         scope,
@@ -1953,41 +1950,74 @@ fn maybe_synthesise_return_union(
     Some(quote! { #ident })
 }
 
-/// Decide whether a return-position union should produce a synthesised
-/// `<Anchor>Kind` enum.
+/// The members a return-position union synthesises its `<Anchor>Kind`
+/// enum from, or `None` when it keeps its regular lowering.
 ///
-/// Three layered rules:
+/// wasm-bindgen discriminants are either all strings (optionally next to
+/// tuple variants) or all 32-bit integers (unit variants only). So number
+/// literals stay discriminants only when every member is such an integer
+/// literal; otherwise they widen to `number`, and boolean literals widen to
+/// `boolean`. After widening:
 ///
-/// 1. **Pure-boolean-literal unions** (`true | false`, `true`, `false`)
-///    keep `bool` — every member round-trips through it without loss.
-/// 2. **Any literal member** (string / number) ⇒ synthesise. Pure
-///    string-literal unions (`"a" | "b"`) become string-discriminant
-///    enums; mixed `"a" | string` becomes a dynamic union with
-///    literal variants + a fallback tuple. The numeric case mirrors
-///    this for `number` / `bigint`.
-/// 3. **Otherwise**, fall back to the named LUB lattice — synthesise
-///    only when there's no useful narrowing.
-fn should_synthesise_union(
+/// 1. **Fewer than two members** (`true | false`, `number | 1`, `0.5 | 1.5`)
+///    keep the plain primitive.
+/// 2. **Any string literal** ⇒ synthesise a string-discriminant enum, or a
+///    dynamic union when non-literal members remain.
+/// 3. **Otherwise**, fall back to the named LUB lattice — synthesise only
+///    when there's no useful narrowing.
+fn dynamic_union_members(
     members: &[TypeRef],
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
-) -> bool {
-    if members.is_empty() {
-        return false;
+) -> Option<Vec<TypeRef>> {
+    if is_integer_literal_union(members) {
+        return Some(members.to_vec());
     }
-    if members
+    let mut widened: Vec<TypeRef> = Vec::with_capacity(members.len());
+    for m in members {
+        let primitive = match m {
+            TypeRef::NumberLiteral(_) => TypeRef::Number,
+            TypeRef::BooleanLiteral(_) => TypeRef::Boolean,
+            other => {
+                widened.push(other.clone());
+                continue;
+            }
+        };
+        if !widened.contains(&primitive) && !members.contains(&primitive) {
+            widened.push(primitive);
+        }
+    }
+    if widened.len() < 2 {
+        return None;
+    }
+    if widened
         .iter()
-        .all(|m| matches!(m, TypeRef::BooleanLiteral(_) | TypeRef::Boolean))
+        .any(|m| matches!(m, TypeRef::StringLiteral(_)))
     {
-        return false;
+        return Some(widened);
     }
-    let has_literal = members
+    crate::codegen::subtyping::lub_union(&widened, ctx, scope)
+        .is_none()
+        .then_some(widened)
+}
+
+/// Whether every member is a distinct-valued integer literal that fits the
+/// `u32` (or, with any negative, `i32`) repr of a wasm-bindgen C-style enum.
+fn is_integer_literal_union(members: &[TypeRef]) -> bool {
+    let signed = members
         .iter()
-        .any(|m| matches!(m, TypeRef::StringLiteral(_) | TypeRef::NumberLiteral(_)));
-    if has_literal {
-        return true;
-    }
-    crate::codegen::subtyping::lub_union(members, ctx, scope).is_none()
+        .any(|m| matches!(m, TypeRef::NumberLiteral(n) if *n < 0.0));
+    let range = if signed {
+        i32::MIN as f64..=i32::MAX as f64
+    } else {
+        0.0..=u32::MAX as f64
+    };
+    let mut seen = HashSet::new();
+    !members.is_empty()
+        && members.iter().all(|m| {
+            matches!(m, TypeRef::NumberLiteral(n)
+                if n.fract() == 0.0 && range.contains(n) && seen.insert(*n as i64))
+        })
 }
 
 /// Whether a function with these parameter types should be tagged
@@ -2902,6 +2932,46 @@ mod tests {
         assert_eq!(
             CodegenContext::extern_attr(None, None).to_string(),
             "# [wasm_bindgen]"
+        );
+    }
+
+    #[test]
+    fn dynamic_union_members_literal_kinds() {
+        use TypeRef::{
+            Boolean, BooleanLiteral as B, Number, NumberLiteral as N, StringLiteral as S,
+        };
+        let members = |ms: &[TypeRef]| dynamic_union_members(ms, None, ScopeId(0));
+        let ab = || TypeRef::ident("ArrayBuffer");
+
+        // 32-bit integer literals stay discriminants of a C-style enum.
+        assert_eq!(
+            members(&[N(0.0), N(1.0), N(2.0)]),
+            Some(vec![N(0.0), N(1.0), N(2.0)])
+        );
+        assert_eq!(members(&[N(-1.0), N(1.0)]), Some(vec![N(-1.0), N(1.0)]));
+        assert_eq!(
+            members(&[N(0.0), N(u32::MAX as f64)]),
+            Some(vec![N(0.0), N(u32::MAX as f64)])
+        );
+
+        // Otherwise they widen to `number`, collapsing to a plain `f64`.
+        assert_eq!(members(&[N(0.5), N(1.0)]), None);
+        assert_eq!(members(&[Number, N(0.0)]), None);
+        assert_eq!(members(&[N(0.0), Number]), None);
+        assert_eq!(members(&[N(0.0), N(4294967296.0)]), None);
+        assert_eq!(members(&[N(-1.0), N(u32::MAX as f64)]), None);
+        assert_eq!(members(&[N(1.0), N(1.0)]), None);
+
+        // Boolean literals widen to `boolean` beside other members.
+        assert_eq!(members(&[B(true), B(false)]), None);
+        assert_eq!(
+            members(&[B(true), S("x".into()), S("y".into())]),
+            Some(vec![Boolean, S("x".into()), S("y".into())])
+        );
+        assert_eq!(members(&[B(false), ab()]), Some(vec![Boolean, ab()]));
+        assert_eq!(
+            members(&[S("auto".into()), N(0.0), N(1.0)]),
+            Some(vec![S("auto".into()), Number])
         );
     }
 }

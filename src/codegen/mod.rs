@@ -357,43 +357,24 @@ fn generate_dynamic_unions(cgctx: &CodegenContext) -> TokenStream {
                 .iter()
                 .map(|m| {
                     match m {
-                        // String / number / boolean literal members
-                        // become string-discriminant / numeric-discriminant
-                        // / boolean-discriminant variants — wasm-bindgen
-                        // routes these as the literal value at the FFI
-                        // boundary, exactly matching TS narrowing.
+                        // Literal members become discriminant variants.
+                        // `typemap::dynamic_union_members` only keeps
+                        // number literals when every member is a 32-bit
+                        // integer literal (a C-style enum), and widens
+                        // boolean literals to `boolean`.
                         T::StringLiteral(s) => {
                             let variant_name =
                                 alloc_variant(&crate::util::naming::to_pascal_case(s));
                             let variant_ident = typemap::make_ident(&variant_name);
                             quote! { #variant_ident = #s }
                         }
-                        T::NumberLiteral(n) => {
-                            let variant_name = alloc_variant(&format!(
-                                "N{}",
-                                n.to_string().replace(['.', '-'], "_")
-                            ));
+                        T::NumberLiteral(n) if n.fract() == 0.0 => {
+                            let variant_name =
+                                alloc_variant(&crate::util::naming::number_literal_pascal(*n));
                             let variant_ident = typemap::make_ident(&variant_name);
-                            // wasm-bindgen accepts integer literals on
-                            // numeric-discriminant variants.
-                            let lit = syn::LitInt::new(
-                                &(*n as i64).to_string(),
-                                proc_macro2::Span::call_site(),
-                            );
-                            quote! { #variant_ident = #lit }
-                        }
-                        T::BooleanLiteral(b) => {
-                            let variant_name = alloc_variant(if *b { "True" } else { "False" });
-                            let variant_ident = typemap::make_ident(&variant_name);
-                            // Boolean literals don't have a syntactic
-                            // discriminant form in Rust enums, so we
-                            // fall back to the `1` / `0` numeric
-                            // form that wasm-bindgen also recognises.
-                            let lit = syn::LitInt::new(
-                                if *b { "1" } else { "0" },
-                                proc_macro2::Span::call_site(),
-                            );
-                            quote! { #variant_ident = #lit }
+                            let lit = proc_macro2::Literal::i64_unsuffixed(n.abs() as i64);
+                            let sign = (*n < 0.0).then(|| quote! { - });
+                            quote! { #variant_ident = #sign #lit }
                         }
                         _ => {
                             let variant_name = alloc_variant(&dynamic_union_variant_name(m));

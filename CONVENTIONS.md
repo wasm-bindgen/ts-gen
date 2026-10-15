@@ -470,6 +470,11 @@ EmailAttachment::new_attachment(content: &str, filename: &str, type_: &str)
 EmailAttachment::new_attachment_with_array_buffer(content: &ArrayBuffer, filename: &str, type_: &str)
 ```
 
+A number literal is baked in as a float literal matching the `f64`
+setter, and names its factory with `.` and a leading `-` spelled out
+(`scale: -1 | 0.5` → `new_neg_1()` setting `-1.0`, `new_0_5()` setting
+`0.5`).
+
 Mixed unions like `disposition: "inline" | string` produce one variant
 per literal *plus* a generic catch-all that takes the field as a
 parameter:
@@ -1568,15 +1573,19 @@ parent-prefixed (or numeric-suffixed if that also collides).
 
 #### When synthesis fires
 
-Three layered rules decide whether a return-position union becomes
-a synthesised enum:
+wasm-bindgen enum discriminants are either all strings (optionally
+beside tuple variants) or all 32-bit integers (unit variants only).
+So a union made up entirely of distinct integer literals that fit `u32`
+(or `i32`, when any is negative) synthesises a C-style enum directly.
+Otherwise number literals first widen to `number` and boolean literals
+to `boolean`, then three layered rules decide:
 
-1. **Pure-boolean-literal unions** (`true | false`, `true`, `false`)
-   keep `bool` — every member round-trips through it without loss.
-2. **Any literal member** (string / number) ⇒ synthesise. Pure
-   string-literal unions (`"a" | "b"`) become string-discriminant
-   enums; mixed `"a" | string` becomes a dynamic union with literal
-   variants + a fallback tuple. Same for `number` / `bigint`.
+1. **A single remaining member** keeps its plain lowering:
+   `true | false` → `bool`, `number | 0` and `0.5 | 1` → `f64`.
+2. **Any string literal** ⇒ synthesise. Pure string-literal unions
+   (`"a" | "b"`) become string-discriminant enums; mixed
+   `"a" | string` becomes a dynamic union with literal variants + a
+   fallback tuple, and `true | "x" | "y"` gets a `Bool(bool)` tuple.
 3. **Otherwise**, fall back to the named LUB lattice — synthesise
    only when there's no useful narrowing. Unions like
    `TypeError | RangeError` keep the `Error` ancestor; mixed
@@ -1592,15 +1601,22 @@ because wasm-bindgen requires `T: JsGeneric` for `Promise<T>` /
 
 A synthesised enum can mix two variant forms in the same body:
 
-* **Literal-discriminant variants** for string / number / boolean
-  literal members. The variant name is PascalCased from the
-  literal value; the discriminant is the literal itself, which
-  wasm-bindgen routes as the literal value at the FFI boundary.
+* **Literal-discriminant variants** for string literal members, and
+  integer literal members of a C-style enum. The variant name is
+  PascalCased from the literal value (`N1`, `Neg1` for numbers); the
+  discriminant is the literal itself, which wasm-bindgen routes as
+  the literal value at the FFI boundary.
   ```rs
   pub enum RoleKind {
       User = "user",
       Assistant = "assistant",
       System = "system",
+  }
+
+  pub enum DirectionReturnKind {
+      Neg1 = -1,
+      N0 = 0,
+      N1 = 1,
   }
   ```
 * **Tuple variants** for everything else. The variant name is the

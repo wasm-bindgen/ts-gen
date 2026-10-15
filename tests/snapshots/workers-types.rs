@@ -31256,7 +31256,7 @@ impl IncomingRequestCfPropertiesBase {
     ) -> IncomingRequestCfPropertiesBaseBuilder {
         let inner: IncomingRequestCfPropertiesBase = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(0);
+        inner.set_edge_request_keep_alive_status(0.0);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -31303,7 +31303,7 @@ impl IncomingRequestCfPropertiesBase {
     ) -> IncomingRequestCfPropertiesBaseBuilder {
         let inner: IncomingRequestCfPropertiesBase = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(1);
+        inner.set_edge_request_keep_alive_status(1.0);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -31350,7 +31350,7 @@ impl IncomingRequestCfPropertiesBase {
     ) -> IncomingRequestCfPropertiesBaseBuilder {
         let inner: IncomingRequestCfPropertiesBase = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(2);
+        inner.set_edge_request_keep_alive_status(2.0);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -31397,7 +31397,7 @@ impl IncomingRequestCfPropertiesBase {
     ) -> IncomingRequestCfPropertiesBaseBuilder {
         let inner: IncomingRequestCfPropertiesBase = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(3);
+        inner.set_edge_request_keep_alive_status(3.0);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -31444,7 +31444,7 @@ impl IncomingRequestCfPropertiesBase {
     ) -> IncomingRequestCfPropertiesBaseBuilder {
         let inner: IncomingRequestCfPropertiesBase = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(4);
+        inner.set_edge_request_keep_alive_status(4.0);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -31491,7 +31491,7 @@ impl IncomingRequestCfPropertiesBase {
     ) -> IncomingRequestCfPropertiesBaseBuilder {
         let inner: IncomingRequestCfPropertiesBase = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_colo(colo);
-        inner.set_edge_request_keep_alive_status(5);
+        inner.set_edge_request_keep_alive_status(5.0);
         inner.set_http_protocol(http_protocol);
         inner.set_request_priority(request_priority);
         inner.set_tls_version(tls_version);
@@ -41428,7 +41428,7 @@ pub enum BackoffKind {
 }
 #[wasm_bindgen]
 pub enum FeedbackKind {
-    F64(f64),
+    Neg1 = -1,
     N1 = 1,
 }
 #[wasm_bindgen]
@@ -41524,7 +41524,7 @@ pub enum PolishKind {
 }
 #[wasm_bindgen]
 pub enum RepeatKind {
-    True = 1,
+    Bool(bool),
     X = "x",
     Y = "y",
 }
