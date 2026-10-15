@@ -33,11 +33,12 @@ use crate::ir::{NumericEnumDecl, StringEnumDecl};
 
 /// wasm-bindgen exports enums by their JS name crate-wide, so one declared
 /// inside a namespace takes a namespace-prefixed `js_name` to avoid a clash
-/// with a same-named enum elsewhere.
+/// with a same-named enum elsewhere. The `_` keeps `Timing.DurationUnit`
+/// apart from a top-level `TimingDurationUnit`.
 fn enum_attr(name: &str, js_namespace: Option<&str>) -> TokenStream {
     match js_namespace {
         Some(ns) => {
-            let js_name = format!("{ns}{name}");
+            let js_name = format!("{ns}_{name}");
             quote! { #[wasm_bindgen(js_name = #js_name)] }
         }
         None => quote! { #[wasm_bindgen] },

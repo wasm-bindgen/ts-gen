@@ -12,6 +12,12 @@ pub enum DurationUnit {
 }
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TimingDurationUnit {
+    Day = "day",
+    Week = "week",
+}
+#[wasm_bindgen]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum Precision {
     Low = 1u32,
@@ -19,14 +25,14 @@ pub enum Precision {
 }
 pub mod timing {
     use wasm_bindgen::prelude::*;
-    #[wasm_bindgen(js_name = "TimingDurationUnit")]
+    #[wasm_bindgen(js_name = "Timing_DurationUnit")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum DurationUnit {
         Second = "second",
         Minute = "minute",
         Hour = "hour",
     }
-    #[wasm_bindgen(js_name = "TimingPrecision")]
+    #[wasm_bindgen(js_name = "Timing_Precision")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     #[repr(u32)]
     pub enum Precision {

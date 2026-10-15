@@ -1901,7 +1901,7 @@ keeps it apart from a same-named enum elsewhere:
 
 ```rust
 pub mod timing {
-    #[wasm_bindgen(js_name = "TimingDurationUnit")]
+    #[wasm_bindgen(js_name = "Timing_DurationUnit")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum DurationUnit { /* ... */ }
 }
