@@ -891,6 +891,19 @@ fn flatten_into(
         // `JsOption<T>`) is independent and lives in `to_syn_type`.
         TypeRef::Nullable(inner) => flatten_into(inner, cgctx, scope, out),
 
+        // Intersections collapse to their bound before flattening so the
+        // concrete param carries the named type (and its `_with_` suffix),
+        // and so a refined overload dedups against its unrefined twin.
+        TypeRef::Intersection(members) => {
+            match crate::codegen::subtyping::glb_intersection(members, cgctx, scope) {
+                Some(bound) => flatten_into(&bound, cgctx, scope, out),
+                None => {
+                    out.push(ty.clone());
+                    true
+                }
+            }
+        }
+
         // `PropertyKey` stays whole for per-mono grouping so it keeps
         // the `js_sys::PropertyKey` spelling; otherwise it fans out like
         // the union it abbreviates.
@@ -931,6 +944,10 @@ fn flatten_collapse_to_lub(
     match ty {
         TypeRef::Union(members) => {
             crate::codegen::subtyping::lub_union(members, cgctx, scope).unwrap_or(TypeRef::Any)
+        }
+        TypeRef::Intersection(members) => {
+            crate::codegen::subtyping::glb_intersection(members, cgctx, scope)
+                .unwrap_or(TypeRef::Any)
         }
         TypeRef::Nullable(inner) => flatten_collapse_to_lub(inner, cgctx, scope),
         TypeRef::PropertyKey => TypeRef::Any,

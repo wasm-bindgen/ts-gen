@@ -1,6 +1,7 @@
 //! Subtyping lattice — walk parent chains for built-in JS/TS types and
 //! user-declared `class`/`interface` types, and compute the most-specific
-//! common ancestor (LUB) of a set of types.
+//! common ancestor (LUB) of a set of types, or the most-specific member
+//! of an intersection.
 //!
 //! This is what powers union simplification (`T1 | T2 | …` → common
 //! ancestor) including the special case of `@throws {T1 | T2 | …}` whose
@@ -208,6 +209,7 @@ pub fn lub_union(
     if members.is_empty() {
         return None;
     }
+    let members = &collapse_intersections(members, ctx, scope);
     if let Some(widened) = widen_literal_family(members) {
         return Some(widened);
     }
@@ -225,6 +227,84 @@ pub fn lub_union(
         return None;
     }
     Some(TypeRef::ident(lub))
+}
+
+/// Upper bound of an intersection — the dual of [`lub_union`].
+///
+/// `A & B` is a subtype of every member, so each member is already a
+/// sound bound and the question is only which is most specific. Top
+/// types (`object`, `any`, `unknown`; an inline `{ … }` literal lowers
+/// to `object`) contribute nothing and drop out, which is what makes
+/// the common `Options & { field: Required }` refinement collapse to
+/// `Options`. Between named members, one that descends from all the
+/// others is the bound. `None` when the remaining members are
+/// unrelated; the caller substitutes `JsValue`.
+pub fn glb_intersection(
+    members: &[TypeRef],
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> Option<TypeRef> {
+    let mut flat = Vec::new();
+    flatten_intersection(members, ctx, scope, &mut flat);
+    flat.retain(|m| !matches!(m, TypeRef::Object | TypeRef::Any | TypeRef::Unknown));
+    match flat.len() {
+        0 => return Some(TypeRef::Object),
+        1 => return flat.pop(),
+        _ => {}
+    }
+    let cgctx = ctx?;
+    let names: Vec<&str> = flat.iter().map(|m| m.as_ident()).collect::<Option<_>>()?;
+    let chains: Vec<Vec<String>> = names
+        .iter()
+        .map(|n| ancestor_chain(n, cgctx, scope))
+        .collect();
+    let glb = (0..names.len()).find(|&i| {
+        names
+            .iter()
+            .enumerate()
+            .all(|(j, n)| j == i || chains[i].iter().any(|a| a == n))
+    })?;
+    Some(TypeRef::ident(names[glb]))
+}
+
+/// Replace each intersection member of a union with its bound so the
+/// union sees the member it actually lowers to: `"a" | (string & {})`
+/// is `"a" | string`. Members with no bound are left for the caller's
+/// `JsValue` fallback.
+pub fn collapse_intersections(
+    members: &[TypeRef],
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> Vec<TypeRef> {
+    members
+        .iter()
+        .map(|m| match m {
+            TypeRef::Intersection(parts) => {
+                glb_intersection(parts, ctx, scope).unwrap_or_else(|| m.clone())
+            }
+            _ => m.clone(),
+        })
+        .collect()
+}
+
+/// Resolve aliases and inline nested `&` so `glb_intersection` sees the
+/// leaf members of `A & (B & C)` where `A` may itself alias an intersection.
+fn flatten_intersection(
+    members: &[TypeRef],
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    out: &mut Vec<TypeRef>,
+) {
+    for m in members {
+        let resolved = m
+            .as_ident()
+            .and_then(|name| ctx?.resolve_alias(name, scope))
+            .unwrap_or(m);
+        match resolved {
+            TypeRef::Intersection(inner) => flatten_intersection(inner, ctx, scope, out),
+            other => out.push(other.clone()),
+        }
+    }
 }
 
 /// If every member of `types` belongs to the same primitive family —
@@ -476,5 +556,61 @@ mod tests {
         let cgctx = CodegenContext::empty(&gctx, scope);
         let lub = lub_union(&[], Some(&cgctx), scope);
         assert_eq!(lub, None);
+    }
+
+    fn glb(members: &[TypeRef]) -> Option<TypeRef> {
+        let (gctx, scope) = ctx();
+        let cgctx = CodegenContext::empty(&gctx, scope);
+        glb_intersection(members, Some(&cgctx), scope)
+    }
+
+    #[test]
+    fn glb_drops_object_literal_refinement() {
+        assert_eq!(
+            glb(&[TypeRef::ident("Options"), TypeRef::Object]),
+            Some(TypeRef::ident("Options"))
+        );
+    }
+
+    #[test]
+    fn glb_of_only_top_types_is_object() {
+        assert_eq!(glb(&[TypeRef::Object, TypeRef::Any]), Some(TypeRef::Object));
+    }
+
+    #[test]
+    fn glb_picks_the_subtype_in_either_order() {
+        let expected = Some(TypeRef::ident("TypeError"));
+        assert_eq!(
+            glb(&[TypeRef::ident("Error"), TypeRef::ident("TypeError")]),
+            expected
+        );
+        assert_eq!(
+            glb(&[TypeRef::ident("TypeError"), TypeRef::ident("Error")]),
+            expected
+        );
+    }
+
+    #[test]
+    fn glb_unrelated_named_members_is_none() {
+        assert_eq!(
+            glb(&[TypeRef::ident("TypeError"), TypeRef::ident("RangeError")]),
+            None
+        );
+    }
+
+    #[test]
+    fn glb_flattens_nested_intersections() {
+        assert_eq!(
+            glb(&[
+                TypeRef::ident("Error"),
+                TypeRef::Intersection(vec![TypeRef::ident("TypeError"), TypeRef::Object]),
+            ]),
+            Some(TypeRef::ident("TypeError"))
+        );
+    }
+
+    #[test]
+    fn glb_non_ident_members_is_none() {
+        assert_eq!(glb(&[TypeRef::ident("Foo"), TypeRef::String]), None);
     }
 }

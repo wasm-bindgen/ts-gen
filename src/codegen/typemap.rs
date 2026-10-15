@@ -993,10 +993,13 @@ pub fn to_syn_type(
             }
             maybe_ref(quote! { JsValue }, borrow)
         }
-        TypeRef::Intersection(_) => {
+        TypeRef::Intersection(members) => {
+            if let Some(bound) = crate::codegen::subtyping::glb_intersection(members, ctx, scope) {
+                return to_syn_type(&bound, pos, ctx, scope, from_module);
+            }
             if let Some(c) = ctx {
                 c.warn(format!(
-                    "intersection `{}` has no structural merge yet, erased to JsValue",
+                    "intersection `{}` has no member that subtypes the others, erased to JsValue",
                     ty.format_ts(),
                 ));
             }
@@ -1996,6 +1999,7 @@ fn maybe_synthesise_return_union(
         _ => return None,
     };
     let cgctx = ctx?;
+    let members = &crate::codegen::subtyping::collapse_intersections(members, ctx, scope);
 
     let members = dynamic_union_members(members, ctx, scope)?;
     let name = cgctx.synthesise_dynamic_union(

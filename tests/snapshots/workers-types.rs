@@ -2267,7 +2267,7 @@ extern "C" {
     ) -> Result<Option<Promise<Undefined>>, JsValue>;
 }
 #[allow(dead_code)]
-pub type DurableObjectStub<T> = JsValue;
+pub type DurableObjectStub<T> = Fetcher<T, JsString>;
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -9034,13 +9034,7 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn get(this: &R2Bucket, key: &str) -> Result<JsOption<R2Object>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_js_value(
-        this: &R2Bucket,
-        key: &str,
-        options: &JsValue,
-    ) -> Result<JsOption<R2Object>, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_r2_get_options(
+    pub async fn get_with_options(
         this: &R2Bucket,
         key: &str,
         options: &R2GetOptions,
@@ -9076,70 +9070,35 @@ extern "C" {
         value: &Blob,
     ) -> Result<JsOption<R2Object>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_readable_stream_and_js_value(
-        this: &R2Bucket,
-        key: &str,
-        value: &ReadableStream,
-        options: &JsValue,
-    ) -> Result<JsOption<R2Object>, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_array_buffer_and_js_value(
-        this: &R2Bucket,
-        key: &str,
-        value: &ArrayBuffer,
-        options: &JsValue,
-    ) -> Result<JsOption<R2Object>, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_typed_array_and_js_value(
-        this: &R2Bucket,
-        key: &str,
-        value: &Object,
-        options: &JsValue,
-    ) -> Result<JsOption<R2Object>, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_str_and_js_value(
-        this: &R2Bucket,
-        key: &str,
-        value: &str,
-        options: &JsValue,
-    ) -> Result<JsOption<R2Object>, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_blob_and_js_value(
-        this: &R2Bucket,
-        key: &str,
-        value: &Blob,
-        options: &JsValue,
-    ) -> Result<JsOption<R2Object>, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_readable_stream_and_r2_put_options(
+    pub async fn put_with_readable_stream_and_options(
         this: &R2Bucket,
         key: &str,
         value: &ReadableStream,
         options: &R2PutOptions,
     ) -> Result<JsOption<R2Object>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_array_buffer_and_r2_put_options(
+    pub async fn put_with_array_buffer_and_options(
         this: &R2Bucket,
         key: &str,
         value: &ArrayBuffer,
         options: &R2PutOptions,
     ) -> Result<JsOption<R2Object>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_typed_array_and_r2_put_options(
+    pub async fn put_with_typed_array_and_options(
         this: &R2Bucket,
         key: &str,
         value: &Object,
         options: &R2PutOptions,
     ) -> Result<JsOption<R2Object>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_str_and_r2_put_options(
+    pub async fn put_with_str_and_options(
         this: &R2Bucket,
         key: &str,
         value: &str,
         options: &R2PutOptions,
     ) -> Result<JsOption<R2Object>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_blob_and_r2_put_options(
+    pub async fn put_with_blob_and_options(
         this: &R2Bucket,
         key: &str,
         value: &Blob,
@@ -15203,9 +15162,9 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn role(this: &RoleScopedChatInput) -> RoleKind;
     #[wasm_bindgen(method, setter)]
-    pub fn set_role(this: &RoleScopedChatInput, val: RoleKind);
+    pub fn set_role(this: &RoleScopedChatInput, val: RoleScopedChatInputRoleKind);
     #[wasm_bindgen(method, setter, js_name = "role")]
-    pub fn set_role_with_js_value(this: &RoleScopedChatInput, val: &JsValue);
+    pub fn set_role_with_str(this: &RoleScopedChatInput, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn content(this: &RoleScopedChatInput) -> String;
     #[wasm_bindgen(method, setter)]
@@ -15240,7 +15199,7 @@ impl RoleScopedChatInput {
     pub fn new_tool(content: &str) -> RoleScopedChatInput {
         Self::builder_tool(content).build()
     }
-    pub fn new(role: &JsValue, content: &str) -> RoleScopedChatInput {
+    pub fn new(role: &str, content: &str) -> RoleScopedChatInput {
         Self::builder(role, content).build()
     }
     #[doc = " ## Inlined fields"]
@@ -15248,7 +15207,7 @@ impl RoleScopedChatInput {
     #[doc = " * `role: \"user\"`"]
     pub fn builder_user(content: &str) -> RoleScopedChatInputBuilder {
         let inner: RoleScopedChatInput = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_role(RoleKind::User);
+        inner.set_role(RoleScopedChatInputRoleKind::User);
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
     }
@@ -15257,7 +15216,7 @@ impl RoleScopedChatInput {
     #[doc = " * `role: \"assistant\"`"]
     pub fn builder_assistant(content: &str) -> RoleScopedChatInputBuilder {
         let inner: RoleScopedChatInput = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_role(RoleKind::Assistant);
+        inner.set_role(RoleScopedChatInputRoleKind::Assistant);
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
     }
@@ -15266,7 +15225,7 @@ impl RoleScopedChatInput {
     #[doc = " * `role: \"system\"`"]
     pub fn builder_system(content: &str) -> RoleScopedChatInputBuilder {
         let inner: RoleScopedChatInput = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_role(RoleKind::System);
+        inner.set_role(RoleScopedChatInputRoleKind::System);
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
     }
@@ -15275,13 +15234,13 @@ impl RoleScopedChatInput {
     #[doc = " * `role: \"tool\"`"]
     pub fn builder_tool(content: &str) -> RoleScopedChatInputBuilder {
         let inner: RoleScopedChatInput = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_role(RoleKind::Tool);
+        inner.set_role(RoleScopedChatInputRoleKind::Tool);
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
     }
-    pub fn builder(role: &JsValue, content: &str) -> RoleScopedChatInputBuilder {
+    pub fn builder(role: &str, content: &str) -> RoleScopedChatInputBuilder {
         let inner: RoleScopedChatInput = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_role_with_js_value(role);
+        inner.set_role_with_str(role);
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
     }
@@ -15347,9 +15306,9 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &AiTextGenerationToolInput) -> AiTextGenerationToolInputTypeKind;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type(this: &AiTextGenerationToolInput, val: AiTextGenerationToolInputTypeKind);
+    pub fn set_type(this: &AiTextGenerationToolInput, val: AiTextGenerationToolInputTypeKind2);
     #[wasm_bindgen(method, setter, js_name = "type")]
-    pub fn set_type_with_js_value(this: &AiTextGenerationToolInput, val: &JsValue);
+    pub fn set_type_with_str(this: &AiTextGenerationToolInput, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn function(this: &AiTextGenerationToolInput) -> Object;
     #[wasm_bindgen(method, setter)]
@@ -15361,13 +15320,13 @@ impl AiTextGenerationToolInput {
     #[doc = " * `type: \"function\"`"]
     pub fn new_function(function: &Object) -> AiTextGenerationToolInput {
         let inner: AiTextGenerationToolInput = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_type(AiTextGenerationToolInputTypeKind::Function);
+        inner.set_type(AiTextGenerationToolInputTypeKind2::Function);
         inner.set_function(function);
         inner
     }
-    pub fn new(r#type: &JsValue, function: &Object) -> AiTextGenerationToolInput {
+    pub fn new(r#type: &str, function: &Object) -> AiTextGenerationToolInput {
         let inner: AiTextGenerationToolInput = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_type_with_js_value(r#type);
+        inner.set_type_with_str(r#type);
         inner.set_function(function);
         inner
     }
@@ -15497,7 +15456,7 @@ extern "C" {
         val: &[AiTextGenerationToolLegacyInput],
     );
     #[wasm_bindgen(method, setter, js_name = "tools")]
-    pub fn set_tools_with_js_value(this: &AiTextGenerationInput, val: &JsValue);
+    pub fn set_tools_with_object(this: &AiTextGenerationInput, val: &Object);
     #[wasm_bindgen(method, getter)]
     pub fn functions(this: &AiTextGenerationInput) -> Option<Vec<AiTextGenerationFunctionsInput>>;
     #[wasm_bindgen(method, setter, slice_to_array)]
@@ -15577,8 +15536,8 @@ impl AiTextGenerationInputBuilder {
         self.inner.set_tools_with_slice(val);
         self
     }
-    pub fn tools_with_js_value(self, val: &JsValue) -> Self {
-        self.inner.set_tools_with_js_value(val);
+    pub fn tools_with_object(self, val: &Object) -> Self {
+        self.inner.set_tools_with_object(val);
         self
     }
     pub fn functions(self, val: &[AiTextGenerationFunctionsInput]) -> Self {
@@ -20298,10 +20257,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_image(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt, val: &[f64]);
     #[wasm_bindgen(method, setter, js_name = "image")]
-    pub fn set_image_with_js_value(
-        this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt,
-        val: &JsValue,
-    );
+    pub fn set_image_with_str(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt, val: &str);
     #[doc = " If true, a chat template is not applied and you must adhere to the specific model's expected formatting."]
     #[wasm_bindgen(method, getter)]
     pub fn raw(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt) -> Option<bool>;
@@ -20382,8 +20338,8 @@ impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_PromptBuilder {
         self.inner.set_image(val);
         self
     }
-    pub fn image_with_js_value(self, val: &JsValue) -> Self {
-        self.inner.set_image_with_js_value(val);
+    pub fn image_with_str(self, val: &str) -> Self {
+        self.inner.set_image_with_str(val);
         self
     }
     pub fn raw(self, val: bool) -> Self {
@@ -20449,10 +20405,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_image(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages, val: &[f64]);
     #[wasm_bindgen(method, setter, js_name = "image")]
-    pub fn set_image_with_js_value(
-        this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages,
-        val: &JsValue,
-    );
+    pub fn set_image_with_str(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn functions(
         this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages,
@@ -20545,8 +20498,8 @@ impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_MessagesBuilder {
         self.inner.set_image(val);
         self
     }
-    pub fn image_with_js_value(self, val: &JsValue) -> Self {
-        self.inner.set_image_with_js_value(val);
+    pub fn image_with_str(self, val: &str) -> Self {
+        self.inner.set_image_with_str(val);
         self
     }
     pub fn functions(self, val: &[Object]) -> Self {
@@ -29095,7 +29048,7 @@ impl GatewayOptionsBuilder {
     }
 }
 #[allow(dead_code)]
-pub type UniversalGatewayOptions = JsValue;
+pub type UniversalGatewayOptions = GatewayOptions;
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -29617,9 +29570,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiGatewayOptions;
     #[wasm_bindgen(method, getter)]
-    pub fn gateway(this: &AiGatewayOptions) -> JsValue;
+    pub fn gateway(this: &AiGatewayOptions) -> Option<GatewayOptions>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_gateway(this: &AiGatewayOptions, val: &JsValue);
+    pub fn set_gateway(this: &AiGatewayOptions, val: &GatewayOptions);
     #[wasm_bindgen(method, getter, js_name = "extraHeaders")]
     pub fn extra_headers(this: &AiGatewayOptions) -> Option<Object>;
     #[wasm_bindgen(method, setter, js_name = "extraHeaders")]
@@ -29639,7 +29592,7 @@ pub struct AiGatewayOptionsBuilder {
     inner: AiGatewayOptions,
 }
 impl AiGatewayOptionsBuilder {
-    pub fn gateway(self, val: &JsValue) -> Self {
+    pub fn gateway(self, val: &GatewayOptions) -> Self {
         self.inner.set_gateway(val);
         self
     }
@@ -29988,9 +29941,9 @@ impl AutoRagSearchRequestBuilder {
     }
 }
 #[allow(dead_code)]
-pub type AutoRagAiSearchRequest = JsValue;
+pub type AutoRagAiSearchRequest = AutoRagSearchRequest;
 #[allow(dead_code)]
-pub type AutoRagAiSearchRequestStreaming = JsValue;
+pub type AutoRagAiSearchRequestStreaming = AutoRagSearchRequest;
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -30039,7 +29992,7 @@ impl AutoRagSearchResponse {
 #[allow(dead_code)]
 pub type AutoRagListResponse = Array<Object>;
 #[allow(dead_code)]
-pub type AutoRagAiSearchResponse = JsValue;
+pub type AutoRagAiSearchResponse = AutoRagSearchResponse;
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -30060,7 +30013,10 @@ extern "C" {
     #[doc = " @deprecated Use `env.AI.aiSearch.get(id).chatCompletions(...)` instead."]
     #[doc = " @see AiSearchInstanceService.chatCompletions"]
     #[wasm_bindgen(method, catch, js_name = "aiSearch")]
-    pub async fn ai_search(this: &AutoRAG, params: &JsValue) -> Result<Response, JsValue>;
+    pub async fn ai_search(
+        this: &AutoRAG,
+        params: &AutoRagSearchRequest,
+    ) -> Result<Response, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -31653,16 +31609,20 @@ extern "C" {
     pub type IncomingRequestCfPropertiesBotManagementEnterprise;
     #[doc = " Results of Cloudflare's Bot Management analysis"]
     #[wasm_bindgen(method, getter, js_name = "botManagement")]
-    pub fn bot_management(this: &IncomingRequestCfPropertiesBotManagementEnterprise) -> JsValue;
+    pub fn bot_management(
+        this: &IncomingRequestCfPropertiesBotManagementEnterprise,
+    ) -> IncomingRequestCfPropertiesBotManagementBase;
     #[wasm_bindgen(method, setter, js_name = "botManagement")]
     pub fn set_bot_management(
         this: &IncomingRequestCfPropertiesBotManagementEnterprise,
-        val: &JsValue,
+        val: &IncomingRequestCfPropertiesBotManagementBase,
     );
 }
 impl IncomingRequestCfPropertiesBotManagementEnterprise {
     #[doc = " * `bot_management` - Results of Cloudflare's Bot Management analysis"]
-    pub fn new(bot_management: &JsValue) -> IncomingRequestCfPropertiesBotManagementEnterprise {
+    pub fn new(
+        bot_management: &IncomingRequestCfPropertiesBotManagementBase,
+    ) -> IncomingRequestCfPropertiesBotManagementEnterprise {
         let inner: IncomingRequestCfPropertiesBotManagementEnterprise =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_bot_management(bot_management);
@@ -32972,7 +32932,7 @@ impl D1ResponseBuilder {
     }
 }
 #[allow(dead_code)]
-pub type D1Result<T> = JsValue;
+pub type D1Result<T> = D1Response;
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -35331,9 +35291,9 @@ extern "C" {
         val: &Function<fn(JsValue, RequestInit) -> Promise<Response>>,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn env(this: &EventContext) -> JsValue;
+    pub fn env(this: &EventContext) -> Env;
     #[wasm_bindgen(method, setter)]
-    pub fn set_env(this: &EventContext, val: &JsValue);
+    pub fn set_env(this: &EventContext, val: &Env);
     #[wasm_bindgen(method, getter)]
     pub fn params(this: &EventContext) -> Params<P>;
     #[wasm_bindgen(method, setter)]
@@ -35350,7 +35310,7 @@ impl EventContext {
         wait_until: &Function<fn(Promise) -> Undefined>,
         pass_through_on_exception: &Function<fn() -> Undefined>,
         next: &Function<fn(JsValue, RequestInit) -> Promise<Response>>,
-        env: &JsValue,
+        env: &Env,
         params: &Params<P>,
         data: &Data,
     ) -> EventContext {
@@ -35407,9 +35367,9 @@ extern "C" {
         val: &Function<fn(JsValue, RequestInit) -> Promise<Response>>,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn env(this: &EventPluginContext) -> JsValue;
+    pub fn env(this: &EventPluginContext) -> Env;
     #[wasm_bindgen(method, setter)]
-    pub fn set_env(this: &EventPluginContext, val: &JsValue);
+    pub fn set_env(this: &EventPluginContext, val: &Env);
     #[wasm_bindgen(method, getter)]
     pub fn params(this: &EventPluginContext) -> Params<P>;
     #[wasm_bindgen(method, setter)]
@@ -35430,7 +35390,7 @@ impl EventPluginContext {
         wait_until: &Function<fn(Promise) -> Undefined>,
         pass_through_on_exception: &Function<fn() -> Undefined>,
         next: &Function<fn(JsValue, RequestInit) -> Promise<Response>>,
-        env: &JsValue,
+        env: &Env,
         params: &Params<P>,
         data: &Data,
         plugin_args: &PluginArgs,
@@ -38516,7 +38476,7 @@ impl ImageConversionOptionsBuilder {
     }
 }
 #[allow(dead_code)]
-pub type EmbeddedImageConversionOptions = JsValue;
+pub type EmbeddedImageConversionOptions = ImageConversionOptions;
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -39756,23 +39716,23 @@ impl VectorizeVectorBuilder {
     }
 }
 #[allow(dead_code)]
-pub type VectorizeMatch = JsValue;
+pub type VectorizeMatch = VectorizeVector;
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeMatches;
     #[wasm_bindgen(method, getter)]
-    pub fn matches(this: &VectorizeMatches) -> Vec<JsValue>;
+    pub fn matches(this: &VectorizeMatches) -> Vec<VectorizeVector>;
     #[wasm_bindgen(method, setter, slice_to_array)]
-    pub fn set_matches(this: &VectorizeMatches, val: &[JsValue]);
+    pub fn set_matches(this: &VectorizeMatches, val: &[VectorizeVector]);
     #[wasm_bindgen(method, getter)]
     pub fn count(this: &VectorizeMatches) -> f64;
     #[wasm_bindgen(method, setter)]
     pub fn set_count(this: &VectorizeMatches, val: f64);
 }
 impl VectorizeMatches {
-    pub fn new(matches: &[JsValue], count: f64) -> VectorizeMatches {
+    pub fn new(matches: &[VectorizeVector], count: f64) -> VectorizeMatches {
         let inner: VectorizeMatches = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_matches(matches);
         inner.set_count(count);
@@ -40802,18 +40762,31 @@ pub enum RoleKind {
     Assistant = "assistant",
     System = "system",
     Tool = "tool",
-    JsValue(JsValue),
+    String(String),
+}
+#[wasm_bindgen(private)]
+pub enum RoleScopedChatInputRoleKind {
+    User = "user",
+    Assistant = "assistant",
+    System = "system",
+    Tool = "tool",
+    JsValue(String),
 }
 #[wasm_bindgen(private)]
 pub enum AiTextGenerationToolInputTypeKind {
     Function = "function",
-    JsValue(JsValue),
+    String(String),
+}
+#[wasm_bindgen(private)]
+pub enum AiTextGenerationToolInputTypeKind2 {
+    Function = "function",
+    JsValue(String),
 }
 #[wasm_bindgen(private)]
 pub enum ToolsKind {
     VecOfAiTextGenerationToolInput(Vec<AiTextGenerationToolInput>),
     VecOfAiTextGenerationToolLegacyInput(Vec<AiTextGenerationToolLegacyInput>),
-    JsValue(JsValue),
+    Object(Object),
 }
 #[wasm_bindgen(private)]
 pub enum ConversationKind {
@@ -40934,7 +40907,7 @@ pub enum PoolingKind {
 #[wasm_bindgen(private)]
 pub enum ImageKind {
     VecOfF64(Vec<f64>),
-    JsValue(JsValue),
+    String(String),
 }
 #[wasm_bindgen(private)]
 pub enum Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind {

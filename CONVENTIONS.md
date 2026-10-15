@@ -1567,6 +1567,42 @@ is still a single `Array<Error>` type, and `Record<string, string |
 number | boolean>` lowers as one `Object` binding rather than separate
 record overloads for each value type.
 
+### Intersections take their most specific member
+
+`A & B` is a subtype of every member, so each member is already a sound
+upper bound and the only question is which is most specific. Top types
+(`object`, `any`, `unknown`) drop out — an inline `{ … }` literal lowers
+to `object`, which is what makes the common "required-field refinement"
+collapse to the named type. Between named members, the one that
+descends from all the others wins. Unrelated named members erase to
+`JsValue` with a diagnostic:
+
+```text
+Options & { onlyIf: Conditional }    -> Options     (literal refines Options)
+Derived & Base                       -> Derived     (Derived extends Base)
+{ a: string } & { b: number }        -> Object
+Derived & Unrelated                  -> JsValue     (no member subtypes the other)
+```
+
+The collapse happens before parameter flattening, so a refined overload
+dedups against its unrefined twin and the first-declared return type
+(the wider one) is kept:
+
+```ts
+get(key: string, options: Options & { onlyIf: Conditional }): Promise<Body | Meta | null>;
+get(key: string, options?: Options): Promise<Body | null>;
+```
+
+```rust
+pub async fn get(this: &Store, key: &str) -> Result<JsOption<Meta>, JsValue>;
+pub async fn get_with_options(this: &Store, key: &str, options: &Options) -> Result<JsOption<Meta>, JsValue>;
+```
+
+In argument position this accepts slightly more than TypeScript does
+(the refinement's required field is optional on `Options`); in return
+position the literal's extra fields are not reachable. Neither is
+unsound at the ABI.
+
 ### Erased return-position unions become dynamic-union enums
 
 When a top-level return-position type is a union that would
