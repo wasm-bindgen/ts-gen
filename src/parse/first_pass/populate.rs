@@ -469,8 +469,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         // so consumers get the dictionary-builder / variant-factory
         // treatment instead of an opaque type alias to `Object`. The
         // alias's own name becomes the synthesized type.
-        if let Some(kind) = self.try_synthesize_alias_decl(&name, &alias.type_annotation, dcx.scope)
-        {
+        if let Some(kind) = self.try_synthesize_alias_decl(alias, dcx.scope) {
             declarations.push(dcx.decl(kind, doc));
             // Hoisted nested interfaces accumulated in `self.synth` —
             // drain them alongside the promoted alias declaration.
@@ -502,100 +501,48 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         ));
     }
 
-    /// Promote `type Foo = { ... }` or `type Foo = { ... } | { ... }`
-    /// into either a named `InterfaceDecl` or a `DiscriminatedUnionDecl`,
-    /// going through the same merge rules as anonymous-parameter union
-    /// synthesis. Returns `None` if the target shape matches neither
-    /// form.
+    /// Promote `type Foo = { ... }`, `type Foo = { ... } | { ... }` or
+    /// `type Foo = A & { ... }` into a named `InterfaceDecl` (or a
+    /// `DiscriminatedUnionDecl` for a union whose branches share a
+    /// required literal-typed property — see
+    /// [`literal_union::detect_discriminators`]), going through the same
+    /// [`synthesize_inline`] as anonymous-parameter hoisting. Returns
+    /// `None` if the target shape matches none of these forms.
     ///
-    /// Discriminated-union promotion happens when every branch is a
-    /// type literal AND there's a shared required string-literal-typed
-    /// property — see [`literal_union::detect_discriminators`].
-    /// Otherwise the merge produces a plain `InterfaceDecl` as before.
+    /// [`synthesize_inline`]: crate::parse::members::synthesize_inline
     fn try_synthesize_alias_decl(
         &mut self,
-        alias_name: &str,
-        target: &ast::TSType<'_>,
+        alias: &ast::TSTypeAliasDeclaration<'_>,
         parent_scope: ScopeId,
     ) -> Option<ir::TypeKind> {
-        match target {
-            ast::TSType::TSTypeLiteral(literal) => {
-                let iface = crate::parse::first_pass::converters::interface_from_signatures(
-                    alias_name.to_string(),
-                    Vec::new(),
-                    Vec::new(),
-                    &literal.members,
-                    parent_scope,
-                    &mut self.parse_ctx(),
-                );
-                self.used_type_names.claim(alias_name);
-                // Any nested anonymous interfaces hoisted from member
-                // params during `interface_from_signatures` accumulate
-                // in `self.synth` — the caller drains them alongside
-                // the alias-promoted interface.
-                Some(ir::TypeKind::Interface(iface))
+        let shape = crate::parse::members::inline_shape(&alias.type_annotation)?;
+        let name = alias.id.name.to_string();
+        let type_params = convert_type_params(alias.type_parameters.as_ref(), self.diag);
+        let synth = crate::parse::members::synthesize_inline(
+            &shape,
+            name.clone(),
+            type_params,
+            parent_scope,
+            &mut self.parse_ctx(),
+        )?;
+        if matches!(shape, crate::parse::members::InlineShape::Union(_)) {
+            let discriminators =
+                crate::parse::literal_union::detect_discriminators(&synth.branches);
+            if !discriminators.is_empty() {
+                return Some(ir::TypeKind::DiscriminatedUnion(
+                    ir::DiscriminatedUnionDecl {
+                        name: name.clone(),
+                        js_name: name,
+                        type_params: synth.iface.type_params,
+                        branches: synth.branches,
+                        members: synth.iface.members,
+                        discriminators,
+                        body_scope: synth.iface.body_scope,
+                    },
+                ));
             }
-            ast::TSType::TSUnionType(union)
-                if union
-                    .types
-                    .iter()
-                    .all(|t| matches!(t, ast::TSType::TSTypeLiteral(_))) =>
-            {
-                // Hoisted alias-union has no surface type parameters,
-                // so the body scope is the parent scope directly.
-                let body_scope = parent_scope;
-                let alias_owned = alias_name.to_string();
-                let branches: Vec<Vec<ir::Member>> = union
-                    .types
-                    .iter()
-                    .filter_map(|t| match t {
-                        ast::TSType::TSTypeLiteral(lit) => Some(
-                            lit.members
-                                .iter()
-                                .flat_map(|sig| {
-                                    crate::parse::members::convert_ts_signature(
-                                        sig,
-                                        Some(&alias_owned),
-                                        body_scope,
-                                        &mut self.parse_ctx(),
-                                    )
-                                })
-                                .collect(),
-                        ),
-                        _ => None,
-                    })
-                    .collect();
-                let merged = crate::parse::literal_union::merge_member_branches(&branches);
-                self.used_type_names.claim(alias_name);
-
-                let discriminators = crate::parse::literal_union::detect_discriminators(&branches);
-                if !discriminators.is_empty() {
-                    Some(ir::TypeKind::DiscriminatedUnion(
-                        ir::DiscriminatedUnionDecl {
-                            name: alias_name.to_string(),
-                            js_name: alias_name.to_string(),
-                            type_params: Vec::new(),
-                            branches,
-                            members: merged,
-                            discriminators,
-                            body_scope,
-                        },
-                    ))
-                } else {
-                    let classification = crate::parse::classify::classify_interface(&merged);
-                    Some(ir::TypeKind::Interface(ir::InterfaceDecl {
-                        name: alias_name.to_string(),
-                        js_name: alias_name.to_string(),
-                        type_params: Vec::new(),
-                        extends: Vec::new(),
-                        members: merged,
-                        classification,
-                        body_scope,
-                    }))
-                }
-            }
-            _ => None,
         }
+        Some(ir::TypeKind::Interface(synth.iface))
     }
 
     fn populate_function(

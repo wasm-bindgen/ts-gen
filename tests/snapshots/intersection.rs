@@ -4,7 +4,7 @@
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
-#[wasm_bindgen]
+#[wasm_bindgen(module = "intersection")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
@@ -36,7 +36,7 @@ impl ConditionalBuilder {
         self.inner
     }
 }
-#[wasm_bindgen]
+#[wasm_bindgen(module = "intersection")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
@@ -76,7 +76,7 @@ impl GetOptionsBuilder {
         self.inner
     }
 }
-#[wasm_bindgen]
+#[wasm_bindgen(module = "intersection")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
@@ -93,7 +93,7 @@ impl Base {
         inner
     }
 }
-#[wasm_bindgen]
+#[wasm_bindgen(module = "intersection")]
 extern "C" {
     # [wasm_bindgen (extends = Base , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
@@ -110,7 +110,7 @@ impl Derived {
         inner
     }
 }
-#[wasm_bindgen]
+#[wasm_bindgen(module = "intersection")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
@@ -127,7 +127,7 @@ impl Unrelated {
         inner
     }
 }
-#[wasm_bindgen]
+#[wasm_bindgen(module = "intersection")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
@@ -135,27 +135,124 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn get(this: &Store, key: &str) -> Result<JsOption<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_options(
+    pub async fn get_with_store_options(
+        this: &Store,
+        key: &str,
+        options: &StoreOptions,
+    ) -> Result<JsOption<JsString>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub async fn get_with_get_options(
         this: &Store,
         key: &str,
         options: &GetOptions,
     ) -> Result<JsOption<JsString>, JsValue>;
     #[wasm_bindgen(method)]
-    pub fn refine(this: &Store, value: &Derived);
+    pub fn refine(this: &Store, value: &StoreValue);
     #[wasm_bindgen(method, catch, js_name = "refine")]
-    pub fn try_refine(this: &Store, value: &Derived) -> Result<(), JsValue>;
+    pub fn try_refine(this: &Store, value: &StoreValue) -> Result<(), JsValue>;
     #[wasm_bindgen(method)]
-    pub fn unrelated(this: &Store, value: &JsValue);
+    pub fn unrelated(this: &Store, value: &StoreValue2);
     #[wasm_bindgen(method, catch, js_name = "unrelated")]
-    pub fn try_unrelated(this: &Store, value: &JsValue) -> Result<(), JsValue>;
+    pub fn try_unrelated(this: &Store, value: &StoreValue2) -> Result<(), JsValue>;
     #[wasm_bindgen(method)]
-    pub fn shape(this: &Store, value: &Object);
+    pub fn shape(this: &Store, value: &StoreValue3);
     #[wasm_bindgen(method, catch, js_name = "shape")]
-    pub fn try_shape(this: &Store, value: &Object) -> Result<(), JsValue>;
+    pub fn try_shape(this: &Store, value: &StoreValue3) -> Result<(), JsValue>;
 }
-#[allow(dead_code)]
-pub type Refined = GetOptions;
-#[wasm_bindgen]
+#[wasm_bindgen(module = "intersection")]
+extern "C" {
+    # [wasm_bindgen (extends = GetOptions , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StoreOptions;
+    #[wasm_bindgen(method, getter, js_name = "onlyIf")]
+    pub fn only_if(this: &StoreOptions) -> Conditional;
+    #[wasm_bindgen(method, setter, js_name = "onlyIf")]
+    pub fn set_only_if(this: &StoreOptions, val: &Conditional);
+}
+impl StoreOptions {
+    pub fn new(only_if: &Conditional) -> StoreOptions {
+        let inner: StoreOptions = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_only_if(only_if);
+        inner
+    }
+}
+#[wasm_bindgen(module = "intersection")]
+extern "C" {
+    # [wasm_bindgen (extends = Derived , extends = Base , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StoreValue;
+}
+#[wasm_bindgen(module = "intersection")]
+extern "C" {
+    # [wasm_bindgen (extends = Derived , extends = Unrelated , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StoreValue2;
+}
+#[wasm_bindgen(module = "intersection")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StoreValue3;
+    #[wasm_bindgen(method, getter)]
+    pub fn a(this: &StoreValue3) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_a(this: &StoreValue3, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn b(this: &StoreValue3) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_b(this: &StoreValue3, val: f64);
+}
+impl StoreValue3 {
+    pub fn new(a: &str, b: f64) -> StoreValue3 {
+        let inner: StoreValue3 = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_a(a);
+        inner.set_b(b);
+        inner
+    }
+}
+#[wasm_bindgen(module = "intersection")]
+extern "C" {
+    # [wasm_bindgen (extends = GetOptions , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Refined;
+    #[wasm_bindgen(method, getter, js_name = "onlyIf")]
+    pub fn only_if(this: &Refined) -> Conditional;
+    #[wasm_bindgen(method, setter, js_name = "onlyIf")]
+    pub fn set_only_if(this: &Refined, val: &Conditional);
+}
+impl Refined {
+    pub fn new(only_if: &Conditional) -> Refined {
+        let inner: Refined = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_only_if(only_if);
+        inner
+    }
+}
+#[wasm_bindgen(module = "intersection")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Fetcher;
+    #[wasm_bindgen(method, catch)]
+    pub async fn fetch(this: &Fetcher, input: &str) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "intersection")]
+extern "C" {
+    # [wasm_bindgen (extends = Fetcher , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Stub;
+    #[wasm_bindgen(method, getter)]
+    pub fn id(this: &Stub) -> String;
+}
+impl Stub {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Stub {
+        #[allow(unused_unsafe)]
+        unsafe {
+            JsValue::from(js_sys::Object::new()).unchecked_into()
+        }
+    }
+}
+#[wasm_bindgen(module = "intersection")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]

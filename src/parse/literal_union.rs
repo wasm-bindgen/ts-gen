@@ -1,5 +1,6 @@
-//! Structural merge of an anonymous-interface union into a single
-//! interface body.
+//! Structural merge of anonymous-interface branches into a single
+//! interface body: the join of a union of literals, or the meet of an
+//! intersection of them (see [`MergeMode`]).
 //!
 //! TypeScript happily lets users write
 //!
@@ -47,10 +48,25 @@ use crate::ir::{
 };
 use indexmap::IndexMap;
 
+/// Which lattice operation a structural merge performs.
+///
+/// The rules above describe [`MergeMode::Join`] (a union of literals: a
+/// value may be *any* branch, so the merged shape must be valid against
+/// every branch). [`MergeMode::Meet`] is the dual for an intersection of
+/// literals (a value is *every* branch at once): a property is required
+/// if any branch requires it, writable if any branch allows writing, and
+/// its type is the intersection of the branch types, which resolves to the
+/// most specific member at codegen.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum MergeMode {
+    Join,
+    Meet,
+}
+
 /// Merge a list of type-literal branches (each as a `Vec<Member>` produced
 /// by the regular `convert_ts_signature` pipeline) into a single combined
 /// member set per the rules above.
-pub(crate) fn merge_member_branches(branches: &[Vec<Member>]) -> Vec<Member> {
+pub(crate) fn merge_member_branches(branches: &[Vec<Member>], mode: MergeMode) -> Vec<Member> {
     if branches.is_empty() {
         return Vec::new();
     }
@@ -145,11 +161,14 @@ pub(crate) fn merge_member_branches(branches: &[Vec<Member>]) -> Vec<Member> {
         if present.is_empty() {
             return None;
         }
-        let absent_in_any = slots.iter().any(|s| s.is_none());
-        let optional_in_any = present.iter().any(|g| g.optional);
-        let optional = absent_in_any || optional_in_any;
+        let optional = match mode {
+            MergeMode::Join => {
+                slots.iter().any(|s| s.is_none()) || present.iter().any(|g| g.optional)
+            }
+            MergeMode::Meet => present.iter().all(|g| g.optional),
+        };
 
-        let type_ref = union_member_types(present.iter().map(|g| g.type_ref.clone()));
+        let type_ref = merge_member_types(present.iter().map(|g| g.type_ref.clone()), mode);
         let doc = present.iter().find_map(|g| g.doc.clone());
 
         Some(Member::Getter(GetterMember {
@@ -175,11 +194,11 @@ pub(crate) fn merge_member_branches(branches: &[Vec<Member>]) -> Vec<Member> {
                 .iter()
                 .zip(slots.iter())
                 .any(|(g, s)| g.is_some() && s.is_none());
-            if any_branch_readonly {
+            if any_branch_readonly && mode == MergeMode::Join {
                 return None;
             }
         }
-        let type_ref = union_member_types(present.iter().map(|s| s.type_ref.clone()));
+        let type_ref = merge_member_types(present.iter().map(|s| s.type_ref.clone()), mode);
         let doc = present.iter().find_map(|s| s.doc.clone());
         Some(Member::Setter(SetterMember {
             js_name: name.to_string(),
@@ -238,13 +257,14 @@ pub(crate) fn merge_member_branches(branches: &[Vec<Member>]) -> Vec<Member> {
 
 /// Combine per-property branch types into a single `TypeRef`.
 ///
-/// Identical branches collapse to a single type. Otherwise we hand
+/// Identical branches collapse to a single type. Otherwise a join hands
 /// off to the regular [`simplify_union`] from the parse layer so
 /// `null` / `undefined` arms coalesce into `Nullable<T>` (matching
-/// what users get from a hand-written `T | null` union).
+/// what users get from a hand-written `T | null` union), and a meet
+/// leaves a `TypeRef::Intersection` for codegen to bound.
 ///
 /// [`simplify_union`]: crate::parse::types::simplify_union
-fn union_member_types(types: impl IntoIterator<Item = TypeRef>) -> TypeRef {
+fn merge_member_types(types: impl IntoIterator<Item = TypeRef>, mode: MergeMode) -> TypeRef {
     let mut all: Vec<TypeRef> = types.into_iter().collect();
     if all.is_empty() {
         return TypeRef::Any;
@@ -253,7 +273,10 @@ fn union_member_types(types: impl IntoIterator<Item = TypeRef>) -> TypeRef {
     if all.len() == 1 {
         return all.into_iter().next().unwrap();
     }
-    crate::parse::types::simplify_union(all)
+    match mode {
+        MergeMode::Join => crate::parse::types::simplify_union(all),
+        MergeMode::Meet => TypeRef::Intersection(all),
+    }
 }
 
 /// Identify discriminator properties across a set of branches.
@@ -318,4 +341,86 @@ pub(crate) fn detect_discriminators(branches: &[Vec<Member>]) -> Vec<String> {
             })
         })
         .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn prop(name: &str, ty: TypeRef, optional: bool, readonly: bool) -> Vec<Member> {
+        let mut out = vec![Member::Getter(GetterMember {
+            js_name: name.to_string(),
+            type_ref: ty.clone(),
+            optional,
+            doc: None,
+        })];
+        if !readonly {
+            out.push(Member::Setter(SetterMember {
+                js_name: name.to_string(),
+                type_ref: ty,
+                doc: None,
+            }));
+        }
+        out
+    }
+
+    fn getter(members: &[Member]) -> &GetterMember {
+        members
+            .iter()
+            .find_map(|m| match m {
+                Member::Getter(g) => Some(g),
+                _ => None,
+            })
+            .unwrap()
+    }
+
+    fn has_setter(members: &[Member]) -> bool {
+        members.iter().any(|m| matches!(m, Member::Setter(_)))
+    }
+
+    #[test]
+    fn meet_requires_when_any_branch_requires() {
+        let branches = [
+            prop("onlyIf", TypeRef::String, true, false),
+            prop("onlyIf", TypeRef::String, false, false),
+        ];
+        assert!(getter(&merge_member_branches(&branches, MergeMode::Join)).optional);
+        assert!(!getter(&merge_member_branches(&branches, MergeMode::Meet)).optional);
+    }
+
+    #[test]
+    fn meet_keeps_property_absent_from_a_branch_as_declared() {
+        let branches = [prop("a", TypeRef::String, false, false), Vec::new()];
+        assert!(getter(&merge_member_branches(&branches, MergeMode::Join)).optional);
+        assert!(!getter(&merge_member_branches(&branches, MergeMode::Meet)).optional);
+    }
+
+    #[test]
+    fn meet_intersects_differing_types() {
+        let branches = [
+            prop("x", TypeRef::ident("A"), false, false),
+            prop("x", TypeRef::ident("B"), false, false),
+        ];
+        let merged = merge_member_branches(&branches, MergeMode::Meet);
+        assert_eq!(
+            getter(&merged).type_ref,
+            TypeRef::Intersection(vec![TypeRef::ident("A"), TypeRef::ident("B")])
+        );
+    }
+
+    #[test]
+    fn meet_is_writable_when_any_branch_is() {
+        let branches = [
+            prop("x", TypeRef::String, false, true),
+            prop("x", TypeRef::String, false, false),
+        ];
+        assert!(!has_setter(&merge_member_branches(
+            &branches,
+            MergeMode::Join
+        )));
+        assert!(has_setter(&merge_member_branches(
+            &branches,
+            MergeMode::Meet
+        )));
+    }
 }

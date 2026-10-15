@@ -597,10 +597,11 @@ pub fn set_level(this: &Options, val: LevelKind);
 
 ## Anonymous interface synthesis
 
-An inline `{ … }` type — or a union of `{ … }` types — that appears
-in a position where a named interface would do is promoted to a real
-`InterfaceDecl` so consumers get a typed builder rather than an opaque
-`Object`. Two positions trigger synthesis:
+An inline `{ … }` type — or a union or intersection built from `{ … }`
+types and named references — that appears in a position where a named
+interface would do is promoted to a real `InterfaceDecl` so consumers
+get a typed builder rather than an opaque `Object`. Two positions
+trigger synthesis:
 
 ### Parameter position
 
@@ -641,10 +642,11 @@ type R2Range = {
 };
 ```
 
-is treated as if the user had written `interface R2Range { … }`.
-Type aliases whose target is a single inline literal — or a union of
-inline literals (see below) — promote directly to interfaces; aliases
-to anything else (named types, primitives, function types, generics,
+is treated as if the user had written `interface R2Range { … }`, and
+the alias's type parameters become the interface's. Type aliases whose
+target is a single inline literal, a union of inline literals, or an
+intersection (see below) promote directly to interfaces; aliases to
+anything else (named types, primitives, function types, generics,
 `Record<…>`, etc.) keep their existing alias semantics.
 
 ### Union of inline literals
@@ -689,6 +691,47 @@ discriminator is detected (see [Discriminated unions](#discriminated-unions)):
 * **`DiscriminatedUnionDecl`** when at least one shared literal-typed
   required field exists — gets the per-branch factory rules described
   in the next section.
+
+### Intersections
+
+`A & B & { … }` is exactly what the user would have written as
+`interface X extends A, B { … }`, so that is what it becomes: every
+named reference in the intersection is an `extends` parent and every
+inline literal contributes own members. The result then flows through
+the regular interface pipeline, including `extends = A, extends = B`
+on the wasm-bindgen side and the dictionary builder for the own
+members. This is what makes the common required-field refinement
+produce a usable type:
+
+```ts
+interface R2Bucket {
+  get(key: string, options: R2GetOptions & { onlyIf: R2Conditional | Headers }): …;
+  get(key: string, options?: R2GetOptions): …;
+}
+type D1Result<T = unknown> = D1Response & { results: T[] };
+```
+
+```rust
+#[wasm_bindgen(extends = R2GetOptions, extends = Object)]
+pub type R2BucketOptions;
+pub fn new(only_if: &R2Conditional) -> R2BucketOptions;
+pub fn new_with_headers(only_if: &Headers) -> R2BucketOptions;
+
+#[wasm_bindgen(extends = D1Response, extends = Object)]
+pub type D1Result<T>;
+pub fn results<T>(this: &D1Result<T>) -> Vec<T>;
+```
+
+Several literals in one intersection are merged with the **meet** of
+the union rules above (a value is every branch at once): a property is
+required if any branch requires it, writable if any branch allows
+writing, and a property typed differently across branches carries the
+intersection of those types, which is bounded at codegen (see
+[Intersections take their most specific member](#intersections-take-their-most-specific-member)).
+Parents that lower to a top type (`object`, `unknown`, a utility type
+over one) are dropped; an intersection with a member that no interface
+could extend (`string & {}`) does not synthesise and is bounded at
+codegen instead.
 
 ### Naming
 
@@ -1569,6 +1612,10 @@ record overloads for each value type.
 
 ### Intersections take their most specific member
 
+Where an intersection does not hoist to an interface (see
+[Intersections](#intersections) under anonymous interface synthesis) —
+a non-object member, or a position such as a property type or a nested
+generic argument that does not synthesise — it is lowered to a bound.
 `A & B` is a subtype of every member, so each member is already a sound
 upper bound and the only question is which is most specific. Top types
 (`object`, `any`, `unknown`) drop out — an inline `{ … }` literal lowers
@@ -1584,24 +1631,12 @@ Derived & Base                       -> Derived     (Derived extends Base)
 Derived & Unrelated                  -> JsValue     (no member subtypes the other)
 ```
 
-The collapse happens before parameter flattening, so a refined overload
-dedups against its unrefined twin and the first-declared return type
-(the wider one) is kept:
-
-```ts
-get(key: string, options: Options & { onlyIf: Conditional }): Promise<Body | Meta | null>;
-get(key: string, options?: Options): Promise<Body | null>;
-```
-
-```rust
-pub async fn get(this: &Store, key: &str) -> Result<JsOption<Meta>, JsValue>;
-pub async fn get_with_options(this: &Store, key: &str, options: &Options) -> Result<JsOption<Meta>, JsValue>;
-```
-
-In argument position this accepts slightly more than TypeScript does
-(the refinement's required field is optional on `Options`); in return
-position the literal's extra fields are not reachable. Neither is
-unsound at the ABI.
+The collapse also applies to intersection members of a union before
+the LUB, so `"a" | "b" | (string & {})` is the plain `"a" | "b" | string`
+and keeps a `String(String)` arm in its dynamic-union enum rather than a
+`JsValue` one. In argument position the bound accepts slightly more
+than TypeScript does; in return position the literal's extra fields are
+not reachable. Neither is unsound at the ABI.
 
 ### Erased return-position unions become dynamic-union enums
 

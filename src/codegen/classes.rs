@@ -1960,12 +1960,16 @@ fn extends_tokens(
     scope: ScopeId,
     from_module: &ModuleContext,
 ) -> TokenStream {
-    // Only named references (bare or generic) are valid `extends`
-    // targets; structural types and primitives don't have a single
-    // supertype identity at the wasm-bindgen level.
+    // Only named references are valid `extends` targets; structural
+    // types and primitives don't have a single supertype identity at the
+    // wasm-bindgen level. The attribute takes a bare path, so a generic
+    // parent is named without its arguments.
     let tokens = match ty {
-        TypeRef::Reference { .. } => super::typemap::to_syn_type(
-            ty,
+        TypeRef::Reference { segments, .. } => super::typemap::to_syn_type(
+            &TypeRef::Reference {
+                segments: segments.clone(),
+                generic_args: Vec::new(),
+            },
             TypePosition::ARGUMENT.to_inner(),
             cgctx,
             scope,

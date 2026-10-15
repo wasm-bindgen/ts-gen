@@ -82,8 +82,12 @@ impl HasAge {
         inner
     }
 }
-#[allow(dead_code)]
-pub type Person = JsValue;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = HasName , extends = HasAge , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Person;
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -94,8 +98,12 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "serialize")]
     pub fn try_serialize(this: &Serializable) -> Result<String, JsValue>;
 }
-#[allow(dead_code)]
-pub type SerializablePerson = JsValue;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Person , extends = Serializable , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type SerializablePerson;
+}
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
