@@ -246,8 +246,9 @@ reference. We resolve this by:
 
 1. Picking a suffixed Rust ident (`Global` → `Global_`) for the
    internal declaration.
-2. Keeping `js_name = "Global"` on the wasm-bindgen attr so the JS-side
-   binding is unaffected.
+2. Keeping `js_name = "Global"` on the type, and `js_class = "Global"` on
+   its constructors and static members, so the JS-side binding is
+   unaffected (see [Naming conversion](#naming-conversion)).
 3. Re-exporting under the original name so the public Rust path is
    unchanged: `pub use Global_ as Global;`
 
