@@ -292,12 +292,13 @@ fn generate_tokens(
     };
 
     let mut global_items = Vec::new();
+    let mut static_names = functions::StaticNames::default();
     for &type_id in &module.types {
         let decl = gctx.get_type(type_id);
         if !should_emit(decl) {
             continue;
         }
-        if let Some(tokens) = generate_declaration(decl, &cgctx) {
+        if let Some(tokens) = generate_declaration(decl, &cgctx, &mut static_names) {
             global_items.push(tokens);
         }
     }
@@ -462,7 +463,11 @@ fn dynamic_union_variant_name(ty: &TypeRef) -> String {
 }
 
 /// Generate tokens for a single declaration.
-fn generate_declaration(decl: &TypeDeclaration, cgctx: &CodegenContext) -> Option<TokenStream> {
+fn generate_declaration(
+    decl: &TypeDeclaration,
+    cgctx: &CodegenContext,
+    static_names: &mut functions::StaticNames,
+) -> Option<TokenStream> {
     match &decl.kind {
         TypeKind::Class(c) => Some(classes::generate_class(
             c,
@@ -512,6 +517,7 @@ fn generate_declaration(decl: &TypeDeclaration, cgctx: &CodegenContext) -> Optio
             &decl.doc,
             None,
             decl.scope_id,
+            static_names,
         )),
         TypeKind::TypeAlias(alias) => Some(generate_type_alias(
             alias,
@@ -624,10 +630,11 @@ fn generate_namespace(
     let mod_name = typemap::make_ident(&crate::util::naming::to_snake_case(&ns.name));
     let js_name = &ns.name;
 
+    let mut static_names = functions::StaticNames::default();
     let items: Vec<TokenStream> = ns
         .declarations
         .iter()
-        .filter_map(|decl| generate_ns_declaration(decl, js_name, cgctx))
+        .filter_map(|decl| generate_ns_declaration(decl, js_name, cgctx, &mut static_names))
         .collect();
 
     quote! {
@@ -645,6 +652,7 @@ fn generate_ns_declaration(
     decl: &TypeDeclaration,
     ns_js_name: &str,
     cgctx: &CodegenContext,
+    static_names: &mut functions::StaticNames,
 ) -> Option<TokenStream> {
     match &decl.kind {
         TypeKind::Class(c) => Some(classes::generate_class_with_js_namespace(
@@ -701,6 +709,7 @@ fn generate_ns_declaration(
             &decl.doc,
             Some(ns_js_name),
             decl.scope_id,
+            static_names,
         )),
         TypeKind::TypeAlias(_) => None,
         TypeKind::Namespace(ns) => Some(generate_namespace(ns, &decl.module_context, cgctx)),

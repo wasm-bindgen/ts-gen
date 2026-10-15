@@ -45,24 +45,24 @@ pub fn to_snake_case(name: &str) -> String {
     // The trailing context (`_` or end) ensures we only merge digits
     // that originally trailed a letter run, not standalone numeric
     // segments.
-    let bytes = standard.as_bytes();
+    let chars: Vec<char> = standard.chars().collect();
     let mut out = String::with_capacity(standard.len());
     let mut i = 0;
-    while i < bytes.len() {
-        let c = bytes[i] as char;
+    while i < chars.len() {
+        let c = chars[i];
         // Look for `<letter>_<digits>` and elide the `_`.
-        if c.is_ascii_alphabetic() && i + 1 < bytes.len() && bytes[i + 1] == b'_' {
+        if c.is_alphabetic() && chars.get(i + 1) == Some(&'_') {
             let mut j = i + 2;
-            while j < bytes.len() && (bytes[j] as char).is_ascii_digit() {
+            while j < chars.len() && chars[j].is_ascii_digit() {
                 j += 1;
             }
             // Only merge when the digit run is followed by a word
             // boundary (`_` or end) — otherwise it's a separate
             // numeric segment we want to keep separated.
-            let merged_ok = j > i + 2 && (j == bytes.len() || bytes[j] == b'_');
+            let merged_ok = j > i + 2 && (j == chars.len() || chars[j] == '_');
             if merged_ok {
                 out.push(c);
-                out.push_str(&standard[i + 2..j]);
+                out.extend(&chars[i + 2..j]);
                 i = j;
                 continue;
             }
@@ -157,6 +157,12 @@ mod tests {
         assert_eq!(number_literal_pascal(1.0), "N1");
         assert_eq!(number_literal_pascal(0.5), "N0_5");
         assert_eq!(number_literal_pascal(-1.0), "Neg1");
+    }
+
+    #[test]
+    fn test_snake_case_non_ascii() {
+        assert_eq!(to_snake_case("déjà"), "déjà");
+        assert_eq!(to_snake_case("voilàLà2"), "voilà_là2");
     }
 
     #[test]

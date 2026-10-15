@@ -181,6 +181,7 @@ pub mod intl {
     }
     #[wasm_bindgen]
     extern "C" {
+        #[allow(non_upper_case_globals)]
         #[wasm_bindgen(thread_local_v2, js_name = "defaultLocale", js_namespace = "Intl")]
         pub static default_locale: String;
     }

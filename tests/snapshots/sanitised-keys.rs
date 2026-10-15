@@ -82,6 +82,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "sanitised-keys")]
 extern "C" {
+    #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2, js_name = "$version")]
     pub static version: String;
 }

@@ -218,6 +218,16 @@ the setter is named `set_<snake_case>`.
 
 * JS `camelCase` / `PascalCase` identifiers → Rust `snake_case` for fns,
   `PascalCase` for types.
+* The statics that `declare const` / `let` / `var` lower to keep the
+  same `snake_case` conversion (`caches` → `pub static caches`), with
+  `#[allow(non_upper_case_globals)]` on the item; wasm-bindgen applies
+  the attribute to the expanded static.
+* A redeclared static (`declare var console` in several input files) is
+  emitted once, from its first declaration, including that declaration's
+  doc comment. Distinct JS bindings whose names collide after conversion
+  are numbered in declaration order: `fooBar` and `FOO_BAR` become
+  `foo_bar` and `foo_bar_2`. The same name under different
+  `module = "..."` specifiers is a distinct binding.
 * Reserved Rust keywords in fn, method, and accessor names get a trailing
   underscore (`type()` → `type_`). Elsewhere (parameters, variables) they
   are emitted as raw identifiers (`r#type`, `r#loop`), except `self`,

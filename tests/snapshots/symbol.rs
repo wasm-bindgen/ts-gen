@@ -91,6 +91,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "symbol")]
 extern "C" {
+    #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2)]
     pub static marker: Symbol;
 }

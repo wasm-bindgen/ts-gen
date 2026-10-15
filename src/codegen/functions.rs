@@ -179,6 +179,17 @@ fn generic_bounds_for_function(
         .collect()
 }
 
+/// Statics already emitted into one Rust module.
+///
+/// `declare var` may be redeclared, including across input files, so a
+/// repeated JS binding is emitted once. Distinct bindings that convert to
+/// the same ident (`fooBar` / `FOO_BAR`) are numbered instead.
+#[derive(Default)]
+pub struct StaticNames {
+    idents: HashSet<String>,
+    bindings: HashSet<(Option<String>, String)>,
+}
+
 /// Generate a wasm_bindgen extern block for a global constant/variable.
 pub fn generate_variable(
     decl: &VariableDecl,
@@ -187,8 +198,20 @@ pub fn generate_variable(
     doc: &Option<String>,
     js_namespace: Option<&str>,
     scope: ScopeId,
+    static_names: &mut StaticNames,
 ) -> TokenStream {
-    let rust_ident = super::typemap::make_ident(&decl.name);
+    let binding = (ctx.specifier().map(str::to_string), decl.js_name.clone());
+    if !static_names.bindings.insert(binding) {
+        return TokenStream::new();
+    }
+    let base = super::typemap::make_ident(&decl.name).to_string();
+    let mut rust_name = base.clone();
+    let mut i = 2;
+    while !static_names.idents.insert(rust_name.clone()) {
+        rust_name = format!("{base}_{i}");
+        i += 1;
+    }
+    let rust_ident = super::typemap::make_ident(&rust_name);
     let ty = to_syn_type(&decl.type_ref, TypePosition::RETURN, cgctx, scope, ctx);
     let doc = super::doc_tokens(doc);
 
@@ -205,10 +228,14 @@ pub fn generate_variable(
 
     let wb_extern_attr = CodegenContext::extern_attr(cgctx, ctx.specifier());
 
+    // Statics keep the JS binding's casing (`caches`, not `CACHES`), so
+    // the lint is allowed per item; wasm-bindgen applies the attribute
+    // to the expanded static.
     quote! {
         #wb_extern_attr
         extern "C" {
             #doc
+            #[allow(non_upper_case_globals)]
             #wb_attr
             pub static #rust_ident: #ty;
         }

@@ -43,6 +43,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "node:thing")]
 extern "C" {
+    #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2)]
     pub static version: String;
 }

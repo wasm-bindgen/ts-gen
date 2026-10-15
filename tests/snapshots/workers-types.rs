@@ -64,6 +64,7 @@ use JsValue as TailEvent;
 use JsValue as TailEventHandler;
 #[wasm_bindgen]
 extern "C" {
+    #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2)]
     pub static onmessage: JsValue;
 }
@@ -519,6 +520,7 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
+    #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2)]
     pub static console: Console;
 }
@@ -1695,6 +1697,7 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
+    #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2, js_name = "self")]
     pub static self_: ServiceWorkerGlobalScope;
 }
@@ -1706,6 +1709,7 @@ extern "C" {
     #[doc = " compared to those implemented in most browsers."]
     #[doc = ""]
     #[doc = " [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/web-crypto/)"]
+    #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2)]
     pub static crypto: Crypto;
 }
@@ -1714,11 +1718,13 @@ extern "C" {
     #[doc = " The Cache API allows fine grained control of reading and writing from the Cloudflare global network cache."]
     #[doc = ""]
     #[doc = " [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/cache/)"]
+    #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2)]
     pub static caches: CacheStorage;
 }
 #[wasm_bindgen]
 extern "C" {
+    #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2)]
     pub static scheduler: Scheduler;
 }
@@ -1728,21 +1734,25 @@ extern "C" {
     #[doc = " as well as timing of subrequests and other operations."]
     #[doc = ""]
     #[doc = " [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/performance/)"]
+    #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2)]
     pub static performance: Performance;
 }
 #[wasm_bindgen]
 extern "C" {
+    #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2, js_name = "Cloudflare")]
     pub static cloudflare: JsValue;
 }
 #[wasm_bindgen]
 extern "C" {
+    #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2)]
     pub static origin: String;
 }
 #[wasm_bindgen]
 extern "C" {
+    #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2)]
     pub static navigator: Navigator;
 }
@@ -13107,6 +13117,7 @@ impl WebSocketAcceptOptionsBuilder {
 }
 #[wasm_bindgen]
 extern "C" {
+    #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2, js_name = "WebSocketPair")]
     pub static web_socket_pair: Object;
 }
@@ -35696,6 +35707,7 @@ pub type PagesPluginFunction<Env, Params, Data, PluginArgs> =
     Function<fn(EventPluginContext) -> JsValue>;
 #[wasm_bindgen(module = "assets:*")]
 extern "C" {
+    #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2, js_name = "onRequest")]
     pub static on_request: Function<fn(EventContext) -> JsValue>;
 }
@@ -35905,16 +35917,19 @@ pub mod rpc {
     use wasm_bindgen::prelude::*;
     #[wasm_bindgen]
     extern "C" {
+        #[allow(non_upper_case_globals)]
         #[wasm_bindgen(thread_local_v2, js_name = "__RPC_STUB_BRAND", js_namespace = "Rpc")]
         pub static rpc_stub_brand: String;
     }
     #[wasm_bindgen]
     extern "C" {
+        #[allow(non_upper_case_globals)]
         #[wasm_bindgen(thread_local_v2, js_name = "__RPC_TARGET_BRAND", js_namespace = "Rpc")]
         pub static rpc_target_brand: String;
     }
     #[wasm_bindgen]
     extern "C" {
+        #[allow(non_upper_case_globals)]
         #[wasm_bindgen(
             thread_local_v2,
             js_name = "__WORKER_ENTRYPOINT_BRAND",
@@ -35924,6 +35939,7 @@ pub mod rpc {
     }
     #[wasm_bindgen]
     extern "C" {
+        #[allow(non_upper_case_globals)]
         #[wasm_bindgen(
             thread_local_v2,
             js_name = "__DURABLE_OBJECT_BRAND",
@@ -35933,6 +35949,7 @@ pub mod rpc {
     }
     #[wasm_bindgen]
     extern "C" {
+        #[allow(non_upper_case_globals)]
         #[wasm_bindgen(
             thread_local_v2,
             js_name = "__WORKFLOW_ENTRYPOINT_BRAND",
@@ -35996,6 +36013,7 @@ pub mod cloudflare_workers_module {
     use wasm_bindgen::prelude::*;
     #[wasm_bindgen]
     extern "C" {
+        #[allow(non_upper_case_globals)]
         #[wasm_bindgen(
             thread_local_v2,
             js_name = "RpcStub",
@@ -36586,11 +36604,13 @@ pub mod cloudflare_workers_module {
     }
     #[wasm_bindgen]
     extern "C" {
+        #[allow(non_upper_case_globals)]
         #[wasm_bindgen(thread_local_v2, js_namespace = "CloudflareWorkersModule")]
         pub static env: Env;
     }
     #[wasm_bindgen]
     extern "C" {
+        #[allow(non_upper_case_globals)]
         #[wasm_bindgen(thread_local_v2, js_namespace = "CloudflareWorkersModule")]
         pub static exports: Exports;
     }
