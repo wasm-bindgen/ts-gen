@@ -31,9 +31,23 @@ use quote::quote;
 
 use crate::ir::{NumericEnumDecl, StringEnumDecl};
 
+/// wasm-bindgen exports enums by their JS name crate-wide, so one declared
+/// inside a namespace takes a namespace-prefixed `js_name` to avoid a clash
+/// with a same-named enum elsewhere.
+fn enum_attr(name: &str, js_namespace: Option<&str>) -> TokenStream {
+    match js_namespace {
+        Some(ns) => {
+            let js_name = format!("{ns}{name}");
+            quote! { #[wasm_bindgen(js_name = #js_name)] }
+        }
+        None => quote! { #[wasm_bindgen] },
+    }
+}
+
 /// Generate a wasm_bindgen string enum.
-pub fn generate_string_enum(decl: &StringEnumDecl) -> TokenStream {
+pub fn generate_string_enum(decl: &StringEnumDecl, js_namespace: Option<&str>) -> TokenStream {
     let name = super::typemap::make_ident(&decl.name);
+    let attr = enum_attr(&decl.name, js_namespace);
 
     let variants: Vec<_> = decl
         .variants
@@ -48,7 +62,7 @@ pub fn generate_string_enum(decl: &StringEnumDecl) -> TokenStream {
         .collect();
 
     quote! {
-        #[wasm_bindgen]
+        #attr
         #[derive(Debug, Clone, Copy, PartialEq, Eq)]
         pub enum #name {
             #(#variants,)*
@@ -73,8 +87,9 @@ fn numeric_enum_repr(decl: &NumericEnumDecl) -> TokenStream {
 }
 
 /// Generate a wasm_bindgen numeric enum with automatically selected repr.
-pub fn generate_numeric_enum(decl: &NumericEnumDecl) -> TokenStream {
+pub fn generate_numeric_enum(decl: &NumericEnumDecl, js_namespace: Option<&str>) -> TokenStream {
     let name = super::typemap::make_ident(&decl.name);
+    let attr = enum_attr(&decl.name, js_namespace);
     let repr = numeric_enum_repr(decl);
 
     let has_negative = decl.variants.iter().any(|v| v.value < 0);
@@ -106,7 +121,7 @@ pub fn generate_numeric_enum(decl: &NumericEnumDecl) -> TokenStream {
         .collect();
 
     quote! {
-        #[wasm_bindgen]
+        #attr
         #[derive(Debug, Clone, Copy, PartialEq, Eq)]
         #[repr(#repr)]
         pub enum #name {

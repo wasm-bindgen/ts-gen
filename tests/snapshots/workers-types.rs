@@ -560,7 +560,7 @@ pub mod web_assembly {
         )]
         pub fn new_with_message(message: &str) -> Result<RuntimeError, JsValue>;
     }
-    #[wasm_bindgen]
+    #[wasm_bindgen(js_name = "WebAssemblyValueType")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum ValueType {
         Anyfunc = "anyfunc",
@@ -705,7 +705,7 @@ pub mod web_assembly {
         #[wasm_bindgen(method, catch, js_name = "grow")]
         pub fn try_grow(this: &Memory, delta: f64) -> Result<f64, JsValue>;
     }
-    #[wasm_bindgen]
+    #[wasm_bindgen(js_name = "WebAssemblyImportExportKind")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum ImportExportKind {
         Function = "function",
@@ -783,7 +783,7 @@ pub mod web_assembly {
         # [wasm_bindgen (static_method_of = Module , js_namespace = "WebAssembly" , catch , js_name = "imports")]
         pub fn try_imports(module: &Module) -> Result<Vec<ModuleImportDescriptor>, JsValue>;
     }
-    #[wasm_bindgen]
+    #[wasm_bindgen(js_name = "WebAssemblyTableKind")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum TableKind {
         Anyfunc = "anyfunc",
@@ -35938,7 +35938,7 @@ pub mod cloudflare_workers_module {
             error: &JsValue,
         ) -> Result<Option<Promise<Undefined>>, JsValue>;
     }
-    #[wasm_bindgen]
+    #[wasm_bindgen(js_name = "CloudflareWorkersModuleWorkflowDurationLabel")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum WorkflowDurationLabel {
         Second = "second",
@@ -35949,7 +35949,7 @@ pub mod cloudflare_workers_module {
         Month = "month",
         Year = "year",
     }
-    #[wasm_bindgen]
+    #[wasm_bindgen(js_name = "CloudflareWorkersModuleWorkflowBackoff")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum WorkflowBackoff {
         Constant = "constant",
@@ -36156,7 +36156,7 @@ pub mod cloudflare_workers_module {
             self.inner
         }
     }
-    #[wasm_bindgen]
+    #[wasm_bindgen(js_name = "CloudflareWorkersModuleWorkflowInstanceStatus")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum WorkflowInstanceStatus {
         Queued = "queued",
@@ -38877,7 +38877,7 @@ pub mod tail_stream {
             }
         }
     }
-    #[wasm_bindgen]
+    #[wasm_bindgen(js_name = "TailStreamEventOutcome")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum EventOutcome {
         Ok = "ok",

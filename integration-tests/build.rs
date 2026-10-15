@@ -216,10 +216,14 @@ fn generate_bindings(entry: &Entry, out_dir: &Path) {
 
     // The fixture's `--lib-name` causes every declaration to land in
     // `ModuleContext::Module(lib_name)`. Lift it explicitly via
-    // `ExportSpec::Module` so codegen emits it at global scope.
+    // `ExportSpec::Module` so codegen emits it at global scope. The file
+    // export covers any `declare global` block in the fixture.
     let mut exports: std::collections::HashSet<ts_gen::codegen::ExportSpec> =
         std::collections::HashSet::new();
     exports.insert(ts_gen::codegen::ExportSpec::Module(entry.lib_name.clone()));
+    exports.insert(ts_gen::codegen::ExportSpec::File(
+        entry.dts_path.canonicalize().unwrap(),
+    ));
     let options = ts_gen::codegen::GenerateOptions::new()
         .experimental_generic_mono(entry.experimental_generic_mono)
         .exports(exports);

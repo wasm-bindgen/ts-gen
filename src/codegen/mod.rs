@@ -501,8 +501,8 @@ fn generate_declaration(
                 decl.scope_id,
             ))
         }
-        TypeKind::StringEnum(e) => Some(enums::generate_string_enum(e)),
-        TypeKind::NumericEnum(e) => Some(enums::generate_numeric_enum(e)),
+        TypeKind::StringEnum(e) => Some(enums::generate_string_enum(e, None)),
+        TypeKind::NumericEnum(e) => Some(enums::generate_numeric_enum(e, None)),
         TypeKind::Function(f) => Some(functions::generate_function(
             f,
             &decl.module_context,
@@ -706,8 +706,8 @@ fn generate_ns_declaration(
             &decl.doc,
             decl.scope_id,
         )),
-        TypeKind::StringEnum(e) => Some(enums::generate_string_enum(e)),
-        TypeKind::NumericEnum(e) => Some(enums::generate_numeric_enum(e)),
+        TypeKind::StringEnum(e) => Some(enums::generate_string_enum(e, Some(ns_js_name))),
+        TypeKind::NumericEnum(e) => Some(enums::generate_numeric_enum(e, Some(ns_js_name))),
         TypeKind::Variable(v) => Some(functions::generate_variable(
             v,
             &decl.module_context,

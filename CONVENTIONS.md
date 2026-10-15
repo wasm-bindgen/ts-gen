@@ -1895,6 +1895,18 @@ primitive it carries, exactly as `string` / `number` would there:
 carries an enum as a payload, `Kind | number` → `Kind(Kind)`, `F64(f64)`,
 dispatched through the enum's `TryFromJsValue`.
 
+wasm-bindgen exports enums by their JS name across the whole crate, so
+an enum inside a namespace takes a namespace-prefixed `js_name`, which
+keeps it apart from a same-named enum elsewhere:
+
+```rust
+pub mod timing {
+    #[wasm_bindgen(js_name = "TimingDurationUnit")]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum DurationUnit { /* ... */ }
+}
+```
+
 ## Multiple-context name resolution
 
 When the same name appears in different `ModuleContext`s (e.g. a global
