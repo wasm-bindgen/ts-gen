@@ -68,4 +68,5 @@ async fn generic_mono_signatures_compile(flags: &Flags, js_string: &JsString) {
 
     let bytes = Uint8Array::new_with_length(1);
     let _ = TypedArrayOptions::new(&bytes);
+    let _ = TypedArrayOptions::builder(&bytes).extra(&bytes).build();
 }

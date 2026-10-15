@@ -108,15 +108,40 @@ extern "C" {
     pub fn value(this: &TypedArrayOptions) -> Uint8Array;
     #[wasm_bindgen(method, setter)]
     pub fn set_value<T: ::js_sys::TypedArray>(this: &TypedArrayOptions, val: &T);
+    #[wasm_bindgen(method, getter)]
+    pub fn extra(this: &TypedArrayOptions) -> Option<Uint8Array>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_extra<T: ::js_sys::TypedArray>(this: &TypedArrayOptions, val: &T);
 }
 impl TypedArrayOptions {
     pub fn new<T: ::js_sys::TypedArray>(value: &T) -> TypedArrayOptions
     where
         for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
     {
+        Self::builder(value).build()
+    }
+    pub fn builder<T: ::js_sys::TypedArray>(value: &T) -> TypedArrayOptionsBuilder
+    where
+        for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
         let inner: TypedArrayOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_value(value);
-        inner
+        TypedArrayOptionsBuilder { inner }
+    }
+}
+pub struct TypedArrayOptionsBuilder {
+    inner: TypedArrayOptions,
+}
+impl TypedArrayOptionsBuilder {
+    pub fn extra<T: ::js_sys::TypedArray>(self, val: &T) -> Self
+    where
+        for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
+        self.inner.set_extra(val);
+        self
+    }
+    pub fn build(self) -> TypedArrayOptions {
+        self.inner
     }
 }
 #[wasm_bindgen(module = "generic-mono", experimental_generic_mono)]

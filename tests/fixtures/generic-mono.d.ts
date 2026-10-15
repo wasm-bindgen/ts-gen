@@ -21,6 +21,7 @@ export interface Pair<A, B> {
 
 export interface TypedArrayOptions {
   value: ArrayBufferView;
+  extra?: ArrayBufferView;
 }
 
 export declare class Flags {
