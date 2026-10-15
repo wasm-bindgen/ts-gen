@@ -1988,22 +1988,7 @@ fn maybe_synthesise_return_union(
     };
     let cgctx = ctx?;
 
-    // A string enum has no `TryFromJsValue`, so it can't be a variant
-    // payload; its values join the union as literals, as if the alias were
-    // written inline.
-    let members: Vec<TypeRef> = members
-        .iter()
-        .flat_map(|m| match cgctx.enum_kind(m, scope) {
-            Some(TypeKind::StringEnum(e)) => e
-                .variants
-                .iter()
-                .map(|v| TypeRef::StringLiteral(v.js_value.clone()))
-                .collect(),
-            _ => vec![m.clone()],
-        })
-        .collect();
-
-    let members = dynamic_union_members(&members, ctx, scope)?;
+    let members = dynamic_union_members(members, ctx, scope)?;
     let name = cgctx.synthesise_dynamic_union(
         &members,
         &anchor.enum_anchor(),

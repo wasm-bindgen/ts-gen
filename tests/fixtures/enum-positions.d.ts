@@ -1,9 +1,8 @@
 //! @ts-gen --lib-name enum-positions --export enum-positions
 
 // Enums are named only in top-level argument / return positions, where
-// they pass by value. Inside slices, generics and callbacks they lower as
-// the string / number they carry, and a string enum in a dynamic union
-// contributes its values as literal variants.
+// they pass by value, and as dynamic-union payloads. Inside slices,
+// generics and callbacks they lower as the string / number they carry.
 
 export type Mode = "fast" | "slow";
 export type ModeAlias = Mode;

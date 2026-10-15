@@ -1645,10 +1645,6 @@ A synthesised enum can mix two variant forms in the same body:
   | `Array<Foo>`      | `Vec<Foo>`      | `VecOfFoo(Vec<Foo>)` |
   | `Foo` (named)     | `Foo`           | `Foo(Foo)`      |
 
-  A string enum member is the exception: wasm-bindgen string enums
-  have no `TryFromJsValue`, so its values become literal variants
-  instead (see [String and numeric enums](#string-and-numeric-enums)).
-
 Mixed unions like `"user" | "system" | (string & NonNullable<unknown>)`
 emit literal variants for each named string + a tuple
 `JsValue(JsValue)` fallback for the residual — wasm-bindgen tries
@@ -1882,11 +1878,10 @@ primitive it carries, exactly as `string` / `number` would there:
 | `Array<Level>`         | `Array<Number>`                   |
 | `(kind: Kind) => void` | `Function<fn(JsString) -> Undefined>` |
 
-`Kind::from_js_value(&value)` converts back. In a
+`Kind::from_js_value(&value)` converts back. A
 [dynamic union](#erased-return-position-unions-become-dynamic-union-enums)
-a string enum contributes its values as literal variants, as if written
-inline (`Kind | number` → `Text = "text"`, `Bytes = "bytes"`,
-`F64(f64)`); a numeric enum stays a `Level(Level)` payload.
+carries an enum as a payload, `Kind | number` → `Kind(Kind)`, `F64(f64)`,
+dispatched through the enum's `TryFromJsValue`.
 
 ## Multiple-context name resolution
 

@@ -101,22 +101,18 @@ extern "C" {
 }
 #[wasm_bindgen]
 pub enum ModeOrNumberReturnKind {
-    Fast = "fast",
-    Slow = "slow",
+    Mode(Mode),
     F64(f64),
 }
 #[wasm_bindgen]
 pub enum ModeOrStringReturnKind {
-    Fast = "fast",
-    Slow = "slow",
+    Mode(Mode),
     String(String),
 }
 #[wasm_bindgen]
 pub enum ModeOrRegionReturnKind {
-    Fast = "fast",
-    Slow = "slow",
-    Eu = "eu",
-    Us = "us",
+    Mode(Mode),
+    Region(Region),
 }
 #[wasm_bindgen]
 pub enum LevelOrStringReturnKind {

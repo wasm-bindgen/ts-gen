@@ -8,8 +8,9 @@ use ts_gen_integration_tests::enum_positions::{
 };
 
 // This fixture has no backing JavaScript module, so it provides compile-only
-// coverage that enums are named by value at the top level and lower to their
-// JS primitive inside slices, generics and callbacks.
+// coverage that enums are named by value at the top level and as
+// dynamic-union payloads, and lower to their JS primitive inside slices,
+// generics and callbacks.
 #[allow(dead_code)]
 async fn enum_positions_compile(
     probe: &Probe,
@@ -36,20 +37,17 @@ async fn enum_positions_compile(
     let _: ArrayTuple<(JsString, Number)> = probe.pair();
 
     match probe.mode_or_number() {
-        ModeOrNumberReturnKind::Fast | ModeOrNumberReturnKind::Slow => {}
+        ModeOrNumberReturnKind::Mode(mode) => probe.alias(mode),
         ModeOrNumberReturnKind::F64(_) => {}
     }
     match probe.mode_or_string() {
-        ModeOrStringReturnKind::Fast | ModeOrStringReturnKind::Slow => {}
+        ModeOrStringReturnKind::Mode(mode) => probe.alias(mode),
         ModeOrStringReturnKind::String(_) => {}
     }
-    let _: [ModeOrRegionReturnKind; 4] = [
-        ModeOrRegionReturnKind::Fast,
-        ModeOrRegionReturnKind::Slow,
-        ModeOrRegionReturnKind::Eu,
-        ModeOrRegionReturnKind::Us,
-    ];
-    let _ = probe.mode_or_region();
+    match probe.mode_or_region() {
+        ModeOrRegionReturnKind::Mode(mode) => probe.alias(mode),
+        ModeOrRegionReturnKind::Region(region) => probe.region(region),
+    }
     match probe.level_or_string() {
         LevelOrStringReturnKind::Level(level) => probe.set_level(level),
         LevelOrStringReturnKind::String(_) => {}
