@@ -320,16 +320,14 @@ fn generate_tokens(
 
 /// Emit the synthesised dynamic-union enums collected on `cgctx`
 /// during the per-declaration pass. Each enum lowers each member
-/// type via the regular return-position path, so cross-module
-/// references get the correct path qualifier.
+/// type via the regular return-position path, resolved from the
+/// scope and module of the union's first use site.
 fn generate_dynamic_unions(cgctx: &CodegenContext) -> TokenStream {
-    use crate::ir::ModuleContext;
     use crate::ir::TypeRef as T;
     let registry = cgctx.dynamic_unions.borrow();
     if registry.by_key.is_empty() {
         return quote! {};
     }
-    let from_module = ModuleContext::Global;
     let enums: Vec<TokenStream> = registry
         .by_key
         .values()
@@ -404,8 +402,8 @@ fn generate_dynamic_unions(cgctx: &CodegenContext) -> TokenStream {
                                 m,
                                 typemap::TypePosition::RETURN,
                                 Some(cgctx),
-                                cgctx.root_scope,
-                                &from_module,
+                                info.scope,
+                                &info.from_module,
                             );
                             quote! { #variant_ident(#payload) }
                         }

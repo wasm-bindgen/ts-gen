@@ -41676,7 +41676,7 @@ pub enum TailStreamReturnKind {
 }
 #[wasm_bindgen]
 pub enum TimeoutKind {
-    WorkflowTimeoutDuration(WorkflowTimeoutDuration),
+    WorkflowTimeoutDuration(JsValue),
     F64(f64),
 }
 #[wasm_bindgen]
