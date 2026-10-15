@@ -1317,7 +1317,7 @@ fn generate_type_decl(config: &ClassConfig) -> TokenStream {
     // Emit `js_name` whenever the JS-side class name differs from the Rust
     // ident we'll use — that's true after a collision rename even if the
     // `config.rust_name` (pre-rename) matched `js_name`.
-    if rust_name != *js_name {
+    if super::typemap::needs_js_name(&rust_ident, js_name) {
         wb_parts.push(quote! { js_name = #js_name });
     }
 
@@ -1449,8 +1449,7 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
     if super::typemap::needs_slice_to_array(&sig.params) {
         wb_parts.push(quote! { slice_to_array });
     }
-    // Emit js_name when the JS name differs from the Rust name.
-    if sig.rust_name != sig.js_name {
+    if super::typemap::needs_js_name(&rust_ident, &sig.js_name) {
         let js_name = &sig.js_name;
         wb_parts.push(quote! { js_name = #js_name });
     }
@@ -1516,7 +1515,7 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
     if super::typemap::needs_slice_to_array(&sig.params) {
         wb_parts.push(quote! { slice_to_array });
     }
-    if sig.rust_name != sig.js_name {
+    if super::typemap::needs_js_name(&rust_ident, &sig.js_name) {
         let js_name = &sig.js_name;
         wb_parts.push(quote! { js_name = #js_name });
     }
@@ -1604,9 +1603,7 @@ fn generate_getter(
     );
 
     let mut wb_parts: Vec<TokenStream> = vec![quote! { method }, quote! { getter }];
-    // Compare the emitted ident, not the pre-sanitised name: a numeric key
-    // like `0` becomes `_0`, which wasm-bindgen would otherwise bind to `_0`.
-    if rust_ident != getter.js_name {
+    if super::typemap::needs_js_name(&rust_ident, &getter.js_name) {
         let js_name = &getter.js_name;
         wb_parts.push(quote! { js_name = #js_name });
     }
@@ -1723,7 +1720,7 @@ fn generate_setter(
             if super::typemap::needs_slice_to_array(&sig.params) {
                 wb_parts.push(quote! { slice_to_array });
             }
-            if rust_ident != format!("set_{}", setter.js_name) {
+            if super::typemap::needs_js_name(&rust_ident, &format!("set_{}", setter.js_name)) {
                 let js_name = &setter.js_name;
                 wb_parts.push(quote! { js_name = #js_name });
             }
@@ -1767,7 +1764,7 @@ fn generate_static_getter(
         quote! { static_method_of = #class_ident },
         quote! { getter },
     ];
-    if rust_ident != getter.js_name {
+    if super::typemap::needs_js_name(&rust_ident, &getter.js_name) {
         let js_name = &getter.js_name;
         wb_parts.push(quote! { js_name = #js_name });
     }
@@ -1864,7 +1861,7 @@ fn generate_static_setter(
             if super::typemap::needs_slice_to_array(&sig.params) {
                 wb_parts.push(quote! { slice_to_array });
             }
-            if rust_ident != format!("set_{}", setter.js_name) {
+            if super::typemap::needs_js_name(&rust_ident, &format!("set_{}", setter.js_name)) {
                 let js_name = &setter.js_name;
                 wb_parts.push(quote! { js_name = #js_name });
             }

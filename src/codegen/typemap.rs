@@ -1491,6 +1491,15 @@ pub(crate) fn make_ident(name: &str) -> syn::Ident {
     }
 }
 
+/// Whether a binding needs an explicit `js_name`. wasm-bindgen infers the JS
+/// name from the emitted ident, so this must compare against the ident after
+/// [`make_ident`] sanitisation (`0` → `_0`, `$foo` → `foo`), not the
+/// pre-sanitised Rust name.
+pub(crate) fn needs_js_name(ident: &syn::Ident, js_name: &str) -> bool {
+    use syn::ext::IdentExt;
+    ident.unraw() != js_name
+}
+
 /// Map an IR `TypeRef` to the type used in a wasm_bindgen return position,
 /// wrapping in `Result<T, ErrTy>` when `catch` is true.
 ///
@@ -2052,6 +2061,24 @@ mod tests {
             &ModuleContext::Global,
         )
         .to_string()
+    }
+
+    #[test]
+    fn needs_js_name_compares_sanitised_ident() {
+        let needs = |rust: &str, js: &str| needs_js_name(&make_ident(rust), js);
+        assert!(!needs("foo", "foo"));
+        assert!(needs("foo_bar", "fooBar"));
+        assert!(needs("0", "0"));
+        assert!(needs("$foo", "$foo"));
+        assert!(needs("@cf/x", "@cf/x"));
+        assert!(needs("$", "$"));
+        assert!(!needs("set_0", "set_0"));
+        assert!(needs("set_$foo", "set_$foo"));
+        // Raw idents are unrawed by wasm-bindgen, so `r#type` already binds `type`.
+        assert!(!needs_js_name(
+            &syn::Ident::new_raw("type", proc_macro2::Span::call_site()),
+            "type"
+        ));
     }
 
     fn inner_type(ty: &TypeRef) -> String {

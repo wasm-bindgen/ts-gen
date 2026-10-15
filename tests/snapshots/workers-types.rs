@@ -1679,7 +1679,7 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(thread_local_v2)]
+    #[wasm_bindgen(thread_local_v2, js_name = "self")]
     pub static self_: ServiceWorkerGlobalScope;
 }
 #[wasm_bindgen]

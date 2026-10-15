@@ -31,6 +31,18 @@ extern "C" {
     pub fn cfmodel() -> String;
     # [wasm_bindgen (static_method_of = Pair , setter , js_name = "@cf/model")]
     pub fn set_cfmodel(val: &str);
+    #[wasm_bindgen(method, js_name = "$emit")]
+    pub fn emit(this: &Pair, event: &str);
+    #[wasm_bindgen(method, catch, js_name = "$emit")]
+    pub fn try_emit(this: &Pair, event: &str) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "@cf/run")]
+    pub fn cfrun(this: &Pair);
+    #[wasm_bindgen(method, catch, js_name = "@cf/run")]
+    pub fn try_cfrun(this: &Pair) -> Result<(), JsValue>;
+    # [wasm_bindgen (static_method_of = Pair , js_name = "$create")]
+    pub fn create() -> Pair;
+    # [wasm_bindgen (static_method_of = Pair , catch , js_name = "$create")]
+    pub fn try_create() -> Result<Pair, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -41,4 +53,27 @@ extern "C" {
     pub fn accept(this: &Socket);
     #[wasm_bindgen(method, catch, js_name = "accept")]
     pub fn try_accept(this: &Socket) -> Result<(), JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object , js_name = "$Store")]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Store;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<Store, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "$")]
+    pub fn __unknown__(selector: &str) -> Pair;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "$")]
+    pub fn try_(selector: &str) -> Result<Pair, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(thread_local_v2, js_name = "$version")]
+    pub static version: String;
 }

@@ -113,10 +113,7 @@ fn generate_expanded_free_function(
     if super::typemap::needs_slice_to_array(&sig.params) {
         wb_parts.push(quote! { slice_to_array });
     }
-    // Emit js_name when the JS name differs from the Rust name.
-    // wasm-bindgen uses the Rust fn name as the JS name by default,
-    // so we need js_name for any camelCase → snake_case conversion.
-    if sig.rust_name != sig.js_name {
+    if super::typemap::needs_js_name(&rust_ident, &sig.js_name) {
         let js_name = &sig.js_name;
         wb_parts.push(quote! { js_name = #js_name });
     }
@@ -196,7 +193,7 @@ pub fn generate_variable(
     let doc = super::doc_tokens(doc);
 
     let mut wb_parts: Vec<TokenStream> = vec![quote! { thread_local_v2 }];
-    if decl.js_name != decl.name {
+    if super::typemap::needs_js_name(&rust_ident, &decl.js_name) {
         let js_name = &decl.js_name;
         wb_parts.push(quote! { js_name = #js_name });
     }

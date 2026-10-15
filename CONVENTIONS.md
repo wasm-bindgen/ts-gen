@@ -207,7 +207,7 @@ pub fn bar(this: &Foo) -> String;
 
 #[wasm_bindgen(method, getter)]
 pub fn baz(this: &Foo) -> f64;
-#[wasm_bindgen(method, setter, js_name = "baz")]
+#[wasm_bindgen(method, setter)]
 pub fn set_baz(this: &Foo, val: f64);
 ```
 
@@ -218,15 +218,16 @@ the setter is named `set_<snake_case>`.
 
 * JS `camelCase` / `PascalCase` identifiers → Rust `snake_case` for fns,
   `PascalCase` for types.
-* `js_name = "..."` is emitted whenever the Rust ident differs from the JS
-  ident, so `wasm-bindgen` binds to the correct runtime name.
-* Reserved Rust keywords (e.g. `type`, `match`, `move`) are emitted as raw
-  identifiers (`r#type`).
+* Reserved Rust keywords (e.g. `type`, `self`, `match`) get a trailing
+  underscore (`type_`, `self_`).
 * Names that are not valid Rust identifiers are sanitised (`0` → `_0`,
-  `$public` → `public`, `@cf/openai/whisper` → `cfopenaiwhisper`). Both
-  the getter and the `set_` setter carry `js_name` with the original key
-  whenever the emitted ident no longer spells it, so `WebSocketPair`'s
-  `0` / `1` and `$public` bind to the real properties.
+  `$public` → `public`, `@cf/openai/whisper` → `cfopenaiwhisper`).
+* `js_name = "..."` is emitted whenever the final Rust ident (after all of
+  the above) no longer spells the JS name, so `wasm-bindgen` binds to the
+  correct runtime name. This applies to types, methods, free functions,
+  variables, getters, and setters (whose JS name `wasm-bindgen` infers by
+  stripping `set_`, so `set_0` needs no `js_name` but `set_public` for
+  `$public` does).
 
 ## JS-name collisions with `js_sys` glob imports
 
