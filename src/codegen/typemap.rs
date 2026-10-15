@@ -636,9 +636,10 @@ impl<'a> CodegenContext<'a> {
 
     /// The primitive an enum reference carries on the JS side.
     ///
-    /// wasm-bindgen enums are `Copy` values with no `JsGeneric` or slice
-    /// support, so only a top-level argument or return can name one; inside
-    /// a slice, generic or callback it lowers as this primitive instead.
+    /// wasm-bindgen enums cross the ABI natively, like primitives, with no
+    /// `JsGeneric` or slice support. Wherever a primitive would take its
+    /// `js_sys` wrapper, an enum takes the wrapper of this primitive; in a
+    /// slice it lowers as this primitive itself.
     pub(crate) fn enum_repr(&self, ty: &ir::TypeRef, scope: ScopeId) -> Option<ir::TypeRef> {
         match self.enum_kind(ty, scope)? {
             TypeKind::StringEnum(_) => Some(ir::TypeRef::String),
@@ -1674,7 +1675,11 @@ fn peel_mono<'t>(
     current
 }
 
-fn is_mono_primitive(ty: &TypeRef) -> bool {
+/// Leaves that cross the ABI natively rather than as a JS handle: primitives
+/// and enums. A per-mono type parameter instantiated with one keeps it
+/// (`Holder<String>`, `Holder<Kind>`), where an erased `T: JsGeneric` would
+/// need its `js_sys` wrapper (`Holder<JsString>` for both).
+fn is_mono_native_leaf(ty: &TypeRef, ctx: &CodegenContext<'_>, scope: ScopeId) -> bool {
     matches!(
         ty,
         TypeRef::Boolean
@@ -1683,7 +1688,7 @@ fn is_mono_primitive(ty: &TypeRef) -> bool {
             | TypeRef::NumberLiteral(_)
             | TypeRef::String
             | TypeRef::StringLiteral(_)
-    )
+    ) || ctx.enum_kind(ty, scope).is_some()
 }
 
 /// The generic arguments of `ty` if it instantiates a locally declared
@@ -1705,8 +1710,9 @@ fn local_generic_args<'t>(ty: &'t TypeRef, ctx: &CodegenContext<'_>) -> Option<&
 }
 
 /// Lower an argument of a locally declared generic type in per-mono mode.
-/// Primitive leaves use their native Rust ABI, while built-in JS containers
-/// remain on the established inner-position wrapper mapping.
+/// Native leaves (primitives, enums) use their native Rust ABI, while
+/// built-in JS containers remain on the established inner-position wrapper
+/// mapping.
 fn to_mono_user_generic_arg(
     ty: &TypeRef,
     ctx: Option<&CodegenContext<'_>>,
@@ -1728,7 +1734,7 @@ fn to_mono_user_generic_arg_impl(
 ) -> TokenStream {
     let peeled = peel_mono(ty, ctx, scope, visited);
     match peeled.as_ref() {
-        t if is_mono_primitive(t) => {
+        t if is_mono_native_leaf(t, ctx, scope) => {
             to_syn_type(t, TypePosition::RETURN, Some(ctx), scope, from_module)
         }
         TypeRef::Nullable(inner) => {
@@ -1765,7 +1771,7 @@ fn is_mono_native_return_shape_impl(
 ) -> bool {
     let peeled = peel_mono(ty, ctx, scope, visited);
     match peeled.as_ref() {
-        t if is_mono_primitive(t) => true,
+        t if is_mono_native_leaf(t, ctx, scope) => true,
         TypeRef::Nullable(inner) => is_mono_native_return_shape_impl(inner, ctx, scope, visited),
         t => local_generic_args(t, ctx).is_some(),
     }
@@ -2797,6 +2803,9 @@ mod tests {
         type MaybeId = Id | null;
         type Loop = Loop2;
         type Loop2 = Loop;
+        type Mode = "fast" | "slow";
+        type ModeAlias = Mode;
+        declare enum Level { Low = 1 }
     "#;
 
     fn holder(arg: TypeRef) -> TypeRef {
@@ -2892,6 +2901,30 @@ mod tests {
                 user_arg(&holder(TypeRef::ident("Id")), ctx, scope),
                 "Holder < String >"
             );
+            // Enums are native leaves too, so they stay named rather than
+            // taking the wrapper of their primitive.
+            assert_eq!(user_arg(&TypeRef::ident("ModeAlias"), ctx, scope), "Mode");
+            assert_eq!(user_arg(&TypeRef::ident("Level"), ctx, scope), "Level");
+            assert_eq!(
+                user_arg(&holder(TypeRef::ident("Mode")), ctx, scope),
+                "Holder < Mode >"
+            );
+            assert_eq!(
+                user_arg(
+                    &TypeRef::Nullable(Box::new(TypeRef::ident("Level"))),
+                    ctx,
+                    scope
+                ),
+                "Option < Level >"
+            );
+            assert_eq!(
+                user_arg(
+                    &TypeRef::generic("Array", vec![TypeRef::ident("Mode")]),
+                    ctx,
+                    scope
+                ),
+                "Array < JsString >"
+            );
         });
     }
 
@@ -2902,6 +2935,8 @@ mod tests {
             assert!(native(&TypeRef::String));
             assert!(native(&TypeRef::ident("MaybeId")));
             assert!(native(&holder(TypeRef::Number)));
+            assert!(native(&TypeRef::ident("ModeAlias")));
+            assert!(native(&TypeRef::ident("Level")));
             assert!(!native(&TypeRef::generic("Array", vec![TypeRef::String])));
             assert!(!native(&TypeRef::ident("Plain")));
             assert!(!native(&TypeRef::ident("Loop")));
@@ -2920,6 +2955,8 @@ mod tests {
                 "Pair",
                 vec![TypeRef::Number, TypeRef::ident("Id")]
             )));
+            assert!(!eligible(&TypeRef::ident("Mode")));
+            assert!(!eligible(&holder(TypeRef::ident("Mode"))));
             // Top-level literal unions become enums, not `String`.
             assert!(!eligible(&lits(&["a", "b"])));
             assert!(!eligible(&TypeRef::Nullable(Box::new(lits(&["a", "b"])))));
