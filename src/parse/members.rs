@@ -505,10 +505,15 @@ pub fn convert_ts_signature(
         TSSignature::TSIndexSignature(idx) => convert_index_signature(idx, parent_scope, ctx)
             .into_iter()
             .collect(),
-        TSSignature::TSConstructSignatureDeclaration(ctor) => {
-            convert_construct_signature(ctor, parent, parent_scope, ctx)
-                .into_iter()
-                .collect()
+        // An object type with `new` is a constructor *value*; only a
+        // `declare var X: ...` static side (handled in `merge.rs`) makes
+        // it the constructor of a class.
+        TSSignature::TSConstructSignatureDeclaration(_) => {
+            ctx.diag.warn(format!(
+                "Construct signature on `{}` is not a class constructor, skipping",
+                parent.unwrap_or("<anonymous>")
+            ));
+            vec![]
         }
         TSSignature::TSCallSignatureDeclaration(_) => {
             ctx.diag
@@ -672,29 +677,6 @@ fn convert_index_signature(
         key_type,
         value_type,
         readonly: idx.readonly,
-    }))
-}
-
-fn convert_construct_signature(
-    ctor: &TSConstructSignatureDeclaration<'_>,
-    parent: Option<&str>,
-    parent_scope: ScopeId,
-    ctx: &mut ParseCtx<'_, '_>,
-) -> Option<Member> {
-    // Constructors have no surface-level type parameters of their own
-    // — they instantiate the parent type's parameters. Use the parent
-    // scope directly.
-    let params = match parent {
-        Some(p) => {
-            convert_formal_params_with_synthesis(&ctor.params, p, "Constructor", parent_scope, ctx)
-        }
-        None => convert_formal_params_scoped(&ctor.params, parent_scope, ctx),
-    };
-    let (doc, info) = split_info(ctx.docs.info_for_span(ctor.span.start));
-    Some(Member::Constructor(ConstructorMember {
-        params,
-        doc,
-        throws: info.throws(),
     }))
 }
 

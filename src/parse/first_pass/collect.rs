@@ -5,7 +5,9 @@
 use oxc_ast::ast;
 
 use crate::ir;
-use crate::parse::merge::{is_class_constructor_var, var_declarator_name};
+use crate::parse::merge::{
+    has_constructor_shape, is_class_constructor_var, named_constructor_ref, var_declarator_name,
+};
 use crate::parse::scope::ScopeId;
 use crate::util::diagnostics::DiagnosticCollector;
 
@@ -23,6 +25,12 @@ struct CollectCtx<'a> {
     /// Resolved once the whole file is collected, since a specifier may
     /// precede the declaration it names.
     export_specifiers: Vec<(ScopeId, String, String)>,
+    /// Interfaces with a construct signature or `prototype` member.
+    constructor_shaped: std::collections::HashSet<String>,
+    /// `declare var X: Y` declarators, held back until the file is
+    /// collected so `Y` can be checked against `constructor_shaped`
+    /// regardless of declaration order.
+    named_ctor_vars: Vec<(String, String, ir::ModuleContext, ScopeId, bool)>,
 }
 
 /// Walk the AST and collect all type names into the registry and scope arena.
@@ -41,10 +49,16 @@ pub fn collect_type_names(
         diag,
         file_scope: root_scope,
         export_specifiers: Vec::new(),
+        constructor_shaped: Default::default(),
+        named_ctor_vars: Vec::new(),
     };
 
     for stmt in &program.body {
         ccx.collect_statement(stmt, &ir::ModuleContext::Global, root_scope, false);
+    }
+
+    for (name, iface, ctx, scope, exported) in std::mem::take(&mut ccx.named_ctor_vars) {
+        ccx.resolve_named_ctor_var(&name, &iface, &ctx, scope, exported);
     }
 
     for (scope, local, public) in std::mem::take(&mut ccx.export_specifiers) {
@@ -79,7 +93,7 @@ impl<'a> CollectCtx<'a> {
                 }
             }
             ast::Statement::TSInterfaceDeclaration(iface) => {
-                self.collect_interface_name(&iface.id.name, ctx, scope, exported);
+                self.collect_interface_name(iface, ctx, scope, exported);
             }
             ast::Statement::TSTypeAliasDeclaration(alias) => {
                 self.collect_type_alias_name(alias, ctx, scope, exported);
@@ -233,7 +247,7 @@ impl<'a> CollectCtx<'a> {
                 }
             }
             ast::Declaration::TSInterfaceDeclaration(iface) => {
-                self.collect_interface_name(&iface.id.name, ctx, scope, exported);
+                self.collect_interface_name(iface, ctx, scope, exported);
             }
             ast::Declaration::TSTypeAliasDeclaration(alias) => {
                 self.collect_type_alias_name(alias, ctx, scope, exported);
@@ -276,11 +290,15 @@ impl<'a> CollectCtx<'a> {
 
     fn collect_interface_name(
         &mut self,
-        name: &str,
+        iface: &ast::TSInterfaceDeclaration<'_>,
         ctx: &ir::ModuleContext,
         scope: ScopeId,
         exported: bool,
     ) {
+        let name = iface.id.name.as_str();
+        if has_constructor_shape(&iface.body.body) {
+            self.constructor_shaped.insert(name.to_string());
+        }
         if let Some(info) = self.registry.types.get_mut(name) {
             if info.kind == ir::RegisteredKind::Variable {
                 info.kind = ir::RegisteredKind::MergedClassLike;
@@ -338,10 +356,54 @@ impl<'a> CollectCtx<'a> {
                         }
                     }
                     self.register_type(&name, ir::RegisteredKind::Variable, ctx, scope, exported);
+                } else if let Some(iface) = named_constructor_ref(declarator) {
+                    self.named_ctor_vars
+                        .push((name, iface, ctx.clone(), scope, exported));
                 } else {
                     self.register_type(&name, ir::RegisteredKind::Variable, ctx, scope, exported);
                 }
             }
+        }
+    }
+
+    /// `declare var X: XConstructor` merges like the inline literal form
+    /// when `XConstructor` has constructor shape and there is an instance
+    /// interface `X` to carry the members (or the var is module-scoped,
+    /// where the class may be constructor-only). Otherwise it is a plain
+    /// variable of that type; a same-named namespace or interface
+    /// collected meanwhile keeps the name, as it would have by
+    /// overwriting the var in source order.
+    fn resolve_named_ctor_var(
+        &mut self,
+        name: &str,
+        iface: &str,
+        ctx: &ir::ModuleContext,
+        scope: ScopeId,
+        exported: bool,
+    ) {
+        let instance = self
+            .registry
+            .types
+            .get_mut(name)
+            .filter(|info| info.kind == ir::RegisteredKind::Interface);
+        if self.constructor_shaped.contains(iface) && iface != name {
+            if let Some(info) = instance {
+                info.kind = ir::RegisteredKind::MergedClassLike;
+                self.registry
+                    .ctor_interfaces
+                    .insert(name.to_string(), iface.to_string());
+                return;
+            }
+            if matches!(ctx, ir::ModuleContext::Module(_)) {
+                self.registry
+                    .ctor_interfaces
+                    .insert(name.to_string(), iface.to_string());
+                self.register_type(name, ir::RegisteredKind::Variable, ctx, scope, exported);
+                return;
+            }
+        }
+        if !self.registry.types.contains_key(name) {
+            self.register_type(name, ir::RegisteredKind::Variable, ctx, scope, exported);
         }
     }
 

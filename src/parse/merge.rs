@@ -14,26 +14,41 @@ use crate::util::naming::to_snake_case;
 /// Check if a variable declarator looks like a class constructor pattern.
 /// Returns true if the type annotation is a type literal containing `prototype` and/or `new`.
 pub fn is_class_constructor_var(declarator: &VariableDeclarator<'_>) -> bool {
-    // In oxc 0.118, type_annotation is directly on VariableDeclarator
-    if let Some(type_ann) = &declarator.type_annotation {
-        if let TSType::TSTypeLiteral(lit) = &type_ann.type_annotation {
-            let has_prototype = lit.members.iter().any(|m| {
-                if let TSSignature::TSPropertySignature(prop) = m {
-                    property_key_name(&prop.key)
-                        .map(|n| n == "prototype")
-                        .unwrap_or(false)
-                } else {
-                    false
-                }
-            });
-            let has_new = lit
-                .members
-                .iter()
-                .any(|m| matches!(m, TSSignature::TSConstructSignatureDeclaration(_)));
-            return has_prototype || has_new;
-        }
+    match declarator.type_annotation.as_deref() {
+        Some(TSTypeAnnotation {
+            type_annotation: TSType::TSTypeLiteral(lit),
+            ..
+        }) => has_constructor_shape(&lit.members),
+        _ => false,
     }
-    false
+}
+
+/// Whether an object type body has a `prototype` property and/or a
+/// construct signature, the shape TS libs give a class's static side.
+pub fn has_constructor_shape(members: &[TSSignature<'_>]) -> bool {
+    members.iter().any(|m| match m {
+        TSSignature::TSConstructSignatureDeclaration(_) => true,
+        TSSignature::TSPropertySignature(prop) => {
+            property_key_name(&prop.key).is_some_and(|n| n == "prototype")
+        }
+        _ => false,
+    })
+}
+
+/// The bare interface name a `declare var X: XConstructor` annotation
+/// refers to. Whether that interface actually has constructor shape is
+/// only known once the whole file has been collected.
+pub fn named_constructor_ref(declarator: &VariableDeclarator<'_>) -> Option<String> {
+    match declarator.type_annotation.as_deref() {
+        Some(TSTypeAnnotation {
+            type_annotation: TSType::TSTypeReference(r),
+            ..
+        }) if r.type_arguments.is_none() => match &r.type_name {
+            TSTypeName::IdentifierReference(id) => Some(id.name.to_string()),
+            _ => None,
+        },
+        _ => None,
+    }
 }
 
 /// Extract the name from a variable declarator.
@@ -45,16 +60,18 @@ pub fn var_declarator_name(declarator: &VariableDeclarator<'_>) -> Option<String
     }
 }
 
-/// Extract constructor, static methods, and static properties from a type literal.
+/// Extract constructor, static methods, and static properties from the
+/// static-side object type of a class: an inline `{ new(...): T; ... }`
+/// literal or a `*Constructor` interface body.
 pub fn extract_var_members(
-    type_literal: &TSTypeLiteral<'_>,
+    members: &[TSSignature<'_>],
     parent_scope: ScopeId,
     ctx: &mut ParseCtx<'_, '_>,
 ) -> (Option<ConstructorMember>, Vec<Member>) {
     let mut constructor = None;
     let mut static_members = Vec::new();
 
-    for member in &type_literal.members {
+    for member in members {
         match member {
             TSSignature::TSConstructSignatureDeclaration(ctor) => {
                 let params = convert_formal_params_scoped(&ctor.params, parent_scope, ctx);
@@ -126,11 +143,11 @@ pub fn extract_var_members(
             }
             TSSignature::TSCallSignatureDeclaration(_) => {
                 ctx.diag
-                    .warn("Call signatures in declare var type literal are not supported");
+                    .warn("Call signatures on a class static side are not supported");
             }
             TSSignature::TSIndexSignature(_) => {
                 ctx.diag
-                    .warn("Index signatures in declare var type literal are not supported");
+                    .warn("Index signatures on a class static side are not supported");
             }
         }
     }

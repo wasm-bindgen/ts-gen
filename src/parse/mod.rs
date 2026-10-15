@@ -674,7 +674,7 @@ fn merge_members(base: &mut Vec<crate::ir::Member>, incoming: Vec<crate::ir::Mem
 ///
 /// Getters and setters for the same JS property name get distinct keys,
 /// since they are independent bindings that should not overwrite each other.
-#[derive(PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 enum MemberKey {
     Constructor,
     StaticMethod(String),
@@ -1059,6 +1059,66 @@ mod tests {
         let a_scope = gctx.ambient_module_scopes["a"][0];
         assert!(gctx.scopes.resolve(a_scope, "Private").is_some());
         assert!(gctx.scopes.resolve(file_scope, "Private").is_none());
+    }
+
+    #[test]
+    fn test_named_constructor_interface_merges_into_class() {
+        let src = r#"
+            declare var Later: LaterConstructor;
+            interface Codec { encode(input: string): string; }
+            interface CodecConstructor {
+                new (name: string): Codec;
+                readonly prototype: Codec;
+                readonly version: number;
+                isCodec(value: unknown): boolean;
+            }
+            declare var Codec: CodecConstructor;
+            interface LaterConstructor { new (): Later; }
+            interface Later {}
+            interface Factory { new (id: number): Codec; label: string; }
+            declare const Ns: Ns;
+            declare namespace Ns { interface Inner {} }
+        "#;
+        let (module, gctx) = crate::parse_source(src, None).unwrap();
+
+        let find = |name: &str| {
+            module
+                .types
+                .iter()
+                .map(|&id| &gctx.get_type(id).kind)
+                .find(|k| declaration_name(k).as_deref() == Some(name))
+        };
+        let member_keys =
+            |members: &[Member]| -> Vec<MemberKey> { members.iter().map(member_key).collect() };
+
+        let Some(TypeKind::Class(codec)) = find("Codec") else {
+            panic!("Codec should be a class");
+        };
+        assert_eq!(
+            member_keys(&codec.members),
+            vec![
+                MemberKey::Constructor,
+                MemberKey::StaticGetter("version".into()),
+                MemberKey::StaticMethod("is_codec".into()),
+                MemberKey::Proto("encode".into()),
+            ]
+        );
+        assert!(find("CodecConstructor").is_none());
+        assert!(matches!(find("Later"), Some(TypeKind::Class(c)) if c.members.len() == 1));
+        assert!(find("LaterConstructor").is_none());
+
+        let Some(TypeKind::Interface(factory)) = find("Factory") else {
+            panic!("Factory should stay an interface");
+        };
+        assert!(!factory
+            .members
+            .iter()
+            .any(|m| matches!(m, Member::Constructor(_))));
+
+        // A deferred var must not clobber a later same-named namespace.
+        let file_scope = module.file_scopes[0];
+        let ns = gctx.scopes.resolve(file_scope, "Ns").unwrap();
+        assert!(matches!(gctx.get_type(ns).kind, TypeKind::Namespace(_)));
     }
 
     #[test]

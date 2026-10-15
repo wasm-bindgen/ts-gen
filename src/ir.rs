@@ -757,6 +757,10 @@ pub struct TypeRegistry {
     /// exporting scope. A same-named declaration in any other scope is a
     /// different binding and keeps its own name.
     pub export_names: HashMap<crate::context::TypeId, Vec<String>>,
+    /// `declare var X: XConstructor` pairs, var name → interface name.
+    /// The interface supplies the class constructor and statics and is
+    /// not emitted as a type of its own.
+    pub ctor_interfaces: HashMap<String, String>,
 }
 
 #[derive(Clone, Debug)]

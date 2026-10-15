@@ -893,6 +893,30 @@ is recognised at parse time. The variable contributes the constructor,
 the interface contributes the methods, and the merged result emits as a
 single class. See `merge.rs` for the heuristic.
 
+The TS lib spelling, where the static side is a named interface rather
+than an inline literal, merges the same way:
+
+```ts
+interface URIError extends Error { … }
+interface URIErrorConstructor {
+  new (message?: string): URIError;
+  readonly prototype: URIError;
+}
+declare var URIError: URIErrorConstructor;
+```
+
+`URIErrorConstructor` qualifies by having a construct signature and/or
+a `prototype` member; it supplies the constructor and the statics, and
+is not emitted as a type of its own. Declaration order does not matter.
+If something else refers to `URIErrorConstructor` by name it falls back
+to `JsValue` with an unresolved-type diagnostic, like any unmapped type.
+
+A construct signature on any other object type (`interface Factory {
+new (): Widget }`, or an inline `{ new (): T }` parameter type) is the
+type of a constructor *value*, not a constructor of that type. It is
+dropped with a warning rather than emitted as
+`#[wasm_bindgen(constructor)]` on the wrong class.
+
 ## Module-scoped constructor variables
 
 ```ts

@@ -437,6 +437,18 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         let doc = self.lookup_doc(dcx.export_span_start, iface.span.start);
         let module_context = dcx.module_context.clone();
         let scope = dcx.scope;
+        let iface_name = iface.id.name.as_str();
+        let static_side_of = self
+            .registry
+            .ctor_interfaces
+            .iter()
+            .find(|(_, ctor)| *ctor == iface_name)
+            .map(|(var, _)| var.clone());
+        if let Some(var) = static_side_of {
+            self.push_static_side_class(&var, &iface.body.body, dcx, doc, declarations);
+            declarations.extend(self.drain_synth(&module_context, scope));
+            return;
+        }
         let iface_decl = convert_interface_decl(iface, scope, &mut self.parse_ctx());
         declarations.push(dcx.decl(ir::TypeKind::Interface(iface_decl), doc));
         declarations.extend(self.drain_synth(&module_context, scope));
@@ -566,6 +578,63 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         }
     }
 
+    /// Emit the class a `declare var X: { new(...) }` / `declare var X:
+    /// XConstructor` static side describes. The instance interface `X`,
+    /// if any, is folded in by `merge_class_pairs`.
+    fn push_static_side_class(
+        &mut self,
+        name: &str,
+        members: &[ast::TSSignature<'_>],
+        dcx: &DeclCtx<'_>,
+        doc: Option<String>,
+        declarations: &mut Vec<ir::TypeDeclaration>,
+    ) {
+        let (ctor, static_members) = extract_var_members(members, dcx.scope, &mut self.parse_ctx());
+
+        let mut members = Vec::new();
+        if let Some(c) = ctor {
+            members.push(ir::Member::Constructor(c));
+        }
+        members.extend(static_members);
+
+        // The variable is a value, not a type, so nothing refers
+        // to the class by its local name: the class takes its
+        // first public name and further ones alias it.
+        let public_names = self.export_names(dcx.scope, name);
+        let mut public_names = public_names.iter();
+        let class_name = public_names.next().map_or(name, String::as_str).to_string();
+
+        // Var-promoted classes have no surface
+        // type parameters; body scope = enclosing.
+        let body_scope = dcx.scope;
+        declarations.push(dcx.decl(
+            ir::TypeKind::Class(ir::ClassDecl {
+                name: class_name.clone(),
+                js_name: class_name.clone(),
+                type_params: vec![],
+                extends: None,
+                implements: vec![],
+                is_abstract: false,
+                members,
+                type_module_context: dcx.module_context.clone(),
+                body_scope,
+            }),
+            doc,
+        ));
+        for alias in public_names {
+            declarations.push(dcx.decl(
+                ir::TypeKind::TypeAlias(ir::TypeAliasDecl {
+                    name: alias.clone(),
+                    type_params: vec![],
+                    target: ir::TypeRef::ident(class_name.clone()),
+                    from_module: None,
+                    body_scope,
+                }),
+                None,
+            ));
+        }
+    }
+
     fn populate_variable_decl(
         &mut self,
         var_decl: &ast::VariableDeclaration<'_>,
@@ -575,6 +644,10 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         let doc = self.lookup_doc(dcx.export_span_start, var_decl.span.start);
         for declarator in &var_decl.declarations {
             if let Some(name) = var_declarator_name(declarator) {
+                if self.registry.ctor_interfaces.contains_key(&name) {
+                    // Emitted as a class from the `*Constructor` interface.
+                    continue;
+                }
                 let merged_with_iface = self
                     .registry
                     .types
@@ -593,50 +666,13 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                 if merged_with_iface || is_module_ctor_var {
                     if let Some(type_ann) = &declarator.type_annotation {
                         if let ast::TSType::TSTypeLiteral(lit) = &type_ann.type_annotation {
-                            let (ctor, static_members) =
-                                extract_var_members(lit, dcx.scope, &mut self.parse_ctx());
-
-                            let mut members = Vec::new();
-                            if let Some(c) = ctor {
-                                members.push(ir::Member::Constructor(c));
-                            }
-                            members.extend(static_members);
-
-                            // The variable is a value, not a type, so nothing refers
-                            // to the class by its local name: the class takes its
-                            // first public name and further ones alias it.
-                            let mut public_names = self.export_names(dcx.scope, &name).iter();
-                            let class_name = public_names.next().unwrap_or(&name).clone();
-
-                            // Var-promoted classes have no surface
-                            // type parameters; body scope = enclosing.
-                            let body_scope = dcx.scope;
-                            declarations.push(dcx.decl(
-                                ir::TypeKind::Class(ir::ClassDecl {
-                                    name: class_name.clone(),
-                                    js_name: class_name.clone(),
-                                    type_params: vec![],
-                                    extends: None,
-                                    implements: vec![],
-                                    is_abstract: false,
-                                    members,
-                                    type_module_context: dcx.module_context.clone(),
-                                    body_scope,
-                                }),
+                            self.push_static_side_class(
+                                &name,
+                                &lit.members,
+                                dcx,
                                 doc.clone(),
-                            ));
-                            for alias in public_names {
-                                declarations.push(dcx.decl(
-                                    ir::TypeKind::TypeAlias(ir::TypeAliasDecl {
-                                        name: alias.clone(),
-                                        type_params: vec![],
-                                        target: ir::TypeRef::ident(class_name.clone()),
-                                        from_module: None,
-                                        body_scope,
-                                    }),
-                                    None,
-                                ));
-                            }
+                                declarations,
+                            );
                             continue;
                         }
                     }
