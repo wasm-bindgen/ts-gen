@@ -142,6 +142,12 @@ fn parse_single_file(
             None => gctx.warn(format!("{}: {message}", path.display())),
         }
     }
+    if parser_return.fatal_error {
+        gctx.diagnostics.error(format!(
+            "Internal OXC parse error: {} could not be parsed, no bindings were generated for it",
+            path.display()
+        ));
+    }
 
     let program = &parser_return.program;
     let doc_comments = docs::DocComments::new(&program.comments, source);
@@ -1028,5 +1034,14 @@ mod tests {
         );
         let loc = diag.location.as_ref().expect("parse error location");
         assert_eq!(loc.to_string(), "<input>:4:36");
+        assert!(gctx.diagnostics.has_errors());
+    }
+
+    #[test]
+    fn test_recoverable_parse_error_is_not_fatal() {
+        let source = "export interface A { public x: string }\n";
+        let (_, gctx) = parse_single_source(source, Some("m")).unwrap();
+        assert!(gctx.diagnostics.has_warnings());
+        assert!(!gctx.diagnostics.has_errors());
     }
 }
