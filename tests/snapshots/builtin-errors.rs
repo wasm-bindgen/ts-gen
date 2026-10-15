@@ -2,13 +2,11 @@
 
 #[allow(dead_code)]
 use ::js_sys::UriError as URIError;
-#[allow(dead_code)]
-use ::web_sys::DomException as DOMException;
 #[allow(unused_imports)]
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
-#[wasm_bindgen]
+#[wasm_bindgen(module = "builtin-errors")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
@@ -25,14 +23,14 @@ extern "C" {
     pub fn try_decode(this: &Codec, input: &str) -> Result<String, URIError>;
     #[doc = " ## Errors"]
     #[doc = ""]
-    #[doc = " * `DOMException` — when the codec is closed"]
-    #[wasm_bindgen(method)]
-    pub fn encode(this: &Codec, input: &str) -> Uint8Array;
+    #[doc = " * `AggregateError` — when several escape sequences are malformed"]
+    #[wasm_bindgen(method, js_name = "decodeAll")]
+    pub fn decode_all(this: &Codec, input: &str) -> String;
     #[doc = " ## Errors"]
     #[doc = ""]
-    #[doc = " * `DOMException` — when the codec is closed"]
-    #[wasm_bindgen(method, catch, js_name = "encode")]
-    pub fn try_encode(this: &Codec, input: &str) -> Result<Uint8Array, DOMException>;
+    #[doc = " * `AggregateError` — when several escape sequences are malformed"]
+    #[wasm_bindgen(method, catch, js_name = "decodeAll")]
+    pub fn try_decode_all(this: &Codec, input: &str) -> Result<String, AggregateError>;
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `URIError | TypeError`"]

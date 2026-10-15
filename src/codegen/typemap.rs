@@ -26,6 +26,7 @@ use crate::util::diagnostics::DiagnosticCollector;
 /// js_sys type names reserved by the `use js_sys::*` glob import.
 /// User-defined types that collide with these will be renamed.
 pub const JS_SYS_RESERVED: &[&str] = &[
+    "AggregateError",
     "Array",
     "ArrayBuffer",
     "ArrayTuple",

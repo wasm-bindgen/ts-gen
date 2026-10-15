@@ -1,16 +1,17 @@
-// Fixture: error classes that TS spells differently from their Rust
-// binding resolve without a declaration or `--external`. `URIError` is
-// `js_sys::UriError`; `DOMException` is `web_sys::DomException` through
-// the web platform defaults. Both are bindable `@throws` names, so the
-// `try_` forms return them as the error type; the union collapses to
-// their common ancestor `Error`.
+//! @ts-gen --lib-name builtin-errors --export builtin-errors
 
-declare class Codec {
+// Fixture: js_sys error classes resolve as `@throws` types without a
+// declaration or `--external`. `URIError` is spelled `UriError` in
+// js_sys and gets aliased; `AggregateError` comes from the glob. The
+// `try_` forms return them as the error type; the union collapses to
+// the common ancestor `Error`.
+
+export declare class Codec {
   /** @throws {URIError} on a malformed escape sequence */
   decode(input: string): string;
 
-  /** @throws {DOMException} when the codec is closed */
-  encode(input: string): Uint8Array;
+  /** @throws {AggregateError} when several escape sequences are malformed */
+  decodeAll(input: string): string;
 
   /** @throws {URIError | TypeError} */
   parse(input: string): Promise<string>;
