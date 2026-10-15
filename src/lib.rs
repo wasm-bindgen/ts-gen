@@ -19,6 +19,7 @@ pub mod context;
 pub mod external_map;
 pub mod ir;
 pub mod parse;
+pub mod provides;
 pub mod util;
 
 use std::path::Path;

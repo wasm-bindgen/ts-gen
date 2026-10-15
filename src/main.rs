@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use anyhow::{bail, Context, Result};
 use clap::Parser;
@@ -141,6 +141,25 @@ struct Cli {
     /// two empties apart. Writes are exact under either setting.
     #[arg(long = "strict-nullable")]
     strict_nullable: bool,
+
+    /// What the module provides to JS, the reverse of the bindings. Either
+    /// a `.d.ts` whose exports are the module's exports, or
+    /// `Name[.member,...]`: an input interface the default export
+    /// implements, with optional members listed to include them. Writes
+    /// `provides.rs` (wasm-bindgen exports delegating to the app module)
+    /// and, if absent, the app module's scaffold, next to the output.
+    #[arg(long)]
+    provides: Option<String>,
+
+    /// Module path the `--provides` wrapper delegates to, relative to the
+    /// wrapper's parent; its last segment names the scaffold file.
+    #[arg(long, default_value = "super::app")]
+    provides_app: String,
+
+    /// Module path of the generated bindings, for the `--provides` wrapper.
+    /// Defaults to `super::<output file stem>`.
+    #[arg(long)]
+    provides_bindings: Option<String>,
 }
 
 fn main() -> Result<()> {
@@ -166,6 +185,10 @@ fn main() -> Result<()> {
         gctx.external_map.add_mappings(mapping);
     }
 
+    let provided = match &cli.provides {
+        Some(spec) => ts_gen::provides::resolve(spec, &module, &mut gctx)?,
+        None => Vec::new(),
+    };
     gctx.diagnostics.emit();
 
     if cli.verbose {
@@ -222,22 +245,62 @@ fn main() -> Result<()> {
     if let Some(name) = &cli.error_enum {
         options = options.error_enum(name);
     }
-    let rust_source = ts_gen::codegen::generate_with_options(&module, &gctx, &options)?;
+    let source = ts_gen::codegen::generate_with_options(&module, &gctx, &options)?;
 
-    // Write output file, creating parent directories if needed
-    if let Some(parent) = cli.output.parent() {
+    write_file(&cli.output, &source)?;
+
+    if !provided.is_empty() {
+        let stem = cli
+            .output
+            .file_stem()
+            .map(|s| s.to_string_lossy().into_owned())
+            .unwrap_or_else(|| "bindings".into());
+        let bindings = cli
+            .provides_bindings
+            .clone()
+            .unwrap_or_else(|| format!("super::{stem}"));
+        let app: syn::Path = syn::parse_str(&cli.provides_app)
+            .with_context(|| format!("--provides-app {:?} is not a path", cli.provides_app))?;
+        let app_file_stem = app
+            .segments
+            .last()
+            .map(|s| s.ident.to_string())
+            .unwrap_or_else(|| "app".into());
+        let paths = ts_gen::codegen::provides::ProvidesPaths {
+            bindings: syn::parse_str(&bindings)
+                .with_context(|| format!("--provides-bindings {bindings:?} is not a path"))?,
+            app,
+        };
+        let (wrapper, scaffold) =
+            ts_gen::codegen::generate_provides(&module, &gctx, &options, &provided, &paths)?;
+        let dir = cli
+            .output
+            .parent()
+            .map(Path::to_path_buf)
+            .unwrap_or_default();
+        write_file(&dir.join("provides.rs"), &wrapper)?;
+        let app_file = dir.join(format!("{app_file_stem}.rs"));
+        if app_file.exists() {
+            eprintln!("[ts-gen] Kept existing {}", app_file.display());
+        } else {
+            write_file(&app_file, &scaffold)?;
+        }
+    }
+    eprintln!("[ts-gen] Done");
+
+    Ok(())
+}
+
+fn write_file(path: &std::path::Path, contents: impl AsRef<[u8]>) -> Result<()> {
+    if let Some(parent) = path.parent() {
         if !parent.as_os_str().is_empty() {
             std::fs::create_dir_all(parent)
                 .with_context(|| format!("Failed to create directory: {}", parent.display()))?;
         }
     }
-
-    std::fs::write(&cli.output, &rust_source)
-        .with_context(|| format!("Failed to write {}", cli.output.display()))?;
-
-    eprintln!("[ts-gen] Wrote {}", cli.output.display());
-    eprintln!("[ts-gen] Done");
-
+    std::fs::write(path, contents)
+        .with_context(|| format!("Failed to write {}", path.display()))?;
+    eprintln!("[ts-gen] Wrote {}", path.display());
     Ok(())
 }
 

@@ -159,6 +159,9 @@ pub enum Direction {
     Argument,
     /// Data flowing from JS to Rust (function returns).
     Return,
+    /// Data flowing from Rust to JS as what a provided function returns
+    /// (`--provides`): owned like a return, exact like a write.
+    ExportReturn,
 }
 
 /// Position context for type mapping, following the wasm-bindgen WebIDL pattern.
@@ -185,6 +188,11 @@ impl TypePosition {
         direction: Direction::Return,
         inner: false,
     };
+    /// Top-level return of a provided function: a write JS receives.
+    pub const EXPORT_RETURN: Self = Self {
+        direction: Direction::ExportReturn,
+        inner: false,
+    };
 
     /// Convert to inner position (for generic type parameters).
     /// Preserves direction but sets `inner: true`.
@@ -197,6 +205,16 @@ impl TypePosition {
 
     pub fn is_argument(self) -> bool {
         matches!(self.direction, Direction::Argument)
+    }
+
+    /// Whether Rust writes this value to JS, so `IntoWasmAbi` must pick
+    /// what each empty crosses as: an argument, or a provided function's
+    /// return.
+    pub fn is_write(self) -> bool {
+        matches!(
+            self.direction,
+            Direction::Argument | Direction::ExportReturn
+        )
     }
 }
 
@@ -2075,6 +2093,15 @@ pub fn to_syn_type(
             }
             return nullable_carrier(inner_ty, n);
         }
+        // What a provided function returns is a write too, in the owned
+        // spelling: the exact carrier, and a bare `JsValue` carries both
+        // empties in-band.
+        if pos.is_write() {
+            if is_jsvalue_arg(&inner_ty) {
+                return inner_ty;
+            }
+            return nullable_carrier(inner_ty, n);
+        }
         // A read of the top type stays bare: `any` and `unknown` already
         // admit both empties in-band (`is_null`, `is_undefined`), and
         // TypeScript itself erases a `| null` or `| undefined` on them. Any
@@ -2963,7 +2990,7 @@ fn mono_promise_carrier(
     scope: ScopeId,
     from_module: &ModuleContext,
 ) -> Option<TokenStream> {
-    if !CodegenContext::generic_mono(ctx) || pos.inner || pos.is_argument() {
+    if !CodegenContext::generic_mono(ctx) || pos.inner || pos.is_write() {
         return None;
     }
     let (core, n, scope) = split_empties_in(inner, ctx, scope)?;

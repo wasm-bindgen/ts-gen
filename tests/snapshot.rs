@@ -205,7 +205,12 @@ fn snapshot_test(fixture_name: &str) {
     let out_dir = TempDir::new(&format!("snapshot-{base_name}"));
 
     for (config_name, config_args) in &configs {
-        let out_file = out_dir.0.join(format!("{config_name}.rs"));
+        // One directory per configuration: `--provides` writes its wrapper
+        // and app scaffold next to the output, and the output stem names
+        // the bindings module the wrapper delegates to.
+        let config_dir = out_dir.0.join(config_name);
+        std::fs::create_dir_all(&config_dir).unwrap();
+        let out_file = config_dir.join("bindings.rs");
 
         // Invoke the CLI binary: ts-gen --input <fixture> --output <out_file> [extra_args...]
         let output = Command::new(ts_gen_bin())
@@ -238,13 +243,22 @@ fn snapshot_test(fixture_name: &str) {
         });
 
         assert_snapshot(&snap_dir.join(format!("{config_name}.rs")), &rust_code);
+
+        // `--provides` writes a wrapper and an app scaffold next to the output.
+        for file in ["provides.rs", "app.rs"] {
+            let path = config_dir.join(file);
+            if path.is_file() {
+                let code = std::fs::read_to_string(&path).unwrap();
+                assert_snapshot(&snap_dir.join(format!("{config_name}.{file}")), &code);
+            }
+        }
     }
 }
 
 /// Every entry under `tests/snapshots/` must be the directory of a current
-/// fixture holding exactly one file per configuration it is rendered under,
-/// so a renamed fixture or a dropped configuration can't leave stale
-/// snapshots behind.
+/// fixture holding only files named after a configuration it is rendered
+/// under (`default.rs`, `default.provides.rs`, ...), so a renamed fixture or
+/// a dropped configuration can't leave stale snapshots behind.
 fn check_stale_snapshots(fixtures: &[String]) -> Vec<String> {
     let snapshots_dir = crate_root().join("tests/snapshots");
     let mut stale = Vec::new();
@@ -259,12 +273,13 @@ fn check_stale_snapshots(fixtures: &[String]) -> Vec<String> {
             stale.push(path.display().to_string());
             continue;
         }
-        let expected_files: Vec<String> = configs_for(&name)
+        let expected_prefixes: Vec<String> = configs_for(&name)
             .iter()
-            .map(|(config, _)| format!("{config}.rs"))
+            .map(|(config, _)| format!("{config}."))
             .collect();
         for file in std::fs::read_dir(&path).into_iter().flatten().flatten() {
-            if !expected_files.contains(&file.file_name().to_string_lossy().to_string()) {
+            let file_name = file.file_name().to_string_lossy().to_string();
+            if !expected_prefixes.iter().any(|p| file_name.starts_with(p)) {
                 stale.push(file.path().display().to_string());
             }
         }
@@ -283,10 +298,11 @@ fn snapshots() {
         .filter_map(|entry| {
             let entry = entry.ok()?;
             let path = entry.path();
-            if path.extension().and_then(|e| e.to_str()) == Some("ts")
-                && path.to_string_lossy().ends_with(".d.ts")
-            {
-                Some(path.file_name()?.to_string_lossy().to_string())
+            let name = path.file_name()?.to_string_lossy().to_string();
+            // `<fixture>.provides.d.ts` is a fixture's `--provides` surface,
+            // not an input of its own.
+            if name.ends_with(".d.ts") && !name.ends_with(".provides.d.ts") {
+                Some(name)
             } else {
                 None
             }

@@ -1,4 +1,4 @@
-//! @ts-gen --lib-name cloudflare-worker
+//! @ts-gen --lib-name cloudflare-worker --provides ExportedHandler.fetch
 // Minimal TypeScript bindings for a Cloudflare Workers hello world.
 // Covers: Request, Response, ResponseInit, Headers, ExportedHandler, and fetch event.
 

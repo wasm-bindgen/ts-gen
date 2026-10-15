@@ -37,3 +37,7 @@ test-integration *ARGS="":
     NODE_PATH={{justfile_directory()}}/integration-tests/node_modules \
     CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUNNER=wasm-bindgen-test-runner \
         cargo +stable test -p ts-gen-integration-tests --target wasm32-unknown-unknown {{ARGS}}
+    cargo +stable build -p ts-gen-integration-tests --target wasm32-unknown-unknown
+    node integration-tests/provides_namespace.mjs \
+        {{justfile_directory()}}/target/wasm32-unknown-unknown/debug/ts_gen_integration_tests.wasm \
+        $(which wasm-bindgen)

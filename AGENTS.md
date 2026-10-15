@@ -17,6 +17,7 @@ src/
 ├── lib.rs                     # public API (`parse_source`, re-exports)
 ├── ir.rs                      # IR types (TypeRef, ClassDecl, …)
 ├── context.rs                 # GlobalContext (scopes, registry, externals)
+├── provides.rs                # `--provides` model: what the module provides to JS (ProvidedFn)
 ├── external_map.rs            # `--external Foo=::path::Bar` resolution
 ├── parse/                     # .d.ts → IR
 │   ├── docs.rs                # JSDoc extraction (incl. @throws)
@@ -36,6 +37,7 @@ src/
 │   ├── functions.rs           # free function / variable bindings
 │   ├── enums.rs               # string + numeric enums
 │   ├── error_enum.rs          # `--error-enum`: @throws types → one enum
+│   ├── provides.rs            # provides.rs wrapper + app scaffold for --provides
 │   ├── signatures.rs          # parameter expansion + per-callable layer
 │   ├── subtyping.rs           # builtin parents + `lub_types` (LUB)
 │   ├── surface.rs             # output surface: export roots, `--export <Name>`, closure
