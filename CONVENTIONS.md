@@ -49,7 +49,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 | `string`                        | `String` / `&str`          |
 | `number`                        | `f64`                      |
 | `boolean`                       | `bool`                     |
-| `bigint`                        | `i64`                      |
+| `bigint`                        | `BigInt`                   |
 | `symbol` / `unique symbol`      | `Symbol`                   |
 | `void`                          | `()` (or omitted from sig) |
 | `undefined`                     | `Undefined`                |
