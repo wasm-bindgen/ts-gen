@@ -4,7 +4,11 @@
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
-#[wasm_bindgen]
+#[allow(dead_code)]
+pub type Row = Array<JsString>;
+#[allow(dead_code)]
+pub type Id = JsString;
+#[wasm_bindgen(module = "nested-arrays")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
@@ -23,4 +27,160 @@ extern "C" {
     pub fn tags(this: &Grid) -> Vec<Array<Boolean>>;
     #[wasm_bindgen(method, setter, slice_to_array)]
     pub fn set_tags(this: &Grid, val: &[Array<Boolean>]);
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    pub fn deep() -> Vec<Array<Array<JsString>>>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "deep")]
+    pub fn try_deep() -> Result<Vec<Array<Array<JsString>>>, JsValue>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(slice_to_array, js_name = "putDeep")]
+    pub fn put_deep(rows: &[Array<Array<JsString>>]);
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(catch, slice_to_array, js_name = "putDeep")]
+    pub fn try_put_deep(rows: &[Array<Array<JsString>>]) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(slice_to_array, js_name = "readonlyRows")]
+    pub fn readonly_rows(rows: &[Array<JsString>]) -> Vec<Array<JsString>>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(catch, slice_to_array, js_name = "readonlyRows")]
+    pub fn try_readonly_rows(rows: &[Array<JsString>]) -> Result<Vec<Array<JsString>>, JsValue>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(slice_to_array, js_name = "genericRows")]
+    pub fn generic_rows(rows: &[Array<JsString>]) -> Vec<Array<JsString>>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(catch, slice_to_array, js_name = "genericRows")]
+    pub fn try_generic_rows(rows: &[Array<JsString>]) -> Result<Vec<Array<JsString>>, JsValue>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(slice_to_array, js_name = "aliasRows")]
+    pub fn alias_rows(rows: &[Array<JsString>]) -> Vec<Array<JsString>>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(catch, slice_to_array, js_name = "aliasRows")]
+    pub fn try_alias_rows(rows: &[Array<JsString>]) -> Result<Vec<Array<JsString>>, JsValue>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(slice_to_array, js_name = "maybeRows")]
+    pub fn maybe_rows(rows: &[Array<JsString>]) -> Option<Vec<Array<JsString>>>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(catch, slice_to_array, js_name = "maybeRows")]
+    pub fn try_maybe_rows(
+        rows: &[Array<JsString>],
+    ) -> Result<Option<Vec<Array<JsString>>>, JsValue>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(js_name = "forEachRow")]
+    pub fn for_each_row(callback: &Function<fn(Array<Array<JsString>>) -> Undefined>);
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "forEachRow")]
+    pub fn try_for_each_row(
+        callback: &Function<fn(Array<Array<JsString>>) -> Undefined>,
+    ) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(slice_to_array, js_name = "nullableStrings")]
+    pub fn nullable_strings(values: &[JsOption<JsString>]) -> Vec<JsOption<JsString>>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(catch, slice_to_array, js_name = "nullableStrings")]
+    pub fn try_nullable_strings(
+        values: &[JsOption<JsString>],
+    ) -> Result<Vec<JsOption<JsString>>, JsValue>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(slice_to_array, js_name = "nullableRows")]
+    pub fn nullable_rows(rows: &[JsOption<Array<JsString>>]) -> Vec<JsOption<Array<JsString>>>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(catch, slice_to_array, js_name = "nullableRows")]
+    pub fn try_nullable_rows(
+        rows: &[JsOption<Array<JsString>>],
+    ) -> Result<Vec<JsOption<Array<JsString>>>, JsValue>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(slice_to_array)]
+    pub fn flags(values: &[Boolean]) -> Vec<Boolean>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(catch, slice_to_array, js_name = "flags")]
+    pub fn try_flags(values: &[Boolean]) -> Result<Vec<Boolean>, JsValue>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(slice_to_array)]
+    pub fn ids(values: &[String]) -> Vec<String>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(catch, slice_to_array, js_name = "ids")]
+    pub fn try_ids(values: &[String]) -> Result<Vec<String>, JsValue>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(slice_to_array)]
+    pub fn modes(values: &[String]) -> Vec<String>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(catch, slice_to_array, js_name = "modes")]
+    pub fn try_modes(values: &[String]) -> Result<Vec<String>, JsValue>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(slice_to_array)]
+    pub fn counts(values: &[f64]) -> Vec<f64>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(catch, slice_to_array, js_name = "counts")]
+    pub fn try_counts(values: &[f64]) -> Result<Vec<f64>, JsValue>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    pub fn bigints(values: &[BigInt]) -> Vec<BigInt>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "bigints")]
+    pub fn try_bigints(values: &[BigInt]) -> Result<Vec<BigInt>, JsValue>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(slice_to_array)]
+    pub fn grids(values: &[Grid]) -> Vec<Grid>;
+}
+#[wasm_bindgen(module = "nested-arrays")]
+extern "C" {
+    #[wasm_bindgen(catch, slice_to_array, js_name = "grids")]
+    pub fn try_grids(values: &[Grid]) -> Result<Vec<Grid>, JsValue>;
 }

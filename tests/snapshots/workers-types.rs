@@ -39358,7 +39358,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &TraceEventInfo) -> String;
         #[wasm_bindgen(method, getter)]
-        pub fn traces(this: &TraceEventInfo) -> Vec<Option<String>>;
+        pub fn traces(this: &TraceEventInfo) -> Vec<JsOption<JsString>>;
     }
     impl TraceEventInfo {
         #[allow(clippy::new_without_default)]
@@ -41999,7 +41999,7 @@ pub enum AttributeValueKind {
     String(String),
     VecOfString(Vec<String>),
     Bool(bool),
-    VecOfBool(Vec<bool>),
+    VecOfBool(Vec<Boolean>),
     F64(f64),
     VecOfF64(Vec<f64>),
     BigInt(BigInt),

@@ -95,22 +95,28 @@ sequences:
   JS `Array`.
 * **Return position** → `Vec<T>`.
 
-Element type lowering inside the slice / `Vec<T>` follows
-**return-position** rules regardless of the outer direction:
+wasm-bindgen only has slice / `Vec` ABIs for Rust-native `String` and
+`f64` elements and for JS handles. So an element that resolves, through
+aliases and unions, to a string or number keeps its return-position
+form; every other element takes its inner-position handle form:
 
-| TypeScript element        | Slice / Vec element    |
-| ------------------------- | ---------------------- |
-| `number`                  | `f64`                  |
-| `bigint`                  | `i64`                  |
-| `boolean`                 | `bool`                 |
-| `string`                  | `String`               |
-| `Foo` (named JS / Rust type) | `Foo`               |
-| `any` / `unknown`         | `JsValue`              |
+| TypeScript element           | Slice / Vec element    |
+| ---------------------------- | ---------------------- |
+| `number`, `1 \| 2`           | `f64`                  |
+| `string`, `"a" \| "b"`       | `String`               |
+| `Foo` (named JS / Rust type) | `Foo`                  |
+| `any` / `unknown`            | `JsValue`              |
+| `boolean`                    | `Boolean`              |
+| `bigint`                     | `BigInt`               |
+| `T \| null`                  | `JsOption<U>`          |
+| `T[]`                        | `Array<U>`             |
 
 Strings stay owned (`Vec<String>`, not `Vec<&str>`); JS-imported
 classes stay unborrowed (`&[EmailAttachment]`, not
-`&[&EmailAttachment]`); primitives stay bare (`&[f64]`, not
-`&[Number]`).
+`&[&EmailAttachment]`); numbers stay bare (`&[f64]`, not
+`&[Number]`). With `type Row = string[]`, `Row[]` is
+`&[Array<JsString>]` / `Vec<Array<JsString>>`, the same as
+`string[][]`.
 
 Inside an actual generic (`Promise<Array<T>>`, `Map<K, Array<V>>`,
 …) the legacy `Array<T'>` form is preserved — `Promise<T>` /
@@ -165,8 +171,6 @@ is exposed as a distinct TS spelling:
 
 Where `U` is the element's inner-position lowering (`JsString`
 for `string`, `Number` for `number`, `Foo` for a named ref).
-A nested `T[][]` has no `Vec<Vec<_>>` ABI, so its inner array is the
-handle: `string[][]` is `&[Array<JsString>]` / `Vec<Array<JsString>>`.
 
 Writing `Array<T>` (the explicit generic) gets the JS-array
 reference form; writing `T[]` (the syntactic shortcut) gets

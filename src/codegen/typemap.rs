@@ -943,14 +943,15 @@ pub fn to_syn_type(
         //   or a plain `Array` depending on the element kind).
         // * Return position → `Vec<T>` (owned).
         //
-        // The element uses **return-position** lowering regardless of
-        // direction. wasm-bindgen treats the slice / `Vec<T>` wrapper
-        // as the FFI boundary, so primitives stay bare (`&[f64]`,
-        // `Vec<f64>` — not `&[Number]` / `Vec<Number>`) and named
-        // types stay unborrowed (`&[EmailAttachment]`, not
-        // `&[&EmailAttachment]`). Strings stay owned (`&[String]`,
-        // `Vec<String>`); `&[&str]` would needlessly thread a borrow
-        // lifetime through the slice.
+        // wasm-bindgen only has slice / `Vec` ABIs for Rust-native
+        // `String` and `f64` elements and for JS handles. So an element
+        // that resolves (through aliases and unions) to a string or
+        // number takes return-position lowering (`&[f64]`,
+        // `Vec<String>`; `&[&str]` would needlessly thread a borrow
+        // lifetime through the slice). Every other element takes its
+        // inner-position handle form: `&[EmailAttachment]`,
+        // `Vec<Boolean>`, `Vec<JsOption<JsString>>`, and
+        // `Vec<Array<JsString>>` for `string[][]`.
         //
         // For non-primitive element kinds the binding also gets
         // `#[wasm_bindgen(slice_to_array)]` so JS receives a plain
@@ -969,12 +970,10 @@ pub fn to_syn_type(
             } else {
                 let repr = ctx.and_then(|c| c.enum_repr(inner, scope));
                 let inner = repr.as_ref().unwrap_or(inner);
-                // wasm-bindgen has no `Vec<Vec<_>>` ABI, so an inner
-                // array stays a JS handle: `string[][]` is `Vec<Array<JsString>>`.
-                let elem_pos = if matches!(*inner, TypeRef::Array(_)) {
-                    TypePosition::RETURN.to_inner()
-                } else {
+                let elem_pos = if is_native_array_element(inner, ctx, scope) {
                     TypePosition::RETURN
+                } else {
+                    TypePosition::RETURN.to_inner()
                 };
                 let elem = to_syn_type(inner, elem_pos, ctx, scope, from_module);
                 if pos.is_argument() {
@@ -2284,6 +2283,23 @@ fn param_needs_slice_to_array(ty: &TypeRef) -> bool {
     }
 }
 
+/// Whether a `T[]` element keeps its Rust-native form (`String` /
+/// `f64`) inside the top-level slice / `Vec`.
+fn is_native_array_element(
+    elem: &TypeRef,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> bool {
+    let resolved = match ctx {
+        Some(c) => peel_mono(elem, c, scope, &mut HashSet::new()),
+        None => std::borrow::Cow::Borrowed(elem),
+    };
+    matches!(
+        resolved.as_ref(),
+        TypeRef::String | TypeRef::StringLiteral(_) | TypeRef::Number | TypeRef::NumberLiteral(_)
+    )
+}
+
 fn is_numeric_primitive(ty: &TypeRef) -> bool {
     matches!(
         ty,
@@ -3048,6 +3064,34 @@ mod tests {
             let ty = TypeRef::ident("Loop");
             let peeled = peel_mono(&ty, ctx, scope, &mut HashSet::new());
             assert!(matches!(peeled.as_ref(), TypeRef::Reference { .. }));
+        });
+    }
+
+    #[test]
+    fn array_elements_are_native_only_for_strings_and_numbers() {
+        with_mono_ctx(MONO_SRC, |ctx, scope| {
+            let ret = |elem: TypeRef| {
+                to_syn_type(
+                    &TypeRef::Array(Box::new(elem)),
+                    TypePosition::RETURN,
+                    Some(ctx),
+                    scope,
+                    &ModuleContext::Global,
+                )
+                .to_string()
+            };
+            assert_eq!(ret(TypeRef::ident("IdChain")), "Vec < String >");
+            assert_eq!(ret(lits(&["a", "b"])), "Vec < String >");
+            assert_eq!(ret(TypeRef::Number), "Vec < f64 >");
+            assert_eq!(ret(TypeRef::Boolean), "Vec < Boolean >");
+            assert_eq!(
+                ret(TypeRef::ident("MaybeId")),
+                "Vec < JsOption < JsString > >"
+            );
+            assert_eq!(
+                ret(TypeRef::Array(Box::new(TypeRef::String))),
+                "Vec < Array < JsString > >"
+            );
         });
     }
 
