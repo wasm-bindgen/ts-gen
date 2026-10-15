@@ -533,9 +533,14 @@ pub mod web_assembly {
         # [wasm_bindgen (extends = Error , extends = Object , js_namespace = "WebAssembly")]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type CompileError;
-        #[wasm_bindgen(constructor, catch)]
+        #[wasm_bindgen(constructor, js_namespace = "WebAssembly", catch)]
         pub fn new() -> Result<CompileError, JsValue>;
-        #[wasm_bindgen(constructor, catch, js_name = "CompileError")]
+        #[wasm_bindgen(
+            constructor,
+            js_namespace = "WebAssembly",
+            catch,
+            js_name = "CompileError"
+        )]
         pub fn new_with_message(message: &str) -> Result<CompileError, JsValue>;
     }
     #[wasm_bindgen]
@@ -543,9 +548,14 @@ pub mod web_assembly {
         # [wasm_bindgen (extends = Error , extends = Object , js_namespace = "WebAssembly")]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type RuntimeError;
-        #[wasm_bindgen(constructor, catch)]
+        #[wasm_bindgen(constructor, js_namespace = "WebAssembly", catch)]
         pub fn new() -> Result<RuntimeError, JsValue>;
-        #[wasm_bindgen(constructor, catch, js_name = "RuntimeError")]
+        #[wasm_bindgen(
+            constructor,
+            js_namespace = "WebAssembly",
+            catch,
+            js_name = "RuntimeError"
+        )]
         pub fn new_with_message(message: &str) -> Result<RuntimeError, JsValue>;
     }
     #[wasm_bindgen]
@@ -607,9 +617,15 @@ pub mod web_assembly {
         # [wasm_bindgen (extends = Object , js_name = "Global" , js_namespace = "WebAssembly")]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Global_;
-        #[wasm_bindgen(constructor, catch)]
+        #[wasm_bindgen(constructor, js_class = "Global", js_namespace = "WebAssembly", catch)]
         pub fn new(descriptor: &GlobalDescriptor) -> Result<Global, JsValue>;
-        #[wasm_bindgen(constructor, catch, js_name = "Global")]
+        #[wasm_bindgen(
+            constructor,
+            js_class = "Global",
+            js_namespace = "WebAssembly",
+            catch,
+            js_name = "Global"
+        )]
         pub fn new_with_value(
             descriptor: &GlobalDescriptor,
             value: &JsValue,
@@ -629,9 +645,9 @@ pub mod web_assembly {
         # [wasm_bindgen (extends = Object , js_namespace = "WebAssembly")]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Instance;
-        #[wasm_bindgen(constructor, catch)]
+        #[wasm_bindgen(constructor, js_namespace = "WebAssembly", catch)]
         pub fn new(module: &Module) -> Result<Instance, JsValue>;
-        #[wasm_bindgen(constructor, catch, js_name = "Instance")]
+        #[wasm_bindgen(constructor, js_namespace = "WebAssembly", catch, js_name = "Instance")]
         pub fn new_with_imports(module: &Module, imports: &JsValue) -> Result<Instance, JsValue>;
         #[wasm_bindgen(method, getter)]
         pub fn exports(this: &Instance) -> JsValue;
@@ -685,7 +701,7 @@ pub mod web_assembly {
         # [wasm_bindgen (extends = Object , js_namespace = "WebAssembly")]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Memory;
-        #[wasm_bindgen(constructor, catch)]
+        #[wasm_bindgen(constructor, js_namespace = "WebAssembly", catch)]
         pub fn new(descriptor: &MemoryDescriptor) -> Result<Memory, JsValue>;
         #[wasm_bindgen(method, getter)]
         pub fn buffer(this: &Memory) -> ArrayBuffer;
@@ -760,20 +776,20 @@ pub mod web_assembly {
         # [wasm_bindgen (extends = Object , js_namespace = "WebAssembly")]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Module;
-        # [wasm_bindgen (static_method_of = Module , js_name = "customSections")]
+        # [wasm_bindgen (static_method_of = Module , js_namespace = "WebAssembly" , js_name = "customSections")]
         pub fn custom_sections(module: &Module, section_name: &str) -> Vec<ArrayBuffer>;
-        # [wasm_bindgen (static_method_of = Module , catch , js_name = "customSections")]
+        # [wasm_bindgen (static_method_of = Module , js_namespace = "WebAssembly" , catch , js_name = "customSections")]
         pub fn try_custom_sections(
             module: &Module,
             section_name: &str,
         ) -> Result<Vec<ArrayBuffer>, JsValue>;
-        # [wasm_bindgen (static_method_of = Module)]
+        # [wasm_bindgen (static_method_of = Module , js_namespace = "WebAssembly")]
         pub fn exports(module: &Module) -> Vec<ModuleExportDescriptor>;
-        # [wasm_bindgen (static_method_of = Module , catch , js_name = "exports")]
+        # [wasm_bindgen (static_method_of = Module , js_namespace = "WebAssembly" , catch , js_name = "exports")]
         pub fn try_exports(module: &Module) -> Result<Vec<ModuleExportDescriptor>, JsValue>;
-        # [wasm_bindgen (static_method_of = Module)]
+        # [wasm_bindgen (static_method_of = Module , js_namespace = "WebAssembly")]
         pub fn imports(module: &Module) -> Vec<ModuleImportDescriptor>;
-        # [wasm_bindgen (static_method_of = Module , catch , js_name = "imports")]
+        # [wasm_bindgen (static_method_of = Module , js_namespace = "WebAssembly" , catch , js_name = "imports")]
         pub fn try_imports(module: &Module) -> Result<Vec<ModuleImportDescriptor>, JsValue>;
     }
     #[wasm_bindgen]
@@ -830,9 +846,9 @@ pub mod web_assembly {
         # [wasm_bindgen (extends = Object , js_namespace = "WebAssembly")]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Table;
-        #[wasm_bindgen(constructor, catch)]
+        #[wasm_bindgen(constructor, js_namespace = "WebAssembly", catch)]
         pub fn new(descriptor: &TableDescriptor) -> Result<Table, JsValue>;
-        #[wasm_bindgen(constructor, catch, js_name = "Table")]
+        #[wasm_bindgen(constructor, js_namespace = "WebAssembly", catch, js_name = "Table")]
         pub fn new_with_value(
             descriptor: &TableDescriptor,
             value: &JsValue,

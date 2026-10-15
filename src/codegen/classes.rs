@@ -258,6 +258,23 @@ impl<'a> ClassConfig<'a> {
             .unwrap_or_else(|| self.rust_name.clone())
     }
 
+    /// wasm-bindgen resolves the JS class of a constructor or static member
+    /// from the return type / `static_method_of` ident and the item's own
+    /// `js_namespace`, ignoring the type's `js_name` and `js_namespace`. A
+    /// sanitised, renamed, or namespaced type has to spell both out.
+    fn js_class_parts(&self) -> Vec<TokenStream> {
+        let mut parts = Vec::new();
+        let ident = super::typemap::make_ident(&self.effective_rust_name());
+        if super::typemap::needs_js_name(&ident, &self.js_name) {
+            let js_class = &self.js_name;
+            parts.push(quote! { js_class = #js_class });
+        }
+        if let Some(ns) = &self.js_namespace {
+            parts.push(quote! { js_namespace = #ns });
+        }
+        parts
+    }
+
     /// The `ModuleContext` this extern block lives in. Used as the
     /// `from_module` argument to type-emit helpers so cross-module
     /// references get the correct path qualifier.
@@ -1396,6 +1413,7 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
     );
 
     let mut wb_parts = vec![quote! { constructor }];
+    wb_parts.extend(config.js_class_parts());
     if sig.catch {
         wb_parts.push(quote! { catch });
     }
@@ -1506,6 +1524,7 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
     let has_variadic = sig.params.last().is_some_and(|p| p.variadic);
 
     let mut wb_parts: Vec<TokenStream> = vec![quote! { static_method_of = #class_ident }];
+    wb_parts.extend(config.js_class_parts());
     if has_variadic {
         wb_parts.push(quote! { variadic });
     }
@@ -1760,10 +1779,9 @@ fn generate_static_getter(
         },
     );
 
-    let mut wb_parts: Vec<TokenStream> = vec![
-        quote! { static_method_of = #class_ident },
-        quote! { getter },
-    ];
+    let mut wb_parts: Vec<TokenStream> = vec![quote! { static_method_of = #class_ident }];
+    wb_parts.extend(config.js_class_parts());
+    wb_parts.push(quote! { getter });
     if super::typemap::needs_js_name(&rust_ident, &getter.js_name) {
         let js_name = &getter.js_name;
         wb_parts.push(quote! { js_name = #js_name });
@@ -1777,12 +1795,13 @@ fn generate_static_getter(
     let fn_generics = render_generic_bounds(&bounds);
 
     let source_name = &getter.js_name;
+    let js_class = config.js_class_parts();
     let js_string_variant =
         getter_js_string_variant(config, &getter.type_ref, &rust_name, used_names).map(
             |(js_ident, js_type)| {
                 quote! {
                     #doc
-                    #[wasm_bindgen(static_method_of = #class_ident, getter, js_name = #source_name)]
+                    #[wasm_bindgen(static_method_of = #class_ident, #(#js_class,)* getter, js_name = #source_name)]
                     pub fn #js_ident #fn_generics () -> #js_type;
                 }
             },
@@ -1854,10 +1873,9 @@ fn generate_static_setter(
             bounds.extend(abv_bounds);
             let fn_generics = render_generic_bounds(&bounds);
 
-            let mut wb_parts: Vec<TokenStream> = vec![
-                quote! { static_method_of = #class_ident },
-                quote! { setter },
-            ];
+            let mut wb_parts: Vec<TokenStream> = vec![quote! { static_method_of = #class_ident }];
+            wb_parts.extend(config.js_class_parts());
+            wb_parts.push(quote! { setter });
             if super::typemap::needs_slice_to_array(&sig.params) {
                 wb_parts.push(quote! { slice_to_array });
             }

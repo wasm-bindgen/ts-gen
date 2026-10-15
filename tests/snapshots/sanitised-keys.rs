@@ -4,7 +4,7 @@
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
-#[wasm_bindgen]
+#[wasm_bindgen(module = "sanitised-keys")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
@@ -44,7 +44,7 @@ extern "C" {
     # [wasm_bindgen (static_method_of = Pair , catch , js_name = "$create")]
     pub fn try_create() -> Result<Pair, JsValue>;
 }
-#[wasm_bindgen]
+#[wasm_bindgen(module = "sanitised-keys")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
@@ -54,25 +54,33 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "accept")]
     pub fn try_accept(this: &Socket) -> Result<(), JsValue>;
 }
-#[wasm_bindgen]
+#[wasm_bindgen(module = "sanitised-keys")]
 extern "C" {
     # [wasm_bindgen (extends = Object , js_name = "$Store")]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
-    #[wasm_bindgen(constructor, catch)]
+    #[wasm_bindgen(constructor, js_class = "$Store", catch)]
     pub fn new() -> Result<Store, JsValue>;
+    # [wasm_bindgen (static_method_of = Store , js_class = "$Store")]
+    pub fn create() -> Store;
+    # [wasm_bindgen (static_method_of = Store , js_class = "$Store" , catch , js_name = "create")]
+    pub fn try_create() -> Result<Store, JsValue>;
+    # [wasm_bindgen (static_method_of = Store , js_class = "$Store" , getter)]
+    pub fn count() -> f64;
+    # [wasm_bindgen (static_method_of = Store , js_class = "$Store" , setter)]
+    pub fn set_count(val: f64);
 }
-#[wasm_bindgen]
+#[wasm_bindgen(module = "sanitised-keys")]
 extern "C" {
     #[wasm_bindgen(js_name = "$")]
     pub fn __unknown__(selector: &str) -> Pair;
 }
-#[wasm_bindgen]
+#[wasm_bindgen(module = "sanitised-keys")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "$")]
     pub fn try_(selector: &str) -> Result<Pair, JsValue>;
 }
-#[wasm_bindgen]
+#[wasm_bindgen(module = "sanitised-keys")]
 extern "C" {
     #[wasm_bindgen(thread_local_v2, js_name = "$version")]
     pub static version: String;

@@ -356,7 +356,7 @@ pub mod web_assembly {
         # [wasm_bindgen (extends = Object , js_namespace = "WebAssembly")]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Module;
-        #[wasm_bindgen(constructor, catch)]
+        #[wasm_bindgen(constructor, js_namespace = "WebAssembly", catch)]
         pub fn new(bytes: &ArrayBuffer) -> Result<Module, JsValue>;
     }
     #[wasm_bindgen]
@@ -364,9 +364,9 @@ pub mod web_assembly {
         # [wasm_bindgen (extends = Object , js_namespace = "WebAssembly")]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Instance;
-        #[wasm_bindgen(constructor, catch)]
+        #[wasm_bindgen(constructor, js_namespace = "WebAssembly", catch)]
         pub fn new(module: &Module) -> Result<Instance, JsValue>;
-        #[wasm_bindgen(constructor, catch, js_name = "Instance")]
+        #[wasm_bindgen(constructor, js_namespace = "WebAssembly", catch, js_name = "Instance")]
         pub fn new_with_imports(module: &Module, imports: &Object) -> Result<Instance, JsValue>;
         #[wasm_bindgen(method, getter)]
         pub fn exports(this: &Instance) -> Object;

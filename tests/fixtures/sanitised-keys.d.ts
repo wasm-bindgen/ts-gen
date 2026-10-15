@@ -1,6 +1,8 @@
+//! @ts-gen --lib-name sanitised-keys --export sanitised-keys
+
 // Names that sanitise (`0` → `_0`, `$public` → `public`) must still address
 // the original JS name from every binding wasm-bindgen infers a name for.
-declare class Pair {
+export declare class Pair {
   constructor();
   0: Socket;
   1: Socket;
@@ -11,11 +13,15 @@ declare class Pair {
   "@cf/run"(): void;
   static $create(): Pair;
 }
-declare class Socket {
+export declare class Socket {
   accept(): void;
 }
-declare class $Store {
+// Constructors and statics resolve their JS class from the Rust ident, so
+// they need `js_class` too.
+export declare class $Store {
   constructor();
+  static create(): $Store;
+  static count: number;
 }
-declare function $(selector: string): Pair;
-declare const $version: string;
+export declare function $(selector: string): Pair;
+export declare const $version: string;

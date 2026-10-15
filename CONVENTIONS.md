@@ -218,8 +218,10 @@ the setter is named `set_<snake_case>`.
 
 * JS `camelCase` / `PascalCase` identifiers → Rust `snake_case` for fns,
   `PascalCase` for types.
-* Reserved Rust keywords (e.g. `type`, `self`, `match`) get a trailing
-  underscore (`type_`, `self_`).
+* Reserved Rust keywords in fn, method, and accessor names get a trailing
+  underscore (`type()` → `type_`). Elsewhere (parameters, variables) they
+  are emitted as raw identifiers (`r#type`, `r#loop`), except `self`,
+  `Self`, `super`, and `crate`, which cannot be raw and become `self_` etc.
 * Names that are not valid Rust identifiers are sanitised (`0` → `_0`,
   `$public` → `public`, `@cf/openai/whisper` → `cfopenaiwhisper`).
 * `js_name = "..."` is emitted whenever the final Rust ident (after all of
@@ -227,7 +229,13 @@ the setter is named `set_<snake_case>`.
   correct runtime name. This applies to types, methods, free functions,
   variables, getters, and setters (whose JS name `wasm-bindgen` infers by
   stripping `set_`, so `set_0` needs no `js_name` but `set_public` for
-  `$public` does).
+  `$public` does). Raw identifiers already bind to their unraw name.
+* `wasm-bindgen` resolves the JS class of constructors and static members
+  from the return type / `static_method_of` ident and the item's own
+  `js_namespace`, ignoring the type's attributes. So when a type's Rust
+  ident differs from its JS name (`$Store` → `Store`, or a collision rename
+  like `Global_`) they carry `js_class = "<js name>"`, and inside a
+  namespace they repeat `js_namespace`.
 
 ## JS-name collisions with `js_sys` glob imports
 
@@ -250,7 +258,7 @@ pub mod web_assembly {
     extern "C" {
         #[wasm_bindgen(extends = Object, js_name = "Global", js_namespace = "WebAssembly")]
         pub type Global_;
-        #[wasm_bindgen(constructor, catch, js_name = "Global")]
+        #[wasm_bindgen(constructor, js_class = "Global", js_namespace = "WebAssembly", catch)]
         pub fn new(...) -> Result<Global_, JsValue>;
     }
     pub use Global_ as Global;   // public face
