@@ -1,7 +1,7 @@
 #![cfg(target_arch = "wasm32")]
 
 use ts_gen_integration_tests::namespace_merge::{
-    make, make_foo, Bar, Config, Foo, Kind, Mode, Options, Shape,
+    make, make_foo, Axis, Bar, Config, Foo, Options, Power, Shape,
 };
 
 // This fixture has no backing JavaScript module, so it provides compile-only
@@ -13,8 +13,8 @@ fn namespace_merge_compiles(bar: &Bar, shape: &Shape) {
     let _: fn(&Foo, &Options) = Foo::m;
     let _: fn(&Config) = make;
     let _: Foo = make_foo();
-    let _: Bar = bar.mode(Mode::On);
-    shape.kind(Kind::X);
+    let _: Bar = bar.power(Power::On);
+    shape.axis(Axis::X);
     let _ = Options::new("a");
     let _ = Config::new("c");
 }

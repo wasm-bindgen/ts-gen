@@ -15,10 +15,10 @@ export declare namespace Foo {
 export declare function makeFoo(): Foo;
 
 export declare namespace Bar {
-  type Mode = "on" | "off";
+  type Power = "on" | "off";
 }
 export declare class Bar {
-  mode(mode: Bar.Mode): Bar;
+  power(power: Bar.Power): Bar;
 }
 
 export declare function make(config: make.Config): void;
@@ -29,8 +29,8 @@ export declare namespace make {
 }
 
 export interface Shape {
-  kind(kind: Shape.Kind): void;
+  axis(axis: Shape.Axis): void;
 }
 export declare namespace Shape {
-  type Kind = "x" | "y";
+  type Axis = "x" | "y";
 }

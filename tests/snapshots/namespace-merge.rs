@@ -43,7 +43,7 @@ extern "C" {
 }
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Mode {
+pub enum Power {
     On = "on",
     Off = "off",
 }
@@ -53,9 +53,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Bar;
     #[wasm_bindgen(method)]
-    pub fn mode(this: &Bar, mode: Mode) -> Bar;
-    #[wasm_bindgen(method, catch, js_name = "mode")]
-    pub fn try_mode(this: &Bar, mode: Mode) -> Result<Bar, JsValue>;
+    pub fn power(this: &Bar, power: Power) -> Bar;
+    #[wasm_bindgen(method, catch, js_name = "power")]
+    pub fn try_power(this: &Bar, power: Power) -> Result<Bar, JsValue>;
 }
 #[wasm_bindgen(module = "namespace-merge")]
 extern "C" {
@@ -89,13 +89,13 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Shape;
     #[wasm_bindgen(method)]
-    pub fn kind(this: &Shape, kind: Kind);
-    #[wasm_bindgen(method, catch, js_name = "kind")]
-    pub fn try_kind(this: &Shape, kind: Kind) -> Result<(), JsValue>;
+    pub fn axis(this: &Shape, axis: Axis);
+    #[wasm_bindgen(method, catch, js_name = "axis")]
+    pub fn try_axis(this: &Shape, axis: Axis) -> Result<(), JsValue>;
 }
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Kind {
+pub enum Axis {
     X = "x",
     Y = "y",
 }
