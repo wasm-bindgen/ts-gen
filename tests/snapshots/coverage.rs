@@ -96,7 +96,7 @@ extern "C" {
 }
 #[allow(dead_code)]
 pub type SerializablePerson = JsValue;
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum Direction {
@@ -105,7 +105,7 @@ pub enum Direction {
     Left = 2u32,
     Right = 3u32,
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum HttpStatus {
@@ -299,7 +299,7 @@ extern "C" {
         space: f64,
     ) -> Result<String, JsValue>;
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(i32)]
 pub enum SignedValues {
@@ -618,17 +618,17 @@ impl MutableWidget {
         }
     }
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum HeadersKind {
     Headers(Headers),
     Record(Object<JsString>),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum BodyKind {
     String(String),
     ArrayBuffer(ArrayBuffer),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum LabelKind {
     String(String),
     F64(f64),

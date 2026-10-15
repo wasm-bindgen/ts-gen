@@ -4,7 +4,7 @@
 //! variant's discriminant is its JS string value:
 //!
 //! ```rust,ignore
-//! #[wasm_bindgen]
+//! #[wasm_bindgen(private)]
 //! #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 //! pub enum QueueContentType {
 //!     Text = "text",
@@ -16,7 +16,7 @@
 //! discriminant values) with wasm_bindgen:
 //!
 //! ```rust,ignore
-//! #[wasm_bindgen]
+//! #[wasm_bindgen(private)]
 //! #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 //! #[repr(u32)]
 //! pub enum ImportType {
@@ -31,17 +31,20 @@ use quote::quote;
 
 use crate::ir::{NumericEnumDecl, StringEnumDecl};
 
-/// wasm-bindgen exports enums by their JS name crate-wide, so one declared
-/// inside a namespace takes a namespace-prefixed `js_name` to avoid a clash
-/// with a same-named enum elsewhere. The `_` keeps `Timing.DurationUnit`
-/// apart from a top-level `TimingDurationUnit`.
+/// Generated enums describe JS-side values rather than anything this crate
+/// exports, so they are `private`: wasm-bindgen then keeps them off the JS
+/// module's exports and lets same-named copies coexist. wasm-bindgen still
+/// names them by JS name crate-wide, so one declared inside a namespace takes
+/// a namespace-prefixed `js_name` to stay apart from a same-named enum
+/// elsewhere. The `_` keeps `Timing.DurationUnit` apart from a top-level
+/// `TimingDurationUnit`.
 fn enum_attr(name: &str, js_namespace: Option<&str>) -> TokenStream {
     match js_namespace {
         Some(ns) => {
             let js_name = format!("{ns}_{name}");
-            quote! { #[wasm_bindgen(js_name = #js_name)] }
+            quote! { #[wasm_bindgen(private, js_name = #js_name)] }
         }
-        None => quote! { #[wasm_bindgen] },
+        None => quote! { #[wasm_bindgen(private)] },
     }
 }
 

@@ -373,23 +373,23 @@ impl SettingsBuilder {
         self.inner
     }
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum CurrentReturnKind {
     String(String),
     F64(f64),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum LevelKind {
     Low = "low",
     High = "high",
     F64(f64),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum LabelKind {
     String(String),
     Bool(bool),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum FromKind {
     Target(Target),
     String(String),

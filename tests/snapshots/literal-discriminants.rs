@@ -193,35 +193,35 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "flag")]
     pub fn try_flag() -> Result<FlagReturnKind, JsValue>;
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum LevelReturnKind {
     N0 = 0,
     N1 = 1,
     N2 = 2,
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum DirectionReturnKind {
     Neg1 = -1,
     N0 = 0,
     N1 = 1,
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ValueKind {
     Neg1 = -1,
     N1 = 1,
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum SizeReturnKind {
     Auto = "auto",
     F64(f64),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum RepeatReturnKind {
     Bool(bool),
     X = "x",
     Y = "y",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum FlagReturnKind {
     Bool(bool),
     ArrayBuffer(ArrayBuffer),

@@ -4,7 +4,7 @@
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Kind {
     Text = "text",

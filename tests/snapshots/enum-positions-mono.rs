@@ -4,7 +4,7 @@
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Mode {
     Fast = "fast",
@@ -12,7 +12,7 @@ pub enum Mode {
 }
 #[allow(dead_code)]
 pub type ModeAlias = Mode;
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum Level {
@@ -144,7 +144,7 @@ extern "C" {
         x: impl ::js_sys::JsNumberOrStringLike,
     ) -> Result<(), JsValue>;
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ModeOrNumberReturnKind {
     Mode(Mode),
     F64(f64),

@@ -41,7 +41,7 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "makeFoo")]
     pub fn try_make_foo() -> Result<Foo, JsValue>;
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Power {
     On = "on",
@@ -93,7 +93,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "axis")]
     pub fn try_axis(this: &Shape, axis: Axis) -> Result<(), JsValue>;
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Axis {
     X = "x",

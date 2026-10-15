@@ -24,7 +24,7 @@ extern "C" {
 }
 #[allow(dead_code)]
 pub type WritableStream = Writable;
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(i32)]
 pub enum Priority {

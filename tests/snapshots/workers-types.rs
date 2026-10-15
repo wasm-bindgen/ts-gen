@@ -560,7 +560,7 @@ pub mod web_assembly {
         )]
         pub fn new_with_message(message: &str) -> Result<RuntimeError, JsValue>;
     }
-    #[wasm_bindgen(js_name = "WebAssembly_ValueType")]
+    #[wasm_bindgen(private, js_name = "WebAssembly_ValueType")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum ValueType {
         Anyfunc = "anyfunc",
@@ -705,7 +705,7 @@ pub mod web_assembly {
         #[wasm_bindgen(method, catch, js_name = "grow")]
         pub fn try_grow(this: &Memory, delta: f64) -> Result<f64, JsValue>;
     }
-    #[wasm_bindgen(js_name = "WebAssembly_ImportExportKind")]
+    #[wasm_bindgen(private, js_name = "WebAssembly_ImportExportKind")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum ImportExportKind {
         Function = "function",
@@ -783,7 +783,7 @@ pub mod web_assembly {
         # [wasm_bindgen (static_method_of = Module , js_namespace = "WebAssembly" , catch , js_name = "imports")]
         pub fn try_imports(module: &Module) -> Result<Vec<ModuleImportDescriptor>, JsValue>;
     }
-    #[wasm_bindgen(js_name = "WebAssembly_TableKind")]
+    #[wasm_bindgen(private, js_name = "WebAssembly_TableKind")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum TableKind {
         Anyfunc = "anyfunc",
@@ -2384,7 +2384,7 @@ extern "C" {
         jurisdiction: DurableObjectJurisdiction,
     ) -> Result<DurableObjectNamespace<T>, JsValue>;
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DurableObjectJurisdiction {
     Eu = "eu",
@@ -2428,7 +2428,7 @@ impl DurableObjectNamespaceNewUniqueIdOptionsBuilder {
         self.inner
     }
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DurableObjectLocationHint {
     Wnam = "wnam",
@@ -2441,7 +2441,7 @@ pub enum DurableObjectLocationHint {
     Afr = "afr",
     Me = "me",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DurableObjectRoutingMode {
     PrimaryOnly = "primary-only",
@@ -8636,7 +8636,7 @@ impl<Value: ::wasm_bindgen::JsGeneric, Metadata: ::wasm_bindgen::JsGeneric>
         inner
     }
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum QueueContentType {
     Text = "text",
@@ -17416,7 +17416,7 @@ impl ResponseFunctionToolCallOutputItemBuilder {
         self.inner
     }
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ResponseIncludable {
     MessageinputImageimageUrl = "message.input_image.image_url",
@@ -18551,7 +18551,7 @@ impl ResponseRefusalDoneEvent {
         inner
     }
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ResponseStatus {
     Completed = "completed",
@@ -18907,7 +18907,7 @@ impl ToolChoiceFunction {
         inner
     }
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ToolChoiceOptions {
     None = "none",
@@ -29313,7 +29313,7 @@ impl AiGatewayLogBuilder {
         self.inner
     }
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AIGatewayProviders {
     WorkersAi = "workers-ai",
@@ -32456,7 +32456,7 @@ impl IncomingRequestCfPropertiesTLSClientAuthPlaceholder {
         inner
     }
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CertVerificationStatus {
     Success = "SUCCESS",
@@ -32469,7 +32469,7 @@ pub enum CertVerificationStatus {
 }
 #[allow(dead_code)]
 pub type IncomingRequestCfPropertiesEdgeRequestKeepAliveStatus = Number;
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Iso3166Alpha2Code {
     Ad = "AD",
@@ -32722,7 +32722,7 @@ pub enum Iso3166Alpha2Code {
     Zm = "ZM",
     Zw = "ZW",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContinentCode {
     Af = "AF",
@@ -32934,7 +32934,7 @@ impl D1ExecResult {
         inner
     }
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum D1SessionConstraint {
     FirstPrimary = "first-primary",
@@ -35938,7 +35938,7 @@ pub mod cloudflare_workers_module {
             error: &JsValue,
         ) -> Result<Option<Promise<Undefined>>, JsValue>;
     }
-    #[wasm_bindgen(js_name = "CloudflareWorkersModule_WorkflowDurationLabel")]
+    #[wasm_bindgen(private, js_name = "CloudflareWorkersModule_WorkflowDurationLabel")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum WorkflowDurationLabel {
         Second = "second",
@@ -35949,7 +35949,7 @@ pub mod cloudflare_workers_module {
         Month = "month",
         Year = "year",
     }
-    #[wasm_bindgen(js_name = "CloudflareWorkersModule_WorkflowBackoff")]
+    #[wasm_bindgen(private, js_name = "CloudflareWorkersModule_WorkflowBackoff")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum WorkflowBackoff {
         Constant = "constant",
@@ -36156,7 +36156,7 @@ pub mod cloudflare_workers_module {
             self.inner
         }
     }
-    #[wasm_bindgen(js_name = "CloudflareWorkersModule_WorkflowInstanceStatus")]
+    #[wasm_bindgen(private, js_name = "CloudflareWorkersModule_WorkflowInstanceStatus")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum WorkflowInstanceStatus {
         Queued = "queued",
@@ -37663,14 +37663,14 @@ impl StreamCaptionBuilder {
         self.inner
     }
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StreamDownloadStatus {
     Ready = "ready",
     Inprogress = "inprogress",
     Error = "error",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StreamDownloadType {
     Default = "default",
@@ -37766,7 +37766,7 @@ impl StreamDownloadGetResponseBuilder {
         self.inner
     }
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StreamWatermarkPosition {
     UpperRight = "upperRight",
@@ -38046,7 +38046,7 @@ impl StreamVideosListParamsBuilder {
         self.inner
     }
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StreamPaginationComparison {
     Eq = "eq",
@@ -38877,7 +38877,7 @@ pub mod tail_stream {
             }
         }
     }
-    #[wasm_bindgen(js_name = "TailStream_EventOutcome")]
+    #[wasm_bindgen(private, js_name = "TailStream_EventOutcome")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum EventOutcome {
         Ok = "ok",
@@ -39350,7 +39350,7 @@ impl VectorizeErrorBuilder {
         self.inner
     }
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VectorizeVectorMetadataFilterOp {
     eq = "$eq",
@@ -39360,7 +39360,7 @@ pub enum VectorizeVectorMetadataFilterOp {
     gt = "$gt",
     gte = "$gte",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VectorizeVectorMetadataFilterCollectionOp {
     r#in = "$in",
@@ -39372,14 +39372,14 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type VectorizeVectorMetadataFilter;
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VectorizeDistanceMetric {
     Euclidean = "euclidean",
     Cosine = "cosine",
     DotProduct = "dot-product",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VectorizeMetadataRetrievalLevel {
     All = "all",
@@ -40278,7 +40278,7 @@ extern "C" {
         batch: &[WorkflowInstanceCreateOptions<PARAMS>],
     ) -> Result<Array<WorkflowInstance>, JsValue>;
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WorkflowDurationLabel {
     Second = "second",
@@ -40609,12 +40609,12 @@ impl WorkflowInstanceSendEvent {
         inner
     }
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum FetchReturnKind {
     Response(Response),
     Promise(Promise<Response>),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum AlgorithmKind {
     CryptoKeyKeyAlgorithm(CryptoKeyKeyAlgorithm),
     CryptoKeyAesKeyAlgorithm(CryptoKeyAesKeyAlgorithm),
@@ -40623,62 +40623,62 @@ pub enum AlgorithmKind {
     CryptoKeyEllipticKeyAlgorithm(CryptoKeyEllipticKeyAlgorithm),
     CryptoKeyArbitraryKeyAlgorithm(CryptoKeyArbitraryKeyAlgorithm),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum SaltKind {
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum HashKind {
     String(String),
     SubtleCryptoHashAlgorithm(SubtleCryptoHashAlgorithm),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum BytesWrittenKind {
     F64(f64),
     BigInt(BigInt),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum DataKind {
     ArrayBuffer(ArrayBuffer),
     String(String),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum TypeKind {
     Default = "default",
     Error = "error",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum EncodeBodyKind {
     Automatic = "automatic",
     Manual = "manual",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum CacheKind {
     NoStore = "no-store",
     NoCache = "no-cache",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum OnlyIfKind {
     R2Conditional(R2Conditional),
     Headers(Headers),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum RangeKind {
     R2Range(R2Range),
     Headers(Headers),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum HttpMetadataKind {
     R2HttpMetadata(R2HTTPMetadata),
     Headers(Headers),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum Md5Kind {
     JsValue(JsValue),
     String(String),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum EventKind {
     TraceItemFetchEventInfo(TraceItemFetchEventInfo),
     TraceItemJsRpcEventInfo(TraceItemJsRpcEventInfo),
@@ -40690,39 +40690,39 @@ pub enum EventKind {
     TraceItemCustomEventInfo(TraceItemCustomEventInfo),
     TraceItemHibernatableWebSocketEventInfo(TraceItemHibernatableWebSocketEventInfo),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum GetWebSocketEventKind {
     TraceItemHibernatableWebSocketEventInfoMessage(TraceItemHibernatableWebSocketEventInfoMessage),
     TraceItemHibernatableWebSocketEventInfoClose(TraceItemHibernatableWebSocketEventInfoClose),
     TraceItemHibernatableWebSocketEventInfoError(TraceItemHibernatableWebSocketEventInfoError),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum BinaryTypeKind {
     Blob = "blob",
     Arraybuffer = "arraybuffer",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum NextReturnKind {
     Object(Object),
     Object2(Object),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum SecureTransportKind {
     On = "on",
     Off = "off",
     Starttls = "starttls",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum AiSearchConfigTypeKind {
     R2 = "r2",
     WebCrawler = "web-crawler",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum TextKind {
     String(String),
     VecOfString(Vec<String>),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum RoleKind {
     User = "user",
     Assistant = "assistant",
@@ -40730,28 +40730,28 @@ pub enum RoleKind {
     Tool = "tool",
     JsValue(JsValue),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum AiTextGenerationToolInputTypeKind {
     Function = "function",
     JsValue(JsValue),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ToolsKind {
     VecOfAiTextGenerationToolInput(Vec<AiTextGenerationToolInput>),
     VecOfAiTextGenerationToolLegacyInput(Vec<AiTextGenerationToolLegacyInput>),
     JsValue(JsValue),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ConversationKind {
     String(String),
     ResponseConversationParam(ResponseConversationParam),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum InputKind {
     String(String),
     ResponseInput(Array),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ServiceTierKind {
     Auto = "auto",
     Default = "default",
@@ -40759,50 +40759,50 @@ pub enum ServiceTierKind {
     Scale = "scale",
     Priority = "priority",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ToolChoiceKind {
     ToolChoiceOptions(ToolChoiceOptions),
     ToolChoiceFunction(ToolChoiceFunction),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum TruncationKind {
     Auto = "auto",
     Disabled = "disabled",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum InstructionsKind {
     String(String),
     Array(Array),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ContentKind {
     String(String),
     ResponseInputMessageContentList(Array),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum EasyInputMessageRoleKind {
     User = "user",
     Assistant = "assistant",
     System = "system",
     Developer = "developer",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ReasonKind {
     MaxOutputTokens = "max_output_tokens",
     ContentFilter = "content_filter",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum GenerateSummaryKind {
     Auto = "auto",
     Concise = "concise",
     Detailed = "detailed",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum OutputKind {
     String(String),
     Array(Array),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum CodeKind {
     ServerError = "server_error",
     RateLimitExceeded = "rate_limit_exceeded",
@@ -40823,61 +40823,61 @@ pub enum CodeKind {
     FailedToDownloadImage = "failed_to_download_image",
     ImageFileNotFound = "image_file_not_found",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum StatusKind {
     InProgress = "in_progress",
     Completed = "completed",
     Incomplete = "incomplete",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum DetailKind {
     Low = "low",
     High = "high",
     Auto = "auto",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ResponseInputItemFunctionCallOutputOutputKind {
     String(String),
     ResponseFunctionCallOutputItemList(Array),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ResponseInputItemMessageRoleKind {
     User = "user",
     System = "system",
     Developer = "developer",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum VerbosityKind {
     Low = "low",
     Medium = "medium",
     High = "high",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum PoolingKind {
     Mean = "mean",
     Cls = "cls",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ImageKind {
     VecOfF64(Vec<f64>),
     JsValue(JsValue),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_ModeTypeKind {
     JsonObject = "json_object",
     JsonSchema = "json_schema",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ResponseKind {
     String(String),
     Object(Object),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum CustomTopicModeKind {
     Extended = "extended",
     Strict = "strict",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum EncodingKind {
     Linear16 = "linear16",
     Flac = "flac",
@@ -40888,24 +40888,24 @@ pub enum EncodingKind {
     Speex = "speex",
     G729 = "g729",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ModeKind {
     General = "general",
     Medical = "medical",
     Finance = "finance",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum AudioKind {
     Object(Object),
     String(String),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum DtypeKind {
     Uint8 = "uint8",
     Float32 = "float32",
     Float64 = "float64",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum SpeakerKind {
     Angus = "angus",
     Asteria = "asteria",
@@ -40920,7 +40920,7 @@ pub enum SpeakerKind {
     Hera = "hera",
     Stella = "stella",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum Ai_Cf_Deepgram_Aura_1_InputEncodingKind {
     Linear16 = "linear16",
     Flac = "flac",
@@ -40930,13 +40930,13 @@ pub enum Ai_Cf_Deepgram_Aura_1_InputEncodingKind {
     Opus = "opus",
     Aac = "aac",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ContainerKind {
     None = "none",
     Wav = "wav",
     Ogg = "ogg",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum TargetLanguageKind {
     AsmBeng = "asm_Beng",
     AwaDeva = "awa_Deva",
@@ -40973,12 +40973,12 @@ pub enum TargetLanguageKind {
     UrdArab = "urd_Arab",
     UnrDeva = "unr_Deva",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum MipOptOutKind {
     True = "true",
     False = "false",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum Ai_Cf_Deepgram_Flux_OutputEventKind {
     Update = "Update",
     StartOfTurn = "StartOfTurn",
@@ -40986,7 +40986,7 @@ pub enum Ai_Cf_Deepgram_Flux_OutputEventKind {
     TurnResumed = "TurnResumed",
     EndOfTurn = "EndOfTurn",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind {
     Amalthea = "amalthea",
     Andromeda = "andromeda",
@@ -41029,7 +41029,7 @@ pub enum Ai_Cf_Deepgram_Aura_2_En_InputSpeakerKind {
     Vesta = "vesta",
     Zeus = "zeus",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind {
     Sirio = "sirio",
     Nestor = "nestor",
@@ -41042,7 +41042,7 @@ pub enum Ai_Cf_Deepgram_Aura_2_Es_InputSpeakerKind {
     Estrella = "estrella",
     Javier = "javier",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum MaxAttemptsKind {
     N1 = 1,
     N2 = 2,
@@ -41050,44 +41050,44 @@ pub enum MaxAttemptsKind {
     N4 = 4,
     N5 = 5,
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum BackoffKind {
     Constant = "constant",
     Linear = "linear",
     Exponential = "exponential",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum FeedbackKind {
     Neg1 = -1,
     N1 = 1,
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum CfAigMetadataKind {
     Record(Object),
     String(String),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum CfAigCustomCostKind {
     Object(Object),
     Object2(Object),
     String(String),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum CfAigCacheTtlKind {
     F64(f64),
     String(String),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum CfAigSkipCacheKind {
     Bool(bool),
     String(String),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ProviderKind {
     AiGatewayProviders(AIGatewayProviders),
     String(String),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ComparisonFilterTypeKind {
     Eq = "eq",
     Ne = "ne",
@@ -41096,23 +41096,23 @@ pub enum ComparisonFilterTypeKind {
     Lt = "lt",
     Lte = "lte",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ValueKind {
     String(String),
     F64(f64),
     Bool(bool),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum CompoundFilterTypeKind {
     And = "and",
     Or = "or",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum FiltersKind {
     CompoundFilter(CompoundFilter),
     ComparisonFilter(ComparisonFilter),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum FitKind {
     ScaleDown = "scale-down",
     Contain = "contain",
@@ -41121,7 +41121,7 @@ pub enum FitKind {
     Pad = "pad",
     Squeeze = "squeeze",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum GravityKind {
     Face = "face",
     Left = "left",
@@ -41133,7 +41133,7 @@ pub enum GravityKind {
     Entropy = "entropy",
     BasicImageTransformationsGravityCoordinates(BasicImageTransformationsGravityCoordinates),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum RotateKind {
     N0 = 0,
     N90 = 90,
@@ -41141,29 +41141,29 @@ pub enum RotateKind {
     N270 = 270,
     N360 = 360,
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum BasicImageTransformationsGravityCoordinatesModeKind {
     Remainder = "remainder",
     BoxCenter = "box-center",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum PolishKind {
     Lossy = "lossy",
     Lossless = "lossless",
     Off = "off",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum RepeatKind {
     Bool(bool),
     X = "x",
     Y = "y",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum TrimKind {
     Border = "border",
     Object(Object),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum QualityKind {
     F64(f64),
     Low = "low",
@@ -41171,7 +41171,7 @@ pub enum QualityKind {
     MediumHigh = "medium-high",
     High = "high",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum FormatKind {
     Avif = "avif",
     Webp = "webp",
@@ -41182,57 +41182,57 @@ pub enum FormatKind {
     PngForce = "png-force",
     Svg = "svg",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum MetadataKind {
     Keep = "keep",
     Copyright = "copyright",
     None = "none",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum FlipKind {
     H = "h",
     V = "v",
     Hv = "hv",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum TlsClientAuthKind {
     IncomingRequestCfPropertiesTlsClientAuth(IncomingRequestCfPropertiesTLSClientAuth),
     IncomingRequestCfPropertiesTlsClientAuthPlaceholder(
         IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
     ),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum CountryKind {
     Iso3166Alpha2Code(Iso3166Alpha2Code),
     T1 = "T1",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum CertRevokedKind {
     _1 = "1",
     _0 = "0",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum DispositionKind {
     Inline = "inline",
     Attachment = "attachment",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum EmailAttachmentContentKind {
     String(String),
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum FromKind {
     String(String),
     EmailAddress(EmailAddress),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ImageInfoResponseFormatKind {
     Imagesvgxml = "image/svg+xml",
     String(String),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ImageTransformFitKind {
     ScaleDown = "scale-down",
     Contain = "contain",
@@ -41241,7 +41241,7 @@ pub enum ImageTransformFitKind {
     Cover = "cover",
     Crop = "crop",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ImageTransformGravityKind {
     Face = "face",
     Left = "left",
@@ -41253,14 +41253,14 @@ pub enum ImageTransformGravityKind {
     Entropy = "entropy",
     Object(Object),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ImageTransformRotateKind {
     N0 = 0,
     N90 = 90,
     N180 = 180,
     N270 = 270,
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ImageOutputOptionsFormatKind {
     Imagejpeg = "image/jpeg",
     Imagepng = "image/png",
@@ -41270,57 +41270,57 @@ pub enum ImageOutputOptionsFormatKind {
     Rgb = "rgb",
     Rgba = "rgba",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum SortOrderKind {
     Asc = "asc",
     Desc = "desc",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum MediaTransformationInputOptionsFitKind {
     Contain = "contain",
     Cover = "cover",
     ScaleDown = "scale-down",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum MediaTransformationOutputOptionsModeKind {
     Video = "video",
     Spritesheet = "spritesheet",
     Frame = "frame",
     Audio = "audio",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum MediaTransformationOutputOptionsFormatKind {
     Jpg = "jpg",
     Png = "png",
     M4A = "m4a",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum PayloadKind {
     String(String),
     Uint8Array(Uint8Array),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum TailStreamReturnKind {
     TailEventHandlerType(TailEventHandlerType),
     Promise(Promise<TailEventHandlerType>),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum TimeoutKind {
     WorkflowTimeoutDuration(JsValue),
     F64(f64),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum StreamCaptionStatusKind {
     Ready = "ready",
     Inprogress = "inprogress",
     Error = "error",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ConversionResponseFormatKind {
     Markdown = "markdown",
     Error = "error",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum DescriptionLanguageKind {
     En = "en",
     Es = "es",
@@ -41329,13 +41329,13 @@ pub enum DescriptionLanguageKind {
     Pt = "pt",
     De = "de",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum InfoKind {
     HibernatableWebSocketEventInfoClose(HibernatableWebSocketEventInfoClose),
     HibernatableWebSocketEventInfoError(HibernatableWebSocketEventInfoError),
     HibernatableWebSocketEventInfoMessage(HibernatableWebSocketEventInfoMessage),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum OnsetInfoKind {
     FetchEventInfo(FetchEventInfo),
     JsRpcEventInfo(JsRpcEventInfo),
@@ -41347,13 +41347,13 @@ pub enum OnsetInfoKind {
     HibernatableWebSocketEventInfo(HibernatableWebSocketEventInfo),
     CustomEventInfo(CustomEventInfo),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum SpanOpenInfoKind {
     FetchEventInfo(FetchEventInfo),
     JsRpcEventInfo(JsRpcEventInfo),
     Attributes(Attributes),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum LevelKind {
     Debug = "debug",
     Error = "error",
@@ -41361,7 +41361,7 @@ pub enum LevelKind {
     Log = "log",
     Warn = "warn",
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum AttributeValueKind {
     String(String),
     VecOfString(Vec<String>),
@@ -41372,17 +41372,17 @@ pub enum AttributeValueKind {
     BigInt(BigInt),
     VecOfBigInt(Vec<BigInt>),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ReturnMetadataKind {
     Bool(bool),
     VectorizeMetadataRetrievalLevel(VectorizeMetadataRetrievalLevel),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ValuesKind {
     VectorFloatArray(JsValue),
     VecOfF64(Vec<f64>),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum InstanceStatusStatusKind {
     Queued = "queued",
     Running = "running",

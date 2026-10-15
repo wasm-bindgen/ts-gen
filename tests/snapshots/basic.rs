@@ -223,7 +223,7 @@ impl ResponseInitBuilder {
         self.inner
     }
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum QueueContentType {
     Text = "text",

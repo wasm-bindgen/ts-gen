@@ -152,7 +152,7 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "shadowsAlias")]
     pub fn try_shadows_alias<Id>(h: &Holder<Id>) -> Result<Holder<Id>, JsValue>;
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum LiteralUnionReturnKind {
     A = "a",
     B = "b",

@@ -1544,7 +1544,7 @@ interface EmailAttachment {
 emits:
 
 ```rust
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum EmailAttachmentContentKind {
     String(String),
     ArrayBuffer(ArrayBuffer),
@@ -1862,7 +1862,7 @@ wasm-bindgen string enum, whose variant discriminants are the JS
 string values:
 
 ```rust
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Color {
     Red = "red",
@@ -1906,13 +1906,17 @@ Slices and `js_sys` containers are unchanged by the mode.
 carries an enum as a payload, `Kind | number` → `Kind(Kind)`, `F64(f64)`,
 dispatched through the enum's `TryFromJsValue`.
 
-wasm-bindgen exports enums by their JS name across the whole crate, so
-an enum inside a namespace takes a namespace-prefixed `js_name`, which
+Generated enums describe values on the JS side, not anything the crate
+exports, so every string enum, numeric enum and dynamic union is
+`#[wasm_bindgen(private)]`: wasm-bindgen keeps it off the JS module's
+exports and lets same-named private copies coexist in one build.
+wasm-bindgen still names enums by JS name across the whole crate, so an
+enum inside a namespace takes a namespace-prefixed `js_name`, which
 keeps it apart from a same-named enum elsewhere:
 
 ```rust
 pub mod timing {
-    #[wasm_bindgen(js_name = "Timing_DurationUnit")]
+    #[wasm_bindgen(private, js_name = "Timing_DurationUnit")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum DurationUnit { /* ... */ }
 }

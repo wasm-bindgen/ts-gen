@@ -52,13 +52,13 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "fetchValue")]
     pub async fn fetch_value() -> Result<JsValue, JsValue>;
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ContentKind {
     String(String),
     ArrayBuffer(ArrayBuffer),
     Uint8Array(Uint8Array),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum VariantKind {
     A = "a",
     B = "b",

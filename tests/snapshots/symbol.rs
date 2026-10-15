@@ -139,7 +139,7 @@ impl TaggedBuilder {
         self.inner
     }
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum LookupReturnKind {
     String(String),
     Symbol(Symbol),

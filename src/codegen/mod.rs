@@ -393,7 +393,7 @@ fn generate_dynamic_unions(cgctx: &CodegenContext) -> TokenStream {
                 })
                 .collect();
             quote! {
-                #[wasm_bindgen]
+                #[wasm_bindgen(private)]
                 pub enum #enum_ident {
                     #(#variants),*
                 }

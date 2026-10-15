@@ -472,7 +472,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "timeStamp")]
     pub fn try_time_stamp_with_label(this: &Console, label: &str) -> Result<(), JsValue>;
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ColorModeKind {
     Bool(bool),
     String(String),

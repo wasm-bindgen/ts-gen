@@ -6,7 +6,7 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[allow(dead_code)]
 use JsValue as EventEmitter;
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(i32)]
 pub enum SignedEnum {
@@ -14,7 +14,7 @@ pub enum SignedEnum {
     Zero = 0i32,
     Positive = 1i32,
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum UnsignedEnum {
@@ -22,7 +22,7 @@ pub enum UnsignedEnum {
     B = 1u32,
     C = 2u32,
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(i32)]
 pub enum AutoIncrement {

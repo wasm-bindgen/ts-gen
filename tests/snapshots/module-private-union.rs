@@ -45,7 +45,7 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "list")]
     pub fn try_list() -> Result<ListReturnKind, JsValue>;
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ListReturnKind {
     Array(Array<JsString>),
     Promise(Promise<Base>),

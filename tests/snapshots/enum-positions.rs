@@ -4,7 +4,7 @@
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Mode {
     Fast = "fast",
@@ -12,14 +12,14 @@ pub enum Mode {
 }
 #[allow(dead_code)]
 pub type ModeAlias = Mode;
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
 pub enum Level {
     Low = 1u32,
     High = 2u32,
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Region {
     Eu = "eu",
@@ -99,22 +99,22 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "levelOrString")]
     pub fn try_level_or_string(this: &Probe) -> Result<LevelOrStringReturnKind, JsValue>;
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ModeOrNumberReturnKind {
     Mode(Mode),
     F64(f64),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ModeOrStringReturnKind {
     Mode(Mode),
     String(String),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum ModeOrRegionReturnKind {
     Mode(Mode),
     Region(Region),
 }
-#[wasm_bindgen]
+#[wasm_bindgen(private)]
 pub enum LevelOrStringReturnKind {
     Level(Level),
     String(String),
