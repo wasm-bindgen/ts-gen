@@ -127,8 +127,8 @@ fn parse_single_file(
 
     let parser_return = Parser::new(&allocator, source, source_type).parse();
 
-    if !parser_return.errors.is_empty() {
-        for error in &parser_return.errors {
+    if !parser_return.diagnostics.is_empty() {
+        for error in parser_return.diagnostics.iter() {
             gctx.warn(format!("Parse error in {}: {}", path.display(), error));
         }
     }

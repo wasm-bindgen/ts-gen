@@ -19,6 +19,7 @@ use super::converters::{
     convert_class_decl, convert_function_decl, convert_interface_decl, convert_numeric_enum,
     convert_string_enum, convert_string_ts_enum, export_default_kind_name,
 };
+use super::namespace_block_statements;
 
 /// Shared context for Phase 2 declaration population.
 ///
@@ -199,8 +200,11 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
             ast::Statement::VariableDeclaration(var_decl) => {
                 self.populate_variable_decl(var_decl, &dcx, declarations);
             }
-            ast::Statement::TSModuleDeclaration(module) => {
-                self.populate_module(module, ctx, declarations, scope, exported);
+            ast::Statement::TSExternalModuleDeclaration(module) => {
+                self.populate_external_module(module, declarations);
+            }
+            ast::Statement::TSNamespaceDeclaration(ns) => {
+                self.populate_namespace(ns, ctx, declarations, scope, exported);
             }
             ast::Statement::TSEnumDeclaration(enum_decl) => {
                 self.populate_ts_enum(enum_decl, &dcx, declarations);
@@ -218,31 +222,41 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
             }
 
             // ModuleDeclaration variants
-            ast::Statement::ExportNamedDeclaration(export) => {
-                if let Some(ref decl) = export.declaration {
-                    let export_ctx = if let Some(lib) = self.lib_name {
-                        ir::ModuleContext::Module(lib.into())
-                    } else {
-                        ctx.clone()
-                    };
-                    self.populate_oxc_declaration(
-                        decl,
-                        &export_ctx,
+            ast::Statement::ExportDeclaration(export) => {
+                let export_ctx = if let Some(lib) = self.lib_name {
+                    ir::ModuleContext::Module(lib.into())
+                } else {
+                    ctx.clone()
+                };
+                self.populate_oxc_declaration(
+                    &export.declaration,
+                    &export_ctx,
+                    declarations,
+                    Some(export.span.start),
+                    scope,
+                );
+            }
+            ast::Statement::ExportFromDeclaration(export) => {
+                for spec in &export.specifiers {
+                    self.push_export_alias(
+                        spec,
+                        Some(export.source.value.to_string()),
+                        ctx,
                         declarations,
-                        Some(export.span.start),
                         scope,
                     );
                 }
+            }
+            ast::Statement::ExportNamedDeclaration(export) => {
                 for spec in &export.specifiers {
                     let exported_name = spec.exported.name().to_string();
                     let local = spec.local.name().to_string();
-                    if exported_name == local && export.source.is_none() {
+                    if exported_name == local {
                         continue;
                     }
                     // Functions and variables are emitted under each public name
                     // directly, so an alias stub would only shadow them.
-                    if export.source.is_none()
-                        && self.export_names(scope, &local).contains(&exported_name)
+                    if self.export_names(scope, &local).contains(&exported_name)
                         && self.scopes.get(scope).get(&local).is_some_and(|type_id| {
                             matches!(
                                 self.type_arena[type_id.index()].kind,
@@ -252,22 +266,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                     {
                         continue;
                     }
-                    let from_module = export.source.as_ref().map(|s| s.value.to_string());
-                    declarations.push(ir::TypeDeclaration {
-                        kind: ir::TypeKind::TypeAlias(ir::TypeAliasDecl {
-                            name: exported_name,
-                            type_params: vec![],
-                            target: ir::TypeRef::ident(local),
-                            from_module,
-                            // Re-export aliases have no body — pin to the
-                            // enclosing scope.
-                            body_scope: scope,
-                        }),
-                        module_context: ctx.clone(),
-                        doc: None,
-                        scope_id: scope,
-                        exported: true,
-                    });
+                    self.push_export_alias(spec, None, ctx, declarations, scope);
                 }
             }
             ast::Statement::ExportDefaultDeclaration(export) => match &export.declaration {
@@ -374,8 +373,11 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
             ast::Declaration::VariableDeclaration(var_decl) => {
                 self.populate_variable_decl(var_decl, &dcx, declarations);
             }
-            ast::Declaration::TSModuleDeclaration(module) => {
-                self.populate_module(module, ctx, declarations, scope, true);
+            ast::Declaration::TSExternalModuleDeclaration(module) => {
+                self.populate_external_module(module, declarations);
+            }
+            ast::Declaration::TSNamespaceDeclaration(ns) => {
+                self.populate_namespace(ns, ctx, declarations, scope, true);
             }
             ast::Declaration::TSEnumDeclaration(enum_decl) => {
                 self.populate_ts_enum(enum_decl, &dcx, declarations);
@@ -736,81 +738,93 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         }
     }
 
-    fn populate_module(
+    /// Re-export alias stub for `export { local as exported } [from "m"]`.
+    fn push_export_alias(
+        &self,
+        spec: &ast::ExportSpecifier<'_>,
+        from_module: Option<String>,
+        ctx: &ir::ModuleContext,
+        declarations: &mut Vec<ir::TypeDeclaration>,
+        scope: ScopeId,
+    ) {
+        declarations.push(ir::TypeDeclaration {
+            kind: ir::TypeKind::TypeAlias(ir::TypeAliasDecl {
+                name: spec.exported.name().to_string(),
+                type_params: vec![],
+                target: ir::TypeRef::ident(spec.local.name().to_string()),
+                from_module,
+                // Re-export aliases have no body — pin to the
+                // enclosing scope.
+                body_scope: scope,
+            }),
+            module_context: ctx.clone(),
+            doc: None,
+            scope_id: scope,
+            exported: true,
+        });
+    }
+
+    fn populate_external_module(
         &mut self,
-        module: &ast::TSModuleDeclaration<'_>,
+        module: &ast::TSExternalModuleDeclaration<'_>,
+        declarations: &mut Vec<ir::TypeDeclaration>,
+    ) {
+        let specifier = module.id.value.as_str();
+        let module_ctx = ir::ModuleContext::Module(specifier.into());
+        let module_scope = *self
+            .registry
+            .module_scopes
+            .get(specifier)
+            .expect("phase 1 creates a scope for every ambient module");
+        if let Some(block) = &module.body {
+            for stmt in &block.body {
+                self.populate_statement(stmt, &module_ctx, declarations, module_scope, false);
+            }
+        }
+    }
+
+    fn populate_namespace(
+        &mut self,
+        ns: &ast::TSNamespaceDeclaration<'_>,
         parent_ctx: &ir::ModuleContext,
         declarations: &mut Vec<ir::TypeDeclaration>,
         scope: ScopeId,
         exported: bool,
     ) {
-        let doc = self.docs.for_span(module.span.start);
-        match &module.id {
-            ast::TSModuleDeclarationName::StringLiteral(s) => {
-                let module_ctx = ir::ModuleContext::Module(s.value.as_str().into());
-                let module_scope = *self
-                    .registry
-                    .module_scopes
-                    .get(s.value.as_str())
-                    .expect("phase 1 creates a scope for every ambient module");
-                if let Some(ast::TSModuleDeclarationBody::TSModuleBlock(block)) = &module.body {
-                    for stmt in &block.body {
-                        self.populate_statement(
-                            stmt,
-                            &module_ctx,
-                            declarations,
-                            module_scope,
-                            false,
-                        );
-                    }
-                }
-            }
-            ast::TSModuleDeclarationName::Identifier(id) => {
-                let ns_name = id.name.to_string();
-                let is_inside_module = matches!(parent_ctx, ir::ModuleContext::Module(_));
-                // Use the namespace's child scope from Phase 1 (fixes Item 10).
-                let ns_scope = self.resolve_namespace_scope(&ns_name, scope);
+        let doc = self.docs.for_span(ns.span.start);
+        let ns_name = ns.id.name.to_string();
+        // Use the namespace's child scope from Phase 1 (fixes Item 10).
+        let ns_scope = self.resolve_namespace_scope(&ns_name, scope);
+        let stmts = namespace_block_statements(ns);
 
-                if is_inside_module {
-                    // Flatten: emit declarations directly into the parent module.
-                    if let Some(ast::TSModuleDeclarationBody::TSModuleBlock(block)) = &module.body {
-                        for stmt in &block.body {
-                            self.populate_statement(
-                                stmt,
-                                parent_ctx,
-                                declarations,
-                                ns_scope,
-                                exported,
-                            );
-                        }
-                    }
-                } else {
-                    let mut ns_decls = Vec::new();
-                    if let Some(ast::TSModuleDeclarationBody::TSModuleBlock(block)) = &module.body {
-                        for stmt in &block.body {
-                            self.populate_statement(
-                                stmt,
-                                &ir::ModuleContext::Global,
-                                &mut ns_decls,
-                                ns_scope,
-                                exported,
-                            );
-                        }
-                    }
-                    declarations.push(ir::TypeDeclaration {
-                        kind: ir::TypeKind::Namespace(ir::NamespaceDecl {
-                            name: ns_name,
-                            declarations: ns_decls,
-                            child_scope: ns_scope,
-                        }),
-                        module_context: ir::ModuleContext::Global,
-                        doc,
-                        scope_id: scope,
-                        exported,
-                    });
-                }
+        if matches!(parent_ctx, ir::ModuleContext::Module(_)) {
+            // Flatten: emit declarations directly into the parent module.
+            for stmt in stmts {
+                self.populate_statement(stmt, parent_ctx, declarations, ns_scope, exported);
             }
+            return;
         }
+        let mut ns_decls = Vec::new();
+        for stmt in stmts {
+            self.populate_statement(
+                stmt,
+                &ir::ModuleContext::Global,
+                &mut ns_decls,
+                ns_scope,
+                exported,
+            );
+        }
+        declarations.push(ir::TypeDeclaration {
+            kind: ir::TypeKind::Namespace(ir::NamespaceDecl {
+                name: ns_name,
+                declarations: ns_decls,
+                child_scope: ns_scope,
+            }),
+            module_context: ir::ModuleContext::Global,
+            doc,
+            scope_id: scope,
+            exported,
+        });
     }
 
     fn populate_ts_enum(

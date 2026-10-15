@@ -32,13 +32,26 @@ pub fn is_module(program: &ast::Program<'_>) -> bool {
             ast::Statement::ImportDeclaration(_)
                 | ast::Statement::ExportAllDeclaration(_)
                 | ast::Statement::ExportDefaultDeclaration(_)
+                | ast::Statement::ExportDeclaration(_)
                 | ast::Statement::ExportNamedDeclaration(_)
+                | ast::Statement::ExportFromDeclaration(_)
                 | ast::Statement::TSExportAssignment(_)
         )
     })
 }
 
 // ─── Shared Helpers ─────────────────────────────────────────────────
+
+/// Statements of `namespace N { ... }`. Dotted `namespace A.B {}` bodies
+/// are not descended into.
+fn namespace_block_statements<'s, 'a>(
+    ns: &'s ast::TSNamespaceDeclaration<'a>,
+) -> &'s [ast::Statement<'a>] {
+    match &ns.body {
+        ast::TSNamespaceDeclarationBody::TSModuleBlock(block) => &block.body,
+        ast::TSNamespaceDeclarationBody::TSNamespaceDeclaration(_) => &[],
+    }
+}
 
 fn is_string_literal_union(ts_type: &ast::TSType<'_>) -> bool {
     match ts_type {

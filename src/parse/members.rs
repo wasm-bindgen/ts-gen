@@ -574,11 +574,11 @@ fn convert_index_signature(
     parent_scope: ScopeId,
     ctx: &mut ParseCtx<'_, '_>,
 ) -> Option<Member> {
-    let key_type = idx
-        .parameters
-        .first()
-        .map(|p| convert_ts_type_scoped(&p.type_annotation.type_annotation, parent_scope, ctx))
-        .unwrap_or(TypeRef::String);
+    let key_type = convert_ts_type_scoped(
+        &idx.parameter.type_annotation.type_annotation,
+        parent_scope,
+        ctx,
+    );
 
     let value_type =
         convert_ts_type_scoped(&idx.type_annotation.type_annotation, parent_scope, ctx);

@@ -10,7 +10,7 @@ use crate::parse::scope::ScopeId;
 use crate::util::diagnostics::DiagnosticCollector;
 
 use super::converters::{classify_ts_enum_kind, export_default_kind_name};
-use super::is_string_literal_union;
+use super::{is_string_literal_union, namespace_block_statements};
 
 /// Shared context for Phase 1 name collection.
 struct CollectCtx<'a> {
@@ -98,8 +98,11 @@ impl<'a> CollectCtx<'a> {
             ast::Statement::VariableDeclaration(var_decl) => {
                 self.collect_variable_names(var_decl, ctx, scope, exported);
             }
-            ast::Statement::TSModuleDeclaration(module) => {
-                self.collect_module_names(module, ctx, scope, exported);
+            ast::Statement::TSExternalModuleDeclaration(module) => {
+                self.collect_external_module_names(module, scope);
+            }
+            ast::Statement::TSNamespaceDeclaration(ns) => {
+                self.collect_namespace_names(ns, ctx, scope, exported);
             }
             ast::Statement::TSEnumDeclaration(enum_decl) => {
                 let name = enum_decl.id.name.to_string();
@@ -113,32 +116,30 @@ impl<'a> CollectCtx<'a> {
             }
 
             // ModuleDeclaration variants
-            ast::Statement::ExportNamedDeclaration(export) => {
-                if let Some(ref decl) = export.declaration {
-                    let export_ctx = if let Some(lib) = self.lib_name {
-                        ir::ModuleContext::Module(lib.into())
-                    } else {
-                        self.diag.warn(
-                            "Found export declaration without --lib-name; treating as global",
-                        );
-                        ctx.clone()
-                    };
-                    self.collect_declaration(decl, &export_ctx, scope, true);
-                }
-                if let Some(ref source_lit) = export.source {
-                    let source = source_lit.value.to_string();
-                    for spec in &export.specifiers {
-                        let exported_name = spec.exported.name().to_string();
-                        let imported = spec.local.name().to_string();
-                        self.register_import(&exported_name, &imported, &source, scope);
-                    }
+            ast::Statement::ExportDeclaration(export) => {
+                let export_ctx = if let Some(lib) = self.lib_name {
+                    ir::ModuleContext::Module(lib.into())
                 } else {
-                    for spec in &export.specifiers {
-                        let exported_name = spec.exported.name().to_string();
-                        let local = spec.local.name().to_string();
-                        if exported_name != local {
-                            self.export_specifiers.push((scope, local, exported_name));
-                        }
+                    self.diag
+                        .warn("Found export declaration without --lib-name; treating as global");
+                    ctx.clone()
+                };
+                self.collect_declaration(&export.declaration, &export_ctx, scope, true);
+            }
+            ast::Statement::ExportFromDeclaration(export) => {
+                let source = export.source.value.to_string();
+                for spec in &export.specifiers {
+                    let exported_name = spec.exported.name().to_string();
+                    let imported = spec.local.name().to_string();
+                    self.register_import(&exported_name, &imported, &source, scope);
+                }
+            }
+            ast::Statement::ExportNamedDeclaration(export) => {
+                for spec in &export.specifiers {
+                    let exported_name = spec.exported.name().to_string();
+                    let local = spec.local.name().to_string();
+                    if exported_name != local {
+                        self.export_specifiers.push((scope, local, exported_name));
                     }
                 }
             }
@@ -251,8 +252,11 @@ impl<'a> CollectCtx<'a> {
             ast::Declaration::VariableDeclaration(var_decl) => {
                 self.collect_variable_names(var_decl, ctx, scope, exported);
             }
-            ast::Declaration::TSModuleDeclaration(module) => {
-                self.collect_module_names(module, ctx, scope, exported);
+            ast::Declaration::TSExternalModuleDeclaration(module) => {
+                self.collect_external_module_names(module, scope);
+            }
+            ast::Declaration::TSNamespaceDeclaration(ns) => {
+                self.collect_namespace_names(ns, ctx, scope, exported);
             }
             ast::Declaration::TSEnumDeclaration(enum_decl) => {
                 let name = enum_decl.id.name.to_string();
@@ -325,61 +329,52 @@ impl<'a> CollectCtx<'a> {
         }
     }
 
-    fn collect_module_names(
+    fn collect_external_module_names(
         &mut self,
-        module: &ast::TSModuleDeclaration<'_>,
+        module: &ast::TSExternalModuleDeclaration<'_>,
+        scope: ScopeId,
+    ) {
+        let specifier = module.id.value.as_str();
+        let module_ctx = ir::ModuleContext::Module(specifier.into());
+        let module_scope = *self
+            .registry
+            .module_scopes
+            .entry(specifier.to_string())
+            .or_insert_with(|| self.gctx.scopes.create_child(scope));
+        if let Some(block) = &module.body {
+            for stmt in &block.body {
+                self.collect_statement(stmt, &module_ctx, module_scope, false);
+            }
+        }
+    }
+
+    fn collect_namespace_names(
+        &mut self,
+        ns: &ast::TSNamespaceDeclaration<'_>,
         parent_ctx: &ir::ModuleContext,
         scope: ScopeId,
         exported: bool,
     ) {
-        match &module.id {
-            ast::TSModuleDeclarationName::StringLiteral(s) => {
-                let module_ctx = ir::ModuleContext::Module(s.value.as_str().into());
-                let module_scope = *self
-                    .registry
-                    .module_scopes
-                    .entry(s.value.to_string())
-                    .or_insert_with(|| self.gctx.scopes.create_child(scope));
-                if let Some(ast::TSModuleDeclarationBody::TSModuleBlock(block)) = &module.body {
-                    for stmt in &block.body {
-                        self.collect_statement(stmt, &module_ctx, module_scope, false);
-                    }
-                }
+        let stmts = namespace_block_statements(ns);
+        if matches!(parent_ctx, ir::ModuleContext::Module(_)) {
+            for stmt in stmts {
+                self.collect_statement(stmt, parent_ctx, scope, false);
             }
-            ast::TSModuleDeclarationName::Identifier(id) => {
-                let name = id.name.to_string();
-                let is_inside_module = matches!(parent_ctx, ir::ModuleContext::Module(_));
-
-                if is_inside_module {
-                    if let Some(ast::TSModuleDeclarationBody::TSModuleBlock(block)) = &module.body {
-                        for stmt in &block.body {
-                            self.collect_statement(stmt, parent_ctx, scope, false);
-                        }
-                    }
-                } else {
-                    let ns_scope = if let Some(type_id) = self.gctx.scopes.get(scope).get(&name) {
-                        let decl = self.gctx.get_type(type_id);
-                        if let ir::TypeKind::Namespace(ns) = &decl.kind {
-                            ns.child_scope
-                        } else {
-                            self.create_namespace_scope(&name, scope, false)
-                        }
-                    } else {
-                        self.create_namespace_scope(&name, scope, exported)
-                    };
-
-                    if let Some(ast::TSModuleDeclarationBody::TSModuleBlock(block)) = &module.body {
-                        for stmt in &block.body {
-                            self.collect_statement(
-                                stmt,
-                                &ir::ModuleContext::Global,
-                                ns_scope,
-                                false,
-                            );
-                        }
-                    }
-                }
+            return;
+        }
+        let name = ns.id.name.to_string();
+        let ns_scope = if let Some(type_id) = self.gctx.scopes.get(scope).get(&name) {
+            let decl = self.gctx.get_type(type_id);
+            if let ir::TypeKind::Namespace(ns) = &decl.kind {
+                ns.child_scope
+            } else {
+                self.create_namespace_scope(&name, scope, false)
             }
+        } else {
+            self.create_namespace_scope(&name, scope, exported)
+        };
+        for stmt in stmts {
+            self.collect_statement(stmt, &ir::ModuleContext::Global, ns_scope, false);
         }
     }
 

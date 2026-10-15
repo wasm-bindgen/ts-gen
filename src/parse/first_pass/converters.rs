@@ -28,17 +28,18 @@ pub fn convert_class_decl(
 
     let type_params = convert_type_params(class.type_parameters.as_ref(), ctx.diag);
 
-    let extends = class
-        .super_class
-        .as_ref()
-        .and_then(|sc| match expression_to_dotted_name(sc) {
-            Some(name) => Some(ir::TypeRef::ident(name)),
-            None => {
-                ctx.diag
-                    .warn("Complex super class expression is not supported");
-                None
-            }
-        });
+    let extends =
+        class
+            .heritage
+            .as_ref()
+            .and_then(|h| match expression_to_dotted_name(&h.expression) {
+                Some(name) => Some(ir::TypeRef::ident(name)),
+                None => {
+                    ctx.diag
+                        .warn("Complex super class expression is not supported");
+                    None
+                }
+            });
 
     let implements: Vec<ir::TypeRef> = class
         .implements
@@ -81,7 +82,7 @@ pub fn convert_interface_decl(
     let extends: Vec<ir::TypeRef> = iface
         .extends
         .iter()
-        .map(|ext| convert_ts_type_from_heritage(&ext.expression, ctx.diag))
+        .map(|ext| convert_ts_type_name_to_ref(&ext.type_name))
         .collect();
     interface_from_signatures(
         name,
@@ -357,25 +358,6 @@ pub fn convert_numeric_enum(
         .collect();
 
     ir::NumericEnumDecl { name, variants }
-}
-
-fn convert_ts_type_from_heritage(
-    expr: &ast::Expression<'_>,
-    diag: &mut DiagnosticCollector,
-) -> ir::TypeRef {
-    match expression_to_path(expr) {
-        Some((head, mut segments)) => {
-            segments.insert(0, head);
-            ir::TypeRef::Reference {
-                segments,
-                generic_args: Vec::new(),
-            }
-        }
-        None => {
-            diag.warn("Unsupported heritage expression, falling back to Object");
-            ir::TypeRef::ident("Object")
-        }
-    }
 }
 
 /// Extract a path from an expression: `Foo` → `("Foo", [])`,
