@@ -629,15 +629,7 @@ impl<'a> CodegenContext<'a> {
         if !generic_args.is_empty() {
             return None;
         }
-        // A namespace inside a module is flattened into the module scope, so
-        // its members only resolve by their last segment.
-        let id = self
-            .gctx
-            .resolve_path(scope, &segments.join("."))
-            .or_else(|| match segments.as_slice() {
-                [_, .., last] => self.gctx.scopes.resolve(scope, last),
-                _ => None,
-            })?;
+        let id = self.gctx.resolve_path(scope, &segments.join("."))?;
         let kind = &self.gctx.get_type(id).kind;
         matches!(kind, TypeKind::StringEnum(_) | TypeKind::NumericEnum(_)).then_some(kind)
     }
@@ -1214,6 +1206,7 @@ fn is_jsvalue_arg(tokens: &TokenStream) -> bool {
 /// declaration's `module_context` drives qualification.
 fn emit_type_name(
     name: &str,
+    use_scope: Option<ScopeId>,
     ctx: &CodegenContext<'_>,
     from_module: &ModuleContext,
 ) -> TokenStream {
@@ -1223,16 +1216,22 @@ fn emit_type_name(
         ModuleContext::Module(m) => ctx.gctx.ambient_module_scopes.get(m.as_ref()),
         ModuleContext::Global => None,
     };
-    let resolved = module_scopes
-        .into_iter()
-        .flatten()
-        .chain(&ctx.file_scopes)
-        .find_map(|&scope| {
-            if name.contains('.') {
-                ctx.gctx.resolve_path(scope, name)
-            } else {
-                ctx.gctx.scopes.resolve(scope, name)
-            }
+    // A qualified path can name a namespace only visible from the use site,
+    // such as a sibling namespace inside the enclosing one.
+    let resolved = use_scope
+        .and_then(|scope| ctx.gctx.resolve_path(scope, name))
+        .or_else(|| {
+            module_scopes
+                .into_iter()
+                .flatten()
+                .chain(&ctx.file_scopes)
+                .find_map(|&scope| {
+                    if name.contains('.') {
+                        ctx.gctx.resolve_path(scope, name)
+                    } else {
+                        ctx.gctx.scopes.resolve(scope, name)
+                    }
+                })
         });
 
     // Canonical ident name (last segment for dotted paths)
@@ -1285,7 +1284,7 @@ fn emit_type_name(
         .or_else(|| {
             // Fallback: tests and entry points that don't construct a
             // full scope chain populate `local_types` by name.
-            if resolved.is_none() {
+            if resolved.is_none() && !name.contains('.') {
                 ctx.local_types.get(ident_name).cloned()
             } else {
                 None
@@ -1362,10 +1361,14 @@ fn emit_type_name(
         return quote! { #ident };
     }
 
-    // Truly unresolved — error + JsValue alias
+    // Truly unresolved — error + JsValue alias. A qualified name's last
+    // segment may be a local type's name, so it isn't aliased.
     ctx.error(format!(
         "Unresolved type `{name}`. Use --external to map this type."
     ));
+    if name.contains('.') {
+        return quote! { JsValue };
+    }
     ctx.register_external(ident_name, "JsValue");
     let ident = make_ident(ident_name);
     quote! { #ident }
@@ -1378,7 +1381,7 @@ fn named_type_to_rust(
     from_module: &ModuleContext,
 ) -> TokenStream {
     match ctx {
-        Some(ctx) => emit_type_name(name, ctx, from_module),
+        Some(ctx) => emit_type_name(name, None, ctx, from_module),
         // Without a codegen context (e.g. unit tests that exercise
         // type lowering directly) we can still resolve names that
         // appear in the `js_sys::*` glob — emit them as a bare ident.
@@ -1408,14 +1411,13 @@ fn lower_reference(
     scope: ScopeId,
     from_module: &ModuleContext,
 ) -> TokenStream {
-    // Qualified paths (more than one segment) are not yet resolved
-    // through the scope chain — we keep the dotted form for
-    // `emit_type_name` to consult the external map, then fall back
-    // to `JsValue` with a diagnostic for anything that doesn't match.
+    // Qualified paths resolve through namespace scopes from the use site;
+    // `emit_type_name` then consults the external map and falls back to
+    // `JsValue` with a diagnostic for anything that doesn't match.
     if segments.len() > 1 {
         let dotted = segments.join(".");
         return match ctx {
-            Some(c) => emit_type_name(&dotted, c, from_module),
+            Some(c) => emit_type_name(&dotted, Some(scope), c, from_module),
             None => quote! { JsValue },
         };
     }
@@ -3072,5 +3074,38 @@ mod tests {
             Some(TypeRef::String)
         );
         assert_eq!(ctx.enum_repr(&TypeRef::ident("Codes"), scope), None);
+    }
+
+    #[test]
+    fn qualified_names_resolve_through_module_namespaces() {
+        let src = r#"
+            export type Kind = "text" | "bytes";
+            export declare namespace Outer {
+                namespace Inner { type Deep = "a" | "b"; }
+            }
+        "#;
+        let (module, gctx) = crate::parse_source(src, Some("m")).unwrap();
+        let ctx = CodegenContext::from_module_full(&module, &gctx, false, false, HashSet::new());
+        let scope = *module.file_scopes.first().expect("file scope");
+        let outer = match &gctx
+            .get_type(gctx.resolve_path(scope, "Outer").unwrap())
+            .kind
+        {
+            TypeKind::Namespace(ns) => ns.child_scope,
+            _ => unreachable!(),
+        };
+        let path = |p: &str| TypeRef::Reference {
+            segments: p.split('.').map(String::from).collect(),
+            generic_args: vec![],
+        };
+        let lower = |ty: &TypeRef, scope: ScopeId| {
+            let from = ModuleContext::Module("m".into());
+            to_syn_type(ty, TypePosition::ARGUMENT, Some(&ctx), scope, &from).to_string()
+        };
+
+        assert_eq!(lower(&path("Outer.Inner.Deep"), scope), "Deep");
+        assert_eq!(lower(&path("Inner.Deep"), outer), "Deep");
+        // Only the last segment matches the local `Kind`.
+        assert_eq!(lower(&path("Other.Kind"), scope), "& JsValue");
     }
 }

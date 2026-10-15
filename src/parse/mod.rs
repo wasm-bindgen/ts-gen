@@ -235,10 +235,26 @@ fn parse_single_file(
             }
             let name = declaration_name(&decl.kind);
             let decl_scope = decl.scope_id;
+            let flat_scope = match &decl.module_context {
+                crate::ir::ModuleContext::Module(m) => Some(
+                    registry
+                        .module_scopes
+                        .get(m.as_ref())
+                        .copied()
+                        .unwrap_or(file_scope),
+                ),
+                crate::ir::ModuleContext::Global => None,
+            };
             let type_id = gctx.insert_type(decl);
             // Insert/upgrade the type in the scope so codegen can resolve it.
+            // Members of a namespace inside a module are flattened into the
+            // module but declared in the namespace scope, which also needs the
+            // upgrade for `NS.Member` to reach the populated declaration.
             if let Some(ref name) = name {
                 gctx.scopes.insert(decl_scope, name.clone(), type_id);
+                if let Some(flat_scope) = flat_scope.filter(|&s| s != decl_scope) {
+                    gctx.scopes.insert(flat_scope, name.clone(), type_id);
+                }
             }
             // Script files: hoist global declarations to the builtin scope
             // so they're visible across all files (TypeScript "script" semantics).
@@ -1079,5 +1095,24 @@ mod tests {
                 TypeRef::BigInt
             ]
         );
+    }
+
+    #[test]
+    fn module_namespace_members_resolve_by_qualified_path() {
+        let src = r#"
+            export declare namespace Codes {
+                type Region = "eu" | "us";
+            }
+        "#;
+        let (module, gctx) = crate::parse_source(src, Some("m")).unwrap();
+        let scope = module.file_scopes[0];
+        let id = gctx
+            .resolve_path(scope, "Codes.Region")
+            .expect("Codes.Region resolves");
+        assert!(module.types.contains(&id), "resolves to the populated decl");
+        match &gctx.get_type(id).kind {
+            TypeKind::StringEnum(e) => assert_eq!(e.variants.len(), 2),
+            other => panic!("expected a string enum, got {other:?}"),
+        }
     }
 }

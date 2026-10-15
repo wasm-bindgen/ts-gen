@@ -1810,6 +1810,13 @@ not module specifiers — they're independent of the `--export`
 filter. The namespace lookup is one-deep; nested namespaces are not
 yet supported.
 
+Inside a module, a namespace's members are emitted flat into the
+module instead, while qualified references to them (`Codes.Region`,
+`Outer.Inner.Deep`, or `Inner.Deep` from within `Outer`) still resolve
+through the namespace. A qualified name that resolves to nothing
+erases to `JsValue` with an error rather than matching a local type
+by its last segment.
+
 ## Type aliases and `export { X as Y }`
 
 * `type Foo = Bar;` → `pub type Foo = Bar;` if `Bar` is a recognised
