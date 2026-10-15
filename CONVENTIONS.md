@@ -107,7 +107,6 @@ form; every other element takes its inner-position handle form:
 | `Foo` (named JS / Rust type) | `Foo`                  |
 | `any` / `unknown`            | `JsValue`              |
 | `boolean`                    | `Boolean`              |
-| `bigint`                     | `BigInt`               |
 | `T \| null`                  | `JsOption<U>`          |
 | `T[]`                        | `Array<U>`             |
 
