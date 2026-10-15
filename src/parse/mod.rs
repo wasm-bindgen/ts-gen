@@ -297,6 +297,16 @@ fn bind_import(
     import: &scope::PendingImport,
     target: ScopeId,
 ) -> bool {
+    // `import * as A` makes `A` a namespace whose members are the module's
+    // own scope. `export *` also registers as `*` but binds no local name.
+    if import.original_name == "*" {
+        if import.local_name == "*" {
+            return false;
+        }
+        gctx.scopes
+            .insert_namespace(import.scope, import.local_name.clone(), target);
+        return true;
+    }
     let type_id = gctx.scopes.resolve(target, &import.original_name);
     let members = gctx.scopes.resolve_namespace(target, &import.original_name);
     if let Some(type_id) = type_id {
@@ -1196,7 +1206,11 @@ mod tests {
         )
         .unwrap();
         let main = dir.join("main.d.ts");
-        std::fs::write(&main, r#"import { NS, Foo as Bar } from "./dep";"#).unwrap();
+        std::fs::write(
+            &main,
+            r#"import { NS, Foo as Bar } from "./dep"; import * as D from "./dep";"#,
+        )
+        .unwrap();
         let result = parse_dts_files(&[&main], Some("main"));
         std::fs::remove_dir_all(&dir).unwrap();
 
@@ -1209,5 +1223,11 @@ mod tests {
         assert!(matches!(kind("NS.K"), Some(TypeKind::StringEnum(_))));
         assert!(matches!(kind("Bar"), Some(TypeKind::Class(_))));
         assert!(matches!(kind("Bar.Options"), Some(TypeKind::Interface(_))));
+        assert!(matches!(kind("D.Foo"), Some(TypeKind::Class(_))));
+        assert!(matches!(kind("D.NS.K"), Some(TypeKind::StringEnum(_))));
+        assert!(matches!(
+            kind("D.Foo.Options"),
+            Some(TypeKind::Interface(_))
+        ));
     }
 }
