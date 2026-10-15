@@ -128,18 +128,25 @@ fn parse_single_file(
     let parser_return = Parser::new(&allocator, source, source_type).parse();
 
     for error in parser_return.diagnostics.iter() {
-        let mut message = format!("Parse error: {}", error.message);
-        if let Some(help) = &error.help {
-            message.push_str(&format!("\n  help: {help}"));
-        }
+        let message = format!("Parse error: {}", error.message);
+        let help = error.help.as_ref().map(|h| h.to_string());
         let label = error
             .labels
             .iter()
             .find(|l| l.primary())
             .or_else(|| error.labels.first());
         match label {
-            Some(label) => gctx.diagnostics.warn_at(message, label.offset()),
-            None => gctx.warn(format!("{}: {message}", path.display())),
+            Some(label) => gctx.diagnostics.warn_span(
+                message,
+                label.offset(),
+                label.offset() + label.len(),
+                label.label().map(str::to_string),
+                help,
+            ),
+            None => {
+                let help = help.map_or(String::new(), |h| format!(" (help: {h})"));
+                gctx.warn(format!("{}: {message}{help}", path.display()))
+            }
         }
     }
     if parser_return.fatal_error {
@@ -1035,6 +1042,13 @@ mod tests {
         let loc = diag.location.as_ref().expect("parse error location");
         assert_eq!(loc.to_string(), "<input>:4:36");
         assert!(gctx.diagnostics.has_errors());
+        assert!(gctx.diagnostics.render(false).contains(
+            "\
+  |
+4 | export declare function f(a: string: number): void;
+  |                                    ^ `,` or `)` expected
+"
+        ));
     }
 
     #[test]
