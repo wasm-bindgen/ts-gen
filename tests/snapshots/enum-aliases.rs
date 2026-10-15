@@ -48,6 +48,27 @@ impl Kind {
     #[allow(non_upper_case_globals)]
     pub const Fallback: Kind = Kind::Text;
 }
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u32)]
+pub enum Bits {
+    Low = 1u32,
+    High = 2u32,
+    Both = 3u32,
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u32)]
+pub enum Other {
+    X = 7u32,
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u32)]
+pub enum Unresolved {
+    A = 1u32,
+    C = 2u32,
+}
 #[wasm_bindgen(module = "enum-aliases")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]

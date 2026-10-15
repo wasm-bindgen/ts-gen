@@ -1960,8 +1960,14 @@ literals, unary and binary constant expressions with JS numeric
 semantics (bitwise operators on int32, `>>>` on uint32), string
 concatenation, and references to earlier members, bare or qualified by
 the enum's own name. A member without an initialiser continues from the
-previous member's evaluated value. An initialiser that is none of these
-takes the next auto-increment with a diagnostic.
+previous member's evaluated value. An enum is numeric when any member
+evaluates to a number, so `Read = 1 << 0` alone is enough, and a string
+enum otherwise.
+
+A member whose value can't be evaluated, such as `B = Other.X`, or one
+continuing from it, is skipped with a diagnostic. Its value is only known
+at runtime, and a guessed discriminant could repeat a real member's value
+and turn that member into an alias of it.
 
 A member whose value repeats an earlier member's is an alias, not a
 second variant: wasm-bindgen rejects duplicate discriminants, and two

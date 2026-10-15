@@ -41,9 +41,6 @@
 //! for a declaration ending `ImportMeta = 3, Latest = 3`. The parser has
 //! already evaluated member references and constant expressions
 //! (`Latest = ImportMeta`, `All = Read | Write`) to their values.
-//!
-//! ```rust,ignore
-//! ```
 
 use proc_macro2::TokenStream;
 use quote::quote;

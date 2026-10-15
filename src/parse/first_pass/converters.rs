@@ -215,26 +215,13 @@ pub fn convert_string_enum(name: &str, ts_type: &ast::TSType<'_>) -> Option<ir::
     })
 }
 
-/// Classify a TS enum as string or numeric based on its member initializers.
+/// Classify a TS enum from its evaluated member values: numeric when any
+/// member is a number (heterogeneous enums included), otherwise string.
 pub fn classify_ts_enum_kind(enum_decl: &ast::TSEnumDeclaration<'_>) -> ir::RegisteredKind {
-    let mut has_string = false;
-    let mut has_numeric = false;
-
-    for member in &enum_decl.body.members {
-        match &member.initializer {
-            Some(ast::Expression::StringLiteral(_)) => has_string = true,
-            Some(ast::Expression::NumericLiteral(_)) => has_numeric = true,
-            Some(ast::Expression::UnaryExpression(_)) => has_numeric = true,
-            None => {
-                has_numeric = true;
-            }
-            _ => {}
-        }
-    }
-
-    if has_string && !has_numeric {
-        ir::RegisteredKind::StringEnum
-    } else if has_numeric {
+    let numeric = evaluate_enum_members(enum_decl)
+        .iter()
+        .any(|m| matches!(m.value, Some(EnumValue::Num(_))));
+    if numeric {
         ir::RegisteredKind::NumericEnum
     } else {
         ir::RegisteredKind::StringEnum
@@ -341,37 +328,68 @@ fn enum_member_name(member: &ast::TSEnumMember<'_>) -> Option<String> {
     }
 }
 
+struct EnumMember<'m, 'a> {
+    member: &'m ast::TSEnumMember<'a>,
+    name: String,
+    /// `None` when the value is only known at runtime: an initialiser that
+    /// isn't a constant expression over this enum's members (`Other.X`), or
+    /// a member following one without its own initialiser.
+    value: Option<EnumValue>,
+}
+
+/// Each member with the value TypeScript gives it. A member without an
+/// initialiser continues from the previous member's numeric value.
+fn evaluate_enum_members<'m, 'a>(
+    enum_decl: &'m ast::TSEnumDeclaration<'a>,
+) -> Vec<EnumMember<'m, 'a>> {
+    let enum_name = enum_decl.id.name.as_str();
+    let mut members: Vec<EnumMember<'m, 'a>> = Vec::new();
+    let mut known: Vec<(String, EnumValue)> = Vec::new();
+    for member in &enum_decl.body.members {
+        let Some(name) = enum_member_name(member) else {
+            continue;
+        };
+        let value = match &member.initializer {
+            Some(init) => eval_enum_expr(init, enum_name, &known),
+            None => match members.last() {
+                None => Some(EnumValue::Num(0.0)),
+                Some(EnumMember {
+                    value: Some(EnumValue::Num(prev)),
+                    ..
+                }) => Some(EnumValue::Num(prev + 1.0)),
+                Some(_) => None,
+            },
+        };
+        if let Some(v) = &value {
+            known.push((name.clone(), v.clone()));
+        }
+        members.push(EnumMember {
+            member,
+            name,
+            value,
+        });
+    }
+    members
+}
+
 /// Convert a TS enum with string values to our StringEnumDecl IR.
 pub fn convert_string_ts_enum(
     enum_decl: &ast::TSEnumDeclaration<'_>,
     diag: &mut DiagnosticCollector,
 ) -> ir::StringEnumDecl {
     let name = enum_decl.id.name.to_string();
-    let mut values: Vec<(String, EnumValue)> = Vec::new();
-
-    let variants: Vec<_> = enum_decl
-        .body
-        .members
-        .iter()
-        .filter_map(|member| {
-            let member_name = enum_member_name(member)?;
-            let js_value = match member
-                .initializer
-                .as_ref()
-                .and_then(|init| eval_enum_expr(init, &name, &values))
-            {
-                Some(EnumValue::Str(s)) => s,
-                _ => {
-                    diag.warn(format!(
-                        "Enum `{name}::{member_name}` has no string value, using its name"
-                    ));
-                    member_name.clone()
-                }
+    let variants: Vec<_> = evaluate_enum_members(enum_decl)
+        .into_iter()
+        .filter_map(|m| {
+            let Some(EnumValue::Str(js_value)) = m.value else {
+                diag.warn(format!(
+                    "Enum `{name}::{}` has no constant string value, skipping it",
+                    m.name
+                ));
+                return None;
             };
-            values.push((member_name.clone(), EnumValue::Str(js_value.clone())));
-            let rust_name = crate::util::naming::to_enum_variant(&member_name);
             Some(ir::StringEnumVariant {
-                rust_name,
+                rust_name: crate::util::naming::to_enum_variant(&m.name),
                 js_value,
             })
         })
@@ -392,46 +410,31 @@ pub fn convert_string_ts_enum(
 }
 
 /// Convert a TS enum with numeric values to our NumericEnumDecl IR.
+///
+/// A member without a constant numeric value is skipped: a guessed
+/// discriminant could repeat a real member's value and turn that member into
+/// an alias of it.
 pub fn convert_numeric_enum(
     enum_decl: &ast::TSEnumDeclaration<'_>,
     docs: &DocComments<'_>,
     diag: &mut DiagnosticCollector,
 ) -> ir::NumericEnumDecl {
     let name = enum_decl.id.name.to_string();
-    let mut next_value: i64 = 0;
-    let mut values: Vec<(String, EnumValue)> = Vec::new();
-
-    let variants: Vec<_> = enum_decl
-        .body
-        .members
-        .iter()
-        .filter_map(|member| {
-            let member_name = enum_member_name(member)?;
-
-            let value = match &member.initializer {
-                None => next_value,
-                Some(init) => match eval_enum_expr(init, &name, &values) {
-                    Some(EnumValue::Num(v)) => f64_to_i64(v, &member_name, &name, diag),
-                    _ => {
-                        diag.warn(format!(
-                            "Enum `{name}::{member_name}` has an initializer that is not a \
-                             numeric constant expression, using {next_value}"
-                        ));
-                        next_value
-                    }
-                },
+    let variants: Vec<_> = evaluate_enum_members(enum_decl)
+        .into_iter()
+        .filter_map(|m| {
+            let Some(EnumValue::Num(value)) = m.value else {
+                diag.warn(format!(
+                    "Enum `{name}::{}` has no constant numeric value, skipping it",
+                    m.name
+                ));
+                return None;
             };
-            next_value = value + 1;
-            values.push((member_name.clone(), EnumValue::Num(value as f64)));
-
-            let doc = docs.for_span(member.span.start);
-            let rust_name = crate::util::naming::to_enum_variant(&member_name);
-
             Some(ir::NumericEnumVariant {
-                rust_name,
-                js_name: member_name,
-                value,
-                doc,
+                rust_name: crate::util::naming::to_enum_variant(&m.name),
+                value: f64_to_i64(value, &m.name, &name, diag),
+                doc: docs.for_span(m.member.span.start),
+                js_name: m.name,
             })
         })
         .collect();
@@ -623,9 +626,36 @@ mod tests {
     }
 
     #[test]
-    fn unknown_initializer_falls_back_to_auto_increment() {
-        let values = numeric_values("declare enum E { A = 5, B = foo(), C }");
-        assert_eq!(values, pairs(&[("A", 5), ("B", 6), ("C", 7)]));
+    fn members_without_a_constant_value_are_skipped() {
+        let values = numeric_values("declare enum E { A = 1, B = Other.X, C = 2, D = B, F }");
+        assert_eq!(values, pairs(&[("A", 1), ("C", 2)]));
+        let values = string_values("declare enum K { A = \"B\", B = Other.X, C = \"c\" }");
+        assert_eq!(values, pairs(&[("A", "B".to_string()), ("C", "c".into())]));
+    }
+
+    fn kind(src: &str) -> ir::RegisteredKind {
+        let allocator = Allocator::default();
+        let program = Parser::new(&allocator, src, SourceType::d_ts()).parse();
+        let ast::Statement::TSEnumDeclaration(decl) = &program.program.body[0] else {
+            panic!("expected an enum");
+        };
+        classify_ts_enum_kind(decl)
+    }
+
+    #[test]
+    fn classification_follows_evaluated_values() {
+        assert_eq!(
+            kind("declare enum F { R = 1 << 0, W = 1 << 1, RW = R | W }"),
+            ir::RegisteredKind::NumericEnum
+        );
+        assert_eq!(
+            kind("declare enum K { A = \"a\" + \"b\", B = A }"),
+            ir::RegisteredKind::StringEnum
+        );
+        assert_eq!(
+            kind("declare enum E { A, B }"),
+            ir::RegisteredKind::NumericEnum
+        );
     }
 
     #[test]

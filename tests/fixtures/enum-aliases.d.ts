@@ -32,6 +32,27 @@ export declare enum Kind {
   Fallback = Text,
 }
 
+// Classification follows the evaluated values, so an enum of constant
+// expressions alone is numeric.
+export declare enum Bits {
+  Low = 1 << 0,
+  High = 1 << 1,
+  Both = Low | High,
+}
+
+// A member referencing something outside the enum has a value we cannot
+// evaluate, so it is skipped rather than given a guessed discriminant that
+// could collide with a real member.
+export declare enum Other {
+  X = 7,
+}
+
+export declare enum Unresolved {
+  A = 1,
+  B = Other.X,
+  C = 2,
+}
+
 export interface Api {
   version: Version;
   flags: Flags;

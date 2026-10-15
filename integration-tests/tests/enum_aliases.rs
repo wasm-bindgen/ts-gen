@@ -1,6 +1,6 @@
 #![cfg(target_arch = "wasm32")]
 
-use ts_gen_integration_tests::enum_aliases::{Api, Flags, Kind, Version};
+use ts_gen_integration_tests::enum_aliases::{Api, Bits, Flags, Kind, Unresolved, Version};
 
 // Compile-only coverage that same-valued members become associated consts
 // of the first variant with that value, and that evaluated initialisers
@@ -16,6 +16,8 @@ const _: () = {
     assert!(Flags::Negated as i32 == -1);
     assert!(matches!(Kind::Default, Kind::Text));
     assert!(matches!(Kind::Fallback, Kind::Text));
+    assert!(Bits::Both as u32 == 3);
+    assert!(Unresolved::C as u32 == 2);
 };
 
 #[allow(dead_code)]
