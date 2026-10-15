@@ -603,18 +603,38 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 })
                 .collect();
 
-            // Exact param-type match first. Per-mono primitive-union
-            // grouping gives setters and factory options different
-            // groupings of the same members (the factory keeps literals
-            // apart), so fall back to the grouped setter whose marker
-            // trait accepts the option's type.
+            // Setter expansion dedups by rendered Rust type, keeping only the
+            // first member of each (`"x" | "y"` leaves one setter typed
+            // `"x"`), so match on the rendered type rather than the IR. Per-mono
+            // primitive-union grouping gives setters and factory options
+            // different groupings of the same members (the factory keeps
+            // literals apart), so fall back to the grouped setter whose
+            // marker trait accepts the option's type.
             let pick_setter = |target: &crate::ir::TypeRef| -> Option<syn::Ident> {
                 fn param_type<'s>(sig: &&'s FunctionSignature) -> Option<&'s crate::ir::TypeRef> {
                     sig.params.first().map(|p| &p.type_ref)
                 }
+                let render = |param: &ConcreteParam| {
+                    super::signatures::render_param_type(
+                        param,
+                        config.cgctx,
+                        config.scope,
+                        &crate::ir::ModuleContext::Global,
+                    )
+                    .to_string()
+                };
+                let target_rendered = render(&ConcreteParam {
+                    name: String::new(),
+                    type_ref: target.clone(),
+                    variadic: false,
+                });
                 setters
                     .iter()
-                    .find(|sig| param_type(sig) == Some(target))
+                    .find(|sig| {
+                        sig.params
+                            .first()
+                            .is_some_and(|p| render(p) == target_rendered)
+                    })
                     .or_else(|| {
                         setters.iter().find(|sig| {
                             param_type(sig)

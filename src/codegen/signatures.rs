@@ -1358,7 +1358,7 @@ pub(crate) fn generate_concrete_params_with_mono_bounds(
 /// The Rust type of one concrete parameter, exactly as the emitters render
 /// it. Cross-overload dedup compares these so two expansions collapse only
 /// when their rendered signatures coincide.
-fn render_param_type(
+pub(crate) fn render_param_type(
     param: &ConcreteParam,
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
