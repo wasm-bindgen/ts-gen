@@ -292,10 +292,14 @@ fn parse_single_file(
 
 /// Bind an import to what its name means in the exporting scope: a type, a
 /// namespace, or both when they merge. Returns whether either was found.
+///
+/// `own_only` restricts the lookup to names `target` declares itself, for a
+/// `declare module` block whose parent scope is the enclosing file's.
 fn bind_import(
     gctx: &mut crate::context::GlobalContext,
     import: &scope::PendingImport,
     target: ScopeId,
+    own_only: bool,
 ) -> bool {
     // `import * as A` makes `A` a namespace whose members are the module's
     // own scope. `export *` also registers as `*` but binds no local name.
@@ -307,8 +311,16 @@ fn bind_import(
             .insert_namespace(import.scope, import.local_name.clone(), target);
         return true;
     }
-    let type_id = gctx.scopes.resolve(target, &import.original_name);
-    let members = gctx.scopes.resolve_namespace(target, &import.original_name);
+    let name = &import.original_name;
+    let (type_id, members) = if own_only {
+        let scope = gctx.scopes.get(target);
+        (scope.get(name), scope.namespace(name))
+    } else {
+        (
+            gctx.scopes.resolve(target, name),
+            gctx.scopes.resolve_namespace(target, name),
+        )
+    };
     if let Some(type_id) = type_id {
         gctx.scopes
             .insert(import.scope, import.local_name.clone(), type_id);
@@ -402,12 +414,12 @@ fn resolve_imports(
             let ambient = gctx
                 .ambient_module_scopes
                 .get(&import.from_module)
+                .cloned()
+                .unwrap_or_default();
+            if ambient
                 .into_iter()
-                .flatten()
-                .find_map(|&scope| gctx.scopes.get(scope).get(&import.original_name));
-            if let Some(type_id) = ambient {
-                gctx.scopes
-                    .insert(import.scope, import.local_name.clone(), type_id);
+                .any(|scope| bind_import(gctx, &import, scope, true))
+            {
                 continue;
             }
 
@@ -415,7 +427,7 @@ fn resolve_imports(
             if let Some(module_id) = gctx.find_module(&import.from_module) {
                 // Look up the name in the target module's scope
                 let target_scope = gctx.get_module(module_id).scope;
-                if !bind_import(gctx, &import, target_scope) {
+                if !bind_import(gctx, &import, target_scope, false) {
                     gctx.warn(format!(
                         "Import `{}` not found in module \"{}\"",
                         import.original_name, import.from_module
@@ -459,7 +471,7 @@ fn resolve_imports(
                                     new_files_parsed = true;
 
                                     // Now resolve the imported name from the dep's scope
-                                    if !bind_import(gctx, &import, dep_scope) {
+                                    if !bind_import(gctx, &import, dep_scope, false) {
                                         gctx.warn(format!(
                                             "Import `{}` not found in \"{}\"",
                                             import.original_name, import.from_module
@@ -1059,6 +1071,42 @@ mod tests {
             assert!(declared.is_some());
             assert_eq!(gctx.scopes.resolve(user_scope, name), declared);
         }
+    }
+
+    #[test]
+    fn test_import_namespaces_between_ambient_modules() {
+        let dir = std::env::temp_dir().join(format!("ts-gen-ambient-ns-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let decls = dir.join("decls.d.ts");
+        std::fs::write(
+            &decls,
+            r#"
+                declare module "a" {
+                    export interface Opts {}
+                    export namespace inner { type Deep = "p" | "q"; }
+                }
+                declare module "b" {
+                    import { inner } from "a";
+                    import * as A from "a";
+                }
+            "#,
+        )
+        .unwrap();
+        let result = parse_dts_files(&[&decls], None);
+        std::fs::remove_dir_all(&dir).unwrap();
+        let (_, gctx) = result.unwrap();
+
+        let b_scope = gctx.ambient_module_scopes["b"][0];
+        let kind = |path: &str| {
+            gctx.resolve_path(b_scope, path)
+                .map(|id| &gctx.get_type(id).kind)
+        };
+        assert!(matches!(kind("inner.Deep"), Some(TypeKind::StringEnum(_))));
+        assert!(matches!(kind("A.Opts"), Some(TypeKind::Interface(_))));
+        assert!(matches!(
+            kind("A.inner.Deep"),
+            Some(TypeKind::StringEnum(_))
+        ));
     }
 
     #[test]
