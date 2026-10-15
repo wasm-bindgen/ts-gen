@@ -346,7 +346,8 @@ extern "C" {
     ) -> Result<Undefined, JsValue>;
 }
 pub mod web_assembly {
-    use wasm_bindgen::prelude::*;
+    #[allow(unused_imports)]
+    use super::*;
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "WebAssembly")]

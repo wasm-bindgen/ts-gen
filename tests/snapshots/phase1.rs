@@ -4,8 +4,6 @@
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
-#[allow(dead_code)]
-use JsValue as EventEmitter;
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(i32)]
@@ -65,7 +63,8 @@ extern "C" {
     pub fn try_emit(this: &EventEmitter, event: &str) -> Result<bool, JsValue>;
 }
 pub mod node_js {
-    use wasm_bindgen::prelude::*;
+    #[allow(unused_imports)]
+    use super::*;
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "NodeJS")]
@@ -83,7 +82,7 @@ pub mod node_js {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = node_js :: EventEmitter , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Stream;
     #[wasm_bindgen(method)]
@@ -128,7 +127,8 @@ extern "C" {
     pub fn try_end(this: &Duplex) -> Result<(), JsValue>;
 }
 pub mod intl {
-    use wasm_bindgen::prelude::*;
+    #[allow(unused_imports)]
+    use super::*;
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "Intl")]

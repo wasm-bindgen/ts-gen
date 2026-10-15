@@ -264,7 +264,7 @@ reference. We resolve this by:
 
 ```rust
 pub mod web_assembly {
-    use js_sys::*;
+    use super::*;
     #[wasm_bindgen]
     extern "C" {
         #[wasm_bindgen(extends = Object, js_name = "Global", js_namespace = "WebAssembly")]
@@ -1851,8 +1851,45 @@ emits a `pub mod web_assembly { ... }` (note: still `pub`) with
 `#[wasm_bindgen(js_namespace = "WebAssembly")]` on each member.
 Namespaces describe runtime *property access* (`WebAssembly.Module`),
 not module specifiers — they're independent of the `--export`
-filter. The namespace lookup is one-deep; nested namespaces are not
-yet supported.
+filter. A nested namespace nests its `pub mod`, and its members carry the
+full segment chain as an array:
+
+```rust
+#[wasm_bindgen(js_namespace = ["Outer", "Inner"])]
+pub fn run();
+```
+
+The module starts with `use super::*;`, so members name `js_sys` types,
+globals and the file's external aliases bare, like top-level items. A
+name resolves from where it is written, so inside a namespace a sibling
+wins over a same-named global, and an alias resolves to its target. A
+reference to a namespace member from outside its `pub mod` is qualified
+with the path to it, relative to where the reference is emitted:
+
+```ts
+interface Emitter {}
+declare namespace Events {
+  interface Emitter {}
+  interface Options { emitter: Emitter }   // Events.Emitter
+  namespace Inner {
+    interface Handle { emitter: Emitter }  // Events.Emitter
+  }
+}
+interface Stream extends Events.Emitter {}
+```
+
+```rust
+pub mod events {
+    use super::*;
+    // Options::emitter → Emitter
+    pub mod inner {
+        use super::*;
+        // Handle::emitter → super::Emitter
+    }
+}
+#[wasm_bindgen(extends = events::Emitter, extends = Object)]
+pub type Stream;
+```
 
 Inside a module, a namespace's members are emitted flat into the
 module instead, while qualified references to them (`Codes.Region`,
@@ -1952,14 +1989,13 @@ dispatched through the enum's `TryFromJsValue`.
 Generated enums describe values on the JS side, not anything the crate
 exports, so every string enum, numeric enum and dynamic union is
 `#[wasm_bindgen(private)]`: wasm-bindgen keeps it off the JS module's
-exports and lets same-named private copies coexist in one build.
-wasm-bindgen still names enums by JS name across the whole crate, so an
-enum inside a namespace takes a namespace-prefixed `js_name`, which
-keeps it apart from a same-named enum elsewhere:
+exports and lets same-named private copies coexist in one build. An enum
+inside a namespace carries the namespace's `js_namespace`, like its
+imports:
 
 ```rust
 pub mod timing {
-    #[wasm_bindgen(private, js_name = "Timing_DurationUnit")]
+    #[wasm_bindgen(private, js_namespace = "Timing")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum DurationUnit { /* ... */ }
 }

@@ -50,8 +50,9 @@ pub(crate) struct ClassConfig<'a> {
     extends: Vec<TokenStream>,
     /// Module specifier for `#[wasm_bindgen(module = "...")]`.
     module: Option<std::rc::Rc<str>>,
-    /// JS namespace (e.g., `"WebAssembly"`) for types inside a namespace.
-    js_namespace: Option<String>,
+    /// JS namespace path (e.g., `["WebAssembly"]`) for types inside a
+    /// namespace, outermost first; empty at the top level.
+    js_namespace: Vec<String>,
     /// Whether this is an abstract class (skip constructor).
     is_abstract: bool,
     /// Members to generate.
@@ -126,7 +127,7 @@ impl<'a> ClassConfig<'a> {
             js_name: decl.js_name.clone(),
             extends,
             module,
-            js_namespace: None,
+            js_namespace: Vec::new(),
             is_abstract: decl.is_abstract,
             members: decl.members.clone(),
             type_params: decl.type_params.clone(),
@@ -160,7 +161,7 @@ impl<'a> ClassConfig<'a> {
             js_name: decl.js_name.clone(),
             extends,
             module,
-            js_namespace: None,
+            js_namespace: Vec::new(),
             is_abstract: false,
             members: decl.members.clone(),
             type_params: decl.type_params.clone(),
@@ -190,7 +191,7 @@ impl<'a> ClassConfig<'a> {
             js_name: decl.js_name.clone(),
             extends: vec![quote! { Object }],
             module,
-            js_namespace: None,
+            js_namespace: Vec::new(),
             is_abstract: false,
             members: decl.members.clone(),
             type_params: decl.type_params.clone(),
@@ -302,9 +303,7 @@ impl<'a> ClassConfig<'a> {
             let js_class = &self.js_name;
             parts.push(quote! { js_class = #js_class });
         }
-        if let Some(ns) = &self.js_namespace {
-            parts.push(quote! { js_namespace = #ns });
-        }
+        parts.extend(super::js_namespace_attr(&self.js_namespace));
         parts
     }
 
@@ -336,7 +335,7 @@ pub fn generate_class_like_interface(
     decl: &InterfaceDecl,
     ctx: &ModuleContext,
     cgctx: Option<&CodegenContext<'_>>,
-    js_namespace: Option<&str>,
+    js_namespace: &[String],
     scope: ScopeId,
 ) -> TokenStream {
     debug_assert!(
@@ -348,7 +347,7 @@ pub fn generate_class_like_interface(
         decl.classification
     );
     let mut config = ClassConfig::from_interface(decl, ctx, cgctx, scope);
-    config.js_namespace = js_namespace.map(|s| s.to_string());
+    config.js_namespace = js_namespace.to_vec();
     generate_extern_block(&config)
 }
 
@@ -356,12 +355,12 @@ pub fn generate_class_like_interface(
 pub fn generate_class_with_js_namespace(
     decl: &ClassDecl,
     ctx: &ModuleContext,
-    js_namespace: &str,
+    js_namespace: &[String],
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) -> TokenStream {
     let mut config = ClassConfig::from_class(decl, ctx, cgctx, scope);
-    config.js_namespace = Some(js_namespace.to_string());
+    config.js_namespace = js_namespace.to_vec();
     generate_extern_block(&config)
 }
 
@@ -371,11 +370,11 @@ pub fn generate_dictionary_extern(
     decl: &InterfaceDecl,
     ctx: &ModuleContext,
     cgctx: Option<&CodegenContext<'_>>,
-    js_namespace: Option<&str>,
+    js_namespace: &[String],
     scope: ScopeId,
 ) -> TokenStream {
     let mut config = ClassConfig::from_interface(decl, ctx, cgctx, scope);
-    config.js_namespace = js_namespace.map(|s| s.to_string());
+    config.js_namespace = js_namespace.to_vec();
 
     let extern_block = generate_extern_block(&config);
     let factory = generate_dictionary_factory(&config);
@@ -1403,9 +1402,7 @@ fn generate_type_decl(config: &ClassConfig) -> TokenStream {
     }
 
     // Namespace for types inside a JS namespace (e.g., WebAssembly.Module)
-    if let Some(ns) = &config.js_namespace {
-        wb_parts.push(quote! { js_namespace = #ns });
-    }
+    wb_parts.extend(super::js_namespace_attr(&config.js_namespace));
 
     let wb_attr = if wb_parts.is_empty() {
         quote! {}

@@ -116,7 +116,7 @@ fn main() -> Result<()> {
         eprintln!("[ts-gen] Parsed {} declarations", module.types.len());
         for &type_id in &module.types {
             let decl = gctx.get_type(type_id);
-            print_declaration(decl, 0);
+            print_declaration(&gctx, decl, 0);
         }
     }
 
@@ -193,7 +193,11 @@ fn resolve_input_files(paths: &[PathBuf]) -> Result<Vec<PathBuf>> {
 }
 
 /// Pretty-print a declaration for debugging.
-fn print_declaration(decl: &ts_gen::ir::TypeDeclaration, indent: usize) {
+fn print_declaration(
+    gctx: &ts_gen::context::GlobalContext,
+    decl: &ts_gen::ir::TypeDeclaration,
+    indent: usize,
+) {
     let prefix = "  ".repeat(indent);
     let ctx = match &decl.module_context {
         ts_gen::ir::ModuleContext::Global => "global".to_string(),
@@ -275,8 +279,8 @@ fn print_declaration(decl: &ts_gen::ir::TypeDeclaration, indent: usize) {
                 ns.name,
                 ns.declarations.len()
             );
-            for d in &ns.declarations {
-                print_declaration(d, indent + 1);
+            for &id in &ns.declarations {
+                print_declaration(gctx, gctx.get_type(id), indent + 1);
             }
         }
     }

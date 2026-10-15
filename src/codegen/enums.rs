@@ -33,25 +33,17 @@ use crate::ir::{NumericEnumDecl, StringEnumDecl};
 
 /// Generated enums describe JS-side values rather than anything this crate
 /// exports, so they are `private`: wasm-bindgen then keeps them off the JS
-/// module's exports and lets same-named copies coexist. wasm-bindgen still
-/// names them by JS name crate-wide, so one declared inside a namespace takes
-/// a namespace-prefixed `js_name` to stay apart from a same-named enum
-/// elsewhere. The `_` keeps `Timing.DurationUnit` apart from a top-level
-/// `TimingDurationUnit`.
-fn enum_attr(name: &str, js_namespace: Option<&str>) -> TokenStream {
-    match js_namespace {
-        Some(ns) => {
-            let js_name = format!("{ns}_{name}");
-            quote! { #[wasm_bindgen(private, js_name = #js_name)] }
-        }
-        None => quote! { #[wasm_bindgen(private)] },
-    }
+/// module's exports and lets same-named copies coexist. One declared inside
+/// a namespace carries its `js_namespace`, like the namespace's imports.
+fn enum_attr(js_namespace: &[String]) -> TokenStream {
+    let js_namespace = super::js_namespace_attr(js_namespace).map(|ns| quote! { , #ns });
+    quote! { #[wasm_bindgen(private #js_namespace)] }
 }
 
 /// Generate a wasm_bindgen string enum.
-pub fn generate_string_enum(decl: &StringEnumDecl, js_namespace: Option<&str>) -> TokenStream {
+pub fn generate_string_enum(decl: &StringEnumDecl, js_namespace: &[String]) -> TokenStream {
     let name = super::typemap::make_ident(&decl.name);
-    let attr = enum_attr(&decl.name, js_namespace);
+    let attr = enum_attr(js_namespace);
 
     let variants: Vec<_> = decl
         .variants
@@ -91,9 +83,9 @@ fn numeric_enum_repr(decl: &NumericEnumDecl) -> TokenStream {
 }
 
 /// Generate a wasm_bindgen numeric enum with automatically selected repr.
-pub fn generate_numeric_enum(decl: &NumericEnumDecl, js_namespace: Option<&str>) -> TokenStream {
+pub fn generate_numeric_enum(decl: &NumericEnumDecl, js_namespace: &[String]) -> TokenStream {
     let name = super::typemap::make_ident(&decl.name);
-    let attr = enum_attr(&decl.name, js_namespace);
+    let attr = enum_attr(js_namespace);
     let repr = numeric_enum_repr(decl);
 
     let has_negative = decl.variants.iter().any(|v| v.value < 0);

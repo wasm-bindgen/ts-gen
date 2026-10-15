@@ -1,9 +1,8 @@
 //! @ts-gen --lib-name namespace-enums --export namespace-enums --export tests/fixtures/namespace-enums.d.ts
 
-// wasm-bindgen exports enums by name across the whole crate, so an enum
-// inside a namespace exports under a namespace-prefixed name, sparing it
-// a clash with a same-named enum elsewhere. The prefix is separated, so it
-// does not collide with `TimingDurationUnit` either.
+// An enum inside a namespace carries its `js_namespace`, so it does not
+// clash with a same-named enum at the top level, nor with a top-level
+// `TimingDurationUnit` that spells out the namespace.
 
 export type DurationUnit = "second" | "minute";
 export type TimingDurationUnit = "day" | "week";

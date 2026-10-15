@@ -24,15 +24,16 @@ pub enum Precision {
     High = 2u32,
 }
 pub mod timing {
-    use wasm_bindgen::prelude::*;
-    #[wasm_bindgen(private, js_name = "Timing_DurationUnit")]
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen(private, js_namespace = "Timing")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum DurationUnit {
         Second = "second",
         Minute = "minute",
         Hour = "hour",
     }
-    #[wasm_bindgen(private, js_name = "Timing_Precision")]
+    #[wasm_bindgen(private, js_namespace = "Timing")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     #[repr(u32)]
     pub enum Precision {

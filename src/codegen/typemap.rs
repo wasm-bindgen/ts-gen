@@ -153,6 +153,14 @@ pub struct CodegenContext<'a> {
     /// (e.g. `web_sys::ReadableStream`) would emit `Type<Arg>` and
     /// fail to compile.
     pub local_type_param_counts: HashMap<String, usize>,
+    /// Member scope of each emitted global namespace → the path of the
+    /// `pub mod` it is emitted as.
+    pub namespace_paths: HashMap<ScopeId, Vec<String>>,
+    /// Path of the `pub mod` currently being emitted into, empty at the top
+    /// level. References are qualified relative to it, not to the scope
+    /// they resolve from: a synthesised union resolves from its use site
+    /// but is emitted at the top level.
+    pub emit_path: RefCell<Vec<String>>,
     /// Builtin (root) scope id.
     pub root_scope: ScopeId,
     /// Per-file scopes (children of root, contain imports + local types).
@@ -463,6 +471,8 @@ impl<'a> CodegenContext<'a> {
             local_type_ids: HashSet::new(),
             renamed_locals: HashMap::new(),
             local_type_param_counts: HashMap::new(),
+            namespace_paths: HashMap::new(),
+            emit_path: RefCell::new(Vec::new()),
             root_scope: module.builtin_scope,
             file_scopes: module.file_scopes.clone(),
             external_uses: RefCell::new(HashMap::new()),
@@ -475,8 +485,7 @@ impl<'a> CodegenContext<'a> {
             unresolved_module_refs: RefCell::new(HashSet::new()),
         };
         for &type_id in &module.types {
-            let decl = gctx.get_type(type_id);
-            ctx.collect_declaration(type_id, &decl.kind, &decl.module_context);
+            ctx.collect_declaration(type_id, &[]);
         }
         ctx.resolve_collisions();
         // Seed the dynamic-union registry's used-name set with every
@@ -498,6 +507,8 @@ impl<'a> CodegenContext<'a> {
             local_type_ids: HashSet::new(),
             renamed_locals: HashMap::new(),
             local_type_param_counts: HashMap::new(),
+            namespace_paths: HashMap::new(),
+            emit_path: RefCell::new(Vec::new()),
             root_scope,
             file_scopes: vec![],
             external_uses: RefCell::new(HashMap::new()),
@@ -716,100 +727,89 @@ impl<'a> CodegenContext<'a> {
         }
     }
 
-    fn collect_declaration(&mut self, type_id: TypeId, kind: &ir::TypeKind, mctx: &ModuleContext) {
-        match kind {
-            ir::TypeKind::Class(c) => {
-                self.local_types.insert(c.name.clone(), mctx.clone());
-                self.local_type_ids.insert(type_id);
-                self.local_type_param_counts
-                    .insert(c.name.clone(), c.type_params.len());
-            }
-            ir::TypeKind::Interface(i) => {
-                self.local_types.insert(i.name.clone(), mctx.clone());
-                self.local_type_ids.insert(type_id);
-                self.local_type_param_counts
-                    .insert(i.name.clone(), i.type_params.len());
-            }
-            ir::TypeKind::DiscriminatedUnion(d) => {
-                self.local_types.insert(d.name.clone(), mctx.clone());
-                self.local_type_ids.insert(type_id);
-                self.local_type_param_counts
-                    .insert(d.name.clone(), d.type_params.len());
-            }
-            ir::TypeKind::StringEnum(e) => {
-                self.local_types.insert(e.name.clone(), mctx.clone());
-                self.local_type_ids.insert(type_id);
-            }
-            ir::TypeKind::NumericEnum(e) => {
-                self.local_types.insert(e.name.clone(), mctx.clone());
-                self.local_type_ids.insert(type_id);
-            }
+    /// Record a declaration this unit emits. `mod_path` is the `pub mod`
+    /// it is emitted in.
+    fn collect_declaration(&mut self, type_id: TypeId, mod_path: &[String]) {
+        let gctx = self.gctx;
+        let decl = gctx.get_type(type_id);
+        let mctx = &decl.module_context;
+        let (name, arity) = match &decl.kind {
+            ir::TypeKind::Class(c) => (&c.name, Some(c.type_params.len())),
+            ir::TypeKind::Interface(i) => (&i.name, Some(i.type_params.len())),
+            ir::TypeKind::DiscriminatedUnion(d) => (&d.name, Some(d.type_params.len())),
+            ir::TypeKind::StringEnum(e) => (&e.name, None),
+            ir::TypeKind::NumericEnum(e) => (&e.name, None),
             ir::TypeKind::TypeAlias(a) => {
                 // Type aliases resolve through the scope during codegen,
                 // but record their arity so `Reference` lowering can
-                // preserve generic args on alias references.
+                // preserve generic args on references to an emitted
+                // alias. Aliases in a namespace are not emitted.
+                if mod_path.is_empty() {
+                    self.local_type_param_counts
+                        .insert(a.name.clone(), a.type_params.len());
+                }
+                return;
+            }
+            ir::TypeKind::Namespace(ns) => {
+                let mut path = mod_path.to_vec();
+                path.push(crate::util::naming::to_snake_case(&ns.name));
+                for &member in &ns.declarations {
+                    self.collect_declaration(member, &path);
+                }
+                self.namespace_paths.insert(ns.child_scope, path);
+                return;
+            }
+            ir::TypeKind::Function(_) | ir::TypeKind::Variable(_) => return,
+        };
+        self.local_types.insert(name.clone(), mctx.clone());
+        self.local_type_ids.insert(type_id);
+        if let Some(arity) = arity {
+            // Keyed by name, so a top-level declaration keeps its arity over
+            // a same-named namespace member.
+            if mod_path.is_empty() {
+                self.local_type_param_counts.insert(name.clone(), arity);
+            } else {
                 self.local_type_param_counts
-                    .insert(a.name.clone(), a.type_params.len());
+                    .entry(name.clone())
+                    .or_insert(arity);
             }
-            ir::TypeKind::Namespace(ns) => {
-                // Namespaces don't have an Id-of-themselves to chase here —
-                // their nested declarations carry their own TypeIds via the
-                // global registry, but the IR doesn't expose them on
-                // NamespaceDecl. Walk the structure for `local_types` only.
-                for inner in &ns.declarations {
-                    // Without a TypeId on hand, we synthesize a placeholder:
-                    // namespaced declarations are surfaced through the scope
-                    // chain, so name + module_context coverage in
-                    // `local_types` is enough for the fallback path.
-                    self.collect_declaration_name_only(&inner.kind, &inner.module_context);
-                }
-            }
-            ir::TypeKind::Function(_) | ir::TypeKind::Variable(_) => {}
         }
     }
 
-    fn collect_declaration_name_only(&mut self, kind: &ir::TypeKind, mctx: &ModuleContext) {
-        match kind {
-            ir::TypeKind::Class(c) => {
-                self.local_types.insert(c.name.clone(), mctx.clone());
-            }
-            ir::TypeKind::Interface(i) => {
-                self.local_types.insert(i.name.clone(), mctx.clone());
-            }
-            ir::TypeKind::DiscriminatedUnion(d) => {
-                self.local_types.insert(d.name.clone(), mctx.clone());
-            }
-            ir::TypeKind::StringEnum(e) => {
-                self.local_types.insert(e.name.clone(), mctx.clone());
-            }
-            ir::TypeKind::NumericEnum(e) => {
-                self.local_types.insert(e.name.clone(), mctx.clone());
-            }
-            ir::TypeKind::Namespace(ns) => {
-                for inner in &ns.declarations {
-                    self.collect_declaration_name_only(&inner.kind, &inner.module_context);
-                }
-            }
-            _ => {}
+    /// The path from the `pub mod` being emitted into to the one `target`
+    /// is declared in, or `None` when they are the same. Namespaces inside
+    /// an ambient module are emitted flat, so only global namespaces are
+    /// in `namespace_paths`.
+    pub(crate) fn namespace_qualifier(&self, target: TypeId) -> Option<TokenStream> {
+        let target_path = self.namespace_path(self.gctx.get_type(target).scope_id);
+        let here = self.emit_path.borrow();
+        let common = here
+            .iter()
+            .zip(target_path)
+            .take_while(|(a, b)| a == b)
+            .count();
+        if common == here.len() && common == target_path.len() {
+            return None;
         }
+        let supers = (common..here.len()).map(|_| quote! { super:: });
+        let mods = target_path[common..].iter().map(|m| {
+            let m = make_ident(m);
+            quote! { #m:: }
+        });
+        Some(quote! { #(#supers)* #(#mods)* })
     }
 
-    /// Compute the path prefix needed to reach `target` from a callsite
-    /// emitted inside `from`. In the current design every emitted
-    /// declaration lives at global scope — module-context decls are
-    /// either lifted (`--export`), externalised (`--external`), or
-    /// suppressed — so the prefix is always empty when both endpoints
-    /// resolve to something we emit. References to a `Module(m)`
-    /// target that isn't lifted or externalised return `None` here;
-    /// the caller in [`emit_type_name`] emits the bare ident plus a
-    /// `use JsValue as Name;` alias and raises a codegen error.
-    pub(crate) fn module_qualifier(
-        &self,
-        from: &ModuleContext,
-        target: &ModuleContext,
-    ) -> Option<TokenStream> {
-        let _ = (from, target);
-        None
+    /// The `pub mod` path of the innermost emitted namespace enclosing
+    /// `scope`.
+    fn namespace_path(&self, scope: ScopeId) -> &[String] {
+        let mut scope = Some(scope);
+        while let Some(id) = scope {
+            if let Some(path) = self.namespace_paths.get(&id) {
+                return path;
+            }
+            scope = self.gctx.scopes.get(id).parent;
+        }
+        &[]
     }
 
     /// Returns the names of types in `type_ids` whose
@@ -1132,6 +1132,18 @@ pub fn to_syn_type(
                     }
                 }
             }
+            // `Ns.Alias` lowers its target from the alias's own scope, where
+            // the target's names are declared.
+            if segments.len() > 1 && generic_args.is_empty() {
+                if let Some(c) = ctx {
+                    let resolved = c.gctx.resolve_path(scope, &segments.join("."));
+                    if let Some(TypeKind::TypeAlias(alias)) =
+                        resolved.map(|id| &c.gctx.get_type(id).kind)
+                    {
+                        return to_syn_type(&alias.target, pos, ctx, alias.body_scope, from_module);
+                    }
+                }
+            }
             if let Some(repr) = ctx.and_then(|c| c.enum_repr(ty, scope)) {
                 if pos.inner {
                     return to_syn_type(&repr, pos, ctx, scope, from_module);
@@ -1204,22 +1216,20 @@ fn is_jsvalue_arg(tokens: &TokenStream) -> bool {
 /// 1. Resolve name → TypeId through scope (the resolved declaration tells
 ///    us where the referenced type actually lives — its `module_context`).
 /// 2. Get canonical name (last segment for dotted paths).
-/// 3. Resolved to a local type → emit directly, qualified across module
-///    boundaries (with js_sys collision rename).
+/// 3. Resolved to a local type → emit directly, qualified with the path to
+///    its namespace `pub mod` (with js_sys collision rename).
 /// 4. Resolved-but-non-local with an external mapping → register the use alias.
 /// 5. Unresolved → js_sys glob → name directly.
 /// 6. Otherwise → error + `use JsValue as Foo;`.
 ///
-/// `from_module` is the [`ModuleContext`] of the extern block this name is
-/// being emitted into. When the resolved type lives in a different module
-/// context, codegen prepends the necessary path prefix (e.g. `email::` or
-/// `super::email::`) so the reference compiles without any extra `use`.
+/// `use_scope` is the scope the reference appears in, and `from_module` the
+/// [`ModuleContext`] of the extern block this name is being emitted into.
 ///
 /// Going through the scope-resolved `TypeId` (rather than a flat name →
 /// module map) keeps name collisions like a global `interface Foo` and a
-/// module-scoped `class Foo` correctly distinguished: scope-chain
-/// resolution from the use site picks the visible declaration, and that
-/// declaration's `module_context` drives qualification.
+/// namespace member `Foo` correctly distinguished: scope-chain resolution
+/// from the use site picks the visible declaration, and that declaration's
+/// scope drives qualification.
 fn emit_type_name(
     name: &str,
     use_scope: Option<ScopeId>,
@@ -1232,8 +1242,9 @@ fn emit_type_name(
         ModuleContext::Module(m) => ctx.gctx.ambient_module_scopes.get(m.as_ref()),
         ModuleContext::Global => None,
     };
-    // A qualified path can name a namespace only visible from the use site,
-    // such as a sibling namespace inside the enclosing one.
+    // Names resolve from the use site first: a namespace member sees its
+    // siblings over same-named globals, and a qualified path can name a
+    // namespace only visible there.
     let resolved = use_scope
         .and_then(|scope| ctx.gctx.resolve_path(scope, name))
         .or_else(|| {
@@ -1351,7 +1362,7 @@ fn emit_type_name(
             .map(String::as_str)
             .unwrap_or(ident_name);
         let ident = make_ident(rust_name);
-        let qualifier = ctx.module_qualifier(from_module, &target_module);
+        let qualifier = resolved.and_then(|id| ctx.namespace_qualifier(id));
         return match qualifier {
             Some(prefix) => quote! { #prefix #ident },
             None => quote! { #ident },
@@ -1394,10 +1405,11 @@ fn emit_type_name(
 fn named_type_to_rust(
     name: &str,
     ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
     from_module: &ModuleContext,
 ) -> TokenStream {
     match ctx {
-        Some(ctx) => emit_type_name(name, None, ctx, from_module),
+        Some(ctx) => emit_type_name(name, Some(scope), ctx, from_module),
         // Without a codegen context (e.g. unit tests that exercise
         // type lowering directly) we can still resolve names that
         // appear in the `js_sys::*` glob — emit them as a bare ident.
@@ -1517,7 +1529,7 @@ fn lower_reference(
         }
     }
 
-    let base = named_type_to_rust(head, ctx, from_module);
+    let base = named_type_to_rust(head, ctx, scope, from_module);
 
     // Generic instantiation: keep the args only when the target
     // accepts them. Locally-emitted types record their arity in
@@ -1863,7 +1875,7 @@ fn to_mono_js_string_return_type_impl(
             quote! { Option<#inner> }
         }
         t @ TypeRef::Reference { segments, .. } if local_generic_args(t, ctx).is_some() => {
-            let base = named_type_to_rust(&segments[0], Some(ctx), from_module);
+            let base = named_type_to_rust(&segments[0], Some(ctx), scope, from_module);
             let args = local_generic_args(t, ctx)
                 .unwrap_or_default()
                 .iter()
@@ -3226,7 +3238,7 @@ mod tests {
         assert_eq!(lower(&TypeRef::ident("Mode"), arg), "Mode");
         assert_eq!(lower(&TypeRef::ident("ModeAlias"), arg), "Mode");
         assert_eq!(lower(&TypeRef::ident("Level"), arg), "Level");
-        assert_eq!(lower(&region, arg), "Region");
+        assert_eq!(lower(&region, arg), "codes :: Region");
 
         let modes = TypeRef::Array(Box::new(TypeRef::ident("ModeAlias")));
         let levels = TypeRef::Array(Box::new(TypeRef::ident("Level")));
@@ -3282,5 +3294,49 @@ mod tests {
         assert_eq!(lower(&path("Inner.Deep"), outer), "Deep");
         // Only the last segment matches the local `Kind`.
         assert_eq!(lower(&path("Other.Kind"), scope), "& JsValue");
+    }
+
+    #[test]
+    fn namespace_members_resolve_from_their_use_site() {
+        let src = r#"
+            interface Emitter {}
+            declare namespace Events {
+                interface Emitter {}
+                interface Options { emitter: Emitter }
+                namespace Inner { interface Handle {} }
+            }
+        "#;
+        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let ctx = CodegenContext::from_module_full(&module, &gctx, false, false, HashSet::new());
+        let file = module.file_scopes[0];
+        let events = gctx.scopes.get(file).namespace("Events").unwrap();
+        let inner = gctx.scopes.get(events).namespace("Inner").unwrap();
+        let lower = |p: &str, scope: ScopeId, here: &[&str]| {
+            *ctx.emit_path.borrow_mut() = here.iter().map(|s| s.to_string()).collect();
+            let ty = TypeRef::Reference {
+                segments: p.split('.').map(String::from).collect(),
+                generic_args: vec![],
+            };
+            to_syn_type(
+                &ty,
+                TypePosition::RETURN,
+                Some(&ctx),
+                scope,
+                &ModuleContext::Global,
+            )
+            .to_string()
+        };
+
+        assert_eq!(lower("Emitter", file, &[]), "Emitter");
+        assert_eq!(lower("Events.Emitter", file, &[]), "events :: Emitter");
+        assert_eq!(lower("Emitter", events, &["events"]), "Emitter");
+        assert_eq!(
+            lower("Emitter", inner, &["events", "inner"]),
+            "super :: Emitter"
+        );
+        assert_eq!(
+            lower("Events.Inner.Handle", file, &["other"]),
+            "super :: events :: inner :: Handle"
+        );
     }
 }

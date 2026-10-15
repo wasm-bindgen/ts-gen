@@ -611,7 +611,10 @@ pub struct VariableDecl {
 
 pub struct NamespaceDecl {
     pub name: String,
-    pub declarations: Vec<TypeDeclaration>,
+    /// Member declarations in source order. Members live in the type arena
+    /// like top-level declarations, so a scope lookup through the namespace
+    /// reaches the same declaration that is emitted.
+    pub declarations: Vec<crate::context::TypeId>,
     /// The child scope containing this namespace's member types.
     pub child_scope: crate::parse::scope::ScopeId,
 }

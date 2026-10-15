@@ -24,19 +24,19 @@ pub fn generate_function(
     doc: &Option<String>,
     scope: ScopeId,
 ) -> TokenStream {
-    emit_function(decl, ctx, cgctx, doc, None, scope)
+    emit_function(decl, ctx, cgctx, doc, &[], scope)
 }
 
 /// Generate wasm_bindgen extern blocks for a free function inside a namespace.
 pub fn generate_function_with_js_namespace(
     decl: &FunctionDecl,
     ctx: &ModuleContext,
-    js_namespace: &str,
+    js_namespace: &[String],
     cgctx: Option<&CodegenContext<'_>>,
     doc: &Option<String>,
     scope: ScopeId,
 ) -> TokenStream {
-    emit_function(decl, ctx, cgctx, doc, Some(js_namespace), scope)
+    emit_function(decl, ctx, cgctx, doc, js_namespace, scope)
 }
 
 fn emit_function(
@@ -44,7 +44,7 @@ fn emit_function(
     ctx: &ModuleContext,
     cgctx: Option<&CodegenContext<'_>>,
     doc: &Option<String>,
-    js_namespace: Option<&str>,
+    js_namespace: &[String],
     scope: ScopeId,
 ) -> TokenStream {
     let mut used_names = HashSet::new();
@@ -77,7 +77,7 @@ fn generate_expanded_free_function(
     sig: &FunctionSignature,
     ctx: &ModuleContext,
     cgctx: Option<&CodegenContext<'_>>,
-    js_namespace: Option<&str>,
+    js_namespace: &[String],
     _enclosing_scope: ScopeId,
 ) -> TokenStream {
     // Free-function type parameters live in `sig.body_scope`; use it
@@ -117,9 +117,7 @@ fn generate_expanded_free_function(
         let js_name = &sig.js_name;
         wb_parts.push(quote! { js_name = #js_name });
     }
-    if let Some(ns) = js_namespace {
-        wb_parts.push(quote! { js_namespace = #ns });
-    }
+    wb_parts.extend(super::js_namespace_attr(js_namespace));
 
     let wb_attr = if wb_parts.is_empty() {
         quote! {}
@@ -196,7 +194,7 @@ pub fn generate_variable(
     ctx: &ModuleContext,
     cgctx: Option<&CodegenContext<'_>>,
     doc: &Option<String>,
-    js_namespace: Option<&str>,
+    js_namespace: &[String],
     scope: ScopeId,
     static_names: &mut StaticNames,
 ) -> TokenStream {
@@ -220,9 +218,7 @@ pub fn generate_variable(
         let js_name = &decl.js_name;
         wb_parts.push(quote! { js_name = #js_name });
     }
-    if let Some(ns) = js_namespace {
-        wb_parts.push(quote! { js_namespace = #ns });
-    }
+    wb_parts.extend(super::js_namespace_attr(js_namespace));
 
     let wb_attr = quote! { #[wasm_bindgen(#(#wb_parts),*)] };
 

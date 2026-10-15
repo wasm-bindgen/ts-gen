@@ -19,8 +19,6 @@ use JsValue as DurableObjectStub;
 #[allow(dead_code)]
 use JsValue as EmailExportedHandler;
 #[allow(dead_code)]
-use JsValue as Env;
-#[allow(dead_code)]
 use JsValue as EventListenerOrEventListenerObject;
 #[allow(dead_code)]
 use JsValue as ExportedHandlerFetchHandler;
@@ -36,8 +34,6 @@ use JsValue as ExportedHandlerTailStreamHandler;
 use JsValue as ExportedHandlerTestHandler;
 #[allow(dead_code)]
 use JsValue as ExportedHandlerTraceHandler;
-#[allow(dead_code)]
-use JsValue as Exports;
 #[allow(dead_code)]
 use JsValue as Fetcher;
 #[allow(dead_code)]
@@ -58,8 +54,6 @@ use JsValue as R;
 use JsValue as Readonly;
 #[allow(dead_code)]
 use JsValue as RequestInfo;
-#[allow(dead_code)]
-use JsValue as TailEvent;
 #[allow(dead_code)]
 use JsValue as TailEventHandler;
 #[wasm_bindgen]
@@ -529,7 +523,8 @@ pub type BufferSource = JsValue;
 #[allow(dead_code)]
 pub type TypedArray = JsValue;
 pub mod web_assembly {
-    use wasm_bindgen::prelude::*;
+    #[allow(unused_imports)]
+    use super::*;
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Error , extends = Object , js_namespace = "WebAssembly")]
@@ -560,7 +555,7 @@ pub mod web_assembly {
         )]
         pub fn new_with_message(message: &str) -> Result<RuntimeError, JsValue>;
     }
-    #[wasm_bindgen(private, js_name = "WebAssembly_ValueType")]
+    #[wasm_bindgen(private, js_namespace = "WebAssembly")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum ValueType {
         Anyfunc = "anyfunc",
@@ -613,7 +608,7 @@ pub mod web_assembly {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Global_;
         #[wasm_bindgen(constructor, js_class = "Global", js_namespace = "WebAssembly", catch)]
-        pub fn new(descriptor: &GlobalDescriptor) -> Result<Global, JsValue>;
+        pub fn new(descriptor: &GlobalDescriptor) -> Result<Global_, JsValue>;
         #[wasm_bindgen(
             constructor,
             js_class = "Global",
@@ -624,7 +619,7 @@ pub mod web_assembly {
         pub fn new_with_value(
             descriptor: &GlobalDescriptor,
             value: &JsValue,
-        ) -> Result<Global, JsValue>;
+        ) -> Result<Global_, JsValue>;
         #[wasm_bindgen(method, getter)]
         pub fn value(this: &Global_) -> JsValue;
         #[wasm_bindgen(method, setter)]
@@ -643,9 +638,12 @@ pub mod web_assembly {
         #[wasm_bindgen(constructor, js_namespace = "WebAssembly", catch)]
         pub fn new(module: &Module) -> Result<Instance, JsValue>;
         #[wasm_bindgen(constructor, js_namespace = "WebAssembly", catch, js_name = "Instance")]
-        pub fn new_with_imports(module: &Module, imports: &JsValue) -> Result<Instance, JsValue>;
+        pub fn new_with_imports(
+            module: &Module,
+            imports: &Object<Object>,
+        ) -> Result<Instance, JsValue>;
         #[wasm_bindgen(method, getter)]
-        pub fn exports(this: &Instance) -> JsValue;
+        pub fn exports(this: &Instance) -> Object;
     }
     #[wasm_bindgen]
     extern "C" {
@@ -705,7 +703,7 @@ pub mod web_assembly {
         #[wasm_bindgen(method, catch, js_name = "grow")]
         pub fn try_grow(this: &Memory, delta: f64) -> Result<f64, JsValue>;
     }
-    #[wasm_bindgen(private, js_name = "WebAssembly_ImportExportKind")]
+    #[wasm_bindgen(private, js_namespace = "WebAssembly")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum ImportExportKind {
         Function = "function",
@@ -783,7 +781,7 @@ pub mod web_assembly {
         # [wasm_bindgen (static_method_of = Module , js_namespace = "WebAssembly" , catch , js_name = "imports")]
         pub fn try_imports(module: &Module) -> Result<Vec<ModuleImportDescriptor>, JsValue>;
     }
-    #[wasm_bindgen(private, js_name = "WebAssembly_TableKind")]
+    #[wasm_bindgen(private, js_namespace = "WebAssembly")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum TableKind {
         Anyfunc = "anyfunc",
@@ -880,7 +878,7 @@ pub mod web_assembly {
         #[wasm_bindgen(catch, js_name = "instantiate", js_namespace = "WebAssembly")]
         pub async fn instantiate_with_imports(
             module: &Module,
-            imports: &JsValue,
+            imports: &Object<Object>,
         ) -> Result<Instance, JsValue>;
     }
     #[wasm_bindgen]
@@ -1773,7 +1771,7 @@ extern "C" {
         this: &ExecutionContext<Props>,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, getter)]
-    pub fn exports<Props: ::wasm_bindgen::JsGeneric>(this: &ExecutionContext<Props>) -> Exports;
+    pub fn exports<Props: ::wasm_bindgen::JsGeneric>(this: &ExecutionContext<Props>) -> JsValue;
     #[wasm_bindgen(method, getter)]
     pub fn props<Props: ::wasm_bindgen::JsGeneric>(this: &ExecutionContext<Props>) -> Props;
 }
@@ -1793,7 +1791,7 @@ pub type ExportedHandlerTraceHandler<Env, Props> =
     Function<fn(Array<TraceItem>, Env, ExecutionContext<Props>) -> JsOption<Promise<Undefined>>>;
 #[allow(dead_code)]
 pub type ExportedHandlerTailStreamHandler<Env, Props> =
-    Function<fn(TailEvent, Env, ExecutionContext<Props>) -> JsValue>;
+    Function<fn(tail_stream::TailEvent, Env, ExecutionContext<Props>) -> JsValue>;
 #[allow(dead_code)]
 pub type ExportedHandlerScheduledHandler<Env, Props> =
     Function<fn(ScheduledController, Env, ExecutionContext<Props>) -> JsOption<Promise<Undefined>>>;
@@ -2518,7 +2516,7 @@ extern "C" {
         promise: &Promise,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, getter)]
-    pub fn exports<Props: ::wasm_bindgen::JsGeneric>(this: &DurableObjectState<Props>) -> Exports;
+    pub fn exports<Props: ::wasm_bindgen::JsGeneric>(this: &DurableObjectState<Props>) -> JsValue;
     #[wasm_bindgen(method, getter)]
     pub fn props<Props: ::wasm_bindgen::JsGeneric>(this: &DurableObjectState<Props>) -> Props;
     #[wasm_bindgen(method, getter)]
@@ -35662,7 +35660,8 @@ extern "C" {
     ) -> Result<RateLimitOutcome, JsValue>;
 }
 pub mod rpc {
-    use wasm_bindgen::prelude::*;
+    #[allow(unused_imports)]
+    use super::*;
     #[wasm_bindgen]
     extern "C" {
         #[allow(non_upper_case_globals)]
@@ -35731,7 +35730,7 @@ pub mod rpc {
     }
     #[wasm_bindgen]
     extern "C" {
-        # [wasm_bindgen (extends = Disposable , extends = Object , js_namespace = "Rpc")]
+        # [wasm_bindgen (extends = super :: Disposable , extends = Object , js_namespace = "Rpc")]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type StubBase<T: ::wasm_bindgen::JsGeneric>;
         #[wasm_bindgen(method)]
@@ -35743,7 +35742,8 @@ pub mod rpc {
     }
 }
 pub mod cloudflare {
-    use wasm_bindgen::prelude::*;
+    #[allow(unused_imports)]
+    use super::*;
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "Cloudflare")]
@@ -35758,7 +35758,8 @@ pub mod cloudflare {
     }
 }
 pub mod cloudflare_workers_module {
-    use wasm_bindgen::prelude::*;
+    #[allow(unused_imports)]
+    use super::*;
     #[wasm_bindgen]
     extern "C" {
         #[allow(non_upper_case_globals)]
@@ -35786,11 +35787,11 @@ pub mod cloudflare_workers_module {
         #[wasm_bindgen(method, getter)]
         pub fn ctx<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
-        ) -> ExecutionContext<Props>;
+        ) -> super::ExecutionContext<Props>;
         #[wasm_bindgen(method, setter)]
         pub fn set_ctx<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
-            val: &ExecutionContext<Props>,
+            val: &super::ExecutionContext<Props>,
         );
         #[wasm_bindgen(method, getter)]
         pub fn env<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
@@ -35804,82 +35805,82 @@ pub mod cloudflare_workers_module {
         #[wasm_bindgen(method)]
         pub fn email<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
-            message: &ForwardableEmailMessage,
+            message: &super::ForwardableEmailMessage,
         ) -> Option<Promise<Undefined>>;
         #[wasm_bindgen(method, catch, js_name = "email")]
         pub fn try_email<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
-            message: &ForwardableEmailMessage,
+            message: &super::ForwardableEmailMessage,
         ) -> Result<Option<Promise<Undefined>>, JsValue>;
         #[wasm_bindgen(method)]
         pub fn fetch<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
-            request: &Request,
+            request: &super::Request,
         ) -> FetchReturnKind;
         #[wasm_bindgen(method, catch, js_name = "fetch")]
         pub fn try_fetch<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
-            request: &Request,
+            request: &super::Request,
         ) -> Result<FetchReturnKind, JsValue>;
         #[wasm_bindgen(method)]
         pub fn queue<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
-            batch: &MessageBatch<JsValue>,
+            batch: &super::MessageBatch<JsValue>,
         ) -> Option<Promise<Undefined>>;
         #[wasm_bindgen(method, catch, js_name = "queue")]
         pub fn try_queue<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
-            batch: &MessageBatch<JsValue>,
+            batch: &super::MessageBatch<JsValue>,
         ) -> Result<Option<Promise<Undefined>>, JsValue>;
         #[wasm_bindgen(method)]
         pub fn scheduled<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
-            controller: &ScheduledController,
+            controller: &super::ScheduledController,
         ) -> Option<Promise<Undefined>>;
         #[wasm_bindgen(method, catch, js_name = "scheduled")]
         pub fn try_scheduled<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
-            controller: &ScheduledController,
+            controller: &super::ScheduledController,
         ) -> Result<Option<Promise<Undefined>>, JsValue>;
         #[wasm_bindgen(method, slice_to_array)]
         pub fn tail<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
-            events: &[TraceItem],
+            events: &[super::TraceItem],
         ) -> Option<Promise<Undefined>>;
         #[wasm_bindgen(method, catch, slice_to_array, js_name = "tail")]
         pub fn try_tail<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
-            events: &[TraceItem],
+            events: &[super::TraceItem],
         ) -> Result<Option<Promise<Undefined>>, JsValue>;
         #[wasm_bindgen(method, js_name = "tailStream")]
         pub fn tail_stream<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
-            event: &TailEvent,
+            event: &super::tail_stream::TailEvent,
         ) -> TailStreamReturnKind;
         #[wasm_bindgen(method, catch, js_name = "tailStream")]
         pub fn try_tail_stream<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
-            event: &TailEvent,
+            event: &super::tail_stream::TailEvent,
         ) -> Result<TailStreamReturnKind, JsValue>;
         #[wasm_bindgen(method)]
         pub fn test<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
-            controller: &TestController,
+            controller: &super::TestController,
         ) -> Option<Promise<Undefined>>;
         #[wasm_bindgen(method, catch, js_name = "test")]
         pub fn try_test<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
-            controller: &TestController,
+            controller: &super::TestController,
         ) -> Result<Option<Promise<Undefined>>, JsValue>;
         #[wasm_bindgen(method, slice_to_array)]
         pub fn trace<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
-            traces: &[TraceItem],
+            traces: &[super::TraceItem],
         ) -> Option<Promise<Undefined>>;
         #[wasm_bindgen(method, catch, slice_to_array, js_name = "trace")]
         pub fn try_trace<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
-            traces: &[TraceItem],
+            traces: &[super::TraceItem],
         ) -> Result<Option<Promise<Undefined>>, JsValue>;
     }
     #[wasm_bindgen]
@@ -35890,11 +35891,11 @@ pub mod cloudflare_workers_module {
         #[wasm_bindgen(method, getter)]
         pub fn ctx<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &DurableObject<Env, Props>,
-        ) -> DurableObjectState<Props>;
+        ) -> super::DurableObjectState<Props>;
         #[wasm_bindgen(method, setter)]
         pub fn set_ctx<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &DurableObject<Env, Props>,
-            val: &DurableObjectState<Props>,
+            val: &super::DurableObjectState<Props>,
         );
         #[wasm_bindgen(method, getter)]
         pub fn env<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
@@ -35919,7 +35920,7 @@ pub mod cloudflare_workers_module {
             Props: ::wasm_bindgen::JsGeneric,
         >(
             this: &DurableObject<Env, Props>,
-            alarm_info: &AlarmInvocationInfo,
+            alarm_info: &super::AlarmInvocationInfo,
         ) -> Option<Promise<Undefined>>;
         #[wasm_bindgen(method, catch, js_name = "alarm")]
         pub fn try_alarm_with_alarm_info<
@@ -35927,17 +35928,17 @@ pub mod cloudflare_workers_module {
             Props: ::wasm_bindgen::JsGeneric,
         >(
             this: &DurableObject<Env, Props>,
-            alarm_info: &AlarmInvocationInfo,
+            alarm_info: &super::AlarmInvocationInfo,
         ) -> Result<Option<Promise<Undefined>>, JsValue>;
         #[wasm_bindgen(method)]
         pub fn fetch<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &DurableObject<Env, Props>,
-            request: &Request,
+            request: &super::Request,
         ) -> FetchReturnKind;
         #[wasm_bindgen(method, catch, js_name = "fetch")]
         pub fn try_fetch<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &DurableObject<Env, Props>,
-            request: &Request,
+            request: &super::Request,
         ) -> Result<FetchReturnKind, JsValue>;
         #[wasm_bindgen(method, js_name = "webSocketMessage")]
         pub fn web_socket_message<
@@ -35945,7 +35946,7 @@ pub mod cloudflare_workers_module {
             Props: ::wasm_bindgen::JsGeneric,
         >(
             this: &DurableObject<Env, Props>,
-            ws: &WebSocket,
+            ws: &super::WebSocket,
             message: &str,
         ) -> Option<Promise<Undefined>>;
         #[wasm_bindgen(method, catch, js_name = "webSocketMessage")]
@@ -35954,7 +35955,7 @@ pub mod cloudflare_workers_module {
             Props: ::wasm_bindgen::JsGeneric,
         >(
             this: &DurableObject<Env, Props>,
-            ws: &WebSocket,
+            ws: &super::WebSocket,
             message: &str,
         ) -> Result<Option<Promise<Undefined>>, JsValue>;
         #[wasm_bindgen(method, js_name = "webSocketMessage")]
@@ -35963,7 +35964,7 @@ pub mod cloudflare_workers_module {
             Props: ::wasm_bindgen::JsGeneric,
         >(
             this: &DurableObject<Env, Props>,
-            ws: &WebSocket,
+            ws: &super::WebSocket,
             message: &ArrayBuffer,
         ) -> Option<Promise<Undefined>>;
         #[wasm_bindgen(method, catch, js_name = "webSocketMessage")]
@@ -35972,13 +35973,13 @@ pub mod cloudflare_workers_module {
             Props: ::wasm_bindgen::JsGeneric,
         >(
             this: &DurableObject<Env, Props>,
-            ws: &WebSocket,
+            ws: &super::WebSocket,
             message: &ArrayBuffer,
         ) -> Result<Option<Promise<Undefined>>, JsValue>;
         #[wasm_bindgen(method, js_name = "webSocketClose")]
         pub fn web_socket_close<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &DurableObject<Env, Props>,
-            ws: &WebSocket,
+            ws: &super::WebSocket,
             code: f64,
             reason: &str,
             was_clean: bool,
@@ -35989,7 +35990,7 @@ pub mod cloudflare_workers_module {
             Props: ::wasm_bindgen::JsGeneric,
         >(
             this: &DurableObject<Env, Props>,
-            ws: &WebSocket,
+            ws: &super::WebSocket,
             code: f64,
             reason: &str,
             was_clean: bool,
@@ -35997,7 +35998,7 @@ pub mod cloudflare_workers_module {
         #[wasm_bindgen(method, js_name = "webSocketError")]
         pub fn web_socket_error<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &DurableObject<Env, Props>,
-            ws: &WebSocket,
+            ws: &super::WebSocket,
             error: &JsValue,
         ) -> Option<Promise<Undefined>>;
         #[wasm_bindgen(method, catch, js_name = "webSocketError")]
@@ -36006,11 +36007,11 @@ pub mod cloudflare_workers_module {
             Props: ::wasm_bindgen::JsGeneric,
         >(
             this: &DurableObject<Env, Props>,
-            ws: &WebSocket,
+            ws: &super::WebSocket,
             error: &JsValue,
         ) -> Result<Option<Promise<Undefined>>, JsValue>;
     }
-    #[wasm_bindgen(private, js_name = "CloudflareWorkersModule_WorkflowDurationLabel")]
+    #[wasm_bindgen(private, js_namespace = "CloudflareWorkersModule")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum WorkflowDurationLabel {
         Second = "second",
@@ -36021,7 +36022,7 @@ pub mod cloudflare_workers_module {
         Month = "month",
         Year = "year",
     }
-    #[wasm_bindgen(private, js_name = "CloudflareWorkersModule_WorkflowBackoff")]
+    #[wasm_bindgen(private, js_namespace = "CloudflareWorkersModule")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum WorkflowBackoff {
         Constant = "constant",
@@ -36040,7 +36041,7 @@ pub mod cloudflare_workers_module {
         #[wasm_bindgen(method, getter)]
         pub fn timeout(this: &WorkflowStepConfig) -> Option<TimeoutKind>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_timeout(this: &WorkflowStepConfig, val: &JsValue);
+        pub fn set_timeout(this: &WorkflowStepConfig, val: &str);
         #[wasm_bindgen(method, setter, js_name = "timeout")]
         pub fn set_timeout_with_f64(this: &WorkflowStepConfig, val: f64);
     }
@@ -36062,7 +36063,7 @@ pub mod cloudflare_workers_module {
             self.inner.set_retries(val);
             self
         }
-        pub fn timeout(self, val: &JsValue) -> Self {
+        pub fn timeout(self, val: &str) -> Self {
             self.inner.set_timeout(val);
             self
         }
@@ -36154,14 +36155,14 @@ pub mod cloudflare_workers_module {
         pub async fn do_<T: ::wasm_bindgen::JsGeneric>(
             this: &WorkflowStep,
             name: &str,
-            callback: &Function<fn(JsValue) -> Promise<T>>,
+            callback: &Function<fn(WorkflowStepContext) -> Promise<T>>,
         ) -> Result<T, JsValue>;
         #[wasm_bindgen(method, catch, js_name = "do")]
         pub async fn do_with_config<T: ::wasm_bindgen::JsGeneric>(
             this: &WorkflowStep,
             name: &str,
-            config: &JsValue,
-            callback: &Function<fn(JsValue) -> Promise<T>>,
+            config: &WorkflowStepConfig,
+            callback: &Function<fn(WorkflowStepContext) -> Promise<T>>,
         ) -> Result<T, JsValue>;
         #[wasm_bindgen(method, getter)]
         pub fn sleep(this: &WorkflowStep) -> Function<fn(JsString, JsValue) -> Promise<Undefined>>;
@@ -36198,7 +36199,7 @@ pub mod cloudflare_workers_module {
         #[wasm_bindgen(method, getter)]
         pub fn timeout(this: &WorkflowStepOptions) -> Option<TimeoutKind>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_timeout(this: &WorkflowStepOptions, val: &JsValue);
+        pub fn set_timeout(this: &WorkflowStepOptions, val: &str);
         #[wasm_bindgen(method, setter, js_name = "timeout")]
         pub fn set_timeout_with_f64(this: &WorkflowStepOptions, val: f64);
     }
@@ -36216,7 +36217,7 @@ pub mod cloudflare_workers_module {
         inner: WorkflowStepOptions,
     }
     impl WorkflowStepOptionsBuilder {
-        pub fn timeout(self, val: &JsValue) -> Self {
+        pub fn timeout(self, val: &str) -> Self {
             self.inner.set_timeout(val);
             self
         }
@@ -36228,7 +36229,7 @@ pub mod cloudflare_workers_module {
             self.inner
         }
     }
-    #[wasm_bindgen(private, js_name = "CloudflareWorkersModule_WorkflowInstanceStatus")]
+    #[wasm_bindgen(private, js_namespace = "CloudflareWorkersModule")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum WorkflowInstanceStatus {
         Queued = "queued",
@@ -36249,11 +36250,11 @@ pub mod cloudflare_workers_module {
         #[wasm_bindgen(method, getter)]
         pub fn ctx<Env: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
             this: &WorkflowEntrypoint<Env, T>,
-        ) -> ExecutionContext;
+        ) -> super::ExecutionContext;
         #[wasm_bindgen(method, setter)]
         pub fn set_ctx<Env: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
             this: &WorkflowEntrypoint<Env, T>,
-            val: &ExecutionContext,
+            val: &super::ExecutionContext,
         );
         #[wasm_bindgen(method, getter)]
         pub fn env<Env: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
@@ -36335,13 +36336,13 @@ pub mod cloudflare_workers_module {
     extern "C" {
         #[allow(non_upper_case_globals)]
         #[wasm_bindgen(thread_local_v2, js_namespace = "CloudflareWorkersModule")]
-        pub static env: Env;
+        pub static env: super::cloudflare::Env;
     }
     #[wasm_bindgen]
     extern "C" {
         #[allow(non_upper_case_globals)]
         #[wasm_bindgen(thread_local_v2, js_namespace = "CloudflareWorkersModule")]
-        pub static exports: Exports;
+        pub static exports: JsValue;
     }
 }
 #[wasm_bindgen]
@@ -38674,7 +38675,8 @@ extern "C" {
         -> Result<Array<SupportedFileFormat>, JsValue>;
 }
 pub mod tail_stream {
-    use wasm_bindgen::prelude::*;
+    #[allow(unused_imports)]
+    use super::*;
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
@@ -38949,7 +38951,7 @@ pub mod tail_stream {
             }
         }
     }
-    #[wasm_bindgen(private, js_name = "TailStream_EventOutcome")]
+    #[wasm_bindgen(private, js_namespace = "TailStream")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum EventOutcome {
         Ok = "ok",
@@ -41373,8 +41375,8 @@ pub enum PayloadKind {
 }
 #[wasm_bindgen(private)]
 pub enum TailStreamReturnKind {
-    TailEventHandlerType(TailEventHandlerType),
-    Promise(Promise<TailEventHandlerType>),
+    TailEventHandlerType(JsValue),
+    Promise(Promise),
 }
 #[wasm_bindgen(private)]
 pub enum TimeoutKind {
@@ -41403,27 +41405,27 @@ pub enum DescriptionLanguageKind {
 }
 #[wasm_bindgen(private)]
 pub enum InfoKind {
-    HibernatableWebSocketEventInfoClose(HibernatableWebSocketEventInfoClose),
-    HibernatableWebSocketEventInfoError(HibernatableWebSocketEventInfoError),
-    HibernatableWebSocketEventInfoMessage(HibernatableWebSocketEventInfoMessage),
+    HibernatableWebSocketEventInfoClose(tail_stream::HibernatableWebSocketEventInfoClose),
+    HibernatableWebSocketEventInfoError(tail_stream::HibernatableWebSocketEventInfoError),
+    HibernatableWebSocketEventInfoMessage(tail_stream::HibernatableWebSocketEventInfoMessage),
 }
 #[wasm_bindgen(private)]
 pub enum OnsetInfoKind {
-    FetchEventInfo(FetchEventInfo),
-    JsRpcEventInfo(JsRpcEventInfo),
-    ScheduledEventInfo(ScheduledEventInfo),
-    AlarmEventInfo(AlarmEventInfo),
-    QueueEventInfo(QueueEventInfo),
-    EmailEventInfo(EmailEventInfo),
-    TraceEventInfo(TraceEventInfo),
-    HibernatableWebSocketEventInfo(HibernatableWebSocketEventInfo),
-    CustomEventInfo(CustomEventInfo),
+    FetchEventInfo(tail_stream::FetchEventInfo),
+    JsRpcEventInfo(tail_stream::JsRpcEventInfo),
+    ScheduledEventInfo(tail_stream::ScheduledEventInfo),
+    AlarmEventInfo(tail_stream::AlarmEventInfo),
+    QueueEventInfo(tail_stream::QueueEventInfo),
+    EmailEventInfo(tail_stream::EmailEventInfo),
+    TraceEventInfo(tail_stream::TraceEventInfo),
+    HibernatableWebSocketEventInfo(tail_stream::HibernatableWebSocketEventInfo),
+    CustomEventInfo(tail_stream::CustomEventInfo),
 }
 #[wasm_bindgen(private)]
 pub enum SpanOpenInfoKind {
-    FetchEventInfo(FetchEventInfo),
-    JsRpcEventInfo(JsRpcEventInfo),
-    Attributes(Attributes),
+    FetchEventInfo(tail_stream::FetchEventInfo),
+    JsRpcEventInfo(tail_stream::JsRpcEventInfo),
+    Attributes(tail_stream::Attributes),
 }
 #[wasm_bindgen(private)]
 pub enum LevelKind {

@@ -205,7 +205,7 @@ fn parse_single_file(
     let mut scopes = std::mem::take(&mut gctx.scopes);
     let mut diag = std::mem::take(&mut gctx.diagnostics);
     let type_arena_snapshot = gctx.type_arena().to_vec();
-    let declarations = first_pass::populate_declarations(
+    let (declarations, mut namespace_members) = first_pass::populate_declarations(
         program,
         &registry,
         lib_name,
@@ -226,6 +226,13 @@ fn parse_single_file(
     // Detect script vs module — script files have global declarations.
     let is_script = !first_pass::is_module(program);
 
+    let mut cx = InsertCtx {
+        gctx,
+        namespace_members: &mut namespace_members,
+        module_scopes: &registry.module_scopes,
+        file_scope,
+        is_script,
+    };
     let type_ids: Vec<crate::context::TypeId> = merged
         .into_iter()
         .map(|mut decl| {
@@ -233,61 +240,89 @@ fn parse_single_file(
             if is_script {
                 decl.exported = true;
             }
-            let name = declaration_name(&decl.kind);
-            let decl_scope = decl.scope_id;
-            let flat_scope = match &decl.module_context {
-                crate::ir::ModuleContext::Module(m) => Some(
-                    registry
-                        .module_scopes
-                        .get(m.as_ref())
-                        .copied()
-                        .unwrap_or(file_scope),
-                ),
-                crate::ir::ModuleContext::Global => None,
-            };
-            let members = match &decl.kind {
-                crate::ir::TypeKind::Namespace(ns) => Some(ns.child_scope),
-                _ => None,
-            };
-            let type_id = gctx.insert_type(decl);
-            // A namespace merged with a same-named class, function or
-            // interface leaves that declaration as the name's type.
-            let merged = members.is_some()
-                && name.as_ref().is_some_and(|name| {
-                    gctx.scopes.get(decl_scope).get(name).is_some_and(|id| {
-                        !matches!(gctx.get_type(id).kind, crate::ir::TypeKind::Namespace(_))
-                    })
-                });
-            // Insert/upgrade the type in the scope so codegen can resolve it.
-            // Members of a namespace inside a module are flattened into the
-            // module but declared in the namespace scope, which also needs the
-            // upgrade for `NS.Member` to reach the populated declaration.
-            if let Some(name) = name.as_ref().filter(|_| !merged) {
-                gctx.scopes.insert(decl_scope, name.clone(), type_id);
-                if let Some(flat_scope) = flat_scope.filter(|&s| s != decl_scope) {
-                    gctx.scopes.insert(flat_scope, name.clone(), type_id);
-                }
-            }
-            // Script files: hoist global declarations to the builtin scope
-            // so they're visible across all files (TypeScript "script" semantics).
-            // Ambient module bodies stay private to their module scope.
-            if is_script && decl_scope == file_scope {
-                if let Some(parent) = gctx.scopes.get(file_scope).parent {
-                    if let Some(name) = name {
-                        if let Some(members) = members {
-                            gctx.scopes.insert_namespace(parent, name.clone(), members);
-                        }
-                        if !merged {
-                            gctx.scopes.insert(parent, name, type_id);
-                        }
-                    }
-                }
-            }
-            type_id
+            cx.insert(decl)
         })
         .collect();
 
     Ok(type_ids)
+}
+
+struct InsertCtx<'a> {
+    gctx: &'a mut GlobalContext,
+    namespace_members: &'a mut first_pass::NamespaceMembers,
+    module_scopes: &'a std::collections::HashMap<String, ScopeId>,
+    file_scope: ScopeId,
+    is_script: bool,
+}
+
+impl InsertCtx<'_> {
+    /// Insert a populated declaration into the type arena and bind its name
+    /// over the phase 1 placeholder, so scope lookups reach the populated
+    /// declaration. A namespace's members are inserted the same way first,
+    /// giving the namespace their ids.
+    fn insert(&mut self, mut decl: crate::ir::TypeDeclaration) -> crate::context::TypeId {
+        let members = match &mut decl.kind {
+            crate::ir::TypeKind::Namespace(ns) => {
+                let member_decls = self
+                    .namespace_members
+                    .remove(&ns.child_scope)
+                    .unwrap_or_default();
+                ns.declarations = merge_namespaces(member_decls)
+                    .into_iter()
+                    .map(|member| self.insert(member))
+                    .collect();
+                Some(ns.child_scope)
+            }
+            _ => None,
+        };
+        let gctx = &mut *self.gctx;
+        let file_scope = self.file_scope;
+        let name = declaration_name(&decl.kind);
+        let decl_scope = decl.scope_id;
+        let flat_scope = match &decl.module_context {
+            crate::ir::ModuleContext::Module(m) => Some(
+                self.module_scopes
+                    .get(m.as_ref())
+                    .copied()
+                    .unwrap_or(file_scope),
+            ),
+            crate::ir::ModuleContext::Global => None,
+        };
+        let type_id = gctx.insert_type(decl);
+        // A namespace merged with a same-named class, function or
+        // interface leaves that declaration as the name's type.
+        let merged = members.is_some()
+            && name.as_ref().is_some_and(|name| {
+                gctx.scopes.get(decl_scope).get(name).is_some_and(|id| {
+                    !matches!(gctx.get_type(id).kind, crate::ir::TypeKind::Namespace(_))
+                })
+            });
+        // Members of a namespace inside a module are flattened into the
+        // module but declared in the namespace scope, which also needs the
+        // upgrade for `NS.Member` to reach the populated declaration.
+        if let Some(name) = name.as_ref().filter(|_| !merged) {
+            gctx.scopes.insert(decl_scope, name.clone(), type_id);
+            if let Some(flat_scope) = flat_scope.filter(|&s| s != decl_scope) {
+                gctx.scopes.insert(flat_scope, name.clone(), type_id);
+            }
+        }
+        // Script files: hoist global declarations to the builtin scope
+        // so they're visible across all files (TypeScript "script" semantics).
+        // Ambient module bodies stay private to their module scope.
+        if self.is_script && decl_scope == file_scope {
+            if let Some(parent) = gctx.scopes.get(file_scope).parent {
+                if let Some(name) = name {
+                    if let Some(members) = members {
+                        gctx.scopes.insert_namespace(parent, name.clone(), members);
+                    }
+                    if !merged {
+                        gctx.scopes.insert(parent, name, type_id);
+                    }
+                }
+            }
+        }
+        type_id
+    }
 }
 
 /// Bind an import to what its name means in the exporting scope: a type, a
@@ -579,36 +614,21 @@ fn populate_builtin_scope(gctx: &mut GlobalContext, scope: ScopeId) {
     }
 }
 
-/// Merge namespace declarations with the same name into a single `NamespaceDecl`.
-///
-/// TypeScript allows multiple `namespace Foo { ... }` blocks that get merged.
-/// We consolidate them so codegen produces a single `mod foo { ... }`.
+/// Keep one declaration per namespace. TypeScript merges repeated
+/// `namespace Foo { ... }` blocks, which already share one member scope and
+/// so one entry in the populated members, so only the first block's
+/// declaration is kept and codegen produces a single `mod foo { ... }`.
 fn merge_namespaces(
     declarations: Vec<crate::ir::TypeDeclaration>,
 ) -> Vec<crate::ir::TypeDeclaration> {
-    use crate::ir::{TypeDeclaration, TypeKind};
-    use std::collections::HashMap;
-
-    let mut ns_map: HashMap<String, usize> = HashMap::new();
-    let mut result: Vec<TypeDeclaration> = Vec::new();
-
-    for decl in declarations {
-        if let TypeKind::Namespace(ref ns_decl) = decl.kind {
-            if let Some(&existing_idx) = ns_map.get(&ns_decl.name) {
-                // Merge into existing namespace
-                if let TypeKind::Namespace(ref mut existing) = result[existing_idx].kind {
-                    existing.declarations.extend(ns_decl.declarations.clone());
-                }
-                continue;
-            }
-            let name = ns_decl.name.clone();
-            let idx = result.len();
-            ns_map.insert(name, idx);
-        }
-        result.push(decl);
-    }
-
-    result
+    let mut seen = std::collections::HashSet::new();
+    declarations
+        .into_iter()
+        .filter(|decl| match &decl.kind {
+            crate::ir::TypeKind::Namespace(ns) => seen.insert(ns.child_scope),
+            _ => true,
+        })
+        .collect()
 }
 
 /// Extract the name from a declaration kind, if it has one.
@@ -1277,5 +1297,36 @@ mod tests {
             kind("D.Foo.Options"),
             Some(TypeKind::Interface(_))
         ));
+    }
+
+    #[test]
+    fn namespace_members_resolve_to_their_populated_declarations() {
+        let src = r#"
+            declare namespace N { type T = string; interface A { b: string } }
+            declare namespace N { interface B {} }
+        "#;
+        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let scope = module.file_scopes[0];
+        let ns = module
+            .types
+            .iter()
+            .find_map(|&id| match &gctx.get_type(id).kind {
+                TypeKind::Namespace(ns) => Some(ns),
+                _ => None,
+            })
+            .expect("namespace");
+        let id = |path: &str| gctx.resolve_path(scope, path).expect(path);
+
+        // Both blocks merge into one namespace holding the member ids.
+        assert_eq!(ns.declarations, [id("N.T"), id("N.A"), id("N.B")]);
+        match &gctx.get_type(id("N.T")).kind {
+            TypeKind::TypeAlias(a) => assert_eq!(a.target, TypeRef::String),
+            other => panic!("expected an alias, got {other:?}"),
+        }
+        match &gctx.get_type(id("N.A")).kind {
+            TypeKind::Interface(i) => assert!(!i.members.is_empty()),
+            other => panic!("expected an interface, got {other:?}"),
+        }
+        assert_eq!(gctx.scopes.resolve(ns.child_scope, "A"), Some(id("N.A")));
     }
 }

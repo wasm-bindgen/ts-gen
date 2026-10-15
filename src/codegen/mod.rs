@@ -481,7 +481,7 @@ fn generate_declaration(
                     i,
                     &decl.module_context,
                     Some(cgctx),
-                    None,
+                    &[],
                     decl.scope_id,
                 ))
             }
@@ -489,7 +489,7 @@ fn generate_declaration(
                 i,
                 &decl.module_context,
                 Some(cgctx),
-                None,
+                &[],
                 decl.scope_id,
             )),
         },
@@ -501,8 +501,8 @@ fn generate_declaration(
                 decl.scope_id,
             ))
         }
-        TypeKind::StringEnum(e) => Some(enums::generate_string_enum(e, None)),
-        TypeKind::NumericEnum(e) => Some(enums::generate_numeric_enum(e, None)),
+        TypeKind::StringEnum(e) => Some(enums::generate_string_enum(e, &[])),
+        TypeKind::NumericEnum(e) => Some(enums::generate_numeric_enum(e, &[])),
         TypeKind::Function(f) => Some(functions::generate_function(
             f,
             &decl.module_context,
@@ -515,7 +515,7 @@ fn generate_declaration(
             &decl.module_context,
             Some(cgctx),
             &decl.doc,
-            None,
+            &[],
             decl.scope_id,
             static_names,
         )),
@@ -525,7 +525,7 @@ fn generate_declaration(
             decl.scope_id,
             &decl.module_context,
         )),
-        TypeKind::Namespace(ns) => Some(generate_namespace(ns, &decl.module_context, cgctx)),
+        TypeKind::Namespace(ns) => Some(generate_namespace(ns, &[], cgctx)),
     }
 }
 
@@ -627,25 +627,50 @@ fn generate_type_alias(
     }
 }
 
+/// `js_namespace = "Outer"` for one segment, `js_namespace = ["Outer",
+/// "Inner"]` for a nested namespace, so a member binds to its full JS path.
+pub(crate) fn js_namespace_attr(js_namespace: &[String]) -> Option<TokenStream> {
+    match js_namespace {
+        [] => None,
+        [ns] => Some(quote! { js_namespace = #ns }),
+        segments => Some(quote! { js_namespace = [#(#segments),*] }),
+    }
+}
+
 /// Generate a Rust `mod` block for a namespace, with all nested declarations.
+/// `parent_js_namespace` is the JS path of the enclosing namespaces.
 fn generate_namespace(
     ns: &crate::ir::NamespaceDecl,
-    _parent_ctx: &crate::ir::ModuleContext,
+    parent_js_namespace: &[String],
     cgctx: &CodegenContext,
 ) -> TokenStream {
     let mod_name = typemap::make_ident(&crate::util::naming::to_snake_case(&ns.name));
-    let js_name = &ns.name;
+    let mut js_namespace = parent_js_namespace.to_vec();
+    js_namespace.push(ns.name.clone());
 
     let mut static_names = functions::StaticNames::default();
+    let path = cgctx.namespace_paths[&ns.child_scope].clone();
+    let outer = cgctx.emit_path.replace(path);
     let items: Vec<TokenStream> = ns
         .declarations
         .iter()
-        .filter_map(|decl| generate_ns_declaration(decl, js_name, cgctx, &mut static_names))
+        .filter_map(|&id| {
+            generate_ns_declaration(
+                cgctx.gctx.get_type(id),
+                &js_namespace,
+                cgctx,
+                &mut static_names,
+            )
+        })
         .collect();
+    cgctx.emit_path.replace(outer);
 
+    // Members name `js_sys` types, globals and the file's external aliases
+    // bare, exactly like top-level items.
     quote! {
         pub mod #mod_name {
-            use wasm_bindgen::prelude::*;
+            #[allow(unused_imports)]
+            use super::*;
             #(#items)*
         }
     }
@@ -656,7 +681,7 @@ fn generate_namespace(
 /// the correct JS access (e.g., `WebAssembly.Module`).
 fn generate_ns_declaration(
     decl: &TypeDeclaration,
-    ns_js_name: &str,
+    js_namespace: &[String],
     cgctx: &CodegenContext,
     static_names: &mut functions::StaticNames,
 ) -> Option<TokenStream> {
@@ -664,7 +689,7 @@ fn generate_ns_declaration(
         TypeKind::Class(c) => Some(classes::generate_class_with_js_namespace(
             c,
             &decl.module_context,
-            ns_js_name,
+            js_namespace,
             Some(cgctx),
             decl.scope_id,
         )),
@@ -674,7 +699,7 @@ fn generate_ns_declaration(
                     i,
                     &decl.module_context,
                     Some(cgctx),
-                    Some(ns_js_name),
+                    js_namespace,
                     decl.scope_id,
                 ))
             }
@@ -682,7 +707,7 @@ fn generate_ns_declaration(
                 i,
                 &decl.module_context,
                 Some(cgctx),
-                Some(ns_js_name),
+                js_namespace,
                 decl.scope_id,
             )),
         },
@@ -701,23 +726,45 @@ fn generate_ns_declaration(
         TypeKind::Function(f) => Some(functions::generate_function_with_js_namespace(
             f,
             &decl.module_context,
-            ns_js_name,
+            js_namespace,
             Some(cgctx),
             &decl.doc,
             decl.scope_id,
         )),
-        TypeKind::StringEnum(e) => Some(enums::generate_string_enum(e, Some(ns_js_name))),
-        TypeKind::NumericEnum(e) => Some(enums::generate_numeric_enum(e, Some(ns_js_name))),
+        TypeKind::StringEnum(e) => Some(enums::generate_string_enum(e, js_namespace)),
+        TypeKind::NumericEnum(e) => Some(enums::generate_numeric_enum(e, js_namespace)),
         TypeKind::Variable(v) => Some(functions::generate_variable(
             v,
             &decl.module_context,
             Some(cgctx),
             &decl.doc,
-            Some(ns_js_name),
+            js_namespace,
             decl.scope_id,
             static_names,
         )),
         TypeKind::TypeAlias(_) => None,
-        TypeKind::Namespace(ns) => Some(generate_namespace(ns, &decl.module_context, cgctx)),
+        TypeKind::Namespace(ns) => Some(generate_namespace(ns, js_namespace, cgctx)),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::js_namespace_attr;
+
+    #[test]
+    fn js_namespace_attr_spells_one_segment_bare_and_nested_as_an_array() {
+        let attr = |path: &[&str]| {
+            let path: Vec<String> = path.iter().map(|s| s.to_string()).collect();
+            js_namespace_attr(&path).map(|t| t.to_string())
+        };
+        assert_eq!(attr(&[]), None);
+        assert_eq!(
+            attr(&["Outer"]).as_deref(),
+            Some("js_namespace = \"Outer\"")
+        );
+        assert_eq!(
+            attr(&["Outer", "Inner"]).as_deref(),
+            Some("js_namespace = [\"Outer\" , \"Inner\"]")
+        );
     }
 }

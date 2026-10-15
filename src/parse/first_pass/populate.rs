@@ -46,7 +46,14 @@ struct PopulateCtx<'a, 'docs> {
     diag: &'a mut DiagnosticCollector,
     docs: &'a DocComments<'docs>,
     file_scope: ScopeId,
+    namespace_members: NamespaceMembers,
 }
+
+/// Populated members of each global namespace, keyed by its member scope.
+/// They are inserted into the type arena after population, when the
+/// namespace takes their ids; every block of a merged namespace shares the
+/// one scope, so their members land together.
+pub type NamespaceMembers = std::collections::HashMap<ScopeId, Vec<ir::TypeDeclaration>>;
 
 impl<'a, 'docs> PopulateCtx<'a, 'docs> {
     /// Public names an `export { local as public }` in `scope` gives the
@@ -104,7 +111,7 @@ pub fn populate_declarations<'a, 'docs>(
     scopes: &'a mut ScopeArena,
     type_arena: &'a [ir::TypeDeclaration],
     scope: ScopeId,
-) -> Vec<ir::TypeDeclaration> {
+) -> (Vec<ir::TypeDeclaration>, NamespaceMembers) {
     let mut declarations = Vec::new();
     let used_type_names: std::collections::HashSet<String> =
         registry.types.keys().cloned().collect();
@@ -118,6 +125,7 @@ pub fn populate_declarations<'a, 'docs>(
         diag,
         docs,
         file_scope: scope,
+        namespace_members: NamespaceMembers::new(),
     };
 
     for stmt in &program.body {
@@ -130,7 +138,7 @@ pub fn populate_declarations<'a, 'docs>(
         );
     }
 
-    declarations
+    (declarations, pcx.namespace_members)
 }
 
 /// `(rust_name, js_name)` for each name a value binding is imported by: its
@@ -814,10 +822,14 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                 exported,
             );
         }
+        self.namespace_members
+            .entry(ns_scope)
+            .or_default()
+            .extend(ns_decls);
         declarations.push(ir::TypeDeclaration {
             kind: ir::TypeKind::Namespace(ir::NamespaceDecl {
                 name: ns_name,
-                declarations: ns_decls,
+                declarations: vec![],
                 child_scope: ns_scope,
             }),
             module_context: ir::ModuleContext::Global,
