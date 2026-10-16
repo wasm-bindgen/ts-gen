@@ -298,10 +298,26 @@ impl<'a> CollectCtx<'a> {
         exported: bool,
     ) {
         let name = alias.id.name.to_string();
-        if is_string_literal_union(&alias.type_annotation) {
-            self.register_type(&name, ir::RegisteredKind::StringEnum, ctx, scope, exported);
+        // Phase 2 reads a parent's placeholder when deciding whether an
+        // intersection may `extends` it, so the placeholder says what can
+        // be known syntactically: an alias over an inline shape becomes an
+        // interface and registers as one; an alias to a non-object type
+        // (`type Id = string`) records that in its target, since the
+        // default `any` means "not yet known".
+        let kind = if is_string_literal_union(&alias.type_annotation) {
+            ir::RegisteredKind::StringEnum
+        } else if crate::parse::members::inline_shape(&alias.type_annotation).is_some() {
+            ir::RegisteredKind::Interface
         } else {
-            self.register_type(&name, ir::RegisteredKind::TypeAlias, ctx, scope, exported);
+            ir::RegisteredKind::TypeAlias
+        };
+        self.register_type(&name, kind, ctx, scope, exported);
+        if let Some(target) = non_object_target(&alias.type_annotation) {
+            if let Some(id) = self.gctx.scopes.get(scope).get(&name) {
+                if let ir::TypeKind::TypeAlias(a) = &mut self.gctx.get_type_mut(id).kind {
+                    a.target = target;
+                }
+            }
         }
     }
 
@@ -427,4 +443,33 @@ impl<'a> CollectCtx<'a> {
         );
         ns_scope
     }
+}
+
+/// The IR type of an alias target that is syntactically not an object type,
+/// so could never be a parent: primitives, literals, functions, arrays and
+/// tuples. `None` for anything that might be one.
+fn non_object_target(ts_type: &ast::TSType<'_>) -> Option<ir::TypeRef> {
+    use ast::TSType as T;
+    Some(match ts_type.without_parenthesized() {
+        T::TSStringKeyword(_) | T::TSTemplateLiteralType(_) => ir::TypeRef::String,
+        T::TSNumberKeyword(_) => ir::TypeRef::Number,
+        T::TSBooleanKeyword(_) => ir::TypeRef::Boolean,
+        T::TSBigIntKeyword(_) => ir::TypeRef::BigInt,
+        T::TSSymbolKeyword(_) => ir::TypeRef::Symbol,
+        T::TSNullKeyword(_) => ir::TypeRef::Null,
+        T::TSUndefinedKeyword(_) | T::TSVoidKeyword(_) => ir::TypeRef::Undefined,
+        T::TSLiteralType(lit) => match &lit.literal {
+            ast::TSLiteral::StringLiteral(s) => ir::TypeRef::StringLiteral(s.value.to_string()),
+            ast::TSLiteral::NumericLiteral(n) => ir::TypeRef::NumberLiteral(n.value),
+            ast::TSLiteral::BooleanLiteral(b) => ir::TypeRef::BooleanLiteral(b.value),
+            _ => return None,
+        },
+        T::TSFunctionType(_) | T::TSConstructorType(_) => ir::TypeRef::Function(ir::FunctionSig {
+            params: vec![],
+            return_type: Box::new(ir::TypeRef::Any),
+        }),
+        T::TSArrayType(_) => ir::TypeRef::Array(Box::new(ir::TypeRef::Any)),
+        T::TSTupleType(_) => ir::TypeRef::Tuple(vec![]),
+        _ => return None,
+    })
 }

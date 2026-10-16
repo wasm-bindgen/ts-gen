@@ -5,9 +5,11 @@
 // an inline literal: references become `extends`, literals are met into
 // the own members (required if any branch requires). `get`'s refined
 // overload therefore gets its own `StoreOptions extends GetOptions` with
-// a required `onlyIf`. Where nothing hoists (a non-object member like
-// `string & {}`, or a position that does not synthesise) the
-// intersection is bounded by its most specific member at codegen.
+// a required `onlyIf`. Hoisting needs every parent to be a class or
+// interface; a type parameter, a primitive alias or an unresolved name
+// leaves the intersection to codegen, where it is bounded by its most
+// specific member (`Derived & Base` -> `Derived`). A parameter typed by
+// named types alone is bounded too rather than given a fresh subtype.
 
 export interface Conditional {
   etag?: string;
@@ -25,18 +27,30 @@ export interface Derived extends Base {
 export interface Unrelated {
   other: string;
 }
+export type Str = string;
 export interface Store {
   get(key: string, options: GetOptions & { onlyIf: Conditional }): Promise<string | null>;
   get(key: string, options?: GetOptions): Promise<string>;
   refine(value: Derived & Base): void;
+  same(value: Derived & Derived): void;
   unrelated(value: Derived & Unrelated): void;
   shape(value: { a: string } & { b: number }): void;
+  generic<T>(value: T & { id: string }): void;
+  primitive(value: Str & { c: string }): void;
+  anything(value: Derived & any): void;
 }
+export type Branded<T> = T & { __brand: string };
+export type Both = Derived & Unrelated;
 export type Refined = GetOptions & { onlyIf: Conditional };
 export interface Fetcher {
   fetch(input: string): Promise<string>;
 }
 export type Stub = Fetcher & { readonly id: string };
+export interface Provider<T> {
+  call(): T;
+}
+export type GenericStub<T> = Provider<T> & Fetcher & { readonly id: string };
+export type Unknown = Missing & Fetcher & { readonly id: string };
 export interface Message {
   role: "user" | "assistant" | (string & {});
 }

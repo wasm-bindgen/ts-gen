@@ -496,23 +496,34 @@ pub(crate) fn simplify_union(types: Vec<TypeRef>) -> TypeRef {
     }
 }
 
-/// Normalise an intersection: inline nested `&`, and drop top types, which
-/// an inline `{ … }` lowers to, since `A & object` is `A`. One survivor is
-/// returned bare, so `Options & { field: Required }` is `Options` wherever
-/// it is not hoisted to an interface; none is `object`. Several survivors
-/// stay an `Intersection` for codegen to bound.
+/// Normalise an intersection: inline nested `&`, drop repeats and the
+/// identity elements `unknown` and `object` (which an inline `{ … }`
+/// lowers to), since `A & object` is `A`; `any` absorbs the whole thing as
+/// in TypeScript. One survivor is returned bare, so `Options & { field:
+/// Required }` is `Options` wherever it is not hoisted to an interface;
+/// none is `object`. Several survivors stay an `Intersection` for codegen
+/// to bound.
 pub(crate) fn simplify_intersection(types: Vec<TypeRef>) -> TypeRef {
-    fn flatten(types: Vec<TypeRef>, out: &mut Vec<TypeRef>) {
+    fn flatten(types: Vec<TypeRef>, out: &mut Vec<TypeRef>) -> bool {
         for ty in types {
             match ty {
-                TypeRef::Intersection(inner) => flatten(inner, out),
-                TypeRef::Object | TypeRef::Any | TypeRef::Unknown => {}
+                TypeRef::Intersection(inner) => {
+                    if flatten(inner, out) {
+                        return true;
+                    }
+                }
+                TypeRef::Any => return true,
+                TypeRef::Object | TypeRef::Unknown => {}
+                other if out.contains(&other) => {}
                 other => out.push(other),
             }
         }
+        false
     }
     let mut members = Vec::new();
-    flatten(types, &mut members);
+    if flatten(types, &mut members) {
+        return TypeRef::Any;
+    }
     match members.len() {
         0 => TypeRef::Object,
         1 => members.pop().unwrap(),
@@ -537,4 +548,39 @@ pub fn convert_type_params(
                 .collect()
         })
         .unwrap_or_default()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn simplify_intersection_drops_identity_members_and_repeats() {
+        let a = TypeRef::ident("A");
+        let b = TypeRef::ident("B");
+        assert_eq!(
+            simplify_intersection(vec![a.clone(), TypeRef::Object, TypeRef::Unknown]),
+            a
+        );
+        assert_eq!(simplify_intersection(vec![a.clone(), a.clone()]), a);
+        assert_eq!(
+            simplify_intersection(vec![TypeRef::Object, TypeRef::Unknown]),
+            TypeRef::Object
+        );
+        assert_eq!(
+            simplify_intersection(vec![
+                a.clone(),
+                TypeRef::Intersection(vec![b.clone(), TypeRef::Object])
+            ]),
+            TypeRef::Intersection(vec![a, b])
+        );
+    }
+
+    #[test]
+    fn simplify_intersection_any_absorbs() {
+        assert_eq!(
+            simplify_intersection(vec![TypeRef::ident("A"), TypeRef::Any]),
+            TypeRef::Any
+        );
+    }
 }

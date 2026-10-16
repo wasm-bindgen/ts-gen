@@ -127,6 +127,8 @@ impl Unrelated {
         inner
     }
 }
+#[allow(dead_code)]
+pub type Str = JsString;
 #[wasm_bindgen(module = "intersection")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -147,17 +149,36 @@ extern "C" {
         options: &GetOptions,
     ) -> Result<JsOption<JsString>, JsValue>;
     #[wasm_bindgen(method)]
-    pub fn refine(this: &Store, value: &StoreValue);
+    pub fn refine(this: &Store, value: &Derived);
     #[wasm_bindgen(method, catch, js_name = "refine")]
-    pub fn try_refine(this: &Store, value: &StoreValue) -> Result<(), JsValue>;
+    pub fn try_refine(this: &Store, value: &Derived) -> Result<(), JsValue>;
     #[wasm_bindgen(method)]
-    pub fn unrelated(this: &Store, value: &StoreValue2);
+    pub fn same(this: &Store, value: &Derived);
+    #[wasm_bindgen(method, catch, js_name = "same")]
+    pub fn try_same(this: &Store, value: &Derived) -> Result<(), JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn unrelated(this: &Store, value: &JsValue);
     #[wasm_bindgen(method, catch, js_name = "unrelated")]
-    pub fn try_unrelated(this: &Store, value: &StoreValue2) -> Result<(), JsValue>;
+    pub fn try_unrelated(this: &Store, value: &JsValue) -> Result<(), JsValue>;
     #[wasm_bindgen(method)]
-    pub fn shape(this: &Store, value: &StoreValue3);
+    pub fn shape(this: &Store, value: &StoreValue);
     #[wasm_bindgen(method, catch, js_name = "shape")]
-    pub fn try_shape(this: &Store, value: &StoreValue3) -> Result<(), JsValue>;
+    pub fn try_shape(this: &Store, value: &StoreValue) -> Result<(), JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn generic<T: ::wasm_bindgen::JsGeneric>(this: &Store, value: &T);
+    #[wasm_bindgen(method, catch, js_name = "generic")]
+    pub fn try_generic<T: ::wasm_bindgen::JsGeneric>(
+        this: &Store,
+        value: &T,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn primitive(this: &Store, value: &str);
+    #[wasm_bindgen(method, catch, js_name = "primitive")]
+    pub fn try_primitive(this: &Store, value: &str) -> Result<(), JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn anything(this: &Store, value: &JsValue);
+    #[wasm_bindgen(method, catch, js_name = "anything")]
+    pub fn try_anything(this: &Store, value: &JsValue) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "intersection")]
 extern "C" {
@@ -178,37 +199,33 @@ impl StoreOptions {
 }
 #[wasm_bindgen(module = "intersection")]
 extern "C" {
-    # [wasm_bindgen (extends = Derived , extends = Base , extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type StoreValue;
-}
-#[wasm_bindgen(module = "intersection")]
-extern "C" {
-    # [wasm_bindgen (extends = Derived , extends = Unrelated , extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type StoreValue2;
-}
-#[wasm_bindgen(module = "intersection")]
-extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type StoreValue3;
+    pub type StoreValue;
     #[wasm_bindgen(method, getter)]
-    pub fn a(this: &StoreValue3) -> String;
+    pub fn a(this: &StoreValue) -> String;
     #[wasm_bindgen(method, setter)]
-    pub fn set_a(this: &StoreValue3, val: &str);
+    pub fn set_a(this: &StoreValue, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn b(this: &StoreValue3) -> f64;
+    pub fn b(this: &StoreValue) -> f64;
     #[wasm_bindgen(method, setter)]
-    pub fn set_b(this: &StoreValue3, val: f64);
+    pub fn set_b(this: &StoreValue, val: f64);
 }
-impl StoreValue3 {
-    pub fn new(a: &str, b: f64) -> StoreValue3 {
-        let inner: StoreValue3 = JsCast::unchecked_into(js_sys::Object::new());
+impl StoreValue {
+    pub fn new(a: &str, b: f64) -> StoreValue {
+        let inner: StoreValue = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_a(a);
         inner.set_b(b);
         inner
     }
+}
+#[allow(dead_code)]
+pub type Branded<T> = T;
+#[wasm_bindgen(module = "intersection")]
+extern "C" {
+    # [wasm_bindgen (extends = Derived , extends = Unrelated , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Both;
 }
 #[wasm_bindgen(module = "intersection")]
 extern "C" {
@@ -252,6 +269,35 @@ impl Stub {
         }
     }
 }
+#[wasm_bindgen(module = "intersection")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Provider<T: ::wasm_bindgen::JsGeneric>;
+    #[wasm_bindgen(method)]
+    pub fn call<T: ::wasm_bindgen::JsGeneric>(this: &Provider<T>) -> T;
+    #[wasm_bindgen(method, catch, js_name = "call")]
+    pub fn try_call<T: ::wasm_bindgen::JsGeneric>(this: &Provider<T>) -> Result<T, JsValue>;
+}
+#[wasm_bindgen(module = "intersection")]
+extern "C" {
+    # [wasm_bindgen (extends = Provider , extends = Fetcher , extends = Object)]
+    #[derive(Debug, Clone, PartialEq)]
+    pub type GenericStub<T: ::wasm_bindgen::JsGeneric>;
+    #[wasm_bindgen(method, getter)]
+    pub fn id<T: ::wasm_bindgen::JsGeneric>(this: &GenericStub<T>) -> String;
+}
+impl<T: ::wasm_bindgen::JsGeneric> GenericStub<T> {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> GenericStub<T> {
+        #[allow(unused_unsafe)]
+        unsafe {
+            JsValue::from(js_sys::Object::new()).unchecked_into()
+        }
+    }
+}
+#[allow(dead_code)]
+pub type Unknown = JsValue;
 #[wasm_bindgen(module = "intersection")]
 extern "C" {
     # [wasm_bindgen (extends = Object)]

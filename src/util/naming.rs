@@ -166,6 +166,12 @@ impl LocalScope {
         self.claimed.insert(name.into())
     }
 
+    /// Give a claimed name back, for a declaration that was named before
+    /// it turned out not to be emitted.
+    pub fn release(&mut self, name: &str) {
+        self.claimed.remove(name);
+    }
+
     /// Claim `candidate`, or the first free respelling of it under
     /// `suffix`, and return the name claimed.
     pub fn declare(&mut self, candidate: &str, suffix: Suffix) -> String {

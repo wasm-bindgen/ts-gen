@@ -728,10 +728,23 @@ required if any branch requires it, writable if any branch allows
 writing, and a property typed differently across branches carries the
 intersection of those types, which is bounded at codegen (see
 [Intersections take their most specific member](#intersections-take-their-most-specific-member)).
-Parents that lower to a top type (`object`, `unknown`, a utility type
-over one) are dropped; an intersection with a member that no interface
-could extend (`string & {}`) does not synthesise and is bounded at
-codegen instead.
+
+Every parent must be something an interface could `extends`. A type
+parameter (`T & { id: string }`), a name that does not resolve, or an
+alias to a non-object type (`type Id = string`) leaves the intersection
+unhoisted, to be bounded at codegen. A parent that resolves but erases
+at codegen (a conditional type, say) is dropped from `extends` rather
+than replaced, so the first real parent stays the `Deref` target; the
+literal's own members survive either way. A generic first parent is
+spelled bare in `extends`, which wasm-bindgen reads as
+`Parent<JsValue>`, so such a type derives `PartialEq` without `Eq`.
+
+In parameter position an intersection of named types alone
+(`refine(value: Derived & Base)`) is not hoisted: a fresh subtype would
+force callers to cast a value they already hold, and the bound names
+the member the value is (`&Derived`). An alias supplies a name of its
+own, so `type Person = HasName & HasAge` does hoist, with no own
+members.
 
 ### Naming
 
@@ -1612,13 +1625,15 @@ record overloads for each value type.
 
 ### Intersections take their most specific member
 
-Parsing normalises every intersection: nested `&` is inlined and top
-types (`object`, `any`, `unknown`) are dropped, since `A & object` is
-`A`. An inline `{ … }` lowers to `object`, so where an intersection is
-not hoisted to an interface (see [Intersections](#intersections) under
-anonymous interface synthesis) the common required-field refinement
-collapses to the named type, and `(string & {})` inside a union is the
-plain `string` arm. A single survivor is used bare; none is `Object`.
+Parsing normalises every intersection: nested `&` is inlined, repeats
+and the identity elements `unknown` and `object` are dropped, since
+`A & object` is `A`, and `any` absorbs the whole intersection as in
+TypeScript. An inline `{ … }` lowers to `object`, so where an
+intersection is not hoisted to an interface (see
+[Intersections](#intersections) under anonymous interface synthesis)
+the common required-field refinement collapses to the named type, and
+`(string & {})` inside a union is the plain `string` arm. A single
+survivor is used bare; none is `Object`.
 
 Two or more surviving members reach codegen as an `Intersection` and
 are lowered to a bound. `A & B` is a subtype of every member, so each
@@ -1629,7 +1644,9 @@ Unrelated or unnamed members erase to `JsValue` with a diagnostic:
 ```text
 Options & { onlyIf: Conditional }    -> Options     (literal refines Options)
 "a" | "b" | (string & {})            -> "a" | "b" | string
+T & { id: string }                   -> T
 Derived & Base                       -> Derived     (Derived extends Base)
+Derived & any                        -> any
 { a: string } & { b: number }        -> Object
 Derived & Unrelated                  -> JsValue     (no member subtypes the other)
 ```

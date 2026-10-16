@@ -76,6 +76,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
             docs: self.docs,
             used_type_names: &mut self.used_type_names,
             synth: &mut self.synth,
+            type_arena: self.type_arena,
         }
     }
 

@@ -570,7 +570,15 @@ fn generate_type_alias(
     // We only inspect bare references here; generic instantiations
     // and qualified paths flow through to `to_syn_type` unchanged.
     if let Some(target_name) = alias.target.as_ident() {
-        if !cgctx.local_types.contains_key(target_name)
+        let is_type_param = matches!(
+            cgctx
+                .gctx
+                .scopes
+                .resolve_binding(alias.body_scope, target_name),
+            Some(crate::parse::scope::Binding::TypeParam)
+        );
+        if !is_type_param
+            && !cgctx.local_types.contains_key(target_name)
             && !crate::codegen::typemap::JS_SYS_RESERVED.contains(&target_name)
         {
             cgctx.warn(format!(

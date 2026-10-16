@@ -357,9 +357,11 @@ pub(crate) struct SynthesizedInline {
 }
 
 /// Build the interface for `shape` under `name`. `None` when an
-/// intersection parent lowers to something an interface cannot extend
-/// (a primitive, union, …); top-type parents (`object`, `unknown`) are
-/// simply dropped since they add nothing to the shape.
+/// intersection parent is not something an interface could `extends`:
+/// a type parameter, a name that does not resolve here, or one that
+/// resolves to anything but a class or interface (an alias to a
+/// primitive, say). Top-type parents (`object`, `unknown`) are dropped
+/// since they add nothing to the shape.
 pub(crate) fn synthesize_inline(
     shape: &InlineShape<'_, '_>,
     name: String,
@@ -375,8 +377,18 @@ pub(crate) fn synthesize_inline(
             let mut extends: Vec<TypeRef> = Vec::new();
             for parent in parents {
                 let converted = convert_ts_type_scoped(parent, body_scope, ctx);
-                match converted {
-                    TypeRef::Object | TypeRef::Any | TypeRef::Unknown => {}
+                match &converted {
+                    TypeRef::Object | TypeRef::Unknown => {}
+                    TypeRef::Reference { segments, .. } if segments.len() == 1 => {
+                        if !is_extendable(&segments[0], body_scope, ctx) {
+                            return None;
+                        }
+                        if !extends.contains(&converted) {
+                            extends.push(converted);
+                        }
+                    }
+                    // Qualified names are not resolved at parse time; the
+                    // codegen `extends` lowering drops one that erases.
                     TypeRef::Reference { .. } => {
                         if !extends.contains(&converted) {
                             extends.push(converted);
@@ -413,9 +425,32 @@ pub(crate) fn synthesize_inline(
     })
 }
 
+/// Whether a single-segment name may appear in an interface's `extends`.
+/// A type parameter or a name that does not resolve here cannot; nor can
+/// an alias phase 1 already knows is not an object type. An alias whose
+/// target is still unknown is allowed through: codegen drops a parent
+/// that erases, keeping the literal's own members.
+fn is_extendable(name: &str, scope: ScopeId, ctx: &ParseCtx<'_, '_>) -> bool {
+    match ctx.scopes.resolve_binding(scope, name) {
+        Some(crate::parse::scope::Binding::Declared(id)) => {
+            match &ctx.type_arena[id.index()].kind {
+                TypeKind::Class(_) | TypeKind::Interface(_) => true,
+                TypeKind::TypeAlias(a) => matches!(a.target, TypeRef::Any),
+                _ => false,
+            }
+        }
+        Some(crate::parse::scope::Binding::TypeParam) | None => false,
+    }
+}
+
 /// Try to synthesize an anonymous-interface hoist for a parameter type
 /// (see [`inline_shape`] for the recognised forms). The hoisted
 /// interface lands in `ctx.synth`; the returned `TypeRef` names it.
+///
+/// An intersection of named types alone (`Derived & Base`) is not hoisted
+/// here: a parameter typed as a fresh subtype would force callers to cast
+/// a value they already hold, and the codegen bound names the member the
+/// value actually is. An alias supplies a name of its own, so it hoists.
 fn try_synthesize_inline_param(
     ts_type: &TSType<'_>,
     parent_name: &str,
@@ -424,8 +459,16 @@ fn try_synthesize_inline_param(
     ctx: &mut ParseCtx<'_, '_>,
 ) -> Option<TypeRef> {
     let shape = inline_shape(ts_type)?;
+    if matches!(&shape, InlineShape::Intersection { literals, .. } if literals.is_empty()) {
+        return None;
+    }
+    // Named before the body converts so hoists nested in it dedup against
+    // it; given back if a parent turns out not to be extendable.
     let synth_name = unique_type_name(parent_name, segment, ctx.used_type_names);
-    let synth = synthesize_inline(&shape, synth_name.clone(), Vec::new(), scope, ctx)?;
+    let Some(synth) = synthesize_inline(&shape, synth_name.clone(), Vec::new(), scope, ctx) else {
+        ctx.used_type_names.release(&synth_name);
+        return None;
+    };
     ctx.synth.push(synth.iface);
     Some(TypeRef::ident(synth_name))
 }

@@ -48,6 +48,11 @@ pub(crate) struct ClassConfig<'a> {
     js_name: String,
     /// The `extends` parents (wasm_bindgen supports chained `extends = ...`).
     extends: Vec<TokenStream>,
+    /// Whether the type can `derive(Eq)`. wasm-bindgen stores the first
+    /// parent as the type's field, and a generic parent is spelled bare in
+    /// `extends`, meaning `Parent<JsValue>`, whose derived `Eq` needs
+    /// `JsValue: Eq`. Such a type keeps `PartialEq` only.
+    derive_eq: bool,
     /// Module specifier for `#[wasm_bindgen(module = "...")]`.
     module: Option<std::rc::Rc<str>>,
     /// JS namespace path (e.g., `["WebAssembly"]`) for types inside a
@@ -113,10 +118,7 @@ impl<'a> ClassConfig<'a> {
         // scope to thread through name resolution everywhere inside
         // its extern block.
         let scope = decl.body_scope;
-        let extends = match &decl.extends {
-            Some(e) => vec![extends_tokens(e, cgctx, scope, ctx)],
-            None => vec![quote! { Object }],
-        };
+        let (extends, derive_eq) = extends_list(decl.extends.as_slice(), cgctx, scope, ctx);
         let module = match ctx {
             ModuleContext::Module(m) => Some(m.clone()),
             ModuleContext::Global => None,
@@ -126,6 +128,7 @@ impl<'a> ClassConfig<'a> {
             rust_name: decl.name.clone(),
             js_name: decl.js_name.clone(),
             extends,
+            derive_eq,
             module,
             js_namespace: Vec::new(),
             is_abstract: decl.is_abstract,
@@ -143,14 +146,7 @@ impl<'a> ClassConfig<'a> {
         _enclosing_scope: ScopeId,
     ) -> Self {
         let scope = decl.body_scope;
-        let extends = if decl.extends.is_empty() {
-            vec![quote! { Object }]
-        } else {
-            decl.extends
-                .iter()
-                .map(|e| extends_tokens(e, cgctx, scope, ctx))
-                .collect()
-        };
+        let (extends, derive_eq) = extends_list(&decl.extends, cgctx, scope, ctx);
         let module = match ctx {
             ModuleContext::Module(m) => Some(m.clone()),
             ModuleContext::Global => None,
@@ -160,6 +156,7 @@ impl<'a> ClassConfig<'a> {
             rust_name: decl.name.clone(),
             js_name: decl.js_name.clone(),
             extends,
+            derive_eq,
             module,
             js_namespace: Vec::new(),
             is_abstract: false,
@@ -190,6 +187,7 @@ impl<'a> ClassConfig<'a> {
             rust_name: decl.name.clone(),
             js_name: decl.js_name.clone(),
             extends: vec![quote! { Object }],
+            derive_eq: true,
             module,
             js_namespace: Vec::new(),
             is_abstract: false,
@@ -1411,10 +1409,11 @@ fn generate_type_decl(config: &ClassConfig) -> TokenStream {
     };
 
     let generics_decl = config.type_generics_decl();
+    let eq = config.derive_eq.then(|| quote! { , Eq });
 
     quote! {
         #wb_attr
-        #[derive(Debug, Clone, PartialEq, Eq)]
+        #[derive(Debug, Clone, PartialEq #eq)]
         pub type #rust_ident #generics_decl;
     }
 }
@@ -1949,23 +1948,37 @@ fn generate_static_setter(
 // ─── Helpers ─────────────────────────────────────────────────────────
 
 /// Convert concrete params to `fn` parameter token stream.
-/// Convert a `TypeRef` representing an extends target into tokens for
-/// the `extends = ...` attribute.
-///
-/// Falls back to `Object` for unresolved types — `extends = JsValue` is
-/// never useful (it's implicit and causes conflicting trait impls).
-fn extends_tokens(
-    ty: &TypeRef,
+/// Lower the `extends` parents of a declaration. A parent that erases to
+/// `JsValue` is dropped rather than replaced: `JsValue` is implicit, and
+/// a stand-in `Object` would take the first slot, which wasm-bindgen
+/// makes the `Deref` target. `Object` closes the list when nothing else
+/// does. Also reports whether the type can `derive(Eq)`, which a generic
+/// first parent rules out (see [`ClassConfig::derive_eq`]).
+fn extends_list(
+    parents: &[TypeRef],
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
     from_module: &ModuleContext,
-) -> TokenStream {
-    // Only named references are valid `extends` targets; structural
-    // types and primitives don't have a single supertype identity at the
-    // wasm-bindgen level. The attribute takes a bare path, so a generic
-    // parent is named without its arguments.
-    let tokens = match ty {
-        TypeRef::Reference { segments, .. } => super::typemap::to_syn_type(
+) -> (Vec<TokenStream>, bool) {
+    let mut out = Vec::new();
+    let mut derive_eq = true;
+    for parent in parents {
+        let TypeRef::Reference {
+            segments,
+            generic_args,
+        } = parent
+        else {
+            if let Some(ctx) = cgctx {
+                ctx.warn(format!(
+                    "unsupported extends type `{}`, ignored",
+                    parent.format_ts()
+                ));
+            }
+            continue;
+        };
+        // The attribute takes a bare path, so a generic parent is named
+        // without its arguments.
+        let tokens = super::typemap::to_syn_type(
             &TypeRef::Reference {
                 segments: segments.clone(),
                 generic_args: Vec::new(),
@@ -1974,21 +1987,17 @@ fn extends_tokens(
             cgctx,
             scope,
             from_module,
-        ),
-        _ => {
-            if let Some(ctx) = cgctx {
-                ctx.warn(format!(
-                    "unsupported extends type `{ty:?}`, falling back to Object"
-                ));
-            }
-            quote! { Object }
+        );
+        if tokens.to_string() == "JsValue" {
+            continue;
         }
-    };
-    // JsValue is the root of all wasm_bindgen types — extending it is
-    // implicit, so fall back to Object (which is always safe).
-    if tokens.to_string() == "JsValue" {
-        quote! { Object }
-    } else {
-        tokens
+        if out.is_empty() && !generic_args.is_empty() {
+            derive_eq = false;
+        }
+        out.push(tokens);
     }
+    if out.is_empty() {
+        out.push(quote! { Object });
+    }
+    (out, derive_eq)
 }

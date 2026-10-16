@@ -36192,8 +36192,8 @@ pub mod rpc {
     }
     #[wasm_bindgen]
     extern "C" {
-        # [wasm_bindgen (extends = Object , extends = StubBase , js_namespace = "Rpc")]
-        #[derive(Debug, Clone, PartialEq, Eq)]
+        # [wasm_bindgen (extends = StubBase , extends = Object , js_namespace = "Rpc")]
+        #[derive(Debug, Clone, PartialEq)]
         pub type Stub<T: ::wasm_bindgen::JsGeneric>;
     }
 }

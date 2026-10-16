@@ -150,6 +150,10 @@ impl GlobalContext {
         &self.types[id.index()]
     }
 
+    pub fn get_type_mut(&mut self, id: TypeId) -> &mut TypeDeclaration {
+        &mut self.types[id.index()]
+    }
+
     /// Read-only access to the full type arena slice.
     pub fn type_arena(&self) -> &[TypeDeclaration] {
         &self.types

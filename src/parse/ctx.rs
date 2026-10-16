@@ -45,4 +45,8 @@ pub struct ParseCtx<'arena, 'docs> {
     /// drains this and emits the synthesized interfaces alongside
     /// the parent declaration.
     pub synth: &'arena mut Vec<InterfaceDecl>,
+    /// Phase 1 declarations, read-only. Placeholders carry each name's
+    /// registered kind, which is what parse-time decisions that depend on
+    /// what a name *is* (class, interface, alias) consult.
+    pub type_arena: &'arena [crate::ir::TypeDeclaration],
 }
