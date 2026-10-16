@@ -40,15 +40,23 @@ extern "C" {
     #[wasm_bindgen(thread_local_v2)]
     pub static console: String;
 }
-#[wasm_bindgen(module = "mod-a")]
-extern "C" {
-    #[allow(non_upper_case_globals)]
-    #[wasm_bindgen(thread_local_v2)]
-    pub static value: String;
+pub mod mod_a {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen(module = "mod-a")]
+    extern "C" {
+        #[allow(non_upper_case_globals)]
+        #[wasm_bindgen(thread_local_v2)]
+        pub static value: String;
+    }
 }
-#[wasm_bindgen(module = "mod-b")]
-extern "C" {
-    #[allow(non_upper_case_globals)]
-    #[wasm_bindgen(thread_local_v2, js_name = "value")]
-    pub static value_2: String;
+pub mod mod_b {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen(module = "mod-b")]
+    extern "C" {
+        #[allow(non_upper_case_globals)]
+        #[wasm_bindgen(thread_local_v2)]
+        pub static value: String;
+    }
 }

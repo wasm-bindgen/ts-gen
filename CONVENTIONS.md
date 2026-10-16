@@ -929,23 +929,26 @@ declare module "cloudflare:email" {
 }
 ```
 
-Recognised as a module-scoped class declaration. ts-gen never emits a
-local `mod` wrapper for this — the decl appears at global scope only
-when `cloudflare:email` is listed in `--export` (the lifted state),
-with its `#[wasm_bindgen(module = "cloudflare:email")]` attribute
-already attached to the extern block:
+Recognised as a module-scoped class declaration. When
+`cloudflare:email` is listed in `--export`, it is emitted in the
+module's `pub mod`, with its `#[wasm_bindgen(module = "cloudflare:email")]`
+attribute attached to the extern block:
 
 ```rust
-#[wasm_bindgen(module = "cloudflare:email")]
-extern "C" {
-    pub type EmailMessage;
-    #[wasm_bindgen(constructor, catch)]
-    pub fn new(from: &str, to: &str, raw: &str) -> Result<EmailMessage, JsValue>;
-    // ...
+pub mod cloudflare {
+    pub mod email {
+        #[wasm_bindgen(module = "cloudflare:email")]
+        extern "C" {
+            pub type EmailMessage;
+            #[wasm_bindgen(constructor, catch)]
+            pub fn new(from: &str, to: &str, raw: &str) -> Result<EmailMessage, JsValue>;
+            // ...
+        }
+    }
 }
 ```
 
-References from elsewhere use the bare `EmailMessage` ident. See
+References from elsewhere are qualified, `cloudflare::email::EmailMessage`. See
 [Module declarations and namespace
 nesting](#module-declarations-and-namespace-nesting) for the
 `--export` / `--external` knobs.
@@ -1830,14 +1833,36 @@ A `declare module "<spec>" { ... }` block introduces a set of
 declarations whose `module_context` is `Module("<spec>")`. They are
 **resolved** at parse time so cross-module references work, but
 whether they are **emitted** is governed by `--export` and
-`--external`. ts-gen never wraps emitted code in a local `mod` block
-— a module-context declaration has exactly three possible states:
+`--external`.
 
-1. **Exported (lifted)** — `<spec>` is in `--export`. The
-   declaration emits at global scope with its
+An input describes an environment: its globals and the host modules
+it can import. The output mirrors it, with the globals at the top
+level and each emitted module in its own `pub mod`, one segment per
+`:` or `/` component of the specifier:
+
+| Specifier | Rust module |
+|---|---|
+| `node:fs` | `node::fs` |
+| `node:fs/promises` | `node::fs::promises` |
+| `cloudflare:email` | `cloudflare::email` |
+| `assets:*` | `assets` |
+
+Components without an identifier character, such as `*`, are dropped.
+Modules sharing a prefix, and a namespace with the same path, share
+one `pub mod`, so `cloudflare::email` sits next to the members of a
+global `namespace Cloudflare`. The `--lib-name` module is the
+exception: it is the library the output binds, so its declarations,
+the file's top-level exports and any `declare module` of that name,
+are emitted at the top level.
+
+A module-context declaration has exactly three possible states:
+
+1. **Exported** — `<spec>` is in `--export`. The declaration is
+   emitted in the module's `pub mod` with its
    `#[wasm_bindgen(module = "<spec>")]` attribute attached to the
-   extern block. Cross-references from other emitted code use the
-   bare ident.
+   extern block. References from other emitted code are qualified
+   relative to where they are emitted (`cloudflare::email::EmailMessage`
+   from the top level, `super::super::Socket` from `cloudflare::sockets`).
 
 2. **Externalised (suppressed)** — every type in `<spec>` resolves
    through `--external`. The declaration is not emitted; references
@@ -1852,7 +1877,7 @@ whether they are **emitted** is governed by `--export` and
    ```text
    error: type `Bar` from module "x:foo" is referenced by exported
      declarations but module "x:foo" is not in --export and not in
-     --external. Add `--export x:foo` to lift it to global scope, or
+     --external. Add `--export x:foo` to emit it, or
      `--external x:foo=...` to point at a separately-generated crate.
    ```
 
@@ -1861,7 +1886,7 @@ whether they are **emitted** is governed by `--export` and
    surfaces at the next ts-gen run, not at `cargo build`.
 
 `--external` always wins over `--export`: a module in both is
-externalised, not lifted.
+externalised, not emitted.
 
 For `Global` declarations (top-level `declare class`, `declare
 function`, `declare const`, etc. in a script file) the rule is simpler:
@@ -1893,8 +1918,8 @@ what actually gets emitted as public Rust code. Two forms:
 
 * **File path** (e.g. `--export types/email.d.ts`) — emit that file's
   **global-scope** declarations.
-* **Module specifier** (e.g. `--export cloudflare:email`) — lift that
-  module's declarations to global scope, attribute-attached.
+* **Module specifier** (e.g. `--export cloudflare:email`) — emit that
+  module's declarations in its `pub mod`, attribute-attached.
 
 When `--export` is omitted entirely, every `--input` file becomes an
 implicit file export. **No modules are emitted by the implicit
@@ -1906,7 +1931,7 @@ disabled and only what's listed contributes to the output. So
 ts-gen --input types/email.d.ts --export cloudflare:email
 ```
 
-emits ONLY the `cloudflare:email` module (lifted to global), not the
+emits ONLY the `cloudflare:email` module (as `cloudflare::email`), not the
 file's other globals. To get both you list both:
 
 ```sh
@@ -1949,19 +1974,24 @@ interface SendEmail {
 With `--export types/email.d.ts --export cloudflare:email`:
 
 ```rust
-#[wasm_bindgen(module = "cloudflare:email")]
-extern "C" {
-    pub type EmailMessage;             // lifted to global scope
+pub mod cloudflare {
+    pub mod email {
+        #[wasm_bindgen(module = "cloudflare:email")]
+        extern "C" {
+            pub type EmailMessage;
+        }
+    }
 }
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(extends = EmailMessage)]
-    pub type ForwardableEmailMessage;  // bare ident — no `email::` prefix
+    #[wasm_bindgen(extends = cloudflare::email::EmailMessage)]
+    pub type ForwardableEmailMessage;
 }
 #[wasm_bindgen]
 extern "C" {
     pub type SendEmail;
-    pub fn send(this: &SendEmail, message: &EmailMessage) -> Promise<EmailSendResult>;
+    pub fn send(this: &SendEmail, message: &cloudflare::email::EmailMessage)
+        -> Promise<EmailSendResult>;
 }
 ```
 
@@ -2033,15 +2063,17 @@ declare module "util" {
 ```
 
 ```rust
-#[wasm_bindgen(module = "util")]
-extern "C" {
-    pub fn inspect(object: &JsValue) -> String;
-}
-pub mod inspect {
+pub mod util {
     #[wasm_bindgen(module = "util")]
     extern "C" {
-        #[wasm_bindgen(thread_local_v2, js_name = "defaultOptions", js_namespace = "inspect")]
-        pub static default_options: super::InspectOptions;
+        pub fn inspect(object: &JsValue) -> String;
+    }
+    pub mod inspect {
+        #[wasm_bindgen(module = "util")]
+        extern "C" {
+            #[wasm_bindgen(thread_local_v2, js_name = "defaultOptions", js_namespace = "inspect")]
+            pub static default_options: super::InspectOptions;
+        }
     }
 }
 ```
@@ -2056,6 +2088,13 @@ member that shares its name with a top-level type is a different
 declaration with its own arity. A qualified name that resolves to
 nothing erases to `JsValue` with an error rather than matching a local
 type by its last segment.
+
+A namespace the module assigns with `export =` is the module itself, so
+its members are the module's exports and are emitted directly in the
+module's `pub mod`, without `js_namespace`. In `node:assert`
+(`function assert` + `namespace assert` + `export = assert`),
+`strictEqual` binds as `import { strictEqual }`, since the module has
+no `assert` export to reach it through.
 
 A namespace merged with a same-named class, function or interface
 (`class Foo {}` + `namespace Foo { interface Options {} }`) leaves

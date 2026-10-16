@@ -121,45 +121,49 @@ pub enum HttpStatus {
     NotFound = 404u32,
     InternalServerError = 500u32,
 }
-#[wasm_bindgen(module = "my-module")]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "doWork")]
-    pub async fn do_work(input: &str) -> Result<JsString, JsValue>;
-}
-#[wasm_bindgen(module = "my-module")]
-extern "C" {
-    # [wasm_bindgen (extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type WorkResult;
-    #[wasm_bindgen(method, getter)]
-    pub fn success(this: &WorkResult) -> bool;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_success(this: &WorkResult, val: bool);
-    #[wasm_bindgen(method, getter)]
-    pub fn data(this: &WorkResult) -> Option<String>;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_data(this: &WorkResult, val: &str);
-}
-impl WorkResult {
-    pub fn new(success: bool) -> WorkResult {
-        Self::builder(success).build()
+pub mod my_module {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen(module = "my-module")]
+    extern "C" {
+        #[wasm_bindgen(catch, js_name = "doWork")]
+        pub async fn do_work(input: &str) -> Result<JsString, JsValue>;
     }
-    pub fn builder(success: bool) -> WorkResultBuilder {
-        let inner: WorkResult = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_success(success);
-        WorkResultBuilder { inner }
+    #[wasm_bindgen(module = "my-module")]
+    extern "C" {
+        # [wasm_bindgen (extends = Object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type WorkResult;
+        #[wasm_bindgen(method, getter)]
+        pub fn success(this: &WorkResult) -> bool;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_success(this: &WorkResult, val: bool);
+        #[wasm_bindgen(method, getter)]
+        pub fn data(this: &WorkResult) -> Option<String>;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_data(this: &WorkResult, val: &str);
     }
-}
-pub struct WorkResultBuilder {
-    inner: WorkResult,
-}
-impl WorkResultBuilder {
-    pub fn data(self, val: &str) -> Self {
-        self.inner.set_data(val);
-        self
+    impl WorkResult {
+        pub fn new(success: bool) -> WorkResult {
+            Self::builder(success).build()
+        }
+        pub fn builder(success: bool) -> WorkResultBuilder {
+            let inner: WorkResult = JsCast::unchecked_into(js_sys::Object::new());
+            inner.set_success(success);
+            WorkResultBuilder { inner }
+        }
     }
-    pub fn build(self) -> WorkResult {
-        self.inner
+    pub struct WorkResultBuilder {
+        inner: WorkResult,
+    }
+    impl WorkResultBuilder {
+        pub fn data(self, val: &str) -> Self {
+            self.inner.set_data(val);
+            self
+        }
+        pub fn build(self) -> WorkResult {
+            self.inner
+        }
     }
 }
 #[wasm_bindgen]

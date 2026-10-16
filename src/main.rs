@@ -24,10 +24,10 @@ struct Cli {
     /// Two forms:
     ///   - File path (e.g. `types/email.d.ts`) — emits that file's
     ///     **global-scope** declarations.
-    ///   - Module specifier (e.g. `cloudflare:email`) — lifts that
-    ///     module's declarations to global scope in the output. The
-    ///     `#[wasm_bindgen(module = "...")]` attribute already on each
-    ///     extern block keeps the module association.
+    ///   - Module specifier (e.g. `cloudflare:email`) — emits that
+    ///     module's declarations in a `pub mod` named by the specifier
+    ///     (`cloudflare::email`). The `--lib-name` module is emitted at
+    ///     the top level instead.
     ///
     /// When omitted entirely, every `--input` file becomes an implicit
     /// file export. NO modules are emitted by the implicit default —
@@ -38,6 +38,8 @@ struct Cli {
     export: Vec<String>,
 
     /// JS module specifier (required when .d.ts has top-level exports).
+    /// This module is the library the output binds, so it is emitted at
+    /// the top level rather than in a `pub mod`.
     #[arg(long)]
     lib_name: Option<String>,
 

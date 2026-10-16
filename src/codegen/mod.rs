@@ -12,7 +12,7 @@ pub mod signatures;
 pub mod subtyping;
 pub mod typemap;
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 
 use proc_macro2::TokenStream;
@@ -78,11 +78,10 @@ pub struct GenerateOptions {
     /// * Empty → implicit default: emit every input file's global
     ///   declarations. No module-context declarations are emitted.
     /// * Non-empty → authoritative: emit exactly the listed files'
-    ///   globals plus the listed modules' declarations. Modules in
-    ///   this set are lifted directly to global scope — there is no
-    ///   enclosing `mod` block; the per-decl
-    ///   `#[wasm_bindgen(module = "...")]` attribute carries the
-    ///   module association.
+    ///   globals plus the listed modules' declarations. Each module is
+    ///   emitted in a `pub mod` named by its specifier (`node:fs` →
+    ///   `node::fs`), except the `--lib-name` module, which is emitted
+    ///   at the top level.
     ///
     /// A module that is fully covered by `--external` is always
     /// suppressed from emission regardless of its presence here.
@@ -120,8 +119,8 @@ pub enum ExportSpec {
     /// Canonical path of an input file whose global-scope
     /// declarations should be emitted.
     File(PathBuf),
-    /// JS module specifier whose declarations are lifted to global
-    /// scope in the output.
+    /// JS module specifier whose declarations are emitted in its
+    /// `pub mod`.
     Module(String),
 }
 
@@ -291,17 +290,16 @@ fn generate_tokens(
         }
     };
 
-    let mut global_items = Vec::new();
-    let mut static_names = functions::StaticNames::default();
+    let mut root = ModTree::default();
     for &type_id in &module.types {
         let decl = gctx.get_type(type_id);
-        if !should_emit(decl) {
-            continue;
-        }
-        if let Some(tokens) = generate_declaration(decl, &cgctx, &mut static_names) {
-            global_items.push(tokens);
+        if should_emit(decl) {
+            root.at(&cgctx.module_path(&decl.module_context))
+                .insert(decl, Vec::new(), gctx);
         }
     }
+    let global_items = root.generate(&mut Vec::new(), &cgctx);
+    cgctx.emit_path.replace(Vec::new());
 
     let external_uses = cgctx.external_use_tokens();
 
@@ -525,7 +523,8 @@ fn generate_declaration(
             decl.scope_id,
             &decl.module_context,
         )),
-        TypeKind::Namespace(ns) => Some(generate_namespace(ns, &[], cgctx)),
+        // Namespaces are `ModTree` children.
+        TypeKind::Namespace(_) => None,
     }
 }
 
@@ -654,42 +653,87 @@ pub(crate) fn js_namespace_attr(js_namespace: &[String]) -> Option<TokenStream> 
     }
 }
 
-/// Generate a Rust `mod` block for a namespace, with all nested declarations.
-/// `parent_js_namespace` is the JS path of the enclosing namespaces.
-fn generate_namespace(
-    ns: &crate::ir::NamespaceDecl,
-    parent_js_namespace: &[String],
-    cgctx: &CodegenContext,
-) -> TokenStream {
-    let mod_name = typemap::make_ident(&crate::util::naming::to_snake_case(&ns.name));
-    let mut js_namespace = parent_js_namespace.to_vec();
-    js_namespace.push(ns.name.clone());
+/// The top level of the output, or one `pub mod` in it. A declared module
+/// (`node:fs` → `node::fs`) and a namespace each get one, and share it when
+/// their paths meet, as `cloudflare:email` and a global
+/// `namespace Cloudflare` do under `cloudflare`.
+#[derive(Default)]
+struct ModTree<'d> {
+    entries: Vec<ModEntry<'d>>,
+    children: HashMap<String, ModTree<'d>>,
+}
 
-    let mut static_names = functions::StaticNames::default();
-    let path = cgctx.namespace_paths[&ns.child_scope].clone();
-    let outer = cgctx.emit_path.replace(path);
-    let items: Vec<TokenStream> = ns
-        .declarations
-        .iter()
-        .filter_map(|&id| {
-            generate_ns_declaration(
-                cgctx.gctx.get_type(id),
-                &js_namespace,
-                cgctx,
-                &mut static_names,
-            )
-        })
-        .collect();
-    cgctx.emit_path.replace(outer);
+enum ModEntry<'d> {
+    /// A declaration and the JS path of the namespaces enclosing it.
+    Item(&'d TypeDeclaration, Vec<String>),
+    /// A child `pub mod`, at the position of its first declaration.
+    Mod(String),
+}
 
-    // Members name `js_sys` types, globals and the file's external aliases
-    // bare, exactly like top-level items.
-    quote! {
-        pub mod #mod_name {
-            #[allow(unused_imports)]
-            use super::*;
-            #(#items)*
+impl<'d> ModTree<'d> {
+    fn child(&mut self, name: &str) -> &mut ModTree<'d> {
+        if !self.children.contains_key(name) {
+            self.entries.push(ModEntry::Mod(name.to_string()));
         }
+        self.children.entry(name.to_string()).or_default()
+    }
+
+    fn at(&mut self, path: &[String]) -> &mut ModTree<'d> {
+        path.iter().fold(self, |node, name| node.child(name))
+    }
+
+    /// Add `decl`, whose enclosing namespaces have the JS path
+    /// `js_namespace`. A namespace becomes a child holding its members.
+    fn insert(
+        &mut self,
+        decl: &'d TypeDeclaration,
+        mut js_namespace: Vec<String>,
+        gctx: &'d crate::context::GlobalContext,
+    ) {
+        match &decl.kind {
+            TypeKind::Namespace(ns) => {
+                let child = self.child(&crate::util::naming::to_snake_case(&ns.name));
+                js_namespace.push(ns.name.clone());
+                for &id in &ns.declarations {
+                    child.insert(gctx.get_type(id), js_namespace.clone(), gctx);
+                }
+            }
+            _ => self.entries.push(ModEntry::Item(decl, js_namespace)),
+        }
+    }
+
+    /// Generate this module's items. `path` is its `pub mod` path.
+    fn generate(&self, path: &mut Vec<String>, cgctx: &CodegenContext) -> Vec<TokenStream> {
+        let mut static_names = functions::StaticNames::default();
+        let mut items = Vec::new();
+        for entry in &self.entries {
+            match entry {
+                ModEntry::Item(decl, js_namespace) => {
+                    cgctx.emit_path.replace(path.clone());
+                    items.extend(if js_namespace.is_empty() {
+                        generate_declaration(decl, cgctx, &mut static_names)
+                    } else {
+                        generate_ns_declaration(decl, js_namespace, cgctx, &mut static_names)
+                    });
+                }
+                ModEntry::Mod(name) => {
+                    path.push(name.clone());
+                    let members = self.children[name].generate(path, cgctx);
+                    path.pop();
+                    let ident = typemap::make_ident(name);
+                    // Members name `js_sys` types, globals and the file's
+                    // external aliases bare, exactly like top-level items.
+                    items.push(quote! {
+                        pub mod #ident {
+                            #[allow(unused_imports)]
+                            use super::*;
+                            #(#members)*
+                        }
+                    });
+                }
+            }
+        }
+        items
     }
 }
 
@@ -765,7 +809,8 @@ fn generate_ns_declaration(
             decl.scope_id,
             &decl.module_context,
         )),
-        TypeKind::Namespace(ns) => Some(generate_namespace(ns, js_namespace, cgctx)),
+        // Namespaces are `ModTree` children.
+        TypeKind::Namespace(_) => None,
     }
 }
 

@@ -66,6 +66,9 @@ struct Entry {
     externals: Vec<String>,
     /// Whether this fixture opts into per-monomorphization generic imports.
     experimental_generic_mono: bool,
+    /// Further modules listed as `--export <specifier>`, emitted alongside
+    /// `lib_name`.
+    export_modules: Vec<String>,
 }
 
 /// Pair every `integration-tests/tests/<name>.rs` with the fixture
@@ -110,6 +113,7 @@ fn discover_entries(tests_dir: &Path, fixtures_dir: &Path) -> Vec<Entry> {
             dts_path,
             externals: directive.externals,
             experimental_generic_mono: directive.experimental_generic_mono,
+            export_modules: directive.export_modules,
         });
     }
 
@@ -124,6 +128,8 @@ struct Directive {
     externals: Vec<String>,
     /// Whether `--experimental-generic-mono` is present.
     experimental_generic_mono: bool,
+    /// `--export` values that name a module rather than a fixture file.
+    export_modules: Vec<String>,
 }
 
 /// Parse the `//! @ts-gen ...` directive lines at the top of the fixture
@@ -133,6 +139,7 @@ fn parse_directive(dts_path: &Path) -> Directive {
     let mut lib_name = None;
     let mut externals = Vec::new();
     let mut experimental_generic_mono = false;
+    let mut export_modules = Vec::new();
 
     for line in content.lines() {
         let trimmed = line.trim();
@@ -147,6 +154,12 @@ fn parse_directive(dts_path: &Path) -> Directive {
                     }
                     "--external" | "-e" if i + 1 < args.len() => {
                         externals.push(args[i + 1].clone());
+                        i += 2;
+                    }
+                    "--export" | "-E" if i + 1 < args.len() => {
+                        if !args[i + 1].ends_with(".d.ts") {
+                            export_modules.push(args[i + 1].clone());
+                        }
                         i += 2;
                     }
                     "--experimental-generic-mono" => {
@@ -165,6 +178,7 @@ fn parse_directive(dts_path: &Path) -> Directive {
         lib_name,
         externals,
         experimental_generic_mono,
+        export_modules,
     }
 }
 
@@ -215,12 +229,16 @@ fn generate_bindings(entry: &Entry, out_dir: &Path) {
     }
 
     // The fixture's `--lib-name` causes every declaration to land in
-    // `ModuleContext::Module(lib_name)`. Lift it explicitly via
-    // `ExportSpec::Module` so codegen emits it at global scope. The file
-    // export covers any `declare global` block in the fixture.
+    // `ModuleContext::Module(lib_name)`, which codegen emits at the top
+    // level once selected via `ExportSpec::Module`. Further `--export`
+    // modules are emitted in their own `pub mod`. The file export covers
+    // any `declare global` block in the fixture.
     let mut exports: std::collections::HashSet<ts_gen::codegen::ExportSpec> =
         std::collections::HashSet::new();
     exports.insert(ts_gen::codegen::ExportSpec::Module(entry.lib_name.clone()));
+    for module in &entry.export_modules {
+        exports.insert(ts_gen::codegen::ExportSpec::Module(module.clone()));
+    }
     exports.insert(ts_gen::codegen::ExportSpec::File(
         entry.dts_path.canonicalize().unwrap(),
     ));

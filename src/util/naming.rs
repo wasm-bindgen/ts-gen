@@ -38,6 +38,24 @@ pub fn module_specifier_to_ident(specifier: &str) -> String {
 /// — a digit followed by a letter still introduces a boundary
 /// (`HTML5Element` → `html5_element` would still split the `5e`,
 /// matching the standard convention).
+/// Rust module path for a JS module specifier, one snake_case segment per
+/// `:` or `/` component: `node:fs/promises` → `node::fs::promises`.
+/// Components without an identifier character, such as the `*` of
+/// `assets:*`, are dropped.
+pub fn module_path(specifier: &str) -> Vec<String> {
+    specifier
+        .split([':', '/'])
+        .map(|component| {
+            let component: String = component
+                .chars()
+                .filter(|c| c.is_alphanumeric() || matches!(c, '_' | '-'))
+                .collect();
+            to_snake_case(&component)
+        })
+        .filter(|segment| !segment.is_empty())
+        .collect()
+}
+
 pub fn to_snake_case(name: &str) -> String {
     // First pass through `convert_case::Case::Snake` to do the
     // standard splits (camelCase boundaries, runs of caps, etc.).
@@ -211,6 +229,19 @@ mod tests {
         assert_eq!(scope.declare("Kind", Suffix::Pascal), "Kind3");
         assert!(scope.contains("Kind3"));
         assert!(!scope.claim("foo_3"));
+    }
+
+    #[test]
+    fn module_path_splits_scheme_and_subpath() {
+        let path = |spec: &str| module_path(spec).join("::");
+        assert_eq!(path("node:fs"), "node::fs");
+        assert_eq!(path("node:fs/promises"), "node::fs::promises");
+        assert_eq!(path("cloudflare:email"), "cloudflare::email");
+        assert_eq!(path("node:http2"), "node::http2");
+        assert_eq!(path("es-module-lexer"), "es_module_lexer");
+        assert_eq!(path("@scope/pkg/sub"), "scope::pkg::sub");
+        assert_eq!(path("assets:*"), "assets");
+        assert_eq!(path("worker_threads"), "worker_threads");
     }
 
     #[test]

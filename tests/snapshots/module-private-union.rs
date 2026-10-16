@@ -4,49 +4,57 @@
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
-#[allow(dead_code)]
-pub type Id = JsString;
-#[wasm_bindgen(module = "x:shapes")]
-extern "C" {
-    # [wasm_bindgen (extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Base;
-    #[wasm_bindgen(method)]
-    pub fn base(this: &Base);
-    #[wasm_bindgen(method, catch, js_name = "base")]
-    pub fn try_base(this: &Base) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "x:shapes")]
-extern "C" {
-    # [wasm_bindgen (extends = Base , extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type A;
-    #[wasm_bindgen(method)]
-    pub fn a(this: &A);
-    #[wasm_bindgen(method, catch, js_name = "a")]
-    pub fn try_a(this: &A) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "x:shapes")]
-extern "C" {
-    # [wasm_bindgen (extends = Base , extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type B;
-    #[wasm_bindgen(method)]
-    pub fn b(this: &B);
-    #[wasm_bindgen(method, catch, js_name = "b")]
-    pub fn try_b(this: &B) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(module = "x:shapes")]
-extern "C" {
-    pub fn list() -> ListReturnKind;
-}
-#[wasm_bindgen(module = "x:shapes")]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "list")]
-    pub fn try_list() -> Result<ListReturnKind, JsValue>;
+pub mod x {
+    #[allow(unused_imports)]
+    use super::*;
+    pub mod shapes {
+        #[allow(unused_imports)]
+        use super::*;
+        #[allow(dead_code)]
+        pub type Id = JsString;
+        #[wasm_bindgen(module = "x:shapes")]
+        extern "C" {
+            # [wasm_bindgen (extends = Object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type Base;
+            #[wasm_bindgen(method)]
+            pub fn base(this: &Base);
+            #[wasm_bindgen(method, catch, js_name = "base")]
+            pub fn try_base(this: &Base) -> Result<(), JsValue>;
+        }
+        #[wasm_bindgen(module = "x:shapes")]
+        extern "C" {
+            # [wasm_bindgen (extends = Base , extends = Object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type A;
+            #[wasm_bindgen(method)]
+            pub fn a(this: &A);
+            #[wasm_bindgen(method, catch, js_name = "a")]
+            pub fn try_a(this: &A) -> Result<(), JsValue>;
+        }
+        #[wasm_bindgen(module = "x:shapes")]
+        extern "C" {
+            # [wasm_bindgen (extends = Base , extends = Object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type B;
+            #[wasm_bindgen(method)]
+            pub fn b(this: &B);
+            #[wasm_bindgen(method, catch, js_name = "b")]
+            pub fn try_b(this: &B) -> Result<(), JsValue>;
+        }
+        #[wasm_bindgen(module = "x:shapes")]
+        extern "C" {
+            pub fn list() -> ListReturnKind;
+        }
+        #[wasm_bindgen(module = "x:shapes")]
+        extern "C" {
+            #[wasm_bindgen(catch, js_name = "list")]
+            pub fn try_list() -> Result<ListReturnKind, JsValue>;
+        }
+    }
 }
 #[wasm_bindgen(private)]
 pub enum ListReturnKind {
     Array(Array<JsString>),
-    Promise(Promise<Base>),
+    Promise(Promise<x::shapes::Base>),
 }

@@ -1,0 +1,10 @@
+{
+  "name": "declared-modules",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./fs": "./fs.js",
+    "./os": "./os.js"
+  }
+}

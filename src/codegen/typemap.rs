@@ -168,9 +168,12 @@ pub struct CodegenContext<'a> {
     /// name. `is_local_generic` reads arity from the resolved declaration
     /// and only falls back to this for references it cannot resolve.
     pub local_type_param_counts: HashMap<String, usize>,
-    /// Member scope of each emitted namespace → the path of the `pub mod`
-    /// it is emitted as.
+    /// Member scope of each namespace and declared module → the path of
+    /// the `pub mod` it is emitted as.
     pub namespace_paths: HashMap<ScopeId, Vec<String>>,
+    /// The `--lib-name` module, which is the output's own and emitted at
+    /// the top level.
+    lib_name: Option<String>,
     /// Path of the `pub mod` currently being emitted into, empty at the top
     /// level. References are qualified relative to it, not to the scope
     /// they resolve from: a synthesised union resolves from its use site
@@ -199,9 +202,8 @@ pub struct CodegenContext<'a> {
     /// Whether generic imports use wasm-bindgen's experimental
     /// per-monomorphization codegen rather than type erasure.
     pub experimental_generic_mono: bool,
-    /// JS module specifiers whose declarations are lifted into global
-    /// scope. References to types from these modules emit without the
-    /// `mod_name::` qualifier — they live alongside the global decls.
+    /// JS module specifiers whose declarations are emitted, each in the
+    /// `pub mod` of `module_path`.
     pub exported_modules: HashSet<String>,
     /// JS module specifiers whose declarations are fully covered by the
     /// external map. References to their types resolve through
@@ -439,7 +441,7 @@ impl<'a> CodegenContext<'a> {
     }
 
     /// Build a `CodegenContext` with the full set of per-codegen options
-    /// including the set of JS module specifiers lifted to global scope.
+    /// including the set of emitted JS module specifiers.
     pub fn from_module_full(
         module: &ir::Module,
         gctx: &'a GlobalContext,
@@ -481,6 +483,7 @@ impl<'a> CodegenContext<'a> {
             renamed_locals: HashMap::new(),
             local_type_param_counts: HashMap::new(),
             namespace_paths: HashMap::new(),
+            lib_name: module.lib_name.clone(),
             emit_path: RefCell::new(Vec::new()),
             root_scope: module.builtin_scope,
             file_scopes: module.file_scopes.clone(),
@@ -493,8 +496,15 @@ impl<'a> CodegenContext<'a> {
             externalised_modules,
             unresolved_module_refs: RefCell::new(HashSet::new()),
         };
+        for (spec, scopes) in &gctx.ambient_module_scopes {
+            let path = ctx.specifier_path(spec);
+            for &scope in scopes {
+                ctx.namespace_paths.insert(scope, path.clone());
+            }
+        }
         for &type_id in &module.types {
-            ctx.collect_declaration(type_id, &[]);
+            let path = ctx.module_path(&gctx.get_type(type_id).module_context);
+            ctx.collect_declaration(type_id, &path);
         }
         ctx.resolve_collisions();
         ctx
@@ -510,6 +520,7 @@ impl<'a> CodegenContext<'a> {
             renamed_locals: HashMap::new(),
             local_type_param_counts: HashMap::new(),
             namespace_paths: HashMap::new(),
+            lib_name: None,
             emit_path: RefCell::new(Vec::new()),
             root_scope,
             file_scopes: vec![],
@@ -768,10 +779,32 @@ impl<'a> CodegenContext<'a> {
         }
     }
 
+    /// The `pub mod` path declarations of `module` are emitted in: the top
+    /// level for globals and the `--lib-name` module, and the specifier's
+    /// segments for any other module (`node:fs` → `node::fs`).
+    pub(crate) fn module_path(&self, module: &ModuleContext) -> Vec<String> {
+        match module {
+            ModuleContext::Module(m) => self.specifier_path(m),
+            ModuleContext::Global => Vec::new(),
+        }
+    }
+
+    fn specifier_path(&self, specifier: &str) -> Vec<String> {
+        if self.lib_name.as_deref() == Some(specifier) {
+            return Vec::new();
+        }
+        crate::util::naming::module_path(specifier)
+    }
+
     /// The path from the `pub mod` being emitted into to the one `target`
     /// is declared in, or `None` when they are the same.
     pub(crate) fn namespace_qualifier(&self, target: TypeId) -> Option<TokenStream> {
-        let target_path = self.namespace_path(self.gctx.get_type(target).scope_id);
+        self.path_qualifier(self.namespace_path(self.gctx.get_type(target).scope_id))
+    }
+
+    /// The path from the `pub mod` being emitted into to `target_path`, or
+    /// `None` when they are the same.
+    fn path_qualifier(&self, target_path: &[String]) -> Option<TokenStream> {
         let here = self.emit_path.borrow();
         let common = here
             .iter()
@@ -1325,7 +1358,7 @@ fn emit_type_name(
             }
         }
         // Resolution-only module: the type lives in a `Module(m)` we
-        // parsed but the user neither lifted it (`--export m`) nor
+        // parsed but the user neither emitted it (`--export m`) nor
         // externalised it (`--external m=...`). The reference can't
         // compile against any emitted declaration, so we error and
         // fall back to a `use JsValue as Name;` alias to keep the
@@ -1340,7 +1373,7 @@ fn emit_type_name(
                     ctx.error(format!(
                         "type `{ident_name}` from module \"{m_str}\" is referenced by exported \
                          declarations but module \"{m_str}\" is not in --export and not in \
-                         --external. Add `--export {m_str}` to lift it to global scope, or \
+                         --external. Add `--export {m_str}` to emit it, or \
                          `--external {m_str}=...` to point at a separately-generated crate."
                     ));
                 }
@@ -1355,7 +1388,10 @@ fn emit_type_name(
             .map(String::as_str)
             .unwrap_or(ident_name);
         let ident = make_ident(rust_name);
-        let qualifier = resolved.and_then(|id| ctx.namespace_qualifier(id));
+        let qualifier = match resolved {
+            Some(id) => ctx.namespace_qualifier(id),
+            None => ctx.path_qualifier(&ctx.module_path(&target_module)),
+        };
         return match qualifier {
             Some(prefix) => quote! { #prefix #ident },
             None => quote! { #ident },
@@ -2837,10 +2873,9 @@ mod tests {
     }
 
     #[test]
-    fn test_lifted_module_emits_bare_ident_from_global() {
-        // Module-context decls always emit at global scope (lifted via
-        // `--export`), so references to them from another global decl
-        // are bare — no `mod::` prefix.
+    fn test_declared_module_is_qualified_from_global() {
+        // A declared module is emitted under its specifier's `pub mod`
+        // path, so a global reference to one of its types is qualified.
         let (gctx, scope) = test_gctx();
         let mut ctx = CodegenContext::empty(&gctx, scope);
         ctx.exported_modules.insert("cloudflare:email".to_string());
@@ -2848,16 +2883,21 @@ mod tests {
         ctx.local_types
             .insert("EmailMessage".into(), module.clone());
 
-        let ty = TypeRef::ident("EmailMessage");
-        let result = to_syn_type(
-            &ty,
-            TypePosition::ARGUMENT,
-            Some(&ctx),
-            scope,
-            &ModuleContext::Global,
-        )
-        .to_string();
-        assert_eq!(result, "& EmailMessage");
+        let lower = |ctx: &CodegenContext| {
+            to_syn_type(
+                &TypeRef::ident("EmailMessage"),
+                TypePosition::ARGUMENT,
+                Some(ctx),
+                scope,
+                &ModuleContext::Global,
+            )
+            .to_string()
+        };
+        assert_eq!(lower(&ctx), "& cloudflare :: email :: EmailMessage");
+
+        // The `--lib-name` module is the output's own, at the top level.
+        ctx.lib_name = Some("cloudflare:email".to_string());
+        assert_eq!(lower(&ctx), "& EmailMessage");
     }
 
     #[test]
