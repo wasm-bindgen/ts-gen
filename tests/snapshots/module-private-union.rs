@@ -55,6 +55,6 @@ pub mod x {
 }
 #[wasm_bindgen(private)]
 pub enum ListReturnKind {
-    Array(Array<JsString>),
+    VecOfId(Vec<String>),
     Promise(Promise<x::shapes::Base>),
 }

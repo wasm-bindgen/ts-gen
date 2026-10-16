@@ -8301,28 +8301,28 @@ extern "C" {
         options: &KVNamespaceGetOptions<JsString>,
     ) -> Result<JsOption<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_array_and_type<Key: ::wasm_bindgen::JsGeneric>(
+    pub async fn get_with_slice_and_type<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
-        key: &Array<Key>,
+        key: &[Key],
         r#type: &str,
     ) -> Result<JsOption<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_array<Key: ::wasm_bindgen::JsGeneric>(
+    pub async fn get_with_slice<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
-        key: &Array<Key>,
+        key: &[Key],
     ) -> Result<JsOption<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_array_and_kv_namespace_get_options<Key: ::wasm_bindgen::JsGeneric>(
+    pub async fn get_with_slice_and_kv_namespace_get_options<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
-        key: &Array<Key>,
+        key: &[Key],
         options: &KVNamespaceGetOptions<Undefined>,
     ) -> Result<JsOption<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_key_array_and_options_kv_namespace_get_options<
+    pub async fn get_with_key_slice_and_options_kv_namespace_get_options<
         Key: ::wasm_bindgen::JsGeneric,
     >(
         this: &KVNamespace<Key>,
-        key: &Array<Key>,
+        key: &[Key],
         options: &KVNamespaceGetOptions<JsString>,
     ) -> Result<JsOption<JsString>, JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -8425,38 +8425,38 @@ extern "C" {
         options: &KVNamespaceGetOptions<JsString>,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_array_and_type<
+    pub async fn get_with_metadata_with_slice_and_type<
         Key: ::wasm_bindgen::JsGeneric,
         Metadata: ::wasm_bindgen::JsGeneric,
     >(
         this: &KVNamespace<Key>,
-        key: &Array<Key>,
+        key: &[Key],
         r#type: &str,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_array<
+    pub async fn get_with_metadata_with_slice<
         Key: ::wasm_bindgen::JsGeneric,
         Metadata: ::wasm_bindgen::JsGeneric,
     >(
         this: &KVNamespace<Key>,
-        key: &Array<Key>,
+        key: &[Key],
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_array_and_kv_namespace_get_options<
+    pub async fn get_with_metadata_with_slice_and_kv_namespace_get_options<
         Key: ::wasm_bindgen::JsGeneric,
         Metadata: ::wasm_bindgen::JsGeneric,
     >(
         this: &KVNamespace<Key>,
-        key: &Array<Key>,
+        key: &[Key],
         options: &KVNamespaceGetOptions<Undefined>,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_key_array_and_options_kv_namespace_get_options<
+    pub async fn get_with_metadata_with_key_slice_and_options_kv_namespace_get_options<
         Key: ::wasm_bindgen::JsGeneric,
         Metadata: ::wasm_bindgen::JsGeneric,
     >(
         this: &KVNamespace<Key>,
-        key: &Array<Key>,
+        key: &[Key],
         options: &KVNamespaceGetOptions<JsString>,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -14198,19 +14198,19 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiSearchSearchRequest;
     #[wasm_bindgen(method, getter)]
-    pub fn messages(this: &AiSearchSearchRequest) -> Array<Object>;
+    pub fn messages(this: &AiSearchSearchRequest) -> Vec<Object>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_messages(this: &AiSearchSearchRequest, val: &Array<Object>);
+    pub fn set_messages(this: &AiSearchSearchRequest, val: &[Object]);
     #[wasm_bindgen(method, getter)]
     pub fn ai_search_options(this: &AiSearchSearchRequest) -> Option<Object>;
     #[wasm_bindgen(method, setter)]
     pub fn set_ai_search_options(this: &AiSearchSearchRequest, val: &Object);
 }
 impl AiSearchSearchRequest {
-    pub fn new(messages: &Array<Object>) -> AiSearchSearchRequest {
+    pub fn new(messages: &[Object]) -> AiSearchSearchRequest {
         Self::builder(messages).build()
     }
-    pub fn builder(messages: &Array<Object>) -> AiSearchSearchRequestBuilder {
+    pub fn builder(messages: &[Object]) -> AiSearchSearchRequestBuilder {
         let inner: AiSearchSearchRequest = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
         AiSearchSearchRequestBuilder { inner }
@@ -14234,9 +14234,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiSearchChatCompletionsRequest;
     #[wasm_bindgen(method, getter)]
-    pub fn messages(this: &AiSearchChatCompletionsRequest) -> Array<Object>;
+    pub fn messages(this: &AiSearchChatCompletionsRequest) -> Vec<Object>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_messages(this: &AiSearchChatCompletionsRequest, val: &Array<Object>);
+    pub fn set_messages(this: &AiSearchChatCompletionsRequest, val: &[Object]);
     #[wasm_bindgen(method, getter)]
     pub fn model(this: &AiSearchChatCompletionsRequest) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -14251,10 +14251,10 @@ extern "C" {
     pub fn set_ai_search_options(this: &AiSearchChatCompletionsRequest, val: &Object);
 }
 impl AiSearchChatCompletionsRequest {
-    pub fn new(messages: &Array<Object>) -> AiSearchChatCompletionsRequest {
+    pub fn new(messages: &[Object]) -> AiSearchChatCompletionsRequest {
         Self::builder(messages).build()
     }
-    pub fn builder(messages: &Array<Object>) -> AiSearchChatCompletionsRequestBuilder {
+    pub fn builder(messages: &[Object]) -> AiSearchChatCompletionsRequestBuilder {
         let inner: AiSearchChatCompletionsRequest = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_messages(messages);
         AiSearchChatCompletionsRequestBuilder { inner }
@@ -14290,12 +14290,12 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_search_query(this: &AiSearchSearchResponse, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn chunks(this: &AiSearchSearchResponse) -> Array<Object>;
+    pub fn chunks(this: &AiSearchSearchResponse) -> Vec<Object>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_chunks(this: &AiSearchSearchResponse, val: &Array<Object>);
+    pub fn set_chunks(this: &AiSearchSearchResponse, val: &[Object]);
 }
 impl AiSearchSearchResponse {
-    pub fn new(search_query: &str, chunks: &Array<Object>) -> AiSearchSearchResponse {
+    pub fn new(search_query: &str, chunks: &[Object]) -> AiSearchSearchResponse {
         let inner: AiSearchSearchResponse = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_search_query(search_query);
         inner.set_chunks(chunks);
@@ -16093,15 +16093,15 @@ extern "C" {
         val: &ResponseConversationParam,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn include(this: &ResponsesInput) -> Option<Array<JsString>>;
+    pub fn include(this: &ResponsesInput) -> Option<Vec<String>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_include(this: &ResponsesInput, val: &Array<JsString>);
+    pub fn set_include(this: &ResponsesInput, val: &[String]);
     #[wasm_bindgen(method, getter)]
     pub fn input(this: &ResponsesInput) -> Option<InputKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_input(this: &ResponsesInput, val: &str);
     #[wasm_bindgen(method, setter, js_name = "input")]
-    pub fn set_input_with_array(this: &ResponsesInput, val: &Array);
+    pub fn set_input_with_slice(this: &ResponsesInput, val: &[JsValue]);
     #[wasm_bindgen(method, getter)]
     pub fn instructions(this: &ResponsesInput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -16160,9 +16160,9 @@ extern "C" {
         val: &ToolChoiceFunction,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn tools(this: &ResponsesInput) -> Option<Array<ResponsesFunctionTool>>;
+    pub fn tools(this: &ResponsesInput) -> Option<Vec<ResponsesFunctionTool>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(this: &ResponsesInput, val: &Array<ResponsesFunctionTool>);
+    pub fn set_tools(this: &ResponsesInput, val: &[ResponsesFunctionTool]);
     #[wasm_bindgen(method, getter)]
     pub fn top_p(this: &ResponsesInput) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
@@ -16202,7 +16202,7 @@ impl ResponsesInputBuilder {
             .set_conversation_with_response_conversation_param(val);
         self
     }
-    pub fn include(self, val: &Array<JsString>) -> Self {
+    pub fn include(self, val: &[String]) -> Self {
         self.inner.set_include(val);
         self
     }
@@ -16210,8 +16210,8 @@ impl ResponsesInputBuilder {
         self.inner.set_input(val);
         self
     }
-    pub fn input_with_array(self, val: &Array) -> Self {
-        self.inner.set_input_with_array(val);
+    pub fn input_with_slice(self, val: &[JsValue]) -> Self {
+        self.inner.set_input_with_slice(val);
         self
     }
     pub fn instructions(self, val: &str) -> Self {
@@ -16270,7 +16270,7 @@ impl ResponsesInputBuilder {
         self.inner.set_tool_choice_with_tool_choice_function(val);
         self
     }
-    pub fn tools(self, val: &Array<ResponsesFunctionTool>) -> Self {
+    pub fn tools(self, val: &[ResponsesFunctionTool]) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -16316,15 +16316,15 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_instructions(this: &ResponsesOutput, val: &str);
     #[wasm_bindgen(method, setter, js_name = "instructions")]
-    pub fn set_instructions_with_array(this: &ResponsesOutput, val: &Array);
+    pub fn set_instructions_with_slice(this: &ResponsesOutput, val: &[JsValue]);
     #[wasm_bindgen(method, getter)]
     pub fn object(this: &ResponsesOutput) -> Option<String>;
     #[wasm_bindgen(method, setter)]
     pub fn set_object(this: &ResponsesOutput, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn output(this: &ResponsesOutput) -> Option<Array>;
+    pub fn output(this: &ResponsesOutput) -> Option<Vec<JsValue>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_output(this: &ResponsesOutput, val: &Array);
+    pub fn set_output(this: &ResponsesOutput, val: &[JsValue]);
     #[wasm_bindgen(method, getter)]
     pub fn parallel_tool_calls(this: &ResponsesOutput) -> Option<bool>;
     #[wasm_bindgen(method, setter)]
@@ -16343,9 +16343,9 @@ extern "C" {
         val: &ToolChoiceFunction,
     );
     #[wasm_bindgen(method, getter)]
-    pub fn tools(this: &ResponsesOutput) -> Option<Array<ResponsesFunctionTool>>;
+    pub fn tools(this: &ResponsesOutput) -> Option<Vec<ResponsesFunctionTool>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tools(this: &ResponsesOutput, val: &Array<ResponsesFunctionTool>);
+    pub fn set_tools(this: &ResponsesOutput, val: &[ResponsesFunctionTool]);
     #[wasm_bindgen(method, getter)]
     pub fn top_p(this: &ResponsesOutput) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
@@ -16429,15 +16429,15 @@ impl ResponsesOutputBuilder {
         self.inner.set_instructions(val);
         self
     }
-    pub fn instructions_with_array(self, val: &Array) -> Self {
-        self.inner.set_instructions_with_array(val);
+    pub fn instructions_with_slice(self, val: &[JsValue]) -> Self {
+        self.inner.set_instructions_with_slice(val);
         self
     }
     pub fn object(self, val: &str) -> Self {
         self.inner.set_object(val);
         self
     }
-    pub fn output(self, val: &Array) -> Self {
+    pub fn output(self, val: &[JsValue]) -> Self {
         self.inner.set_output(val);
         self
     }
@@ -16457,7 +16457,7 @@ impl ResponsesOutputBuilder {
         self.inner.set_tool_choice_with_tool_choice_function(val);
         self
     }
-    pub fn tools(self, val: &Array<ResponsesFunctionTool>) -> Self {
+    pub fn tools(self, val: &[ResponsesFunctionTool]) -> Self {
         self.inner.set_tools(val);
         self
     }
@@ -16519,7 +16519,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_content(this: &EasyInputMessage, val: &str);
     #[wasm_bindgen(method, setter, js_name = "content")]
-    pub fn set_content_with_array(this: &EasyInputMessage, val: &Array);
+    pub fn set_content_with_slice(this: &EasyInputMessage, val: &[JsValue]);
     #[wasm_bindgen(method, getter)]
     pub fn role(this: &EasyInputMessage) -> EasyInputMessageRoleKind;
     #[wasm_bindgen(method, setter)]
@@ -16557,26 +16557,26 @@ impl EasyInputMessage {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
-    pub fn new_user_with_array(content: &Array) -> EasyInputMessage {
-        Self::builder_user_with_array(content).build()
+    pub fn new_user_with_slice(content: &[JsValue]) -> EasyInputMessage {
+        Self::builder_user_with_slice(content).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
-    pub fn new_assistant_with_array(content: &Array) -> EasyInputMessage {
-        Self::builder_assistant_with_array(content).build()
+    pub fn new_assistant_with_slice(content: &[JsValue]) -> EasyInputMessage {
+        Self::builder_assistant_with_slice(content).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
-    pub fn new_system_with_array(content: &Array) -> EasyInputMessage {
-        Self::builder_system_with_array(content).build()
+    pub fn new_system_with_slice(content: &[JsValue]) -> EasyInputMessage {
+        Self::builder_system_with_slice(content).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
-    pub fn new_developer_with_array(content: &Array) -> EasyInputMessage {
-        Self::builder_developer_with_array(content).build()
+    pub fn new_developer_with_slice(content: &[JsValue]) -> EasyInputMessage {
+        Self::builder_developer_with_slice(content).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
@@ -16617,36 +16617,36 @@ impl EasyInputMessage {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
-    pub fn builder_user_with_array(content: &Array) -> EasyInputMessageBuilder {
+    pub fn builder_user_with_slice(content: &[JsValue]) -> EasyInputMessageBuilder {
         let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_content_with_array(content);
+        inner.set_content_with_slice(content);
         inner.set_role(EasyInputMessageRoleKind::User);
         EasyInputMessageBuilder { inner }
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"assistant\"`"]
-    pub fn builder_assistant_with_array(content: &Array) -> EasyInputMessageBuilder {
+    pub fn builder_assistant_with_slice(content: &[JsValue]) -> EasyInputMessageBuilder {
         let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_content_with_array(content);
+        inner.set_content_with_slice(content);
         inner.set_role(EasyInputMessageRoleKind::Assistant);
         EasyInputMessageBuilder { inner }
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
-    pub fn builder_system_with_array(content: &Array) -> EasyInputMessageBuilder {
+    pub fn builder_system_with_slice(content: &[JsValue]) -> EasyInputMessageBuilder {
         let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_content_with_array(content);
+        inner.set_content_with_slice(content);
         inner.set_role(EasyInputMessageRoleKind::System);
         EasyInputMessageBuilder { inner }
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
-    pub fn builder_developer_with_array(content: &Array) -> EasyInputMessageBuilder {
+    pub fn builder_developer_with_slice(content: &[JsValue]) -> EasyInputMessageBuilder {
         let inner: EasyInputMessage = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_content_with_array(content);
+        inner.set_content_with_slice(content);
         inner.set_role(EasyInputMessageRoleKind::Developer);
         EasyInputMessageBuilder { inner }
     }
@@ -16936,7 +16936,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_output(this: &ResponseCustomToolCallOutput, val: &str);
     #[wasm_bindgen(method, setter, js_name = "output")]
-    pub fn set_output_with_array(this: &ResponseCustomToolCallOutput, val: &Array);
+    pub fn set_output_with_slice(this: &ResponseCustomToolCallOutput, val: &[JsValue]);
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseCustomToolCallOutput) -> String;
     #[wasm_bindgen(method, setter)]
@@ -16959,11 +16959,11 @@ impl ResponseCustomToolCallOutput {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
-    pub fn new_custom_tool_call_output_with_array(
+    pub fn new_custom_tool_call_output_with_slice(
         call_id: &str,
-        output: &Array,
+        output: &[JsValue],
     ) -> ResponseCustomToolCallOutput {
-        Self::builder_custom_tool_call_output_with_array(call_id, output).build()
+        Self::builder_custom_tool_call_output_with_slice(call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
@@ -16981,13 +16981,13 @@ impl ResponseCustomToolCallOutput {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
-    pub fn builder_custom_tool_call_output_with_array(
+    pub fn builder_custom_tool_call_output_with_slice(
         call_id: &str,
-        output: &Array,
+        output: &[JsValue],
     ) -> ResponseCustomToolCallOutputBuilder {
         let inner: ResponseCustomToolCallOutput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_call_id(call_id);
-        inner.set_output_with_array(output);
+        inner.set_output_with_slice(output);
         inner.set_type("custom_tool_call_output");
         ResponseCustomToolCallOutputBuilder { inner }
     }
@@ -17417,7 +17417,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_output(this: &ResponseFunctionToolCallOutputItem, val: &str);
     #[wasm_bindgen(method, setter, js_name = "output")]
-    pub fn set_output_with_array(this: &ResponseFunctionToolCallOutputItem, val: &Array);
+    pub fn set_output_with_slice(this: &ResponseFunctionToolCallOutputItem, val: &[JsValue]);
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseFunctionToolCallOutputItem) -> String;
     #[wasm_bindgen(method, setter)]
@@ -17441,12 +17441,12 @@ impl ResponseFunctionToolCallOutputItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn new_function_call_output_with_array(
+    pub fn new_function_call_output_with_slice(
         id: &str,
         call_id: &str,
-        output: &Array,
+        output: &[JsValue],
     ) -> ResponseFunctionToolCallOutputItem {
-        Self::builder_function_call_output_with_array(id, call_id, output).build()
+        Self::builder_function_call_output_with_slice(id, call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
@@ -17467,16 +17467,16 @@ impl ResponseFunctionToolCallOutputItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn builder_function_call_output_with_array(
+    pub fn builder_function_call_output_with_slice(
         id: &str,
         call_id: &str,
-        output: &Array,
+        output: &[JsValue],
     ) -> ResponseFunctionToolCallOutputItemBuilder {
         let inner: ResponseFunctionToolCallOutputItem =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_call_id(call_id);
-        inner.set_output_with_array(output);
+        inner.set_output_with_slice(output);
         inner.set_type("function_call_output");
         ResponseFunctionToolCallOutputItemBuilder { inner }
     }
@@ -17689,7 +17689,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_output(this: &ResponseInputItemFunctionCallOutput, val: &str);
     #[wasm_bindgen(method, setter, js_name = "output")]
-    pub fn set_output_with_array(this: &ResponseInputItemFunctionCallOutput, val: &Array);
+    pub fn set_output_with_slice(this: &ResponseInputItemFunctionCallOutput, val: &[JsValue]);
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseInputItemFunctionCallOutput) -> String;
     #[wasm_bindgen(method, setter)]
@@ -17716,11 +17716,11 @@ impl ResponseInputItemFunctionCallOutput {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn new_function_call_output_with_array(
+    pub fn new_function_call_output_with_slice(
         call_id: &str,
-        output: &Array,
+        output: &[JsValue],
     ) -> ResponseInputItemFunctionCallOutput {
-        Self::builder_function_call_output_with_array(call_id, output).build()
+        Self::builder_function_call_output_with_slice(call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
@@ -17739,14 +17739,14 @@ impl ResponseInputItemFunctionCallOutput {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn builder_function_call_output_with_array(
+    pub fn builder_function_call_output_with_slice(
         call_id: &str,
-        output: &Array,
+        output: &[JsValue],
     ) -> ResponseInputItemFunctionCallOutputBuilder {
         let inner: ResponseInputItemFunctionCallOutput =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_call_id(call_id);
-        inner.set_output_with_array(output);
+        inner.set_output_with_slice(output);
         inner.set_type("function_call_output");
         ResponseInputItemFunctionCallOutputBuilder { inner }
     }
@@ -17773,9 +17773,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ResponseInputItemMessage;
     #[wasm_bindgen(method, getter)]
-    pub fn content(this: &ResponseInputItemMessage) -> Array;
+    pub fn content(this: &ResponseInputItemMessage) -> Vec<JsValue>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_content(this: &ResponseInputItemMessage, val: &Array);
+    pub fn set_content(this: &ResponseInputItemMessage, val: &[JsValue]);
     #[wasm_bindgen(method, getter)]
     pub fn role(this: &ResponseInputItemMessage) -> ResponseInputItemMessageRoleKind;
     #[wasm_bindgen(method, setter)]
@@ -17793,25 +17793,25 @@ impl ResponseInputItemMessage {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
-    pub fn new_user(content: &Array) -> ResponseInputItemMessage {
+    pub fn new_user(content: &[JsValue]) -> ResponseInputItemMessage {
         Self::builder_user(content).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
-    pub fn new_system(content: &Array) -> ResponseInputItemMessage {
+    pub fn new_system(content: &[JsValue]) -> ResponseInputItemMessage {
         Self::builder_system(content).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
-    pub fn new_developer(content: &Array) -> ResponseInputItemMessage {
+    pub fn new_developer(content: &[JsValue]) -> ResponseInputItemMessage {
         Self::builder_developer(content).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
-    pub fn builder_user(content: &Array) -> ResponseInputItemMessageBuilder {
+    pub fn builder_user(content: &[JsValue]) -> ResponseInputItemMessageBuilder {
         let inner: ResponseInputItemMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
         inner.set_role(ResponseInputItemMessageRoleKind::User);
@@ -17820,7 +17820,7 @@ impl ResponseInputItemMessage {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
-    pub fn builder_system(content: &Array) -> ResponseInputItemMessageBuilder {
+    pub fn builder_system(content: &[JsValue]) -> ResponseInputItemMessageBuilder {
         let inner: ResponseInputItemMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
         inner.set_role(ResponseInputItemMessageRoleKind::System);
@@ -17829,7 +17829,7 @@ impl ResponseInputItemMessage {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
-    pub fn builder_developer(content: &Array) -> ResponseInputItemMessageBuilder {
+    pub fn builder_developer(content: &[JsValue]) -> ResponseInputItemMessageBuilder {
         let inner: ResponseInputItemMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_content(content);
         inner.set_role(ResponseInputItemMessageRoleKind::Developer);
@@ -17864,9 +17864,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_id(this: &ResponseInputMessageItem, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn content(this: &ResponseInputMessageItem) -> Array;
+    pub fn content(this: &ResponseInputMessageItem) -> Vec<JsValue>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_content(this: &ResponseInputMessageItem, val: &Array);
+    pub fn set_content(this: &ResponseInputMessageItem, val: &[JsValue]);
     #[wasm_bindgen(method, getter)]
     pub fn role(this: &ResponseInputMessageItem) -> ResponseInputItemMessageRoleKind;
     #[wasm_bindgen(method, setter)]
@@ -17884,25 +17884,25 @@ impl ResponseInputMessageItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
-    pub fn new_user(id: &str, content: &Array) -> ResponseInputMessageItem {
+    pub fn new_user(id: &str, content: &[JsValue]) -> ResponseInputMessageItem {
         Self::builder_user(id, content).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
-    pub fn new_system(id: &str, content: &Array) -> ResponseInputMessageItem {
+    pub fn new_system(id: &str, content: &[JsValue]) -> ResponseInputMessageItem {
         Self::builder_system(id, content).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
-    pub fn new_developer(id: &str, content: &Array) -> ResponseInputMessageItem {
+    pub fn new_developer(id: &str, content: &[JsValue]) -> ResponseInputMessageItem {
         Self::builder_developer(id, content).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"user\"`"]
-    pub fn builder_user(id: &str, content: &Array) -> ResponseInputMessageItemBuilder {
+    pub fn builder_user(id: &str, content: &[JsValue]) -> ResponseInputMessageItemBuilder {
         let inner: ResponseInputMessageItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
@@ -17912,7 +17912,7 @@ impl ResponseInputMessageItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"system\"`"]
-    pub fn builder_system(id: &str, content: &Array) -> ResponseInputMessageItemBuilder {
+    pub fn builder_system(id: &str, content: &[JsValue]) -> ResponseInputMessageItemBuilder {
         let inner: ResponseInputMessageItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
@@ -17922,7 +17922,7 @@ impl ResponseInputMessageItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `role: \"developer\"`"]
-    pub fn builder_developer(id: &str, content: &Array) -> ResponseInputMessageItemBuilder {
+    pub fn builder_developer(id: &str, content: &[JsValue]) -> ResponseInputMessageItemBuilder {
         let inner: ResponseInputMessageItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
@@ -18168,9 +18168,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_id(this: &ResponseOutputMessage, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn content(this: &ResponseOutputMessage) -> Array;
+    pub fn content(this: &ResponseOutputMessage) -> Vec<JsValue>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_content(this: &ResponseOutputMessage, val: &Array);
+    pub fn set_content(this: &ResponseOutputMessage, val: &[JsValue]);
     #[wasm_bindgen(method, getter)]
     pub fn role(this: &ResponseOutputMessage) -> String;
     #[wasm_bindgen(method, setter)]
@@ -18190,7 +18190,10 @@ impl ResponseOutputMessage {
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"in_progress\"`"]
     #[doc = " * `type: \"message\"`"]
-    pub fn new_assistant_in_progress_message(id: &str, content: &Array) -> ResponseOutputMessage {
+    pub fn new_assistant_in_progress_message(
+        id: &str,
+        content: &[JsValue],
+    ) -> ResponseOutputMessage {
         let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
@@ -18204,7 +18207,7 @@ impl ResponseOutputMessage {
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"completed\"`"]
     #[doc = " * `type: \"message\"`"]
-    pub fn new_assistant_completed_message(id: &str, content: &Array) -> ResponseOutputMessage {
+    pub fn new_assistant_completed_message(id: &str, content: &[JsValue]) -> ResponseOutputMessage {
         let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
@@ -18218,7 +18221,10 @@ impl ResponseOutputMessage {
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"incomplete\"`"]
     #[doc = " * `type: \"message\"`"]
-    pub fn new_assistant_incomplete_message(id: &str, content: &Array) -> ResponseOutputMessage {
+    pub fn new_assistant_incomplete_message(
+        id: &str,
+        content: &[JsValue],
+    ) -> ResponseOutputMessage {
         let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
@@ -18267,9 +18273,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseOutputText, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn logprobs(this: &ResponseOutputText) -> Option<Array<Logprob>>;
+    pub fn logprobs(this: &ResponseOutputText) -> Option<Vec<Logprob>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_logprobs(this: &ResponseOutputText, val: &Array<Logprob>);
+    pub fn set_logprobs(this: &ResponseOutputText, val: &[Logprob]);
 }
 impl ResponseOutputText {
     #[doc = " ## Inlined fields"]
@@ -18292,7 +18298,7 @@ pub struct ResponseOutputTextBuilder {
     inner: ResponseOutputText,
 }
 impl ResponseOutputTextBuilder {
-    pub fn logprobs(self, val: &Array<Logprob>) -> Self {
+    pub fn logprobs(self, val: &[Logprob]) -> Self {
         self.inner.set_logprobs(val);
         self
     }
@@ -18310,17 +18316,17 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_id(this: &ResponseReasoningItem, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn summary(this: &ResponseReasoningItem) -> Array<ResponseReasoningSummaryItem>;
+    pub fn summary(this: &ResponseReasoningItem) -> Vec<ResponseReasoningSummaryItem>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_summary(this: &ResponseReasoningItem, val: &Array<ResponseReasoningSummaryItem>);
+    pub fn set_summary(this: &ResponseReasoningItem, val: &[ResponseReasoningSummaryItem]);
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseReasoningItem) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseReasoningItem, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn content(this: &ResponseReasoningItem) -> Option<Array<ResponseReasoningContentItem>>;
+    pub fn content(this: &ResponseReasoningItem) -> Option<Vec<ResponseReasoningContentItem>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_content(this: &ResponseReasoningItem, val: &Array<ResponseReasoningContentItem>);
+    pub fn set_content(this: &ResponseReasoningItem, val: &[ResponseReasoningContentItem]);
     #[wasm_bindgen(method, getter)]
     pub fn encrypted_content(this: &ResponseReasoningItem) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -18336,7 +18342,7 @@ impl ResponseReasoningItem {
     #[doc = " * `type: \"reasoning\"`"]
     pub fn new_reasoning(
         id: &str,
-        summary: &Array<ResponseReasoningSummaryItem>,
+        summary: &[ResponseReasoningSummaryItem],
     ) -> ResponseReasoningItem {
         Self::builder_reasoning(id, summary).build()
     }
@@ -18345,7 +18351,7 @@ impl ResponseReasoningItem {
     #[doc = " * `type: \"reasoning\"`"]
     pub fn builder_reasoning(
         id: &str,
-        summary: &Array<ResponseReasoningSummaryItem>,
+        summary: &[ResponseReasoningSummaryItem],
     ) -> ResponseReasoningItemBuilder {
         let inner: ResponseReasoningItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
@@ -18358,7 +18364,7 @@ pub struct ResponseReasoningItemBuilder {
     inner: ResponseReasoningItem,
 }
 impl ResponseReasoningItemBuilder {
-    pub fn content(self, val: &Array<ResponseReasoningContentItem>) -> Self {
+    pub fn content(self, val: &[ResponseReasoningContentItem]) -> Self {
         self.inner.set_content(val);
         self
     }
@@ -18753,9 +18759,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_item_id(this: &ResponseTextDeltaEvent, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn logprobs(this: &ResponseTextDeltaEvent) -> Array<Logprob>;
+    pub fn logprobs(this: &ResponseTextDeltaEvent) -> Vec<Logprob>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_logprobs(this: &ResponseTextDeltaEvent, val: &Array<Logprob>);
+    pub fn set_logprobs(this: &ResponseTextDeltaEvent, val: &[Logprob]);
     #[wasm_bindgen(method, getter)]
     pub fn output_index(this: &ResponseTextDeltaEvent) -> f64;
     #[wasm_bindgen(method, setter)]
@@ -18777,7 +18783,7 @@ impl ResponseTextDeltaEvent {
         content_index: f64,
         delta: &str,
         item_id: &str,
-        logprobs: &Array<Logprob>,
+        logprobs: &[Logprob],
         output_index: f64,
         sequence_number: f64,
     ) -> ResponseTextDeltaEvent {
@@ -18806,9 +18812,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_item_id(this: &ResponseTextDoneEvent, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn logprobs(this: &ResponseTextDoneEvent) -> Array<Logprob>;
+    pub fn logprobs(this: &ResponseTextDoneEvent) -> Vec<Logprob>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_logprobs(this: &ResponseTextDoneEvent, val: &Array<Logprob>);
+    pub fn set_logprobs(this: &ResponseTextDoneEvent, val: &[Logprob]);
     #[wasm_bindgen(method, getter)]
     pub fn output_index(this: &ResponseTextDoneEvent) -> f64;
     #[wasm_bindgen(method, setter)]
@@ -18833,7 +18839,7 @@ impl ResponseTextDoneEvent {
     pub fn new_responseoutput_textdone(
         content_index: f64,
         item_id: &str,
-        logprobs: &Array<Logprob>,
+        logprobs: &[Logprob],
         output_index: f64,
         sequence_number: f64,
         text: &str,
@@ -18863,9 +18869,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_logprob(this: &Logprob, val: f64);
     #[wasm_bindgen(method, getter)]
-    pub fn top_logprobs(this: &Logprob) -> Option<Array<TopLogprob>>;
+    pub fn top_logprobs(this: &Logprob) -> Option<Vec<TopLogprob>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_top_logprobs(this: &Logprob, val: &Array<TopLogprob>);
+    pub fn set_top_logprobs(this: &Logprob, val: &[TopLogprob]);
 }
 impl Logprob {
     pub fn new(token: &str, logprob: f64) -> Logprob {
@@ -18882,7 +18888,7 @@ pub struct LogprobBuilder {
     inner: Logprob,
 }
 impl LogprobBuilder {
-    pub fn top_logprobs(self, val: &Array<TopLogprob>) -> Self {
+    pub fn top_logprobs(self, val: &[TopLogprob]) -> Self {
         self.inner.set_top_logprobs(val);
         self
     }
@@ -37207,9 +37213,9 @@ extern "C" {
     pub fn set_preview(this: &StreamVideo, val: &str);
     #[doc = " Origins allowed to display the video."]
     #[wasm_bindgen(method, getter, js_name = "allowedOrigins")]
-    pub fn allowed_origins(this: &StreamVideo) -> Array<JsString>;
+    pub fn allowed_origins(this: &StreamVideo) -> Vec<String>;
     #[wasm_bindgen(method, setter, js_name = "allowedOrigins")]
-    pub fn set_allowed_origins(this: &StreamVideo, val: &Array<JsString>);
+    pub fn set_allowed_origins(this: &StreamVideo, val: &[String]);
     #[doc = " Indicates whether signed URLs are required."]
     #[wasm_bindgen(method, getter, js_name = "requireSignedURLs")]
     pub fn require_signed_ur_ls(this: &StreamVideo) -> Option<bool>;
@@ -37313,7 +37319,7 @@ impl StreamVideo {
         modified: &str,
         scheduled_deletion: &str,
         size: f64,
-        allowed_origins: &Array<JsString>,
+        allowed_origins: &[String],
         require_signed_ur_ls: bool,
         uploaded: &str,
         upload_expiry: &str,
@@ -37393,7 +37399,7 @@ impl StreamVideo {
         modified: &str,
         scheduled_deletion: &str,
         size: f64,
-        allowed_origins: &Array<JsString>,
+        allowed_origins: &[String],
         require_signed_ur_ls: bool,
         uploaded: &str,
         upload_expiry: &str,
@@ -37665,9 +37671,9 @@ extern "C" {
     pub fn set_meta(this: &StreamDirectUploadCreateParams, val: &Object<JsString>);
     #[doc = " Lists the origins allowed to display the video."]
     #[wasm_bindgen(method, getter, js_name = "allowedOrigins")]
-    pub fn allowed_origins(this: &StreamDirectUploadCreateParams) -> Option<Array<JsString>>;
+    pub fn allowed_origins(this: &StreamDirectUploadCreateParams) -> Option<Vec<String>>;
     #[wasm_bindgen(method, setter, js_name = "allowedOrigins")]
-    pub fn set_allowed_origins(this: &StreamDirectUploadCreateParams, val: &Array<JsString>);
+    pub fn set_allowed_origins(this: &StreamDirectUploadCreateParams, val: &[String]);
     #[doc = " Indicates whether the video can be accessed using the id. When set to `true`,"]
     #[doc = " a signed token must be generated with a signing key to view the video."]
     #[wasm_bindgen(method, getter, js_name = "requireSignedURLs")]
@@ -37719,7 +37725,7 @@ impl StreamDirectUploadCreateParamsBuilder {
         self.inner.set_meta(val);
         self
     }
-    pub fn allowed_origins(self, val: &Array<JsString>) -> Self {
+    pub fn allowed_origins(self, val: &[String]) -> Self {
         self.inner.set_allowed_origins(val);
         self
     }
@@ -37771,9 +37777,9 @@ extern "C" {
     #[doc = " domains in an array and use `*` for wildcard subdomains. Empty arrays allow the"]
     #[doc = " video to be viewed on any origin."]
     #[wasm_bindgen(method, getter, js_name = "allowedOrigins")]
-    pub fn allowed_origins(this: &StreamUrlUploadParams) -> Option<Array<JsString>>;
+    pub fn allowed_origins(this: &StreamUrlUploadParams) -> Option<Vec<String>>;
     #[wasm_bindgen(method, setter, js_name = "allowedOrigins")]
-    pub fn set_allowed_origins(this: &StreamUrlUploadParams, val: &Array<JsString>);
+    pub fn set_allowed_origins(this: &StreamUrlUploadParams, val: &[String]);
     #[doc = " A user-defined identifier for the media creator."]
     #[wasm_bindgen(method, getter)]
     pub fn creator(this: &StreamUrlUploadParams) -> Option<String>;
@@ -37829,7 +37835,7 @@ pub struct StreamUrlUploadParamsBuilder {
     inner: StreamUrlUploadParams,
 }
 impl StreamUrlUploadParamsBuilder {
-    pub fn allowed_origins(self, val: &Array<JsString>) -> Self {
+    pub fn allowed_origins(self, val: &[String]) -> Self {
         self.inner.set_allowed_origins(val);
         self
     }
@@ -38158,9 +38164,9 @@ extern "C" {
     #[doc = " domains in an array and use `*` for wildcard subdomains. Empty arrays allow the"]
     #[doc = " video to be viewed on any origin."]
     #[wasm_bindgen(method, getter, js_name = "allowedOrigins")]
-    pub fn allowed_origins(this: &StreamUpdateVideoParams) -> Option<Array<JsString>>;
+    pub fn allowed_origins(this: &StreamUpdateVideoParams) -> Option<Vec<String>>;
     #[wasm_bindgen(method, setter, js_name = "allowedOrigins")]
-    pub fn set_allowed_origins(this: &StreamUpdateVideoParams, val: &Array<JsString>);
+    pub fn set_allowed_origins(this: &StreamUpdateVideoParams, val: &[String]);
     #[doc = " A user-defined identifier for the media creator."]
     #[wasm_bindgen(method, getter)]
     pub fn creator(this: &StreamUpdateVideoParams) -> Option<String>;
@@ -38219,7 +38225,7 @@ pub struct StreamUpdateVideoParamsBuilder {
     inner: StreamUpdateVideoParams,
 }
 impl StreamUpdateVideoParamsBuilder {
-    pub fn allowed_origins(self, val: &Array<JsString>) -> Self {
+    pub fn allowed_origins(self, val: &[String]) -> Self {
         self.inner.set_allowed_origins(val);
         self
     }
@@ -41457,7 +41463,7 @@ pub enum ConversationKind {
 #[wasm_bindgen(private)]
 pub enum InputKind {
     String(String),
-    ResponseInput(Array),
+    ResponseInput(Vec<JsValue>),
 }
 #[wasm_bindgen(private)]
 pub enum ServiceTierKind {
@@ -41480,12 +41486,12 @@ pub enum TruncationKind {
 #[wasm_bindgen(private)]
 pub enum InstructionsKind {
     String(String),
-    Array(Array),
+    VecOfResponseInputItem(Vec<JsValue>),
 }
 #[wasm_bindgen(private)]
 pub enum ContentKind {
     String(String),
-    ResponseInputMessageContentList(Array),
+    ResponseInputMessageContentList(Vec<JsValue>),
 }
 #[wasm_bindgen(private)]
 pub enum EasyInputMessageRoleKind {
@@ -41508,7 +41514,7 @@ pub enum GenerateSummaryKind {
 #[wasm_bindgen(private)]
 pub enum OutputKind {
     String(String),
-    Array(Array),
+    VecOfJsValue(Vec<JsValue>),
 }
 #[wasm_bindgen(private)]
 pub enum CodeKind {
@@ -41546,7 +41552,7 @@ pub enum DetailKind {
 #[wasm_bindgen(private)]
 pub enum ResponseInputItemFunctionCallOutputOutputKind {
     String(String),
-    ResponseFunctionCallOutputItemList(Array),
+    ResponseFunctionCallOutputItemList(Vec<JsValue>),
 }
 #[wasm_bindgen(private)]
 pub enum ResponseInputItemMessageRoleKind {

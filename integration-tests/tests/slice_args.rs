@@ -45,3 +45,12 @@ fn typed_array_unions_pass_a_typed_copy() {
 fn slice_modes_are_per_argument() {
     assert_eq!(mixed(&[1.0], &[2]), "Array(1)|Uint8Array(2)");
 }
+
+#[wasm_bindgen_test]
+fn generic_array_spellings_lower_like_arrays() {
+    assert_eq!(spelled(&["a".to_string()]), "Array(a)");
+    assert_eq!(spelled_readonly(&[1.0]), "Array(1)");
+    let handle: js_sys::Array<JsString> =
+        wasm_bindgen::JsCast::unchecked_into(js_sys::Array::from_iter([JsString::from("h")]));
+    assert_eq!(array_like(&handle), "Array(h)");
+}

@@ -86,8 +86,11 @@ per-monomorphization mode.
 
 ## Array and slice types
 
-A top-level `T[]` lowers to a Rust-idiomatic sequence; `Array<T>`
-written as a generic stays the `Array<U>` handle:
+`T[]`, `Array<T>` and `ReadonlyArray<T>` are the same TypeScript type
+and lower identically, to a Rust-idiomatic sequence at the top level;
+`ArrayLike<T>` is the distinct TS type that stays the `Array<U>`
+handle, for callers who want to pass a JS array reference with no
+element-wise materialisation (a bare `Array` does too):
 
 * **Argument position** → `&[T]`, which JS receives as a plain `Array`
   (see [slice modes](#slice-modes)).
@@ -224,18 +227,18 @@ is exposed as a distinct TS spelling:
 | ------------------ | ------------------ | --------------- | -------------------------------------- |
 | `string`           | `&str`             | `String`        | Idiomatic Rust; UTF-8 copy on boundary |
 | `String`           | `&JsString`        | `JsString`      | Zero-copy JS handle                    |
-| `T[]`              | `&[T]`             | `Vec<T>`        | Idiomatic Rust slice / owned vec       |
-| `Array<T>`         | `&Array<U>`        | `Array<U>`      | Zero-copy JS array handle              |
-| `ReadonlyArray<T>` | `&Array<U>`        | `Array<U>`      | Same as `Array<T>` for FFI purposes    |
+| `T[]` / `Array<T>` / `ReadonlyArray<T>` | `&[T]` | `Vec<T>` | Idiomatic Rust slice / owned vec |
+| `ArrayLike<T>`     | `&Array<U>`        | `Array<U>`      | Zero-copy JS array handle              |
 
 Where `U` is the element's inner-position lowering (`JsString`
 for `string`, `Number` for `number`, `Foo` for a named ref).
 
-Writing `Array<T>` (the explicit generic) gets the JS-array
-reference form; writing `T[]` (the syntactic shortcut) gets
-the Rust slice form. Writing `String` (the JS wrapper class) gets
-`&JsString`; writing `string` (the primitive) gets `&str`. The
-TS spelling controls the choice 1:1 — no fan-out, no duplicate
+Writing `String` (the JS wrapper class) gets `&JsString`; writing
+`string` (the primitive) gets `&str`. Likewise `ArrayLike<T>` (a
+genuinely wider type) gets the JS-array reference form, while the
+array types themselves get the Rust slice form — `Array<T>` and
+`T[]` are one TS type, so their spelling carries no intent. The TS
+spelling controls the choice 1:1 — no fan-out, no duplicate
 variants.
 
 Other arg lowerings are independent of this rule:

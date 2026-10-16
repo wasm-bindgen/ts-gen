@@ -243,3 +243,32 @@ extern "C" {
         bytes: &Uint8Array,
     ) -> Result<String, JsValue>;
 }
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    pub fn spelled(values: &[String]) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "spelled")]
+    pub fn try_spelled(values: &[String]) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    pub fn spelled_readonly(#[wasm_bindgen(slice = "array")] values: &[f64]) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "spelled_readonly")]
+    pub fn try_spelled_readonly(
+        #[wasm_bindgen(slice = "array")] values: &[f64],
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    pub fn array_like(values: &Array<JsString>) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "array_like")]
+    pub fn try_array_like(values: &Array<JsString>) -> Result<String, JsValue>;
+}

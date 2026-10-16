@@ -243,6 +243,13 @@ fn convert_type_reference(
 
     if segments.is_empty() {
         match head.as_str() {
+            // `Array<T>` / `ReadonlyArray<T>` are the same TS type as
+            // `T[]`, so they normalise to the same IR. `ArrayLike<T>` is
+            // a distinct type and keeps its reference form (the JS
+            // array-handle lowering); a bare `Array` does too.
+            "Array" | "ReadonlyArray" if type_args.len() == 1 => {
+                return TypeRef::Array(Box::new(type_args.into_iter().next().unwrap()));
+            }
             "ArrayBufferView" => return TypeRef::ArrayBufferView,
             "Boolean" => return TypeRef::Boolean,
             "Number" => return TypeRef::Number,
@@ -553,6 +560,37 @@ pub fn convert_type_params(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn generic_array_spellings_normalise_to_array() {
+        let (module, gctx) = crate::parse_source(
+            "declare function f(a: Array<string>, b: ReadonlyArray<number>, c: ArrayLike<string>, d: Array<string, number>): void;",
+            None,
+        )
+        .unwrap();
+        let decl = gctx.get_type(module.types[0]);
+        let crate::ir::TypeKind::Function(f) = &decl.kind else {
+            panic!("expected function");
+        };
+        assert_eq!(
+            f.params[0].type_ref,
+            TypeRef::Array(Box::new(TypeRef::String))
+        );
+        assert_eq!(
+            f.params[1].type_ref,
+            TypeRef::Array(Box::new(TypeRef::Number))
+        );
+        // `ArrayLike<T>` is a distinct TS type and keeps its reference
+        // form; a malformed two-argument `Array<..>` does too.
+        assert_eq!(
+            f.params[2].type_ref,
+            TypeRef::generic("ArrayLike", vec![TypeRef::String])
+        );
+        assert_eq!(
+            f.params[3].type_ref,
+            TypeRef::generic("Array", vec![TypeRef::String, TypeRef::Number])
+        );
+    }
 
     #[test]
     fn simplify_intersection_drops_identity_members_and_repeats() {

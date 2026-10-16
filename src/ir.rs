@@ -50,11 +50,11 @@ impl ModuleContext {
 /// time against the scope chain. This means user-declared types
 /// shadow built-ins exactly the way they do in TypeScript.
 ///
-/// Note that `T[]` and `Array<T>` are **distinct** at the IR level
-/// (matching TS): `T[]` is the syntactic [`TypeRef::Array`] shortcut
-/// that never goes through name resolution, while `Array<T>` is a
-/// `Reference { head: "Array", ... }` that *does* go through the
-/// scope chain and is therefore affected by local shadowing.
+/// Note that `T[]`, `Array<T>` and `ReadonlyArray<T>` are the same TS
+/// type and normalise to [`TypeRef::Array`] at parse, like the other
+/// built-in names (`Boolean`, `Number`, `String`, …) that are matched
+/// before name resolution. `ArrayLike<T>` is a distinct type and stays
+/// a `Reference`, lowering to the JS array-handle form.
 #[derive(Clone, Debug, PartialEq)]
 pub enum TypeRef {
     // === Primitives ===
