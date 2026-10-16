@@ -15286,9 +15286,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn role(this: &RoleScopedChatInput) -> RoleKind;
     #[wasm_bindgen(method, setter)]
-    pub fn set_role(this: &RoleScopedChatInput, val: RoleScopedChatInputRoleKind);
-    #[wasm_bindgen(method, setter, js_name = "role")]
-    pub fn set_role_with_str(this: &RoleScopedChatInput, val: &str);
+    pub fn set_role(this: &RoleScopedChatInput, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn content(this: &RoleScopedChatInput) -> String;
     #[wasm_bindgen(method, setter)]
@@ -15331,7 +15329,7 @@ impl RoleScopedChatInput {
     #[doc = " * `role: \"user\"`"]
     pub fn builder_user(content: &str) -> RoleScopedChatInputBuilder {
         let inner: RoleScopedChatInput = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_role(RoleScopedChatInputRoleKind::User);
+        inner.set_role("user");
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
     }
@@ -15340,7 +15338,7 @@ impl RoleScopedChatInput {
     #[doc = " * `role: \"assistant\"`"]
     pub fn builder_assistant(content: &str) -> RoleScopedChatInputBuilder {
         let inner: RoleScopedChatInput = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_role(RoleScopedChatInputRoleKind::Assistant);
+        inner.set_role("assistant");
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
     }
@@ -15349,7 +15347,7 @@ impl RoleScopedChatInput {
     #[doc = " * `role: \"system\"`"]
     pub fn builder_system(content: &str) -> RoleScopedChatInputBuilder {
         let inner: RoleScopedChatInput = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_role(RoleScopedChatInputRoleKind::System);
+        inner.set_role("system");
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
     }
@@ -15358,13 +15356,13 @@ impl RoleScopedChatInput {
     #[doc = " * `role: \"tool\"`"]
     pub fn builder_tool(content: &str) -> RoleScopedChatInputBuilder {
         let inner: RoleScopedChatInput = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_role(RoleScopedChatInputRoleKind::Tool);
+        inner.set_role("tool");
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
     }
     pub fn builder(role: &str, content: &str) -> RoleScopedChatInputBuilder {
         let inner: RoleScopedChatInput = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_role_with_str(role);
+        inner.set_role(role);
         inner.set_content(content);
         RoleScopedChatInputBuilder { inner }
     }
@@ -15430,9 +15428,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &AiTextGenerationToolInput) -> AiTextGenerationToolInputTypeKind;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type(this: &AiTextGenerationToolInput, val: AiTextGenerationToolInputTypeKind2);
-    #[wasm_bindgen(method, setter, js_name = "type")]
-    pub fn set_type_with_str(this: &AiTextGenerationToolInput, val: &str);
+    pub fn set_type(this: &AiTextGenerationToolInput, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn function(this: &AiTextGenerationToolInput) -> Object;
     #[wasm_bindgen(method, setter)]
@@ -15444,13 +15440,13 @@ impl AiTextGenerationToolInput {
     #[doc = " * `type: \"function\"`"]
     pub fn new_function(function: &Object) -> AiTextGenerationToolInput {
         let inner: AiTextGenerationToolInput = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_type(AiTextGenerationToolInputTypeKind2::Function);
+        inner.set_type("function");
         inner.set_function(function);
         inner
     }
     pub fn new(r#type: &str, function: &Object) -> AiTextGenerationToolInput {
         let inner: AiTextGenerationToolInput = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_type_with_str(r#type);
+        inner.set_type(r#type);
         inner.set_function(function);
         inner
     }
@@ -41323,22 +41319,9 @@ pub enum RoleKind {
     String(String),
 }
 #[wasm_bindgen(private)]
-pub enum RoleScopedChatInputRoleKind {
-    User = "user",
-    Assistant = "assistant",
-    System = "system",
-    Tool = "tool",
-    JsValue(String),
-}
-#[wasm_bindgen(private)]
 pub enum AiTextGenerationToolInputTypeKind {
     Function = "function",
     String(String),
-}
-#[wasm_bindgen(private)]
-pub enum AiTextGenerationToolInputTypeKind2 {
-    Function = "function",
-    JsValue(String),
 }
 #[wasm_bindgen(private)]
 pub enum ToolsKind {

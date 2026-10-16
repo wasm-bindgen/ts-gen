@@ -275,7 +275,7 @@ fn merge_member_types(types: impl IntoIterator<Item = TypeRef>, mode: MergeMode)
     }
     match mode {
         MergeMode::Join => crate::parse::types::simplify_union(all),
-        MergeMode::Meet => TypeRef::Intersection(all),
+        MergeMode::Meet => crate::parse::types::simplify_intersection(all),
     }
 }
 

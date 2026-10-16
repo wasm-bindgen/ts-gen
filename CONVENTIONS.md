@@ -1612,31 +1612,31 @@ record overloads for each value type.
 
 ### Intersections take their most specific member
 
-Where an intersection does not hoist to an interface (see
-[Intersections](#intersections) under anonymous interface synthesis) —
-a non-object member, or a position such as a property type or a nested
-generic argument that does not synthesise — it is lowered to a bound.
-`A & B` is a subtype of every member, so each member is already a sound
-upper bound and the only question is which is most specific. Top types
-(`object`, `any`, `unknown`) drop out — an inline `{ … }` literal lowers
-to `object`, which is what makes the common "required-field refinement"
-collapse to the named type. Between named members, the one that
-descends from all the others wins. Unrelated named members erase to
-`JsValue` with a diagnostic:
+Parsing normalises every intersection: nested `&` is inlined and top
+types (`object`, `any`, `unknown`) are dropped, since `A & object` is
+`A`. An inline `{ … }` lowers to `object`, so where an intersection is
+not hoisted to an interface (see [Intersections](#intersections) under
+anonymous interface synthesis) the common required-field refinement
+collapses to the named type, and `(string & {})` inside a union is the
+plain `string` arm. A single survivor is used bare; none is `Object`.
+
+Two or more surviving members reach codegen as an `Intersection` and
+are lowered to a bound. `A & B` is a subtype of every member, so each
+member is a sound upper bound and the only question is which is most
+specific: a named member whose ancestor chain contains all the others.
+Unrelated or unnamed members erase to `JsValue` with a diagnostic:
 
 ```text
 Options & { onlyIf: Conditional }    -> Options     (literal refines Options)
+"a" | "b" | (string & {})            -> "a" | "b" | string
 Derived & Base                       -> Derived     (Derived extends Base)
 { a: string } & { b: number }        -> Object
 Derived & Unrelated                  -> JsValue     (no member subtypes the other)
 ```
 
-The collapse also applies to intersection members of a union before
-the LUB, so `"a" | "b" | (string & {})` is the plain `"a" | "b" | string`
-and keeps a `String(String)` arm in its dynamic-union enum rather than a
-`JsValue` one. In argument position the bound accepts slightly more
-than TypeScript does; in return position the literal's extra fields are
-not reachable. Neither is unsound at the ABI.
+In argument position the bound accepts slightly more than TypeScript
+does; in return position the literal's extra fields are not reachable.
+Neither is unsound at the ABI.
 
 ### Erased return-position unions become dynamic-union enums
 

@@ -229,31 +229,23 @@ pub fn lub_union(
     Some(TypeRef::ident(lub))
 }
 
-/// Upper bound of an intersection — the dual of [`lub_union`].
-///
-/// `A & B` is a subtype of every member, so each member is already a
-/// sound bound and the question is only which is most specific. Top
-/// types (`object`, `any`, `unknown`; an inline `{ … }` literal lowers
-/// to `object`) contribute nothing and drop out, which is what makes
-/// the common `Options & { field: Required }` refinement collapse to
-/// `Options`. Between named members, one that descends from all the
-/// others is the bound. `None` when the remaining members are
-/// unrelated; the caller substitutes `JsValue`.
+/// Bound for an intersection that was not hoisted to an interface — the
+/// dual of [`lub_union`]. Parsing has already dropped top types and
+/// unwrapped single survivors (`simplify_intersection`), so what reaches
+/// here has two or more real members. `A & B` is a subtype of each, so
+/// any member is a sound bound; the most specific is a named member whose
+/// ancestor chain contains all the others. `None` when the members are
+/// unrelated or not all named; the caller substitutes `JsValue`.
 pub fn glb_intersection(
     members: &[TypeRef],
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) -> Option<TypeRef> {
-    let mut flat = Vec::new();
-    flatten_intersection(members, ctx, scope, &mut flat);
-    flat.retain(|m| !matches!(m, TypeRef::Object | TypeRef::Any | TypeRef::Unknown));
-    match flat.len() {
-        0 => return Some(TypeRef::Object),
-        1 => return flat.pop(),
-        _ => {}
-    }
     let cgctx = ctx?;
-    let names: Vec<&str> = flat.iter().map(|m| m.as_ident()).collect::<Option<_>>()?;
+    let names: Vec<&str> = members
+        .iter()
+        .map(|m| m.as_ident())
+        .collect::<Option<_>>()?;
     let chains: Vec<Vec<String>> = names
         .iter()
         .map(|n| ancestor_chain(n, cgctx, scope))
@@ -267,11 +259,10 @@ pub fn glb_intersection(
     Some(TypeRef::ident(names[glb]))
 }
 
-/// Replace each intersection member of a union with its bound so the
-/// union sees the member it actually lowers to: `"a" | (string & {})`
-/// is `"a" | string`. Members with no bound are left for the caller's
-/// `JsValue` fallback.
-pub fn collapse_intersections(
+/// Replace each intersection member of a union with its bound so the LUB
+/// sees the member it actually lowers to. Members with no bound are left
+/// for the caller's `JsValue` fallback.
+fn collapse_intersections(
     members: &[TypeRef],
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
@@ -285,26 +276,6 @@ pub fn collapse_intersections(
             _ => m.clone(),
         })
         .collect()
-}
-
-/// Resolve aliases and inline nested `&` so `glb_intersection` sees the
-/// leaf members of `A & (B & C)` where `A` may itself alias an intersection.
-fn flatten_intersection(
-    members: &[TypeRef],
-    ctx: Option<&CodegenContext<'_>>,
-    scope: ScopeId,
-    out: &mut Vec<TypeRef>,
-) {
-    for m in members {
-        let resolved = m
-            .as_ident()
-            .and_then(|name| ctx?.resolve_alias(name, scope))
-            .unwrap_or(m);
-        match resolved {
-            TypeRef::Intersection(inner) => flatten_intersection(inner, ctx, scope, out),
-            other => out.push(other.clone()),
-        }
-    }
 }
 
 /// If every member of `types` belongs to the same primitive family —
@@ -565,19 +536,6 @@ mod tests {
     }
 
     #[test]
-    fn glb_drops_object_literal_refinement() {
-        assert_eq!(
-            glb(&[TypeRef::ident("Options"), TypeRef::Object]),
-            Some(TypeRef::ident("Options"))
-        );
-    }
-
-    #[test]
-    fn glb_of_only_top_types_is_object() {
-        assert_eq!(glb(&[TypeRef::Object, TypeRef::Any]), Some(TypeRef::Object));
-    }
-
-    #[test]
     fn glb_picks_the_subtype_in_either_order() {
         let expected = Some(TypeRef::ident("TypeError"));
         assert_eq!(
@@ -599,18 +557,22 @@ mod tests {
     }
 
     #[test]
-    fn glb_flattens_nested_intersections() {
-        assert_eq!(
-            glb(&[
-                TypeRef::ident("Error"),
-                TypeRef::Intersection(vec![TypeRef::ident("TypeError"), TypeRef::Object]),
-            ]),
-            Some(TypeRef::ident("TypeError"))
-        );
+    fn glb_non_ident_members_is_none() {
+        assert_eq!(glb(&[TypeRef::ident("Foo"), TypeRef::String]), None);
     }
 
     #[test]
-    fn glb_non_ident_members_is_none() {
-        assert_eq!(glb(&[TypeRef::ident("Foo"), TypeRef::String]), None);
+    fn lub_union_bounds_intersection_members_first() {
+        let (gctx, scope) = ctx();
+        let cgctx = CodegenContext::empty(&gctx, scope);
+        let lub = lub_union(
+            &[
+                TypeRef::ident("RangeError"),
+                TypeRef::Intersection(vec![TypeRef::ident("Error"), TypeRef::ident("TypeError")]),
+            ],
+            Some(&cgctx),
+            scope,
+        );
+        assert_eq!(lub, Some(TypeRef::ident("Error")));
     }
 }

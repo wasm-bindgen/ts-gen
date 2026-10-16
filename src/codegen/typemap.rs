@@ -1999,7 +1999,6 @@ fn maybe_synthesise_return_union(
         _ => return None,
     };
     let cgctx = ctx?;
-    let members = &crate::codegen::subtyping::collapse_intersections(members, ctx, scope);
 
     let members = dynamic_union_members(members, ctx, scope)?;
     let name = cgctx.synthesise_dynamic_union(

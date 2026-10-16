@@ -108,7 +108,7 @@ fn convert_ts_type_with_arena(
                 .iter()
                 .map(|t| convert_ts_type_with_arena(t, scope, scopes, diag))
                 .collect();
-            TypeRef::Intersection(types)
+            simplify_intersection(types)
         }
 
         // === Tuple types ===
@@ -493,6 +493,30 @@ pub(crate) fn simplify_union(types: Vec<TypeRef>) -> TypeRef {
         TypeRef::Nullable(Box::new(core_type))
     } else {
         core_type
+    }
+}
+
+/// Normalise an intersection: inline nested `&`, and drop top types, which
+/// an inline `{ … }` lowers to, since `A & object` is `A`. One survivor is
+/// returned bare, so `Options & { field: Required }` is `Options` wherever
+/// it is not hoisted to an interface; none is `object`. Several survivors
+/// stay an `Intersection` for codegen to bound.
+pub(crate) fn simplify_intersection(types: Vec<TypeRef>) -> TypeRef {
+    fn flatten(types: Vec<TypeRef>, out: &mut Vec<TypeRef>) {
+        for ty in types {
+            match ty {
+                TypeRef::Intersection(inner) => flatten(inner, out),
+                TypeRef::Object | TypeRef::Any | TypeRef::Unknown => {}
+                other => out.push(other),
+            }
+        }
+    }
+    let mut members = Vec::new();
+    flatten(types, &mut members);
+    match members.len() {
+        0 => TypeRef::Object,
+        1 => members.pop().unwrap(),
+        _ => TypeRef::Intersection(members),
     }
 }
 

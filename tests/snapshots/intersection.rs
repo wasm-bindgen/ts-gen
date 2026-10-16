@@ -260,9 +260,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn role(this: &Message) -> RoleKind;
     #[wasm_bindgen(method, setter)]
-    pub fn set_role(this: &Message, val: MessageRoleKind);
-    #[wasm_bindgen(method, setter, js_name = "role")]
-    pub fn set_role_with_str(this: &Message, val: &str);
+    pub fn set_role(this: &Message, val: &str);
 }
 impl Message {
     #[doc = " ## Inlined fields"]
@@ -270,7 +268,7 @@ impl Message {
     #[doc = " * `role: \"user\"`"]
     pub fn new_user() -> Message {
         let inner: Message = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_role(MessageRoleKind::User);
+        inner.set_role("user");
         inner
     }
     #[doc = " ## Inlined fields"]
@@ -278,12 +276,12 @@ impl Message {
     #[doc = " * `role: \"assistant\"`"]
     pub fn new_assistant() -> Message {
         let inner: Message = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_role(MessageRoleKind::Assistant);
+        inner.set_role("assistant");
         inner
     }
     pub fn new(role: &str) -> Message {
         let inner: Message = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_role_with_str(role);
+        inner.set_role(role);
         inner
     }
 }
@@ -292,10 +290,4 @@ pub enum RoleKind {
     User = "user",
     Assistant = "assistant",
     String(String),
-}
-#[wasm_bindgen(private)]
-pub enum MessageRoleKind {
-    User = "user",
-    Assistant = "assistant",
-    JsValue(String),
 }
