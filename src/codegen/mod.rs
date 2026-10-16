@@ -445,6 +445,7 @@ fn dynamic_union_variant_name(ty: &TypeRef) -> String {
         // `Uint8Array` (see `to_syn_type`), so the variant name
         // matches the payload.
         T::ArrayBufferView => "Uint8Array".to_string(),
+        T::TypedSlice(e) => e.typed_array().to_string(),
         // `Array<T>` / `T[]` lowers to `Vec<T>` in return position.
         T::Array(inner) => format!("VecOf{}", dynamic_union_variant_name(inner)),
         T::Nullable(inner) => format!("Optional{}", dynamic_union_variant_name(inner)),

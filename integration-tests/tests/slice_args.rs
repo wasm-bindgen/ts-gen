@@ -1,6 +1,6 @@
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{BigInt, Boolean, JsString};
+use js_sys::{BigInt, Boolean, JsString, Uint8Array};
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::slice_args::*;
@@ -22,4 +22,21 @@ fn slice_arguments_arrive_as_arrays() {
         "Array(x,y)"
     );
     assert_eq!(generic(&[JsString::from("g")]), "Array(g)");
+}
+
+#[wasm_bindgen_test]
+fn typed_array_unions_pass_a_typed_view() {
+    assert_eq!(bytes(&[1, 2]), "Uint8Array(1,2)");
+    assert_eq!(
+        bytes_with_uint8_array(&Uint8Array::new_from_slice(&[3])),
+        "Uint8Array(3)"
+    );
+    assert_eq!(words(&[-1]), "BigInt64Array(-1)");
+    assert_eq!(
+        unsigned(&[u64::MAX]),
+        "BigUint64Array(18446744073709551615)"
+    );
+    assert_eq!(buffered(&[4]), "Uint8Array(4)");
+    assert_eq!(floats(), "none");
+    assert_eq!(floats_with_slice(&[0.5]), "Float64Array(0.5)");
 }

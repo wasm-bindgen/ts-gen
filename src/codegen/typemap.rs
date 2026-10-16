@@ -304,6 +304,7 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
         TypeRef::Symbol => buf.push_str("Symbol"),
         TypeRef::ArrayBufferView => buf.push_str("ArrayBufferView"),
         TypeRef::PropertyKey => buf.push_str("PropertyKey"),
+        TypeRef::TypedSlice(e) => write!(buf, "slice:{}", e.rust()).unwrap(),
         TypeRef::StringLiteral(s) => write!(buf, "lit:{s:?}").unwrap(),
         TypeRef::NumberLiteral(n) => write!(buf, "lit:{n}").unwrap(),
         TypeRef::BooleanLiteral(b) => write!(buf, "lit:{b}").unwrap(),
@@ -965,6 +966,19 @@ pub fn to_syn_type(
             }
         }
         TypeRef::PropertyKey => unreachable!("desugared at the top of `to_syn_type`"),
+        TypeRef::TypedSlice(elem) => {
+            if pos.inner {
+                let ident = make_ident(elem.typed_array());
+                quote! { #ident }
+            } else {
+                let scalar = make_ident(elem.rust());
+                if pos.is_argument() {
+                    quote! { &[#scalar] }
+                } else {
+                    quote! { Vec<#scalar> }
+                }
+            }
+        }
 
         // === Syntactic constructs ===
         //
@@ -1723,7 +1737,7 @@ pub fn to_return_type(
 /// self-referential alias ends the walk. When a walker descends into several
 /// generic arguments, it gives each argument its own copy of `visited`, so
 /// `Pair<Id, Id>` resolves `Id` both times.
-fn peel_mono<'t>(
+pub(crate) fn peel_mono<'t>(
     ty: &'t TypeRef,
     ctx: &CodegenContext<'_>,
     scope: ScopeId,

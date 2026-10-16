@@ -109,3 +109,108 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "generic")]
     pub fn try_generic<T: ::wasm_bindgen::JsGeneric>(values: &[T]) -> Result<String, JsValue>;
 }
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    pub fn bytes(values: &[u8]) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "bytes")]
+    pub fn try_bytes(values: &[u8]) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "bytes")]
+    pub fn bytes_with_uint8_array(values: &Uint8Array) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "bytes")]
+    pub fn try_bytes_with_uint8_array(values: &Uint8Array) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    pub fn words(values: &[i64]) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "words")]
+    pub fn try_words(values: &[i64]) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "words")]
+    pub fn words_with_big_int64_array(values: &BigInt64Array) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "words")]
+    pub fn try_words_with_big_int64_array(values: &BigInt64Array) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    pub fn unsigned(values: &[u64]) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "unsigned")]
+    pub fn try_unsigned(values: &[u64]) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "unsigned")]
+    pub fn unsigned_with_big_uint64_array(values: &BigUint64Array) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "unsigned")]
+    pub fn try_unsigned_with_big_uint64_array(values: &BigUint64Array) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    pub fn buffered(values: &[u8]) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "buffered")]
+    pub fn try_buffered(values: &[u8]) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "buffered")]
+    pub fn buffered_with_uint8_array(values: &Uint8Array) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "buffered")]
+    pub fn try_buffered_with_uint8_array(values: &Uint8Array) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    pub fn floats() -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "floats")]
+    pub fn try_floats() -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "floats")]
+    pub fn floats_with_slice(values: &[f64]) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "floats")]
+    pub fn try_floats_with_slice(values: &[f64]) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "floats")]
+    pub fn floats_with_float64_array(values: &Float64Array) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "floats")]
+    pub fn try_floats_with_float64_array(values: &Float64Array) -> Result<String, JsValue>;
+}

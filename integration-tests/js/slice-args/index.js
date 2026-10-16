@@ -19,3 +19,8 @@ export const flags = describe;
 export const bigints = describe;
 export const items = describe;
 export const generic = describe;
+export const bytes = describe;
+export const words = describe;
+export const unsigned = describe;
+export const buffered = describe;
+export const floats = (values) => (values === undefined ? "none" : describe(values));

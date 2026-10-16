@@ -87,6 +87,11 @@ pub enum TypeRef {
     /// spelling; everywhere else it lowers exactly like that union (see
     /// [`TypeRef::property_key_members`]).
     PropertyKey,
+    /// A `TypedArray | number[]` (or `bigint[]`) argument's slice of the
+    /// typed array's element: `Uint8Array | number[]` is `&[u8]`, passed
+    /// to JS as a `Uint8Array` view. Synthesised by codegen's overload
+    /// flattening, never parsed.
+    TypedSlice(TypedArrayElement),
 
     // === Syntactic constructs ===
     /// `T[]` — the syntactic array shortcut. Distinct from
@@ -140,6 +145,63 @@ pub enum TypeRef {
     /// For TS constructs we can't represent (conditional types, mapped types,
     /// template literals, `keyof`, etc.) — erased to `JsValue`.
     Unresolved(String),
+}
+
+/// The element of a JS typed array with a matching Rust slice ABI.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum TypedArrayElement {
+    I8,
+    U8,
+    I16,
+    U16,
+    I32,
+    U32,
+    F32,
+    F64,
+    I64,
+    U64,
+}
+
+impl TypedArrayElement {
+    const ALL: [(Self, &'static str, &'static str); 10] = [
+        (Self::I8, "Int8Array", "i8"),
+        (Self::U8, "Uint8Array", "u8"),
+        (Self::I16, "Int16Array", "i16"),
+        (Self::U16, "Uint16Array", "u16"),
+        (Self::I32, "Int32Array", "i32"),
+        (Self::U32, "Uint32Array", "u32"),
+        (Self::F32, "Float32Array", "f32"),
+        (Self::F64, "Float64Array", "f64"),
+        (Self::I64, "BigInt64Array", "i64"),
+        (Self::U64, "BigUint64Array", "u64"),
+    ];
+
+    /// The element of the typed array named `name`. `Uint8ClampedArray`
+    /// and `Float16Array` have no plain Rust slice and are `None`.
+    pub fn of_typed_array(name: &str) -> Option<Self> {
+        Self::ALL
+            .iter()
+            .find(|(_, n, _)| *n == name)
+            .map(|(e, ..)| *e)
+    }
+
+    fn entry(self) -> &'static (Self, &'static str, &'static str) {
+        Self::ALL.iter().find(|(e, ..)| *e == self).unwrap()
+    }
+
+    pub fn typed_array(self) -> &'static str {
+        self.entry().1
+    }
+
+    /// The Rust scalar, e.g. `u8`.
+    pub fn rust(self) -> &'static str {
+        self.entry().2
+    }
+
+    /// Whether JS holds the values as `bigint` rather than `number`.
+    pub fn is_bigint(self) -> bool {
+        matches!(self, Self::I64 | Self::U64)
+    }
 }
 
 impl TypeRef {
@@ -227,6 +289,8 @@ impl TypeRef {
             TypeRef::Symbol => "symbol".into(),
             TypeRef::ArrayBufferView => "ArrayBufferView".into(),
             TypeRef::PropertyKey => "PropertyKey".into(),
+            TypeRef::TypedSlice(e) if e.is_bigint() => "bigint[]".into(),
+            TypeRef::TypedSlice(_) => "number[]".into(),
             TypeRef::Array(inner) => {
                 // Wrap composite inner types in parens so e.g.
                 // `(A | B)[]` doesn't render as the wrong-precedence

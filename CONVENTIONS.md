@@ -145,6 +145,43 @@ The user-facing Rust signature is unchanged — only the JS-side wire
 format changes. The attribute is per function, so one qualifying
 parameter applies it to every slice parameter of that binding.
 
+### Typed-array unions
+
+`TypedArray | number[]` (or `bigint[]` with `BigInt64Array` /
+`BigUint64Array`) is how wasm-bindgen declares a numeric slice
+argument, and how libraries accept either form. A callee that accepts
+`number[]` reads the values during the call, so the slice can be a
+zero-copy view: the array alternative takes the typed array's element
+and comes first, and the typed array keeps a handle overload.
+
+```ts
+function take(values: Uint8Array | number[]): void;
+function take64(values: BigInt64Array | bigint[]): void;
+```
+
+```rs
+pub fn take(values: &[u8]); // JS receives a `Uint8Array` view
+pub fn take_with_uint8_array(values: &Uint8Array);
+pub fn take64(values: &[i64]); // a `BigInt64Array` view
+pub fn take64_with_big_int64_array(values: &BigInt64Array);
+```
+
+The pairing applies after aliases, `null` and optional parameters are
+flattened, and to a generic member such as `Uint8Array<ArrayBuffer>`.
+It needs exactly one typed array whose element matches the array's
+(`bigint` for the 64-bit arrays, `number` for the rest);
+`Uint8ClampedArray` and `Float16Array` have no plain Rust slice and
+don't pair. The view takes no `slice_to_array`, but since the attribute
+is per binding, a `string[]` or `number[]` parameter in the same
+overload makes the view an `Array` copy too.
+
+A bare typed array stays the `&Uint8Array` handle: a view is only safe
+if the callee is done with it when the call returns, which the bare
+type doesn't promise. A bare `bigint[]` stays `&[BigInt]` /
+`Vec<BigInt>`, like a scalar `bigint`. A `Vec<i64>` return would
+silently wrap values beyond 64 bits, and the argument matches it so a
+getter's value can be passed back to the setter.
+
 ## Outer-type ABI fan-out
 
 Some Rust-idiomatic outer-type lowerings imply a copy across the

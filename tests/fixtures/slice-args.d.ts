@@ -25,3 +25,14 @@ export declare function flags(values: boolean[]): string;
 export declare function bigints(values: bigint[]): string;
 export declare function items(values: Item[]): string;
 export declare function generic<T>(values: T[]): string;
+
+// `TypedArray | number[]` (or `bigint[]` for the 64-bit arrays) is how
+// wasm-bindgen declares a numeric slice argument, and how libraries accept
+// either form. Accepting `number[]` means the callee reads the values during
+// the call, so the slice of the typed array's element is passed as a
+// zero-copy view and comes first; the typed array keeps a handle overload.
+export declare function bytes(values: Uint8Array | number[]): string;
+export declare function words(values: BigInt64Array | bigint[]): string;
+export declare function unsigned(values: BigUint64Array | bigint[]): string;
+export declare function buffered(values: Uint8Array<ArrayBuffer> | number[]): string;
+export declare function floats(values?: number[] | Float64Array | null): string;

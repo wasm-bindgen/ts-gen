@@ -305,6 +305,7 @@ pub fn collect_type_params(
         | TypeRef::Symbol
         | TypeRef::ArrayBufferView
         | TypeRef::PropertyKey
+        | TypeRef::TypedSlice(_)
         | TypeRef::StringLiteral(_)
         | TypeRef::NumberLiteral(_)
         | TypeRef::BooleanLiteral(_)
@@ -827,6 +828,7 @@ fn flatten_type_with(
 ) -> Vec<TypeRef> {
     let mut out: Vec<TypeRef> = Vec::new();
     if flatten_into(ty, cgctx, scope, &mut out) {
+        pair_typed_array_slice(&mut out, cgctx, scope);
         if cgctx.is_some_and(|ctx| ctx.experimental_generic_mono) {
             return primitive_unions::group_alternatives(out, keep_literals);
         }
@@ -842,6 +844,48 @@ fn flatten_type_with(
         ));
     }
     vec![flatten_collapse_to_lub(ty, cgctx, scope)]
+}
+
+/// Pair a typed array with the `number[]` (or `bigint[]` for a 64-bit
+/// array) beside it. A callee accepting `Uint8Array | number[]` reads the
+/// values during the call, so the array alternative becomes the typed
+/// array's element slice (`&[u8]`), passed as a zero-copy view of that
+/// typed array, and goes first. The typed array keeps its handle
+/// alternative. With more than one typed array the element is ambiguous
+/// and nothing pairs.
+fn pair_typed_array_slice(
+    alts: &mut Vec<TypeRef>,
+    cgctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) {
+    let mut typed = alts.iter().filter_map(|t| match t {
+        TypeRef::Reference { segments, .. } if segments.len() == 1 => {
+            crate::ir::TypedArrayElement::of_typed_array(&segments[0])
+        }
+        _ => None,
+    });
+    let (Some(elem), None) = (typed.next(), typed.next()) else {
+        return;
+    };
+    let pairs = |inner: &TypeRef| {
+        let inner = match cgctx {
+            Some(c) => typemap::peel_mono(inner, c, scope, &mut Default::default()),
+            None => std::borrow::Cow::Borrowed(inner),
+        };
+        match inner.as_ref() {
+            TypeRef::BigInt => elem.is_bigint(),
+            TypeRef::Number | TypeRef::NumberLiteral(_) => !elem.is_bigint(),
+            _ => false,
+        }
+    };
+    let Some(i) = alts
+        .iter()
+        .position(|t| matches!(t, TypeRef::Array(inner) if pairs(inner)))
+    else {
+        return;
+    };
+    alts.remove(i);
+    alts.insert(0, TypeRef::TypedSlice(elem));
 }
 
 /// Push every flatten-alternative for `ty` into `out`. Returns
@@ -1257,7 +1301,7 @@ fn type_snake_name(ty: &TypeRef) -> String {
             }
             to_snake_case(head)
         }
-        TypeRef::Array(_) => "slice".to_string(),
+        TypeRef::Array(_) | TypeRef::TypedSlice(_) => "slice".to_string(),
         TypeRef::Nullable(inner) => type_snake_name(inner),
         TypeRef::Function(_) => "function".to_string(),
         _ => "js_value".to_string(),
@@ -2471,6 +2515,41 @@ mod tests {
         let (gctx, scope) = test_ctx();
         let cgctx = CodegenContext::empty(&gctx, scope);
         flatten_type(ty, Some(&cgctx), scope)
+    }
+
+    #[test]
+    fn typed_array_pairs_with_its_element_array() {
+        use crate::ir::TypedArrayElement as E;
+        let array = |elem: TypeRef| TypeRef::Array(Box::new(elem));
+        let flat = |members: Vec<TypeRef>| flatten_no_ctx(&TypeRef::Union(members));
+        assert_eq!(
+            flat(vec![TypeRef::ident("Uint8Array"), array(TypeRef::Number)]),
+            vec![TypeRef::TypedSlice(E::U8), TypeRef::ident("Uint8Array")]
+        );
+        assert_eq!(
+            flat(vec![
+                TypeRef::String,
+                array(TypeRef::BigInt),
+                TypeRef::generic("BigInt64Array", vec![TypeRef::ident("ArrayBuffer")]),
+            ]),
+            vec![
+                TypeRef::TypedSlice(E::I64),
+                TypeRef::String,
+                TypeRef::generic("BigInt64Array", vec![TypeRef::ident("ArrayBuffer")]),
+            ]
+        );
+        for unpaired in [
+            vec![TypeRef::ident("Uint8Array"), array(TypeRef::BigInt)],
+            vec![TypeRef::ident("BigInt64Array"), array(TypeRef::Number)],
+            vec![TypeRef::ident("Uint8ClampedArray"), array(TypeRef::Number)],
+            vec![
+                TypeRef::ident("Uint8Array"),
+                TypeRef::ident("Int8Array"),
+                array(TypeRef::Number),
+            ],
+        ] {
+            assert_eq!(flat(unpaired.clone()), unpaired);
+        }
     }
 
     #[test]
