@@ -12,7 +12,7 @@ pub mod signatures;
 pub mod subtyping;
 pub mod typemap;
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::path::PathBuf;
 
 use proc_macro2::TokenStream;
@@ -291,17 +291,17 @@ fn generate_tokens(
         }
     };
 
-    let mut global_items = Vec::new();
+    let emitted: Vec<(&TypeDeclaration, Vec<String>)> = module
+        .types
+        .iter()
+        .map(|&type_id| gctx.get_type(type_id))
+        .filter(|decl| should_emit(decl))
+        .map(|decl| (decl, Vec::new()))
+        .collect();
     let mut static_names = functions::StaticNames::default();
-    for &type_id in &module.types {
-        let decl = gctx.get_type(type_id);
-        if !should_emit(decl) {
-            continue;
-        }
-        if let Some(tokens) = generate_declaration(decl, &cgctx, &mut static_names) {
-            global_items.push(tokens);
-        }
-    }
+    let global_items = generate_members(&emitted, &cgctx, |decl, _| {
+        generate_declaration(decl, &cgctx, &mut static_names)
+    });
 
     let external_uses = cgctx.external_use_tokens();
 
@@ -525,7 +525,8 @@ fn generate_declaration(
             decl.scope_id,
             &decl.module_context,
         )),
-        TypeKind::Namespace(ns) => Some(generate_namespace(ns, &[], cgctx)),
+        // Grouped into `pub mod`s by `generate_members`.
+        TypeKind::Namespace(_) => None,
     }
 }
 
@@ -637,32 +638,63 @@ pub(crate) fn js_namespace_attr(js_namespace: &[String]) -> Option<TokenStream> 
     }
 }
 
-/// Generate a Rust `mod` block for a namespace, with all nested declarations.
-/// `parent_js_namespace` is the JS path of the enclosing namespaces.
-fn generate_namespace(
-    ns: &crate::ir::NamespaceDecl,
-    parent_js_namespace: &[String],
-    cgctx: &CodegenContext,
-) -> TokenStream {
-    let mod_name = typemap::make_ident(&crate::util::naming::to_snake_case(&ns.name));
-    let mut js_namespace = parent_js_namespace.to_vec();
-    js_namespace.push(ns.name.clone());
+/// A namespace together with the JS path of the namespaces enclosing it.
+type NamespaceSource<'d> = (&'d crate::ir::NamespaceDecl, Vec<String>);
 
-    let mut static_names = functions::StaticNames::default();
-    let path = cgctx.namespace_paths[&ns.child_scope].clone();
-    let outer = cgctx.emit_path.replace(path);
-    let items: Vec<TokenStream> = ns
-        .declarations
+/// Emit `members`, each paired with the JS path of its enclosing namespaces,
+/// through `generate`. Namespaces with the same name share one `pub mod`:
+/// the namespaces of several modules, or of a module and the global scope,
+/// are separate declarations that `namespace_paths` maps to the same path.
+fn generate_members<'d>(
+    members: &[(&'d TypeDeclaration, Vec<String>)],
+    cgctx: &CodegenContext,
+    mut generate: impl FnMut(&TypeDeclaration, &[String]) -> Option<TokenStream>,
+) -> Vec<TokenStream> {
+    let mut groups: HashMap<String, Vec<NamespaceSource<'d>>> = HashMap::new();
+    for (decl, js_namespace) in members {
+        if let TypeKind::Namespace(ns) = &decl.kind {
+            groups
+                .entry(crate::util::naming::to_snake_case(&ns.name))
+                .or_default()
+                .push((ns, js_namespace.clone()));
+        }
+    }
+    let mut items = Vec::new();
+    for (decl, js_namespace) in members {
+        match &decl.kind {
+            TypeKind::Namespace(ns) => {
+                if let Some(group) = groups.remove(&crate::util::naming::to_snake_case(&ns.name)) {
+                    items.push(generate_namespace(&group, cgctx));
+                }
+            }
+            _ => items.extend(generate(decl, js_namespace)),
+        }
+    }
+    items
+}
+
+/// Generate the Rust `mod` block for one or more same-named namespaces, with
+/// all their nested declarations.
+fn generate_namespace(sources: &[NamespaceSource<'_>], cgctx: &CodegenContext) -> TokenStream {
+    let first = sources[0].0;
+    let mod_name = typemap::make_ident(&crate::util::naming::to_snake_case(&first.name));
+    let members: Vec<(&TypeDeclaration, Vec<String>)> = sources
         .iter()
-        .filter_map(|&id| {
-            generate_ns_declaration(
-                cgctx.gctx.get_type(id),
-                &js_namespace,
-                cgctx,
-                &mut static_names,
-            )
+        .flat_map(|(ns, parent_js_namespace)| {
+            let mut js_namespace = parent_js_namespace.clone();
+            js_namespace.push(ns.name.clone());
+            ns.declarations
+                .iter()
+                .map(move |&id| (cgctx.gctx.get_type(id), js_namespace.clone()))
         })
         .collect();
+
+    let mut static_names = functions::StaticNames::default();
+    let path = cgctx.namespace_paths[&first.child_scope].clone();
+    let outer = cgctx.emit_path.replace(path);
+    let items = generate_members(&members, cgctx, |decl, js_namespace| {
+        generate_ns_declaration(decl, js_namespace, cgctx, &mut static_names)
+    });
     cgctx.emit_path.replace(outer);
 
     // Members name `js_sys` types, globals and the file's external aliases
@@ -743,7 +775,8 @@ fn generate_ns_declaration(
             static_names,
         )),
         TypeKind::TypeAlias(_) => None,
-        TypeKind::Namespace(ns) => Some(generate_namespace(ns, js_namespace, cgctx)),
+        // Grouped into `pub mod`s by `generate_members`.
+        TypeKind::Namespace(_) => None,
     }
 }
 

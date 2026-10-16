@@ -1931,6 +1931,19 @@ declaration with its own arity. A qualified name that resolves to
 nothing erases to `JsValue` with an error rather than matching a local
 type by its last segment.
 
+Exported modules are lifted into one Rust scope, so same-named
+namespaces of different modules, or of a module and the global scope,
+share one `pub mod`, as `constants` does across `node:fs` and `node:os`.
+Each member keeps its own `module` and `js_namespace`, and colliding
+statics are numbered within the shared module (`o_rdonly`,
+`o_rdonly_2`).
+
+A namespace the module assigns with `export =` is the module itself, so
+its members are the module's exports and are emitted flat, without
+`js_namespace`. In `node:assert` (`function assert` + `namespace assert`
++ `export = assert`), `strictEqual` binds as `import { strictEqual }`,
+since the module has no `assert` export to reach it through.
+
 A namespace merged with a same-named class, function or interface
 (`class Foo {}` + `namespace Foo { interface Options {} }`) leaves
 that declaration as the type `Foo`, while `Foo.Options` resolves

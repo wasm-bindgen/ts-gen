@@ -1,0 +1,6 @@
+{
+  "name": "module-export-assignment",
+  "private": true,
+  "type": "module",
+  "main": "index.js"
+}
