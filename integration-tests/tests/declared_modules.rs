@@ -12,7 +12,10 @@ fn declared_modules_are_separate_apis() {
     assert_eq!(options().depth(), 1.0);
     assert_eq!(declared_modules::fs::constants::o_rdonly.with(|v| *v), 1.0);
     assert_eq!(declared_modules::os::constants::o_rdonly.with(|v| *v), 10.0);
-    assert_eq!(declared_modules::os::constants::signals::sigint.with(|v| *v), 2.0);
+    assert_eq!(
+        declared_modules::os::constants::signals::sigint.with(|v| *v),
+        2.0
+    );
     assert_eq!(declared_modules::fs::open("abc").fd(), 3.0);
     assert_eq!(declared_modules::os::hostname(), "host");
     // The global namespace has no backing object, so it is only named.
