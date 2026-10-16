@@ -1906,11 +1906,28 @@ global the output never emits.
 
 ### The export map
 
-Every module scope (a `--lib-name` file or a `declare module "x"` body)
-has an export map, built in phase 1 from each export form: `export
-declare X`, `export { local as public }`, `export { … } from "m"`,
-`export default X`. It plays the role ECMA-262's ResolveExport plays at
-link time, over a graph that is fully known up front.
+Every declaration block (a `--lib-name` file, a `declare module "x"`
+body, a namespace body) has an export map, built in phase 1. It plays
+the role ECMA-262's ResolveExport plays at link time, over a graph that
+is fully known up front. The `.d.ts` is not an ES module but
+TypeScript's description of one, so TypeScript's reading defines the
+surface: a block exports every declaration it contains, `export`
+modifier or not, unless it decides its exports explicitly with an
+`export { … }`, `export … from`, `export *`, `export =` or `export
+default`, in which case only what those name is exported (and
+`export declare X` counts). The rule is per block, not per merged
+scope, which is how `@types/node` is written:
+
+```ts
+declare module "node:test" {
+  namespace test { export { test }; }        // exports: test
+  namespace test { function after(): void; } // exports: after
+}
+```
+
+A `.d.ts` file with top-level exports and no `export {}` exports
+everything too, which is why TypeScript's declaration emitter adds
+`export {};` to lock a file's surface down.
 
 * **Imports name exports.** `import { Foo } from "dep"` and `D.Foo`
   through `import * as D` look `Foo` up in `dep`'s export map and bind
@@ -1933,14 +1950,14 @@ link time, over a graph that is fully known up front.
   pub fn take(f: &_Foo) -> _Foo;
   ```
 
-* **Only exports reach JS.** A value the module does not export has no
+* **Only exports reach JS.** A value its block does not export has no
   import to bind to: `import { helper } from "m"` is a link-time
-  `SyntaxError` when `m` has no such export, before any Rust runs. So an
-  unexported `declare function helper()` or `declare const secret` is
-  not emitted, and an unexported class keeps only its instance members,
-  which bind through a value rather than by importing the class.
-  Types are unaffected, as nothing imports them. A `declare module`
-  body with no `export` statements exposes every declaration.
+  `SyntaxError` when `m` has no such export, before any Rust runs. So in
+  a block with an `export { … }`, an unexported `declare function
+  helper()`, `declare const secret` or `namespace M` is not emitted, and
+  an unexported class keeps only its instance members, which bind
+  through a value rather than by importing the class. Types are
+  unaffected, as nothing imports them.
 
 Qualification keys off the *resolved* declaration's `module_context`,
 not the textual name, so a global `interface Foo` and a module-scoped

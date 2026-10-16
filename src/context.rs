@@ -72,13 +72,16 @@ pub struct GlobalContext {
     module_index: std::collections::HashMap<String, ModuleId>,
 }
 
-/// The export map of every module scope: a module file with `--lib-name`
-/// or a `declare module "x"` body. Like ECMA-262's ResolveExport over a
-/// fully known graph, it is built up front, so an import is a lookup by
-/// public name and a value is emitted only when the module exports it.
+/// The export map of every declaration block scope: a module file, a
+/// `declare module "x"` body or a namespace body. Like ECMA-262's
+/// ResolveExport over a fully known graph, it is built up front, so an
+/// import is a lookup by public name and a value is emitted only when its
+/// block exports it. TypeScript's reading of the `.d.ts` defines the
+/// surface: a block exports every declaration unless it decides its
+/// exports explicitly (see `parse::first_pass::block_exports_explicitly`).
 ///
 /// Each entry maps a public name to the local name it is bound to in the
-/// module scope; the two differ for `export { local as public }`.
+/// scope; the two differ for `export { local as public }`.
 #[derive(Clone, Debug, Default)]
 pub struct ModuleExports {
     by_scope: std::collections::HashMap<ScopeId, indexmap::IndexMap<String, String>>,
@@ -93,11 +96,10 @@ impl ModuleExports {
             .insert(public.into(), local.into());
     }
 
-    /// Whether `scope` has any recorded exports. A script file or a
-    /// `declare module` body with no `export` statements has none, and all
-    /// of its declarations are reachable.
-    pub fn has_exports(&self, scope: ScopeId) -> bool {
-        self.by_scope.get(&scope).is_some_and(|m| !m.is_empty())
+    /// Forget everything recorded for `scope`. A script file's globals
+    /// are declarations, not a module's exports.
+    pub fn clear(&mut self, scope: ScopeId) {
+        self.by_scope.remove(&scope);
     }
 
     /// The local name `scope` binds its export `public` to.
@@ -105,29 +107,13 @@ impl ModuleExports {
         self.by_scope.get(&scope)?.get(public).map(String::as_str)
     }
 
-    /// The public names `scope` exports its binding `local` under, in
-    /// source order.
-    pub fn public_names<'a>(
-        &'a self,
-        scope: ScopeId,
-        local: &'a str,
-    ) -> impl Iterator<Item = &'a str> + 'a {
+    /// Whether `scope` exports its binding `local` under any name. A
+    /// renamed constructor variable's class takes its public name as its
+    /// Rust name, so a public name counts as well.
+    pub fn is_exported(&self, scope: ScopeId, local: &str) -> bool {
         self.by_scope
             .get(&scope)
-            .into_iter()
-            .flat_map(|m| m.iter())
-            .filter(move |(_, l)| l.as_str() == local)
-            .map(|(p, _)| p.as_str())
-    }
-
-    /// Whether `scope` exports its binding `local` under any name. Reads
-    /// `true` for a scope with no recorded exports, where everything is
-    /// reachable.
-    pub fn is_exported(&self, scope: ScopeId, local: &str) -> bool {
-        match self.by_scope.get(&scope) {
-            Some(m) if !m.is_empty() => m.values().any(|l| l == local) || m.contains_key(local),
-            _ => true,
-        }
+            .is_some_and(|m| m.contains_key(local) || m.values().any(|l| l == local))
     }
 }
 
@@ -239,14 +225,10 @@ impl GlobalContext {
             .get(self.member_name(members, member)?)
     }
 
-    /// The local name a member `public` of the scope `ns` is bound to. For
-    /// a module scope reached through `import * as A`, `A.Foo` names the
-    /// export `Foo`; a namespace scope has no export map and the name is
-    /// the member's own.
+    /// The local name a member `public` of the block scope `ns` is bound
+    /// to: `A.Foo` through `import * as A`, or `NS.Foo`, names the export
+    /// `Foo` of that block.
     fn member_name<'n>(&'n self, ns: ScopeId, public: &'n str) -> Option<&'n str> {
-        if !self.exports.has_exports(ns) {
-            return Some(public);
-        }
         self.exports.local_name(ns, public)
     }
 

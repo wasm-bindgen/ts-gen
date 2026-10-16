@@ -861,7 +861,7 @@ impl<'a> CodegenContext<'a> {
 
 /// Helper: get the public name of a declaration kind, if it has one.
 /// Mirrors the `kind` arms in `populate_builtin_scope::declaration_name`.
-fn type_decl_name(kind: &ir::TypeKind) -> Option<&str> {
+pub(crate) fn type_decl_name(kind: &ir::TypeKind) -> Option<&str> {
     match kind {
         ir::TypeKind::Class(c) => Some(&c.name),
         ir::TypeKind::Interface(i) => Some(&i.name),

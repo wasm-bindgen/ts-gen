@@ -1,0 +1,6 @@
+{
+  "name": "module-file-locals",
+  "private": true,
+  "type": "module",
+  "main": "index.js"
+}

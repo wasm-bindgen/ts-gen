@@ -56,6 +56,87 @@ pub fn file_context(program: &ast::Program<'_>, lib_name: Option<&str>) -> ir::M
 
 /// Statements of `namespace N { ... }`. Dotted `namespace A.B {}` bodies
 /// are not descended into.
+/// Whether a declaration block decides its exports explicitly. TypeScript
+/// exports every declaration of a `.d.ts` file, `declare module` body or
+/// namespace body implicitly, unless the block contains an export
+/// declaration (`export { … }`, `export … from`, `export *`) or an export
+/// assignment (`export =`, `export default`); `export` modifiers on
+/// declarations do not switch implicit export off. The rule is per block,
+/// so a second `namespace test { function after(); }` next to a
+/// `namespace test { export { test }; }` still exports `after`.
+pub fn block_exports_explicitly(stmts: &[ast::Statement<'_>]) -> bool {
+    stmts.iter().any(|stmt| {
+        matches!(
+            stmt,
+            ast::Statement::ExportNamedDeclaration(_)
+                | ast::Statement::ExportFromDeclaration(_)
+                | ast::Statement::ExportAllDeclaration(_)
+                | ast::Statement::ExportDefaultDeclaration(_)
+                | ast::Statement::TSExportAssignment(_)
+        )
+    })
+}
+
+/// The names a block's own declarations bind, with or without an `export`
+/// modifier. Imports and nested `declare module` / `declare global` blocks
+/// bind nothing here.
+pub fn block_declared_names(stmts: &[ast::Statement<'_>]) -> Vec<String> {
+    let mut names = Vec::new();
+    for stmt in stmts {
+        let decl = match stmt {
+            ast::Statement::ExportDeclaration(export) => Some(&export.declaration),
+            _ => None,
+        };
+        match decl {
+            Some(decl) => declaration_names(decl, &mut names),
+            None => statement_names(stmt, &mut names),
+        }
+    }
+    names
+}
+
+fn statement_names(stmt: &ast::Statement<'_>, names: &mut Vec<String>) {
+    match stmt {
+        ast::Statement::ClassDeclaration(c) => {
+            names.extend(c.id.as_ref().map(|id| id.name.to_string()))
+        }
+        ast::Statement::FunctionDeclaration(f) => {
+            names.extend(f.id.as_ref().map(|id| id.name.to_string()))
+        }
+        ast::Statement::TSInterfaceDeclaration(i) => names.push(i.id.name.to_string()),
+        ast::Statement::TSTypeAliasDeclaration(a) => names.push(a.id.name.to_string()),
+        ast::Statement::TSEnumDeclaration(e) => names.push(e.id.name.to_string()),
+        ast::Statement::TSNamespaceDeclaration(ns) => names.push(ns.id.name.to_string()),
+        ast::Statement::VariableDeclaration(v) => names.extend(
+            v.declarations
+                .iter()
+                .filter_map(crate::parse::merge::var_declarator_name),
+        ),
+        _ => {}
+    }
+}
+
+fn declaration_names(decl: &ast::Declaration<'_>, names: &mut Vec<String>) {
+    match decl {
+        ast::Declaration::ClassDeclaration(c) => {
+            names.extend(c.id.as_ref().map(|id| id.name.to_string()))
+        }
+        ast::Declaration::FunctionDeclaration(f) => {
+            names.extend(f.id.as_ref().map(|id| id.name.to_string()))
+        }
+        ast::Declaration::TSInterfaceDeclaration(i) => names.push(i.id.name.to_string()),
+        ast::Declaration::TSTypeAliasDeclaration(a) => names.push(a.id.name.to_string()),
+        ast::Declaration::TSEnumDeclaration(e) => names.push(e.id.name.to_string()),
+        ast::Declaration::TSNamespaceDeclaration(ns) => names.push(ns.id.name.to_string()),
+        ast::Declaration::VariableDeclaration(v) => names.extend(
+            v.declarations
+                .iter()
+                .filter_map(crate::parse::merge::var_declarator_name),
+        ),
+        _ => {}
+    }
+}
+
 fn namespace_block_statements<'s, 'a>(
     ns: &'s ast::TSNamespaceDeclaration<'a>,
 ) -> &'s [ast::Statement<'a>] {
@@ -172,7 +253,7 @@ fn register_type(
         scope_id: scope,
         exported,
     });
-    if exported && matches!(ctx, ir::ModuleContext::Module(_)) {
+    if exported {
         gctx.exports.insert(scope, name, name);
     }
     gctx.scopes.insert(scope, name_str, type_id);

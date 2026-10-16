@@ -1,24 +1,25 @@
 #![cfg(target_arch = "wasm32")]
 
+use wasm_bindgen_test::*;
+
 use ts_gen_integration_tests::module_file_locals::{
-    _Foo, _Server, configure, ren, reveal, Alias, Foo, Hidden, Options, Server,
+    _Foo, _Server, configure, ren, reveal, Alias, Foo, Hidden, Options,
 };
 
-// This fixture has no backing JavaScript module, so it provides compile-only
-// coverage that unexported top-level declarations in a module file are
-// emitted with the module: the renamed exports resolve and `configure`
-// takes the unexported `Options`. `helper`, `secret`, `Hidden::new` and
-// `Hidden::make` are not bound, as the module does not export them.
-#[allow(dead_code)]
-fn module_file_locals_compile(server: &Server) -> Result<(), wasm_bindgen::JsValue> {
-    let foo: Foo = _Foo::new()?;
+// Unexported top-level declarations in a module file belong to the module:
+// the renamed exports resolve to the local declarations, `configure` takes
+// the unexported `Options`, and `reveal` returns the unexported `Hidden`.
+// The module exports none of `helper`, `secret`, `Hidden`, so none of them
+// is imported; this runs because `import { helper } from "module-file-locals"`
+// would fail at link time, before any test.
+#[wasm_bindgen_test]
+fn module_file_locals_bind_only_through_exports() {
+    let foo: Foo = _Foo::new().unwrap();
     foo.bar();
-    let _: &_Server = server;
-    server.listen();
     let alias: Alias = configure(&Options::new(1.0));
     alias.bar();
     ren();
     let hidden: Hidden = reveal();
     hidden.m();
-    Ok(())
+    let _: fn(&_Server) = _Server::listen;
 }

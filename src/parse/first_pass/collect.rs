@@ -54,8 +54,10 @@ pub fn collect_type_names(
     };
 
     let file_ctx = super::file_context(program, lib_name);
-    for stmt in &program.body {
-        ccx.collect_statement(stmt, &file_ctx, root_scope, false);
+    ccx.collect_block(&program.body, &file_ctx, root_scope, false);
+    if !matches!(file_ctx, ir::ModuleContext::Module(_)) {
+        // A script file's globals are not a module's exports.
+        ccx.gctx.exports.clear(root_scope);
     }
 
     for (name, iface, ctx, scope, exported) in std::mem::take(&mut ccx.named_ctor_vars) {
@@ -165,9 +167,11 @@ impl<'a> CollectCtx<'a> {
                 }
             }
             ast::Statement::ExportDefaultDeclaration(export) => match &export.declaration {
+                // `export default class Def` exports `default` only; `Def`
+                // is a local name (TS2614 on `import { Def }`).
                 ast::ExportDefaultDeclarationKind::ClassDeclaration(class) => {
                     if let Some(ref id) = class.id {
-                        self.register_type(&id.name, ir::RegisteredKind::Class, ctx, scope, true);
+                        self.register_type(&id.name, ir::RegisteredKind::Class, ctx, scope, false);
                         self.gctx.exports.insert(scope, "default", id.name.as_str());
                     }
                 }
@@ -178,7 +182,7 @@ impl<'a> CollectCtx<'a> {
                             ir::RegisteredKind::Function,
                             ctx,
                             scope,
-                            true,
+                            false,
                         );
                         self.gctx.exports.insert(scope, "default", id.name.as_str());
                     }
@@ -197,6 +201,9 @@ impl<'a> CollectCtx<'a> {
                 if let (ir::ModuleContext::Module(_), ast::Expression::Identifier(ident)) =
                     (ctx, &assign.expression)
                 {
+                    self.gctx
+                        .exports
+                        .insert(scope, "default", ident.name.as_str());
                     self.export_specifiers.push((
                         scope,
                         ident.name.to_string(),
@@ -441,8 +448,26 @@ impl<'a> CollectCtx<'a> {
             .entry(specifier.to_string())
             .or_insert_with(|| self.gctx.scopes.create_child(scope));
         if let Some(block) = &module.body {
-            for stmt in &block.body {
-                self.collect_statement(stmt, &module_ctx, module_scope, false);
+            self.collect_block(&block.body, &module_ctx, module_scope, false);
+        }
+    }
+
+    /// Collect one declaration block (a file, a `declare module` body or a
+    /// namespace body) into `scope`, recording what it exports. See
+    /// [`super::block_exports_explicitly`] for the implicit-export rule.
+    fn collect_block(
+        &mut self,
+        stmts: &[ast::Statement<'_>],
+        ctx: &ir::ModuleContext,
+        scope: ScopeId,
+        exported: bool,
+    ) {
+        for stmt in stmts {
+            self.collect_statement(stmt, ctx, scope, exported);
+        }
+        if !super::block_exports_explicitly(stmts) {
+            for name in super::block_declared_names(stmts) {
+                self.gctx.exports.insert(scope, &name, &name);
             }
         }
     }
@@ -461,9 +486,7 @@ impl<'a> CollectCtx<'a> {
             Some(ns_scope) => ns_scope,
             None => self.create_namespace_scope(&name, parent_ctx, scope, exported),
         };
-        for stmt in namespace_block_statements(ns) {
-            self.collect_statement(stmt, parent_ctx, ns_scope, false);
-        }
+        self.collect_block(namespace_block_statements(ns), parent_ctx, ns_scope, false);
     }
 
     // ─── Registration helpers ────────────────────────────────────────
@@ -501,7 +524,7 @@ impl<'a> CollectCtx<'a> {
         self.gctx
             .scopes
             .insert_namespace(scope, name.to_string(), ns_scope);
-        if exported && matches!(ctx, ir::ModuleContext::Module(_)) {
+        if exported {
             self.gctx.exports.insert(scope, name, name);
         }
         // A same-named class, function or interface stays the name's type.

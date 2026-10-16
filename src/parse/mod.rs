@@ -347,15 +347,11 @@ fn bind_import(
         return true;
     }
     // An import names an export, which the module's export map binds to a
-    // local name; they differ for `export { local as public }`. A module
-    // with no recorded exports (a `declare module` body without `export`
-    // statements) exposes every declaration under its own name.
-    let name = match gctx.exports.local_name(target, &import.original_name) {
-        Some(local) => local.to_string(),
-        None if gctx.exports.has_exports(target) => return false,
-        None => import.original_name.clone(),
+    // local name; they differ for `export { local as public }`.
+    let Some(name) = gctx.exports.local_name(target, &import.original_name) else {
+        return false;
     };
-    let name = &name;
+    let name = &name.to_string();
     let (type_id, members) = if own_only {
         let scope = gctx.scopes.get(target);
         (scope.get(name), scope.namespace(name))
@@ -1178,12 +1174,19 @@ mod tests {
                 }
                 declare module "bare" {
                     class Open {}
+                    export function also(): void;
+                    function too(): void;
+                }
+                declare module "blocks" {
+                    namespace ns { const v: number; export { v as w }; }
+                    namespace ns { function after(): void; }
                 }
                 declare module "main" {
                     import { Foo } from "dep";
                     import Def from "dep";
                     import * as D from "dep";
-                    import { Open } from "bare";
+                    import { Open, too } from "bare";
+                    import { ns } from "blocks";
                 }
             "#,
         )
@@ -1195,25 +1198,33 @@ mod tests {
         let dep = gctx.ambient_module_scopes["dep"][0];
         let bare = gctx.ambient_module_scopes["bare"][0];
         let main = gctx.ambient_module_scopes["main"][0];
+        // `export { … }` / `export default` decide the block's exports.
         assert_eq!(gctx.exports.local_name(dep, "Foo"), Some("_Foo"));
         assert_eq!(gctx.exports.local_name(dep, "default"), Some("Def"));
+        assert_eq!(gctx.exports.local_name(dep, "Def"), None);
         assert!(gctx.exports.is_exported(dep, "_Foo"));
         assert!(!gctx.exports.is_exported(dep, "hidden"));
-        // No `export` statements: everything is reachable.
-        assert!(!gctx.exports.has_exports(bare));
-        assert!(gctx.exports.is_exported(bare, "Open"));
+        // Without one, every declaration is exported, `export` modifier or not.
+        for name in ["Open", "also", "too"] {
+            assert!(gctx.exports.is_exported(bare, name), "{name}");
+        }
 
-        let class_name = |id| match &gctx.get_type(id).kind {
-            TypeKind::Class(c) => c.name.clone(),
-            other => panic!("expected a class, got {other:?}"),
+        let name_of = |id| {
+            crate::codegen::typemap::type_decl_name(&gctx.get_type(id).kind).map(str::to_string)
         };
-        let resolve = |path: &str| gctx.resolve_path(main, path).map(class_name);
+        let resolve = |path: &str| gctx.resolve_path(main, path).and_then(name_of);
         assert_eq!(resolve("Foo").as_deref(), Some("_Foo"));
         assert_eq!(resolve("Def").as_deref(), Some("Def"));
         assert_eq!(resolve("D.Foo").as_deref(), Some("_Foo"));
         assert_eq!(resolve("D.default").as_deref(), Some("Def"));
         assert_eq!(resolve("D._Foo"), None, "a local is not an export");
         assert_eq!(resolve("Open").as_deref(), Some("Open"));
+        assert_eq!(resolve("too").as_deref(), Some("too"));
+        // The rule is per block: the second `namespace ns` exports `after`
+        // although the first decides its exports explicitly.
+        assert_eq!(resolve("ns.w").as_deref(), Some("v"));
+        assert_eq!(resolve("ns.after").as_deref(), Some("after"));
+        assert_eq!(resolve("ns.v"), None);
     }
 
     #[test]
