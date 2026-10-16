@@ -304,7 +304,7 @@ extern "C" {
     pub fn table_with_tabular_data_and_properties(
         this: &Console,
         tabular_data: &JsValue,
-        #[wasm_bindgen(slice_to_array)] properties: &[String],
+        properties: &[String],
     );
     #[doc = " Try to construct a table with the columns of the properties of"]
     #[doc = " `tabularData` (or use `properties`) and rows of `tabularData`."]
@@ -315,7 +315,7 @@ extern "C" {
     pub fn try_table_with_tabular_data_and_properties(
         this: &Console,
         tabular_data: &JsValue,
-        #[wasm_bindgen(slice_to_array)] properties: &[String],
+        properties: &[String],
     ) -> Result<(), JsValue>;
     #[doc = " Starts a timer identified by the given `label`."]
     #[doc = ""]

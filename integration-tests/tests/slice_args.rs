@@ -25,7 +25,7 @@ fn slice_arguments_arrive_as_arrays() {
 }
 
 #[wasm_bindgen_test]
-fn typed_array_unions_pass_a_typed_view() {
+fn typed_array_unions_pass_a_typed_copy() {
     assert_eq!(bytes(&[1, 2]), "Uint8Array(1,2)");
     assert_eq!(
         bytes_with_uint8_array(&Uint8Array::new_from_slice(&[3])),
@@ -42,6 +42,6 @@ fn typed_array_unions_pass_a_typed_view() {
 }
 
 #[wasm_bindgen_test]
-fn slice_to_array_is_per_argument() {
+fn slice_modes_are_per_argument() {
     assert_eq!(mixed(&[1.0], &[2]), "Array(1)|Uint8Array(2)");
 }

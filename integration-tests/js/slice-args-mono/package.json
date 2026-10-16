@@ -1,0 +1,6 @@
+{
+  "name": "slice-args-mono",
+  "private": true,
+  "type": "module",
+  "main": "index.js"
+}

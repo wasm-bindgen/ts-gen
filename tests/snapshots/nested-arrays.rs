@@ -136,34 +136,31 @@ extern "C" {
 }
 #[wasm_bindgen(module = "nested-arrays")]
 extern "C" {
-    pub fn ids(#[wasm_bindgen(slice_to_array)] values: &[String]) -> Vec<String>;
+    pub fn ids(values: &[String]) -> Vec<String>;
 }
 #[wasm_bindgen(module = "nested-arrays")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "ids")]
-    pub fn try_ids(
-        #[wasm_bindgen(slice_to_array)] values: &[String],
-    ) -> Result<Vec<String>, JsValue>;
+    pub fn try_ids(values: &[String]) -> Result<Vec<String>, JsValue>;
 }
 #[wasm_bindgen(module = "nested-arrays")]
 extern "C" {
-    pub fn modes(#[wasm_bindgen(slice_to_array)] values: &[String]) -> Vec<String>;
+    pub fn modes(values: &[String]) -> Vec<String>;
 }
 #[wasm_bindgen(module = "nested-arrays")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "modes")]
-    pub fn try_modes(
-        #[wasm_bindgen(slice_to_array)] values: &[String],
-    ) -> Result<Vec<String>, JsValue>;
+    pub fn try_modes(values: &[String]) -> Result<Vec<String>, JsValue>;
 }
 #[wasm_bindgen(module = "nested-arrays")]
 extern "C" {
-    pub fn counts(#[wasm_bindgen(slice_to_array)] values: &[f64]) -> Vec<f64>;
+    pub fn counts(#[wasm_bindgen(slice = "array")] values: &[f64]) -> Vec<f64>;
 }
 #[wasm_bindgen(module = "nested-arrays")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "counts")]
-    pub fn try_counts(#[wasm_bindgen(slice_to_array)] values: &[f64]) -> Result<Vec<f64>, JsValue>;
+    pub fn try_counts(#[wasm_bindgen(slice = "array")] values: &[f64])
+        -> Result<Vec<f64>, JsValue>;
 }
 #[wasm_bindgen(module = "nested-arrays")]
 extern "C" {

@@ -67,6 +67,6 @@ jobs:
     - run: >-
         cargo install wasm-bindgen-cli
         --git https://github.com/wasm-bindgen/wasm-bindgen
-        --rev 9bec40cf3a09e759ad1e3de6921f6dc5caef384b
+        --rev 9d751319b8201892b0f62817fe7005425e060b0d
         --locked
     - run: just test-integration

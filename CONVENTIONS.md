@@ -90,13 +90,14 @@ A top-level `T[]` lowers to a Rust-idiomatic sequence; `Array<T>`
 written as a generic stays the `Array<U>` handle:
 
 * **Argument position** → `&[T]`, which JS receives as a plain `Array`
-  (see [`slice_to_array`](#slice_to_array-attribute)).
+  (see [slice modes](#slice-modes)).
 * **Return position** → `Vec<T>`.
 
-wasm-bindgen only has slice / `Vec` ABIs for Rust-native `String` and
-`f64` elements and for JS handles. So an element that resolves, through
-aliases and unions, to a string or number keeps its return-position
-form; every other element takes its inner-position handle form:
+wasm-bindgen has both a slice and a `Vec` ABI for Rust-native `String`
+and `f64` elements and for JS handles. So an element that resolves,
+through aliases, unions and [enums](#string-and-numeric-enums), to a
+string or number keeps its return-position form; every other element
+takes its inner-position handle form:
 
 | TypeScript element           | Slice / Vec element    |
 | ---------------------------- | ---------------------- |
@@ -107,6 +108,10 @@ form; every other element takes its inner-position handle form:
 | `boolean`                    | `Boolean`              |
 | `T \| null`                  | `JsOption<U>`          |
 | `T[]`                        | `Array<U>`             |
+
+`boolean` takes its handle because `bool` has a slice ABI but no `Vec`
+one, and the argument matches the return so a getter's value can be
+passed back to the setter.
 
 Strings stay owned (`Vec<String>`, not `Vec<&str>`); JS-imported
 classes stay unborrowed (`&[EmailAttachment]`, not
@@ -120,44 +125,59 @@ Inside an actual generic (`Promise<Array<T>>`, `Map<K, Array<V>>`,
 `Map<K,V>` etc. require their generic argument to satisfy
 `T: JsGeneric`, which Rust's `Vec<T>` doesn't.
 
-### `slice_to_array` attribute
+### Slice modes
 
-A TS `T[]` parameter is a plain JS `Array`, which the callee may keep
-after the call returns. wasm-bindgen gives a slice of JS handles that
-form already, but a slice of Rust values needs
-`#[wasm_bindgen(slice_to_array)]`: without it `&[String]` has no ABI,
-and `&[f64]` arrives as a `Float64Array` view of linear memory. So
-every `&[String]` or `&[f64]` parameter (or `Option<&[…]>`) gets the
-attribute, after resolving aliases, literal unions and enums:
+wasm-bindgen's `#[wasm_bindgen(slice = view | array | copy)]` selects
+how a numeric-element slice argument reaches JS: a typed-array
+**view** of wasm linear memory (the default — zero-copy, but it
+dangles if the callee retains it and detaches if memory grows during
+the call), a fresh plain **`Array`**, or a fresh typed-array **copy**
+the callee owns.
+
+ts-gen never emits the view: a generated binding cannot assert that a
+callee neither retains the buffer nor re-enters wasm. The TS type picks
+the copy shape instead:
+
+* A `T[]` parameter is a plain JS `Array` the callee may keep, so a
+  slice of numbers (`&[f64]` or `Option<&[f64]>`) gets
+  `slice = "array"`, after resolving aliases, literal unions and numeric
+  enums.
+* Under [per-monomorphization](#in-scope-generic-type-parameters), a
+  `T[]` whose element is a type parameter gets `slice = "array"` too:
+  wasm-bindgen resolves the mode per instantiation, so `T = f64` reaches
+  JS as an `Array` rather than a view, and every non-numeric `T` is
+  unaffected.
+* A typed slice from a [typed-array union](#typed-array-unions) gets
+  `slice = "copy"`.
 
 ```rs
-#[wasm_bindgen(method, js_name = "acceptWebSocket")]
-pub fn accept_web_socket_with_tags(
-    this: &DurableObjectState,
-    ws: &WebSocket,
-    #[wasm_bindgen(slice_to_array)] tags: &[String],
-);
+pub fn set_weights(#[wasm_bindgen(slice = "array")] weights: &[f64]);
+pub fn generic<T>(#[wasm_bindgen(slice = "array")] values: &[T]) -> String; // per-mono
 ```
 
-A slice of handles (`&[Boolean]`, `&[WebSocket]`, `&[T]`) does not:
-it would only add a per-element clone, and wasm-bindgen rejects the
-attribute when the element is a type parameter. Variadic rest
-parameters (`&[JsValue]`) don't either.
+Every other slice takes no mode, as the modes only act on numeric
+elements and wasm-bindgen already hands JS a fresh `Array`: handles
+(`&[Boolean]`, `&[WebSocket]`, an erased `T: JsGeneric`'s `&[T]`) are
+read in place, and `&[String]` (string enums included) is decoded
+element by element. Variadic rest parameters (`&[JsValue]`) don't take
+one either.
 
 The user-facing Rust signature is unchanged — only the JS-side wire
-format changes. The attribute goes on the argument rather than the
-function: a fn-level attribute is inherited by every slice parameter
-of the binding, which would also turn a typed-array union's view (see
-below) into an `Array` when the two share a signature.
+format changes. The mode goes on the argument rather than the
+function: a fn-level mode is inherited by every slice parameter of
+the binding, which would also turn a typed-array union's typed copy
+(see below) into an `Array` when the two share a signature.
 
 ### Typed-array unions
 
 `TypedArray | number[]` (or `bigint[]` with `BigInt64Array` /
 `BigUint64Array`) is how wasm-bindgen declares a numeric slice
-argument, and how libraries accept either form. A callee that accepts
-`number[]` reads the values during the call, so the slice can be a
-zero-copy view: the array alternative takes the typed array's element
-and comes first, and the typed array keeps a handle overload.
+argument, and how libraries accept either form. The array alternative
+takes the typed array's element and comes first, tagged
+`#[wasm_bindgen(slice = "copy")]` so JS receives a fresh typed array it
+owns rather than a view of linear memory (which would dangle if the
+callee retained it or memory grew during the call); the typed array
+keeps a handle overload.
 
 ```ts
 function take(values: Uint8Array | number[]): void;
@@ -165,9 +185,9 @@ function take64(values: BigInt64Array | bigint[]): void;
 ```
 
 ```rs
-pub fn take(values: &[u8]); // JS receives a `Uint8Array` view
+pub fn take(#[wasm_bindgen(slice = "copy")] values: &[u8]); // a fresh `Uint8Array`
 pub fn take_with_uint8_array(values: &Uint8Array);
-pub fn take64(values: &[i64]); // a `BigInt64Array` view
+pub fn take64(#[wasm_bindgen(slice = "copy")] values: &[i64]); // a fresh `BigInt64Array`
 pub fn take64_with_big_int64_array(values: &BigInt64Array);
 ```
 
@@ -176,16 +196,15 @@ flattened, and to a generic member such as `Uint8Array<ArrayBuffer>`.
 It needs exactly one typed array whose element matches the array's
 (`bigint` for the 64-bit arrays, `number` for the rest);
 `Uint8ClampedArray` and `Float16Array` have no plain Rust slice and
-don't pair. The view takes no `slice_to_array`; the attribute is
-per-argument, so a `string[]` or `number[]` parameter in the same
-overload doesn't affect it.
+don't pair. Modes are per-argument, so a `string[]` or
+`number[]` parameter in the same overload doesn't affect the typed
+slice.
 
-A bare typed array stays the `&Uint8Array` handle: a view is only safe
-if the callee is done with it when the call returns, which the bare
-type doesn't promise. A bare `bigint[]` stays `&[BigInt]` /
-`Vec<BigInt>`, like a scalar `bigint`. A `Vec<i64>` return would
-silently wrap values beyond 64 bits, and the argument matches it so a
-getter's value can be passed back to the setter.
+A bare typed array stays the `&Uint8Array` handle: only the union
+says the callee also accepts a copy. A bare `bigint[]` stays
+`&[BigInt]` / `Vec<BigInt>`, like a scalar `bigint`. A `Vec<i64>`
+return would silently wrap values beyond 64 bits, and the argument
+matches it so a getter's value can be passed back to the setter.
 
 ## Outer-type ABI fan-out
 
@@ -194,8 +213,8 @@ Wasm boundary for large data:
 
 * `&str` arguments incur a UTF-8 conversion vs the JS-side
   `String`/`JsString` representation.
-* `&[String]` / `&[f64]` arguments are copied into a JS `Array` via
-  the `slice_to_array` attribute.
+* `&[String]` / `&[f64]` arguments are copied into a JS `Array`
+  (`&[f64]` via `slice = "array"`).
 
 Rather than emit dual variants for every callable, ts-gen
 **defers to the TS author** to pick the form. Each ABI choice
@@ -2322,11 +2341,13 @@ read back as `Option<Kind>`. This holds through aliases and qualified
 names (`NS.Kind`).
 
 Like primitives they cross the ABI natively rather than as a JS value, so
-they have no `JsGeneric` or slice form. An enum follows the primitive it
-carries wherever that primitive would not stay native: inside a
-`JsGeneric` position (`js_sys` containers, callbacks, erased local
-generics) it takes the primitive's wrapper, and in a slice the primitive
-itself:
+they have no `JsGeneric` form, and a string enum has a slice form but no
+`Vec` one (numeric enums, which have both, match it so the two kinds
+lower alike). An enum follows the primitive it carries wherever that
+primitive would not
+stay native: inside a `JsGeneric` position (`js_sys` containers,
+callbacks, erased local generics) it takes the primitive's wrapper, and
+in a slice the primitive itself:
 
 | TypeScript             | Rust                              |
 | ---------------------- | --------------------------------- |

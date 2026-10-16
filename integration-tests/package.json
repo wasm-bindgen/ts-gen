@@ -6,6 +6,7 @@
     "module-export-assignment": "file:./js/module-export-assignment",
     "module-file-locals": "file:./js/module-file-locals",
     "module-namespace-values": "file:./js/module-namespace-values",
-    "slice-args": "file:./js/slice-args"
+    "slice-args": "file:./js/slice-args",
+    "slice-args-mono": "file:./js/slice-args-mono"
   }
 }

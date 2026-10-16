@@ -988,7 +988,7 @@ pub fn to_syn_type(
         // * Argument position → `&[T]`, reaching JS as a plain `Array`.
         // * Return position → `Vec<T>` (owned).
         //
-        // wasm-bindgen only has slice / `Vec` ABIs for Rust-native
+        // wasm-bindgen has both a slice and a `Vec` ABI for Rust-native
         // `String` and `f64` elements and for JS handles. So an element
         // that resolves (through aliases and unions) to a string or
         // number takes return-position lowering (`&[f64]`,
@@ -998,9 +998,9 @@ pub fn to_syn_type(
         // `Vec<Boolean>`, `Vec<JsOption<JsString>>`, and
         // `Vec<Array<JsString>>` for `string[][]`.
         //
-        // A slice of Rust-native elements also needs
-        // `#[wasm_bindgen(slice_to_array)]` on its argument to reach JS
-        // as an `Array`; see [`param_slice_to_array`].
+        // A slice of numbers also needs `#[wasm_bindgen(slice = "array")]`
+        // on its argument to reach JS as an `Array`; see
+        // [`param_slice_mode`].
         //
         // Inside an actual generic (`pos.inner == true`) we keep the
         // legacy `Array<T'>` form for callers nested in
@@ -2269,32 +2269,71 @@ fn is_integer_literal_union(members: &[TypeRef]) -> bool {
         })
 }
 
-/// Whether this parameter should be tagged
-/// `#[wasm_bindgen(slice_to_array)]`, so its `&[T]` argument reaches JS
-/// as a plain `Array`.
-///
-/// Only a slice of Rust values (`&[String]`, `&[f64]`) needs it: without
-/// the attribute `&[String]` has no ABI and `&[f64]` arrives as a
-/// `Float64Array` view of linear memory, which a `number[]` callee may
-/// keep past the call. A slice of JS handles already arrives as a fresh
-/// `Array`, and the attribute cannot apply to one whose element is a type
-/// parameter. The attribute goes on the argument rather than the
-/// function: a fn-level attribute is inherited by every slice parameter,
-/// which would also turn a `TypedSlice`'s view into an `Array`.
-pub fn param_slice_to_array(
+/// The non-default wasm-bindgen slice mode for a parameter, emitted as a
+/// per-argument `#[wasm_bindgen(slice = ..)]` attribute, or `None` for the
+/// default.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum SliceMode {
+    /// A fresh plain `Array`. A `T[]` parameter is a plain JS `Array` the
+    /// callee may keep, so a slice of numbers takes this rather than
+    /// arriving as a `Float64Array` view of linear memory.
+    Array,
+    /// A fresh typed array (`Uint8Array`, `BigInt64Array`, …). A typed
+    /// slice from a `TypedArray | number[]` union takes this, so the
+    /// callee owns the array outright rather than a view that dangles if
+    /// it's retained or memory grows during the call.
+    Copy,
+}
+
+/// The slice mode for this parameter, or `None` when the default is
+/// right: modes only act on numeric elements, every other slice already
+/// arrives as a fresh `Array`, and a variadic rest lowers to `&[JsValue]`
+/// whatever its element. The attribute goes on the argument rather than
+/// the function: a fn-level mode is inherited by every slice parameter,
+/// which would also turn a `TypedSlice`'s typed copy into a plain `Array`.
+pub fn param_slice_mode(
     p: &crate::codegen::signatures::ConcreteParam,
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
-) -> bool {
-    // A variadic rest lowers to `&[JsValue]` whatever its element.
+) -> Option<SliceMode> {
     if p.variadic {
-        return false;
+        return None;
     }
     let ty = match &p.type_ref {
         TypeRef::Nullable(inner) => inner.as_ref(),
         other => other,
     };
-    matches!(ty, TypeRef::Array(elem) if is_native_array_element(elem, ctx, scope))
+    match ty {
+        TypeRef::Array(elem)
+            if is_numeric_array_element(elem, ctx, scope)
+                || is_mono_type_param(elem, ctx, scope) =>
+        {
+            Some(SliceMode::Array)
+        }
+        TypeRef::TypedSlice(_) => Some(SliceMode::Copy),
+        _ => None,
+    }
+}
+
+/// Whether `ty` is a type parameter that per-monomorphization keeps as a
+/// bare `T`. wasm-bindgen resolves a slice mode on `&[T]` per
+/// instantiation, so `slice = "array"` turns `T = f64`'s view into an
+/// `Array` and is a no-op for every non-numeric `T`. Erased `T: JsGeneric`
+/// is always a handle and needs no mode.
+fn is_mono_type_param(ty: &TypeRef, ctx: Option<&CodegenContext<'_>>, scope: ScopeId) -> bool {
+    let Some(c) = ctx.filter(|c| c.experimental_generic_mono) else {
+        return false;
+    };
+    matches!(
+        ty,
+        TypeRef::Reference { segments, generic_args }
+            if segments.len() == 1
+                && generic_args.is_empty()
+                && matches!(
+                    c.gctx.scopes.resolve_binding(scope, &segments[0]),
+                    Some(crate::parse::scope::Binding::TypeParam),
+                )
+    )
 }
 
 /// Whether a top-level `T[]` element keeps its Rust-native form
@@ -2305,15 +2344,36 @@ fn is_native_array_element(
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) -> bool {
-    let resolved = match ctx {
-        Some(c) if c.enum_repr(elem, scope).is_some() => return true,
-        Some(c) => peel_mono(elem, c, scope, &mut HashSet::new()),
-        None => std::borrow::Cow::Borrowed(elem),
-    };
     matches!(
-        resolved.as_ref(),
+        native_array_leaf(elem, ctx, scope).as_ref(),
         TypeRef::String | TypeRef::StringLiteral(_) | TypeRef::Number | TypeRef::NumberLiteral(_)
     )
+}
+
+/// Whether a top-level `T[]` element lowers to `f64`.
+fn is_numeric_array_element(
+    elem: &TypeRef,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> bool {
+    matches!(
+        native_array_leaf(elem, ctx, scope).as_ref(),
+        TypeRef::Number | TypeRef::NumberLiteral(_)
+    )
+}
+
+fn native_array_leaf<'t>(
+    elem: &'t TypeRef,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> std::borrow::Cow<'t, TypeRef> {
+    match ctx {
+        Some(c) => match c.enum_repr(elem, scope) {
+            Some(repr) => std::borrow::Cow::Owned(repr),
+            None => peel_mono(elem, c, scope, &mut HashSet::new()),
+        },
+        None => std::borrow::Cow::Borrowed(elem),
+    }
 }
 
 #[cfg(test)]
@@ -2556,10 +2616,10 @@ mod tests {
     }
 
     #[test]
-    fn slice_to_array_follows_the_lowered_element() {
+    fn array_mode_follows_the_lowered_element() {
         with_mono_ctx(MONO_SRC, |ctx, scope| {
-            let needs = |elem: &TypeRef| {
-                param_slice_to_array(
+            let mode = |elem: &TypeRef| {
+                param_slice_mode(
                     &cp("xs", TypeRef::Array(Box::new(elem.clone()))),
                     Some(ctx),
                     scope,
@@ -2569,18 +2629,14 @@ mod tests {
                 TypeRef::NumberLiteral(1.0),
                 TypeRef::NumberLiteral(2.0),
             ]);
-            for elem in [
-                TypeRef::String,
-                TypeRef::Number,
-                TypeRef::ident("IdChain"),
-                TypeRef::ident("Mode"),
-                TypeRef::ident("Level"),
-                lits(&["a", "b"]),
-                numbers,
-            ] {
-                assert!(needs(&elem), "expected slice_to_array for {elem:?}");
+            for elem in [TypeRef::Number, TypeRef::ident("Level"), numbers] {
+                assert_eq!(mode(&elem), Some(SliceMode::Array), "for {elem:?}");
             }
             for elem in [
+                TypeRef::String,
+                TypeRef::ident("IdChain"),
+                TypeRef::ident("Mode"),
+                lits(&["a", "b"]),
                 TypeRef::Boolean,
                 TypeRef::BigInt,
                 TypeRef::Any,
@@ -2589,29 +2645,71 @@ mod tests {
                 TypeRef::ident("MaybeId"),
                 TypeRef::Array(Box::new(TypeRef::String)),
             ] {
-                assert!(!needs(&elem), "unexpected slice_to_array for {elem:?}");
+                assert_eq!(mode(&elem), None, "for {elem:?}");
             }
         });
     }
 
     #[test]
-    fn slice_to_array_param_shapes() {
+    fn mono_type_param_slices_take_array_mode() {
+        let src = "declare class Holder<T> { constructor(value: T); }";
+        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let scope = *module.file_scopes.first().expect("file scope");
+        let TypeKind::Class(holder) = &gctx
+            .get_type(gctx.resolve_path(scope, "Holder").unwrap())
+            .kind
+        else {
+            panic!("expected class");
+        };
+        let ts = TypeRef::Array(Box::new(TypeRef::ident("T")));
+        let modes = |mono: bool| {
+            let ctx = CodegenContext::from_module_full(&module, &gctx, false, mono, HashSet::new());
+            [
+                param_slice_mode(&cp("xs", ts.clone()), Some(&ctx), holder.body_scope),
+                param_slice_mode(
+                    &cp("xs", TypeRef::Nullable(Box::new(ts.clone()))),
+                    Some(&ctx),
+                    holder.body_scope,
+                ),
+                // Outside its declaring scope `T` is no type parameter.
+                param_slice_mode(&cp("xs", ts.clone()), Some(&ctx), scope),
+            ]
+        };
+        assert_eq!(
+            modes(true),
+            [Some(SliceMode::Array), Some(SliceMode::Array), None]
+        );
+        assert_eq!(modes(false), [None, None, None]);
+    }
+
+    #[test]
+    fn slice_mode_param_shapes() {
+        use crate::ir::TypedArrayElement as E;
         with_mono_ctx(MONO_SRC, |ctx, scope| {
-            let needs = |p: &crate::codegen::signatures::ConcreteParam| {
-                param_slice_to_array(p, Some(ctx), scope)
+            let mode = |p: &crate::codegen::signatures::ConcreteParam| {
+                param_slice_mode(p, Some(ctx), scope)
             };
-            let strings = || TypeRef::Array(Box::new(TypeRef::String));
-            assert!(needs(&cp("xs", TypeRef::Nullable(Box::new(strings())))));
-            assert!(!needs(&cp("first", TypeRef::ident("Plain"))));
-            assert!(needs(&cp("xs", strings())));
-            assert!(!needs(&cp("x", TypeRef::String)));
-            assert!(!needs(&cp(
-                "xs",
-                TypeRef::generic("Array", vec![TypeRef::String])
-            )));
-            let mut rest = cp("rest", strings());
+            let numbers = || TypeRef::Array(Box::new(TypeRef::Number));
+            let typed = || TypeRef::TypedSlice(E::U8);
+            assert_eq!(
+                mode(&cp("xs", TypeRef::Nullable(Box::new(numbers())))),
+                Some(SliceMode::Array)
+            );
+            assert_eq!(mode(&cp("xs", numbers())), Some(SliceMode::Array));
+            assert_eq!(mode(&cp("xs", typed())), Some(SliceMode::Copy));
+            assert_eq!(
+                mode(&cp("xs", TypeRef::Nullable(Box::new(typed())))),
+                Some(SliceMode::Copy)
+            );
+            assert_eq!(mode(&cp("first", TypeRef::ident("Plain"))), None);
+            assert_eq!(mode(&cp("x", TypeRef::String)), None);
+            assert_eq!(mode(&cp("xs", TypeRef::ident("Uint8Array"))), None);
+            let mut rest = cp("rest", numbers());
             rest.variadic = true;
-            assert!(!needs(&rest));
+            assert_eq!(mode(&rest), None);
+            let mut typed_rest = cp("rest", typed());
+            typed_rest.variadic = true;
+            assert_eq!(mode(&typed_rest), None);
         });
     }
 

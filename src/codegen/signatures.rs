@@ -1313,9 +1313,8 @@ fn type_snake_name(ty: &TypeRef) -> String {
 /// Convert concrete params to a `fn` parameter token stream.
 ///
 /// Handles variadic params with `&[JsValue]`. The output is for extern
-/// declarations: a parameter lowering to a slice of Rust values carries
-/// `#[wasm_bindgen(slice_to_array)]` (see
-/// [`typemap::param_slice_to_array`]).
+/// declarations: a parameter with a non-default slice mode carries
+/// `#[wasm_bindgen(slice = ..)]` (see [`typemap::param_slice_mode`]).
 pub fn generate_concrete_params(
     params: &[ConcreteParam],
     cgctx: Option<&CodegenContext<'_>>,
@@ -1353,10 +1352,13 @@ fn param_attr(
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) -> TokenStream {
-    if typemap::param_slice_to_array(p, cgctx, scope) {
-        quote! { #[wasm_bindgen(slice_to_array)] }
-    } else {
-        quote! {}
+    // The string-literal spelling rather than the bare ident: rustfmt
+    // only normalises `name = <literal>` attribute arms, leaving
+    // `slice = array` token-spaced verbatim.
+    match typemap::param_slice_mode(p, cgctx, scope) {
+        Some(typemap::SliceMode::Array) => quote! { #[wasm_bindgen(slice = "array")] },
+        Some(typemap::SliceMode::Copy) => quote! { #[wasm_bindgen(slice = "copy")] },
+        None => quote! {},
     }
 }
 
@@ -1440,7 +1442,7 @@ pub struct DictionaryParams {
     /// The rendered `name: Type, …` list for Rust helper bodies.
     pub params: TokenStream,
     /// The same list for extern declarations, with per-argument
-    /// wasm-bindgen attributes (`slice_to_array`). Helpers must use
+    /// wasm-bindgen attributes (`slice = ..`). Helpers must use
     /// [`Self::params`]: custom attributes don't parse on an ordinary
     /// `fn`'s parameters.
     pub extern_params: TokenStream,
