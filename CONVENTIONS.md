@@ -2086,12 +2086,18 @@ through the namespace, in either declaration order.
   * Functions and variables are emitted once per public name, with no
     alias stub: `function _connect(...); export { _connect as connect };`
     emits `pub fn connect(...)` bound to the JS export `connect`.
-  * A constructor variable's class takes the first public name; any
-    further names alias it.
+  * A constructor variable on its own is a value nothing refers to by its
+    local name, so its class takes the first public name; any further
+    names alias it.
   * A class keeps its local name as the Rust type, since the module refers
     to it by that name, but binds `js_name` to the first public name, and
     its constructors and static members carry `js_class` with the same
     name. Each public name gets an alias stub (`pub type Server = _Server;`).
+    A constructor variable with an instance interface of the same name
+    (`interface _Foo {…}; var _Foo: { new(): _Foo }`, or `var _Foo:
+    _FooConstructor`) is a class in this sense: the interface's members
+    refer to `_Foo`, so the merged class is `_Foo` with `js_name = "Foo"`
+    and `pub type Foo = _Foo;`.
   * Types without a runtime binding (interfaces, type aliases, enums) get
     an alias stub only.
 
