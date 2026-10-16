@@ -263,12 +263,14 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                         continue;
                     }
                     // Functions and variables are emitted under each public name
-                    // directly, so an alias stub would only shadow them.
+                    // directly, so an alias stub would only shadow them. The
+                    // registry kind, not the phase-1 placeholder, reflects a var
+                    // later merged with its instance interface.
                     if self.export_names(scope, &local).contains(&exported_name)
-                        && self.scopes.get(scope).get(&local).is_some_and(|type_id| {
+                        && self.registry.types.get(&local).is_some_and(|info| {
                             matches!(
-                                self.type_arena[type_id.index()].kind,
-                                ir::TypeKind::Function(_) | ir::TypeKind::Variable(_)
+                                info.kind,
+                                ir::RegisteredKind::Function | ir::RegisteredKind::Variable
                             )
                         })
                     {

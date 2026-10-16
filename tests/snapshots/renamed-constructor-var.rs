@@ -40,6 +40,20 @@ extern "C" {
 pub type Bar = _Bar;
 #[wasm_bindgen(module = "x")]
 extern "C" {
+    # [wasm_bindgen (extends = Object , js_name = "Late")]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type _Late;
+    #[wasm_bindgen(constructor, js_class = "Late", catch)]
+    pub fn new() -> Result<_Late, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn go(this: &_Late);
+    #[wasm_bindgen(method, catch, js_name = "go")]
+    pub fn try_go(this: &_Late) -> Result<(), JsValue>;
+}
+#[allow(dead_code)]
+pub type Late = _Late;
+#[wasm_bindgen(module = "x")]
+extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Plain;

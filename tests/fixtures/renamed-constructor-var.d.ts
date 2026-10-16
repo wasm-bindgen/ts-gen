@@ -3,8 +3,8 @@
 // An interface and a constructor variable sharing a local name describe one
 // class. Exporting that name under a public name keeps the local name as the
 // Rust type, since the interface members refer to it, and binds the class to
-// the public name: the inline form, the `XConstructor` form, and a var with
-// no instance interface.
+// the public name: the inline form, the `XConstructor` form, the var
+// declared before its interface, and a var with no instance interface.
 
 declare module "x" {
   interface _Foo {
@@ -22,6 +22,12 @@ declare module "x" {
   }
   var _Bar: _BarConstructor;
   export { _Bar as Bar };
+
+  var _Late: { new (): _Late };
+  interface _Late {
+    go(): void;
+  }
+  export { _Late as Late };
 
   var _Plain: { new (): object };
   export { _Plain as Plain, _Plain as AlsoPlain };
