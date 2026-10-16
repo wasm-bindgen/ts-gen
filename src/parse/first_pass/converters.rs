@@ -372,6 +372,20 @@ fn evaluate_enum_members<'m, 'a>(
     members
 }
 
+/// Only called for a member whose value doesn't match the enum's kind, so a
+/// string value implies a numeric enum and vice versa.
+fn warn_skipped(diag: &mut DiagnosticCollector, enum_name: &str, m: &EnumMember<'_, '_>) {
+    let reason = match m.value {
+        Some(EnumValue::Str(_)) => "is a string in a numeric enum",
+        Some(EnumValue::Num(_)) => "is a number in a string enum",
+        None => "has no constant value",
+    };
+    diag.warn(format!(
+        "Enum `{enum_name}::{}` {reason}, skipping it",
+        m.name
+    ));
+}
+
 /// Convert a TS enum with string values to our StringEnumDecl IR.
 pub fn convert_string_ts_enum(
     enum_decl: &ast::TSEnumDeclaration<'_>,
@@ -382,10 +396,7 @@ pub fn convert_string_ts_enum(
         .into_iter()
         .filter_map(|m| {
             let Some(EnumValue::Str(js_value)) = m.value else {
-                diag.warn(format!(
-                    "Enum `{name}::{}` has no constant string value, skipping it",
-                    m.name
-                ));
+                warn_skipped(diag, &name, &m);
                 return None;
             };
             Some(ir::StringEnumVariant {
@@ -424,10 +435,7 @@ pub fn convert_numeric_enum(
         .into_iter()
         .filter_map(|m| {
             let Some(EnumValue::Num(value)) = m.value else {
-                diag.warn(format!(
-                    "Enum `{name}::{}` has no constant numeric value, skipping it",
-                    m.name
-                ));
+                warn_skipped(diag, &name, &m);
                 return None;
             };
             Some(ir::NumericEnumVariant {
@@ -631,6 +639,37 @@ mod tests {
         assert_eq!(values, pairs(&[("A", 1), ("C", 2)]));
         let values = string_values("declare enum K { A = \"B\", B = Other.X, C = \"c\" }");
         assert_eq!(values, pairs(&[("A", "B".to_string()), ("C", "c".into())]));
+    }
+
+    fn skip_warnings(src: &str) -> Vec<String> {
+        let allocator = Allocator::default();
+        let program = Parser::new(&allocator, src, SourceType::d_ts()).parse();
+        let docs = DocComments::new(&[], src);
+        let mut diag = DiagnosticCollector::new();
+        let ast::Statement::TSEnumDeclaration(decl) = &program.program.body[0] else {
+            panic!("expected an enum");
+        };
+        if classify_ts_enum_kind(decl) == ir::RegisteredKind::NumericEnum {
+            convert_numeric_enum(decl, &docs, &mut diag);
+        } else {
+            convert_string_ts_enum(decl, &mut diag);
+        }
+        diag.diagnostics.into_iter().map(|d| d.message).collect()
+    }
+
+    #[test]
+    fn skip_warnings_distinguish_mismatched_kind_from_unknown_value() {
+        assert_eq!(
+            skip_warnings("declare enum H { A = 1, B = \"b\", C = Other.X }"),
+            [
+                "Enum `H::B` is a string in a numeric enum, skipping it",
+                "Enum `H::C` has no constant value, skipping it",
+            ]
+        );
+        assert_eq!(
+            skip_warnings("declare enum K { A = \"a\", B = Other.X }"),
+            ["Enum `K::B` has no constant value, skipping it"]
+        );
     }
 
     fn kind(src: &str) -> ir::RegisteredKind {
