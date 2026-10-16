@@ -16,7 +16,7 @@ use crate::parse::scope::ScopeId;
 use crate::parse::types::{
     binding_pattern_name, convert_formal_params_scoped, convert_ts_type_scoped, convert_type_params,
 };
-use crate::util::naming::{to_pascal_case, to_snake_case};
+use crate::util::naming::{to_pascal_case, to_snake_case, LocalScope, Suffix};
 
 /// Split the result of `info_for_span` into a `(doc, info)` pair,
 /// defaulting to empty info when no JSDoc is attached.
@@ -152,7 +152,6 @@ pub(crate) fn try_synthesize_iterable_return(
         .collect();
 
     let synth_name = unique_type_name(parent_name, member_name, ctx.used_type_names);
-    ctx.used_type_names.insert(synth_name.clone());
 
     // Body scope of the synthesized wrapper inherits the parent
     // method's scope and binds the wrapper's own type parameters.
@@ -291,25 +290,13 @@ pub(crate) fn convert_formal_params_with_synthesis(
     result_params
 }
 
-/// Compute a unique synthesized type name for an anonymous interface
-/// hoisted from `<Parent>.<member>(...)`. Falls back to numeric
-/// suffixes on collision (`Foo`, `Foo2`, `Foo3`, ...).
-fn unique_type_name(
-    parent: &str,
-    member: &str,
-    used: &std::collections::HashSet<String>,
-) -> String {
-    let base = format!("{}{}", parent, to_pascal_case(member));
-    if !used.contains(&base) {
-        return base;
-    }
-    for i in 2.. {
-        let candidate = format!("{base}{i}");
-        if !used.contains(&candidate) {
-            return candidate;
-        }
-    }
-    unreachable!("HashSet exhaustion is impossible in practice");
+/// Claim a type name for an anonymous interface hoisted from
+/// `<Parent>.<member>(...)`: `<Parent><Member>`, numbered on collision.
+fn unique_type_name(parent: &str, member: &str, used: &mut LocalScope) -> String {
+    used.declare(
+        &format!("{parent}{}", to_pascal_case(member)),
+        Suffix::Pascal,
+    )
 }
 
 /// Try to synthesize an anonymous-interface hoist for a parameter type.
@@ -334,7 +321,6 @@ fn try_synthesize_inline_param(
     match ts_type {
         TSType::TSTypeLiteral(literal) => {
             let synth_name = unique_type_name(parent_name, segment, ctx.used_type_names);
-            ctx.used_type_names.insert(synth_name.clone());
             // Methods inside the hoisted interface may carry their own
             // anonymous parameter types — recurse and let those land in
             // `ctx.synth` alongside the parent.
@@ -351,7 +337,6 @@ fn try_synthesize_inline_param(
         }
         TSType::TSUnionType(union) if all_type_literals(&union.types) => {
             let synth_name = unique_type_name(parent_name, segment, ctx.used_type_names);
-            ctx.used_type_names.insert(synth_name.clone());
             // Convert each branch through the regular signature pipeline
             // first, then structurally merge at the IR level.
             let branches: Vec<Vec<Member>> = union

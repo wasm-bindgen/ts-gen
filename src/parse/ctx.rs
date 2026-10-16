@@ -10,7 +10,7 @@
 //! parameters keeps converter signatures small and makes adding new
 //! ambient state a one-place change.
 
-use std::collections::HashSet;
+use crate::util::naming::LocalScope;
 
 use crate::ir::InterfaceDecl;
 use crate::parse::docs::DocComments;
@@ -39,7 +39,7 @@ pub struct ParseCtx<'arena, 'docs> {
     /// registry and grown as anonymous interfaces get hoisted. Used
     /// to dedup candidate names for synthesized parameter / iterable
     /// wrapper types.
-    pub used_type_names: &'arena mut HashSet<String>,
+    pub used_type_names: &'arena mut LocalScope,
     /// Sink for interfaces synthesized during member conversion
     /// (anonymous parameter types, iterable wrappers). The caller
     /// drains this and emits the synthesized interfaces alongside

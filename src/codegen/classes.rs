@@ -28,9 +28,9 @@ use quote::quote;
 use std::collections::HashMap;
 
 use crate::codegen::signatures::{
-    build_signatures, dedupe_name, generate_concrete_params_with_mono_bounds,
-    generate_dictionary_params, is_void_return, public_rust_name, render_generic_bounds,
-    CallableSpec, ConcreteParam, DictionaryParams, FunctionSignature, SignatureKind,
+    build_signatures, generate_concrete_params_with_mono_bounds, generate_dictionary_params,
+    is_void_return, public_rust_name, render_generic_bounds, CallableSpec, ConcreteParam,
+    DictionaryParams, FunctionSignature, SignatureKind,
 };
 use crate::codegen::typemap::{to_return_type, CodegenContext, TypePosition};
 use crate::ir::{
@@ -38,7 +38,7 @@ use crate::ir::{
     SetterMember, StaticGetterMember, StaticSetterMember, TypeRef,
 };
 use crate::parse::scope::ScopeId;
-use crate::util::naming::to_snake_case;
+use crate::util::naming::{to_snake_case, LocalScope, Suffix};
 
 /// Configuration for generating a class-like extern block.
 pub(crate) struct ClassConfig<'a> {
@@ -531,7 +531,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
     // combination as its own `new` / `builder` variant.
     let resolve_setter_sigs = |g: &crate::ir::GetterMember| -> Vec<FunctionSignature> {
         let setter_param = config.setter_param(&g.js_name, &g.type_ref);
-        let mut setter_used = HashSet::new();
+        let mut setter_used = LocalScope::default();
         let setter_overloads = [&[setter_param][..]];
         let void = crate::ir::TypeRef::Void;
         build_signatures(
@@ -1133,20 +1133,20 @@ pub(crate) fn generate_dictionary_factory_with_passes(
 
 /// Build the full `#[wasm_bindgen] extern "C" { ... }` block.
 ///
-/// All naming happens through a single `used_names` set that spans the entire
+/// All naming happens through a single `names` set that spans the entire
 /// extern block. Members are processed in declaration order. Methods with the
 /// same `js_name` (TypeScript overloads) are grouped and expanded together as
 /// one unit — overloads feed into the same expansion, producing disambiguated
 /// `_with_`/`_and_` suffixes across all overloads rather than opaque `_1` suffixes.
 ///
-/// Each name — including `try_` variants — is assigned via `dedupe_name`, which
+/// Each name — including `try_` variants — is declared in that scope, which
 /// guarantees uniqueness by appending numeric suffixes on collision.
 pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
     use crate::ir::{ConstructorMember, MethodMember, Param, StaticMethodMember};
     use std::collections::HashMap;
 
     let mut items = Vec::new();
-    let mut used_names: HashSet<String> = HashSet::new();
+    let mut names = LocalScope::default();
 
     // Pre-group methods/statics/constructors by js_name.
     // We iterate config.members in declaration order, so the first occurrence of
@@ -1234,7 +1234,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         // class's. `config.scope` is the class body.
                         body_scope: config.scope,
                     },
-                    &mut used_names,
+                    &mut names,
                     config.cgctx,
                     config.scope,
                 );
@@ -1266,7 +1266,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         doc: &doc,
                         body_scope: method_scope,
                     },
-                    &mut used_names,
+                    &mut names,
                     config.cgctx,
                     method_scope,
                 );
@@ -1297,7 +1297,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         doc: &doc,
                         body_scope: method_scope,
                     },
-                    &mut used_names,
+                    &mut names,
                     config.cgctx,
                     method_scope,
                 );
@@ -1306,16 +1306,16 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 }
             }
             Member::Getter(g) => {
-                items.push(generate_getter(config, g, &mut used_names));
+                items.push(generate_getter(config, g, &mut names));
             }
             Member::Setter(s) => {
-                items.extend(generate_setter(config, s, &mut used_names));
+                items.extend(generate_setter(config, s, &mut names));
             }
             Member::StaticGetter(g) => {
-                items.push(generate_static_getter(config, g, &mut used_names));
+                items.push(generate_static_getter(config, g, &mut names));
             }
             Member::StaticSetter(s) => {
-                items.extend(generate_static_setter(config, s, &mut used_names));
+                items.extend(generate_static_setter(config, s, &mut names));
             }
             Member::IndexSignature(_) | Member::Constructor(_) => {
                 // IndexSignature: not yet supported in codegen
@@ -1640,13 +1640,13 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
 fn generate_getter(
     config: &ClassConfig,
     getter: &GetterMember,
-    used_names: &mut HashSet<String>,
+    names: &mut LocalScope,
 ) -> TokenStream {
     let this_type = super::typemap::make_ident(&config.effective_rust_name());
     let doc = super::doc_tokens(&getter.doc);
 
     let candidate = public_rust_name(&to_snake_case(&getter.js_name));
-    let rust_name = dedupe_name(&candidate, used_names);
+    let rust_name = names.declare(&candidate, Suffix::Snake);
     let rust_ident = super::typemap::make_ident(&rust_name);
 
     // Optional `?:` properties widen to `T | undefined` at the IR
@@ -1699,14 +1699,15 @@ fn generate_getter(
     let this_generics = config.type_generics_args();
 
     let source_name = &getter.js_name;
-    let js_string_variant = getter_js_string_variant(config, &lowered_ty, &rust_name, used_names)
-        .map(|(js_ident, js_type)| {
+    let js_string_variant = getter_js_string_variant(config, &lowered_ty, &rust_name, names).map(
+        |(js_ident, js_type)| {
             quote! {
                 #doc
                 #[wasm_bindgen(method, getter, js_name = #source_name)]
                 pub fn #js_ident #fn_generics (this: &#this_type #this_generics) -> #js_type;
             }
-        });
+        },
+    );
 
     quote! {
         #doc
@@ -1724,13 +1725,13 @@ fn getter_js_string_variant(
     config: &ClassConfig,
     ty: &TypeRef,
     rust_name: &str,
-    used_names: &mut HashSet<String>,
+    names: &mut LocalScope,
 ) -> Option<(syn::Ident, TokenStream)> {
     let ctx = config.cgctx.filter(|ctx| {
         ctx.experimental_generic_mono
             && super::typemap::has_mono_js_string_return(ty, ctx, config.scope)
     })?;
-    let js_name = dedupe_name(&format!("{rust_name}_js_string"), used_names);
+    let js_name = names.declare(&format!("{rust_name}_js_string"), Suffix::Snake);
     let js_type =
         super::typemap::to_mono_js_string_return_type(ty, ctx, config.scope, &config.from_module());
     Some((super::typemap::make_ident(&js_name), js_type))
@@ -1740,7 +1741,7 @@ fn getter_js_string_variant(
 fn generate_setter(
     config: &ClassConfig,
     setter: &SetterMember,
-    used_names: &mut HashSet<String>,
+    names: &mut LocalScope,
 ) -> Vec<TokenStream> {
     let this_type = super::typemap::make_ident(&config.effective_rust_name());
     let doc = setter.doc.clone();
@@ -1760,7 +1761,7 @@ fn generate_setter(
             doc: &doc,
             body_scope: config.scope,
         },
-        used_names,
+        names,
         config.cgctx,
         config.scope,
     );
@@ -1814,13 +1815,13 @@ fn generate_setter(
 fn generate_static_getter(
     config: &ClassConfig,
     getter: &StaticGetterMember,
-    used_names: &mut HashSet<String>,
+    names: &mut LocalScope,
 ) -> TokenStream {
     let class_ident = super::typemap::make_ident(&config.effective_rust_name());
     let doc = super::doc_tokens(&getter.doc);
 
     let candidate = public_rust_name(&to_snake_case(&getter.js_name));
-    let rust_name = dedupe_name(&candidate, used_names);
+    let rust_name = names.declare(&candidate, Suffix::Snake);
     let rust_ident = super::typemap::make_ident(&rust_name);
 
     let getter_type = super::typemap::to_getter_return_type(
@@ -1853,7 +1854,7 @@ fn generate_static_getter(
     let source_name = &getter.js_name;
     let js_class = config.js_class_parts();
     let js_string_variant =
-        getter_js_string_variant(config, &getter.type_ref, &rust_name, used_names).map(
+        getter_js_string_variant(config, &getter.type_ref, &rust_name, names).map(
             |(js_ident, js_type)| {
                 quote! {
                     #doc
@@ -1875,7 +1876,7 @@ fn generate_static_getter(
 fn generate_static_setter(
     config: &ClassConfig,
     setter: &StaticSetterMember,
-    used_names: &mut HashSet<String>,
+    names: &mut LocalScope,
 ) -> Vec<TokenStream> {
     let class_ident = super::typemap::make_ident(&config.effective_rust_name());
     let doc = setter.doc.clone();
@@ -1894,7 +1895,7 @@ fn generate_static_setter(
             doc: &doc,
             body_scope: config.scope,
         },
-        used_names,
+        names,
         config.cgctx,
         config.scope,
     );

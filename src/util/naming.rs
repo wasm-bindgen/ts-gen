@@ -1,5 +1,7 @@
 //! JS name → Rust name conversion utilities.
 
+use std::collections::HashSet;
+
 use convert_case::{Case, Casing};
 
 /// Convert a TS module specifier (`"cloudflare:email"`, `"node:url"`,
@@ -111,25 +113,106 @@ pub(crate) fn number_literal_pascal(n: f64) -> String {
 }
 
 /// Deduplicate names in-place by appending `_2`, `_3`, etc. to collisions.
-///
-/// Takes a slice of `(name, setter)` pairs where `setter` is a closure that
-/// updates the name on the original item. This avoids coupling to specific
-/// enum variant types.
 pub fn dedup_names(names: &mut [String]) {
-    use std::collections::HashMap;
-    let mut counts: HashMap<String, usize> = HashMap::new();
+    let mut scope = LocalScope::default();
     for name in names.iter_mut() {
-        let count = counts.entry(name.clone()).or_insert(0);
-        *count += 1;
-        if *count > 1 {
-            *name = format!("{name}_{count}");
+        *name = scope.declare(name, Suffix::Snake);
+    }
+}
+
+/// How a claimed name is respelled when its candidate is taken.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Suffix {
+    /// `Foo_`, `Foo_2`, …: a declared type moved aside from a prelude
+    /// name, re-exported under its own name.
+    Trailing,
+    /// `foo_2`, `foo_3`, …: a further binding sharing a snake_case ident.
+    Snake,
+    /// `Foo2`, `Foo3`, …: a further synthesised PascalCase type.
+    Pascal,
+}
+
+/// The names claimed in one Rust scope.
+///
+/// Every identifier ts-gen invents, whether a type moved aside from the
+/// `js_sys` glob, an overload or `try_` sibling inside an extern block, a
+/// synthesised interface or dynamic-union enum, an enum variant or a
+/// static, resolves collisions the same way: the first free candidate
+/// against the scope's claimed set. Only the fallback spelling depends on
+/// what kind of name is being claimed, which is the [`Suffix`].
+#[derive(Debug, Default, Clone)]
+pub struct LocalScope {
+    claimed: HashSet<String>,
+}
+
+impl LocalScope {
+    /// A scope with `names` already claimed.
+    pub fn with_claimed<I, S>(names: I) -> Self
+    where
+        I: IntoIterator<Item = S>,
+        S: Into<String>,
+    {
+        Self {
+            claimed: names.into_iter().map(Into::into).collect(),
         }
+    }
+
+    pub fn contains(&self, name: &str) -> bool {
+        self.claimed.contains(name)
+    }
+
+    /// Claim `name` exactly as spelled. Returns whether it was free.
+    pub fn claim(&mut self, name: impl Into<String>) -> bool {
+        self.claimed.insert(name.into())
+    }
+
+    /// Claim `candidate`, or the first free respelling of it under
+    /// `suffix`, and return the name claimed.
+    pub fn declare(&mut self, candidate: &str, suffix: Suffix) -> String {
+        if self.claim(candidate) {
+            return candidate.to_string();
+        }
+        if suffix == Suffix::Trailing {
+            let trailing = format!("{candidate}_");
+            if self.claim(trailing.clone()) {
+                return trailing;
+            }
+        }
+        for n in 2u32.. {
+            let name = match suffix {
+                Suffix::Trailing | Suffix::Snake => format!("{candidate}_{n}"),
+                Suffix::Pascal => format!("{candidate}{n}"),
+            };
+            if self.claim(name.clone()) {
+                return name;
+            }
+        }
+        unreachable!("every scope has a free numbered name")
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn local_scope_respells_by_suffix() {
+        let mut scope = LocalScope::with_claimed(["Map", "Map_", "foo", "Kind", "Kind2"]);
+        assert_eq!(scope.declare("Set", Suffix::Trailing), "Set");
+        assert_eq!(scope.declare("Map", Suffix::Trailing), "Map_2");
+        assert_eq!(scope.declare("foo", Suffix::Snake), "foo_2");
+        assert_eq!(scope.declare("foo", Suffix::Snake), "foo_3");
+        assert_eq!(scope.declare("Kind", Suffix::Pascal), "Kind3");
+        assert!(scope.contains("Kind3"));
+        assert!(!scope.claim("foo_3"));
+    }
+
+    #[test]
+    fn dedup_names_never_lands_on_a_later_name() {
+        let mut names: Vec<String> = ["A", "A", "A_2"].map(String::from).into();
+        dedup_names(&mut names);
+        assert_eq!(names, ["A", "A_2", "A_2_2"]);
+    }
 
     #[test]
     fn test_snake_case() {

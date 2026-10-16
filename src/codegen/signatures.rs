@@ -40,8 +40,6 @@
 //! callable and depends on return-type analysis. See `emit_callable_variants`
 //! in the parent `codegen` module for that layer.
 
-use std::collections::HashSet;
-
 use proc_macro2::TokenStream;
 use quote::quote;
 
@@ -49,7 +47,7 @@ use crate::codegen::primitive_unions;
 use crate::codegen::typemap::{self, CodegenContext, TypePosition};
 use crate::ir::{Param, Throws, TypeRef};
 use crate::parse::scope::ScopeId;
-use crate::util::naming::to_snake_case;
+use crate::util::naming::{to_snake_case, LocalScope, Suffix};
 
 /// What kind of callable an emitter is producing — drives default-naming
 /// (`new`, `set_x`, snake-case, …) and which `wasm_bindgen` attributes to
@@ -239,30 +237,6 @@ pub struct FunctionSignature {
     /// by codegen to resolve type-parameter references during emit.
     /// For non-generic callables this is just the enclosing scope.
     pub body_scope: ScopeId,
-}
-
-/// Assign a unique name within the extern block.
-///
-/// If `candidate` is already taken, appends `_2`, `_3`, ... until a
-/// unique name is found — the unsuffixed candidate is the implicit
-/// `_1`, so collisions start at `_2` (matching the convention used
-/// by `parse::members::unique_type_name`). The chosen name is
-/// inserted into `used_names`.
-pub fn dedupe_name(candidate: &str, used_names: &mut HashSet<String>) -> String {
-    let mut name = candidate.to_string();
-    if !used_names.contains(&name) {
-        used_names.insert(name.clone());
-        return name;
-    }
-    let base = name.clone();
-    for counter in 2.. {
-        name = format!("{base}_{counter}");
-        if !used_names.contains(&name) {
-            used_names.insert(name.clone());
-            return name;
-        }
-    }
-    unreachable!("HashSet exhaustion is impossible in practice");
 }
 
 /// Recursively collect every in-scope type-parameter name reachable
@@ -489,10 +463,10 @@ pub struct CallableSpec<'a> {
 ///   callables drop `catch` and return `T` directly. Constructors ignore
 ///   this — they always catch per JS `new` semantics.
 /// * **Naming**: each surviving expansion gets `base + suffix` deduped against
-///   `used_names`; `try_` variants prepend `try_` and dedup again.
+///   `names`; `try_` variants prepend `try_` and declare again.
 pub fn build_signatures(
     spec: &CallableSpec<'_>,
-    used_names: &mut HashSet<String>,
+    names: &mut LocalScope,
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) -> Vec<FunctionSignature> {
@@ -527,7 +501,7 @@ pub fn build_signatures(
 
     for exp in expansions {
         let primary_candidate = public_rust_name(&format!("{base}{}", exp.name_suffix));
-        let primary_name = dedupe_name(&primary_candidate, used_names);
+        let primary_name = names.declare(&primary_candidate, Suffix::Snake);
 
         // Primary variant catches when:
         // * the kind always catches (constructors), OR
@@ -549,10 +523,10 @@ pub fn build_signatures(
             doc: augmented_doc.clone(),
             body_scope: spec.body_scope,
         };
-        push_with_js_string_return(&mut out, primary, used_names, cgctx, scope);
+        push_with_js_string_return(&mut out, primary, names, cgctx, scope);
 
         if allow_try {
-            let try_name = dedupe_name(&format!("try_{primary_name}"), used_names);
+            let try_name = names.declare(&format!("try_{primary_name}"), Suffix::Snake);
             let try_sig = FunctionSignature {
                 rust_name: try_name,
                 js_name: spec.js_name.to_string(),
@@ -565,7 +539,7 @@ pub fn build_signatures(
                 doc: augmented_doc.clone(),
                 body_scope: spec.body_scope,
             };
-            push_with_js_string_return(&mut out, try_sig, used_names, cgctx, scope);
+            push_with_js_string_return(&mut out, try_sig, names, cgctx, scope);
         }
     }
 
@@ -575,7 +549,7 @@ pub fn build_signatures(
 fn push_with_js_string_return(
     out: &mut Vec<FunctionSignature>,
     sig: FunctionSignature,
-    used_names: &mut HashSet<String>,
+    names: &mut LocalScope,
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) {
@@ -586,7 +560,7 @@ fn push_with_js_string_return(
     out.push(sig.clone());
     if has_js_return {
         let mut js_sig = sig;
-        js_sig.rust_name = dedupe_name(&format!("{}_js_string", js_sig.rust_name), used_names);
+        js_sig.rust_name = names.declare(&format!("{}_js_string", js_sig.rust_name), Suffix::Snake);
         js_sig.js_string_return = true;
         out.push(js_sig);
     }
@@ -985,7 +959,7 @@ fn flatten_collapse_to_lub(
 /// Variadic params participate in naming — if a signature has a trailing variadic
 /// that others lack, the param name is used as a suffix.
 ///
-/// These are candidate names — the caller runs them through `dedupe_name` for
+/// These are candidate names — the caller declares them in the block's `LocalScope` for
 /// final uniqueness within the extern block.
 fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec<String> {
     if signatures.len() == 1 {
@@ -1009,14 +983,14 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
     // numeric dedup (`_with_record` + `_with_record_2`) with
     // semantic disambiguation (`_with_record` + `_with_context`).
     let mut names = Vec::with_capacity(signatures.len());
-    let mut used: std::collections::HashSet<String> = std::collections::HashSet::new();
+    let mut used = LocalScope::default();
 
     for (sig_idx, sig) in signatures.iter().enumerate() {
         // The first signature gets the base name without any suffix;
         // `expand_signatures` has already moved the primary to the front.
         if sig_idx == 0 {
             names.push(base_name.to_string());
-            used.insert(base_name.to_string());
+            used.claim(base_name);
             continue;
         }
 
@@ -1092,20 +1066,9 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
             // prefix. The fanned side keeps its flavor as a suffix.
             name = compose_name(base_name, &parts, NamingStrategy::ParamNamePlusFlavor);
         }
-        if used.contains(&name) {
-            // Strategy 2: numeric fallback. Unlikely to fire in
-            // practice — the param-name + flavor form is already
-            // very specific.
-            let mut n = 2;
-            let base = name.clone();
-            while used.contains(&name) {
-                name = format!("{base}_{n}");
-                n += 1;
-            }
-        }
-
-        used.insert(name.clone());
-        names.push(name);
+        // Strategy 2: numeric fallback. Unlikely to fire in practice —
+        // the param-name + flavor form is already very specific.
+        names.push(used.declare(&name, Suffix::Snake));
     }
 
     names
@@ -1510,8 +1473,8 @@ mod tests {
     use crate::context::GlobalContext;
     use crate::ir::TypeRef;
 
-    fn no_used() -> HashSet<String> {
-        HashSet::new()
+    fn no_used() -> LocalScope {
+        LocalScope::default()
     }
 
     #[test]
@@ -1573,7 +1536,7 @@ mod tests {
         js: &str,
         params: &[Param],
         ret: &TypeRef,
-        used: &mut HashSet<String>,
+        used: &mut LocalScope,
     ) -> Vec<FunctionSignature> {
         let (gctx, scope) = test_ctx();
         let mut cgctx = CodegenContext::empty(&gctx, scope);
@@ -1630,7 +1593,7 @@ mod tests {
 
     #[test]
     fn js_string_variant_names_are_deduped() {
-        let mut used: HashSet<String> = ["value_js_string".to_string()].into();
+        let mut used = LocalScope::with_claimed(["value_js_string"]);
         let sigs = expand_mode(true, "value", &[], &TypeRef::String, &mut used);
         assert!(sigs.iter().any(|s| s.rust_name == "value_js_string_2"));
     }
@@ -1714,7 +1677,7 @@ mod tests {
         ret: &TypeRef,
         kind: SignatureKind,
         doc: &Option<String>,
-        used: &mut HashSet<String>,
+        used: &mut LocalScope,
     ) -> Vec<FunctionSignature> {
         expand_throws(js, params, ret, kind, &Throws::None, doc, used)
     }
@@ -1727,7 +1690,7 @@ mod tests {
         kind: SignatureKind,
         throws: &Throws,
         doc: &Option<String>,
-        used: &mut HashSet<String>,
+        used: &mut LocalScope,
     ) -> Vec<FunctionSignature> {
         let (gctx, scope) = test_ctx();
         let cgctx = CodegenContext::empty(&gctx, scope);
@@ -1754,7 +1717,7 @@ mod tests {
         ret: &TypeRef,
         kind: SignatureKind,
         doc: &Option<String>,
-        used: &mut HashSet<String>,
+        used: &mut LocalScope,
     ) -> Vec<FunctionSignature> {
         let (gctx, scope) = test_ctx();
         let cgctx = CodegenContext::empty(&gctx, scope);
@@ -2356,7 +2319,7 @@ mod tests {
     #[test]
     fn test_try_collision_deduped() {
         // If "try_count" is already taken, the try_ variant gets a numeric suffix.
-        let mut used: HashSet<String> = ["try_count".to_string()].into_iter().collect();
+        let mut used = LocalScope::with_claimed(["try_count"]);
         let sigs = expand(
             "count",
             &[param("x")],

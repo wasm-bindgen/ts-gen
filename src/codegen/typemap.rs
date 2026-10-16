@@ -22,6 +22,7 @@ use crate::context::{GlobalContext, TypeId};
 use crate::ir::{self, ModuleContext, TypeKind, TypeRef};
 use crate::parse::scope::ScopeId;
 use crate::util::diagnostics::DiagnosticCollector;
+use crate::util::naming::{LocalScope, Suffix};
 
 /// js_sys type names reserved by the `use js_sys::*` glob import.
 /// User-defined types that collide with these will be renamed.
@@ -143,8 +144,10 @@ pub struct CodegenContext<'a> {
     /// declarations have distinct `TypeId`s, so this is the lookup key
     /// when scope resolution gives us a hit.
     pub local_type_ids: HashSet<TypeId>,
-    /// Type aliases whose target is a union or other non-representable type.
-
+    /// Every name claimed at the top level of this codegen unit: the
+    /// `js_sys` prelude, declared types, their respellings and synthesised
+    /// enums. Anything that invents a top-level name declares it here.
+    pub names: RefCell<LocalScope>,
     /// Local types that collide with js_sys reserved names — maps original name → renamed name.
     pub renamed_locals: HashMap<String, String>,
     /// How many type parameters each *locally emitted* type accepts.
@@ -207,10 +210,6 @@ pub struct CodegenContext<'a> {
 pub struct DynamicUnionRegistry {
     /// Identity (member-set key) → assigned Rust enum name.
     pub by_key: indexmap::IndexMap<DynamicUnionKey, DynamicUnionInfo>,
-    /// Names already in use in the codegen unit. Includes
-    /// declared types plus all previously-allocated dynamic-union
-    /// enum names.
-    pub used_names: HashSet<String>,
 }
 
 /// Stable identity key for a dynamic union — the ordered list of
@@ -239,41 +238,27 @@ pub struct DynamicUnionInfo {
     pub from_module: ModuleContext,
 }
 
-impl DynamicUnionRegistry {
-    /// Pick a fresh Rust enum name for a synthesised dynamic union.
-    ///
-    /// Preference order: bare anchor → parent-prefixed → numeric
-    /// suffix on whichever form was tried first. The first call with
-    /// a given anchor wins the bare form.
-    ///
-    /// The trailing suffix is `Kind` (rather than `Union`) — Rust
-    /// idiom is to name discriminated-enum types `<Concept>Kind`,
-    /// e.g. `EmailAttachmentContentKind`.
-    fn allocate_name(&self, anchor: &str, parent: Option<&str>) -> String {
-        let bare = format!("{anchor}Kind");
-        if !self.used_names.contains(&bare) {
-            return bare;
-        }
-        if let Some(p) = parent {
-            let qualified = format!("{p}{anchor}Kind");
-            if !self.used_names.contains(&qualified) {
-                return qualified;
-            }
-            // Both bare and qualified taken — number-suffix the qualified.
-            return numeric_dedup(&qualified, &self.used_names);
-        }
-        numeric_dedup(&bare, &self.used_names)
+/// Claim a fresh Rust enum name for a synthesised dynamic union.
+///
+/// Preference order: bare anchor → parent-prefixed → numeric
+/// suffix on whichever form was tried first. The first call with
+/// a given anchor wins the bare form.
+///
+/// The trailing suffix is `Kind` (rather than `Union`) — Rust
+/// idiom is to name discriminated-enum types `<Concept>Kind`,
+/// e.g. `EmailAttachmentContentKind`.
+fn allocate_dynamic_union_name(
+    names: &mut LocalScope,
+    anchor: &str,
+    parent: Option<&str>,
+) -> String {
+    let bare = format!("{anchor}Kind");
+    if names.claim(bare.clone()) {
+        return bare;
     }
-}
-
-fn numeric_dedup(base: &str, used: &HashSet<String>) -> String {
-    let mut n: u32 = 2;
-    loop {
-        let candidate = format!("{base}{n}");
-        if !used.contains(&candidate) {
-            return candidate;
-        }
-        n += 1;
+    match parent {
+        Some(p) => names.declare(&format!("{p}{anchor}Kind"), Suffix::Pascal),
+        None => names.declare(&bare, Suffix::Pascal),
     }
 }
 
@@ -469,6 +454,7 @@ impl<'a> CodegenContext<'a> {
             gctx,
             local_types: HashMap::new(),
             local_type_ids: HashSet::new(),
+            names: RefCell::new(LocalScope::with_claimed(JS_SYS_RESERVED.iter().copied())),
             renamed_locals: HashMap::new(),
             local_type_param_counts: HashMap::new(),
             namespace_paths: HashMap::new(),
@@ -488,14 +474,6 @@ impl<'a> CodegenContext<'a> {
             ctx.collect_declaration(type_id, &[]);
         }
         ctx.resolve_collisions();
-        // Seed the dynamic-union registry's used-name set with every
-        // declared type so synthesised enums never collide with the
-        // user's source.
-        {
-            let mut reg = ctx.dynamic_unions.borrow_mut();
-            reg.used_names.extend(ctx.local_types.keys().cloned());
-            reg.used_names.extend(ctx.renamed_locals.values().cloned());
-        }
         ctx
     }
 
@@ -505,6 +483,7 @@ impl<'a> CodegenContext<'a> {
             gctx,
             local_types: HashMap::new(),
             local_type_ids: HashSet::new(),
+            names: RefCell::new(LocalScope::with_claimed(JS_SYS_RESERVED.iter().copied())),
             renamed_locals: HashMap::new(),
             local_type_param_counts: HashMap::new(),
             namespace_paths: HashMap::new(),
@@ -560,8 +539,7 @@ impl<'a> CodegenContext<'a> {
             return info.rust_name.clone();
         }
         let mut reg = self.dynamic_unions.borrow_mut();
-        let chosen = reg.allocate_name(anchor, parent);
-        reg.used_names.insert(chosen.clone());
+        let chosen = allocate_dynamic_union_name(&mut self.names.borrow_mut(), anchor, parent);
         reg.by_key.insert(
             key,
             DynamicUnionInfo {
@@ -708,20 +686,16 @@ impl<'a> CodegenContext<'a> {
         self.diagnostics.take()
     }
 
-    /// Detect collisions between local type names and the js_sys glob import.
-    /// Colliding local types get renamed with a trailing underscore.
+    /// Claim every declared type at the top level, moving the ones that
+    /// collide with the `js_sys` glob aside under a trailing underscore.
     fn resolve_collisions(&mut self) {
-        let reserved: HashSet<&str> = JS_SYS_RESERVED.iter().copied().collect();
-
-        for name in &reserved {
-            if self.local_types.contains_key(*name) {
-                let mut renamed = format!("{name}_");
-                let mut i = 2;
-                while self.local_types.contains_key(&renamed) || reserved.contains(renamed.as_str())
-                {
-                    renamed = format!("{name}_{i}");
-                    i += 1;
-                }
+        let names = self.names.get_mut();
+        for name in self.local_types.keys() {
+            names.claim(name.clone());
+        }
+        for &name in JS_SYS_RESERVED {
+            if self.local_types.contains_key(name) {
+                let renamed = names.declare(name, Suffix::Trailing);
                 self.renamed_locals.insert(name.to_string(), renamed);
             }
         }

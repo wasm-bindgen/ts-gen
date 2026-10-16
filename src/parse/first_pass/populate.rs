@@ -13,7 +13,7 @@ use crate::parse::merge::{extract_var_members, is_class_constructor_var, var_dec
 use crate::parse::scope::{ScopeArena, ScopeId};
 use crate::parse::types::{convert_ts_type_scoped, convert_type_params};
 use crate::util::diagnostics::DiagnosticCollector;
-use crate::util::naming::to_snake_case;
+use crate::util::naming::{to_snake_case, LocalScope};
 
 use super::converters::{
     convert_class_decl, convert_function_decl, convert_interface_decl, convert_numeric_enum,
@@ -34,7 +34,7 @@ struct PopulateCtx<'a, 'docs> {
     /// Read-only Phase 1 declarations (for looking up namespace child scopes).
     type_arena: &'a [ir::TypeDeclaration],
     /// Used-type-names set, owned by Phase 2 and lent to `ParseCtx`.
-    used_type_names: std::collections::HashSet<String>,
+    used_type_names: LocalScope,
     /// Synthesized-interface sink threaded through member conversion;
     /// the per-statement orchestration drains this between
     /// declarations.
@@ -113,8 +113,7 @@ pub fn populate_declarations<'a, 'docs>(
     scope: ScopeId,
 ) -> (Vec<ir::TypeDeclaration>, NamespaceMembers) {
     let mut declarations = Vec::new();
-    let used_type_names: std::collections::HashSet<String> =
-        registry.types.keys().cloned().collect();
+    let used_type_names = LocalScope::with_claimed(registry.types.keys().cloned());
     let mut pcx = PopulateCtx {
         registry,
         lib_name,
@@ -529,7 +528,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                     parent_scope,
                     &mut self.parse_ctx(),
                 );
-                self.used_type_names.insert(alias_name.to_string());
+                self.used_type_names.claim(alias_name);
                 // Any nested anonymous interfaces hoisted from member
                 // params during `interface_from_signatures` accumulate
                 // in `self.synth` — the caller drains them alongside
@@ -567,7 +566,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                     })
                     .collect();
                 let merged = crate::parse::literal_union::merge_member_branches(&branches);
-                self.used_type_names.insert(alias_name.to_string());
+                self.used_type_names.claim(alias_name);
 
                 let discriminators = crate::parse::literal_union::detect_discriminators(&branches);
                 if !discriminators.is_empty() {

@@ -9,6 +9,7 @@ use crate::codegen::signatures::{
 };
 use crate::codegen::typemap::{to_return_type, to_syn_type, CodegenContext, TypePosition};
 use crate::parse::scope::ScopeId;
+use crate::util::naming::{LocalScope, Suffix};
 use std::collections::HashSet;
 
 use crate::ir::{FunctionDecl, ModuleContext, VariableDecl};
@@ -47,7 +48,7 @@ fn emit_function(
     js_namespace: &[String],
     scope: ScopeId,
 ) -> TokenStream {
-    let mut used_names = HashSet::new();
+    let mut names = LocalScope::default();
     let overloads = [decl.params.as_slice()];
     let sigs = build_signatures(
         &CallableSpec {
@@ -59,7 +60,7 @@ fn emit_function(
             doc,
             body_scope: decl.body_scope,
         },
-        &mut used_names,
+        &mut names,
         cgctx,
         decl.body_scope,
     );
@@ -184,7 +185,7 @@ fn generic_bounds_for_function(
 /// the same ident (`fooBar` / `FOO_BAR`) are numbered instead.
 #[derive(Default)]
 pub struct StaticNames {
-    idents: HashSet<String>,
+    idents: LocalScope,
     bindings: HashSet<(Option<String>, String)>,
 }
 
@@ -203,12 +204,7 @@ pub fn generate_variable(
         return TokenStream::new();
     }
     let base = super::typemap::make_ident(&decl.name).to_string();
-    let mut rust_name = base.clone();
-    let mut i = 2;
-    while !static_names.idents.insert(rust_name.clone()) {
-        rust_name = format!("{base}_{i}");
-        i += 1;
-    }
+    let rust_name = static_names.idents.declare(&base, Suffix::Snake);
     let rust_ident = super::typemap::make_ident(&rust_name);
     let ty = to_syn_type(&decl.type_ref, TypePosition::RETURN, cgctx, scope, ctx);
     let doc = super::doc_tokens(doc);
