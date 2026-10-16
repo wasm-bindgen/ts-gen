@@ -426,10 +426,11 @@ pub(crate) fn synthesize_inline(
 }
 
 /// Whether a single-segment name may appear in an interface's `extends`.
-/// A type parameter or a name that does not resolve here cannot; nor can
-/// an alias phase 1 already knows is not an object type. An alias whose
-/// target is still unknown is allowed through: codegen drops a parent
-/// that erases, keeping the literal's own members.
+/// A type parameter cannot; nor can an alias phase 1 already knows is not
+/// an object type. A name with no local binding (an import, an
+/// `--external` mapping, or a typo) is allowed through, as is an alias
+/// whose target is still unknown: codegen resolves them, and drops a
+/// parent that erases, keeping the literal's own members.
 fn is_extendable(name: &str, scope: ScopeId, ctx: &ParseCtx<'_, '_>) -> bool {
     match ctx.scopes.resolve_binding(scope, name) {
         Some(crate::parse::scope::Binding::Declared(id)) => {
@@ -439,7 +440,8 @@ fn is_extendable(name: &str, scope: ScopeId, ctx: &ParseCtx<'_, '_>) -> bool {
                 _ => false,
             }
         }
-        Some(crate::parse::scope::Binding::TypeParam) | None => false,
+        Some(crate::parse::scope::Binding::TypeParam) => false,
+        None => true,
     }
 }
 

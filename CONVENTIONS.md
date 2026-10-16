@@ -730,12 +730,13 @@ intersection of those types, which is bounded at codegen (see
 [Intersections take their most specific member](#intersections-take-their-most-specific-member)).
 
 Every parent must be something an interface could `extends`. A type
-parameter (`T & { id: string }`), a name that does not resolve, or an
-alias to a non-object type (`type Id = string`) leaves the intersection
-unhoisted, to be bounded at codegen. A parent that resolves but erases
-at codegen (a conditional type, say) is dropped from `extends` rather
-than replaced, so the first real parent stays the `Deref` target; the
-literal's own members survive either way. A generic first parent is
+parameter (`T & { id: string }`) or an alias to a non-object type
+(`type Id = string`) leaves the intersection unhoisted, to be bounded
+at codegen. Imported and `--external` names have no local binding and
+are allowed through. A parent that erases at codegen (a conditional
+type, or a name that never resolves and is reported) is dropped from
+`extends` rather than replaced, so the first real parent stays the
+`Deref` target; the literal's own members survive either way. A generic first parent is
 spelled bare in `extends`, which wasm-bindgen reads as
 `Parent<JsValue>`, so such a type derives `PartialEq` without `Eq`.
 

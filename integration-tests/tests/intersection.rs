@@ -1,8 +1,8 @@
 #![cfg(target_arch = "wasm32")]
 
 use ts_gen_integration_tests::intersection::{
-    Both, Conditional, Derived, Fetcher, GenericStub, GetOptions, Provider, Refined, Store,
-    StoreOptions, Stub, Unrelated,
+    Both, Conditional, Derived, Ext, Fetcher, GenericStub, GetOptions, Provider, Refined, Store,
+    StoreOptions, Stub, Unknown, Unrelated,
 };
 use wasm_bindgen::{JsCast, JsValue};
 
@@ -39,6 +39,12 @@ async fn intersection_bindings_compile(
     let _: String = stub.id();
     let fetcher: &Fetcher = stub;
     let _ = fetcher.fetch("x").await;
+
+    let unknown: &Unknown = &JsValue::NULL.unchecked_into();
+    let _: String = unknown.id();
+    let _: &Fetcher = unknown;
+    let ext = Ext::new("x");
+    let _: &js_sys::Date = &ext;
 
     let _: String = generic_stub.id();
     let provider: &Provider<JsValue> = generic_stub;

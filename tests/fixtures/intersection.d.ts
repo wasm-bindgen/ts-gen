@@ -1,4 +1,4 @@
-//! @ts-gen --lib-name intersection --export intersection
+//! @ts-gen --external Foreign=::js_sys::Date --lib-name intersection --export intersection
 
 // `A & { ... }` is the interface the user would have written as
 // `interface X extends A { ... }`, so it hoists through the same path as
@@ -51,6 +51,7 @@ export interface Provider<T> {
 }
 export type GenericStub<T> = Provider<T> & Fetcher & { readonly id: string };
 export type Unknown = Missing & Fetcher & { readonly id: string };
+export type Ext = Foreign & { extra: string };
 export interface Message {
   role: "user" | "assistant" | (string & {});
 }
