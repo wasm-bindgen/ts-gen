@@ -128,14 +128,9 @@ pub fn populate_declarations<'a, 'docs>(
         namespace_members: NamespaceMembers::new(),
     };
 
+    let file_ctx = super::file_context(program, lib_name);
     for stmt in &program.body {
-        pcx.populate_statement(
-            stmt,
-            &ir::ModuleContext::Global,
-            &mut declarations,
-            scope,
-            false,
-        );
+        pcx.populate_statement(stmt, &file_ctx, &mut declarations, scope, false);
     }
 
     (declarations, pcx.namespace_members)

@@ -1864,8 +1864,16 @@ whether they are **emitted** is governed by `--export` and
 externalised, not lifted.
 
 For `Global` declarations (top-level `declare class`, `declare
-function`, `declare const`, etc.) the rule is simpler: emit when the
-decl's source file is in `--export`, otherwise skip.
+function`, `declare const`, etc. in a script file) the rule is simpler:
+emit when the decl's source file is in `--export`, otherwise skip.
+
+A file with any top-level `import` or `export` is a module, and with
+`--lib-name` every top-level declaration in it is `Module("<lib>")`,
+with or without an `export` prefix. An unexported `interface Options`
+or `declare var _Foo` is still exported by name through
+`export { _Foo as Foo }`, or referred to by the exported declarations,
+and either way it merges and resolves with them rather than being a
+global the output never emits.
 
 Qualification keys off the *resolved* declaration's `module_context`,
 not the textual name, so a global `interface Foo` and a module-scoped

@@ -53,8 +53,9 @@ pub fn collect_type_names(
         named_ctor_vars: Vec::new(),
     };
 
+    let file_ctx = super::file_context(program, lib_name);
     for stmt in &program.body {
-        ccx.collect_statement(stmt, &ir::ModuleContext::Global, root_scope, false);
+        ccx.collect_statement(stmt, &file_ctx, root_scope, false);
     }
 
     for (name, iface, ctx, scope, exported) in std::mem::take(&mut ccx.named_ctor_vars) {

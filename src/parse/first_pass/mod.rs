@@ -40,6 +40,18 @@ pub fn is_module(program: &ast::Program<'_>) -> bool {
     })
 }
 
+/// The module context of a file's top-level declarations. In a module file
+/// every top-level declaration belongs to the module whether or not it has
+/// an `export` prefix: an unexported one can still be exported by name
+/// through `export { local as public }`, or be referred to by exported
+/// declarations, and in either case it must merge and resolve with them.
+pub fn file_context(program: &ast::Program<'_>, lib_name: Option<&str>) -> ir::ModuleContext {
+    match lib_name {
+        Some(lib) if is_module(program) => ir::ModuleContext::Module(lib.into()),
+        _ => ir::ModuleContext::Global,
+    }
+}
+
 // ─── Shared Helpers ─────────────────────────────────────────────────
 
 /// Statements of `namespace N { ... }`. Dotted `namespace A.B {}` bodies
