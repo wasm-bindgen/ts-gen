@@ -1906,62 +1906,24 @@ global the output never emits.
 
 ### The export map
 
-Every declaration block (a `--lib-name` file, a `declare module "x"`
-body, a namespace body) has an export map, built in phase 1. It plays
-the role ECMA-262's ResolveExport plays at link time, over a graph that
-is fully known up front. The `.d.ts` is not an ES module but
-TypeScript's description of one, so TypeScript's reading defines the
-surface: a block exports every declaration it contains, `export`
-modifier or not, unless it decides its exports explicitly with an
-`export { … }`, `export … from`, `export *`, `export =` or `export
-default <expr>`, in which case only what those name is exported (and
-`export declare X` counts). `export default class C {}` is a
-declaration with modifiers, not an export assignment, and leaves
-implicit export on. For `export = X`, the exports of the namespace
-merged with `X` are the module's named exports, alongside `default`.
-The rule is per block, not per merged scope, which is how
-`@types/node` is written:
+Each block (file, `declare module` body, namespace body) exports every
+declaration unless it contains `export { … }`, `export … from`,
+`export *`, `export =` or `export default <expr>`; then only what those
+and `export` modifiers name. `export default class C {}` is a modifier.
+`export = X` adds the exports of the namespace merged with `X` as named
+exports. Per block, not per merged scope:
 
 ```ts
-declare module "node:test" {
-  namespace test { export { test }; }        // exports: test
-  namespace test { function after(): void; } // exports: after
-}
+namespace test { export { test }; }        // exports: test
+namespace test { function after(): void; } // exports: after
 ```
 
-A `.d.ts` file with top-level exports and no `export {}` exports
-everything too, which is why TypeScript's declaration emitter adds
-`export {};` to lock a file's surface down.
+Imports look up public names and bind the local: `export { _Foo as
+Foo }` makes `import { Foo }`, `D.Foo` and `extends Foo` all reach
+`_Foo`, and the Rust reference is `_Foo`.
 
-* **Imports name exports.** `import { Foo } from "dep"` and `D.Foo`
-  through `import * as D` look `Foo` up in `dep`'s export map and bind
-  the local it names (`_Foo`), so every indirection reaches the one
-  declaration and the Rust reference is its own name:
-
-  ```ts
-  declare module "dep" {
-    interface _Foo { bar(): void; }
-    var _Foo: { new (): _Foo };
-    export { _Foo as Foo };
-  }
-  declare module "main" {
-    import { Foo } from "dep";
-    export function take(f: Foo): Foo;
-  }
-  ```
-
-  ```rust
-  pub fn take(f: &_Foo) -> _Foo;
-  ```
-
-* **Only exports reach JS.** A value its block does not export has no
-  import to bind to: `import { helper } from "m"` is a link-time
-  `SyntaxError` when `m` has no such export, before any Rust runs. So in
-  a block with an `export { … }`, an unexported `declare function
-  helper()`, `declare const secret` or `namespace M` is not emitted, and
-  an unexported class keeps only its instance members, which bind
-  through a value rather than by importing the class. Types are
-  unaffected, as nothing imports them.
+Unexported functions, variables and namespaces are not emitted; an
+unexported class keeps only its instance members. Types are unaffected.
 
 Qualification keys off the *resolved* declaration's `module_context`,
 not the textual name, so a global `interface Foo` and a module-scoped
