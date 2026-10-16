@@ -2117,9 +2117,9 @@ exposes them that way, which Node builtins and packages with an ESM
 facade do. A plain CommonJS `module.exports = f; f.x = …` exposes only
 the default, since `cjs-module-lexer` does not detect `f.x`.
 
-Only an `export =` of a binding declared in the same `declare module`
-is handled. A top-level `export =` in a `--lib-name` file, or one
-naming a global, is skipped with a diagnostic.
+A `--lib-name` module file's top-level `export =` is handled the same
+way. Only an `export =` of a binding declared in the same module is
+handled; one naming a global is skipped with a diagnostic.
 
 A namespace merged with a same-named class, function or interface
 (`class Foo {}` + `namespace Foo { interface Options {} }`) leaves

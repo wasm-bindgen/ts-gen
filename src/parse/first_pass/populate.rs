@@ -133,11 +133,25 @@ pub fn populate_declarations<'a, 'docs>(
     };
 
     let file_ctx = super::file_context(program, lib_name);
+    if let ir::ModuleContext::Module(_) = file_ctx {
+        pcx.export_assignment = assigned_name(&program.body).map(|name| (scope, name));
+    }
     for stmt in &program.body {
         pcx.populate_statement(stmt, &file_ctx, &mut declarations, scope, false);
     }
 
     (declarations, pcx.namespace_members)
+}
+
+/// The binding a module body's `export = <name>` assigns.
+fn assigned_name(body: &[ast::Statement<'_>]) -> Option<String> {
+    body.iter().find_map(|stmt| match stmt {
+        ast::Statement::TSExportAssignment(assign) => match &assign.expression {
+            ast::Expression::Identifier(ident) => Some(ident.name.to_string()),
+            _ => None,
+        },
+        _ => None,
+    })
 }
 
 /// `(rust_name, js_name)` for each name a value binding is imported by: its
@@ -351,7 +365,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                 if !declared {
                     self.diag.info(
                         "Skipping `export =` (only a binding declared in the same \
-                         `declare module` is supported)",
+                         module is supported)",
                     );
                 }
             }
@@ -807,16 +821,9 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
             .get(specifier)
             .expect("phase 1 creates a scope for every ambient module");
         if let Some(block) = &module.body {
-            let assigned = block.body.iter().find_map(|stmt| match stmt {
-                ast::Statement::TSExportAssignment(assign) => match &assign.expression {
-                    ast::Expression::Identifier(ident) => Some(ident.name.to_string()),
-                    _ => None,
-                },
-                _ => None,
-            });
             let outer = std::mem::replace(
                 &mut self.export_assignment,
-                assigned.map(|name| (module_scope, name)),
+                assigned_name(&block.body).map(|name| (module_scope, name)),
             );
             for stmt in &block.body {
                 self.populate_statement(stmt, &module_ctx, declarations, module_scope, false);
