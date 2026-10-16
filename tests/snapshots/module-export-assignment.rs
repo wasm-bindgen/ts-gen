@@ -6,11 +6,12 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "module-export-assignment")]
 extern "C" {
+    #[wasm_bindgen(js_name = "default")]
     pub fn check(value: &JsValue);
 }
 #[wasm_bindgen(module = "module-export-assignment")]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "check")]
+    #[wasm_bindgen(catch, js_name = "default")]
     pub fn try_check(value: &JsValue) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "module-export-assignment")]
@@ -41,5 +42,27 @@ pub mod nested {
     extern "C" {
         #[wasm_bindgen(catch, js_name = "run", js_namespace = "nested")]
         pub fn try_run() -> Result<String, JsValue>;
+    }
+}
+pub mod module_export_assignment {
+    #[allow(unused_imports)]
+    use super::*;
+    pub mod counter {
+        #[allow(unused_imports)]
+        use super::*;
+        #[wasm_bindgen(module = "module-export-assignment/counter")]
+        extern "C" {
+            # [wasm_bindgen (extends = Object , js_name = "default")]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type Counter;
+            #[wasm_bindgen(constructor, js_class = "default", catch)]
+            pub fn new(start: f64) -> Result<Counter, JsValue>;
+            #[wasm_bindgen(method, getter)]
+            pub fn value(this: &Counter) -> f64;
+            #[wasm_bindgen(method)]
+            pub fn increment(this: &Counter);
+            #[wasm_bindgen(method, catch, js_name = "increment")]
+            pub fn try_increment(this: &Counter) -> Result<(), JsValue>;
+        }
     }
 }

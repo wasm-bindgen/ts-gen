@@ -53,6 +53,7 @@ fn emit_function(
     let sigs = build_signatures(
         &CallableSpec {
             js_name: &decl.js_name,
+            rust_name: Some(&decl.name),
             kind: SignatureKind::Function,
             overloads: &[overloads[0]],
             return_type: &decl.return_type,

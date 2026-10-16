@@ -148,8 +148,18 @@ fn value_bindings(local: &str, public_names: &[String]) -> Vec<(String, String)>
     }
     public_names
         .iter()
-        .map(|public| (to_snake_case(public), public.clone()))
+        .map(|public| (to_snake_case(rust_name(local, public)), public.clone()))
         .collect()
+}
+
+/// The Rust name of the binding `local` exported as `public`. A default
+/// export has no name of its own, so it keeps the local one.
+fn rust_name<'n>(local: &'n str, public: &'n str) -> &'n str {
+    if public == "default" {
+        local
+    } else {
+        public
+    }
 }
 
 /// Per-declaration context passed to `populate_declaration`.
@@ -328,8 +338,23 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                 }
             },
 
-            // An assigned namespace is emitted flat by `populate_namespace`.
-            ast::Statement::TSExportAssignment(_) => {}
+            // The assigned binding is bound as the default export, and an
+            // assigned namespace is emitted flat by `populate_namespace`.
+            ast::Statement::TSExportAssignment(assign) => {
+                let declared = match &assign.expression {
+                    ast::Expression::Identifier(ident) => {
+                        matches!(ctx, ir::ModuleContext::Module(_))
+                            && self.scopes.get(scope).get(&ident.name).is_some()
+                    }
+                    _ => false,
+                };
+                if !declared {
+                    self.diag.info(
+                        "Skipping `export =` (only a binding declared in the same \
+                         `declare module` is supported)",
+                    );
+                }
+            }
             ast::Statement::TSNamespaceExportDeclaration(decl) => {
                 self.diag.info(format!(
                     "Skipping `export as namespace {}` (UMD namespace export)",
@@ -614,7 +639,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
             Some((public, _)) if has_instance_interface => {
                 (name.to_string(), public.clone(), &[][..])
             }
-            Some((public, rest)) => (public.clone(), public.clone(), rest),
+            Some((public, rest)) => (rust_name(name, public).to_string(), public.clone(), rest),
             None => (name.to_string(), name.to_string(), &[][..]),
         };
 

@@ -417,6 +417,9 @@ fn primary_expansion(sigs: &[Vec<ConcreteParam>], first_overload_len: usize) -> 
 #[derive(Clone, Debug)]
 pub struct CallableSpec<'a> {
     pub js_name: &'a str,
+    /// The Rust name, when it is not derived from `js_name`, as for a
+    /// default export.
+    pub rust_name: Option<&'a str>,
     pub kind: SignatureKind,
     /// All overloads sharing this `js_name` — typically one element, but TS
     /// allows multiple overloaded declarations.
@@ -470,7 +473,9 @@ pub fn build_signatures(
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) -> Vec<FunctionSignature> {
-    let base = base_rust_name(spec.js_name, spec.kind);
+    let base = spec
+        .rust_name
+        .map_or_else(|| base_rust_name(spec.js_name, spec.kind), str::to_string);
     let expansions = expand_signatures(spec.overloads, cgctx, scope);
 
     // Promise unwrap is per-callable, not per-overload — every expansion of a
@@ -1544,6 +1549,7 @@ mod tests {
         build_signatures(
             &CallableSpec {
                 js_name: js,
+                rust_name: None,
                 kind: SignatureKind::Function,
                 overloads: &[params],
                 return_type: ret,
@@ -1697,6 +1703,7 @@ mod tests {
         build_signatures(
             &CallableSpec {
                 js_name: js,
+                rust_name: None,
                 kind,
                 overloads: &[params],
                 return_type: ret,
@@ -1724,6 +1731,7 @@ mod tests {
         build_signatures(
             &CallableSpec {
                 js_name: js,
+                rust_name: None,
                 kind,
                 overloads,
                 return_type: ret,

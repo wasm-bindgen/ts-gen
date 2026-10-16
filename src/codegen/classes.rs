@@ -535,6 +535,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         build_signatures(
             &CallableSpec {
                 js_name: &g.js_name,
+                rust_name: None,
                 kind: SignatureKind::Setter,
                 overloads: &setter_overloads,
                 return_type: &void,
@@ -1232,6 +1233,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 let sigs = build_signatures(
                     &CallableSpec {
                         js_name: &config.js_name,
+                        rust_name: None,
                         kind: SignatureKind::Constructor,
                         overloads: &overloads,
                         return_type: &return_type,
@@ -1267,6 +1269,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 let sigs = build_signatures(
                     &CallableSpec {
                         js_name: &m.js_name,
+                        rust_name: None,
                         kind: SignatureKind::Method,
                         overloads: &overloads,
                         return_type,
@@ -1298,6 +1301,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 let sigs = build_signatures(
                     &CallableSpec {
                         js_name: &m.js_name,
+                        rust_name: None,
                         kind: SignatureKind::StaticMethod,
                         overloads: &overloads,
                         return_type,
@@ -1765,6 +1769,7 @@ fn generate_setter(
     let sigs = build_signatures(
         &CallableSpec {
             js_name: &setter.js_name,
+            rust_name: None,
             kind: SignatureKind::Setter,
             overloads: &overloads,
             return_type: &void,
@@ -1899,6 +1904,7 @@ fn generate_static_setter(
     let sigs = build_signatures(
         &CallableSpec {
             js_name: &setter.js_name,
+            rust_name: None,
             kind: SignatureKind::StaticSetter,
             overloads: &overloads,
             return_type: &void,

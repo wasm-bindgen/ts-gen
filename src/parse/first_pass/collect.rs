@@ -183,7 +183,19 @@ impl<'a> CollectCtx<'a> {
                 }
             },
 
-            ast::Statement::TSExportAssignment(_) => {}
+            // In the ESM shape of `module.exports = x`, `x` is the default
+            // export.
+            ast::Statement::TSExportAssignment(assign) => {
+                if let (ir::ModuleContext::Module(_), ast::Expression::Identifier(ident)) =
+                    (ctx, &assign.expression)
+                {
+                    self.export_specifiers.push((
+                        scope,
+                        ident.name.to_string(),
+                        "default".to_string(),
+                    ));
+                }
+            }
             ast::Statement::TSNamespaceExportDeclaration(_) => {}
 
             ast::Statement::ExportAllDeclaration(export_all) => {

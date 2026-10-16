@@ -2096,6 +2096,31 @@ module's `pub mod`, without `js_namespace`. In `node:assert`
 `strictEqual` binds as `import { strictEqual }`, since the module has
 no `assert` export to reach it through.
 
+The assigned binding itself, a function, class or variable, is the
+default export of the module's ESM shape. It keeps its local Rust name
+and binds with `js_name = "default"`:
+
+```rust
+pub mod node {
+    pub mod assert {
+        #[wasm_bindgen(module = "node:assert")]
+        extern "C" {
+            #[wasm_bindgen(js_name = "default")]
+            pub fn assert(value: &JsValue);
+        }
+    }
+}
+```
+
+Binding the namespace members as named exports assumes the module
+exposes them that way, which Node builtins and packages with an ESM
+facade do. A plain CommonJS `module.exports = f; f.x = …` exposes only
+the default, since `cjs-module-lexer` does not detect `f.x`.
+
+Only an `export =` of a binding declared in the same `declare module`
+is handled. A top-level `export =` in a `--lib-name` file, or one
+naming a global, is skipped with a diagnostic.
+
 A namespace merged with a same-named class, function or interface
 (`class Foo {}` + `namespace Foo { interface Options {} }`) leaves
 that declaration as the type `Foo`, while `Foo.Options` resolves
