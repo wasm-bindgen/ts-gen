@@ -250,7 +250,7 @@ the setter is named `set_<snake_case>`.
 ## JS-name collisions with `js_sys` glob imports
 
 The generated preamble does `use js_sys::*;`, which brings every `js_sys`
-type into scope. A locally declared class with a colliding name (e.g.
+type into scope. A locally declared type with a colliding name (e.g.
 `WebAssembly.Global` vs `js_sys::Global`) would be ambiguous at every
 reference. We resolve this by:
 
@@ -278,6 +278,11 @@ pub mod web_assembly {
 
 Consumers always write `web_assembly::Global`. The `_` suffix is an
 internal detail.
+
+The bindings also spell the prelude's `Option`, `Result`, `String` and
+`Vec` bare, so a declaration with one of those names is suffixed the same
+way. It is not re-exported, since `pub use Result_ as Result;` would
+shadow the prelude `Result` again, so consumers write `Result_`.
 
 ## Classes
 
@@ -2028,7 +2033,26 @@ through the namespace, in either declaration order.
 ## Type aliases and `export { X as Y }`
 
 * `type Foo = Bar;` → `pub type Foo = Bar;` if `Bar` is a recognised
-  type, or chases the alias chain to its terminal during codegen.
+  type, or chases the alias chain to its terminal during codegen. An
+  alias inside a namespace is emitted in the namespace's `pub mod`.
+  A plain reference to an alias lowers to its target, so only a generic
+  instantiation names the alias, qualified like any namespace member:
+
+  ```ts
+  declare namespace Events {
+    type Name = string;
+    type Listener<E> = (event: E) => void;
+  }
+  declare function onEvent(name: Events.Name, listener: Events.Listener<string>): void;
+  ```
+
+  ```rust
+  pub mod events {
+      pub type Name = JsString;
+      pub type Listener<E> = Function<fn(E) -> Undefined>;
+  }
+  pub fn on_event(name: &str, listener: &events::Listener<JsString>);
+  ```
 * `export { Local as Public };` (sourceless) → names the binding `Local`
   declares in the exporting scope, recorded against its `TypeId` in
   `TypeRegistry::export_names`. Each `declare module "x"` body is its own

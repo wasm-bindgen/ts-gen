@@ -13,35 +13,9 @@ use JsValue as CfHostMetadata;
 #[allow(dead_code)]
 use JsValue as Data;
 #[allow(dead_code)]
-use JsValue as EmailExportedHandler;
-#[allow(dead_code)]
-use JsValue as EventListenerOrEventListenerObject;
-#[allow(dead_code)]
-use JsValue as ExportedHandlerFetchHandler;
-#[allow(dead_code)]
-use JsValue as ExportedHandlerQueueHandler;
-#[allow(dead_code)]
-use JsValue as ExportedHandlerScheduledHandler;
-#[allow(dead_code)]
-use JsValue as ExportedHandlerTailHandler;
-#[allow(dead_code)]
-use JsValue as ExportedHandlerTailStreamHandler;
-#[allow(dead_code)]
-use JsValue as ExportedHandlerTestHandler;
-#[allow(dead_code)]
-use JsValue as ExportedHandlerTraceHandler;
-#[allow(dead_code)]
-use JsValue as Fetcher;
-#[allow(dead_code)]
-use JsValue as Params;
-#[allow(dead_code)]
 use JsValue as R;
 #[allow(dead_code)]
 use JsValue as Readonly;
-#[allow(dead_code)]
-use JsValue as RequestInfo;
-#[allow(dead_code)]
-use JsValue as TailEventHandler;
 #[wasm_bindgen]
 extern "C" {
     #[allow(non_upper_case_globals)]
@@ -616,6 +590,16 @@ pub mod web_assembly {
         pub fn try_value_of(this: &Global_) -> Result<JsValue, JsValue>;
     }
     pub use Global_ as Global;
+    #[allow(dead_code)]
+    pub type ImportValue = JsValue;
+    #[allow(dead_code)]
+    pub type ModuleImports = Object;
+    #[allow(dead_code)]
+    pub type Imports = Object<Object>;
+    #[allow(dead_code)]
+    pub type ExportValue = JsValue;
+    #[allow(dead_code)]
+    pub type Exports = Object;
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "WebAssembly")]
@@ -36179,6 +36163,12 @@ pub mod rpc {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type WorkflowEntrypointBranded;
     }
+    #[allow(dead_code)]
+    pub type EntrypointBranded = JsValue;
+    #[allow(dead_code)]
+    pub type Stubable = JsValue;
+    #[allow(dead_code)]
+    pub type Serializable<T> = JsValue;
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = super :: Disposable , extends = Object , js_namespace = "Rpc")]
@@ -36197,6 +36187,26 @@ pub mod rpc {
         #[derive(Debug, Clone, PartialEq)]
         pub type Stub<T: ::wasm_bindgen::JsGeneric>;
     }
+    #[allow(dead_code)]
+    pub type BaseType = JsValue;
+    #[allow(dead_code)]
+    pub type Stubify<T> = JsValue;
+    #[allow(dead_code)]
+    pub type Unstubify<T> = JsValue;
+    #[allow(dead_code)]
+    pub type UnstubifyAll<A> = JsValue;
+    #[allow(dead_code)]
+    pub type MaybeProvider<T> = JsValue;
+    #[allow(dead_code)]
+    pub type MaybeDisposable<T> = JsValue;
+    #[allow(dead_code)]
+    pub type Result_<R> = JsValue;
+    #[allow(dead_code)]
+    pub type MethodOrProperty<V> = JsValue;
+    #[allow(dead_code)]
+    pub type MaybeCallableProvider<T> = JsValue;
+    #[allow(dead_code)]
+    pub type Provider<T, Reserved> = JsValue;
 }
 pub mod cloudflare {
     #[allow(unused_imports)]
@@ -36213,10 +36223,18 @@ pub mod cloudflare {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type GlobalProps;
     }
+    #[allow(dead_code)]
+    pub type GlobalProp<K, Default> = JsValue;
+    #[allow(dead_code)]
+    pub type MainModule = GlobalProp<JsString, Object>;
+    #[allow(dead_code)]
+    pub type Exports = JsValue;
 }
 pub mod cloudflare_workers_module {
     #[allow(unused_imports)]
     use super::*;
+    #[allow(dead_code)]
+    pub type RpcStub<T> = super::rpc::Stub<T>;
     #[wasm_bindgen]
     extern "C" {
         #[allow(non_upper_case_globals)]
@@ -36479,6 +36497,14 @@ pub mod cloudflare_workers_module {
         Month = "month",
         Year = "year",
     }
+    #[allow(dead_code)]
+    pub type WorkflowSleepDuration = JsValue;
+    #[allow(dead_code)]
+    pub type WorkflowDelayDuration = JsValue;
+    #[allow(dead_code)]
+    pub type WorkflowTimeoutDuration = JsValue;
+    #[allow(dead_code)]
+    pub type WorkflowRetentionDuration = JsValue;
     #[wasm_bindgen(private, js_namespace = "CloudflareWorkersModule")]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum WorkflowBackoff {
@@ -39745,6 +39771,8 @@ pub mod tail_stream {
             }
         }
     }
+    #[allow(dead_code)]
+    pub type EventType = JsValue;
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
@@ -39791,6 +39819,9 @@ pub mod tail_stream {
             }
         }
     }
+    #[allow(dead_code)]
+    pub type TailEventHandler<Event> =
+        Function<fn(TailEvent<Event>) -> JsOption<Promise<Undefined>>>;
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
@@ -39884,6 +39915,8 @@ pub mod tail_stream {
             self.inner
         }
     }
+    #[allow(dead_code)]
+    pub type TailEventHandlerType = JsValue;
 }
 #[allow(dead_code)]
 pub type VectorizeVectorMetadataValue = JsValue;
@@ -40885,6 +40918,8 @@ pub enum WorkflowDurationLabel {
 }
 #[allow(dead_code)]
 pub type WorkflowSleepDuration = JsValue;
+#[allow(dead_code)]
+pub type WorkflowRetentionDuration = JsValue;
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]

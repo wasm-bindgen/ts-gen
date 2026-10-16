@@ -77,6 +77,20 @@ pub const JS_SYS_RESERVED: &[&str] = &[
     "WeakSet",
 ];
 
+/// Prelude names the generated code spells bare, so a declaration with one
+/// of these names is moved aside like a `js_sys` collision. Re-exporting it
+/// under its own name would shadow the prelude again, so it keeps the
+/// suffixed name.
+const RUST_PRELUDE_RESERVED: &[&str] = &["Option", "Result", "String", "Vec"];
+
+pub(crate) fn is_prelude_reserved(name: &str) -> bool {
+    RUST_PRELUDE_RESERVED.contains(&name)
+}
+
+fn reserved_names() -> impl Iterator<Item = &'static str> {
+    JS_SYS_RESERVED.iter().chain(RUST_PRELUDE_RESERVED).copied()
+}
+
 /// Direction of data flow at the FFI boundary.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Direction {
@@ -392,11 +406,8 @@ impl<'a> CodegenContext<'a> {
     pub(crate) fn is_local_generic(&self, name: &str, scope: ScopeId) -> bool {
         match self.gctx.resolve_path(scope, name) {
             Some(id) => {
-                let kind = &self.gctx.get_type(id).kind;
-                // Emitted aliases keep their parameters but are not in
-                // `local_type_ids`, which only tracks extern declarations.
-                (self.local_type_ids.contains(&id) || matches!(kind, TypeKind::TypeAlias(_)))
-                    && declared_arity(kind).is_some_and(|n| n > 0)
+                self.local_type_ids.contains(&id)
+                    && declared_arity(&self.gctx.get_type(id).kind).is_some_and(|n| n > 0)
             }
             None => self
                 .local_type_param_counts
@@ -466,7 +477,7 @@ impl<'a> CodegenContext<'a> {
             gctx,
             local_types: HashMap::new(),
             local_type_ids: HashSet::new(),
-            names: RefCell::new(LocalScope::with_claimed(JS_SYS_RESERVED.iter().copied())),
+            names: RefCell::new(LocalScope::with_claimed(reserved_names())),
             renamed_locals: HashMap::new(),
             local_type_param_counts: HashMap::new(),
             namespace_paths: HashMap::new(),
@@ -495,7 +506,7 @@ impl<'a> CodegenContext<'a> {
             gctx,
             local_types: HashMap::new(),
             local_type_ids: HashSet::new(),
-            names: RefCell::new(LocalScope::with_claimed(JS_SYS_RESERVED.iter().copied())),
+            names: RefCell::new(LocalScope::with_claimed(reserved_names())),
             renamed_locals: HashMap::new(),
             local_type_param_counts: HashMap::new(),
             namespace_paths: HashMap::new(),
@@ -699,13 +710,14 @@ impl<'a> CodegenContext<'a> {
     }
 
     /// Claim every declared type at the top level, moving the ones that
-    /// collide with the `js_sys` glob aside under a trailing underscore.
+    /// collide with the `js_sys` glob or the prelude aside under a trailing
+    /// underscore.
     fn resolve_collisions(&mut self) {
         let names = self.names.get_mut();
         for name in self.local_types.keys() {
             names.claim(name.clone());
         }
-        for &name in JS_SYS_RESERVED {
+        for name in reserved_names() {
             if self.local_types.contains_key(name) {
                 let renamed = names.declare(name, Suffix::Trailing);
                 self.renamed_locals.insert(name.to_string(), renamed);
@@ -725,17 +737,9 @@ impl<'a> CodegenContext<'a> {
             ir::TypeKind::DiscriminatedUnion(d) => (&d.name, Some(d.type_params.len())),
             ir::TypeKind::StringEnum(e) => (&e.name, None),
             ir::TypeKind::NumericEnum(e) => (&e.name, None),
-            ir::TypeKind::TypeAlias(a) => {
-                // Type aliases resolve through the scope during codegen,
-                // but record their arity so `Reference` lowering can
-                // preserve generic args on references to an emitted
-                // alias. Aliases in a namespace are not emitted.
-                if mod_path.is_empty() {
-                    self.local_type_param_counts
-                        .insert(a.name.clone(), a.type_params.len());
-                }
-                return;
-            }
+            // Plain references to an alias lower to its target, so only a
+            // generic instantiation names the emitted alias.
+            ir::TypeKind::TypeAlias(a) => (&a.name, Some(a.type_params.len())),
             ir::TypeKind::Namespace(ns) => {
                 let mut path = mod_path.to_vec();
                 path.push(crate::util::naming::to_snake_case(&ns.name));

@@ -36,6 +36,8 @@ extern "C" {
 pub mod events {
     #[allow(unused_imports)]
     use super::*;
+    #[allow(dead_code)]
+    pub type Name = JsString;
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "Events")]

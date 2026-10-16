@@ -1339,7 +1339,9 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
     // resolution renamed it. The suffixed name (`Foo_`) is purely an internal
     // disambiguator against the `use js_sys::*` glob inside the surrounding
     // module — it must never leak into the public Rust path consumers see.
-    let public_alias = if config.effective_rust_name() != config.rust_name {
+    let public_alias = if config.effective_rust_name() != config.rust_name
+        && !super::typemap::is_prelude_reserved(&config.rust_name)
+    {
         let public = super::typemap::make_ident(&config.rust_name);
         let internal = super::typemap::make_ident(&config.effective_rust_name());
         quote! { pub use #internal as #public; }

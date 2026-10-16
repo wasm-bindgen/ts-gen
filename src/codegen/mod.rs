@@ -605,12 +605,20 @@ fn generate_type_alias(
         alias.body_scope,
         from_module,
     );
-    let name = typemap::make_ident(&alias.name);
+    let renamed = cgctx.renamed_locals.get(&alias.name);
+    let name = typemap::make_ident(renamed.map_or(alias.name.as_str(), String::as_str));
 
     // Identity — skip.
     if target.to_string() == alias.name {
         return quote! {};
     }
+
+    let public_alias = if renamed.is_some() && !typemap::is_prelude_reserved(&alias.name) {
+        let public = typemap::make_ident(&alias.name);
+        quote! { pub use #name as #public; }
+    } else {
+        quote! {}
+    };
 
     // Type-parameter declaration so aliases that mention generics
     // survive codegen: `pub type Handler<Env, Props> = …;` rather
@@ -632,6 +640,7 @@ fn generate_type_alias(
     quote! {
         #[allow(dead_code)]
         pub type #name #generics = #target;
+        #public_alias
     }
 }
 
@@ -750,7 +759,12 @@ fn generate_ns_declaration(
             decl.scope_id,
             static_names,
         )),
-        TypeKind::TypeAlias(_) => None,
+        TypeKind::TypeAlias(alias) => Some(generate_type_alias(
+            alias,
+            cgctx,
+            decl.scope_id,
+            &decl.module_context,
+        )),
         TypeKind::Namespace(ns) => Some(generate_namespace(ns, js_namespace, cgctx)),
     }
 }
