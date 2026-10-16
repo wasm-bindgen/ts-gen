@@ -470,6 +470,13 @@ impl<'a> CollectCtx<'a> {
                 self.gctx.exports.insert(scope, &name, &name);
             }
         }
+        // `export = X` makes the exports of the namespace merged with `X`
+        // the module's named exports, alongside `default`.
+        if let Some(assigned) = super::export_assigned_name(stmts) {
+            if let Some(ns_scope) = self.gctx.scopes.get(scope).namespace(assigned) {
+                self.gctx.exports.extend_from(scope, ns_scope);
+            }
+        }
     }
 
     fn collect_namespace_names(

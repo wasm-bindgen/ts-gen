@@ -1181,12 +1181,24 @@ mod tests {
                     namespace ns { const v: number; export { v as w }; }
                     namespace ns { function after(): void; }
                 }
+                declare module "assigned" {
+                    class S { s(): void; }
+                    namespace S { class R { r(): void; } }
+                    export = S;
+                }
+                declare module "defaulted" {
+                    export default class Def {}
+                    function helper(): void;
+                }
                 declare module "main" {
                     import { Foo } from "dep";
                     import Def from "dep";
                     import * as D from "dep";
                     import { Open, too } from "bare";
                     import { ns } from "blocks";
+                    import { R } from "assigned";
+                    import * as A from "assigned";
+                    import { helper } from "defaulted";
                 }
             "#,
         )
@@ -1225,6 +1237,12 @@ mod tests {
         assert_eq!(resolve("ns.w").as_deref(), Some("v"));
         assert_eq!(resolve("ns.after").as_deref(), Some("after"));
         assert_eq!(resolve("ns.v"), None);
+        // `export = S` makes the namespace merged with `S` the module.
+        assert_eq!(resolve("R").as_deref(), Some("R"));
+        assert_eq!(resolve("A.R").as_deref(), Some("R"));
+        assert_eq!(resolve("A.default").as_deref(), Some("S"));
+        // `export default class` is a declaration, not an export assignment.
+        assert_eq!(resolve("helper").as_deref(), Some("helper"));
     }
 
     #[test]

@@ -102,6 +102,17 @@ impl ModuleExports {
         self.by_scope.remove(&scope);
     }
 
+    /// Re-export everything `from` exports as exports of `scope`, under the
+    /// same public and local names. For `export = X`, the members of the
+    /// namespace merged with `X` are the module's named exports, and phase
+    /// 2 binds them in the module scope as well as in `X`'s.
+    pub fn extend_from(&mut self, scope: ScopeId, from: ScopeId) {
+        let Some(entries) = self.by_scope.get(&from).cloned() else {
+            return;
+        };
+        self.by_scope.entry(scope).or_default().extend(entries);
+    }
+
     /// The local name `scope` binds its export `public` to.
     pub fn local_name(&self, scope: ScopeId, public: &str) -> Option<&str> {
         self.by_scope.get(&scope)?.get(public).map(String::as_str)

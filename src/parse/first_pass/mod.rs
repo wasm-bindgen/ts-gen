@@ -60,20 +60,35 @@ pub fn file_context(program: &ast::Program<'_>, lib_name: Option<&str>) -> ir::M
 /// exports every declaration of a `.d.ts` file, `declare module` body or
 /// namespace body implicitly, unless the block contains an export
 /// declaration (`export { … }`, `export … from`, `export *`) or an export
-/// assignment (`export =`, `export default`); `export` modifiers on
-/// declarations do not switch implicit export off. The rule is per block,
-/// so a second `namespace test { function after(); }` next to a
+/// assignment (`export =`, `export default <expr>`); `export` modifiers on
+/// declarations do not switch implicit export off, and nor does `export
+/// default class C {}`, which is a declaration with modifiers. The rule is
+/// per block, so a second `namespace test { function after(); }` next to a
 /// `namespace test { export { test }; }` still exports `after`.
 pub fn block_exports_explicitly(stmts: &[ast::Statement<'_>]) -> bool {
-    stmts.iter().any(|stmt| {
-        matches!(
-            stmt,
-            ast::Statement::ExportNamedDeclaration(_)
-                | ast::Statement::ExportFromDeclaration(_)
-                | ast::Statement::ExportAllDeclaration(_)
-                | ast::Statement::ExportDefaultDeclaration(_)
-                | ast::Statement::TSExportAssignment(_)
-        )
+    stmts.iter().any(|stmt| match stmt {
+        ast::Statement::ExportNamedDeclaration(_)
+        | ast::Statement::ExportFromDeclaration(_)
+        | ast::Statement::ExportAllDeclaration(_)
+        | ast::Statement::TSExportAssignment(_) => true,
+        ast::Statement::ExportDefaultDeclaration(export) => !matches!(
+            export.declaration,
+            ast::ExportDefaultDeclarationKind::ClassDeclaration(_)
+                | ast::ExportDefaultDeclarationKind::FunctionDeclaration(_)
+                | ast::ExportDefaultDeclarationKind::TSInterfaceDeclaration(_)
+        ),
+        _ => false,
+    })
+}
+
+/// The binding a block's `export = <name>` assigns, if any.
+pub fn export_assigned_name<'s>(stmts: &'s [ast::Statement<'_>]) -> Option<&'s str> {
+    stmts.iter().find_map(|stmt| match stmt {
+        ast::Statement::TSExportAssignment(assign) => match &assign.expression {
+            ast::Expression::Identifier(ident) => Some(ident.name.as_str()),
+            _ => None,
+        },
+        _ => None,
     })
 }
 
@@ -97,6 +112,15 @@ pub fn block_declared_names(stmts: &[ast::Statement<'_>]) -> Vec<String> {
 
 fn statement_names(stmt: &ast::Statement<'_>, names: &mut Vec<String>) {
     match stmt {
+        ast::Statement::ExportDefaultDeclaration(export) => match &export.declaration {
+            ast::ExportDefaultDeclarationKind::ClassDeclaration(c) => {
+                names.extend(c.id.as_ref().map(|id| id.name.to_string()))
+            }
+            ast::ExportDefaultDeclarationKind::FunctionDeclaration(f) => {
+                names.extend(f.id.as_ref().map(|id| id.name.to_string()))
+            }
+            _ => {}
+        },
         ast::Statement::ClassDeclaration(c) => {
             names.extend(c.id.as_ref().map(|id| id.name.to_string()))
         }

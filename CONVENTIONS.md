@@ -1914,9 +1914,13 @@ TypeScript's description of one, so TypeScript's reading defines the
 surface: a block exports every declaration it contains, `export`
 modifier or not, unless it decides its exports explicitly with an
 `export { … }`, `export … from`, `export *`, `export =` or `export
-default`, in which case only what those name is exported (and
-`export declare X` counts). The rule is per block, not per merged
-scope, which is how `@types/node` is written:
+default <expr>`, in which case only what those name is exported (and
+`export declare X` counts). `export default class C {}` is a
+declaration with modifiers, not an export assignment, and leaves
+implicit export on. For `export = X`, the exports of the namespace
+merged with `X` are the module's named exports, alongside `default`.
+The rule is per block, not per merged scope, which is how
+`@types/node` is written:
 
 ```ts
 declare module "node:test" {
