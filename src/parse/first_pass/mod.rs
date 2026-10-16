@@ -54,8 +54,6 @@ pub fn file_context(program: &ast::Program<'_>, lib_name: Option<&str>) -> ir::M
 
 // ─── Shared Helpers ─────────────────────────────────────────────────
 
-/// Statements of `namespace N { ... }`. Dotted `namespace A.B {}` bodies
-/// are not descended into.
 /// Whether a declaration block decides its exports explicitly. TypeScript
 /// exports every declaration of a `.d.ts` file, `declare module` body or
 /// namespace body implicitly, unless the block contains an export
@@ -161,6 +159,8 @@ fn declaration_names(decl: &ast::Declaration<'_>, names: &mut Vec<String>) {
     }
 }
 
+/// Statements of `namespace N { ... }`. Dotted `namespace A.B {}` bodies
+/// are not descended into.
 fn namespace_block_statements<'s, 'a>(
     ns: &'s ast::TSNamespaceDeclaration<'a>,
 ) -> &'s [ast::Statement<'a>] {
