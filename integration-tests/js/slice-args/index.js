@@ -24,3 +24,4 @@ export const words = describe;
 export const unsigned = describe;
 export const buffered = describe;
 export const floats = (values) => (values === undefined ? "none" : describe(values));
+export const mixed = (nums, bytes) => `${describe(nums)}|${describe(bytes)}`;

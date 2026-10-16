@@ -36,3 +36,7 @@ export declare function words(values: BigInt64Array | bigint[]): string;
 export declare function unsigned(values: BigUint64Array | bigint[]): string;
 export declare function buffered(values: Uint8Array<ArrayBuffer> | number[]): string;
 export declare function floats(values?: number[] | Float64Array | null): string;
+
+// `slice_to_array` is per-argument, so a `number[]` beside a typed-array
+// union doesn't turn the typed slice's view into a plain `Array`.
+export declare function mixed(nums: number[], bytes: Uint8Array | number[]): string;

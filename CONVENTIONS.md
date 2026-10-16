@@ -127,13 +127,16 @@ after the call returns. wasm-bindgen gives a slice of JS handles that
 form already, but a slice of Rust values needs
 `#[wasm_bindgen(slice_to_array)]`: without it `&[String]` has no ABI,
 and `&[f64]` arrives as a `Float64Array` view of linear memory. So
-every binding with a `&[String]` or `&[f64]` parameter (or
-`Option<&[…]>`) gets the attribute, after resolving aliases, literal
-unions and enums:
+every `&[String]` or `&[f64]` parameter (or `Option<&[…]>`) gets the
+attribute, after resolving aliases, literal unions and enums:
 
 ```rs
-#[wasm_bindgen(method, slice_to_array, js_name = "acceptWebSocket")]
-pub fn accept_web_socket_with_tags(this: &DurableObjectState, ws: &WebSocket, tags: &[String]);
+#[wasm_bindgen(method, js_name = "acceptWebSocket")]
+pub fn accept_web_socket_with_tags(
+    this: &DurableObjectState,
+    ws: &WebSocket,
+    #[wasm_bindgen(slice_to_array)] tags: &[String],
+);
 ```
 
 A slice of handles (`&[Boolean]`, `&[WebSocket]`, `&[T]`) does not:
@@ -142,8 +145,10 @@ attribute when the element is a type parameter. Variadic rest
 parameters (`&[JsValue]`) don't either.
 
 The user-facing Rust signature is unchanged — only the JS-side wire
-format changes. The attribute is per function, so one qualifying
-parameter applies it to every slice parameter of that binding.
+format changes. The attribute goes on the argument rather than the
+function: a fn-level attribute is inherited by every slice parameter
+of the binding, which would also turn a typed-array union's view (see
+below) into an `Array` when the two share a signature.
 
 ### Typed-array unions
 
@@ -171,9 +176,9 @@ flattened, and to a generic member such as `Uint8Array<ArrayBuffer>`.
 It needs exactly one typed array whose element matches the array's
 (`bigint` for the 64-bit arrays, `number` for the rest);
 `Uint8ClampedArray` and `Float16Array` have no plain Rust slice and
-don't pair. The view takes no `slice_to_array`, but since the attribute
-is per binding, a `string[]` or `number[]` parameter in the same
-overload makes the view an `Array` copy too.
+don't pair. The view takes no `slice_to_array`; the attribute is
+per-argument, so a `string[]` or `number[]` parameter in the same
+overload doesn't affect it.
 
 A bare typed array stays the `&Uint8Array` handle: a view is only safe
 if the callee is done with it when the call returns, which the bare

@@ -300,22 +300,22 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `tabularData` - Data to display as a table"]
     #[doc = " * `properties` - Column headers to display"]
-    #[wasm_bindgen(method, slice_to_array, js_name = "table")]
+    #[wasm_bindgen(method, js_name = "table")]
     pub fn table_with_tabular_data_and_properties(
         this: &Console,
         tabular_data: &JsValue,
-        properties: &[String],
+        #[wasm_bindgen(slice_to_array)] properties: &[String],
     );
     #[doc = " Try to construct a table with the columns of the properties of"]
     #[doc = " `tabularData` (or use `properties`) and rows of `tabularData`."]
     #[doc = ""]
     #[doc = " * `tabularData` - Data to display as a table"]
     #[doc = " * `properties` - Column headers to display"]
-    #[wasm_bindgen(method, catch, slice_to_array, js_name = "table")]
+    #[wasm_bindgen(method, catch, js_name = "table")]
     pub fn try_table_with_tabular_data_and_properties(
         this: &Console,
         tabular_data: &JsValue,
-        properties: &[String],
+        #[wasm_bindgen(slice_to_array)] properties: &[String],
     ) -> Result<(), JsValue>;
     #[doc = " Starts a timer identified by the given `label`."]
     #[doc = ""]

@@ -40,3 +40,8 @@ fn typed_array_unions_pass_a_typed_view() {
     assert_eq!(floats(), "none");
     assert_eq!(floats_with_slice(&[0.5]), "Float64Array(0.5)");
 }
+
+#[wasm_bindgen_test]
+fn slice_to_array_is_per_argument() {
+    assert_eq!(mixed(&[1.0], &[2]), "Array(1)|Uint8Array(2)");
+}

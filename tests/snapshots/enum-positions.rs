@@ -50,14 +50,20 @@ extern "C" {
     pub fn alias(this: &Probe, m: Mode);
     #[wasm_bindgen(method, catch, js_name = "alias")]
     pub fn try_alias(this: &Probe, m: Mode) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, slice_to_array)]
-    pub fn levels(this: &Probe, ls: &[f64]) -> Vec<f64>;
-    #[wasm_bindgen(method, catch, slice_to_array, js_name = "levels")]
-    pub fn try_levels(this: &Probe, ls: &[f64]) -> Result<Vec<f64>, JsValue>;
-    #[wasm_bindgen(method, slice_to_array)]
-    pub fn modes(this: &Probe, ms: &[String]) -> Vec<String>;
-    #[wasm_bindgen(method, catch, slice_to_array, js_name = "modes")]
-    pub fn try_modes(this: &Probe, ms: &[String]) -> Result<Vec<String>, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn levels(this: &Probe, #[wasm_bindgen(slice_to_array)] ls: &[f64]) -> Vec<f64>;
+    #[wasm_bindgen(method, catch, js_name = "levels")]
+    pub fn try_levels(
+        this: &Probe,
+        #[wasm_bindgen(slice_to_array)] ls: &[f64],
+    ) -> Result<Vec<f64>, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn modes(this: &Probe, #[wasm_bindgen(slice_to_array)] ms: &[String]) -> Vec<String>;
+    #[wasm_bindgen(method, catch, js_name = "modes")]
+    pub fn try_modes(
+        this: &Probe,
+        #[wasm_bindgen(slice_to_array)] ms: &[String],
+    ) -> Result<Vec<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "modeArray")]
     pub fn mode_array(this: &Probe, ms: &Array<JsString>) -> Array<JsString>;
     #[wasm_bindgen(method, catch, js_name = "modeArray")]

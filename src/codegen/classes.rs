@@ -947,6 +947,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 bounds: abv_bounds,
                 helper_where_clause,
                 params: params_tokens,
+                ..
             } = generate_dictionary_params(
                 &plan.value_params,
                 config.cgctx,
@@ -1087,6 +1088,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 bounds: abv_bounds,
                 helper_where_clause,
                 params,
+                ..
             } = generate_dictionary_params(
                 &sig.params,
                 config.cgctx,
@@ -1493,9 +1495,6 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
     if sig.catch {
         wb_parts.push(quote! { catch });
     }
-    if super::typemap::needs_slice_to_array(&sig.params, config.cgctx, scope) {
-        wb_parts.push(quote! { slice_to_array });
-    }
     // For non-"new" overloads, we need js_name so wasm_bindgen maps them
     // to the same JS constructor.
     if sig.rust_name != "new" {
@@ -1539,9 +1538,6 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
     }
     if sig.catch {
         wb_parts.push(quote! { catch });
-    }
-    if super::typemap::needs_slice_to_array(&sig.params, config.cgctx, method_scope) {
-        wb_parts.push(quote! { slice_to_array });
     }
     if super::typemap::needs_js_name(&rust_ident, &sig.js_name) {
         let js_name = &sig.js_name;
@@ -1606,9 +1602,6 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
     }
     if sig.catch {
         wb_parts.push(quote! { catch });
-    }
-    if super::typemap::needs_slice_to_array(&sig.params, config.cgctx, scope) {
-        wb_parts.push(quote! { slice_to_array });
     }
     if super::typemap::needs_js_name(&rust_ident, &sig.js_name) {
         let js_name = &sig.js_name;
@@ -1788,7 +1781,7 @@ fn generate_setter(
             let rust_ident = super::typemap::make_ident(&sig.rust_name);
             let DictionaryParams {
                 bounds: abv_bounds,
-                params,
+                extern_params,
                 ..
             } = generate_dictionary_params(
                 &sig.params,
@@ -1809,9 +1802,6 @@ fn generate_setter(
             let fn_generics = render_generic_bounds(&bounds);
 
             let mut wb_parts: Vec<TokenStream> = vec![quote! { method }, quote! { setter }];
-            if super::typemap::needs_slice_to_array(&sig.params, config.cgctx, config.scope) {
-                wb_parts.push(quote! { slice_to_array });
-            }
             if super::typemap::needs_js_name(&rust_ident, &format!("set_{}", setter.js_name)) {
                 let js_name = &setter.js_name;
                 wb_parts.push(quote! { js_name = #js_name });
@@ -1821,7 +1811,7 @@ fn generate_setter(
             quote! {
                 #doc
                 #[wasm_bindgen(#(#wb_parts),*)]
-                pub fn #rust_ident #fn_generics (this: &#this_type #this_generics, #params);
+                pub fn #rust_ident #fn_generics (this: &#this_type #this_generics, #extern_params);
             }
         })
         .collect()
@@ -1922,7 +1912,7 @@ fn generate_static_setter(
             let rust_ident = super::typemap::make_ident(&sig.rust_name);
             let DictionaryParams {
                 bounds: abv_bounds,
-                params,
+                extern_params,
                 ..
             } = generate_dictionary_params(
                 &sig.params,
@@ -1945,9 +1935,6 @@ fn generate_static_setter(
             let mut wb_parts: Vec<TokenStream> = vec![quote! { static_method_of = #class_ident }];
             wb_parts.extend(config.js_class_parts());
             wb_parts.push(quote! { setter });
-            if super::typemap::needs_slice_to_array(&sig.params, config.cgctx, config.scope) {
-                wb_parts.push(quote! { slice_to_array });
-            }
             if super::typemap::needs_js_name(&rust_ident, &format!("set_{}", setter.js_name)) {
                 let js_name = &setter.js_name;
                 wb_parts.push(quote! { js_name = #js_name });
@@ -1957,7 +1944,7 @@ fn generate_static_setter(
             quote! {
                 #doc
                 #[wasm_bindgen(#(#wb_parts),*)]
-                pub fn #rust_ident #fn_generics (#params);
+                pub fn #rust_ident #fn_generics (#extern_params);
             }
         })
         .collect()

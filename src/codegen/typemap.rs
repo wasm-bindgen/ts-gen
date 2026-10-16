@@ -999,8 +999,8 @@ pub fn to_syn_type(
         // `Vec<Array<JsString>>` for `string[][]`.
         //
         // A slice of Rust-native elements also needs
-        // `#[wasm_bindgen(slice_to_array)]` on its binding to reach JS
-        // as an `Array`; see [`needs_slice_to_array`].
+        // `#[wasm_bindgen(slice_to_array)]` on its argument to reach JS
+        // as an `Array`; see [`param_slice_to_array`].
         //
         // Inside an actual generic (`pos.inner == true`) we keep the
         // legacy `Array<T'>` form for callers nested in
@@ -2269,33 +2269,32 @@ fn is_integer_literal_union(members: &[TypeRef]) -> bool {
         })
 }
 
-/// Whether a function with these parameters should be tagged
-/// `#[wasm_bindgen(slice_to_array)]`, so its `&[T]` arguments reach JS as
-/// a plain `Array`.
+/// Whether this parameter should be tagged
+/// `#[wasm_bindgen(slice_to_array)]`, so its `&[T]` argument reaches JS
+/// as a plain `Array`.
 ///
 /// Only a slice of Rust values (`&[String]`, `&[f64]`) needs it: without
 /// the attribute `&[String]` has no ABI and `&[f64]` arrives as a
 /// `Float64Array` view of linear memory, which a `number[]` callee may
 /// keep past the call. A slice of JS handles already arrives as a fresh
 /// `Array`, and the attribute cannot apply to one whose element is a type
-/// parameter. The attribute is per function, so one qualifying parameter
-/// applies it to every slice parameter.
-pub fn needs_slice_to_array(
-    params: &[crate::codegen::signatures::ConcreteParam],
+/// parameter. The attribute goes on the argument rather than the
+/// function: a fn-level attribute is inherited by every slice parameter,
+/// which would also turn a `TypedSlice`'s view into an `Array`.
+pub fn param_slice_to_array(
+    p: &crate::codegen::signatures::ConcreteParam,
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) -> bool {
-    params.iter().any(|p| {
-        // A variadic rest lowers to `&[JsValue]` whatever its element.
-        if p.variadic {
-            return false;
-        }
-        let ty = match &p.type_ref {
-            TypeRef::Nullable(inner) => inner.as_ref(),
-            other => other,
-        };
-        matches!(ty, TypeRef::Array(elem) if is_native_array_element(elem, ctx, scope))
-    })
+    // A variadic rest lowers to `&[JsValue]` whatever its element.
+    if p.variadic {
+        return false;
+    }
+    let ty = match &p.type_ref {
+        TypeRef::Nullable(inner) => inner.as_ref(),
+        other => other,
+    };
+    matches!(ty, TypeRef::Array(elem) if is_native_array_element(elem, ctx, scope))
 }
 
 /// Whether a top-level `T[]` element keeps its Rust-native form
@@ -2560,8 +2559,8 @@ mod tests {
     fn slice_to_array_follows_the_lowered_element() {
         with_mono_ctx(MONO_SRC, |ctx, scope| {
             let needs = |elem: &TypeRef| {
-                needs_slice_to_array(
-                    &[cp("xs", TypeRef::Array(Box::new(elem.clone())))],
+                param_slice_to_array(
+                    &cp("xs", TypeRef::Array(Box::new(elem.clone()))),
                     Some(ctx),
                     scope,
                 )
@@ -2598,26 +2597,21 @@ mod tests {
     #[test]
     fn slice_to_array_param_shapes() {
         with_mono_ctx(MONO_SRC, |ctx, scope| {
-            let needs = |params: &[crate::codegen::signatures::ConcreteParam]| {
-                needs_slice_to_array(params, Some(ctx), scope)
+            let needs = |p: &crate::codegen::signatures::ConcreteParam| {
+                param_slice_to_array(p, Some(ctx), scope)
             };
             let strings = || TypeRef::Array(Box::new(TypeRef::String));
-            assert!(needs(&[cp("xs", TypeRef::Nullable(Box::new(strings())))]));
-            assert!(needs(&[
-                cp("first", TypeRef::ident("Plain")),
-                cp("xs", strings())
-            ]));
-            assert!(!needs(&[
-                cp("x", TypeRef::String),
-                cp("y", TypeRef::Number)
-            ]));
-            assert!(!needs(&[cp(
+            assert!(needs(&cp("xs", TypeRef::Nullable(Box::new(strings())))));
+            assert!(!needs(&cp("first", TypeRef::ident("Plain"))));
+            assert!(needs(&cp("xs", strings())));
+            assert!(!needs(&cp("x", TypeRef::String)));
+            assert!(!needs(&cp(
                 "xs",
                 TypeRef::generic("Array", vec![TypeRef::String])
-            )]));
+            )));
             let mut rest = cp("rest", strings());
             rest.variadic = true;
-            assert!(!needs(&[rest]));
+            assert!(!needs(&rest));
         });
     }
 

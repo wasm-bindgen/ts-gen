@@ -1312,7 +1312,10 @@ fn type_snake_name(ty: &TypeRef) -> String {
 
 /// Convert concrete params to a `fn` parameter token stream.
 ///
-/// Handles variadic params with `&[JsValue]`.
+/// Handles variadic params with `&[JsValue]`. The output is for extern
+/// declarations: a parameter lowering to a slice of Rust values carries
+/// `#[wasm_bindgen(slice_to_array)]` (see
+/// [`typemap::param_slice_to_array`]).
 pub fn generate_concrete_params(
     params: &[ConcreteParam],
     cgctx: Option<&CodegenContext<'_>>,
@@ -1323,6 +1326,7 @@ pub fn generate_concrete_params(
         .iter()
         .map(|p| {
             let name = typemap::make_ident(&p.name);
+            let attr = param_attr(p, cgctx, scope);
             let ty = if p.variadic {
                 quote! { &[JsValue] }
             } else {
@@ -1334,11 +1338,26 @@ pub fn generate_concrete_params(
                     from_module,
                 )
             };
-            quote! { #name: #ty }
+            quote! { #attr #name: #ty }
         })
         .collect();
 
     quote! { #(#items),* }
+}
+
+/// The per-argument wasm-bindgen attribute for an extern parameter, or
+/// empty tokens. Extern-only: plain Rust helpers can't carry custom
+/// attributes on their parameters.
+fn param_attr(
+    p: &ConcreteParam,
+    cgctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> TokenStream {
+    if typemap::param_slice_to_array(p, cgctx, scope) {
+        quote! { #[wasm_bindgen(slice_to_array)] }
+    } else {
+        quote! {}
+    }
 }
 
 /// Convert parameters, using argument-position `impl Trait` bounds for
@@ -1359,8 +1378,9 @@ pub(crate) fn generate_concrete_params_with_mono_bounds(
         .iter()
         .map(|param| {
             let name = typemap::make_ident(&param.name);
+            let attr = param_attr(param, cgctx, scope);
             let ty = render_param_type(param, cgctx, scope, from_module);
-            quote! { #name: #ty }
+            quote! { #attr #name: #ty }
         })
         .collect::<Vec<_>>();
 
@@ -1417,8 +1437,13 @@ pub struct DictionaryParams {
     /// Extra `where` clause for Rust helper bodies. Extern declarations must
     /// not use it; see [`generate_dictionary_params`].
     pub helper_where_clause: TokenStream,
-    /// The rendered `name: Type, …` list.
+    /// The rendered `name: Type, …` list for Rust helper bodies.
     pub params: TokenStream,
+    /// The same list for extern declarations, with per-argument
+    /// wasm-bindgen attributes (`slice_to_array`). Helpers must use
+    /// [`Self::params`]: custom attributes don't parse on an ordinary
+    /// `fn`'s parameters.
+    pub extern_params: TokenStream,
 }
 
 /// Render dictionary factory params into a [`DictionaryParams`].
@@ -1444,6 +1469,7 @@ pub fn generate_dictionary_params(
     from_module: &crate::ir::ModuleContext,
 ) -> DictionaryParams {
     let mut generic_idents: Vec<syn::Ident> = Vec::new();
+    let mut extern_items: Vec<TokenStream> = Vec::new();
     let items: Vec<_> = params
         .iter()
         .map(|p| {
@@ -1458,6 +1484,8 @@ pub fn generate_dictionary_params(
             } else {
                 render_param_type(p, cgctx, scope, from_module)
             };
+            let attr = param_attr(p, cgctx, scope);
+            extern_items.push(quote! { #attr #name: #ty });
             quote! { #name: #ty }
         })
         .collect();
@@ -1482,6 +1510,7 @@ pub fn generate_dictionary_params(
         bounds,
         helper_where_clause,
         params: quote! { #(#items),* },
+        extern_params: quote! { #(#extern_items),* },
     }
 }
 

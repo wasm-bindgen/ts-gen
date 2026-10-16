@@ -25,53 +25,50 @@ extern "C" {
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
-    #[wasm_bindgen(slice_to_array)]
-    pub fn numbers(values: &[f64]) -> String;
+    pub fn numbers(#[wasm_bindgen(slice_to_array)] values: &[f64]) -> String;
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
-    #[wasm_bindgen(catch, slice_to_array, js_name = "numbers")]
-    pub fn try_numbers(values: &[f64]) -> Result<String, JsValue>;
+    #[wasm_bindgen(catch, js_name = "numbers")]
+    pub fn try_numbers(#[wasm_bindgen(slice_to_array)] values: &[f64]) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
-    #[wasm_bindgen(slice_to_array)]
-    pub fn counts(values: &[f64]) -> String;
+    pub fn counts(#[wasm_bindgen(slice_to_array)] values: &[f64]) -> String;
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
-    #[wasm_bindgen(catch, slice_to_array, js_name = "counts")]
-    pub fn try_counts(values: &[f64]) -> Result<String, JsValue>;
+    #[wasm_bindgen(catch, js_name = "counts")]
+    pub fn try_counts(#[wasm_bindgen(slice_to_array)] values: &[f64]) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
-    #[wasm_bindgen(slice_to_array)]
-    pub fn literals(values: &[f64]) -> String;
+    pub fn literals(#[wasm_bindgen(slice_to_array)] values: &[f64]) -> String;
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
-    #[wasm_bindgen(catch, slice_to_array, js_name = "literals")]
-    pub fn try_literals(values: &[f64]) -> Result<String, JsValue>;
+    #[wasm_bindgen(catch, js_name = "literals")]
+    pub fn try_literals(#[wasm_bindgen(slice_to_array)] values: &[f64]) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
-    #[wasm_bindgen(slice_to_array)]
-    pub fn levels(values: &[f64]) -> String;
+    pub fn levels(#[wasm_bindgen(slice_to_array)] values: &[f64]) -> String;
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
-    #[wasm_bindgen(catch, slice_to_array, js_name = "levels")]
-    pub fn try_levels(values: &[f64]) -> Result<String, JsValue>;
+    #[wasm_bindgen(catch, js_name = "levels")]
+    pub fn try_levels(#[wasm_bindgen(slice_to_array)] values: &[f64]) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
-    #[wasm_bindgen(slice_to_array)]
-    pub fn strings(values: &[String]) -> String;
+    pub fn strings(#[wasm_bindgen(slice_to_array)] values: &[String]) -> String;
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
-    #[wasm_bindgen(catch, slice_to_array, js_name = "strings")]
-    pub fn try_strings(values: &[String]) -> Result<String, JsValue>;
+    #[wasm_bindgen(catch, js_name = "strings")]
+    pub fn try_strings(
+        #[wasm_bindgen(slice_to_array)] values: &[String],
+    ) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
@@ -213,4 +210,32 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch, js_name = "floats")]
     pub fn try_floats_with_float64_array(values: &Float64Array) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    pub fn mixed(#[wasm_bindgen(slice_to_array)] nums: &[f64], bytes: &[u8]) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "mixed")]
+    pub fn try_mixed(
+        #[wasm_bindgen(slice_to_array)] nums: &[f64],
+        bytes: &[u8],
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "mixed")]
+    pub fn mixed_with_uint8_array(
+        #[wasm_bindgen(slice_to_array)] nums: &[f64],
+        bytes: &Uint8Array,
+    ) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "mixed")]
+    pub fn try_mixed_with_uint8_array(
+        #[wasm_bindgen(slice_to_array)] nums: &[f64],
+        bytes: &Uint8Array,
+    ) -> Result<String, JsValue>;
 }
