@@ -1,0 +1,6 @@
+{
+  "name": "module-namespace-values",
+  "private": true,
+  "type": "module",
+  "main": "index.js"
+}

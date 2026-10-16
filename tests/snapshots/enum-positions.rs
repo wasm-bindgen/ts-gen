@@ -19,11 +19,15 @@ pub enum Level {
     Low = 1u32,
     High = 2u32,
 }
-#[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Region {
-    Eu = "eu",
-    Us = "us",
+pub mod codes {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen(private, js_namespace = "Codes")]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum Region {
+        Eu = "eu",
+        Us = "us",
+    }
 }
 #[wasm_bindgen(module = "enum-positions")]
 extern "C" {
@@ -35,13 +39,13 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_level(this: &Probe, val: Level);
     #[wasm_bindgen(method)]
-    pub fn region(this: &Probe, r: Region);
+    pub fn region(this: &Probe, r: codes::Region);
     #[wasm_bindgen(method, catch, js_name = "region")]
-    pub fn try_region(this: &Probe, r: Region) -> Result<(), JsValue>;
+    pub fn try_region(this: &Probe, r: codes::Region) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "regionOf")]
-    pub fn region_of(this: &Probe) -> Region;
+    pub fn region_of(this: &Probe) -> codes::Region;
     #[wasm_bindgen(method, catch, js_name = "regionOf")]
-    pub fn try_region_of(this: &Probe) -> Result<Region, JsValue>;
+    pub fn try_region_of(this: &Probe) -> Result<codes::Region, JsValue>;
     #[wasm_bindgen(method)]
     pub fn alias(this: &Probe, m: Mode);
     #[wasm_bindgen(method, catch, js_name = "alias")]
@@ -112,7 +116,7 @@ pub enum ModeOrStringReturnKind {
 #[wasm_bindgen(private)]
 pub enum ModeOrRegionReturnKind {
     Mode(Mode),
-    Region(Region),
+    Region(codes::Region),
 }
 #[wasm_bindgen(private)]
 pub enum LevelOrStringReturnKind {

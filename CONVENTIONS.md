@@ -1891,12 +1891,45 @@ pub mod events {
 pub type Stream;
 ```
 
-Inside a module, a namespace's members are emitted flat into the
-module instead, while qualified references to them (`Codes.Region`,
-`Outer.Inner.Deep`, or `Inner.Deep` from within `Outer`) still resolve
-through the namespace. A qualified name that resolves to nothing
-erases to `JsValue` with an error rather than matching a local type
-by its last segment.
+A namespace inside a module takes the same shape, with the members
+carrying `module = "…"` as well as `js_namespace`. This is what binds
+value members correctly: in `@types/node`, `util.inspect.defaultOptions`
+is a property of the exported function `inspect`, not an export of
+`"util"`, so it needs both:
+
+```ts
+declare module "util" {
+  export function inspect(object: any): string;
+  export namespace inspect {
+    let defaultOptions: InspectOptions;
+  }
+}
+```
+
+```rust
+#[wasm_bindgen(module = "util")]
+extern "C" {
+    pub fn inspect(object: &JsValue) -> String;
+}
+pub mod inspect {
+    #[wasm_bindgen(module = "util")]
+    extern "C" {
+        #[wasm_bindgen(thread_local_v2, js_name = "defaultOptions", js_namespace = "inspect")]
+        pub static default_options: super::InspectOptions;
+    }
+}
+```
+
+`pub fn inspect` and `pub mod inspect` coexist, as Rust keeps values and
+modules in separate namespaces. Qualified references (`Codes.Region`,
+`Outer.Inner.Deep`, or `Inner.Deep` from within `Outer`) resolve through
+the namespace and are emitted relative to the use site
+(`codes::Region`, `super::inspect::Style`), keeping any generic
+arguments (`Inner.Settings<number>` → `inner::Settings<Number>`). A
+member that shares its name with a top-level type is a different
+declaration with its own arity. A qualified name that resolves to
+nothing erases to `JsValue` with an error rather than matching a local
+type by its last segment.
 
 A namespace merged with a same-named class, function or interface
 (`class Foo {}` + `namespace Foo { interface Options {} }`) leaves

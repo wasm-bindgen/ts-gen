@@ -10,25 +10,29 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Foo;
     #[wasm_bindgen(method)]
-    pub fn m(this: &Foo, options: &Options);
+    pub fn m(this: &Foo, options: &foo::Options);
     #[wasm_bindgen(method, catch, js_name = "m")]
-    pub fn try_m(this: &Foo, options: &Options) -> Result<(), JsValue>;
+    pub fn try_m(this: &Foo, options: &foo::Options) -> Result<(), JsValue>;
 }
-#[wasm_bindgen(module = "namespace-merge")]
-extern "C" {
-    # [wasm_bindgen (extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Options;
-    #[wasm_bindgen(method, getter)]
-    pub fn a(this: &Options) -> String;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_a(this: &Options, val: &str);
-}
-impl Options {
-    pub fn new(a: &str) -> Options {
-        let inner: Options = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_a(a);
-        inner
+pub mod foo {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen(module = "namespace-merge")]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , js_namespace = "Foo")]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Options;
+        #[wasm_bindgen(method, getter)]
+        pub fn a(this: &Options) -> String;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_a(this: &Options, val: &str);
+    }
+    impl Options {
+        pub fn new(a: &str) -> Options {
+            let inner: Options = JsCast::unchecked_into(js_sys::Object::new());
+            inner.set_a(a);
+            inner
+        }
     }
 }
 #[wasm_bindgen(module = "namespace-merge")]
@@ -41,11 +45,15 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "makeFoo")]
     pub fn try_make_foo() -> Result<Foo, JsValue>;
 }
-#[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Power {
-    On = "on",
-    Off = "off",
+pub mod bar {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen(private, js_namespace = "Bar")]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum Power {
+        On = "on",
+        Off = "off",
+    }
 }
 #[wasm_bindgen(module = "namespace-merge")]
 extern "C" {
@@ -53,34 +61,38 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Bar;
     #[wasm_bindgen(method)]
-    pub fn power(this: &Bar, power: Power) -> Bar;
+    pub fn power(this: &Bar, power: bar::Power) -> Bar;
     #[wasm_bindgen(method, catch, js_name = "power")]
-    pub fn try_power(this: &Bar, power: Power) -> Result<Bar, JsValue>;
+    pub fn try_power(this: &Bar, power: bar::Power) -> Result<Bar, JsValue>;
 }
 #[wasm_bindgen(module = "namespace-merge")]
 extern "C" {
-    pub fn make(config: &Config);
+    pub fn make(config: &make::Config);
 }
 #[wasm_bindgen(module = "namespace-merge")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "make")]
-    pub fn try_make(config: &Config) -> Result<(), JsValue>;
+    pub fn try_make(config: &make::Config) -> Result<(), JsValue>;
 }
-#[wasm_bindgen(module = "namespace-merge")]
-extern "C" {
-    # [wasm_bindgen (extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Config;
-    #[wasm_bindgen(method, getter)]
-    pub fn c(this: &Config) -> String;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_c(this: &Config, val: &str);
-}
-impl Config {
-    pub fn new(c: &str) -> Config {
-        let inner: Config = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_c(c);
-        inner
+pub mod make {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen(module = "namespace-merge")]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , js_namespace = "make")]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Config;
+        #[wasm_bindgen(method, getter)]
+        pub fn c(this: &Config) -> String;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_c(this: &Config, val: &str);
+    }
+    impl Config {
+        pub fn new(c: &str) -> Config {
+            let inner: Config = JsCast::unchecked_into(js_sys::Object::new());
+            inner.set_c(c);
+            inner
+        }
     }
 }
 #[wasm_bindgen(module = "namespace-merge")]
@@ -89,13 +101,17 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Shape;
     #[wasm_bindgen(method)]
-    pub fn axis(this: &Shape, axis: Axis);
+    pub fn axis(this: &Shape, axis: shape::Axis);
     #[wasm_bindgen(method, catch, js_name = "axis")]
-    pub fn try_axis(this: &Shape, axis: Axis) -> Result<(), JsValue>;
+    pub fn try_axis(this: &Shape, axis: shape::Axis) -> Result<(), JsValue>;
 }
-#[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Axis {
-    X = "x",
-    Y = "y",
+pub mod shape {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen(private, js_namespace = "Shape")]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum Axis {
+        X = "x",
+        Y = "y",
+    }
 }

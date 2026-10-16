@@ -804,22 +804,11 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         let ns_scope = self.resolve_namespace_scope(&ns_name, scope);
         let stmts = namespace_block_statements(ns);
 
-        if matches!(parent_ctx, ir::ModuleContext::Module(_)) {
-            // Flatten: emit declarations directly into the parent module.
-            for stmt in stmts {
-                self.populate_statement(stmt, parent_ctx, declarations, ns_scope, exported);
-            }
-            return;
-        }
+        // Members keep the parent's module context so their bindings carry
+        // `module = "…"` as well as the namespace path.
         let mut ns_decls = Vec::new();
         for stmt in stmts {
-            self.populate_statement(
-                stmt,
-                &ir::ModuleContext::Global,
-                &mut ns_decls,
-                ns_scope,
-                exported,
-            );
+            self.populate_statement(stmt, parent_ctx, &mut ns_decls, ns_scope, exported);
         }
         self.namespace_members
             .entry(ns_scope)
@@ -831,7 +820,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                 declarations: vec![],
                 child_scope: ns_scope,
             }),
-            module_context: ir::ModuleContext::Global,
+            module_context: parent_ctx.clone(),
             doc,
             scope_id: scope,
             exported,

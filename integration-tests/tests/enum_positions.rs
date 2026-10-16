@@ -3,8 +3,8 @@
 use js_sys::{Array, ArrayTuple, Function, JsOption, JsString, Map, Number, Object};
 
 use ts_gen_integration_tests::enum_positions::{
-    Level, LevelOrStringReturnKind, Mode, ModeAlias, ModeOrNumberReturnKind,
-    ModeOrRegionReturnKind, ModeOrStringReturnKind, Probe, Region,
+    codes::Region, Level, LevelOrStringReturnKind, Mode, ModeAlias, ModeOrNumberReturnKind,
+    ModeOrRegionReturnKind, ModeOrStringReturnKind, Probe,
 };
 
 // This fixture has no backing JavaScript module, so it provides compile-only

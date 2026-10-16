@@ -150,14 +150,12 @@ pub struct CodegenContext<'a> {
     pub names: RefCell<LocalScope>,
     /// Local types that collide with js_sys reserved names — maps original name → renamed name.
     pub renamed_locals: HashMap<String, String>,
-    /// How many type parameters each *locally emitted* type accepts.
-    /// `Reference` lowering consults this to decide whether to keep
-    /// generic args (`Foo<T>`) or strip them — non-generic externals
-    /// (e.g. `web_sys::ReadableStream`) would emit `Type<Arg>` and
-    /// fail to compile.
+    /// How many type parameters each *locally emitted* type accepts, by
+    /// name. `is_local_generic` reads arity from the resolved declaration
+    /// and only falls back to this for references it cannot resolve.
     pub local_type_param_counts: HashMap<String, usize>,
-    /// Member scope of each emitted global namespace → the path of the
-    /// `pub mod` it is emitted as.
+    /// Member scope of each emitted namespace → the path of the `pub mod`
+    /// it is emitted as.
     pub namespace_paths: HashMap<ScopeId, Vec<String>>,
     /// Path of the `pub mod` currently being emitted into, empty at the top
     /// level. References are qualified relative to it, not to the scope
@@ -385,12 +383,26 @@ impl<'a> CodegenContext<'a> {
         }
     }
 
-    /// Whether `name` is a locally declared type with at least one type
-    /// parameter, i.e. one whose generic arguments survive into the output.
-    pub(crate) fn is_local_generic(&self, name: &str) -> bool {
-        self.local_type_param_counts
-            .get(name)
-            .is_some_and(|count| *count > 0)
+    /// Whether `name`, resolved from `scope`, is a locally declared type
+    /// with at least one type parameter, i.e. one whose generic arguments
+    /// survive into the output. Resolution goes through the scope chain so
+    /// a namespace member and a same-named top-level type each answer for
+    /// themselves; the by-name arity table is only the fallback for use
+    /// sites without a scope chain.
+    pub(crate) fn is_local_generic(&self, name: &str, scope: ScopeId) -> bool {
+        match self.gctx.resolve_path(scope, name) {
+            Some(id) => {
+                let kind = &self.gctx.get_type(id).kind;
+                // Emitted aliases keep their parameters but are not in
+                // `local_type_ids`, which only tracks extern declarations.
+                (self.local_type_ids.contains(&id) || matches!(kind, TypeKind::TypeAlias(_)))
+                    && declared_arity(kind).is_some_and(|n| n > 0)
+            }
+            None => self
+                .local_type_param_counts
+                .get(name)
+                .is_some_and(|count| *count > 0),
+        }
     }
 
     /// Build the attribute for a generated extern block, including the
@@ -738,8 +750,10 @@ impl<'a> CodegenContext<'a> {
         self.local_types.insert(name.clone(), mctx.clone());
         self.local_type_ids.insert(type_id);
         if let Some(arity) = arity {
-            // Keyed by name, so a top-level declaration keeps its arity over
-            // a same-named namespace member.
+            // Fallback for use sites without a scope chain; resolved
+            // references take their arity from the declaration itself, so a
+            // top-level declaration keeps this entry over a same-named
+            // namespace member.
             if mod_path.is_empty() {
                 self.local_type_param_counts.insert(name.clone(), arity);
             } else {
@@ -751,9 +765,7 @@ impl<'a> CodegenContext<'a> {
     }
 
     /// The path from the `pub mod` being emitted into to the one `target`
-    /// is declared in, or `None` when they are the same. Namespaces inside
-    /// an ambient module are emitted flat, so only global namespaces are
-    /// in `namespace_paths`.
+    /// is declared in, or `None` when they are the same.
     pub(crate) fn namespace_qualifier(&self, target: TypeId) -> Option<TokenStream> {
         let target_path = self.namespace_path(self.gctx.get_type(target).scope_id);
         let here = self.emit_path.borrow();
@@ -1396,6 +1408,18 @@ fn named_type_to_rust(
     }
 }
 
+/// Type-parameter count of a declaration that can be instantiated, or
+/// `None` for kinds that cannot carry generic arguments.
+fn declared_arity(kind: &TypeKind) -> Option<usize> {
+    match kind {
+        TypeKind::Class(c) => Some(c.type_params.len()),
+        TypeKind::Interface(i) => Some(i.type_params.len()),
+        TypeKind::DiscriminatedUnion(d) => Some(d.type_params.len()),
+        TypeKind::TypeAlias(a) => Some(a.type_params.len()),
+        _ => None,
+    }
+}
+
 /// Lower a `TypeRef::Reference` to its Rust syntax token. Handles
 /// alias resolution, dedicated-codegen heads (`Promise`, `Map`,
 /// `Set`, `Record`, `Iterator`, ...), in-scope generic type
@@ -1415,13 +1439,15 @@ fn lower_reference(
 ) -> TokenStream {
     // Qualified paths resolve through namespace scopes from the use site;
     // `emit_type_name` then consults the external map and falls back to
-    // `JsValue` with a diagnostic for anything that doesn't match.
+    // `JsValue` with a diagnostic for anything that doesn't match. They
+    // keep their generic arguments like a bare name does.
     if segments.len() > 1 {
         let dotted = segments.join(".");
-        return match ctx {
+        let base = match ctx {
             Some(c) => emit_type_name(&dotted, Some(scope), c, from_module),
             None => quote! { JsValue },
         };
+        return with_generic_args(base, &dotted, generic_args, pos, ctx, scope, from_module);
     }
 
     let head = segments.first().map(String::as_str).unwrap_or("");
@@ -1504,21 +1530,31 @@ fn lower_reference(
     }
 
     let base = named_type_to_rust(head, ctx, scope, from_module);
+    with_generic_args(base, head, generic_args, pos, ctx, scope, from_module)
+}
 
-    // Generic instantiation: keep the args only when the target
-    // accepts them. Locally-emitted types record their arity in
-    // `local_type_param_counts`; everything else (web_sys
-    // externals, builtins) is treated as non-generic and the args
-    // are dropped to keep the output compiling.
+/// Append `generic_args` to `base` when `name` is a locally emitted generic
+/// type. Everything else (web_sys externals, builtins) is treated as
+/// non-generic and the args are dropped to keep the output compiling.
+#[allow(clippy::too_many_arguments)]
+fn with_generic_args(
+    base: TokenStream,
+    name: &str,
+    generic_args: &[TypeRef],
+    pos: TypePosition,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+) -> TokenStream {
     if generic_args.is_empty() {
         return base;
     }
-    let accepts_generics = ctx.is_some_and(|c| c.is_local_generic(head));
+    let accepts_generics = ctx.is_some_and(|c| c.is_local_generic(name, scope));
     if !accepts_generics {
         if let Some(c) = ctx {
             c.warn(format!(
-                "generic type arguments on `{head}<...>` are not emitted (target is not a \
-                 locally-declared generic type), using bare `{head}`"
+                "generic type arguments on `{name}<...>` are not emitted (target is not a \
+                 locally-declared generic type), using bare `{name}`"
             ));
         }
         return base;
@@ -1695,15 +1731,16 @@ fn is_mono_native_leaf(ty: &TypeRef, ctx: &CodegenContext<'_>, scope: ScopeId) -
 /// The generic arguments of `ty` if it instantiates a locally declared
 /// generic type, e.g. `Holder<T>`. These are the only generic arguments
 /// that per-mono lowering looks inside.
-fn local_generic_args<'t>(ty: &'t TypeRef, ctx: &CodegenContext<'_>) -> Option<&'t [TypeRef]> {
+fn local_generic_args<'t>(
+    ty: &'t TypeRef,
+    ctx: &CodegenContext<'_>,
+    scope: ScopeId,
+) -> Option<&'t [TypeRef]> {
     match ty {
         TypeRef::Reference {
             segments,
             generic_args,
-        } if segments.len() == 1
-            && !generic_args.is_empty()
-            && ctx.is_local_generic(&segments[0]) =>
-        {
+        } if !generic_args.is_empty() && ctx.is_local_generic(&segments.join("."), scope) => {
             Some(generic_args)
         }
         _ => None,
@@ -1742,7 +1779,7 @@ fn to_mono_user_generic_arg_impl(
             let inner = to_mono_user_generic_arg_impl(inner, ctx, scope, from_module, visited);
             quote! { Option<#inner> }
         }
-        t if local_generic_args(t, ctx).is_some() => {
+        t if local_generic_args(t, ctx, scope).is_some() => {
             to_syn_type(t, TypePosition::RETURN, Some(ctx), scope, from_module)
         }
         // Lower the original type, not the peeled one, so aliases that are
@@ -1774,7 +1811,7 @@ fn is_mono_native_return_shape_impl(
     match peeled.as_ref() {
         t if is_mono_native_leaf(t, ctx, scope) => true,
         TypeRef::Nullable(inner) => is_mono_native_return_shape_impl(inner, ctx, scope, visited),
-        t => local_generic_args(t, ctx).is_some(),
+        t => local_generic_args(t, ctx, scope).is_some(),
     }
 }
 
@@ -1812,7 +1849,7 @@ fn has_mono_js_string_return_impl(
     match peeled.as_ref() {
         TypeRef::String | TypeRef::StringLiteral(_) => true,
         TypeRef::Nullable(inner) => has_mono_js_string_return_impl(inner, ctx, scope, visited),
-        t => local_generic_args(t, ctx).is_some_and(|args| {
+        t => local_generic_args(t, ctx, scope).is_some_and(|args| {
             args.iter()
                 .any(|arg| has_mono_js_string_return_impl(arg, ctx, scope, &mut visited.clone()))
         }),
@@ -1848,9 +1885,9 @@ fn to_mono_js_string_return_type_impl(
             let inner = to_mono_js_string_return_type_impl(inner, ctx, scope, from_module, visited);
             quote! { Option<#inner> }
         }
-        t @ TypeRef::Reference { segments, .. } if local_generic_args(t, ctx).is_some() => {
+        t @ TypeRef::Reference { segments, .. } if local_generic_args(t, ctx, scope).is_some() => {
             let base = named_type_to_rust(&segments[0], Some(ctx), scope, from_module);
-            let args = local_generic_args(t, ctx)
+            let args = local_generic_args(t, ctx, scope)
                 .unwrap_or_default()
                 .iter()
                 .map(|arg| {
@@ -2955,12 +2992,12 @@ mod tests {
 
     #[test]
     fn mono_context_helpers() {
-        with_mono_ctx(MONO_SRC, |ctx, _| {
+        with_mono_ctx(MONO_SRC, |ctx, scope| {
             assert!(CodegenContext::generic_mono(Some(ctx)));
             assert!(!CodegenContext::generic_mono(None));
-            assert!(ctx.is_local_generic("Holder"));
-            assert!(!ctx.is_local_generic("Plain"));
-            assert!(!ctx.is_local_generic("Array"));
+            assert!(ctx.is_local_generic("Holder", scope));
+            assert!(!ctx.is_local_generic("Plain", scope));
+            assert!(!ctx.is_local_generic("Array", scope));
             assert_eq!(
                 CodegenContext::type_param_decl(Some(ctx), "T").to_string(),
                 "T"

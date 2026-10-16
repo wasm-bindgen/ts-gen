@@ -1790,8 +1790,9 @@ pub type ExportedHandlerTailHandler<Env, Props> =
 pub type ExportedHandlerTraceHandler<Env, Props> =
     Function<fn(Array<TraceItem>, Env, ExecutionContext<Props>) -> JsOption<Promise<Undefined>>>;
 #[allow(dead_code)]
-pub type ExportedHandlerTailStreamHandler<Env, Props> =
-    Function<fn(tail_stream::TailEvent, Env, ExecutionContext<Props>) -> JsValue>;
+pub type ExportedHandlerTailStreamHandler<Env, Props> = Function<
+    fn(tail_stream::TailEvent<tail_stream::Onset>, Env, ExecutionContext<Props>) -> JsValue,
+>;
 #[allow(dead_code)]
 pub type ExportedHandlerScheduledHandler<Env, Props> =
     Function<fn(ScheduledController, Env, ExecutionContext<Props>) -> JsOption<Promise<Undefined>>>;
@@ -35855,12 +35856,12 @@ pub mod cloudflare_workers_module {
         #[wasm_bindgen(method, js_name = "tailStream")]
         pub fn tail_stream<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
-            event: &super::tail_stream::TailEvent,
+            event: &super::tail_stream::TailEvent<super::tail_stream::Onset>,
         ) -> TailStreamReturnKind;
         #[wasm_bindgen(method, catch, js_name = "tailStream")]
         pub fn try_tail_stream<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
-            event: &super::tail_stream::TailEvent,
+            event: &super::tail_stream::TailEvent<super::tail_stream::Onset>,
         ) -> Result<TailStreamReturnKind, JsValue>;
         #[wasm_bindgen(method)]
         pub fn test<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
@@ -39299,37 +39300,42 @@ pub mod tail_stream {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type TailEventHandlerObject;
         #[wasm_bindgen(method, getter)]
-        pub fn outcome(this: &TailEventHandlerObject) -> Option<TailEventHandler>;
+        pub fn outcome(this: &TailEventHandlerObject) -> Option<TailEventHandler<Outcome>>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_outcome(this: &TailEventHandlerObject, val: &TailEventHandler);
+        pub fn set_outcome(this: &TailEventHandlerObject, val: &TailEventHandler<Outcome>);
         #[wasm_bindgen(method, getter, js_name = "spanOpen")]
-        pub fn span_open(this: &TailEventHandlerObject) -> Option<TailEventHandler>;
+        pub fn span_open(this: &TailEventHandlerObject) -> Option<TailEventHandler<SpanOpen>>;
         #[wasm_bindgen(method, setter, js_name = "spanOpen")]
-        pub fn set_span_open(this: &TailEventHandlerObject, val: &TailEventHandler);
+        pub fn set_span_open(this: &TailEventHandlerObject, val: &TailEventHandler<SpanOpen>);
         #[wasm_bindgen(method, getter, js_name = "spanClose")]
-        pub fn span_close(this: &TailEventHandlerObject) -> Option<TailEventHandler>;
+        pub fn span_close(this: &TailEventHandlerObject) -> Option<TailEventHandler<SpanClose>>;
         #[wasm_bindgen(method, setter, js_name = "spanClose")]
-        pub fn set_span_close(this: &TailEventHandlerObject, val: &TailEventHandler);
+        pub fn set_span_close(this: &TailEventHandlerObject, val: &TailEventHandler<SpanClose>);
         #[wasm_bindgen(method, getter, js_name = "diagnosticChannel")]
-        pub fn diagnostic_channel(this: &TailEventHandlerObject) -> Option<TailEventHandler>;
+        pub fn diagnostic_channel(
+            this: &TailEventHandlerObject,
+        ) -> Option<TailEventHandler<DiagnosticChannelEvent>>;
         #[wasm_bindgen(method, setter, js_name = "diagnosticChannel")]
-        pub fn set_diagnostic_channel(this: &TailEventHandlerObject, val: &TailEventHandler);
+        pub fn set_diagnostic_channel(
+            this: &TailEventHandlerObject,
+            val: &TailEventHandler<DiagnosticChannelEvent>,
+        );
         #[wasm_bindgen(method, getter)]
-        pub fn exception(this: &TailEventHandlerObject) -> Option<TailEventHandler>;
+        pub fn exception(this: &TailEventHandlerObject) -> Option<TailEventHandler<Exception>>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_exception(this: &TailEventHandlerObject, val: &TailEventHandler);
+        pub fn set_exception(this: &TailEventHandlerObject, val: &TailEventHandler<Exception>);
         #[wasm_bindgen(method, getter)]
-        pub fn log(this: &TailEventHandlerObject) -> Option<TailEventHandler>;
+        pub fn log(this: &TailEventHandlerObject) -> Option<TailEventHandler<Log>>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_log(this: &TailEventHandlerObject, val: &TailEventHandler);
+        pub fn set_log(this: &TailEventHandlerObject, val: &TailEventHandler<Log>);
         #[wasm_bindgen(method, getter, js_name = "return")]
-        pub fn return_(this: &TailEventHandlerObject) -> Option<TailEventHandler>;
+        pub fn return_(this: &TailEventHandlerObject) -> Option<TailEventHandler<Return>>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_return(this: &TailEventHandlerObject, val: &TailEventHandler);
+        pub fn set_return(this: &TailEventHandlerObject, val: &TailEventHandler<Return>);
         #[wasm_bindgen(method, getter)]
-        pub fn attributes(this: &TailEventHandlerObject) -> Option<TailEventHandler>;
+        pub fn attributes(this: &TailEventHandlerObject) -> Option<TailEventHandler<Attributes>>;
         #[wasm_bindgen(method, setter)]
-        pub fn set_attributes(this: &TailEventHandlerObject, val: &TailEventHandler);
+        pub fn set_attributes(this: &TailEventHandlerObject, val: &TailEventHandler<Attributes>);
     }
     impl TailEventHandlerObject {
         pub fn new() -> TailEventHandlerObject {
@@ -39345,35 +39351,35 @@ pub mod tail_stream {
         inner: TailEventHandlerObject,
     }
     impl TailEventHandlerObjectBuilder {
-        pub fn outcome(self, val: &TailEventHandler) -> Self {
+        pub fn outcome(self, val: &TailEventHandler<Outcome>) -> Self {
             self.inner.set_outcome(val);
             self
         }
-        pub fn span_open(self, val: &TailEventHandler) -> Self {
+        pub fn span_open(self, val: &TailEventHandler<SpanOpen>) -> Self {
             self.inner.set_span_open(val);
             self
         }
-        pub fn span_close(self, val: &TailEventHandler) -> Self {
+        pub fn span_close(self, val: &TailEventHandler<SpanClose>) -> Self {
             self.inner.set_span_close(val);
             self
         }
-        pub fn diagnostic_channel(self, val: &TailEventHandler) -> Self {
+        pub fn diagnostic_channel(self, val: &TailEventHandler<DiagnosticChannelEvent>) -> Self {
             self.inner.set_diagnostic_channel(val);
             self
         }
-        pub fn exception(self, val: &TailEventHandler) -> Self {
+        pub fn exception(self, val: &TailEventHandler<Exception>) -> Self {
             self.inner.set_exception(val);
             self
         }
-        pub fn log(self, val: &TailEventHandler) -> Self {
+        pub fn log(self, val: &TailEventHandler<Log>) -> Self {
             self.inner.set_log(val);
             self
         }
-        pub fn return_(self, val: &TailEventHandler) -> Self {
+        pub fn return_(self, val: &TailEventHandler<Return>) -> Self {
             self.inner.set_return(val);
             self
         }
-        pub fn attributes(self, val: &TailEventHandler) -> Self {
+        pub fn attributes(self, val: &TailEventHandler<Attributes>) -> Self {
             self.inner.set_attributes(val);
             self
         }

@@ -1213,7 +1213,7 @@ mod tests {
         let id = gctx
             .resolve_path(scope, "Codes.Region")
             .expect("Codes.Region resolves");
-        assert!(module.types.contains(&id), "resolves to the populated decl");
+        // The populated declaration, not the phase-1 placeholder.
         match &gctx.get_type(id).kind {
             TypeKind::StringEnum(e) => assert_eq!(e.variants.len(), 2),
             other => panic!("expected a string enum, got {other:?}"),

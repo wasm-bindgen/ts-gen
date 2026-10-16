@@ -46,6 +46,7 @@ tests/
 
 integration-tests/
 ├── tests/*.rs                 # hand-written integration tests
+├── js/<lib-name>/             # backing JS packages for tests that run (file: deps)
 └── build.rs                   # generates per-test bindings via the library API
 ```
 
