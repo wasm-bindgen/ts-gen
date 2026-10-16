@@ -86,13 +86,11 @@ per-monomorphization mode.
 
 ## Array and slice types
 
-Top-level `Array<T>` and the syntactic `T[]` lower to Rust-idiomatic
-sequences:
+A top-level `T[]` lowers to a Rust-idiomatic sequence; `Array<T>`
+written as a generic stays the `Array<U>` handle:
 
-* **Argument position** → `&[T]`. wasm-bindgen handles the JS-side
-  conversion; for primitive numeric `T` the slice arrives as a
-  zero-copy typed-array view, otherwise it's materialised as a plain
-  JS `Array`.
+* **Argument position** → `&[T]`, which JS receives as a plain `Array`
+  (see [`slice_to_array`](#slice_to_array-attribute)).
 * **Return position** → `Vec<T>`.
 
 wasm-bindgen only has slice / `Vec` ABIs for Rust-native `String` and
@@ -124,27 +122,28 @@ Inside an actual generic (`Promise<Array<T>>`, `Map<K, Array<V>>`,
 
 ### `slice_to_array` attribute
 
-By default, `&[T]` arguments to imported JS functions arrive as a
-zero-copy typed-array view when `T` is a primitive numeric (`u8`,
-`i32`, `f64`, …) and as a plain JS `Array` otherwise. ts-gen wants
-the `Array` representation (a TS `Array<string>` or `Array<Foo>` is
-a plain JS Array, not a typed view), so it tags every binding whose
-parameters include a non-numeric `&[T]` (or `Option<&[T]>`) with
-`#[wasm_bindgen(slice_to_array)]`:
+A TS `T[]` parameter is a plain JS `Array`, which the callee may keep
+after the call returns. wasm-bindgen gives a slice of JS handles that
+form already, but a slice of Rust values needs
+`#[wasm_bindgen(slice_to_array)]`: without it `&[String]` has no ABI,
+and `&[f64]` arrives as a `Float64Array` view of linear memory. So
+every binding with a `&[String]` or `&[f64]` parameter (or
+`Option<&[…]>`) gets the attribute, after resolving aliases, literal
+unions and enums:
 
 ```rs
 #[wasm_bindgen(method, slice_to_array, js_name = "acceptWebSocket")]
 pub fn accept_web_socket_with_tags(this: &DurableObjectState, ws: &WebSocket, tags: &[String]);
 ```
 
-The user-facing Rust signature is unchanged — `&[T]` stays `&[T]`.
-Only the JS-side wire format (and the JS-visible type) changes.
+A slice of handles (`&[Boolean]`, `&[WebSocket]`, `&[T]`) does not:
+it would only add a per-element clone, and wasm-bindgen rejects the
+attribute when the element is a type parameter. Variadic rest
+parameters (`&[JsValue]`) don't either.
 
-ts-gen emits the attribute per-function (not per-block) — every
-imported callable that has at least one qualifying parameter gets
-its own `slice_to_array`. Functions whose only slice params are
-numeric (`&[f64]`, `&[i64]`) keep the default typed-array
-representation and do not get the attribute.
+The user-facing Rust signature is unchanged — only the JS-side wire
+format changes. The attribute is per function, so one qualifying
+parameter applies it to every slice parameter of that binding.
 
 ## Outer-type ABI fan-out
 
@@ -153,8 +152,8 @@ Wasm boundary for large data:
 
 * `&str` arguments incur a UTF-8 conversion vs the JS-side
   `String`/`JsString` representation.
-* `&[T]` arguments with non-numeric `T` materialise a JS `Array`
-  element-by-element via the `slice_to_array` attribute.
+* `&[String]` / `&[f64]` arguments are copied into a JS `Array` via
+  the `slice_to_array` attribute.
 
 Rather than emit dual variants for every callable, ts-gen
 **defers to the TS author** to pick the form. Each ABI choice

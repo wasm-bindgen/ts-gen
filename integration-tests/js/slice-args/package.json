@@ -1,0 +1,6 @@
+{
+  "name": "slice-args",
+  "private": true,
+  "type": "module",
+  "main": "index.js"
+}

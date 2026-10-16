@@ -4,6 +4,7 @@
     "declared-modules": "file:./js/declared-modules",
     "es-module-lexer": "^1.6.0",
     "module-export-assignment": "file:./js/module-export-assignment",
-    "module-namespace-values": "file:./js/module-namespace-values"
+    "module-namespace-values": "file:./js/module-namespace-values",
+    "slice-args": "file:./js/slice-args"
   }
 }

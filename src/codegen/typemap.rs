@@ -971,9 +971,7 @@ pub fn to_syn_type(
         // Top-level `Array<T>` (or `T[]`) lowers to a Rust-idiomatic
         // sequence:
         //
-        // * Argument position → `&[T]` (a slice — wasm-bindgen
-        //   handles the JS-side conversion to/from a typed-array view
-        //   or a plain `Array` depending on the element kind).
+        // * Argument position → `&[T]`, reaching JS as a plain `Array`.
         // * Return position → `Vec<T>` (owned).
         //
         // wasm-bindgen only has slice / `Vec` ABIs for Rust-native
@@ -986,13 +984,9 @@ pub fn to_syn_type(
         // `Vec<Boolean>`, `Vec<JsOption<JsString>>`, and
         // `Vec<Array<JsString>>` for `string[][]`.
         //
-        // For non-primitive element kinds the binding also gets
-        // `#[wasm_bindgen(slice_to_array)]` so JS receives a plain
-        // `Array<T>` rather than the default zero-copy view that
-        // wasm-bindgen synthesises for primitive slices. The
-        // attribute is emitted by the per-callable generators in
-        // `classes.rs` / `functions.rs` based on
-        // [`needs_slice_to_array`].
+        // A slice of Rust-native elements also needs
+        // `#[wasm_bindgen(slice_to_array)]` on its binding to reach JS
+        // as an `Array`; see [`needs_slice_to_array`].
         //
         // Inside an actual generic (`pos.inner == true`) we keep the
         // legacy `Array<T'>` form for callers nested in
@@ -2255,91 +2249,51 @@ fn is_integer_literal_union(members: &[TypeRef]) -> bool {
         })
 }
 
-/// Whether a function with these parameter types should be tagged
-/// `#[wasm_bindgen(slice_to_array)]`.
+/// Whether a function with these parameters should be tagged
+/// `#[wasm_bindgen(slice_to_array)]`, so its `&[T]` arguments reach JS as
+/// a plain `Array`.
 ///
-/// `&[T]` arguments default to a zero-copy typed-array view when `T`
-/// is a primitive numeric (`u8`, `i32`, `f64`, ...) and to a freshly-
-/// materialised plain JS `Array` otherwise. ts-gen's job is the
-/// latter: a TypeScript `Array<string>` / `Array<Foo>` parameter
-/// should arrive as a plain `Array` on the JS side, not a typed-array
-/// view of externref handles.
-///
-/// Returns `true` when **any** parameter is a top-level
-/// `TypeRef::Array(inner)` whose `inner` lowers to something other
-/// than a primitive numeric — i.e. anything that would need the
-/// attribute. The check is structural; we don't need `to_syn_type` to
-/// run.
-///
-/// Numeric primitives are `Number` and `BigInt` (TS `number` and
-/// `bigint`). Boolean is *not* primitive for this purpose: `&[bool]`
-/// already needs a JS `Array` because wasm-bindgen has no typed-array
-/// for booleans, but the attribute is still required to opt out of
-/// the default view-based wire format.
-pub fn needs_slice_to_array(params: &[crate::codegen::signatures::ConcreteParam]) -> bool {
-    params
-        .iter()
-        .any(|p| param_needs_slice_to_array(&p.type_ref))
-}
-
-/// `&[T]` argument helper that consults the bare `TypeRef`. The
-/// outer attribute decision applies whenever **any** parameter
-/// satisfies this — see [`needs_slice_to_array`].
-///
-/// Recognises three IR shapes that all lower to a top-level slice:
-///
-/// * `TypeRef::Array(inner)` — the syntactic `T[]` form.
-/// * `TypeRef::Reference { segments: ["Array" | "ReadonlyArray"],
-///   generic_args: [inner] }` — the named generic form.
-/// * `TypeRef::Nullable(inner)` wrapping either of the above.
-///
-/// Each is checked recursively for a non-primitive element.
-fn param_needs_slice_to_array(ty: &TypeRef) -> bool {
-    fn array_element(ty: &TypeRef) -> Option<&TypeRef> {
-        match ty {
-            TypeRef::Array(inner) => Some(inner),
-            TypeRef::Reference {
-                segments,
-                generic_args,
-            } if segments.len() == 1
-                && (segments[0] == "Array" || segments[0] == "ReadonlyArray") =>
-            {
-                generic_args.first()
-            }
-            _ => None,
+/// Only a slice of Rust values (`&[String]`, `&[f64]`) needs it: without
+/// the attribute `&[String]` has no ABI and `&[f64]` arrives as a
+/// `Float64Array` view of linear memory, which a `number[]` callee may
+/// keep past the call. A slice of JS handles already arrives as a fresh
+/// `Array`, and the attribute cannot apply to one whose element is a type
+/// parameter. The attribute is per function, so one qualifying parameter
+/// applies it to every slice parameter.
+pub fn needs_slice_to_array(
+    params: &[crate::codegen::signatures::ConcreteParam],
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> bool {
+    params.iter().any(|p| {
+        // A variadic rest lowers to `&[JsValue]` whatever its element.
+        if p.variadic {
+            return false;
         }
-    }
-
-    match ty {
-        // `Nullable<&[T]>` (i.e. `Option<&[T]>`) participates too —
-        // `slice_to_array` covers `Option<&[T]>` per the upstream
-        // wasm-bindgen feature.
-        TypeRef::Nullable(inner) => array_element(inner).is_some_and(|e| !is_numeric_primitive(e)),
-        other => array_element(other).is_some_and(|e| !is_numeric_primitive(e)),
-    }
+        let ty = match &p.type_ref {
+            TypeRef::Nullable(inner) => inner.as_ref(),
+            other => other,
+        };
+        matches!(ty, TypeRef::Array(elem) if is_native_array_element(elem, ctx, scope))
+    })
 }
 
-/// Whether a `T[]` element keeps its Rust-native form (`String` /
-/// `f64`) inside the top-level slice / `Vec`.
+/// Whether a top-level `T[]` element keeps its Rust-native form
+/// (`String` / `f64`) inside the slice / `Vec`, rather than its handle
+/// form. Enums count as the primitive they carry.
 fn is_native_array_element(
     elem: &TypeRef,
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) -> bool {
     let resolved = match ctx {
+        Some(c) if c.enum_repr(elem, scope).is_some() => return true,
         Some(c) => peel_mono(elem, c, scope, &mut HashSet::new()),
         None => std::borrow::Cow::Borrowed(elem),
     };
     matches!(
         resolved.as_ref(),
         TypeRef::String | TypeRef::StringLiteral(_) | TypeRef::Number | TypeRef::NumberLiteral(_)
-    )
-}
-
-fn is_numeric_primitive(ty: &TypeRef) -> bool {
-    matches!(
-        ty,
-        TypeRef::Number | TypeRef::NumberLiteral(_) | TypeRef::BigInt
     )
 }
 
@@ -2583,68 +2537,68 @@ mod tests {
     }
 
     #[test]
-    fn test_needs_slice_to_array_primitives_skip() {
-        // `&[f64]` / `&[i64]` use the default zero-copy typed-array
-        // wire — no `slice_to_array` needed.
-        let params = vec![cp("xs", TypeRef::Array(Box::new(TypeRef::Number)))];
-        assert!(!needs_slice_to_array(&params));
-
-        let params = vec![cp("xs", TypeRef::Array(Box::new(TypeRef::BigInt)))];
-        assert!(!needs_slice_to_array(&params));
+    fn slice_to_array_follows_the_lowered_element() {
+        with_mono_ctx(MONO_SRC, |ctx, scope| {
+            let needs = |elem: &TypeRef| {
+                needs_slice_to_array(
+                    &[cp("xs", TypeRef::Array(Box::new(elem.clone())))],
+                    Some(ctx),
+                    scope,
+                )
+            };
+            let numbers = TypeRef::Union(vec![
+                TypeRef::NumberLiteral(1.0),
+                TypeRef::NumberLiteral(2.0),
+            ]);
+            for elem in [
+                TypeRef::String,
+                TypeRef::Number,
+                TypeRef::ident("IdChain"),
+                TypeRef::ident("Mode"),
+                TypeRef::ident("Level"),
+                lits(&["a", "b"]),
+                numbers,
+            ] {
+                assert!(needs(&elem), "expected slice_to_array for {elem:?}");
+            }
+            for elem in [
+                TypeRef::Boolean,
+                TypeRef::BigInt,
+                TypeRef::Any,
+                TypeRef::ident("Plain"),
+                TypeRef::ident("T"),
+                TypeRef::ident("MaybeId"),
+                TypeRef::Array(Box::new(TypeRef::String)),
+            ] {
+                assert!(!needs(&elem), "unexpected slice_to_array for {elem:?}");
+            }
+        });
     }
 
     #[test]
-    fn test_needs_slice_to_array_strings_named_jsvalue() {
-        // `&[String]`, `&[Foo]`, `&[JsValue]` all need the attribute
-        // to materialise a plain JS `Array` rather than a typed-array
-        // view of externref handles.
-        for inner in [
-            TypeRef::String,
-            TypeRef::ident("EmailAttachment"),
-            TypeRef::Any,
-            TypeRef::Boolean,
-        ] {
-            let params = vec![cp("xs", TypeRef::Array(Box::new(inner.clone())))];
-            assert!(
-                needs_slice_to_array(&params),
-                "expected slice_to_array for {inner:?}"
-            );
-        }
-    }
-
-    #[test]
-    fn test_needs_slice_to_array_optional_slice() {
-        // `Option<&[String]>` follows the same rule as `&[String]`.
-        let params = vec![cp(
-            "xs",
-            TypeRef::Nullable(Box::new(TypeRef::Array(Box::new(TypeRef::String)))),
-        )];
-        assert!(needs_slice_to_array(&params));
-
-        // `Option<&[f64]>` still skips it.
-        let params = vec![cp(
-            "xs",
-            TypeRef::Nullable(Box::new(TypeRef::Array(Box::new(TypeRef::Number)))),
-        )];
-        assert!(!needs_slice_to_array(&params));
-    }
-
-    #[test]
-    fn test_needs_slice_to_array_any_param_triggers() {
-        // The attribute is per-function, so a single non-numeric
-        // slice param flips the whole function on.
-        let params = vec![
-            cp("first", TypeRef::String),
-            cp("xs", TypeRef::Array(Box::new(TypeRef::Number))),
-            cp("ys", TypeRef::Array(Box::new(TypeRef::String))),
-        ];
-        assert!(needs_slice_to_array(&params));
-    }
-
-    #[test]
-    fn test_needs_slice_to_array_no_array_params() {
-        let params = vec![cp("x", TypeRef::String), cp("y", TypeRef::Number)];
-        assert!(!needs_slice_to_array(&params));
+    fn slice_to_array_param_shapes() {
+        with_mono_ctx(MONO_SRC, |ctx, scope| {
+            let needs = |params: &[crate::codegen::signatures::ConcreteParam]| {
+                needs_slice_to_array(params, Some(ctx), scope)
+            };
+            let strings = || TypeRef::Array(Box::new(TypeRef::String));
+            assert!(needs(&[cp("xs", TypeRef::Nullable(Box::new(strings())))]));
+            assert!(needs(&[
+                cp("first", TypeRef::ident("Plain")),
+                cp("xs", strings())
+            ]));
+            assert!(!needs(&[
+                cp("x", TypeRef::String),
+                cp("y", TypeRef::Number)
+            ]));
+            assert!(!needs(&[cp(
+                "xs",
+                TypeRef::generic("Array", vec![TypeRef::String])
+            )]));
+            let mut rest = cp("rest", strings());
+            rest.variadic = true;
+            assert!(!needs(&[rest]));
+        });
     }
 
     #[test]

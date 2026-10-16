@@ -180,7 +180,7 @@ extern "C" {
     pub fn headers(this: &ResponseInit) -> JsValue;
     #[wasm_bindgen(method, setter)]
     pub fn set_headers(this: &ResponseInit, val: &Headers);
-    #[wasm_bindgen(method, setter, slice_to_array, js_name = "headers")]
+    #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_slice(this: &ResponseInit, val: &[Array<JsString>]);
     #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_record(this: &ResponseInit, val: &Object<JsString>);

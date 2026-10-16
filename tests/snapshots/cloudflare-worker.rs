@@ -25,7 +25,7 @@ extern "C" {
     pub fn new_with_headers(init: &Headers) -> Result<Headers, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Headers")]
     pub fn new_with_record(init: &Object<JsString>) -> Result<Headers, JsValue>;
-    #[wasm_bindgen(constructor, catch, slice_to_array, js_name = "Headers")]
+    #[wasm_bindgen(constructor, catch, js_name = "Headers")]
     pub fn new_with_slice(init: &[ArrayTuple<(JsString, JsString)>]) -> Result<Headers, JsValue>;
     #[wasm_bindgen(method)]
     pub fn append(this: &Headers, name: &str, value: &str);
@@ -126,7 +126,7 @@ extern "C" {
     pub fn set_headers(this: &RequestInit, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_record(this: &RequestInit, val: &Object<JsString>);
-    #[wasm_bindgen(method, setter, slice_to_array, js_name = "headers")]
+    #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_slice(this: &RequestInit, val: &[ArrayTuple<(JsString, JsString)>]);
     #[wasm_bindgen(method, getter)]
     pub fn body(this: &RequestInit) -> JsValue;
@@ -326,7 +326,7 @@ extern "C" {
     pub fn set_headers(this: &ResponseInit, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_record(this: &ResponseInit, val: &Object<JsString>);
-    #[wasm_bindgen(method, setter, slice_to_array, js_name = "headers")]
+    #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_slice(this: &ResponseInit, val: &[ArrayTuple<(JsString, JsString)>]);
 }
 impl ResponseInit {

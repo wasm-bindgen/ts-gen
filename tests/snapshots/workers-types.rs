@@ -162,13 +162,13 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Console;
-    #[wasm_bindgen(method, variadic, slice_to_array)]
+    #[wasm_bindgen(method, variadic)]
     pub fn assert(this: &Console, data: &[JsValue]);
-    #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "assert")]
+    #[wasm_bindgen(method, variadic, catch, js_name = "assert")]
     pub fn try_assert(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, variadic, slice_to_array, js_name = "assert")]
+    #[wasm_bindgen(method, variadic, js_name = "assert")]
     pub fn assert_with_condition(this: &Console, condition: bool, data: &[JsValue]);
-    #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "assert")]
+    #[wasm_bindgen(method, variadic, catch, js_name = "assert")]
     pub fn try_assert_with_condition(
         this: &Console,
         condition: bool,
@@ -227,12 +227,12 @@ extern "C" {
     #[doc = " The **`console.debug()`** static method outputs a message to the console at the 'debug' log level."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/debug_static)"]
-    #[wasm_bindgen(method, variadic, slice_to_array)]
+    #[wasm_bindgen(method, variadic)]
     pub fn debug(this: &Console, data: &[JsValue]);
     #[doc = " The **`console.debug()`** static method outputs a message to the console at the 'debug' log level."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/debug_static)"]
-    #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "debug")]
+    #[wasm_bindgen(method, variadic, catch, js_name = "debug")]
     pub fn try_debug(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " The **`console.dir()`** static method displays a list of the properties of the specified JavaScript object."]
     #[doc = ""]
@@ -271,42 +271,42 @@ extern "C" {
     #[doc = " The **`console.dirxml()`** static method displays an interactive tree of the descendant elements of the specified XML/HTML element."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/dirxml_static)"]
-    #[wasm_bindgen(method, variadic, slice_to_array)]
+    #[wasm_bindgen(method, variadic)]
     pub fn dirxml(this: &Console, data: &[JsValue]);
     #[doc = " The **`console.dirxml()`** static method displays an interactive tree of the descendant elements of the specified XML/HTML element."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/dirxml_static)"]
-    #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "dirxml")]
+    #[wasm_bindgen(method, variadic, catch, js_name = "dirxml")]
     pub fn try_dirxml(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " The **`console.error()`** static method outputs a message to the console at the 'error' log level."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/error_static)"]
-    #[wasm_bindgen(method, variadic, slice_to_array)]
+    #[wasm_bindgen(method, variadic)]
     pub fn error(this: &Console, data: &[JsValue]);
     #[doc = " The **`console.error()`** static method outputs a message to the console at the 'error' log level."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/error_static)"]
-    #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "error")]
+    #[wasm_bindgen(method, variadic, catch, js_name = "error")]
     pub fn try_error(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " The **`console.group()`** static method creates a new inline group in the Web console log, causing any subsequent console messages to be indented by an additional level, until console/groupEnd_static is called."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/group_static)"]
-    #[wasm_bindgen(method, variadic, slice_to_array)]
+    #[wasm_bindgen(method, variadic)]
     pub fn group(this: &Console, data: &[JsValue]);
     #[doc = " The **`console.group()`** static method creates a new inline group in the Web console log, causing any subsequent console messages to be indented by an additional level, until console/groupEnd_static is called."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/group_static)"]
-    #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "group")]
+    #[wasm_bindgen(method, variadic, catch, js_name = "group")]
     pub fn try_group(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " The **`console.groupCollapsed()`** static method creates a new inline group in the console."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/groupCollapsed_static)"]
-    #[wasm_bindgen(method, variadic, slice_to_array, js_name = "groupCollapsed")]
+    #[wasm_bindgen(method, variadic, js_name = "groupCollapsed")]
     pub fn group_collapsed(this: &Console, data: &[JsValue]);
     #[doc = " The **`console.groupCollapsed()`** static method creates a new inline group in the console."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/groupCollapsed_static)"]
-    #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "groupCollapsed")]
+    #[wasm_bindgen(method, variadic, catch, js_name = "groupCollapsed")]
     pub fn try_group_collapsed(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " The **`console.groupEnd()`** static method exits the current inline group in the console."]
     #[doc = ""]
@@ -321,22 +321,22 @@ extern "C" {
     #[doc = " The **`console.info()`** static method outputs a message to the console at the 'info' log level."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/info_static)"]
-    #[wasm_bindgen(method, variadic, slice_to_array)]
+    #[wasm_bindgen(method, variadic)]
     pub fn info(this: &Console, data: &[JsValue]);
     #[doc = " The **`console.info()`** static method outputs a message to the console at the 'info' log level."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/info_static)"]
-    #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "info")]
+    #[wasm_bindgen(method, variadic, catch, js_name = "info")]
     pub fn try_info(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " The **`console.log()`** static method outputs a message to the console."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/log_static)"]
-    #[wasm_bindgen(method, variadic, slice_to_array)]
+    #[wasm_bindgen(method, variadic)]
     pub fn log(this: &Console, data: &[JsValue]);
     #[doc = " The **`console.log()`** static method outputs a message to the console."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/log_static)"]
-    #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "log")]
+    #[wasm_bindgen(method, variadic, catch, js_name = "log")]
     pub fn try_log(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " The **`console.table()`** static method displays tabular data as a table."]
     #[doc = ""]
@@ -422,22 +422,22 @@ extern "C" {
     #[doc = " The **`console.timeLog()`** static method logs the current value of a timer that was previously started by calling console/time_static."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/timeLog_static)"]
-    #[wasm_bindgen(method, variadic, slice_to_array, js_name = "timeLog")]
+    #[wasm_bindgen(method, variadic, js_name = "timeLog")]
     pub fn time_log(this: &Console, data: &[JsValue]);
     #[doc = " The **`console.timeLog()`** static method logs the current value of a timer that was previously started by calling console/time_static."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/timeLog_static)"]
-    #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "timeLog")]
+    #[wasm_bindgen(method, variadic, catch, js_name = "timeLog")]
     pub fn try_time_log(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " The **`console.timeLog()`** static method logs the current value of a timer that was previously started by calling console/time_static."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/timeLog_static)"]
-    #[wasm_bindgen(method, variadic, slice_to_array, js_name = "timeLog")]
+    #[wasm_bindgen(method, variadic, js_name = "timeLog")]
     pub fn time_log_with_label(this: &Console, label: &str, data: &[JsValue]);
     #[doc = " The **`console.timeLog()`** static method logs the current value of a timer that was previously started by calling console/time_static."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/timeLog_static)"]
-    #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "timeLog")]
+    #[wasm_bindgen(method, variadic, catch, js_name = "timeLog")]
     pub fn try_time_log_with_label(
         this: &Console,
         label: &str,
@@ -454,22 +454,22 @@ extern "C" {
     #[doc = " The **`console.trace()`** static method outputs a stack trace to the console."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/trace_static)"]
-    #[wasm_bindgen(method, variadic, slice_to_array)]
+    #[wasm_bindgen(method, variadic)]
     pub fn trace(this: &Console, data: &[JsValue]);
     #[doc = " The **`console.trace()`** static method outputs a stack trace to the console."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/trace_static)"]
-    #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "trace")]
+    #[wasm_bindgen(method, variadic, catch, js_name = "trace")]
     pub fn try_trace(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
     #[doc = " The **`console.warn()`** static method outputs a warning message to the console at the 'warning' log level."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/warn_static)"]
-    #[wasm_bindgen(method, variadic, slice_to_array)]
+    #[wasm_bindgen(method, variadic)]
     pub fn warn(this: &Console, data: &[JsValue]);
     #[doc = " The **`console.warn()`** static method outputs a warning message to the console at the 'warning' log level."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/warn_static)"]
-    #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "warn")]
+    #[wasm_bindgen(method, variadic, catch, js_name = "warn")]
     pub fn try_warn(this: &Console, data: &[JsValue]) -> Result<(), JsValue>;
 }
 #[wasm_bindgen]
@@ -2010,7 +2010,7 @@ extern "C" {
     pub type StructuredSerializeOptions;
     #[wasm_bindgen(method, getter)]
     pub fn transfer(this: &StructuredSerializeOptions) -> Option<Vec<JsValue>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_transfer(this: &StructuredSerializeOptions, val: &[JsValue]);
 }
 impl StructuredSerializeOptions {
@@ -3237,15 +3237,15 @@ extern "C" {
     pub type AnalyticsEngineDataPoint;
     #[wasm_bindgen(method, getter)]
     pub fn indexes(this: &AnalyticsEngineDataPoint) -> Option<Vec<JsValue>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_indexes(this: &AnalyticsEngineDataPoint, val: &[JsValue]);
     #[wasm_bindgen(method, getter)]
     pub fn doubles(this: &AnalyticsEngineDataPoint) -> Option<Vec<f64>>;
-    #[wasm_bindgen(method, setter)]
+    #[wasm_bindgen(method, setter, slice_to_array)]
     pub fn set_doubles(this: &AnalyticsEngineDataPoint, val: &[f64]);
     #[wasm_bindgen(method, getter)]
     pub fn blobs(this: &AnalyticsEngineDataPoint) -> Option<Vec<JsValue>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_blobs(this: &AnalyticsEngineDataPoint, val: &[JsValue]);
 }
 impl AnalyticsEngineDataPoint {
@@ -3830,12 +3830,12 @@ extern "C" {
     #[doc = " The **`AbortSignal.any()`** static method takes an iterable of abort signals and returns an AbortSignal."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/any_static)"]
-    # [wasm_bindgen (static_method_of = AbortSignal , slice_to_array)]
+    # [wasm_bindgen (static_method_of = AbortSignal)]
     pub fn any(signals: &[AbortSignal]) -> AbortSignal;
     #[doc = " The **`AbortSignal.any()`** static method takes an iterable of abort signals and returns an AbortSignal."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/AbortSignal/any_static)"]
-    # [wasm_bindgen (static_method_of = AbortSignal , catch , slice_to_array , js_name = "any")]
+    # [wasm_bindgen (static_method_of = AbortSignal , catch , js_name = "any")]
     pub fn try_any(signals: &[AbortSignal]) -> Result<AbortSignal, JsValue>;
     #[doc = " The **`aborted`** read-only property returns a value that indicates whether the asynchronous operations the signal is communicating with are aborted (`true`) or not (`false`)."]
     #[doc = ""]
@@ -4005,9 +4005,9 @@ extern "C" {
     pub type Blob;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Blob, JsValue>;
-    #[wasm_bindgen(constructor, catch, slice_to_array, js_name = "Blob")]
+    #[wasm_bindgen(constructor, catch, js_name = "Blob")]
     pub fn new_with_type(r#type: &[JsValue]) -> Result<Blob, JsValue>;
-    #[wasm_bindgen(constructor, catch, slice_to_array, js_name = "Blob")]
+    #[wasm_bindgen(constructor, catch, js_name = "Blob")]
     pub fn new_with_type_and_options(
         r#type: &[JsValue],
         options: &BlobOptions,
@@ -4136,9 +4136,9 @@ extern "C" {
     # [wasm_bindgen (extends = Blob , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type File;
-    #[wasm_bindgen(constructor, catch, slice_to_array)]
+    #[wasm_bindgen(constructor, catch)]
     pub fn new(bits: &[JsValue], name: &str) -> Result<File, JsValue>;
-    #[wasm_bindgen(constructor, catch, slice_to_array, js_name = "File")]
+    #[wasm_bindgen(constructor, catch, js_name = "File")]
     pub fn new_with_options(
         bits: &[JsValue],
         name: &str,
@@ -5095,7 +5095,7 @@ extern "C" {
     pub fn set_qi(this: &JsonWebKey, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn oth(this: &JsonWebKey) -> Option<Vec<RsaOtherPrimesInfo>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_oth(this: &JsonWebKey, val: &[RsaOtherPrimesInfo]);
     #[wasm_bindgen(method, getter)]
     pub fn k(this: &JsonWebKey) -> Option<String>;
@@ -8183,7 +8183,7 @@ extern "C" {
     pub fn keys<Metadata: ::wasm_bindgen::JsGeneric, Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespaceListResult<Metadata, Key>,
     ) -> Vec<KVNamespaceListKey<Metadata, Key>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_keys<Metadata: ::wasm_bindgen::JsGeneric, Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespaceListResult<Metadata, Key>,
         val: &[KVNamespaceListKey<Metadata, Key>],
@@ -8297,24 +8297,24 @@ extern "C" {
         key: &Key,
         options: &KVNamespaceGetOptions<JsString>,
     ) -> Result<JsOption<JsString>, JsValue>;
-    #[wasm_bindgen(method, catch, slice_to_array, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_array_and_type<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
         key: &Array<Key>,
         r#type: &str,
     ) -> Result<JsOption<JsString>, JsValue>;
-    #[wasm_bindgen(method, catch, slice_to_array, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_array<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
         key: &Array<Key>,
     ) -> Result<JsOption<JsString>, JsValue>;
-    #[wasm_bindgen(method, catch, slice_to_array, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_array_and_kv_namespace_get_options<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
         key: &Array<Key>,
         options: &KVNamespaceGetOptions<Undefined>,
     ) -> Result<JsOption<JsString>, JsValue>;
-    #[wasm_bindgen(method, catch, slice_to_array, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_key_array_and_options_kv_namespace_get_options<
         Key: ::wasm_bindgen::JsGeneric,
     >(
@@ -8421,7 +8421,7 @@ extern "C" {
         key: &Key,
         options: &KVNamespaceGetOptions<JsString>,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
-    #[wasm_bindgen(method, catch, slice_to_array, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     pub async fn get_with_metadata_with_array_and_type<
         Key: ::wasm_bindgen::JsGeneric,
         Metadata: ::wasm_bindgen::JsGeneric,
@@ -8430,7 +8430,7 @@ extern "C" {
         key: &Array<Key>,
         r#type: &str,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
-    #[wasm_bindgen(method, catch, slice_to_array, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     pub async fn get_with_metadata_with_array<
         Key: ::wasm_bindgen::JsGeneric,
         Metadata: ::wasm_bindgen::JsGeneric,
@@ -8438,7 +8438,7 @@ extern "C" {
         this: &KVNamespace<Key>,
         key: &Array<Key>,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
-    #[wasm_bindgen(method, catch, slice_to_array, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     pub async fn get_with_metadata_with_array_and_kv_namespace_get_options<
         Key: ::wasm_bindgen::JsGeneric,
         Metadata: ::wasm_bindgen::JsGeneric,
@@ -8447,7 +8447,7 @@ extern "C" {
         key: &Array<Key>,
         options: &KVNamespaceGetOptions<Undefined>,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
-    #[wasm_bindgen(method, catch, slice_to_array, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     pub async fn get_with_metadata_with_key_array_and_options_kv_namespace_get_options<
         Key: ::wasm_bindgen::JsGeneric,
         Metadata: ::wasm_bindgen::JsGeneric,
@@ -9324,7 +9324,7 @@ extern "C" {
     ) -> Result<R2UploadedPart, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn abort(this: &R2MultipartUpload) -> Result<Undefined, JsValue>;
-    #[wasm_bindgen(method, catch, slice_to_array)]
+    #[wasm_bindgen(method, catch)]
     pub async fn complete(
         this: &R2MultipartUpload,
         uploaded_parts: &[R2UploadedPart],
@@ -12763,7 +12763,7 @@ extern "C" {
     pub type URLPatternResult;
     #[wasm_bindgen(method, getter)]
     pub fn inputs(this: &URLPatternResult) -> Vec<JsValue>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_inputs(this: &URLPatternResult, val: &[JsValue]);
     #[wasm_bindgen(method, getter)]
     pub fn protocol(this: &URLPatternResult) -> URLPatternComponentResult;
@@ -13162,13 +13162,13 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SqlStorage;
-    #[wasm_bindgen(method, variadic, slice_to_array)]
+    #[wasm_bindgen(method, variadic)]
     pub fn exec<T: ::wasm_bindgen::JsGeneric>(
         this: &SqlStorage,
         query: &str,
         bindings: &[JsValue],
     ) -> SqlStorageCursor<T>;
-    #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "exec")]
+    #[wasm_bindgen(method, variadic, catch, js_name = "exec")]
     pub fn try_exec<T: ::wasm_bindgen::JsGeneric>(
         this: &SqlStorage,
         query: &str,
@@ -13652,7 +13652,7 @@ extern "C" {
     #[doc = " The **`postMessage()`** method of the transfers ownership of objects to other browsing contexts."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessagePort/postMessage)"]
-    #[wasm_bindgen(method, slice_to_array, js_name = "postMessage")]
+    #[wasm_bindgen(method, js_name = "postMessage")]
     pub fn post_message_with_data_and_slice(
         this: &MessagePort,
         data: &JsValue,
@@ -13661,7 +13661,7 @@ extern "C" {
     #[doc = " The **`postMessage()`** method of the transfers ownership of objects to other browsing contexts."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/MessagePort/postMessage)"]
-    #[wasm_bindgen(method, catch, slice_to_array, js_name = "postMessage")]
+    #[wasm_bindgen(method, catch, js_name = "postMessage")]
     pub fn try_post_message_with_data_and_slice(
         this: &MessagePort,
         data: &JsValue,
@@ -13735,7 +13735,7 @@ extern "C" {
     pub type MessagePortPostMessageOptions;
     #[wasm_bindgen(method, getter)]
     pub fn transfer(this: &MessagePortPostMessageOptions) -> Option<Vec<JsValue>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_transfer(this: &MessagePortPostMessageOptions, val: &[JsValue]);
 }
 impl MessagePortPostMessageOptions {
@@ -14090,11 +14090,11 @@ extern "C" {
     pub fn set_global_outbound(this: &WorkerLoaderWorkerCode, val: &JsValue);
     #[wasm_bindgen(method, getter)]
     pub fn tails(this: &WorkerLoaderWorkerCode) -> Option<Vec<JsValue>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_tails(this: &WorkerLoaderWorkerCode, val: &[JsValue]);
     #[wasm_bindgen(method, getter, js_name = "streamingTails")]
     pub fn streaming_tails(this: &WorkerLoaderWorkerCode) -> Option<Vec<JsValue>>;
-    #[wasm_bindgen(method, setter, slice_to_array, js_name = "streamingTails")]
+    #[wasm_bindgen(method, setter, js_name = "streamingTails")]
     pub fn set_streaming_tails(this: &WorkerLoaderWorkerCode, val: &[JsValue]);
 }
 impl WorkerLoaderWorkerCode {
@@ -14196,7 +14196,7 @@ extern "C" {
     pub type AiSearchSearchRequest;
     #[wasm_bindgen(method, getter)]
     pub fn messages(this: &AiSearchSearchRequest) -> Array<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_messages(this: &AiSearchSearchRequest, val: &Array<Object>);
     #[wasm_bindgen(method, getter)]
     pub fn ai_search_options(this: &AiSearchSearchRequest) -> Option<Object>;
@@ -14232,7 +14232,7 @@ extern "C" {
     pub type AiSearchChatCompletionsRequest;
     #[wasm_bindgen(method, getter)]
     pub fn messages(this: &AiSearchChatCompletionsRequest) -> Array<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_messages(this: &AiSearchChatCompletionsRequest, val: &Array<Object>);
     #[wasm_bindgen(method, getter)]
     pub fn model(this: &AiSearchChatCompletionsRequest) -> Option<String>;
@@ -14288,7 +14288,7 @@ extern "C" {
     pub fn set_search_query(this: &AiSearchSearchResponse, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn chunks(this: &AiSearchSearchResponse) -> Array<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_chunks(this: &AiSearchSearchResponse, val: &Array<Object>);
 }
 impl AiSearchSearchResponse {
@@ -14555,7 +14555,7 @@ extern "C" {
     pub type AiImageClassificationInput;
     #[wasm_bindgen(method, getter)]
     pub fn image(this: &AiImageClassificationInput) -> Vec<f64>;
-    #[wasm_bindgen(method, setter)]
+    #[wasm_bindgen(method, setter, slice_to_array)]
     pub fn set_image(this: &AiImageClassificationInput, val: &[f64]);
 }
 impl AiImageClassificationInput {
@@ -14578,7 +14578,7 @@ extern "C" {
     pub fn set_inputs(this: &BaseAiImageClassification, val: &AiImageClassificationInput);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(this: &BaseAiImageClassification) -> Vec<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array, js_name = "postProcessedOutputs")]
+    #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
     pub fn set_post_processed_outputs(this: &BaseAiImageClassification, val: &[Object]);
 }
 #[wasm_bindgen]
@@ -14588,7 +14588,7 @@ extern "C" {
     pub type AiImageToTextInput;
     #[wasm_bindgen(method, getter)]
     pub fn image(this: &AiImageToTextInput) -> Vec<f64>;
-    #[wasm_bindgen(method, setter)]
+    #[wasm_bindgen(method, setter, slice_to_array)]
     pub fn set_image(this: &AiImageToTextInput, val: &[f64]);
     #[wasm_bindgen(method, getter)]
     pub fn prompt(this: &AiImageToTextInput) -> Option<String>;
@@ -14632,7 +14632,7 @@ extern "C" {
     pub fn set_raw(this: &AiImageToTextInput, val: bool);
     #[wasm_bindgen(method, getter)]
     pub fn messages(this: &AiImageToTextInput) -> Option<Vec<RoleScopedChatInput>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_messages(this: &AiImageToTextInput, val: &[RoleScopedChatInput]);
 }
 impl AiImageToTextInput {
@@ -14783,7 +14783,7 @@ extern "C" {
     pub fn set_raw(this: &AiImageTextToTextInput, val: bool);
     #[wasm_bindgen(method, getter)]
     pub fn messages(this: &AiImageTextToTextInput) -> Option<Vec<RoleScopedChatInput>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_messages(this: &AiImageTextToTextInput, val: &[RoleScopedChatInput]);
 }
 impl AiImageTextToTextInput {
@@ -14912,11 +14912,11 @@ extern "C" {
     pub type AiIMultimodalEmbeddingsOutput;
     #[wasm_bindgen(method, getter)]
     pub fn data(this: &AiIMultimodalEmbeddingsOutput) -> Vec<Array<Number>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_data(this: &AiIMultimodalEmbeddingsOutput, val: &[Array<Number>]);
     #[wasm_bindgen(method, getter)]
     pub fn shape(this: &AiIMultimodalEmbeddingsOutput) -> Vec<f64>;
-    #[wasm_bindgen(method, setter)]
+    #[wasm_bindgen(method, setter, slice_to_array)]
     pub fn set_shape(this: &AiIMultimodalEmbeddingsOutput, val: &[f64]);
 }
 impl AiIMultimodalEmbeddingsOutput {
@@ -14951,7 +14951,7 @@ extern "C" {
     pub type AiObjectDetectionInput;
     #[wasm_bindgen(method, getter)]
     pub fn image(this: &AiObjectDetectionInput) -> Vec<f64>;
-    #[wasm_bindgen(method, setter)]
+    #[wasm_bindgen(method, setter, slice_to_array)]
     pub fn set_image(this: &AiObjectDetectionInput, val: &[f64]);
 }
 impl AiObjectDetectionInput {
@@ -14974,7 +14974,7 @@ extern "C" {
     pub fn set_inputs(this: &BaseAiObjectDetection, val: &AiObjectDetectionInput);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(this: &BaseAiObjectDetection) -> Vec<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array, js_name = "postProcessedOutputs")]
+    #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
     pub fn set_post_processed_outputs(this: &BaseAiObjectDetection, val: &[Object]);
 }
 #[wasm_bindgen]
@@ -15012,7 +15012,7 @@ extern "C" {
     pub fn set_inputs(this: &BaseAiSentenceSimilarity, val: &AiSentenceSimilarityInput);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(this: &BaseAiSentenceSimilarity) -> Vec<f64>;
-    #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
+    #[wasm_bindgen(method, setter, slice_to_array, js_name = "postProcessedOutputs")]
     pub fn set_post_processed_outputs(this: &BaseAiSentenceSimilarity, val: &[f64]);
 }
 #[wasm_bindgen]
@@ -15022,7 +15022,7 @@ extern "C" {
     pub type AiAutomaticSpeechRecognitionInput;
     #[wasm_bindgen(method, getter)]
     pub fn audio(this: &AiAutomaticSpeechRecognitionInput) -> Vec<f64>;
-    #[wasm_bindgen(method, setter)]
+    #[wasm_bindgen(method, setter, slice_to_array)]
     pub fn set_audio(this: &AiAutomaticSpeechRecognitionInput, val: &[f64]);
 }
 impl AiAutomaticSpeechRecognitionInput {
@@ -15044,7 +15044,7 @@ extern "C" {
     pub fn set_text(this: &AiAutomaticSpeechRecognitionOutput, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn words(this: &AiAutomaticSpeechRecognitionOutput) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_words(this: &AiAutomaticSpeechRecognitionOutput, val: &[Object]);
     #[wasm_bindgen(method, getter)]
     pub fn vtt(this: &AiAutomaticSpeechRecognitionOutput) -> Option<String>;
@@ -15200,7 +15200,7 @@ extern "C" {
     pub fn set_inputs(this: &BaseAiTextClassification, val: &AiTextClassificationInput);
     #[wasm_bindgen(method, getter, js_name = "postProcessedOutputs")]
     pub fn post_processed_outputs(this: &BaseAiTextClassification) -> Vec<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array, js_name = "postProcessedOutputs")]
+    #[wasm_bindgen(method, setter, js_name = "postProcessedOutputs")]
     pub fn set_post_processed_outputs(this: &BaseAiTextClassification, val: &[Object]);
 }
 #[wasm_bindgen]
@@ -15234,11 +15234,11 @@ extern "C" {
     pub type AiTextEmbeddingsOutput;
     #[wasm_bindgen(method, getter)]
     pub fn shape(this: &AiTextEmbeddingsOutput) -> Vec<f64>;
-    #[wasm_bindgen(method, setter)]
+    #[wasm_bindgen(method, setter, slice_to_array)]
     pub fn set_shape(this: &AiTextEmbeddingsOutput, val: &[f64]);
     #[wasm_bindgen(method, getter)]
     pub fn data(this: &AiTextEmbeddingsOutput) -> Vec<Array<Number>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_data(this: &AiTextEmbeddingsOutput, val: &[Array<Number>]);
 }
 impl AiTextEmbeddingsOutput {
@@ -15545,7 +15545,7 @@ extern "C" {
     pub fn set_presence_penalty(this: &AiTextGenerationInput, val: f64);
     #[wasm_bindgen(method, getter)]
     pub fn messages(this: &AiTextGenerationInput) -> Option<Vec<RoleScopedChatInput>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_messages(this: &AiTextGenerationInput, val: &[RoleScopedChatInput]);
     #[wasm_bindgen(method, getter)]
     pub fn response_format(this: &AiTextGenerationInput) -> Option<AiTextGenerationResponseFormat>;
@@ -15553,9 +15553,9 @@ extern "C" {
     pub fn set_response_format(this: &AiTextGenerationInput, val: &AiTextGenerationResponseFormat);
     #[wasm_bindgen(method, getter)]
     pub fn tools(this: &AiTextGenerationInput) -> Option<ToolsKind>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_tools(this: &AiTextGenerationInput, val: &[AiTextGenerationToolInput]);
-    #[wasm_bindgen(method, setter, slice_to_array, js_name = "tools")]
+    #[wasm_bindgen(method, setter, js_name = "tools")]
     pub fn set_tools_with_slice(
         this: &AiTextGenerationInput,
         val: &[AiTextGenerationToolLegacyInput],
@@ -15564,7 +15564,7 @@ extern "C" {
     pub fn set_tools_with_object(this: &AiTextGenerationInput, val: &Object);
     #[wasm_bindgen(method, getter)]
     pub fn functions(this: &AiTextGenerationInput) -> Option<Vec<AiTextGenerationFunctionsInput>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_functions(this: &AiTextGenerationInput, val: &[AiTextGenerationFunctionsInput]);
 }
 impl AiTextGenerationInput {
@@ -15871,7 +15871,7 @@ extern "C" {
     pub fn set_width(this: &AiTextToImageInput, val: f64);
     #[wasm_bindgen(method, getter)]
     pub fn image(this: &AiTextToImageInput) -> Option<Vec<f64>>;
-    #[wasm_bindgen(method, setter)]
+    #[wasm_bindgen(method, setter, slice_to_array)]
     pub fn set_image(this: &AiTextToImageInput, val: &[f64]);
     #[wasm_bindgen(method, getter)]
     pub fn image_b64(this: &AiTextToImageInput) -> Option<String>;
@@ -15879,7 +15879,7 @@ extern "C" {
     pub fn set_image_b64(this: &AiTextToImageInput, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn mask(this: &AiTextToImageInput) -> Option<Vec<f64>>;
-    #[wasm_bindgen(method, setter)]
+    #[wasm_bindgen(method, setter, slice_to_array)]
     pub fn set_mask(this: &AiTextToImageInput, val: &[f64]);
     #[wasm_bindgen(method, getter)]
     pub fn num_steps(this: &AiTextToImageInput) -> Option<f64>;
@@ -16079,13 +16079,13 @@ extern "C" {
     );
     #[wasm_bindgen(method, getter)]
     pub fn include(this: &ResponsesInput) -> Option<Array<JsString>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_include(this: &ResponsesInput, val: &Array<JsString>);
     #[wasm_bindgen(method, getter)]
     pub fn input(this: &ResponsesInput) -> Option<InputKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_input(this: &ResponsesInput, val: &str);
-    #[wasm_bindgen(method, setter, slice_to_array, js_name = "input")]
+    #[wasm_bindgen(method, setter, js_name = "input")]
     pub fn set_input_with_array(this: &ResponsesInput, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn instructions(this: &ResponsesInput) -> Option<String>;
@@ -16146,7 +16146,7 @@ extern "C" {
     );
     #[wasm_bindgen(method, getter)]
     pub fn tools(this: &ResponsesInput) -> Option<Array<ResponsesFunctionTool>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_tools(this: &ResponsesInput, val: &Array<ResponsesFunctionTool>);
     #[wasm_bindgen(method, getter)]
     pub fn top_p(this: &ResponsesInput) -> Option<f64>;
@@ -16300,7 +16300,7 @@ extern "C" {
     pub fn instructions(this: &ResponsesOutput) -> Option<InstructionsKind>;
     #[wasm_bindgen(method, setter)]
     pub fn set_instructions(this: &ResponsesOutput, val: &str);
-    #[wasm_bindgen(method, setter, slice_to_array, js_name = "instructions")]
+    #[wasm_bindgen(method, setter, js_name = "instructions")]
     pub fn set_instructions_with_array(this: &ResponsesOutput, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn object(this: &ResponsesOutput) -> Option<String>;
@@ -16308,7 +16308,7 @@ extern "C" {
     pub fn set_object(this: &ResponsesOutput, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn output(this: &ResponsesOutput) -> Option<Array>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_output(this: &ResponsesOutput, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn parallel_tool_calls(this: &ResponsesOutput) -> Option<bool>;
@@ -16329,7 +16329,7 @@ extern "C" {
     );
     #[wasm_bindgen(method, getter)]
     pub fn tools(this: &ResponsesOutput) -> Option<Array<ResponsesFunctionTool>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_tools(this: &ResponsesOutput, val: &Array<ResponsesFunctionTool>);
     #[wasm_bindgen(method, getter)]
     pub fn top_p(this: &ResponsesOutput) -> Option<f64>;
@@ -16503,7 +16503,7 @@ extern "C" {
     pub fn content(this: &EasyInputMessage) -> ContentKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_content(this: &EasyInputMessage, val: &str);
-    #[wasm_bindgen(method, setter, slice_to_array, js_name = "content")]
+    #[wasm_bindgen(method, setter, js_name = "content")]
     pub fn set_content_with_array(this: &EasyInputMessage, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn role(this: &EasyInputMessage) -> EasyInputMessageRoleKind;
@@ -16920,7 +16920,7 @@ extern "C" {
     pub fn output(this: &ResponseCustomToolCallOutput) -> OutputKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_output(this: &ResponseCustomToolCallOutput, val: &str);
-    #[wasm_bindgen(method, setter, slice_to_array, js_name = "output")]
+    #[wasm_bindgen(method, setter, js_name = "output")]
     pub fn set_output_with_array(this: &ResponseCustomToolCallOutput, val: &Array);
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseCustomToolCallOutput) -> String;
@@ -17401,7 +17401,7 @@ extern "C" {
     pub fn output(this: &ResponseFunctionToolCallOutputItem) -> OutputKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_output(this: &ResponseFunctionToolCallOutputItem, val: &str);
-    #[wasm_bindgen(method, setter, slice_to_array, js_name = "output")]
+    #[wasm_bindgen(method, setter, js_name = "output")]
     pub fn set_output_with_array(this: &ResponseFunctionToolCallOutputItem, val: &Array);
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseFunctionToolCallOutputItem) -> String;
@@ -17673,7 +17673,7 @@ extern "C" {
     ) -> ResponseInputItemFunctionCallOutputOutputKind;
     #[wasm_bindgen(method, setter)]
     pub fn set_output(this: &ResponseInputItemFunctionCallOutput, val: &str);
-    #[wasm_bindgen(method, setter, slice_to_array, js_name = "output")]
+    #[wasm_bindgen(method, setter, js_name = "output")]
     pub fn set_output_with_array(this: &ResponseInputItemFunctionCallOutput, val: &Array);
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseInputItemFunctionCallOutput) -> String;
@@ -17759,7 +17759,7 @@ extern "C" {
     pub type ResponseInputItemMessage;
     #[wasm_bindgen(method, getter)]
     pub fn content(this: &ResponseInputItemMessage) -> Array;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_content(this: &ResponseInputItemMessage, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn role(this: &ResponseInputItemMessage) -> ResponseInputItemMessageRoleKind;
@@ -17850,7 +17850,7 @@ extern "C" {
     pub fn set_id(this: &ResponseInputMessageItem, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn content(this: &ResponseInputMessageItem) -> Array;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_content(this: &ResponseInputMessageItem, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn role(this: &ResponseInputMessageItem) -> ResponseInputItemMessageRoleKind;
@@ -18154,7 +18154,7 @@ extern "C" {
     pub fn set_id(this: &ResponseOutputMessage, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn content(this: &ResponseOutputMessage) -> Array;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_content(this: &ResponseOutputMessage, val: &Array);
     #[wasm_bindgen(method, getter)]
     pub fn role(this: &ResponseOutputMessage) -> String;
@@ -18253,7 +18253,7 @@ extern "C" {
     pub fn set_type(this: &ResponseOutputText, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn logprobs(this: &ResponseOutputText) -> Option<Array<Logprob>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_logprobs(this: &ResponseOutputText, val: &Array<Logprob>);
 }
 impl ResponseOutputText {
@@ -18296,7 +18296,7 @@ extern "C" {
     pub fn set_id(this: &ResponseReasoningItem, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn summary(this: &ResponseReasoningItem) -> Array<ResponseReasoningSummaryItem>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_summary(this: &ResponseReasoningItem, val: &Array<ResponseReasoningSummaryItem>);
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseReasoningItem) -> String;
@@ -18304,7 +18304,7 @@ extern "C" {
     pub fn set_type(this: &ResponseReasoningItem, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn content(this: &ResponseReasoningItem) -> Option<Array<ResponseReasoningContentItem>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_content(this: &ResponseReasoningItem, val: &Array<ResponseReasoningContentItem>);
     #[wasm_bindgen(method, getter)]
     pub fn encrypted_content(this: &ResponseReasoningItem) -> Option<String>;
@@ -18739,7 +18739,7 @@ extern "C" {
     pub fn set_item_id(this: &ResponseTextDeltaEvent, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn logprobs(this: &ResponseTextDeltaEvent) -> Array<Logprob>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_logprobs(this: &ResponseTextDeltaEvent, val: &Array<Logprob>);
     #[wasm_bindgen(method, getter)]
     pub fn output_index(this: &ResponseTextDeltaEvent) -> f64;
@@ -18792,7 +18792,7 @@ extern "C" {
     pub fn set_item_id(this: &ResponseTextDoneEvent, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn logprobs(this: &ResponseTextDoneEvent) -> Array<Logprob>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_logprobs(this: &ResponseTextDoneEvent, val: &Array<Logprob>);
     #[wasm_bindgen(method, getter)]
     pub fn output_index(this: &ResponseTextDoneEvent) -> f64;
@@ -18849,7 +18849,7 @@ extern "C" {
     pub fn set_logprob(this: &Logprob, val: f64);
     #[wasm_bindgen(method, getter)]
     pub fn top_logprobs(this: &Logprob) -> Option<Array<TopLogprob>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_top_logprobs(this: &Logprob, val: &Array<TopLogprob>);
 }
 impl Logprob {
@@ -19027,7 +19027,7 @@ extern "C" {
     #[doc = " Batch of the embeddings requests to run using async-queue"]
     #[wasm_bindgen(method, getter)]
     pub fn requests(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_requests(this: &Ai_Cf_Baai_Bge_Base_En_V1_5_Input, val: &[Object]);
 }
 impl Ai_Cf_Baai_Bge_Base_En_V1_5_Input {
@@ -19139,7 +19139,7 @@ extern "C" {
     pub fn set_word_count(this: &Ai_Cf_Openai_Whisper_Output, val: f64);
     #[wasm_bindgen(method, getter)]
     pub fn words(this: &Ai_Cf_Openai_Whisper_Output) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_words(this: &Ai_Cf_Openai_Whisper_Output, val: &[Object]);
     #[wasm_bindgen(method, getter)]
     pub fn vtt(this: &Ai_Cf_Openai_Whisper_Output) -> Option<String>;
@@ -19220,7 +19220,7 @@ extern "C" {
     #[doc = " Batch of the embeddings requests to run using async-queue"]
     #[wasm_bindgen(method, getter)]
     pub fn requests(this: &Ai_Cf_Meta_M2M100_1_2B_Input) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_requests(this: &Ai_Cf_Meta_M2M100_1_2B_Input, val: &[Object]);
 }
 impl Ai_Cf_Meta_M2M100_1_2B_Input {
@@ -19330,7 +19330,7 @@ extern "C" {
     #[doc = " Batch of the embeddings requests to run using async-queue"]
     #[wasm_bindgen(method, getter)]
     pub fn requests(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_requests(this: &Ai_Cf_Baai_Bge_Small_En_V1_5_Input, val: &[Object]);
 }
 impl Ai_Cf_Baai_Bge_Small_En_V1_5_Input {
@@ -19443,7 +19443,7 @@ extern "C" {
     #[doc = " Batch of the embeddings requests to run using async-queue"]
     #[wasm_bindgen(method, getter)]
     pub fn requests(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_requests(this: &Ai_Cf_Baai_Bge_Large_En_V1_5_Input, val: &[Object]);
 }
 impl Ai_Cf_Baai_Bge_Large_En_V1_5_Input {
@@ -19610,7 +19610,7 @@ extern "C" {
     pub fn set_word_count(this: &Ai_Cf_Openai_Whisper_Tiny_En_Output, val: f64);
     #[wasm_bindgen(method, getter)]
     pub fn words(this: &Ai_Cf_Openai_Whisper_Tiny_En_Output) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_words(this: &Ai_Cf_Openai_Whisper_Tiny_En_Output, val: &[Object]);
     #[wasm_bindgen(method, getter)]
     pub fn vtt(this: &Ai_Cf_Openai_Whisper_Tiny_En_Output) -> Option<String>;
@@ -19769,7 +19769,7 @@ extern "C" {
     pub fn set_word_count(this: &Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output, val: f64);
     #[wasm_bindgen(method, getter)]
     pub fn segments(this: &Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_segments(this: &Ai_Cf_Openai_Whisper_Large_V3_Turbo_Output, val: &[Object]);
     #[doc = " The transcription in WebVTT format, which includes timing and text information for use in subtitles."]
     #[wasm_bindgen(method, getter)]
@@ -19853,7 +19853,7 @@ extern "C" {
     #[doc = " List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
     #[wasm_bindgen(method, getter)]
     pub fn contexts(this: &Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts) -> Vec<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_contexts(this: &Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts, val: &[Object]);
     #[doc = " When provided with too long context should the model error out or truncate the context to fit?"]
     #[wasm_bindgen(method, getter)]
@@ -19952,7 +19952,7 @@ extern "C" {
     #[doc = " List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
     #[wasm_bindgen(method, getter)]
     pub fn contexts(this: &Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1) -> Vec<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_contexts(this: &Ai_Cf_Baai_Bge_M3_Input_QueryAnd_Contexts_1, val: &[Object]);
     #[doc = " When provided with too long context should the model error out or truncate the context to fit?"]
     #[wasm_bindgen(method, getter)]
@@ -20047,7 +20047,7 @@ extern "C" {
     pub type Ai_Cf_Baai_Bge_M3_Ouput_Query;
     #[wasm_bindgen(method, getter)]
     pub fn response(this: &Ai_Cf_Baai_Bge_M3_Ouput_Query) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_response(this: &Ai_Cf_Baai_Bge_M3_Ouput_Query, val: &[Object]);
 }
 impl Ai_Cf_Baai_Bge_M3_Ouput_Query {
@@ -20081,14 +20081,14 @@ extern "C" {
     pub fn response(
         this: &Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts,
     ) -> Option<Vec<Array<Number>>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_response(
         this: &Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts,
         val: &[Array<Number>],
     );
     #[wasm_bindgen(method, getter)]
     pub fn shape(this: &Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts) -> Option<Vec<f64>>;
-    #[wasm_bindgen(method, setter)]
+    #[wasm_bindgen(method, setter, slice_to_array)]
     pub fn set_shape(this: &Ai_Cf_Baai_Bge_M3_Output_EmbeddingFor_Contexts, val: &[f64]);
     #[doc = " The pooling method used in the embedding process."]
     #[wasm_bindgen(method, getter)]
@@ -20133,12 +20133,12 @@ extern "C" {
     pub type Ai_Cf_Baai_Bge_M3_Ouput_Embedding;
     #[wasm_bindgen(method, getter)]
     pub fn shape(this: &Ai_Cf_Baai_Bge_M3_Ouput_Embedding) -> Option<Vec<f64>>;
-    #[wasm_bindgen(method, setter)]
+    #[wasm_bindgen(method, setter, slice_to_array)]
     pub fn set_shape(this: &Ai_Cf_Baai_Bge_M3_Ouput_Embedding, val: &[f64]);
     #[doc = " Embeddings of the requested text values"]
     #[wasm_bindgen(method, getter)]
     pub fn data(this: &Ai_Cf_Baai_Bge_M3_Ouput_Embedding) -> Option<Vec<Array<Number>>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_data(this: &Ai_Cf_Baai_Bge_M3_Ouput_Embedding, val: &[Array<Number>]);
     #[doc = " The pooling method used in the embedding process."]
     #[wasm_bindgen(method, getter)]
@@ -20363,7 +20363,7 @@ extern "C" {
     pub fn set_prompt(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn image(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt) -> Option<ImageKind>;
-    #[wasm_bindgen(method, setter)]
+    #[wasm_bindgen(method, setter, slice_to_array)]
     pub fn set_image(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt, val: &[f64]);
     #[wasm_bindgen(method, setter, js_name = "image")]
     pub fn set_image_with_str(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Prompt, val: &str);
@@ -20507,11 +20507,11 @@ extern "C" {
     #[doc = " An array of message objects representing the conversation history."]
     #[wasm_bindgen(method, getter)]
     pub fn messages(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages) -> Vec<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_messages(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages, val: &[Object]);
     #[wasm_bindgen(method, getter)]
     pub fn image(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages) -> Option<ImageKind>;
-    #[wasm_bindgen(method, setter)]
+    #[wasm_bindgen(method, setter, slice_to_array)]
     pub fn set_image(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages, val: &[f64]);
     #[wasm_bindgen(method, setter, js_name = "image")]
     pub fn set_image_with_str(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages, val: &str);
@@ -20519,12 +20519,12 @@ extern "C" {
     pub fn functions(
         this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages,
     ) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_functions(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages, val: &[Object]);
     #[doc = " A list of tools available for the assistant to use."]
     #[wasm_bindgen(method, getter)]
     pub fn tools(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages) -> Option<Vec<JsValue>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_tools(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages, val: &[JsValue]);
     #[doc = " If true, the response will be streamed back incrementally."]
     #[wasm_bindgen(method, getter)]
@@ -20674,7 +20674,7 @@ extern "C" {
     pub fn tool_calls(
         this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output,
     ) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_tool_calls(this: &Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output, val: &[Object]);
 }
 impl Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Output {
@@ -20947,13 +20947,13 @@ extern "C" {
     #[doc = " An array of message objects representing the conversation history."]
     #[wasm_bindgen(method, getter)]
     pub fn messages(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages) -> Vec<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_messages(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages, val: &[Object]);
     #[wasm_bindgen(method, getter)]
     pub fn functions(
         this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages,
     ) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_functions(
         this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages,
         val: &[Object],
@@ -20963,7 +20963,7 @@ extern "C" {
     pub fn tools(
         this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages,
     ) -> Option<Vec<JsValue>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_tools(this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages, val: &[JsValue]);
     #[wasm_bindgen(method, getter)]
     pub fn response_format(
@@ -21175,7 +21175,7 @@ extern "C" {
     pub fn requests(
         this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch,
     ) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_requests(
         this: &Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Async_Batch,
         val: &[Object],
@@ -21341,7 +21341,7 @@ extern "C" {
     #[doc = " An array of message objects representing the conversation history."]
     #[wasm_bindgen(method, getter)]
     pub fn messages(this: &Ai_Cf_Meta_Llama_Guard_3_8B_Input) -> Vec<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_messages(this: &Ai_Cf_Meta_Llama_Guard_3_8B_Input, val: &[Object]);
     #[doc = " The maximum number of tokens to generate in the response."]
     #[wasm_bindgen(method, getter)]
@@ -21474,7 +21474,7 @@ extern "C" {
     #[doc = " List of provided contexts. Note that the index in this array is important, as the response will refer to it."]
     #[wasm_bindgen(method, getter)]
     pub fn contexts(this: &Ai_Cf_Baai_Bge_Reranker_Base_Input) -> Vec<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_contexts(this: &Ai_Cf_Baai_Bge_Reranker_Base_Input, val: &[Object]);
 }
 impl Ai_Cf_Baai_Bge_Reranker_Base_Input {
@@ -21509,7 +21509,7 @@ extern "C" {
     pub type Ai_Cf_Baai_Bge_Reranker_Base_Output;
     #[wasm_bindgen(method, getter)]
     pub fn response(this: &Ai_Cf_Baai_Bge_Reranker_Base_Output) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_response(this: &Ai_Cf_Baai_Bge_Reranker_Base_Output, val: &[Object]);
 }
 impl Ai_Cf_Baai_Bge_Reranker_Base_Output {
@@ -21755,16 +21755,16 @@ extern "C" {
     #[doc = " An array of message objects representing the conversation history."]
     #[wasm_bindgen(method, getter)]
     pub fn messages(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages) -> Vec<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_messages(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages, val: &[Object]);
     #[wasm_bindgen(method, getter)]
     pub fn functions(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_functions(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages, val: &[Object]);
     #[doc = " A list of tools available for the assistant to use."]
     #[wasm_bindgen(method, getter)]
     pub fn tools(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages) -> Option<Vec<JsValue>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_tools(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages, val: &[JsValue]);
     #[wasm_bindgen(method, getter)]
     pub fn response_format(
@@ -21963,7 +21963,7 @@ extern "C" {
     #[doc = " An array of tool calls requests made during the response generation"]
     #[wasm_bindgen(method, getter)]
     pub fn tool_calls(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_tool_calls(this: &Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output, val: &[Object]);
 }
 impl Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Output {
@@ -22162,16 +22162,16 @@ extern "C" {
     #[doc = " An array of message objects representing the conversation history."]
     #[wasm_bindgen(method, getter)]
     pub fn messages(this: &Ai_Cf_Qwen_Qwq_32B_Messages) -> Vec<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_messages(this: &Ai_Cf_Qwen_Qwq_32B_Messages, val: &[Object]);
     #[wasm_bindgen(method, getter)]
     pub fn functions(this: &Ai_Cf_Qwen_Qwq_32B_Messages) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_functions(this: &Ai_Cf_Qwen_Qwq_32B_Messages, val: &[Object]);
     #[doc = " A list of tools available for the assistant to use."]
     #[wasm_bindgen(method, getter)]
     pub fn tools(this: &Ai_Cf_Qwen_Qwq_32B_Messages) -> Option<Vec<JsValue>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_tools(this: &Ai_Cf_Qwen_Qwq_32B_Messages, val: &[JsValue]);
     #[doc = " JSON schema that should be fulfilled for the response."]
     #[wasm_bindgen(method, getter)]
@@ -22319,7 +22319,7 @@ extern "C" {
     #[doc = " An array of tool calls requests made during the response generation"]
     #[wasm_bindgen(method, getter)]
     pub fn tool_calls(this: &Ai_Cf_Qwen_Qwq_32B_Output) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_tool_calls(this: &Ai_Cf_Qwen_Qwq_32B_Output, val: &[Object]);
 }
 impl Ai_Cf_Qwen_Qwq_32B_Output {
@@ -22534,7 +22534,7 @@ extern "C" {
     #[doc = " An array of message objects representing the conversation history."]
     #[wasm_bindgen(method, getter)]
     pub fn messages(this: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages) -> Vec<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_messages(
         this: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages,
         val: &[Object],
@@ -22543,7 +22543,7 @@ extern "C" {
     pub fn functions(
         this: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages,
     ) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_functions(
         this: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages,
         val: &[Object],
@@ -22553,7 +22553,7 @@ extern "C" {
     pub fn tools(
         this: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages,
     ) -> Option<Vec<JsValue>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_tools(
         this: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages,
         val: &[JsValue],
@@ -22736,7 +22736,7 @@ extern "C" {
     pub fn tool_calls(
         this: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output,
     ) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_tool_calls(
         this: &Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Output,
         val: &[Object],
@@ -22939,16 +22939,16 @@ extern "C" {
     #[doc = " An array of message objects representing the conversation history."]
     #[wasm_bindgen(method, getter)]
     pub fn messages(this: &Ai_Cf_Google_Gemma_3_12B_It_Messages) -> Vec<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_messages(this: &Ai_Cf_Google_Gemma_3_12B_It_Messages, val: &[Object]);
     #[wasm_bindgen(method, getter)]
     pub fn functions(this: &Ai_Cf_Google_Gemma_3_12B_It_Messages) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_functions(this: &Ai_Cf_Google_Gemma_3_12B_It_Messages, val: &[Object]);
     #[doc = " A list of tools available for the assistant to use."]
     #[wasm_bindgen(method, getter)]
     pub fn tools(this: &Ai_Cf_Google_Gemma_3_12B_It_Messages) -> Option<Vec<JsValue>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_tools(this: &Ai_Cf_Google_Gemma_3_12B_It_Messages, val: &[JsValue]);
     #[doc = " JSON schema that should be fulfilled for the response."]
     #[wasm_bindgen(method, getter)]
@@ -23097,7 +23097,7 @@ extern "C" {
     #[doc = " An array of tool calls requests made during the response generation"]
     #[wasm_bindgen(method, getter)]
     pub fn tool_calls(this: &Ai_Cf_Google_Gemma_3_12B_It_Output) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_tool_calls(this: &Ai_Cf_Google_Gemma_3_12B_It_Output, val: &[Object]);
 }
 impl Ai_Cf_Google_Gemma_3_12B_It_Output {
@@ -23369,19 +23369,19 @@ extern "C" {
     #[doc = " An array of message objects representing the conversation history."]
     #[wasm_bindgen(method, getter)]
     pub fn messages(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages) -> Vec<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_messages(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages, val: &[Object]);
     #[wasm_bindgen(method, getter)]
     pub fn functions(
         this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages,
     ) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_functions(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages, val: &[Object]);
     #[doc = " A list of tools available for the assistant to use."]
     #[wasm_bindgen(method, getter)]
     pub fn tools(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages)
         -> Option<Vec<JsValue>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_tools(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages, val: &[JsValue]);
     #[wasm_bindgen(method, getter)]
     pub fn response_format(
@@ -23553,7 +23553,7 @@ extern "C" {
     pub type Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch;
     #[wasm_bindgen(method, getter)]
     pub fn requests(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch) -> Vec<JsValue>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_requests(
         this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Async_Batch,
         val: &[JsValue],
@@ -23746,7 +23746,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn messages(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner)
         -> Vec<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_messages(
         this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner,
         val: &[Object],
@@ -23755,7 +23755,7 @@ extern "C" {
     pub fn functions(
         this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner,
     ) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_functions(
         this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner,
         val: &[Object],
@@ -23765,7 +23765,7 @@ extern "C" {
     pub fn tools(
         this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner,
     ) -> Option<Vec<JsValue>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_tools(
         this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner,
         val: &[JsValue],
@@ -23967,7 +23967,7 @@ extern "C" {
     pub fn tool_calls(
         this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output,
     ) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_tool_calls(this: &Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output, val: &[Object]);
 }
 impl Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Output {
@@ -24230,16 +24230,16 @@ extern "C" {
     #[doc = " An array of message objects representing the conversation history."]
     #[wasm_bindgen(method, getter)]
     pub fn messages(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages) -> Vec<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_messages(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages, val: &[Object]);
     #[wasm_bindgen(method, getter)]
     pub fn functions(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_functions(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages, val: &[Object]);
     #[doc = " A list of tools available for the assistant to use."]
     #[wasm_bindgen(method, getter)]
     pub fn tools(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages) -> Option<Vec<JsValue>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_tools(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages, val: &[JsValue]);
     #[wasm_bindgen(method, getter)]
     pub fn response_format(
@@ -24426,7 +24426,7 @@ extern "C" {
     pub type Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch;
     #[wasm_bindgen(method, getter)]
     pub fn requests(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch) -> Vec<JsValue>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_requests(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch, val: &[JsValue]);
 }
 impl Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Async_Batch {
@@ -24634,16 +24634,16 @@ extern "C" {
     #[doc = " An array of message objects representing the conversation history."]
     #[wasm_bindgen(method, getter)]
     pub fn messages(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1) -> Vec<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_messages(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1, val: &[Object]);
     #[wasm_bindgen(method, getter)]
     pub fn functions(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_functions(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1, val: &[Object]);
     #[doc = " A list of tools available for the assistant to use."]
     #[wasm_bindgen(method, getter)]
     pub fn tools(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1) -> Option<Vec<JsValue>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_tools(this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1, val: &[JsValue]);
     #[wasm_bindgen(method, getter)]
     pub fn response_format(
@@ -24855,7 +24855,7 @@ extern "C" {
     pub fn choices(
         this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response,
     ) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_choices(
         this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Chat_Completion_Response,
         val: &[Object],
@@ -24952,7 +24952,7 @@ extern "C" {
     pub fn choices(
         this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response,
     ) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_choices(
         this: &Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Text_Completion_Response,
         val: &[Object],
@@ -25556,11 +25556,11 @@ extern "C" {
     pub type Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output;
     #[wasm_bindgen(method, getter)]
     pub fn data(this: &Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output) -> Option<Vec<Array<Number>>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_data(this: &Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output, val: &[Array<Number>]);
     #[wasm_bindgen(method, getter)]
     pub fn shape(this: &Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output) -> Option<Vec<f64>>;
-    #[wasm_bindgen(method, setter)]
+    #[wasm_bindgen(method, setter, slice_to_array)]
     pub fn set_shape(this: &Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output, val: &[f64]);
 }
 impl Ai_Cf_Qwen_Qwen3_Embedding_0_6B_Output {
@@ -26413,13 +26413,13 @@ extern "C" {
     #[doc = " An array of message objects representing the conversation history."]
     #[wasm_bindgen(method, getter)]
     pub fn messages(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages) -> Vec<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_messages(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages, val: &[Object]);
     #[wasm_bindgen(method, getter)]
     pub fn functions(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages,
     ) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_functions(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages,
         val: &[Object],
@@ -26429,7 +26429,7 @@ extern "C" {
     pub fn tools(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages,
     ) -> Option<Vec<JsValue>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_tools(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages, val: &[JsValue]);
     #[wasm_bindgen(method, getter)]
     pub fn response_format(
@@ -26639,7 +26639,7 @@ extern "C" {
     pub type Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch;
     #[wasm_bindgen(method, getter)]
     pub fn requests(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch) -> Vec<JsValue>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_requests(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Async_Batch,
         val: &[JsValue],
@@ -26871,7 +26871,7 @@ extern "C" {
     #[doc = " An array of message objects representing the conversation history."]
     #[wasm_bindgen(method, getter)]
     pub fn messages(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1) -> Vec<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_messages(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1,
         val: &[Object],
@@ -26880,7 +26880,7 @@ extern "C" {
     pub fn functions(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1,
     ) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_functions(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1,
         val: &[Object],
@@ -26890,7 +26890,7 @@ extern "C" {
     pub fn tools(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1,
     ) -> Option<Vec<JsValue>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_tools(this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1, val: &[JsValue]);
     #[wasm_bindgen(method, getter)]
     pub fn response_format(
@@ -27146,7 +27146,7 @@ extern "C" {
     pub fn choices(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response,
     ) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_choices(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Chat_Completion_Response,
         val: &[Object],
@@ -27268,7 +27268,7 @@ extern "C" {
     pub fn choices(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_Response,
     ) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_choices(
         this: &Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Text_Completion_Response,
         val: &[Object],
@@ -27448,7 +27448,7 @@ extern "C" {
     #[doc = " Embedding vectors, where each vector is a list of floats."]
     #[wasm_bindgen(method, getter)]
     pub fn data(this: &Ai_Cf_Pfnet_Plamo_Embedding_1B_Output) -> Vec<Array<Number>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_data(this: &Ai_Cf_Pfnet_Plamo_Embedding_1B_Output, val: &[Array<Number>]);
     #[doc = " Shape of the embedding data as [number_of_embeddings, embedding_dimension]."]
     #[doc = ""]
@@ -27645,7 +27645,7 @@ extern "C" {
     #[doc = " The words in the transcript"]
     #[wasm_bindgen(method, getter)]
     pub fn words(this: &Ai_Cf_Deepgram_Flux_Output) -> Option<Vec<Object>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_words(this: &Ai_Cf_Deepgram_Flux_Output, val: &[Object]);
     #[doc = " Confidence that no more speech is coming in this turn"]
     #[wasm_bindgen(method, getter)]
@@ -28768,7 +28768,7 @@ extern "C" {
     pub fn set_tags(this: &AiModelsSearchObject, val: &[String]);
     #[wasm_bindgen(method, getter)]
     pub fn properties(this: &AiModelsSearchObject) -> Vec<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_properties(this: &AiModelsSearchObject, val: &[Object]);
 }
 impl AiModelsSearchObject {
@@ -28969,23 +28969,23 @@ extern "C" {
     pub fn try_to_markdown<AiModelList: ::wasm_bindgen::JsGeneric>(
         this: &Ai<AiModelList>,
     ) -> Result<ToMarkdownService, JsValue>;
-    #[wasm_bindgen(method, slice_to_array, js_name = "toMarkdown")]
+    #[wasm_bindgen(method, js_name = "toMarkdown")]
     pub fn to_markdown_with_slice<AiModelList: ::wasm_bindgen::JsGeneric>(
         this: &Ai<AiModelList>,
         files: &[MarkdownDocument],
     ) -> ToMarkdownService;
-    #[wasm_bindgen(method, catch, slice_to_array, js_name = "toMarkdown")]
+    #[wasm_bindgen(method, catch, js_name = "toMarkdown")]
     pub fn try_to_markdown_with_slice<AiModelList: ::wasm_bindgen::JsGeneric>(
         this: &Ai<AiModelList>,
         files: &[MarkdownDocument],
     ) -> Result<ToMarkdownService, JsValue>;
-    #[wasm_bindgen(method, slice_to_array, js_name = "toMarkdown")]
+    #[wasm_bindgen(method, js_name = "toMarkdown")]
     pub fn to_markdown_with_slice_and_options<AiModelList: ::wasm_bindgen::JsGeneric>(
         this: &Ai<AiModelList>,
         files: &[MarkdownDocument],
         options: &ConversionRequestOptions,
     ) -> ToMarkdownService;
-    #[wasm_bindgen(method, catch, slice_to_array, js_name = "toMarkdown")]
+    #[wasm_bindgen(method, catch, js_name = "toMarkdown")]
     pub fn try_to_markdown_with_slice_and_options<AiModelList: ::wasm_bindgen::JsGeneric>(
         this: &Ai<AiModelList>,
         files: &[MarkdownDocument],
@@ -29677,7 +29677,7 @@ extern "C" {
         this: &AiGateway,
         data: &AIGatewayUniversalRequest,
     ) -> Result<Response, JsValue>;
-    #[wasm_bindgen(method, catch, slice_to_array, js_name = "run")]
+    #[wasm_bindgen(method, catch, js_name = "run")]
     pub async fn run_with_slice(
         this: &AiGateway,
         data: &[AIGatewayUniversalRequest],
@@ -29688,7 +29688,7 @@ extern "C" {
         data: &AIGatewayUniversalRequest,
         options: &AiGatewayOptions,
     ) -> Result<Response, JsValue>;
-    #[wasm_bindgen(method, catch, slice_to_array, js_name = "run")]
+    #[wasm_bindgen(method, catch, js_name = "run")]
     pub async fn run_with_slice_and_options(
         this: &AiGateway,
         data: &[AIGatewayUniversalRequest],
@@ -29983,7 +29983,7 @@ extern "C" {
     pub fn set_type(this: &CompoundFilter, val: CompoundFilterTypeKind);
     #[wasm_bindgen(method, getter)]
     pub fn filters(this: &CompoundFilter) -> Vec<ComparisonFilter>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_filters(this: &CompoundFilter, val: &[ComparisonFilter]);
 }
 impl CompoundFilter {
@@ -30155,7 +30155,7 @@ extern "C" {
     pub fn set_search_query(this: &AutoRagSearchResponse, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn data(this: &AutoRagSearchResponse) -> Vec<Object>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_data(this: &AutoRagSearchResponse, val: &[Object]);
     #[wasm_bindgen(method, getter)]
     pub fn has_more(this: &AutoRagSearchResponse) -> bool;
@@ -30784,7 +30784,7 @@ extern "C" {
     pub fn draw(
         this: &RequestInitCfPropertiesImage,
     ) -> Option<Vec<RequestInitCfPropertiesImageDraw>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_draw(this: &RequestInitCfPropertiesImage, val: &[RequestInitCfPropertiesImageDraw]);
     #[doc = " Fetching image from authenticated origin. Setting this property will"]
     #[doc = " pass authentication headers (Authorization, Cookie, etc.) through to"]
@@ -31754,7 +31754,7 @@ extern "C" {
     #[doc = " List of IDs that correlate to the Bot Management heuristic detections made on a request (you can have multiple heuristic detections on the same request)."]
     #[wasm_bindgen(method, getter, js_name = "detectionIds")]
     pub fn detection_ids(this: &IncomingRequestCfPropertiesBotManagementBase) -> Vec<f64>;
-    #[wasm_bindgen(method, setter, js_name = "detectionIds")]
+    #[wasm_bindgen(method, setter, slice_to_array, js_name = "detectionIds")]
     pub fn set_detection_ids(this: &IncomingRequestCfPropertiesBotManagementBase, val: &[f64]);
 }
 impl IncomingRequestCfPropertiesBotManagementBase {
@@ -33160,7 +33160,7 @@ extern "C" {
     pub type D1Result<T: ::wasm_bindgen::JsGeneric>;
     #[wasm_bindgen(method, getter)]
     pub fn results<T: ::wasm_bindgen::JsGeneric>(this: &D1Result<T>) -> Vec<T>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_results<T: ::wasm_bindgen::JsGeneric>(this: &D1Result<T>, val: &[T]);
 }
 impl<T: ::wasm_bindgen::JsGeneric> D1Result<T> {
@@ -33209,7 +33209,7 @@ extern "C" {
     pub fn prepare(this: &D1Database, query: &str) -> D1PreparedStatement;
     #[wasm_bindgen(method, catch, js_name = "prepare")]
     pub fn try_prepare(this: &D1Database, query: &str) -> Result<D1PreparedStatement, JsValue>;
-    #[wasm_bindgen(method, catch, slice_to_array)]
+    #[wasm_bindgen(method, catch)]
     pub async fn batch<T: ::wasm_bindgen::JsGeneric>(
         this: &D1Database,
         statements: &[D1PreparedStatement],
@@ -33286,7 +33286,7 @@ extern "C" {
         this: &D1DatabaseSession,
         query: &str,
     ) -> Result<D1PreparedStatement, JsValue>;
-    #[wasm_bindgen(method, catch, slice_to_array)]
+    #[wasm_bindgen(method, catch)]
     pub async fn batch<T: ::wasm_bindgen::JsGeneric>(
         this: &D1DatabaseSession,
         statements: &[D1PreparedStatement],
@@ -33307,9 +33307,9 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type D1PreparedStatement;
-    #[wasm_bindgen(method, variadic, slice_to_array)]
+    #[wasm_bindgen(method, variadic)]
     pub fn bind(this: &D1PreparedStatement, values: &[JsValue]) -> D1PreparedStatement;
-    #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "bind")]
+    #[wasm_bindgen(method, variadic, catch, js_name = "bind")]
     pub fn try_bind(
         this: &D1PreparedStatement,
         values: &[JsValue],
@@ -33761,7 +33761,7 @@ extern "C" {
     pub fn set_html(this: &SendEmailBuilder, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn attachments(this: &SendEmailBuilder) -> Option<Vec<EmailAttachment>>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_attachments(this: &SendEmailBuilder, val: &[EmailAttachment]);
 }
 impl SendEmailBuilder {
@@ -33915,9 +33915,9 @@ pub mod cloudflare {
             # [wasm_bindgen (extends = Object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type NodeStyleServer;
-            #[wasm_bindgen(method, variadic, slice_to_array)]
+            #[wasm_bindgen(method, variadic)]
             pub fn listen(this: &NodeStyleServer, args: &[JsValue]) -> JsValue;
-            #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "listen")]
+            #[wasm_bindgen(method, variadic, catch, js_name = "listen")]
             pub fn try_listen(this: &NodeStyleServer, args: &[JsValue])
                 -> Result<JsValue, JsValue>;
             #[wasm_bindgen(method)]
@@ -33991,7 +33991,7 @@ pub mod cloudflare {
             #[doc = " * `metadata` - Information about the specific pipeline calling the transformation entrypoint"]
             #[doc = ""]
             #[doc = " Returns: A promise containing the transformed PipelineRecord array"]
-            #[wasm_bindgen(method, catch, slice_to_array)]
+            #[wasm_bindgen(method, catch)]
             pub async fn run<
                 Env: ::wasm_bindgen::JsGeneric,
                 I: ::wasm_bindgen::JsGeneric,
@@ -34034,7 +34034,7 @@ pub mod cloudflare {
             #[doc = " The Pipeline interface represents the type of a binding to a Pipeline"]
             #[doc = ""]
             #[doc = " * `records` - The records to send to the pipeline"]
-            #[wasm_bindgen(method, catch, slice_to_array)]
+            #[wasm_bindgen(method, catch)]
             pub async fn send<T: ::wasm_bindgen::JsGeneric>(
                 this: &Pipeline<T>,
                 records: &[T],
@@ -34935,7 +34935,7 @@ extern "C" {
     pub type ImageList;
     #[wasm_bindgen(method, getter)]
     pub fn images(this: &ImageList) -> Vec<ImageMetadata>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_images(this: &ImageList, val: &[ImageMetadata]);
     #[wasm_bindgen(method, getter)]
     pub fn cursor(this: &ImageList) -> Option<String>;
@@ -36418,12 +36418,12 @@ pub mod cloudflare_workers_module {
             this: &WorkerEntrypoint<Env, Props>,
             controller: &super::ScheduledController,
         ) -> Result<Option<Promise<Undefined>>, JsValue>;
-        #[wasm_bindgen(method, slice_to_array)]
+        #[wasm_bindgen(method)]
         pub fn tail<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
             events: &[super::TraceItem],
         ) -> Option<Promise<Undefined>>;
-        #[wasm_bindgen(method, catch, slice_to_array, js_name = "tail")]
+        #[wasm_bindgen(method, catch, js_name = "tail")]
         pub fn try_tail<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
             events: &[super::TraceItem],
@@ -36448,12 +36448,12 @@ pub mod cloudflare_workers_module {
             this: &WorkerEntrypoint<Env, Props>,
             controller: &super::TestController,
         ) -> Result<Option<Promise<Undefined>>, JsValue>;
-        #[wasm_bindgen(method, slice_to_array)]
+        #[wasm_bindgen(method)]
         pub fn trace<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
             traces: &[super::TraceItem],
         ) -> Option<Promise<Undefined>>;
-        #[wasm_bindgen(method, catch, slice_to_array, js_name = "trace")]
+        #[wasm_bindgen(method, catch, js_name = "trace")]
         pub fn try_trace<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
             this: &WorkerEntrypoint<Env, Props>,
             traces: &[super::TraceItem],
@@ -37175,7 +37175,7 @@ extern "C" {
     #[doc = " Origins allowed to display the video."]
     #[wasm_bindgen(method, getter, js_name = "allowedOrigins")]
     pub fn allowed_origins(this: &StreamVideo) -> Array<JsString>;
-    #[wasm_bindgen(method, setter, slice_to_array, js_name = "allowedOrigins")]
+    #[wasm_bindgen(method, setter, js_name = "allowedOrigins")]
     pub fn set_allowed_origins(this: &StreamVideo, val: &Array<JsString>);
     #[doc = " Indicates whether signed URLs are required."]
     #[wasm_bindgen(method, getter, js_name = "requireSignedURLs")]
@@ -37633,7 +37633,7 @@ extern "C" {
     #[doc = " Lists the origins allowed to display the video."]
     #[wasm_bindgen(method, getter, js_name = "allowedOrigins")]
     pub fn allowed_origins(this: &StreamDirectUploadCreateParams) -> Option<Array<JsString>>;
-    #[wasm_bindgen(method, setter, slice_to_array, js_name = "allowedOrigins")]
+    #[wasm_bindgen(method, setter, js_name = "allowedOrigins")]
     pub fn set_allowed_origins(this: &StreamDirectUploadCreateParams, val: &Array<JsString>);
     #[doc = " Indicates whether the video can be accessed using the id. When set to `true`,"]
     #[doc = " a signed token must be generated with a signing key to view the video."]
@@ -37739,7 +37739,7 @@ extern "C" {
     #[doc = " video to be viewed on any origin."]
     #[wasm_bindgen(method, getter, js_name = "allowedOrigins")]
     pub fn allowed_origins(this: &StreamUrlUploadParams) -> Option<Array<JsString>>;
-    #[wasm_bindgen(method, setter, slice_to_array, js_name = "allowedOrigins")]
+    #[wasm_bindgen(method, setter, js_name = "allowedOrigins")]
     pub fn set_allowed_origins(this: &StreamUrlUploadParams, val: &Array<JsString>);
     #[doc = " A user-defined identifier for the media creator."]
     #[wasm_bindgen(method, getter)]
@@ -38126,7 +38126,7 @@ extern "C" {
     #[doc = " video to be viewed on any origin."]
     #[wasm_bindgen(method, getter, js_name = "allowedOrigins")]
     pub fn allowed_origins(this: &StreamUpdateVideoParams) -> Option<Array<JsString>>;
-    #[wasm_bindgen(method, setter, slice_to_array, js_name = "allowedOrigins")]
+    #[wasm_bindgen(method, setter, js_name = "allowedOrigins")]
     pub fn set_allowed_origins(this: &StreamUpdateVideoParams, val: &Array<JsString>);
     #[doc = " A user-defined identifier for the media creator."]
     #[wasm_bindgen(method, getter)]
@@ -39225,12 +39225,12 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ToMarkdownService;
-    #[wasm_bindgen(method, catch, slice_to_array)]
+    #[wasm_bindgen(method, catch)]
     pub async fn transform(
         this: &ToMarkdownService,
         files: &[MarkdownDocument],
     ) -> Result<Array<ConversionResponse>, JsValue>;
-    #[wasm_bindgen(method, catch, slice_to_array, js_name = "transform")]
+    #[wasm_bindgen(method, catch, js_name = "transform")]
     pub async fn transform_with_slice_and_options(
         this: &ToMarkdownService,
         files: &[MarkdownDocument],
@@ -40274,7 +40274,7 @@ extern "C" {
     pub fn set_values(this: &VectorizeVector, val: &Float32Array);
     #[wasm_bindgen(method, setter, js_name = "values")]
     pub fn set_values_with_float64_array(this: &VectorizeVector, val: &Float64Array);
-    #[wasm_bindgen(method, setter, js_name = "values")]
+    #[wasm_bindgen(method, setter, slice_to_array, js_name = "values")]
     pub fn set_values_with_slice(this: &VectorizeVector, val: &[f64]);
     #[doc = " The namespace this vector belongs to."]
     #[wasm_bindgen(method, getter)]
@@ -40370,7 +40370,7 @@ extern "C" {
     pub type VectorizeMatches;
     #[wasm_bindgen(method, getter)]
     pub fn matches(this: &VectorizeMatches) -> Vec<VectorizeMatch>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_matches(this: &VectorizeMatches, val: &[VectorizeMatch]);
     #[wasm_bindgen(method, getter)]
     pub fn count(this: &VectorizeMatches) -> f64;
@@ -40464,7 +40464,7 @@ extern "C" {
     #[doc = " * `options` - Configuration options to massage the returned data."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with matched and scored vectors."]
-    #[wasm_bindgen(method, catch, js_name = "query")]
+    #[wasm_bindgen(method, catch, slice_to_array, js_name = "query")]
     pub async fn query_with_slice(
         this: &VectorizeIndex,
         vector: &[f64],
@@ -40499,7 +40499,7 @@ extern "C" {
     #[doc = " * `options` - Configuration options to massage the returned data."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with matched and scored vectors."]
-    #[wasm_bindgen(method, catch, js_name = "query")]
+    #[wasm_bindgen(method, catch, slice_to_array, js_name = "query")]
     pub async fn query_with_slice_and_options(
         this: &VectorizeIndex,
         vector: &[f64],
@@ -40510,7 +40510,7 @@ extern "C" {
     #[doc = " * `vectors` - List of vectors that will be inserted."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with the ids & count of records that were successfully processed."]
-    #[wasm_bindgen(method, catch, slice_to_array)]
+    #[wasm_bindgen(method, catch)]
     pub async fn insert(
         this: &VectorizeIndex,
         vectors: &[VectorizeVector],
@@ -40520,7 +40520,7 @@ extern "C" {
     #[doc = " * `vectors` - List of vectors that will be upserted."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with the ids & count of records that were successfully processed."]
-    #[wasm_bindgen(method, catch, slice_to_array)]
+    #[wasm_bindgen(method, catch)]
     pub async fn upsert(
         this: &VectorizeIndex,
         vectors: &[VectorizeVector],
@@ -40584,7 +40584,7 @@ extern "C" {
     #[doc = " * `options` - Configuration options to massage the returned data."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with matched and scored vectors."]
-    #[wasm_bindgen(method, catch, js_name = "query")]
+    #[wasm_bindgen(method, catch, slice_to_array, js_name = "query")]
     pub async fn query_with_slice(
         this: &Vectorize,
         vector: &[f64],
@@ -40619,7 +40619,7 @@ extern "C" {
     #[doc = " * `options` - Configuration options to massage the returned data."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with matched and scored vectors."]
-    #[wasm_bindgen(method, catch, js_name = "query")]
+    #[wasm_bindgen(method, catch, slice_to_array, js_name = "query")]
     pub async fn query_with_slice_and_options(
         this: &Vectorize,
         vector: &[f64],
@@ -40653,7 +40653,7 @@ extern "C" {
     #[doc = " * `vectors` - List of vectors that will be inserted."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with a unique identifier of a mutation containing the insert changeset."]
-    #[wasm_bindgen(method, catch, slice_to_array)]
+    #[wasm_bindgen(method, catch)]
     pub async fn insert(
         this: &Vectorize,
         vectors: &[VectorizeVector],
@@ -40663,7 +40663,7 @@ extern "C" {
     #[doc = " * `vectors` - List of vectors that will be upserted."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with a unique identifier of a mutation containing the upsert changeset."]
-    #[wasm_bindgen(method, catch, slice_to_array)]
+    #[wasm_bindgen(method, catch)]
     pub async fn upsert(
         this: &Vectorize,
         vectors: &[VectorizeVector],
@@ -40942,7 +40942,7 @@ extern "C" {
     #[doc = " * `batch` - List of Options when creating an instance including name and params"]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with a list of handles for the created instances."]
-    #[wasm_bindgen(method, catch, slice_to_array, js_name = "createBatch")]
+    #[wasm_bindgen(method, catch, js_name = "createBatch")]
     pub async fn create_batch<PARAMS: ::wasm_bindgen::JsGeneric>(
         this: &Workflow<PARAMS>,
         batch: &[WorkflowInstanceCreateOptions<PARAMS>],

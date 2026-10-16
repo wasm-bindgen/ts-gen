@@ -225,7 +225,7 @@ extern "C" {
     pub fn set_value(this: &TreeNode, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn children(this: &TreeNode) -> Vec<TreeNode>;
-    #[wasm_bindgen(method, setter, slice_to_array)]
+    #[wasm_bindgen(method, setter)]
     pub fn set_children(this: &TreeNode, val: &[TreeNode]);
     #[wasm_bindgen(method, getter)]
     pub fn parent(this: &TreeNode) -> Option<TreeNode>;
@@ -382,9 +382,9 @@ extern "C" {
         event: &str,
         listener: &Function,
     ) -> Result<JsValue, JsValue>;
-    #[wasm_bindgen(method, variadic, slice_to_array)]
+    #[wasm_bindgen(method, variadic)]
     pub fn emit(this: &EventEmitter, event: &str, args: &[JsValue]) -> bool;
-    #[wasm_bindgen(method, variadic, catch, slice_to_array, js_name = "emit")]
+    #[wasm_bindgen(method, variadic, catch, js_name = "emit")]
     pub fn try_emit(this: &EventEmitter, event: &str, args: &[JsValue]) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "removeAllListeners")]
     pub fn remove_all_listeners(this: &EventEmitter) -> JsValue;

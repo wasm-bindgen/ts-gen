@@ -110,9 +110,9 @@ extern "C" {
     pub fn modes(this: &Probe, ms: &[String]) -> Vec<String>;
     #[wasm_bindgen(method, catch, slice_to_array, js_name = "modes")]
     pub fn try_modes(this: &Probe, ms: &[String]) -> Result<Vec<String>, JsValue>;
-    #[wasm_bindgen(method, slice_to_array, js_name = "modeArray")]
+    #[wasm_bindgen(method, js_name = "modeArray")]
     pub fn mode_array(this: &Probe, ms: &Array<JsString>) -> Array<JsString>;
-    #[wasm_bindgen(method, catch, slice_to_array, js_name = "modeArray")]
+    #[wasm_bindgen(method, catch, js_name = "modeArray")]
     pub fn try_mode_array(this: &Probe, ms: &Array<JsString>) -> Result<Array<JsString>, JsValue>;
     #[wasm_bindgen(method, js_name = "onMode")]
     pub fn on_mode(this: &Probe, cb: &Function<fn(JsString) -> Number>);

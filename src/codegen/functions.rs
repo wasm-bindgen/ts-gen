@@ -112,7 +112,7 @@ fn generate_expanded_free_function(
     if sig.catch {
         wb_parts.push(quote! { catch });
     }
-    if super::typemap::needs_slice_to_array(&sig.params) {
+    if super::typemap::needs_slice_to_array(&sig.params, cgctx, scope) {
         wb_parts.push(quote! { slice_to_array });
     }
     if super::typemap::needs_js_name(&rust_ident, &sig.js_name) {
