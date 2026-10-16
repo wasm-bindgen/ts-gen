@@ -172,6 +172,9 @@ fn register_type(
         scope_id: scope,
         exported,
     });
+    if exported && matches!(ctx, ir::ModuleContext::Module(_)) {
+        gctx.exports.insert(scope, name, name);
+    }
     gctx.scopes.insert(scope, name_str, type_id);
 }
 

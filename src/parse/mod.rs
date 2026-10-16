@@ -346,7 +346,16 @@ fn bind_import(
             .insert_namespace(import.scope, import.local_name.clone(), target);
         return true;
     }
-    let name = &import.original_name;
+    // An import names an export, which the module's export map binds to a
+    // local name; they differ for `export { local as public }`. A module
+    // with no recorded exports (a `declare module` body without `export`
+    // statements) exposes every declaration under its own name.
+    let name = match gctx.exports.local_name(target, &import.original_name) {
+        Some(local) => local.to_string(),
+        None if gctx.exports.has_exports(target) => return false,
+        None => import.original_name.clone(),
+    };
+    let name = &name;
     let (type_id, members) = if own_only {
         let scope = gctx.scopes.get(target);
         (scope.get(name), scope.namespace(name))
@@ -1151,6 +1160,60 @@ mod tests {
             assert!(declared.is_some());
             assert_eq!(gctx.scopes.resolve(user_scope, name), declared);
         }
+    }
+
+    #[test]
+    fn export_map_binds_imports_to_the_exported_local() {
+        let dir = std::env::temp_dir().join(format!("ts-gen-export-map-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let decls = dir.join("decls.d.ts");
+        std::fs::write(
+            &decls,
+            r#"
+                declare module "dep" {
+                    class _Foo { bar(): void; }
+                    export { _Foo as Foo };
+                    export default class Def {}
+                    function hidden(): void;
+                }
+                declare module "bare" {
+                    class Open {}
+                }
+                declare module "main" {
+                    import { Foo } from "dep";
+                    import Def from "dep";
+                    import * as D from "dep";
+                    import { Open } from "bare";
+                }
+            "#,
+        )
+        .unwrap();
+        let result = parse_dts_files(&[&decls], None);
+        std::fs::remove_dir_all(&dir).unwrap();
+        let (_, gctx) = result.unwrap();
+
+        let dep = gctx.ambient_module_scopes["dep"][0];
+        let bare = gctx.ambient_module_scopes["bare"][0];
+        let main = gctx.ambient_module_scopes["main"][0];
+        assert_eq!(gctx.exports.local_name(dep, "Foo"), Some("_Foo"));
+        assert_eq!(gctx.exports.local_name(dep, "default"), Some("Def"));
+        assert!(gctx.exports.is_exported(dep, "_Foo"));
+        assert!(!gctx.exports.is_exported(dep, "hidden"));
+        // No `export` statements: everything is reachable.
+        assert!(!gctx.exports.has_exports(bare));
+        assert!(gctx.exports.is_exported(bare, "Open"));
+
+        let class_name = |id| match &gctx.get_type(id).kind {
+            TypeKind::Class(c) => c.name.clone(),
+            other => panic!("expected a class, got {other:?}"),
+        };
+        let resolve = |path: &str| gctx.resolve_path(main, path).map(class_name);
+        assert_eq!(resolve("Foo").as_deref(), Some("_Foo"));
+        assert_eq!(resolve("Def").as_deref(), Some("Def"));
+        assert_eq!(resolve("D.Foo").as_deref(), Some("_Foo"));
+        assert_eq!(resolve("D.default").as_deref(), Some("Def"));
+        assert_eq!(resolve("D._Foo"), None, "a local is not an export");
+        assert_eq!(resolve("Open").as_deref(), Some("Open"));
     }
 
     #[test]

@@ -146,6 +146,11 @@ impl<'a> CollectCtx<'a> {
                 for spec in &export.specifiers {
                     let exported_name = spec.exported.name().to_string();
                     let imported = spec.local.name().to_string();
+                    // The re-export binds the public name locally once the
+                    // import resolves, so it is exported under itself.
+                    self.gctx
+                        .exports
+                        .insert(scope, &exported_name, &exported_name);
                     self.register_import(&exported_name, &imported, &source, scope);
                 }
             }
@@ -153,6 +158,7 @@ impl<'a> CollectCtx<'a> {
                 for spec in &export.specifiers {
                     let exported_name = spec.exported.name().to_string();
                     let local = spec.local.name().to_string();
+                    self.gctx.exports.insert(scope, &exported_name, &local);
                     if exported_name != local {
                         self.export_specifiers.push((scope, local, exported_name));
                     }
@@ -162,6 +168,7 @@ impl<'a> CollectCtx<'a> {
                 ast::ExportDefaultDeclarationKind::ClassDeclaration(class) => {
                     if let Some(ref id) = class.id {
                         self.register_type(&id.name, ir::RegisteredKind::Class, ctx, scope, true);
+                        self.gctx.exports.insert(scope, "default", id.name.as_str());
                     }
                 }
                 ast::ExportDefaultDeclarationKind::FunctionDeclaration(func) => {
@@ -173,6 +180,7 @@ impl<'a> CollectCtx<'a> {
                             scope,
                             true,
                         );
+                        self.gctx.exports.insert(scope, "default", id.name.as_str());
                     }
                 }
                 other => {
@@ -493,6 +501,9 @@ impl<'a> CollectCtx<'a> {
         self.gctx
             .scopes
             .insert_namespace(scope, name.to_string(), ns_scope);
+        if exported && matches!(ctx, ir::ModuleContext::Module(_)) {
+            self.gctx.exports.insert(scope, name, name);
+        }
         // A same-named class, function or interface stays the name's type.
         if self.gctx.scopes.get(scope).get(name).is_some() {
             return ns_scope;

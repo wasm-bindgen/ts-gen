@@ -58,3 +58,31 @@ extern "C" {
 }
 #[allow(dead_code)]
 pub type Alias = _Foo;
+#[wasm_bindgen(module = "module-file-locals")]
+extern "C" {
+    pub fn ren();
+}
+#[wasm_bindgen(module = "module-file-locals")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "ren")]
+    pub fn try_ren() -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "module-file-locals")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Hidden;
+    #[wasm_bindgen(method)]
+    pub fn m(this: &Hidden);
+    #[wasm_bindgen(method, catch, js_name = "m")]
+    pub fn try_m(this: &Hidden) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "module-file-locals")]
+extern "C" {
+    pub fn reveal() -> Hidden;
+}
+#[wasm_bindgen(module = "module-file-locals")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "reveal")]
+    pub fn try_reveal() -> Result<Hidden, JsValue>;
+}

@@ -1382,11 +1382,17 @@ fn emit_type_name(
                 return quote! { #ident };
             }
         }
+        // The Rust ident is the declaration's own name: an import bound
+        // through `export { _Foo as Foo }` is referred to as `Foo` but
+        // emitted as `_Foo`.
+        let declared = resolved
+            .and_then(|id| type_decl_name(&ctx.gctx.get_type(id).kind))
+            .unwrap_or(ident_name);
         let rust_name = ctx
             .renamed_locals
-            .get(ident_name)
+            .get(declared)
             .map(String::as_str)
-            .unwrap_or(ident_name);
+            .unwrap_or(declared);
         let ident = make_ident(rust_name);
         let qualifier = match resolved {
             Some(id) => ctx.namespace_qualifier(id),

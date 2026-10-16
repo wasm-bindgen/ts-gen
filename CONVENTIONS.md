@@ -1904,6 +1904,44 @@ or `declare var _Foo` is still exported by name through
 and either way it merges and resolves with them rather than being a
 global the output never emits.
 
+### The export map
+
+Every module scope (a `--lib-name` file or a `declare module "x"` body)
+has an export map, built in phase 1 from each export form: `export
+declare X`, `export { local as public }`, `export { … } from "m"`,
+`export default X`. It plays the role ECMA-262's ResolveExport plays at
+link time, over a graph that is fully known up front.
+
+* **Imports name exports.** `import { Foo } from "dep"` and `D.Foo`
+  through `import * as D` look `Foo` up in `dep`'s export map and bind
+  the local it names (`_Foo`), so every indirection reaches the one
+  declaration and the Rust reference is its own name:
+
+  ```ts
+  declare module "dep" {
+    interface _Foo { bar(): void; }
+    var _Foo: { new (): _Foo };
+    export { _Foo as Foo };
+  }
+  declare module "main" {
+    import { Foo } from "dep";
+    export function take(f: Foo): Foo;
+  }
+  ```
+
+  ```rust
+  pub fn take(f: &_Foo) -> _Foo;
+  ```
+
+* **Only exports reach JS.** A value the module does not export has no
+  import to bind to: `import { helper } from "m"` is a link-time
+  `SyntaxError` when `m` has no such export, before any Rust runs. So an
+  unexported `declare function helper()` or `declare const secret` is
+  not emitted, and an unexported class keeps only its instance members,
+  which bind through a value rather than by importing the class.
+  Types are unaffected, as nothing imports them. A `declare module`
+  body with no `export` statements exposes every declaration.
+
 Qualification keys off the *resolved* declaration's `module_context`,
 not the textual name, so a global `interface Foo` and a module-scoped
 `class Foo` resolve independently — scope-chain resolution at the use

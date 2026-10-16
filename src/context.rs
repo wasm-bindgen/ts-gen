@@ -64,10 +64,71 @@ pub struct GlobalContext {
     /// Body scopes of every `declare module "x"`, by specifier, one per
     /// declaring file.
     pub ambient_module_scopes: std::collections::HashMap<String, Vec<ScopeId>>,
+    /// What each module scope exports, by public name.
+    pub exports: ModuleExports,
     types: Vec<TypeDeclaration>,
     modules: Vec<ParsedModule>,
     /// Map from module specifier to ModuleId for fast lookup.
     module_index: std::collections::HashMap<String, ModuleId>,
+}
+
+/// The export map of every module scope: a module file with `--lib-name`
+/// or a `declare module "x"` body. Like ECMA-262's ResolveExport over a
+/// fully known graph, it is built up front, so an import is a lookup by
+/// public name and a value is emitted only when the module exports it.
+///
+/// Each entry maps a public name to the local name it is bound to in the
+/// module scope; the two differ for `export { local as public }`.
+#[derive(Clone, Debug, Default)]
+pub struct ModuleExports {
+    by_scope: std::collections::HashMap<ScopeId, indexmap::IndexMap<String, String>>,
+}
+
+impl ModuleExports {
+    /// Record that `scope` exports its binding `local` as `public`.
+    pub fn insert(&mut self, scope: ScopeId, public: impl Into<String>, local: impl Into<String>) {
+        self.by_scope
+            .entry(scope)
+            .or_default()
+            .insert(public.into(), local.into());
+    }
+
+    /// Whether `scope` has any recorded exports. A script file or a
+    /// `declare module` body with no `export` statements has none, and all
+    /// of its declarations are reachable.
+    pub fn has_exports(&self, scope: ScopeId) -> bool {
+        self.by_scope.get(&scope).is_some_and(|m| !m.is_empty())
+    }
+
+    /// The local name `scope` binds its export `public` to.
+    pub fn local_name(&self, scope: ScopeId, public: &str) -> Option<&str> {
+        self.by_scope.get(&scope)?.get(public).map(String::as_str)
+    }
+
+    /// The public names `scope` exports its binding `local` under, in
+    /// source order.
+    pub fn public_names<'a>(
+        &'a self,
+        scope: ScopeId,
+        local: &'a str,
+    ) -> impl Iterator<Item = &'a str> + 'a {
+        self.by_scope
+            .get(&scope)
+            .into_iter()
+            .flat_map(|m| m.iter())
+            .filter(move |(_, l)| l.as_str() == local)
+            .map(|(p, _)| p.as_str())
+    }
+
+    /// Whether `scope` exports its binding `local` under any name. Reads
+    /// `true` for a scope with no recorded exports, where everything is
+    /// reachable.
+    pub fn is_exported(&self, scope: ScopeId, local: &str) -> bool {
+        match self.by_scope.get(&scope) {
+            Some(m) if !m.is_empty() => m.values().any(|l| l == local) || m.contains_key(local),
+            _ => true,
+        }
+    }
 }
 
 impl GlobalContext {
@@ -79,6 +140,7 @@ impl GlobalContext {
             pending_imports: Vec::new(),
             builtin_type_ids: std::collections::HashSet::new(),
             ambient_module_scopes: std::collections::HashMap::new(),
+            exports: ModuleExports::default(),
             types: Vec::new(),
             modules: Vec::new(),
             module_index: std::collections::HashMap::new(),
@@ -169,8 +231,23 @@ impl GlobalContext {
         };
         let mut namespaces = namespaces.split('.');
         let first = self.scopes.resolve_namespace(scope, namespaces.next()?)?;
-        let members = namespaces.try_fold(first, |ns, name| self.scopes.get(ns).namespace(name))?;
-        self.scopes.get(members).get(member)
+        let members = namespaces.try_fold(first, |ns, name| {
+            self.scopes.get(ns).namespace(self.member_name(ns, name)?)
+        })?;
+        self.scopes
+            .get(members)
+            .get(self.member_name(members, member)?)
+    }
+
+    /// The local name a member `public` of the scope `ns` is bound to. For
+    /// a module scope reached through `import * as A`, `A.Foo` names the
+    /// export `Foo`; a namespace scope has no export map and the name is
+    /// the member's own.
+    fn member_name<'n>(&'n self, ns: ScopeId, public: &'n str) -> Option<&'n str> {
+        if !self.exports.has_exports(ns) {
+            return Some(public);
+        }
+        self.exports.local_name(ns, public)
     }
 
     /// Iterate all types in the arena.
