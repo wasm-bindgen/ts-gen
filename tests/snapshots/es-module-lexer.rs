@@ -121,7 +121,7 @@ extern "C" {
     #[doc = " // Returns [['type', 'json'], ['integrity', 'sha384-...']]"]
     #[doc = " ```"]
     #[wasm_bindgen(method, getter)]
-    pub fn at(this: &ImportSpecifier) -> Option<Array<ArrayTuple<(JsString, JsString)>>>;
+    pub fn at(this: &ImportSpecifier) -> Option<Vec<ArrayTuple<(JsString, JsString)>>>;
 }
 impl ImportSpecifier {
     #[allow(clippy::new_without_default)]

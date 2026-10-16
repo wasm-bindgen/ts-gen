@@ -34,7 +34,7 @@ export declare class Probe {
   nextDetails(): Promise<Details<Mode>>;
   levels(ls: Level[]): Level[];
   modes(ms: Mode[]): Mode[];
-  modeArray(ms: Array<Mode>): Array<Mode>;
+  modeArray(ms: ArrayLike<Mode>): ArrayLike<Mode>;
   onMode(cb: (m: Mode) => Level): void;
   modeOrNumber(x: Mode | number): Mode | number;
   modeOrNumberOrString(x: Mode | number | string): void;

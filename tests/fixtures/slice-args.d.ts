@@ -39,3 +39,10 @@ export declare function floats(values?: number[] | Float64Array | null): string;
 // Slice modes are per-argument, so a `number[]` beside a typed-array
 // union doesn't turn the typed slice's copy into a plain `Array`.
 export declare function mixed(nums: number[], bytes: Uint8Array | number[]): string;
+
+// `Array<T>` / `ReadonlyArray<T>` are the same TS type as `T[]` and lower
+// identically. `ArrayLike<T>` is the distinct TS type that keeps the JS
+// array-handle form.
+export declare function spelled(values: Array<string>): string;
+export declare function spelled_readonly(values: ReadonlyArray<number>): string;
+export declare function array_like(values: ArrayLike<string>): string;

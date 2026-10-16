@@ -22,7 +22,7 @@ export declare class Probe {
   alias(m: ModeAlias): void;
   levels(ls: Level[]): Level[];
   modes(ms: Mode[]): Mode[];
-  modeArray(ms: Array<Mode>): Array<Mode>;
+  modeArray(ms: ArrayLike<Mode>): ArrayLike<Mode>;
   rest(...ms: Mode[]): void;
   onMode(cb: (m: Mode) => Level): void;
   nextMode(): Promise<Mode>;

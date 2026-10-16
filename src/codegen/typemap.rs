@@ -1122,12 +1122,12 @@ pub fn to_syn_type(
         // `to_syn_type`, bypassing the outer `maybe_ref` wrap so the
         // already-borrowed slice / `Vec<T>` shape isn't double-borrowed:
         //
-        // * `Array<T>` / `ReadonlyArray<T>` — lower to the JS-array
-        //   reference form (`&Array<U>` / `Array<U>`), distinct from
-        //   the syntactic `T[]` which keeps the Rust-slice form.
-        //   TS spelling drives the choice: callers who want a JS
-        //   array reference (no element-wise materialisation) write
-        //   `Array<T>`; callers who want a Rust slice write `T[]`.
+        // * `Array<T>` / `ReadonlyArray<T>` — parse normalises these to
+        //   `TypeRef::Array`, so a reference here is synthesised; it
+        //   delegates to the same `T[]` lowering. `ArrayLike<T>` is the
+        //   distinct TS type that lowers to the JS-array reference form
+        //   (`&Array<U>` / `Array<U>`), for callers who want to pass an
+        //   array handle with no element-wise materialisation.
         // * Bare references that resolve to a type alias whose target
         //   carries its own borrow shape (e.g. `string`, `T[]`,
         //   `Array<U>`) — recursing into the target re-runs
@@ -1137,11 +1137,32 @@ pub fn to_syn_type(
             segments,
             generic_args,
         } => {
-            if segments.len() == 1 && (segments[0] == "Array" || segments[0] == "ReadonlyArray") {
-                let inner = generic_args.first().cloned().unwrap_or(TypeRef::Any);
-                let base =
-                    generic_container(quote! { Array }, &inner, pos, ctx, scope, from_module);
-                return maybe_ref(base, borrow);
+            if segments.len() == 1 && !generic_args.is_empty() {
+                match segments[0].as_str() {
+                    "Array" | "ReadonlyArray" => {
+                        let inner = generic_args.first().cloned().unwrap();
+                        return to_syn_type(
+                            &TypeRef::Array(Box::new(inner)),
+                            pos,
+                            ctx,
+                            scope,
+                            from_module,
+                        );
+                    }
+                    "ArrayLike" => {
+                        let inner = generic_args.first().cloned().unwrap();
+                        let base = generic_container(
+                            quote! { Array },
+                            &inner,
+                            pos,
+                            ctx,
+                            scope,
+                            from_module,
+                        );
+                        return maybe_ref(base, borrow);
+                    }
+                    _ => {}
+                }
             }
             if segments.len() == 1 && generic_args.is_empty() {
                 if let Some(c) = ctx {
@@ -3423,9 +3444,18 @@ mod tests {
             lower(&TypeRef::generic("Promise", vec![region]), ret),
             "Promise < JsString >"
         );
+        // A synthesised `Array<T>` reference lowers like the
+        // parse-normalised `T[]`.
         assert_eq!(
             lower(
                 &TypeRef::generic("Array", vec![TypeRef::ident("Level")]),
+                arg
+            ),
+            "& [f64]"
+        );
+        assert_eq!(
+            lower(
+                &TypeRef::generic("ArrayLike", vec![TypeRef::ident("Level")]),
                 arg
             ),
             "& Array < Number >"

@@ -1289,15 +1289,13 @@ fn type_snake_name(ty: &TypeRef) -> String {
             .map_or_else(|| "js_value".to_string(), |u| u.suffix()),
         // Snake-case the leftmost (head) segment of any named
         // reference. Type args don't participate in `_with_` suffixes.
-        // `Array<T>` and `ReadonlyArray<T>` lower to `&Array<U>` /
-        // `Array<U>` — the JS-array reference form. Their suffix is
-        // `array`, matching what callers see in the rendered Rust
-        // type. The syntactic `T[]` (a `TypeRef::Array`) is the
-        // slice form and gets `slice`.
+        // A synthesised `Array<T>` / `ReadonlyArray<T>` reference
+        // lowers to the slice form like the parse-normalised
+        // `TypeRef::Array`, so it shares the `slice` suffix.
         TypeRef::Reference { segments, .. } => {
             let head = segments.first().map_or("", |s| s.as_str());
             if head == "Array" || head == "ReadonlyArray" {
-                return "array".to_string();
+                return "slice".to_string();
             }
             to_snake_case(head)
         }
