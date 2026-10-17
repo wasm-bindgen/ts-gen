@@ -92,22 +92,128 @@ pub type Chained<U> = Pair<U, U>;
 pub type Fetcher<T = Undefined> = Pair<T, T>;
 #[wasm_bindgen]
 extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Inner;
+    #[wasm_bindgen(method, getter)]
+    pub fn top(this: &Inner) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_top(this: &Inner, val: &str);
+}
+impl Inner {
+    pub fn new(top: &str) -> Inner {
+        let inner: Inner = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_top(top);
+        inner
+    }
+}
+pub mod ns {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , js_namespace = "Ns")]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Inner;
+        #[wasm_bindgen(method, getter)]
+        pub fn ns(this: &Inner) -> f64;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_ns(this: &Inner, val: f64);
+    }
+    impl Inner {
+        pub fn new(ns: f64) -> Inner {
+            let inner: Inner = JsCast::unchecked_into(js_sys::Object::new());
+            inner.set_ns(ns);
+            inner
+        }
+    }
+    #[allow(dead_code)]
+    pub type WithInner<X, T = Inner> = super::Pair<X, T>;
+    #[allow(dead_code)]
+    pub type Fetcher<T = Undefined> = super::Pair<T, T>;
+}
+#[wasm_bindgen]
+extern "C" {
     pub fn defaults(
-        a: &WithDefault<Number, JsString>,
+        a: &WithDefault<Number>,
         b: &Chained<Number>,
         c: &Pair<Undefined, Undefined>,
         d: &Fetcher<JsString>,
+        e: &ns::WithInner<JsString>,
+        f: &Pair<Undefined, Undefined>,
     );
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "defaults")]
     pub fn try_defaults(
-        a: &WithDefault<Number, JsString>,
+        a: &WithDefault<Number>,
         b: &Chained<Number>,
         c: &Pair<Undefined, Undefined>,
         d: &Fetcher<JsString>,
+        e: &ns::WithInner<JsString>,
+        f: &Pair<Undefined, Undefined>,
     ) -> Result<(), JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "defaultReturn")]
+    pub fn default_return() -> WithDefault<Number>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "defaultReturn")]
+    pub fn try_default_return() -> Result<WithDefault<Number>, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "skipReturn")]
+    pub fn skip_return() -> Skip<Number, Boolean>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "skipReturn")]
+    pub fn try_skip_return() -> Result<Skip<Number, Boolean>, JsValue>;
+}
+pub mod cf {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , js_namespace = "Cf")]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Env;
+        #[wasm_bindgen(method, getter)]
+        pub fn e(this: &Env) -> String;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_e(this: &Env, val: &str);
+    }
+    impl Env {
+        pub fn new(e: &str) -> Env {
+            let inner: Env = JsCast::unchecked_into(js_sys::Object::new());
+            inner.set_e(e);
+            inner
+        }
+    }
+}
+#[allow(dead_code)]
+pub type Handler = Function<fn(cf::Env) -> Undefined>;
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Color {
+    Red = "red",
+    Green = "green",
+}
+#[allow(dead_code)]
+pub type ColorAlias = Color;
+#[wasm_bindgen]
+extern "C" {
+    pub fn misc(handler: &Handler, color: ColorAlias);
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "misc")]
+    pub fn try_misc(handler: &Handler, color: ColorAlias) -> Result<(), JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {

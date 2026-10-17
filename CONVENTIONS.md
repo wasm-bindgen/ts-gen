@@ -2354,12 +2354,11 @@ through the namespace, in either declaration order.
   pub fn skip(value: &Skip<JsString, Boolean>) -> Erased;
   ```
 
-  An instantiation that leaves out defaulted parameters gets TS's
-  defaults filled in, earlier arguments substituted (`U = T`), before the
-  dropped parameters are skipped, and an alias named bare is its target with
-  the defaults substituted. The Rust alias keeps the defaults of its
-  trailing parameters for hand-written instantiations, unless one names a
-  dropped parameter:
+  The trailing kept parameters keep their lowered defaults, unless one
+  names a dropped parameter. An instantiation leaves an omitted argument to
+  that default, which resolves where the alias is declared; the use site
+  fills in the others with TS's defaults (`U = T` with `T` dropped). An
+  alias named bare is its target with the defaults substituted:
 
   ```ts
   type WithDefault<T, U = string> = Pair<T, U>;
@@ -2372,11 +2371,7 @@ through the namespace, in either declaration order.
   pub type WithDefault<T, U = JsString> = Pair<T, U>;
   pub type Chained<U> = Pair<U, U>;
   pub type Fetcher<T = Undefined> = Pair<T, T>;
-  pub fn defaults(
-      a: &WithDefault<Number, JsString>,
-      b: &Chained<Number>,
-      c: &Pair<Undefined, Undefined>,
-  );
+  pub fn defaults(a: &WithDefault<Number>, b: &Chained<Number>, c: &Pair<Undefined, Undefined>);
   ```
 * `export { Local as Public };` (sourceless) → names the binding `Local`
   declares in the exporting scope, recorded against its `TypeId` in

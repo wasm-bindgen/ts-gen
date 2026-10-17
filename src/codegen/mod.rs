@@ -750,32 +750,20 @@ fn generate_type_alias(
     // undeclared. Type aliases use plain `<T, U>` (no `JsGeneric`
     // bound) — they're erased at use-site monomorphisation. Parameters
     // the target doesn't mention are dropped, matching every use site.
-    // Use sites fill in TS's defaults themselves, so the Rust defaults are
-    // for hand-written instantiations: the trailing run of kept parameters
-    // whose defaults name no dropped parameter keeps them.
-    let kept = typemap::alias_params_mentioned(alias, &target);
-    let mut defaults = cgctx.alias_param_defaults(alias, from_module);
-    let mut trailing = true;
-    for i in (0..defaults.len()).rev().filter(|&i| kept[i]) {
-        trailing &= defaults[i].as_ref().is_some_and(|default| {
-            let mentioned = typemap::alias_params_mentioned(alias, default);
-            mentioned.iter().zip(&kept).all(|(&m, &k)| !m || k)
-        });
-        if !trailing {
-            defaults[i] = None;
-        }
-    }
+    let params = cgctx.alias_params(alias, from_module);
     let params = alias
         .type_params
         .iter()
-        .zip(defaults)
-        .zip(kept)
-        .filter(|(_, kept)| *kept)
-        .map(|((tp, default), _)| {
+        .enumerate()
+        .filter(|(i, _)| params.as_ref().is_none_or(|p| p.kept[*i]))
+        .map(|(i, tp)| {
             let ident = typemap::make_ident(&tp.name);
-            match default {
-                Some(default) => quote! { #ident = #default },
-                None => quote! { #ident },
+            match &tp.default {
+                Some(default) if params.as_ref().is_some_and(|p| p.defaulted[i]) => {
+                    let default = cgctx.alias_param_default(default, alias, from_module);
+                    quote! { #ident = #default }
+                }
+                _ => quote! { #ident },
             }
         })
         .collect::<Vec<_>>();

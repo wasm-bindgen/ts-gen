@@ -216,8 +216,21 @@ pub struct CodegenContext<'a> {
     /// offending pair keeps the output focused when many references
     /// point at the same unconfigured module.
     pub unresolved_module_refs: RefCell<HashSet<(String, String)>>,
-    /// [`Self::alias_params_used`], by alias.
-    alias_params_used: RefCell<HashMap<TypeId, Vec<bool>>>,
+    /// [`Self::alias_params`], by the alias's body scope.
+    alias_params: RefCell<HashMap<ScopeId, AliasParams>>,
+    /// The type parameters lowered while [`Self::alias_params`] probes an
+    /// alias, innermost probe last.
+    alias_param_mentions: RefCell<Vec<HashSet<String>>>,
+}
+
+/// How a local generic alias's type parameters carry over to the Rust
+/// alias; see [`CodegenContext::alias_params`].
+#[derive(Clone)]
+pub(crate) struct AliasParams {
+    /// Whether the Rust alias declares each parameter.
+    pub kept: Vec<bool>,
+    /// Whether each kept parameter has its default on the Rust alias.
+    pub defaulted: Vec<bool>,
 }
 
 /// Registry of synthesised dynamic-union enums, plus the bookkeeping
@@ -443,88 +456,135 @@ impl<'a> CodegenContext<'a> {
         )
     }
 
-    /// The Rust default of each of `alias`'s type parameters, lowered like
-    /// a generic argument at a use site so an instantiation that leaves it
-    /// out (`Fetcher<string>`) means what TS does.
-    pub(crate) fn alias_param_defaults(
+    /// The Rust default of a type parameter of `alias`, lowered in the
+    /// alias's scope like a generic argument at a use site.
+    pub(crate) fn alias_param_default(
+        &self,
+        default: &TypeRef,
+        alias: &ir::TypeAliasDecl,
+        from_module: &ModuleContext,
+    ) -> TokenStream {
+        if Self::generic_mono(Some(self)) {
+            to_mono_user_generic_arg(default, Some(self), alias.body_scope, from_module)
+        } else {
+            to_syn_type(
+                default,
+                TypePosition::ARGUMENT.to_inner(),
+                Some(self),
+                alias.body_scope,
+                from_module,
+            )
+        }
+    }
+
+    /// The type parameters of the alias being probed that `lower` emits.
+    fn mentioned_params(&self, lower: impl FnOnce()) -> HashSet<String> {
+        self.alias_param_mentions.borrow_mut().push(HashSet::new());
+        lower();
+        self.alias_param_mentions
+            .borrow_mut()
+            .pop()
+            .unwrap_or_default()
+    }
+
+    /// Which of a local generic alias's type parameters the Rust alias
+    /// keeps, and which keep their defaults.
+    ///
+    /// A Rust alias can't declare a parameter its target doesn't use
+    /// (E0091), and lowering can erase one (`Missing<T>` → `JsValue`,
+    /// `T & { b: B }` → `T`), so those are dropped from the declaration and
+    /// from every instantiation. The trailing kept parameters keep their
+    /// defaults, lowered in the alias's scope, unless one names a dropped
+    /// parameter.
+    pub(crate) fn alias_params(
         &self,
         alias: &ir::TypeAliasDecl,
         from_module: &ModuleContext,
-    ) -> Vec<Option<TokenStream>> {
-        alias
+    ) -> Option<AliasParams> {
+        if alias.type_params.is_empty() || alias.from_module.is_some() {
+            return None;
+        }
+        if let Some(params) = self.alias_params.borrow().get(&alias.body_scope) {
+            return Some(params.clone());
+        }
+        let n = alias.type_params.len();
+        // A recursive alias sees every parameter as kept, and passes every
+        // argument, while its own target is lowered.
+        self.alias_params.borrow_mut().insert(
+            alias.body_scope,
+            AliasParams {
+                kept: vec![true; n],
+                defaulted: vec![false; n],
+            },
+        );
+        // The declaration reports these lowerings' diagnostics when it's
+        // emitted.
+        let diagnostics = self.diagnostics.take();
+        let reported = self.unresolved_module_refs.borrow().clone();
+        let in_target = self.mentioned_params(|| {
+            self.alias_target(alias, from_module);
+        });
+        let in_defaults: Vec<Option<HashSet<String>>> = alias
             .type_params
             .iter()
             .map(|tp| {
                 let default = tp.default.as_ref()?;
-                Some(if Self::generic_mono(Some(self)) {
-                    to_mono_user_generic_arg(default, Some(self), alias.body_scope, from_module)
-                } else {
-                    to_syn_type(
-                        default,
-                        TypePosition::ARGUMENT.to_inner(),
-                        Some(self),
-                        alias.body_scope,
-                        from_module,
-                    )
-                })
+                Some(self.mentioned_params(|| {
+                    self.alias_param_default(default, alias, from_module);
+                }))
             })
-            .collect()
+            .collect();
+        self.diagnostics.replace(diagnostics);
+        self.unresolved_module_refs.replace(reported);
+        let kept: Vec<bool> = alias
+            .type_params
+            .iter()
+            .map(|tp| in_target.contains(&tp.name))
+            .collect();
+        let mut defaulted = vec![false; n];
+        for i in (0..n).rev().filter(|&i| kept[i]) {
+            let Some(mentions) = &in_defaults[i] else {
+                break;
+            };
+            let names_dropped = alias
+                .type_params
+                .iter()
+                .zip(&kept)
+                .any(|(tp, &kept)| !kept && mentions.contains(&tp.name));
+            if names_dropped {
+                break;
+            }
+            defaulted[i] = true;
+        }
+        let params = AliasParams { kept, defaulted };
+        self.alias_params
+            .borrow_mut()
+            .insert(alias.body_scope, params.clone());
+        Some(params)
     }
 
-    /// For the generic alias `name` resolves to, which of its type
-    /// parameters are kept. A Rust alias can't declare a parameter its
-    /// target doesn't use (E0091), and lowering can erase one
-    /// (`Missing<T>` → `JsValue`, `T & { b: B }` → `T`), so those are
-    /// dropped from the declaration and from every instantiation.
-    fn alias_params_used(&self, name: &str, scope: ScopeId) -> Option<Vec<bool>> {
+    /// The arguments an instantiation of the generic alias `name` resolves
+    /// to passes to the Rust alias. One the Rust alias has a default for is
+    /// left to it when omitted, along with every omitted one after it; TS's
+    /// defaults fill the others (`U = T` with `T` dropped), then the
+    /// parameters the alias drops are skipped.
+    fn alias_args(&self, name: &str, scope: ScopeId, args: &[TypeRef]) -> Option<Vec<TypeRef>> {
         let id = self.gctx.resolve_path(scope, name)?;
         let decl = self.gctx.get_type(id);
         let TypeKind::TypeAlias(alias) = &decl.kind else {
             return None;
         };
-        if alias.from_module.is_some() {
-            return None;
-        }
-        if let Some(used) = self.alias_params_used.borrow().get(&id) {
-            return Some(used.clone());
-        }
-        // A recursive alias sees every parameter as used while its own
-        // target is lowered.
-        self.alias_params_used
-            .borrow_mut()
-            .insert(id, vec![true; alias.type_params.len()]);
-        // The declaration reports this lowering's diagnostics when it's
-        // emitted.
-        let diagnostics = self.diagnostics.take();
-        let reported = self.unresolved_module_refs.borrow().clone();
-        let target = self.alias_target(alias, &decl.module_context);
-        self.diagnostics.replace(diagnostics);
-        self.unresolved_module_refs.replace(reported);
-        let used = alias_params_mentioned(alias, &target);
-        self.alias_params_used.borrow_mut().insert(id, used.clone());
-        Some(used)
-    }
-
-    /// The arguments an instantiation of the generic alias `name` resolves
-    /// to passes to the Rust alias: TS's defaults fill those it leaves out,
-    /// then the parameters the alias drops are skipped. The Rust alias's own
-    /// defaults can't always stand in, since one naming a dropped parameter
-    /// (`U = T` with `T` unused) has nowhere to go.
-    fn alias_args(&self, name: &str, scope: ScopeId, args: &[TypeRef]) -> Option<Vec<TypeRef>> {
-        let used = self.alias_params_used(name, scope)?;
-        let id = self.gctx.resolve_path(scope, name)?;
-        let TypeKind::TypeAlias(alias) = &self.gctx.get_type(id).kind else {
-            return None;
-        };
+        let params = self.alias_params(alias, &decl.module_context)?;
         let mut given: HashMap<&str, TypeRef> = HashMap::new();
         let mut out = Vec::new();
         for (i, tp) in alias.type_params.iter().enumerate() {
             let arg = match (args.get(i), &tp.default) {
                 (Some(arg), _) => arg.clone(),
+                _ if params.defaulted[i] => break,
                 (None, Some(default)) => substitute_type_params(default, &given),
                 (None, None) => TypeRef::Any,
             };
-            if used[i] {
+            if params.kept[i] {
                 out.push(arg.clone());
             }
             given.insert(&tp.name, arg);
@@ -609,7 +669,8 @@ impl<'a> CodegenContext<'a> {
             exported_modules,
             externalised_modules,
             unresolved_module_refs: RefCell::new(HashSet::new()),
-            alias_params_used: RefCell::new(HashMap::new()),
+            alias_params: RefCell::new(HashMap::new()),
+            alias_param_mentions: RefCell::new(Vec::new()),
         };
         for (spec, scopes) in &gctx.ambient_module_scopes {
             let path = ctx.specifier_path(spec);
@@ -647,7 +708,8 @@ impl<'a> CodegenContext<'a> {
             exported_modules: HashSet::new(),
             externalised_modules: HashSet::new(),
             unresolved_module_refs: RefCell::new(HashSet::new()),
-            alias_params_used: RefCell::new(HashMap::new()),
+            alias_params: RefCell::new(HashMap::new()),
+            alias_param_mentions: RefCell::new(Vec::new()),
         }
     }
 
@@ -770,20 +832,18 @@ impl<'a> CodegenContext<'a> {
     /// The string or numeric enum declaration `ty` names, through aliases
     /// and qualified paths.
     pub(crate) fn enum_kind(&self, ty: &ir::TypeRef, scope: ScopeId) -> Option<&TypeKind> {
-        let resolved = ty
-            .as_ident()
-            .and_then(|name| self.resolve_alias(name, scope));
+        // An enum, or an alias to one, takes no arguments, so any given
+        // don't matter.
+        let resolved = match ty {
+            ir::TypeRef::Reference { segments, .. } if segments.len() == 1 => {
+                self.resolve_alias(&segments[0], scope)
+            }
+            _ => None,
+        };
         let ty = resolved.as_deref().unwrap_or(ty);
-        let ir::TypeRef::Reference {
-            segments,
-            generic_args,
-        } = ty
-        else {
+        let ir::TypeRef::Reference { segments, .. } = ty else {
             return None;
         };
-        if !generic_args.is_empty() {
-            return None;
-        }
         let id = self.gctx.resolve_path(scope, &segments.join("."))?;
         let kind = &self.gctx.get_type(id).kind;
         matches!(kind, TypeKind::StringEnum(_) | TypeKind::NumericEnum(_)).then_some(kind)
@@ -1321,7 +1381,8 @@ pub fn to_syn_type(
                     if let Some(TypeKind::TypeAlias(alias)) =
                         resolved.map(|id| &c.gctx.get_type(id).kind)
                     {
-                        return to_syn_type(&alias.target, pos, ctx, alias.body_scope, from_module);
+                        let target = alias_target_with_defaults(alias);
+                        return to_syn_type(&target, pos, ctx, alias.body_scope, from_module);
                     }
                 }
             }
@@ -1727,6 +1788,9 @@ fn lower_reference(
                 c.gctx.scopes.resolve_binding(scope, head),
                 Some(crate::parse::scope::Binding::TypeParam),
             ) {
+                if let Some(mentions) = c.alias_param_mentions.borrow_mut().last_mut() {
+                    mentions.insert(head.to_string());
+                }
                 let ident = make_ident(head);
                 return quote! { #ident };
             }
@@ -1842,28 +1906,6 @@ fn substitute_type_params(ty: &TypeRef, params: &HashMap<&str, TypeRef>) -> Type
         }),
         other => other.clone(),
     }
-}
-
-/// Which of `alias`'s type parameters its lowered `target` mentions.
-pub(crate) fn alias_params_mentioned(alias: &ir::TypeAliasDecl, target: &TokenStream) -> Vec<bool> {
-    fn collect(tokens: TokenStream, idents: &mut HashSet<String>) {
-        for tree in tokens {
-            match tree {
-                proc_macro2::TokenTree::Ident(ident) => {
-                    idents.insert(ident.to_string());
-                }
-                proc_macro2::TokenTree::Group(group) => collect(group.stream(), idents),
-                _ => {}
-            }
-        }
-    }
-    let mut idents = HashSet::new();
-    collect(target.clone(), &mut idents);
-    alias
-        .type_params
-        .iter()
-        .map(|tp| idents.contains(&make_ident(&tp.name).to_string()))
-        .collect()
 }
 
 /// Create a `syn::Ident`, sanitizing invalid characters and escaping keywords.
@@ -2035,14 +2077,17 @@ fn local_generic_args<'t>(
     ty: &'t TypeRef,
     ctx: &CodegenContext<'_>,
     scope: ScopeId,
-) -> Option<&'t [TypeRef]> {
+) -> Option<std::borrow::Cow<'t, [TypeRef]>> {
     match ty {
         TypeRef::Reference {
             segments,
             generic_args,
-        } if !generic_args.is_empty() && ctx.is_local_generic(&segments.join("."), scope) => {
-            Some(generic_args)
-        }
+        } if !generic_args.is_empty() && ctx.is_local_generic(&segments.join("."), scope) => Some(
+            match ctx.alias_args(&segments.join("."), scope, generic_args) {
+                Some(args) => std::borrow::Cow::Owned(args),
+                None => std::borrow::Cow::Borrowed(generic_args),
+            },
+        ),
         _ => None,
     }
 }
@@ -2187,8 +2232,11 @@ fn to_mono_js_string_return_type_impl(
         }
         t @ TypeRef::Reference { segments, .. } if local_generic_args(t, ctx, scope).is_some() => {
             let base = named_type_to_rust(&segments[0], Some(ctx), scope, from_module);
-            let args = local_generic_args(t, ctx, scope)
-                .unwrap_or_default()
+            let args = local_generic_args(t, ctx, scope).unwrap_or_default();
+            if args.is_empty() {
+                return base;
+            }
+            let args = args
                 .iter()
                 .map(|arg| {
                     let mut visited = visited.clone();
@@ -2713,28 +2761,6 @@ mod tests {
         assert_eq!(make_ident("$$").to_string(), "DollarDollar");
         assert_eq!(make_ident("_").to_string(), "Underscore");
         assert_eq!(make_ident("☃").to_string(), "__unknown__");
-    }
-
-    #[test]
-    fn alias_params_mentioned_matches_lowered_idents() {
-        let param = |name: &str| ir::TypeParam {
-            name: name.to_string(),
-            constraint: None,
-            default: None,
-        };
-        let alias = ir::TypeAliasDecl {
-            name: "A".to_string(),
-            type_params: vec![param("T"), param("B"), param("type"), param("U")],
-            target: TypeRef::Any,
-            from_module: None,
-            body_scope: ScopeId(0),
-        };
-        let r#type = syn::Ident::new_raw("type", proc_macro2::Span::call_site());
-        let target = quote! { Pair<T, Function<fn(#r#type) -> Undefined> > };
-        assert_eq!(
-            alias_params_mentioned(&alias, &target),
-            [true, false, true, false]
-        );
     }
 
     #[test]
