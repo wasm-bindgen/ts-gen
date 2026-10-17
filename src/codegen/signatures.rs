@@ -566,8 +566,8 @@ fn push_with_js_string_return(
     let has_js_return = cgctx.is_some_and(|ctx| {
         ctx.experimental_generic_mono
             && (typemap::has_mono_js_string_return(&sig.return_type, ctx, scope)
-                || !sig.is_async
-                    && typemap::is_mono_string_list_return(&sig.return_type, ctx, scope))
+                || (!sig.is_async
+                    && typemap::is_mono_string_list_return(&sig.return_type, ctx, scope)))
     });
     out.push(sig.clone());
     if has_js_return {
@@ -1442,24 +1442,26 @@ pub(crate) fn render_param_type(
     scope: ScopeId,
     from_module: &crate::ir::ModuleContext,
 ) -> TokenStream {
-    if param.variadic {
+    let mono = cgctx.filter(|ctx| ctx.experimental_generic_mono);
+    // A per-mono variadic spreads any sequence, so its rest array lowers like
+    // any other list argument.
+    if param.variadic && (mono.is_none() || !matches!(param.type_ref, TypeRef::Array(_))) {
         return quote! { &[JsValue] };
     }
-    cgctx
-        .filter(|ctx| ctx.experimental_generic_mono)
-        .and_then(|ctx| {
-            mono_argument_type(&param.type_ref)
-                .or_else(|| typemap::mono_string_list_argument(&param.type_ref, ctx, scope))
+    mono.and_then(|ctx| {
+        mono_argument_type(&param.type_ref).or_else(|| {
+            typemap::mono_string_like_argument(&param.type_ref, ctx, scope, from_module)
         })
-        .unwrap_or_else(|| {
-            typemap::to_syn_type(
-                &param.type_ref,
-                TypePosition::ARGUMENT,
-                cgctx,
-                scope,
-                from_module,
-            )
-        })
+    })
+    .unwrap_or_else(|| {
+        typemap::to_syn_type(
+            &param.type_ref,
+            TypePosition::ARGUMENT,
+            cgctx,
+            scope,
+            from_module,
+        )
+    })
 }
 
 /// Per-monomorphization argument bounds: strings become `impl

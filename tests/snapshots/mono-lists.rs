@@ -94,14 +94,17 @@ extern "C" {
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(variadic)]
-    pub fn join(separator: impl ::wasm_bindgen::JsStringLike, parts: &[JsValue]) -> String;
+    pub fn join(
+        separator: impl ::wasm_bindgen::JsStringLike,
+        parts: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> String;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(variadic, js_name = "join")]
     pub fn join_js_string(
         separator: impl ::wasm_bindgen::JsStringLike,
-        parts: &[JsValue],
+        parts: &[impl ::wasm_bindgen::JsStringLike],
     ) -> JsString;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
@@ -109,7 +112,7 @@ extern "C" {
     #[wasm_bindgen(variadic, catch, js_name = "join")]
     pub fn try_join(
         separator: impl ::wasm_bindgen::JsStringLike,
-        parts: &[JsValue],
+        parts: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
@@ -117,8 +120,76 @@ extern "C" {
     #[wasm_bindgen(variadic, catch, js_name = "join")]
     pub fn try_join_js_string(
         separator: impl ::wasm_bindgen::JsStringLike,
-        parts: &[JsValue],
+        parts: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(variadic)]
+    pub fn sum(values: &[f64]) -> f64;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(variadic, catch, js_name = "sum")]
+    pub fn try_sum(values: &[f64]) -> Result<f64, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    pub fn rows(values: &[Array<impl ::wasm_bindgen::JsStringLike>]) -> String;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "rows")]
+    pub fn rows_js_string(values: &[Array<impl ::wasm_bindgen::JsStringLike>]) -> JsString;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "rows")]
+    pub fn try_rows(values: &[Array<impl ::wasm_bindgen::JsStringLike>])
+        -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "rows")]
+    pub fn try_rows_js_string(
+        values: &[Array<impl ::wasm_bindgen::JsStringLike>],
+    ) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    pub fn unique(values: &Set<impl ::wasm_bindgen::JsStringLike>) -> String;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "unique")]
+    pub fn unique_js_string(values: &Set<impl ::wasm_bindgen::JsStringLike>) -> JsString;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "unique")]
+    pub fn try_unique(values: &Set<impl ::wasm_bindgen::JsStringLike>) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "unique")]
+    pub fn try_unique_js_string(
+        values: &Set<impl ::wasm_bindgen::JsStringLike>,
+    ) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    pub fn lookup(
+        values: &Map<impl ::wasm_bindgen::JsStringLike, Number>,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> f64;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "lookup")]
+    pub fn try_lookup(
+        values: &Map<impl ::wasm_bindgen::JsStringLike, Number>,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<f64, JsValue>;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
