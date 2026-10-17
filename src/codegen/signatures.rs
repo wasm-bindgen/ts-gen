@@ -411,7 +411,10 @@ pub fn expand_signatures(
         sig.iter()
             .map(|p| {
                 let ty = render_param_type(p, cgctx, scope, &from_module);
-                format!("{}: {}", p.name, ty)
+                // A per-mono variadic renders like the list overload it
+                // spreads, but is a distinct call form.
+                let spread = if p.variadic { "..." } else { "" };
+                format!("{spread}{}: {}", p.name, ty)
             })
             .collect()
     };
@@ -1749,7 +1752,11 @@ pub(crate) fn render_param_type(
     let mono = cgctx.filter(|ctx| ctx.experimental_generic_mono);
     // A per-mono variadic spreads any sequence, so its rest array lowers like
     // any other list argument.
-    if param.variadic && (mono.is_none() || !matches!(param.type_ref, TypeRef::Array(_))) {
+    let spreads_list = |ctx: &CodegenContext<'_>| {
+        let rest = typemap::peel_mono(&param.type_ref, ctx, scope, &mut Default::default());
+        matches!(rest.as_ref(), TypeRef::Array(_))
+    };
+    if param.variadic && !mono.is_some_and(spreads_list) {
         return quote! { &[JsValue] };
     }
     mono.and_then(|ctx| {

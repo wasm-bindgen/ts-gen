@@ -42,6 +42,14 @@
   (import "mono-lists" "unique" (func $mono-lists:unique (param $values externref) (result externref)))
   ;; lookup(values: Map<string, number>, key: string): number
   (import "mono-lists" "lookup" (func $mono-lists:lookup (param $values externref) (param $key externref) (result f64)))
+  ;; joinTags(...tags: Tags): string
+  (import "mono-lists" "joinTags" (func $mono-lists:joinTags (param $tags (ref null $anyrefs)) (result externref)))
+  ;; awaitTag(tag: Promise<string>): string
+  (import "mono-lists" "awaitTag" (func $mono-lists:awaitTag (param $tag externref) (result externref)))
+  ;; firstTag(tags: Iterator<string>): string
+  (import "mono-lists" "firstTag" (func $mono-lists:firstTag (param $tags externref) (result externref)))
+  ;; nextTag(tags: AsyncIterator<string>): string
+  (import "mono-lists" "nextTag" (func $mono-lists:nextTag (param $tags externref) (result externref)))
   ;; getTags(): string[]
   (import "mono-lists" "getTags" (func $mono-lists:getTags (result externref)))
   ;; getMaybeTags(): Tag[] | undefined
@@ -54,6 +62,10 @@
   ;; Labels
   ;; constructor()
   (import "mono-lists" "Labels.new" (func $mono-lists:Labels.new (result externref)))
+  ;; add(values: string[]): string
+  (import "mono-lists" "Labels.add" (func $mono-lists:Labels.add (param $this externref) (param $values externref) (result externref)))
+  ;; add(...values: string[]): string
+  (import "mono-lists" "Labels.add_2" (func $mono-lists:Labels.add_2 (param $this externref) (param $values (ref null $anyrefs)) (result externref)))
   ;; values: string[]
   (import "mono-lists" "Labels.values" (func $mono-lists:Labels.values (param $this externref) (result externref)))
   ;; set values(value: string[])

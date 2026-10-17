@@ -15,12 +15,19 @@ export declare function sum(...values: number[]): number;
 export declare function rows(values: string[][]): string;
 export declare function unique(values: ReadonlySet<string>): string;
 export declare function lookup(values: Map<string, number>, key: string): number;
+export declare function joinTags(...tags: Tags): string;
+export declare function awaitTag(tag: Promise<string>): string;
+export declare function firstTag(tags: Iterator<string>): string;
+export declare function nextTag(tags: AsyncIterator<string>): string;
+export type Tags = string[];
 export declare function getTags(): string[];
 export declare function getMaybeTags(): Tag[] | undefined;
 export declare function getFlags(): boolean[];
 export declare function fetchTags(): Promise<string[]>;
 export declare class Labels {
   constructor();
+  add(values: string[]): string;
+  add(...values: string[]): string;
   values: string[];
   flags: boolean[];
 }
