@@ -33,3 +33,7 @@ declare module "mm" {
     w(): void;
   }
 }
+
+declare module "mm2" {
+  const W: WCtor;
+}

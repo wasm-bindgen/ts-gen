@@ -1,4 +1,4 @@
-//! @ts-gen --input tests/fixtures/ambient-module-merge/b.d.ts --input tests/fixtures/ambient-module-merge/aug.d.ts --lib-name ambient-module-merge-aug --export ovi --export loc --export dflt --export ia --export ib --export ic --export mm
+//! @ts-gen --input tests/fixtures/ambient-module-merge/b.d.ts --input tests/fixtures/ambient-module-merge/aug.d.ts --lib-name ambient-module-merge-aug --export ovi --export loc --export dflt --export ia --export ib --export ic --export mm --export mm2
 
 // As in TypeScript, an ambient module is one symbol whose exports merge
 // across files and module augmentations: `I`'s members, `k`'s overloads
@@ -9,7 +9,7 @@
 // `default` only, and neither is b.d.ts's `N`). Such a block's
 // `export`-modified declarations are still the module's ("loc"'s `E`).
 // A constructor var and the module's interface of its name in another
-// file are one class ("mm"'s `W`).
+// file are one class in either file order ("mm"'s and "mm2"'s `W`).
 
 declare module "ovi" {
   export interface I {
@@ -66,4 +66,10 @@ interface W {
 
 declare module "mm" {
   const W: WCtor;
+}
+
+declare module "mm2" {
+  interface W {
+    w(): void;
+  }
 }

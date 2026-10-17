@@ -108,12 +108,20 @@ pub fn collect_type_names(
         }
     }
 
-    // Every block's exports, its `export default` too, are the module's,
-    // each resolving in its own block.
+    // Every block's exports, its `export default` too, are the module's.
+    // A declaration the block exports resolves in the module's exports,
+    // merged with every block's, and an export specifier in its block.
     let blocks: Vec<ScopeId> = ccx.registry.module_blocks.values().map(|b| b.1).collect();
     for block_scope in blocks {
-        if let Some(exports) = ccx.gctx.scopes.get(block_scope).exports {
-            ccx.gctx.exports.move_into(block_scope, exports);
+        let Some(exports) = ccx.gctx.scopes.get(block_scope).exports else {
+            continue;
+        };
+        ccx.gctx.exports.move_into(block_scope, exports);
+        let declared = ccx.gctx.block_exports.get(&block_scope).cloned();
+        for name in declared.into_iter().flatten() {
+            if ccx.gctx.exports.binding(exports, &name) == Some((name.as_str(), block_scope)) {
+                ccx.gctx.exports.insert(exports, &name, &name);
+            }
         }
     }
     registry.globals = ccx.globals;
