@@ -74,26 +74,26 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
     #[wasm_bindgen(method, catch)]
-    pub async fn get(this: &Store, key: &str) -> Result<JsOption<JsString>, JsValue>;
+    pub async fn get(this: &Store, key: &str) -> Result<JsNullable<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_conditional(
         this: &Store,
         key: &str,
         options: &Conditional,
-    ) -> Result<JsOption<JsString>, JsValue>;
+    ) -> Result<JsNullable<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_get_options(
         this: &Store,
         key: &str,
         options: &GetOptions,
-    ) -> Result<JsOption<JsString>, JsValue>;
+    ) -> Result<JsNullable<JsString>, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn first(this: &Store) -> Result<JsOption<JsString>, JsValue>;
+    pub async fn first(this: &Store) -> Result<JsNullable<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "first")]
     pub async fn first_with_column(
         this: &Store,
         column: &str,
-    ) -> Result<JsOption<JsString>, JsValue>;
+    ) -> Result<JsNullable<JsString>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn put(this: &Store, key: &str, value: &str) -> Result<Undefined, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]

@@ -10,6 +10,7 @@
     "module-namespace-values": "file:./js/module-namespace-values",
     "slice-args": "file:./js/slice-args",
     "slice-args-mono": "file:./js/slice-args-mono",
-    "slice-hints": "file:./js/slice-hints"
+    "slice-hints": "file:./js/slice-hints",
+    "node-nullable": "file:js/node-nullable"
   }
 }

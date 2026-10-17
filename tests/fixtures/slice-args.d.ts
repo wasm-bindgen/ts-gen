@@ -39,6 +39,8 @@ export declare function buffered(values: Uint8Array<ArrayBuffer> | number[]): st
 export declare function clamped(values: Uint8ClampedArray | number[]): string;
 export declare function pixels(values: Uint8Array | Uint8ClampedArray | number[]): string;
 export declare function floats(values?: number[] | Float64Array | null): string;
+export declare function maybeBytes(values: Uint8Array | number[] | undefined): string;
+export declare function maybeClamped(values: Uint8ClampedArray | number[] | undefined): string;
 
 // Slice modes are per-argument, so a `number[]` beside a typed-array
 // union doesn't turn the typed slice's copy into a plain `Array`.

@@ -168,7 +168,11 @@ pub(crate) fn merge_member_branches(branches: &[Vec<Member>], mode: MergeMode) -
             MergeMode::Meet => present.iter().all(|g| g.optional),
         };
 
-        let type_ref = merge_member_types(present.iter().map(|g| g.type_ref.clone()), mode);
+        let mut type_ref = merge_member_types(present.iter().map(|g| g.type_ref.clone()), mode);
+        // A branch without the property reads it as `undefined`.
+        if mode == MergeMode::Join && slots.iter().any(|s| s.is_none()) {
+            type_ref = type_ref.or_undefined();
+        }
         let doc = present.iter().find_map(|g| g.doc.clone());
 
         Some(Member::Getter(GetterMember {

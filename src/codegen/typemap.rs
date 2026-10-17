@@ -334,7 +334,7 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
             write_type_ref_key(buf, inner);
             buf.push('>');
         }
-        TypeRef::Nullable(inner) => {
+        TypeRef::Nullable(inner, _) => {
             buf.push_str("Nullable<");
             write_type_ref_key(buf, inner);
             buf.push('>');
@@ -1142,9 +1142,9 @@ pub fn to_syn_type(
             TypeRef::Number | TypeRef::NumberLiteral(_) => return quote! { Number },
             TypeRef::String | TypeRef::StringLiteral(_) => return quote! { JsString },
             TypeRef::Void | TypeRef::Undefined => return quote! { Undefined },
-            TypeRef::Nullable(inner) => {
+            TypeRef::Nullable(inner, n) => {
                 let inner_ty = to_syn_type(inner, pos, ctx, scope, from_module);
-                return js_option_or_js_value(inner_ty);
+                return js_nullable_or_js_value(inner_ty, *n);
             }
             _ => {}
         }
@@ -1259,19 +1259,48 @@ pub fn to_syn_type(
         }
 
         // === Structural Types ===
-        TypeRef::Nullable(inner) => {
-            let inner_ty = to_syn_type(inner, pos, ctx, scope, from_module);
+        TypeRef::Nullable(inner, n) => {
             if pos.inner {
-                js_option_or_js_value(inner_ty)
-            } else if !pos.is_argument() && is_jsvalue_arg(&inner_ty) {
-                // In return position, `Option<JsValue>` is redundant —
-                // `JsValue` already carries `null`/`undefined` in-band,
-                // so collapse to bare `JsValue`. Argument position
-                // keeps `Option<&JsValue>` since the caller may want
-                // to distinguish "no value" from "JsValue::NULL".
+                let inner_ty = to_syn_type(inner, pos, ctx, scope, from_module);
+                return js_nullable_or_js_value(inner_ty, *n);
+            }
+            if !pos.is_argument() {
+                let inner_ty = to_syn_type(inner, pos, ctx, scope, from_module);
+                // `Option<T>` reads both empties as `None`. `Option<JsValue>`
+                // is redundant: `JsValue` carries them in-band.
+                return if is_jsvalue_arg(&inner_ty) {
+                    quote! { JsValue }
+                } else {
+                    quote! { Option<#inner_ty> }
+                };
+            }
+            // Argument position has to pick the JS value `None` crosses as,
+            // since `Option<T>` only ever emits `undefined`: a `null` arm
+            // goes through `JsNullable`, whose empty is `null`. A type
+            // parameter inner is taken by value, as the macro cannot
+            // borrow a generic (`Option<&T>`).
+            let generic = is_type_param(inner, ctx, scope);
+            if !n.null {
+                let inner_ty = if generic {
+                    to_syn_type(inner, TypePosition::RETURN, ctx, scope, from_module)
+                } else {
+                    to_syn_type(inner, pos, ctx, scope, from_module)
+                };
+                return quote! { Option<#inner_ty> };
+            }
+            let carried = to_syn_type(inner, pos.to_inner(), ctx, scope, from_module);
+            let nullable = if is_jsvalue_arg(&carried) {
                 quote! { JsValue }
             } else {
-                quote! { Option<#inner_ty> }
+                quote! { JsNullable<#carried> }
+            };
+            match (n.undefined, generic) {
+                // `T | null`: the carrier's empty is `null`.
+                (false, false) => quote! { &#nullable },
+                (false, true) => nullable,
+                // `T | null | undefined`: `None` is `undefined`, `Some(null)` is `null`.
+                (true, false) => quote! { Option<&#nullable> },
+                (true, true) => quote! { Option<#nullable> },
             }
         }
         TypeRef::Union(members) => {
@@ -1490,9 +1519,26 @@ fn generic_container(
     }
 }
 
-fn js_option_or_js_value(inner_ty: TokenStream) -> TokenStream {
+/// A bare reference to an in-scope type parameter. Without a context (unit
+/// tests) nothing is a type parameter.
+fn is_type_param(ty: &TypeRef, ctx: Option<&CodegenContext<'_>>, scope: ScopeId) -> bool {
+    match (ty.as_ident(), ctx) {
+        (Some(name), Some(c)) => matches!(
+            c.gctx.scopes.resolve_binding(scope, name),
+            Some(crate::parse::scope::Binding::TypeParam)
+        ),
+        _ => false,
+    }
+}
+
+/// Inner-position nullability follows wasm-bindgen's `sys` split:
+/// `JsOption<T>` is `T | undefined` only, so anything admitting `null`
+/// is `JsNullable<T>` (`null | undefined`, `is_empty` covers both).
+fn js_nullable_or_js_value(inner_ty: TokenStream, n: ir::Nullability) -> TokenStream {
     if is_jsvalue_arg(&inner_ty) {
         quote! { JsValue }
+    } else if n.null {
+        quote! { JsNullable<#inner_ty> }
     } else {
         quote! { JsOption<#inner_ty> }
     }
@@ -1941,7 +1987,7 @@ fn substitute_type_params(ty: &TypeRef, params: &HashMap<&str, TypeRef>) -> Type
             },
         },
         TypeRef::Array(t) => TypeRef::Array(Box::new(sub(t))),
-        TypeRef::Nullable(t) => TypeRef::Nullable(Box::new(sub(t))),
+        TypeRef::Nullable(t, n) => TypeRef::Nullable(Box::new(sub(t)), *n),
         TypeRef::Union(ts) => TypeRef::Union(ts.iter().map(sub).collect()),
         TypeRef::Intersection(ts) => TypeRef::Intersection(ts.iter().map(sub).collect()),
         TypeRef::Tuple(ts) => TypeRef::Tuple(ts.iter().map(sub).collect()),
@@ -2172,7 +2218,7 @@ fn to_mono_user_generic_arg_impl(
         t if is_mono_native_leaf(t, ctx, scope) => {
             to_syn_type(t, TypePosition::RETURN, Some(ctx), scope, from_module)
         }
-        TypeRef::Nullable(inner) => {
+        TypeRef::Nullable(inner, _) => {
             let inner = to_mono_user_generic_arg_impl(inner, ctx, scope, from_module, visited);
             quote! { Option<#inner> }
         }
@@ -2207,7 +2253,7 @@ fn is_mono_native_return_shape_impl(
     let peeled = peel_mono(ty, ctx, scope, visited);
     match peeled.as_ref() {
         t if is_mono_native_leaf(t, ctx, scope) => true,
-        TypeRef::Nullable(inner) => is_mono_native_return_shape_impl(inner, ctx, scope, visited),
+        TypeRef::Nullable(inner, _) => is_mono_native_return_shape_impl(inner, ctx, scope, visited),
         t => local_generic_args(t, ctx, scope).is_some(),
     }
 }
@@ -2225,7 +2271,7 @@ pub(crate) fn has_mono_js_string_return(
     // leaf to swap for `JsString`. Getters synthesise under `Nullable` too,
     // so both shapes are excluded.
     let top = match ty {
-        TypeRef::Nullable(inner) => inner.as_ref(),
+        TypeRef::Nullable(inner, _) => inner.as_ref(),
         other => other,
     };
     if let TypeRef::Union(members) = top {
@@ -2245,7 +2291,7 @@ fn has_mono_js_string_return_impl(
     let peeled = peel_mono(ty, ctx, scope, visited);
     match peeled.as_ref() {
         TypeRef::String | TypeRef::StringLiteral(_) => true,
-        TypeRef::Nullable(inner) => has_mono_js_string_return_impl(inner, ctx, scope, visited),
+        TypeRef::Nullable(inner, _) => has_mono_js_string_return_impl(inner, ctx, scope, visited),
         t => local_generic_args(t, ctx, scope).is_some_and(|args| {
             args.iter()
                 .any(|arg| has_mono_js_string_return_impl(arg, ctx, scope, &mut visited.clone()))
@@ -2278,7 +2324,7 @@ fn to_mono_js_string_return_type_impl(
     let peeled = peel_mono(ty, ctx, scope, visited);
     match peeled.as_ref() {
         TypeRef::String | TypeRef::StringLiteral(_) => quote! { JsString },
-        TypeRef::Nullable(inner) => {
+        TypeRef::Nullable(inner, _) => {
             let inner = to_mono_js_string_return_type_impl(inner, ctx, scope, from_module, visited);
             quote! { Option<#inner> }
         }
@@ -2348,7 +2394,7 @@ pub fn to_getter_return_type(
     // For optional getters the IR widens to `Nullable<T>`. If the
     // inner `T` is itself a top-level erasing union, we still want
     // the synthesised enum — but wrapped in `Option<…>`.
-    if let TypeRef::Nullable(inner) = ty {
+    if let TypeRef::Nullable(inner, _) = ty {
         if let Some(inner_tokens) =
             maybe_synthesise_return_union(inner, ctx, scope, from_module, anchor)
         {
@@ -2466,7 +2512,7 @@ impl SetterEnum {
     /// position of the first one.
     pub(crate) fn param_type(&self, ty: &TypeRef) -> TypeRef {
         match ty {
-            TypeRef::Nullable(inner) => TypeRef::Nullable(Box::new(self.param_type(inner))),
+            TypeRef::Nullable(inner, n) => TypeRef::Nullable(Box::new(self.param_type(inner)), *n),
             TypeRef::Union(members) => {
                 let mut out: Vec<TypeRef> = Vec::with_capacity(members.len());
                 let mut placed = false;
@@ -2503,7 +2549,7 @@ pub(crate) fn setter_enum(
 ) -> Option<SetterEnum> {
     let cgctx = ctx?;
     let ty = match ty {
-        TypeRef::Nullable(inner) => inner,
+        TypeRef::Nullable(inner, _) => inner,
         other => other,
     };
     let TypeRef::Union(members) = ty else {
@@ -2647,8 +2693,10 @@ pub fn param_slice_mode(
     if p.variadic {
         return None;
     }
+    // Only an undefined-only empty keeps the slice (`Option<&[T]>`); a
+    // `null` arm takes the `JsNullable<Array<…>>` handle.
     let ty = match &p.type_ref {
-        TypeRef::Nullable(inner) => inner.as_ref(),
+        TypeRef::Nullable(inner, n) if !n.null => inner.as_ref(),
         other => other,
     };
     let inferred = match ty {
@@ -2749,6 +2797,7 @@ fn native_array_leaf<'t>(
 mod tests {
     use super::*;
 
+    use crate::ir::Nullability;
     use crate::parse::scope::ScopeId;
 
     #[test]
@@ -2777,8 +2826,11 @@ mod tests {
             ])
         );
         assert_eq!(
-            e.param_type(&TypeRef::Nullable(Box::new(union(vec![x.clone(), y])))),
-            TypeRef::Nullable(Box::new(TypeRef::ident("ModeKind")))
+            e.param_type(&TypeRef::Nullable(
+                Box::new(union(vec![x.clone(), y])),
+                Nullability::UNDEFINED
+            )),
+            TypeRef::Nullable(Box::new(TypeRef::ident("ModeKind")), Nullability::UNDEFINED)
         );
         assert_eq!(e.variant(&x), Some("X"));
         assert_eq!(e.variant(&TypeRef::String), None);
@@ -2909,7 +2961,7 @@ mod tests {
 
     #[test]
     fn test_nullable() {
-        let ty = TypeRef::Nullable(Box::new(TypeRef::String));
+        let ty = TypeRef::Nullable(Box::new(TypeRef::String), Nullability::NULL);
         // Option<T> passes through position — Option<String> at return position
         let result = ret_type(&ty);
         assert_eq!(result, "Option < String >");
@@ -2924,15 +2976,18 @@ mod tests {
 
     #[test]
     fn test_nullable_inner() {
-        // Nullable inside generic (inner position) → JsOption
-        let ty = TypeRef::Nullable(Box::new(TypeRef::String));
-        let result = inner_type(&ty);
-        assert_eq!(result, "JsOption < JsString >");
+        let ty = TypeRef::Nullable(Box::new(TypeRef::String), Nullability::NULL);
+        assert_eq!(inner_type(&ty), "JsNullable < JsString >");
+        let ty = TypeRef::Nullable(Box::new(TypeRef::String), Nullability::BOTH);
+        assert_eq!(inner_type(&ty), "JsNullable < JsString >");
+        // Undefined-only is wasm-bindgen's JsOption.
+        let ty = TypeRef::Nullable(Box::new(TypeRef::String), Nullability::UNDEFINED);
+        assert_eq!(inner_type(&ty), "JsOption < JsString >");
     }
 
     #[test]
     fn test_nullable_inner_jsvalue_collapses() {
-        let ty = TypeRef::Nullable(Box::new(TypeRef::Any));
+        let ty = TypeRef::Nullable(Box::new(TypeRef::Any), Nullability::NULL);
         assert_eq!(inner_type(&ty), "JsValue");
     }
 
@@ -2959,15 +3014,37 @@ mod tests {
 
     #[test]
     fn test_nullable_named_type_unresolved() {
-        // Without ctx, `Foo` is unresolved → `JsValue`. In *return*
-        // position the `Option<JsValue>` shape is redundant (JsValue
-        // already carries `null`/`undefined` in-band) and collapses
-        // to bare `JsValue`. In *argument* position we preserve
-        // `Option<&JsValue>` so callers can distinguish "no value"
-        // from passing `JsValue::NULL`.
-        let ty = TypeRef::Nullable(Box::new(TypeRef::ident("Foo")));
-        assert_eq!(arg_type(&ty), "Option < & JsValue >");
+        // Without ctx, `Foo` is unresolved → `JsValue`, which carries
+        // `null` in-band: a `T | null` argument is `&JsValue` (pass
+        // `JsValue::NULL`), a return collapses to bare `JsValue`.
+        let ty = TypeRef::Nullable(Box::new(TypeRef::ident("Foo")), Nullability::NULL);
+        assert_eq!(arg_type(&ty), "& JsValue");
         assert_eq!(ret_type(&ty), "JsValue");
+        // `T | undefined` keeps `Option` so `None` can cross as `undefined`.
+        let ty = TypeRef::Nullable(Box::new(TypeRef::ident("Foo")), Nullability::UNDEFINED);
+        assert_eq!(arg_type(&ty), "Option < & JsValue >");
+    }
+
+    #[test]
+    fn argument_nullability_picks_the_absent_value() {
+        let nullable = |n| TypeRef::Nullable(Box::new(TypeRef::String), n);
+        assert_eq!(
+            arg_type(&nullable(Nullability::UNDEFINED)),
+            "Option < & str >"
+        );
+        assert_eq!(
+            arg_type(&nullable(Nullability::NULL)),
+            "& JsNullable < JsString >"
+        );
+        assert_eq!(
+            arg_type(&nullable(Nullability::BOTH)),
+            "Option < & JsNullable < JsString > >"
+        );
+        let num = TypeRef::Nullable(Box::new(TypeRef::Number), Nullability::NULL);
+        assert_eq!(arg_type(&num), "& JsNullable < Number >");
+        // Returns do not care which: Option reads both as None.
+        assert_eq!(ret_type(&nullable(Nullability::NULL)), "Option < String >");
+        assert_eq!(ret_type(&nullable(Nullability::BOTH)), "Option < String >");
     }
 
     #[test]
@@ -3077,7 +3154,10 @@ mod tests {
             [
                 param_slice_mode(&cp("xs", ts.clone()), Some(&ctx), holder.body_scope),
                 param_slice_mode(
-                    &cp("xs", TypeRef::Nullable(Box::new(ts.clone()))),
+                    &cp(
+                        "xs",
+                        TypeRef::Nullable(Box::new(ts.clone()), Nullability::UNDEFINED),
+                    ),
                     Some(&ctx),
                     holder.body_scope,
                 ),
@@ -3102,13 +3182,26 @@ mod tests {
             let numbers = || TypeRef::Array(Box::new(TypeRef::Number));
             let typed = || TypeRef::TypedSlice(E::U8, crate::ir::SharedMemory::Accepted);
             assert_eq!(
-                mode(&cp("xs", TypeRef::Nullable(Box::new(numbers())))),
+                mode(&cp(
+                    "xs",
+                    TypeRef::Nullable(Box::new(numbers()), Nullability::UNDEFINED)
+                )),
                 Some(SliceMode::Array)
             );
+            // `null` admitted: a `&JsNullable<Array<…>>` handle, not a slice.
+            for n in [Nullability::NULL, Nullability::BOTH] {
+                assert_eq!(
+                    mode(&cp("xs", TypeRef::Nullable(Box::new(numbers()), n))),
+                    None
+                );
+            }
             assert_eq!(mode(&cp("xs", numbers())), Some(SliceMode::Array));
             assert_eq!(mode(&cp("xs", typed())), Some(SliceMode::Copy));
             assert_eq!(
-                mode(&cp("xs", TypeRef::Nullable(Box::new(typed())))),
+                mode(&cp(
+                    "xs",
+                    TypeRef::Nullable(Box::new(typed()), Nullability::UNDEFINED)
+                )),
                 Some(SliceMode::Copy)
             );
             assert_eq!(mode(&cp("first", TypeRef::ident("Plain"))), None);
@@ -3137,7 +3230,7 @@ mod tests {
             );
             assert_eq!(
                 mode(&hinted(
-                    TypeRef::Nullable(Box::new(unshared.clone())),
+                    TypeRef::Nullable(Box::new(unshared.clone()), Nullability::UNDEFINED),
                     H::View
                 )),
                 Some(SliceMode::UnsharedView)
@@ -3184,11 +3277,14 @@ mod tests {
             "Record",
             vec![
                 TypeRef::String,
-                TypeRef::Nullable(Box::new(TypeRef::Union(vec![
-                    TypeRef::String,
-                    TypeRef::Number,
-                    TypeRef::Boolean,
-                ]))),
+                TypeRef::Nullable(
+                    Box::new(TypeRef::Union(vec![
+                        TypeRef::String,
+                        TypeRef::Number,
+                        TypeRef::Boolean,
+                    ])),
+                    Nullability::NULL,
+                ),
             ],
         );
         assert_eq!(ret_type(&ty), "Object");
@@ -3196,18 +3292,24 @@ mod tests {
 
     #[test]
     fn test_promise_nullable_inner() {
-        // Promise<string | null> → Promise<JsOption<JsString>>
+        // Promise<string | null> → Promise<JsNullable<JsString>>
         let ty = TypeRef::generic(
             "Promise",
-            vec![TypeRef::Nullable(Box::new(TypeRef::String))],
+            vec![TypeRef::Nullable(
+                Box::new(TypeRef::String),
+                Nullability::NULL,
+            )],
         );
         let result = ret_type(&ty);
-        assert_eq!(result, "Promise < JsOption < JsString > >");
+        assert_eq!(result, "Promise < JsNullable < JsString > >");
     }
 
     #[test]
     fn test_promise_nullable_jsvalue_elides_generic() {
-        let ty = TypeRef::generic("Promise", vec![TypeRef::Nullable(Box::new(TypeRef::Any))]);
+        let ty = TypeRef::generic(
+            "Promise",
+            vec![TypeRef::Nullable(Box::new(TypeRef::Any), Nullability::NULL)],
+        );
         assert_eq!(ret_type(&ty), "Promise");
     }
 
@@ -3599,7 +3701,7 @@ mod tests {
             assert_eq!(peel(&lits(&["a", "b"])), TypeRef::String);
             assert!(matches!(
                 peel(&TypeRef::ident("MaybeId")),
-                TypeRef::Nullable(_)
+                TypeRef::Nullable(..)
             ));
             // Stops at non-aliases and generic instantiations.
             assert_eq!(peel(&TypeRef::ident("Plain")), TypeRef::ident("Plain"));
@@ -3638,7 +3740,7 @@ mod tests {
             assert_eq!(ret(TypeRef::Boolean), "Vec < Boolean >");
             assert_eq!(
                 ret(TypeRef::ident("MaybeId")),
-                "Vec < JsOption < JsString > >"
+                "Vec < JsNullable < JsString > >"
             );
             assert_eq!(
                 ret(TypeRef::Array(Box::new(TypeRef::String))),
@@ -3682,7 +3784,7 @@ mod tests {
             );
             assert_eq!(
                 user_arg(
-                    &TypeRef::Nullable(Box::new(TypeRef::ident("Level"))),
+                    &TypeRef::Nullable(Box::new(TypeRef::ident("Level")), Nullability::UNDEFINED),
                     ctx,
                     scope
                 ),
@@ -3730,7 +3832,10 @@ mod tests {
             assert!(!eligible(&holder(TypeRef::ident("Mode"))));
             // Top-level literal unions become enums, not `String`.
             assert!(!eligible(&lits(&["a", "b"])));
-            assert!(!eligible(&TypeRef::Nullable(Box::new(lits(&["a", "b"])))));
+            assert!(!eligible(&TypeRef::Nullable(
+                Box::new(lits(&["a", "b"])),
+                Nullability::NULL
+            )));
             // Built-in containers and non-string leaves are excluded.
             assert!(!eligible(&TypeRef::generic("Array", vec![TypeRef::String])));
             assert!(!eligible(&holder(TypeRef::Number)));

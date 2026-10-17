@@ -124,7 +124,7 @@ fn collect_in_scope_type_params(
                 collect_in_scope_type_params(a, scope, scopes, out);
             }
         }
-        TypeRef::Array(inner) | TypeRef::Nullable(inner) => {
+        TypeRef::Array(inner) | TypeRef::Nullable(inner, _) => {
             collect_in_scope_type_params(inner, scope, scopes, out);
         }
         TypeRef::Union(members) | TypeRef::Intersection(members) | TypeRef::Tuple(members) => {
@@ -659,7 +659,7 @@ fn convert_property_signature(
 
     let mut members = vec![Member::Getter(GetterMember {
         js_name: js_name.clone(),
-        type_ref: type_ref.clone(),
+        type_ref: optional_read_type(type_ref.clone(), prop.optional),
         optional: prop.optional,
         doc,
     })];
@@ -674,6 +674,16 @@ fn convert_property_signature(
     }
 
     members
+}
+
+/// An optional property reads as `T | undefined`; the setter keeps `T`
+/// (what `exactOptionalPropertyTypes` allows to be assigned).
+fn optional_read_type(type_ref: TypeRef, optional: bool) -> TypeRef {
+    if optional {
+        type_ref.or_undefined()
+    } else {
+        type_ref
+    }
 }
 
 fn convert_method_signature(
@@ -951,7 +961,7 @@ fn convert_class_property(
     } else {
         let mut members = vec![Member::Getter(GetterMember {
             js_name: js_name.clone(),
-            type_ref: type_ref.clone(),
+            type_ref: optional_read_type(type_ref.clone(), prop.optional),
             optional: prop.optional,
             doc,
         })];

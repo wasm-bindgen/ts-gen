@@ -1,0 +1,6 @@
+{
+  "name": "node-nullable",
+  "private": true,
+  "type": "module",
+  "main": "index.js"
+}
