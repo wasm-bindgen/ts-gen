@@ -144,7 +144,7 @@ pub fn interface_from_signatures(
 
 pub fn convert_function_decl(
     func: &ast::Function<'_>,
-    throws: ir::Throws,
+    info: &crate::parse::docs::JsDocInfo,
     parent_scope: ScopeId,
     ctx: &mut ParseCtx<'_, '_>,
 ) -> Option<ir::FunctionDecl> {
@@ -155,12 +155,19 @@ pub fn convert_function_decl(
     let mut type_params = convert_type_params(func.type_parameters.as_ref(), ctx.diag);
     let body_scope = create_body_scope(&mut type_params, parent_scope, ctx);
 
-    let params = convert_formal_params_scoped(&func.params, body_scope, ctx);
-    let return_type = func
+    let mut params = convert_formal_params_scoped(&func.params, body_scope, ctx);
+    let mut return_type = func
         .return_type
         .as_ref()
         .map(|rt| convert_ts_type_scoped(&rt.type_annotation, body_scope, ctx))
         .unwrap_or(ir::TypeRef::Void);
+    crate::parse::members::apply_rust_tags(
+        info,
+        Some(&mut return_type),
+        &mut params,
+        &js_name,
+        ctx,
+    );
 
     Some(ir::FunctionDecl {
         name: rust_name,
@@ -169,7 +176,7 @@ pub fn convert_function_decl(
         params,
         return_type,
         overloads: vec![],
-        throws,
+        throws: info.throws(),
         body_scope,
     })
 }

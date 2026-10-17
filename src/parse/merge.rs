@@ -80,11 +80,18 @@ pub fn extract_var_members(
                 );
                 let body_scope =
                     crate::parse::members::create_body_scope(&mut type_params, parent_scope, ctx);
-                let params = convert_formal_params_scoped(&ctor.params, body_scope, ctx);
+                let mut params = convert_formal_params_scoped(&ctor.params, body_scope, ctx);
                 let (doc, info) = match ctx.docs.info_for_span(ctor.span.start) {
                     Some((d, i)) => (Some(d), i),
                     None => (None, crate::parse::docs::JsDocInfo::default()),
                 };
+                crate::parse::members::apply_rust_tags(
+                    &info,
+                    None,
+                    &mut params,
+                    "constructor",
+                    ctx,
+                );
                 constructor = Some(ConstructorMember {
                     type_params,
                     params,
