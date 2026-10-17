@@ -392,8 +392,12 @@ fn generate_tokens(
     let mut root = ModTree::default();
     for &type_id in &module.types {
         if let Some(decl) = surfaces.get(&type_id) {
-            root.at(&cgctx.module_path(&decl.module_context))
-                .insert(decl, Vec::new(), &surfaces);
+            root.at(&cgctx.module_path(&decl.module_context)).insert(
+                decl,
+                Vec::new(),
+                &surfaces,
+                gctx,
+            );
         }
     }
     let global_items = root.generate(&mut Vec::new(), &cgctx);
@@ -828,18 +832,30 @@ impl<'d> ModTree<'d> {
     /// Add `decl`, whose enclosing namespaces have the JS path
     /// `js_namespace`. A namespace becomes a child holding those of its
     /// members that are in `surfaces`.
+    ///
+    /// A module's namespace is reached through the module's export of it,
+    /// which a renamed or default export of a merged value names
+    /// differently (`export { make as create }` makes `create.helper`).
     fn insert(
         &mut self,
         decl: &'d TypeDeclaration,
         mut js_namespace: Vec<String>,
         surfaces: &'d HashMap<crate::context::TypeId, std::borrow::Cow<'d, TypeDeclaration>>,
+        gctx: &crate::context::GlobalContext,
     ) {
         match &decl.kind {
             TypeKind::Namespace(ns) => {
                 let child = self.child(&crate::util::naming::to_snake_case(&ns.name));
-                js_namespace.push(ns.name.clone());
+                let js_name = match decl.module_context {
+                    crate::ir::ModuleContext::Module(_) if js_namespace.is_empty() => gctx
+                        .exports
+                        .public_name(decl.scope_id, &ns.name)
+                        .unwrap_or(&ns.name),
+                    _ => &ns.name,
+                };
+                js_namespace.push(js_name.to_string());
                 for member in ns.declarations.iter().filter_map(|id| surfaces.get(id)) {
-                    child.insert(member, js_namespace.clone(), surfaces);
+                    child.insert(member, js_namespace.clone(), surfaces, gctx);
                 }
             }
             _ => self.entries.push(ModEntry::Item(decl, js_namespace)),

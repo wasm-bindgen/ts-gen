@@ -5,6 +5,8 @@
   "exports": {
     ".": "./index.js",
     "./create": "./create.js",
-    "./version": "./version.js"
+    "./version": "./version.js",
+    "./merged": "./merged.js",
+    "./renamed": "./renamed.js"
   }
 }

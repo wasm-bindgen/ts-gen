@@ -2357,6 +2357,35 @@ A namespace merged with a same-named class, function or interface
 that declaration as the type `Foo`, while `Foo.Options` resolves
 through the namespace, in either declaration order.
 
+In a module, the namespace's members bind through the name the module
+exports it under. That differs from the local name for a value merged
+with the namespace and exported renamed or as the default:
+
+```ts
+declare module "m" {
+  function make(): void;
+  namespace make { function helper(): void; }
+  export { make as create };
+}
+```
+
+```rust
+pub mod m {
+    // …
+    pub fn create();
+    pub mod make {
+        #[wasm_bindgen(module = "m")]
+        extern "C" {
+            #[wasm_bindgen(js_namespace = "create")]
+            pub fn helper();
+        }
+    }
+}
+```
+
+With `export default make`, the members take `js_namespace = "default"`.
+A namespace exported under its own name as well keeps it.
+
 ## Type aliases and `export { X as Y }`
 
 * `type Foo = Bar;` → `pub type Foo = Bar;` if `Bar` is a recognised

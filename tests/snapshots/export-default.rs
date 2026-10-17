@@ -45,4 +45,59 @@ pub mod export_default {
             pub static version: String;
         }
     }
+    pub mod merged {
+        #[allow(unused_imports)]
+        use super::*;
+        #[wasm_bindgen(module = "export-default/merged")]
+        extern "C" {
+            #[wasm_bindgen(js_name = "default")]
+            pub fn make() -> String;
+        }
+        #[wasm_bindgen(module = "export-default/merged")]
+        extern "C" {
+            #[wasm_bindgen(catch, js_name = "default")]
+            pub fn try_make() -> Result<String, JsValue>;
+        }
+        pub mod make {
+            #[allow(unused_imports)]
+            use super::*;
+            #[wasm_bindgen(module = "export-default/merged")]
+            extern "C" {
+                #[wasm_bindgen(js_namespace = "default")]
+                pub fn helper() -> String;
+            }
+            #[wasm_bindgen(module = "export-default/merged")]
+            extern "C" {
+                #[wasm_bindgen(catch, js_name = "helper", js_namespace = "default")]
+                pub fn try_helper() -> Result<String, JsValue>;
+            }
+        }
+    }
+    pub mod renamed {
+        #[allow(unused_imports)]
+        use super::*;
+        #[wasm_bindgen(module = "export-default/renamed")]
+        extern "C" {
+            pub fn create() -> String;
+        }
+        #[wasm_bindgen(module = "export-default/renamed")]
+        extern "C" {
+            #[wasm_bindgen(catch, js_name = "create")]
+            pub fn try_create() -> Result<String, JsValue>;
+        }
+        pub mod make {
+            #[allow(unused_imports)]
+            use super::*;
+            #[wasm_bindgen(module = "export-default/renamed")]
+            extern "C" {
+                #[wasm_bindgen(js_namespace = "create")]
+                pub fn helper() -> String;
+            }
+            #[wasm_bindgen(module = "export-default/renamed")]
+            extern "C" {
+                #[wasm_bindgen(catch, js_name = "helper", js_namespace = "create")]
+                pub fn try_helper() -> Result<String, JsValue>;
+            }
+        }
+    }
 }
