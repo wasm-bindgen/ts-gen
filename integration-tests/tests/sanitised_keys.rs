@@ -1,6 +1,9 @@
 #![cfg(target_arch = "wasm32")]
 
-use ts_gen_integration_tests::sanitised_keys::{__unknown__, version, Pair, Store};
+use ts_gen_integration_tests::sanitised_keys::{
+    compare, dollar, dollar_dollar, each, underscore_underscore, version, DollarUnderscore, Op,
+    Pair, Sigil, Store,
+};
 
 // Compile-only coverage that wasm-bindgen accepts the `js_name` / `js_class`
 // combinations emitted for sanitised names.
@@ -23,6 +26,14 @@ fn sanitised_bindings_compile(pair: &Pair) {
     let _: f64 = Store::count();
     Store::set_count(1.0);
 
-    let _: Pair = __unknown__("#id");
+    let _: Pair = dollar("#id");
     let _: String = version.with(|v| v.clone());
+
+    let _: Vec<Pair> = dollar_dollar("#id");
+    let _: f64 = underscore_underscore.with(|v| *v);
+    each(1.0, "x");
+    compare(Op::LtEq);
+    let symbols = DollarUnderscore::new().unwrap();
+    symbols.set_underscore(&symbols.underscore());
+    let _ = [Sigil::Dollar, Sigil::Underscore];
 }
