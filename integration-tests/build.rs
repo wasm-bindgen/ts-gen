@@ -17,6 +17,7 @@ use std::path::{Path, PathBuf};
 ///     The Rust `pub mod` name is always derived (snake_case) from the
 ///     `--lib-name` value (after stripping protocol prefixes like `node:`).
 ///   - `--experimental-generic-mono` enables per-monomorphization imports.
+///   - `--input <path>` adds a workspace-relative input beside the fixture.
 fn main() {
     let out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
     let crate_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
@@ -83,6 +84,8 @@ struct Entry {
     export_specs: Vec<String>,
     /// `--provides <spec>`, if the fixture provides functions.
     provides: Option<String>,
+    /// Further `--input` files, resolved against the workspace.
+    inputs: Vec<PathBuf>,
 }
 
 /// Pair every `integration-tests/tests/<name>.rs` with the fixture
@@ -118,6 +121,7 @@ fn discover_entries(tests_dir: &Path, fixtures_dir: &Path) -> Vec<Entry> {
         }
 
         let directive = parse_directive(&dts_path);
+        let workspace_dir = fixtures_dir.parent().unwrap().parent().unwrap();
 
         entries.push(Entry {
             mod_name: stem.to_string(),
@@ -130,6 +134,11 @@ fn discover_entries(tests_dir: &Path, fixtures_dir: &Path) -> Vec<Entry> {
             experimental_generic_mono: directive.experimental_generic_mono,
             export_specs: directive.export_specs,
             provides: directive.provides,
+            inputs: directive
+                .inputs
+                .iter()
+                .map(|input| workspace_dir.join(input))
+                .collect(),
         });
     }
 
@@ -148,6 +157,8 @@ struct Directive {
     export_specs: Vec<String>,
     /// Value of `--provides <spec>` if specified.
     provides: Option<String>,
+    /// All `--input <path>` (or `-i <path>`) values.
+    inputs: Vec<String>,
 }
 
 /// Parse the `//! @ts-gen ...` directive lines at the top of the fixture
@@ -159,6 +170,7 @@ fn parse_directive(dts_path: &Path) -> Directive {
     let mut experimental_generic_mono = false;
     let mut export_specs = Vec::new();
     let mut provides = None;
+    let mut inputs = Vec::new();
 
     for line in content.lines() {
         let trimmed = line.trim();
@@ -187,6 +199,10 @@ fn parse_directive(dts_path: &Path) -> Directive {
                         provides = Some(args[i + 1].clone());
                         i += 2;
                     }
+                    "--input" | "-i" if i + 1 < args.len() => {
+                        inputs.push(args[i + 1].clone());
+                        i += 2;
+                    }
                     _ => i += 1,
                 }
             }
@@ -201,6 +217,7 @@ fn parse_directive(dts_path: &Path) -> Directive {
         experimental_generic_mono,
         export_specs,
         provides,
+        inputs,
     }
 }
 
@@ -228,7 +245,9 @@ fn shell_split(s: &str) -> Vec<String> {
 }
 
 fn generate_bindings(entry: &Entry, out_dir: &Path) {
-    let path_refs: Vec<&PathBuf> = vec![&entry.dts_path];
+    let path_refs: Vec<&PathBuf> = std::iter::once(&entry.dts_path)
+        .chain(&entry.inputs)
+        .collect();
 
     let lib_name = entry.module_mode.then_some(entry.lib_name.as_str());
     let (module, mut gctx) = ts_gen::parse(&path_refs, lib_name)
@@ -322,6 +341,9 @@ fn generate_bindings(entry: &Entry, out_dir: &Path) {
         .unwrap_or_else(|e| panic!("Failed to write {}: {e}", out_file.display()));
 
     println!("cargo:rerun-if-changed={}", entry.dts_path.display());
+    for input in &entry.inputs {
+        println!("cargo:rerun-if-changed={}", input.display());
+    }
 }
 
 fn strip_inner_attributes(code: &str) -> String {

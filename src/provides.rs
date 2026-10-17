@@ -173,7 +173,7 @@ fn types_scope(module: &Module) -> ScopeId {
         .file_scopes
         .first()
         .copied()
-        .unwrap_or(module.builtin_scope)
+        .unwrap_or(module.global_scope)
 }
 
 fn member_name(m: &Member) -> Option<&str> {
