@@ -12,8 +12,6 @@ use JsValue as Cf;
 use JsValue as R;
 #[allow(dead_code)]
 use JsValue as Readonly;
-#[allow(dead_code)]
-use JsValue as T;
 #[wasm_bindgen]
 extern "C" {
     #[allow(non_upper_case_globals)]
@@ -34104,11 +34102,10 @@ pub mod cloudflare {
         pub type RpcStub<T> = super::super::rpc::Stub<T>;
         #[wasm_bindgen(module = "cloudflare:workers")]
         extern "C" {
-            # [wasm_bindgen (extends = Object)]
-            #[derive(Debug, Clone, PartialEq, Eq)]
-            pub type RpcStub;
-            #[wasm_bindgen(constructor, catch)]
-            pub fn new(value: &T) -> Result<RpcStub, JsValue>;
+            #[wasm_bindgen(constructor, js_class = "RpcStub", catch)]
+            pub fn new<T: ::wasm_bindgen::JsGeneric>(
+                value: &T,
+            ) -> Result<super::super::rpc::Stub<T>, JsValue>;
         }
         #[wasm_bindgen(module = "cloudflare:workers")]
         extern "C" {

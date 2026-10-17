@@ -1,0 +1,6 @@
+{
+  "name": "alias-constructors",
+  "private": true,
+  "type": "module",
+  "exports": "./index.js"
+}

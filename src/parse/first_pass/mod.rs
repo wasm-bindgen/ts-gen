@@ -279,6 +279,7 @@ fn register_type(
             js_name: name_str.clone(),
             type_ref: ir::TypeRef::Any,
             is_const: false,
+            constructs: vec![],
         }),
         ir::RegisteredKind::Namespace => {
             let ns_scope = gctx.scopes.create_child(scope);

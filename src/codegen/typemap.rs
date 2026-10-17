@@ -164,6 +164,9 @@ pub struct CodegenContext<'a> {
     pub names: RefCell<LocalScope>,
     /// Local types that collide with js_sys reserved names — maps original name → renamed name.
     pub renamed_locals: HashMap<String, String>,
+    /// Types a constructor-shaped variable already binds `new` on, which
+    /// a second such variable would redefine.
+    pub constructed: RefCell<HashSet<TypeId>>,
     /// How many type parameters each *locally emitted* type accepts, by
     /// name. `is_local_generic` reads arity from the resolved declaration
     /// and only falls back to this for references it cannot resolve.
@@ -668,6 +671,7 @@ impl<'a> CodegenContext<'a> {
             local_type_ids: HashSet::new(),
             names: RefCell::new(LocalScope::with_claimed(reserved_names())),
             renamed_locals: HashMap::new(),
+            constructed: RefCell::default(),
             local_type_param_counts: HashMap::new(),
             namespace_paths: HashMap::new(),
             lib_name: module.lib_name.clone(),
@@ -708,6 +712,7 @@ impl<'a> CodegenContext<'a> {
             local_type_ids: HashSet::new(),
             names: RefCell::new(LocalScope::with_claimed(reserved_names())),
             renamed_locals: HashMap::new(),
+            constructed: RefCell::default(),
             local_type_param_counts: HashMap::new(),
             namespace_paths: HashMap::new(),
             lib_name: None,

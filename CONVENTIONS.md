@@ -1150,6 +1150,42 @@ nesting](#module-declarations-and-namespace-nesting) for the
 The `export { _EmailMessage as EmailMessage }` rename gives the class its
 public name; see [Type aliases and `export { X as Y }`](#type-aliases-and-export--x-as-y-).
 
+### Constructor variables named by a type alias
+
+```ts
+declare module "cloudflare:workers" {
+  export type RpcStub<T extends Rpc.Stubable> = Rpc.Stub<T>;
+  export const RpcStub: {
+    new <T extends Rpc.Stubable>(value: T): Rpc.Stub<T>;
+  };
+}
+```
+
+When a type alias in the same scope shares the variable's name, the alias
+stays the type, so `RpcStub<T>` remains `Rpc.Stub<T>` everywhere. The
+construct signatures become constructors of the types they return, with
+`js_class` naming the variable, and keep their own type parameters:
+
+```rust
+pub type RpcStub<T> = super::super::rpc::Stub<T>;
+#[wasm_bindgen(module = "cloudflare:workers")]
+extern "C" {
+    #[wasm_bindgen(constructor, js_class = "RpcStub", catch)]
+    pub fn new<T: JsGeneric>(value: &T) -> Result<super::super::rpc::Stub<T>, JsValue>;
+}
+```
+
+`RpcStub::new(&value)?` runs `new RpcStub(value)` and returns a stub that
+any `Rpc.Stub<T>` parameter accepts. Overloads constructing the same type
+are named like a class's (`new`, `new_with_*`), and each type takes its
+own names. Each returned type must be an emitted extern type without a
+`new` of its own. A class constructor, a dictionary's builder, a member
+named `new`, or another variable already constructing that type would
+collide. A literal with members besides its construct signatures and
+`prototype` would leave them unreachable. In those cases the variable
+binds as a value instead (`pub static rpc_stub: Object`). Declaration
+order does not matter.
+
 ## Signature flattening
 
 TypeScript can describe a single callable in several ways that all mean

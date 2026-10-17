@@ -799,6 +799,12 @@ pub struct VariableDecl {
     pub js_name: String,
     pub type_ref: TypeRef,
     pub is_const: bool,
+    /// The construct signatures of a constructor-shaped variable whose
+    /// name a same-scope type alias takes as the type, as with
+    /// `type RpcStub<T> = Rpc.Stub<T>` + `const RpcStub: { new <T>(value:
+    /// T): Rpc.Stub<T> }`. Each constructs the type it returns, `js_class`
+    /// being the variable, when codegen can bind it so.
+    pub constructs: Vec<FunctionDecl>,
 }
 
 // ─── Namespace ───────────────────────────────────────────────────────
@@ -973,6 +979,9 @@ pub struct TypeRegistry {
         (crate::parse::scope::ScopeId, String),
         (crate::parse::scope::ScopeId, String),
     >,
+    /// Constructor-shaped variables whose name a type alias in the same
+    /// scope takes as the type. The alias keeps the binding.
+    pub alias_constructors: std::collections::HashSet<(crate::parse::scope::ScopeId, String)>,
 }
 
 impl TypeRegistry {

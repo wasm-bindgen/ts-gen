@@ -38,6 +38,9 @@ struct CollectCtx<'a> {
     default_identifiers: Vec<(ScopeId, String)>,
     /// Interfaces with a construct signature or `prototype` member.
     constructor_shaped: std::collections::HashSet<(ScopeId, String)>,
+    /// Constructor-shaped `var X: { new(...): T }` declarators, for a type
+    /// alias `X` declared after them.
+    ctor_vars: std::collections::HashSet<(ScopeId, String)>,
     /// `declare var X: Y` declarators, held back until the file is
     /// collected so `Y` can be checked against `constructor_shaped`
     /// regardless of declaration order.
@@ -64,6 +67,7 @@ pub fn collect_type_names(
         outer_assignments: Vec::new(),
         default_identifiers: Vec::new(),
         constructor_shaped: Default::default(),
+        ctor_vars: Default::default(),
         named_ctor_vars: Vec::new(),
     };
 
@@ -423,6 +427,11 @@ impl<'a> CollectCtx<'a> {
         } else {
             ir::RegisteredKind::TypeAlias
         };
+        if kind == ir::RegisteredKind::TypeAlias && self.ctor_vars.remove(&(scope, name.clone())) {
+            self.registry
+                .alias_constructors
+                .insert((scope, name.clone()));
+        }
         self.register_type(&name, kind, ctx, scope, exported);
         let Some(id) = self.gctx.scopes.get(scope).get(&name) else {
             return;
@@ -473,7 +482,16 @@ impl<'a> CollectCtx<'a> {
                             *kind = ir::RegisteredKind::MergedClassLike;
                             continue;
                         }
+                        // The alias stays the type, which the var constructs.
+                        if *kind == ir::RegisteredKind::TypeAlias {
+                            if exported {
+                                self.gctx.exports.insert(scope, &name, &name);
+                            }
+                            self.registry.alias_constructors.insert((scope, name));
+                            continue;
+                        }
                     }
+                    self.ctor_vars.insert((scope, name.clone()));
                     self.register_type(&name, ir::RegisteredKind::Variable, ctx, scope, exported);
                 } else if let Some(iface) = named_constructor_ref(declarator) {
                     self.named_ctor_vars

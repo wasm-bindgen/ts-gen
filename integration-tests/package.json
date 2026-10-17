@@ -1,6 +1,7 @@
 {
   "private": true,
   "dependencies": {
+    "alias-constructors": "file:./js/alias-constructors",
     "declared-modules": "file:./js/declared-modules",
     "es-module-lexer": "^1.6.0",
     "export-default": "file:./js/export-default",

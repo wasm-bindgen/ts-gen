@@ -1628,6 +1628,35 @@ mod tests {
     }
 
     #[test]
+    fn alias_named_constructor_vars_keep_the_alias() {
+        let src = r#"
+            interface Stub<T> { get(): T; }
+            export type A<T> = Stub<T>;
+            export declare const A: { new <T>(value: T): Stub<T> };
+            export declare const B: { new (n: number): Stub<number> };
+            export type B = Stub<number>;
+        "#;
+        let (module, gctx) = crate::parse_source(src, Some("m")).unwrap();
+        let scope = module.file_scopes[0];
+        for name in ["A", "B"] {
+            let id = gctx.resolve_path(scope, name).unwrap();
+            assert!(
+                matches!(gctx.get_type(id).kind, TypeKind::TypeAlias(_)),
+                "{name} resolves to its alias"
+            );
+            let constructs = module
+                .types
+                .iter()
+                .find_map(|&id| match &gctx.get_type(id).kind {
+                    TypeKind::Variable(v) if v.js_name == name => Some(&v.constructs),
+                    _ => None,
+                });
+            let constructs = constructs.unwrap_or_else(|| panic!("{name} has a variable"));
+            assert_eq!(constructs.len(), 1, "{name}");
+        }
+    }
+
+    #[test]
     fn merged_namespaces_resolve_alongside_their_type() {
         for lib in [None, Some("m")] {
             let src = r#"

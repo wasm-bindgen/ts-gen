@@ -12,7 +12,8 @@ use crate::parse::scope::ScopeId;
 use crate::util::naming::{ident_chars, naming_priority, LocalScope, Suffix};
 use std::collections::{HashMap, HashSet};
 
-use crate::ir::{FunctionDecl, ModuleContext, TypeDeclaration, TypeKind, VariableDecl};
+use crate::context::TypeId;
+use crate::ir::{FunctionDecl, Member, ModuleContext, TypeDeclaration, TypeKind, VariableDecl};
 
 /// Generate wasm_bindgen extern blocks for a free function.
 ///
@@ -300,6 +301,11 @@ pub fn generate_variable(
     if !value_names.bindings.insert(binding.clone()) {
         return TokenStream::new();
     }
+    if let Some(cgctx) = cgctx {
+        if let Some(targets) = construct_targets(decl, cgctx) {
+            return generate_constructs(decl, &targets, ctx, cgctx, doc, js_namespace);
+        }
+    }
     let base = value_names.take(&binding, ident_chars(&decl.name));
     let rust_name = value_names.idents.declare(&base, Suffix::Snake);
     let rust_ident = super::typemap::make_ident(&rust_name);
@@ -329,4 +335,148 @@ pub fn generate_variable(
             pub static #rust_ident: #ty;
         }
     }
+}
+
+/// The types `decl`'s construct signatures construct, claimed, when they
+/// bind as constructors of them: each must be a local extern type with no
+/// `new` of its own, as a class constructor, a dictionary builder, a member
+/// named `new` or another variable's constructor would collide with it.
+/// Otherwise the variable binds as a value.
+fn construct_targets(decl: &VariableDecl, cgctx: &CodegenContext<'_>) -> Option<Vec<TypeId>> {
+    let mut targets = Vec::new();
+    for construct in &decl.constructs {
+        let crate::ir::TypeRef::Reference { segments, .. } = &construct.return_type else {
+            return None;
+        };
+        let id = cgctx
+            .gctx
+            .resolve_path(construct.body_scope, &segments.join("."))
+            .filter(|id| cgctx.local_type_ids.contains(id))?;
+        let members = match &cgctx.gctx.get_type(id).kind {
+            TypeKind::Class(c) => &c.members,
+            TypeKind::Interface(i)
+                if i.classification != crate::ir::InterfaceClassification::Dictionary =>
+            {
+                &i.members
+            }
+            _ => return None,
+        };
+        if members.iter().any(member_is_new) || cgctx.constructed.borrow().contains(&id) {
+            return None;
+        }
+        targets.push(id);
+    }
+    if targets.is_empty() {
+        return None;
+    }
+    cgctx
+        .constructed
+        .borrow_mut()
+        .extend(targets.iter().copied());
+    Some(targets)
+}
+
+fn member_is_new(member: &Member) -> bool {
+    let js_name = match member {
+        Member::Constructor(_) => return true,
+        Member::Getter(m) => &m.js_name,
+        Member::StaticGetter(m) => &m.js_name,
+        Member::Method(m) => &m.js_name,
+        Member::StaticMethod(m) => &m.js_name,
+        _ => return false,
+    };
+    crate::util::naming::to_snake_case(js_name) == "new"
+}
+
+/// A constructor-shaped variable whose name a type alias takes as the type
+/// binds its construct signatures as constructors of the types they return,
+/// `new`ing the variable: `RpcStub::new(&value)` is `new RpcStub(value)`
+/// returning the `Rpc.Stub<T>` the alias names.
+fn generate_constructs(
+    decl: &VariableDecl,
+    targets: &[TypeId],
+    ctx: &ModuleContext,
+    cgctx: &CodegenContext<'_>,
+    doc: &Option<String>,
+    js_namespace: &[String],
+) -> TokenStream {
+    let js_class = &decl.js_name;
+    // Overloads constructing the same type are named together, as
+    // `new_with_*`, like a class's constructors, and names are taken per
+    // type, whose impl they go on.
+    let mut groups: Vec<(&FunctionDecl, TypeId, Vec<&[crate::ir::Param]>)> = Vec::new();
+    for (construct, &target) in decl.constructs.iter().zip(targets) {
+        let same = |first: &FunctionDecl| {
+            first.return_type == construct.return_type
+                && first
+                    .type_params
+                    .iter()
+                    .map(|tp| &tp.name)
+                    .eq(construct.type_params.iter().map(|tp| &tp.name))
+        };
+        match groups.iter_mut().find(|(first, _, _)| same(first)) {
+            Some((_, _, overloads)) => overloads.push(&construct.params),
+            None => groups.push((construct, target, vec![&construct.params])),
+        }
+    }
+    let mut names: HashMap<TypeId, LocalScope> = HashMap::new();
+    let mut items = Vec::new();
+    for (construct, target, overloads) in &groups {
+        let sigs = build_signatures(
+            &CallableSpec {
+                js_name: js_class,
+                rust_name: None,
+                kind: SignatureKind::Constructor,
+                overloads,
+                return_type: &construct.return_type,
+                throws: &construct.throws,
+                doc,
+                body_scope: construct.body_scope,
+            },
+            names.entry(*target).or_default(),
+            Some(cgctx),
+            construct.body_scope,
+        );
+        for sig in &sigs {
+            let scope = sig.body_scope;
+            let rust_ident = super::typemap::make_ident(&sig.rust_name);
+            let params =
+                generate_concrete_params_with_mono_bounds(&sig.params, Some(cgctx), scope, ctx);
+            let ret = to_return_type(
+                &sig.return_type,
+                sig.catch,
+                false,
+                sig.js_string_return,
+                sig.error_type.as_ref(),
+                Some(cgctx),
+                scope,
+                ctx,
+                super::typemap::ReturnAnchor {
+                    base: &sig.rust_name,
+                    kind: super::typemap::ReturnAnchorKind::Callable,
+                    parent: None,
+                },
+            );
+            let mut wb_parts = vec![quote! { constructor }, quote! { js_class = #js_class }];
+            wb_parts.extend(super::js_namespace_attr(js_namespace));
+            if sig.catch {
+                wb_parts.push(quote! { catch });
+            }
+            if sig.rust_name != "new" {
+                wb_parts.push(quote! { js_name = #js_class });
+            }
+            let doc = super::doc_tokens(&sig.doc);
+            let generics = render_generic_bounds(&generic_bounds_for_function(sig, Some(cgctx)));
+            let wb_extern_attr = CodegenContext::extern_attr(Some(cgctx), ctx.specifier());
+            items.push(quote! {
+                #wb_extern_attr
+                extern "C" {
+                    #doc
+                    #[wasm_bindgen(#(#wb_parts),*)]
+                    pub fn #rust_ident #generics (#params) -> #ret;
+                }
+            });
+        }
+    }
+    quote! { #(#items)* }
 }

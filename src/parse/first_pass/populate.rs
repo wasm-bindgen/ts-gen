@@ -744,6 +744,15 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                 }
                 let merged_with_iface = self.registry.kind(dcx.scope, &name)
                     == Some(&ir::RegisteredKind::MergedClassLike);
+                let alias_ctor = self
+                    .registry
+                    .alias_constructors
+                    .contains(&(dcx.scope, name.clone()));
+                let constructs = if alias_ctor {
+                    self.alias_constructs(declarator, dcx.scope)
+                } else {
+                    Vec::new()
+                };
 
                 // Promote `let X: { new(...): T }` to a class when either:
                 //   (a) it merged with an interface (script `var + interface` pattern), or
@@ -753,7 +762,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                 let is_module_ctor_var = matches!(dcx.module_context, ir::ModuleContext::Module(_))
                     && is_class_constructor_var(declarator);
 
-                if merged_with_iface || is_module_ctor_var {
+                if (merged_with_iface || is_module_ctor_var) && !alias_ctor {
                     if let Some(type_ann) = &declarator.type_annotation {
                         if let ast::TSType::TSTypeLiteral(lit) = &type_ann.type_annotation {
                             self.push_static_side_class(
@@ -810,6 +819,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                                 js_name,
                                 type_ref: type_ref.clone(),
                                 is_const,
+                                constructs: constructs.clone(),
                             }),
                             doc.clone(),
                         ));
@@ -817,6 +827,62 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                 }
             }
         }
+    }
+
+    /// The construct signatures of `var X: { new(...): T }`, each with its
+    /// own type parameters, or none when the literal has other members.
+    fn alias_constructs(
+        &mut self,
+        declarator: &ast::VariableDeclarator<'_>,
+        scope: ScopeId,
+    ) -> Vec<ir::FunctionDecl> {
+        let Some(ast::TSType::TSTypeLiteral(lit)) = declarator
+            .type_annotation
+            .as_ref()
+            .map(|ann| &ann.type_annotation)
+        else {
+            return Vec::new();
+        };
+        let mut constructs = Vec::new();
+        for member in &lit.members {
+            let sig = match member {
+                ast::TSSignature::TSConstructSignatureDeclaration(sig) => sig,
+                ast::TSSignature::TSPropertySignature(prop)
+                    if crate::parse::members::property_key_name(&prop.key).as_deref()
+                        == Some("prototype") =>
+                {
+                    continue;
+                }
+                // Statics would be unreachable from the constructors, so the
+                // variable binds as a value instead.
+                _ => return Vec::new(),
+            };
+            let mut pcx = self.parse_ctx();
+            let type_params = convert_type_params(sig.type_parameters.as_ref(), pcx.diag);
+            let body_scope =
+                crate::parse::members::create_body_scope(&type_params, scope, &mut pcx);
+            let params = crate::parse::types::convert_formal_params_scoped(
+                &sig.params,
+                body_scope,
+                &mut pcx,
+            );
+            let return_type = sig
+                .return_type
+                .as_ref()
+                .map(|rt| convert_ts_type_scoped(&rt.type_annotation, body_scope, &mut pcx))
+                .unwrap_or(ir::TypeRef::Any);
+            constructs.push(ir::FunctionDecl {
+                name: "new".to_string(),
+                js_name: "new".to_string(),
+                type_params,
+                params,
+                return_type,
+                overloads: vec![],
+                throws: ir::Throws::None,
+                body_scope,
+            });
+        }
+        constructs
     }
 
     /// Re-export alias stub for `export { local as exported } [from "m"]`.
