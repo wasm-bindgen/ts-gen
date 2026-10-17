@@ -32,7 +32,6 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [Signature flattening](#signature-flattening)
 * [Methods + the `try_<name>` companion](#methods--the-try_name-companion)
 * [`Promise<T>` returns become `async fn`](#promiset-returns-become-async-fn)
-* [Type-parameter defaults](#type-parameter-defaults)
 * [`@throws` JSDoc → typed error](#throws-jsdoc--typed-error)
 * [Subtyping LUB across unions](#subtyping-lub-across-unions)
 * [Module declarations and namespace nesting](#module-declarations-and-namespace-nesting)
@@ -982,7 +981,8 @@ type, or a name that never resolves and is reported) is dropped from
 `extends` rather than replaced, so the first real parent stays the
 `Deref` target; the literal's own members survive either way. A generic first parent is
 spelled bare in `extends`, which wasm-bindgen reads as
-`Parent<JsValue>`, so such a type derives `PartialEq` without `Eq`.
+`Parent<JsValue>`; the type still derives `Eq` (see
+[Type-level generics](#type-level-generics-propagate-to-every-binding-site)).
 
 In parameter position an intersection of named types alone
 (`refine(value: Derived & Base)`) is not hoisted: a fresh subtype would
@@ -1845,12 +1845,51 @@ When the surrounding *type* declares parameters
 parameters thread through every site that mentions `Foo`:
 
 * The `pub type` declaration in the extern block —
-  `pub type Foo<T: ::wasm_bindgen::JsGeneric>;`.
+  `pub type Foo<T: ::wasm_bindgen::JsGeneric = JsValue>;`. Every
+  parameter carries a Rust default: the lowered TS default when one is
+  declared (`EventTarget<EventMap = Record<string, Event>>` →
+  `= Object<Event>`), otherwise `JsValue`. Upstream declarations use
+  type parameters mostly as phantom refinements
+  (`Request<CfHostMetadata, Cf>`, `ReadableStream<R>`), and the
+  defaults keep the bare name usable everywhere the parameter is
+  irrelevant: in `extends = Foo`, in return types of other bindings,
+  and in user code. A default lowers like an inner type argument
+  (`string` → `JsString`, named types by reference, earlier parameters
+  by name); when its target erases to `JsValue` (an unresolved name,
+  an alias of an erased union) the whole default is `JsValue`, type
+  arguments included. Rust accepts defaults only on the type
+  definition, so dictionary builders and helper `impl`s keep the plain
+  form and a builder for a defaulted dictionary is named with explicit
+  arguments (`Options::<Box<JsString>>::builder()`).
 * Every getter / setter / method `fn` — redeclares
   `<T: ::wasm_bindgen::JsGeneric>` on the `fn` and uses
   `this: &Foo<T>`. The redeclaration is mandatory because each
   `extern "C"` `pub fn` is independent — the bound on `pub type`
   doesn't propagate to its sibling functions.
+* Constructors and static methods have no `this`, so they declare
+  only the type-level parameters their own signature mentions. A
+  constructor that mentions some returns `Foo<…>` with the mentioned
+  parameters by name and the rest at their defaults; one that
+  mentions none returns the bare `Foo`, so `Foo::new()` never needs a
+  turbofish:
+  ```rust
+  pub fn new() -> Result<TransformStream, JsValue>;
+  pub fn new_with_transformer<I: JsGeneric, O: JsGeneric>(
+      transformer: &Transformer<I, O>,
+  ) -> Result<TransformStream<I, O>, JsValue>;
+  ```
+* `extends Foo<X>` lowers to `extends = Foo` — the attribute cannot
+  carry generic arguments, and the defaults make the bare head valid.
+* A generic type derives `PartialEq, Eq` like any other imported type.
+  wasm-bindgen emits both as handle identity with no bound on the type
+  parameters (wasm-bindgen#5383), so `Foo<JsValue>`, a subclass of
+  `Foo<{…}>` and a child of `Record<string, unknown>` all compare.
+* An `async fn` whose resolved value is a bare type parameter bounds
+  it `T: JsGeneric + FromWasmAbi` — `JsFuture<T>` converts the
+  settled value through `FromWasmAbi`. Inside a callback type
+  (`Function<fn() -> Promise<T>>`) a promised type parameter erases to
+  `Promise`, since wasm-bindgen's `JsFunction` cannot normalise the
+  nested projection.
 * For dictionaries: the factory `impl<T: ::wasm_bindgen::JsGeneric>
   Foo<T>` block, the wrapper struct
   `pub struct FooBuilder<T: ::wasm_bindgen::JsGeneric>`, and the
@@ -1970,39 +2009,6 @@ Return positions are unchanged: an erased union still becomes a
 [dynamic-union enum](#erased-return-position-unions-become-dynamic-union-enums).
 Without `--experimental-generic-mono` the traits aren't available, so
 primitive unions (including `PropertyKey`) keep the per-member fan-out.
-
-## Type-parameter defaults
-
-A TypeScript default (`interface MessageBatch<Body = unknown>`) becomes a
-Rust default on the `pub type` declaration, so the bare name is a complete
-type in handler signatures and constructor returns:
-
-```ts
-interface Box<T = unknown> { readonly value: T; }
-declare class Holder<T = Box<string>> {
-  constructor();
-  get(): T;
-}
-```
-
-becomes:
-
-```rust
-pub type Box<T: ::wasm_bindgen::JsGeneric = JsValue>;
-pub type Holder<T: ::wasm_bindgen::JsGeneric = Box<JsString>>;
-
-pub fn new() -> Result<Holder, JsValue>;
-pub fn get<T: ::wasm_bindgen::JsGeneric>(this: &Holder<T>) -> T;
-```
-
-The default lowers like an inner type argument (`unknown`/`any` → `JsValue`,
-`string` → `JsString`, named types by reference, earlier parameters by name).
-Rust accepts defaults only on the type definition, so methods, dictionary
-builders and helper `impl`s keep the plain `<T: JsGeneric>` form; a builder
-for a defaulted dictionary is named with explicit arguments
-(`Options::<Box<JsString>>::builder()`). When the default's target erases to
-`JsValue` (an unresolved name, an alias of an erased union), the whole
-default is `JsValue`, type arguments included.
 
 ## `@throws` JSDoc → typed error
 

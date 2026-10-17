@@ -110,9 +110,9 @@ fn user_parents(name: &str, ctx: &CodegenContext<'_>, scope: ScopeId) -> Vec<Str
 /// (generic instantiations, unions, qualified paths, etc.) that don't
 /// have a single representative supertype name.
 fn parent_typeref_to_names(ty: &TypeRef) -> Vec<String> {
-    match ty.as_ident() {
-        Some(name) => vec![name.to_string()],
-        None => Vec::new(),
+    match ty {
+        TypeRef::Reference { segments, .. } if segments.len() == 1 => vec![segments[0].clone()],
+        _ => Vec::new(),
     }
 }
 
