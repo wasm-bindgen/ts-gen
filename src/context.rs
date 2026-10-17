@@ -74,9 +74,9 @@ pub struct GlobalContext {
     /// an export map's local names refer to. The global scope holds every
     /// global, with the declarations of all files merged.
     declarations: std::collections::HashMap<ScopeId, indexmap::IndexMap<String, Vec<TypeId>>>,
-    /// The static side of a global constructor-shaped `var` (see
-    /// [`crate::parse::first_pass::StaticSides`]), by the var's id, for an
-    /// instance interface a later file declares.
+    /// The static side of a constructor-shaped `var` (see
+    /// [`crate::parse::first_pass::StaticSides`]), by the id of the var or
+    /// its class, for an instance interface another file declares.
     pub(crate) static_sides: std::collections::HashMap<TypeId, TypeDeclaration>,
     /// The interface the static side of a global var or class came from
     /// (`XConstructor` for `var X: XConstructor`), by its id.
@@ -85,6 +85,10 @@ pub struct GlobalContext {
     /// constructor and statics from. Every file's declarations of that
     /// interface are statics of the class.
     pub(crate) global_ctor_interfaces: std::collections::HashMap<String, TypeId>,
+    /// Each module-scoped constructor class by the global interface
+    /// describing its instance. Every file's declarations of that interface
+    /// are instance members of the class.
+    pub(crate) global_instance_interfaces: std::collections::HashMap<String, TypeId>,
     types: Vec<TypeDeclaration>,
     modules: Vec<ParsedModule>,
     /// Map from module specifier to ModuleId for fast lookup.
@@ -163,6 +167,7 @@ impl GlobalContext {
             static_sides: std::collections::HashMap::new(),
             ctor_interface_of: std::collections::HashMap::new(),
             global_ctor_interfaces: std::collections::HashMap::new(),
+            global_instance_interfaces: std::collections::HashMap::new(),
             types: Vec::new(),
             modules: Vec::new(),
             module_index: std::collections::HashMap::new(),

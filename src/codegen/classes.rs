@@ -1093,6 +1093,30 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         provided_doc_bullets: Vec<String>,
     }
 
+    // A literal names its variant when its field offers a choice: several
+    // options within a pass, or different literals across passes (each
+    // branch of a discriminated union pins one).
+    let mut literals_across_passes: HashMap<String, HashSet<String>> = HashMap::new();
+    if required_passes.len() > 1 {
+        for pass in &required_passes {
+            for dim in build_field_dims(pass) {
+                for opt in dim.options {
+                    if let FieldOption::Literal {
+                        field_js_name,
+                        suffix,
+                        ..
+                    } = opt
+                    {
+                        literals_across_passes
+                            .entry(field_js_name)
+                            .or_default()
+                            .insert(suffix);
+                    }
+                }
+            }
+        }
+    }
+
     let mut builder_variants: Vec<TokenStream> = Vec::new();
     let mut new_variants: Vec<TokenStream> = Vec::new();
     // Shared across passes so a discriminator combo emitted by branch A
@@ -1178,7 +1202,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             let mut arg_idents: Vec<syn::Ident> = Vec::new();
             let mut literal_doc_bullets: Vec<String> = Vec::new();
             let mut provided_doc_bullets: Vec<String> = Vec::new();
-            for opt in combo {
+            for (dim_index, opt) in combo.iter().enumerate() {
                 match opt {
                     FieldOption::Literal {
                         field_js_name,
@@ -1188,7 +1212,16 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                         setter_ident,
                         literal_expr,
                     } => {
-                        literal_suffix.push_str(suffix);
+                        // A field with a single literal option offers no
+                        // choice, so it is baked in without naming the
+                        // variant after it (`new`, not `new_0_none__`).
+                        if field_dims[dim_index].options.len() > 1
+                            || literals_across_passes
+                                .get(field_js_name)
+                                .is_some_and(|values| values.len() > 1)
+                        {
+                            literal_suffix.push_str(suffix);
+                        }
                         init_calls.push(quote! { inner.#setter_ident(#literal_expr); });
                         let bullet_head = format!("`{field_js_name}: {literal_display}`");
                         literal_doc_bullets.push(match field_doc {
