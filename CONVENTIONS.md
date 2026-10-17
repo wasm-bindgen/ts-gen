@@ -3024,7 +3024,8 @@ Two files are written next to the output:
 * `provides.rs` (regenerated): one `#[wasm_bindgen]` function per
   provided function, delegating to the app module (`--provides-app`,
   default `super::app`) and importing types from the bindings module
-  (`--provides-bindings`, default `super::<output stem>`).
+  (`--provides-bindings`, default `super::<output stem>`, with `-` and
+  `.` replaced by `_`).
 
   ```rust
   #[wasm_bindgen(js_namespace = default, js_name = "fetch")]
