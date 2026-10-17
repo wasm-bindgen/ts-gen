@@ -36,3 +36,23 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "b")]
     pub fn try_b() -> Result<(), JsValue>;
 }
+#[wasm_bindgen(module = "module-export-aliases")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , js_name = "Conn")]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type _Conn;
+    #[wasm_bindgen(constructor, js_class = "Conn", catch)]
+    pub fn new() -> Result<_Conn, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn get(this: &_Conn) -> String;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub fn try_get(this: &_Conn) -> Result<String, JsValue>;
+    # [wasm_bindgen (static_method_of = _Conn , js_class = "Conn")]
+    pub fn open() -> _Conn;
+    # [wasm_bindgen (static_method_of = _Conn , js_class = "Conn" , catch , js_name = "open")]
+    pub fn try_open() -> Result<_Conn, JsValue>;
+}
+#[allow(dead_code)]
+pub type Conn = _Conn;
+#[allow(dead_code)]
+pub type Connection = _Conn;
