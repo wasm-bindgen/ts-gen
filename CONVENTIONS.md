@@ -360,19 +360,26 @@ the setter is named `set_<snake_case>`.
   doc comment. The same name under different `module = "..."` specifiers
   is a distinct binding.
 * Distinct JS names that collide after conversion and sanitisation are
-  numbered in declaration order. Free functions and statics share their
-  module's value namespace (`fooBar`, `FOO_BAR` and a function `foo_bar`
-  become `foo_bar`, `foo_bar_2` and `foo_bar_3`; `ajax` and `$ajax`
-  become `ajax` and `ajax_2`). A type's properties and methods are
-  numbered together, in declaration order, and the getter, `set_`
-  setter, and a dictionary's factory parameter and builder method all
-  follow the property's name (`data` and `$data` give `data` /
-  `set_data` and `data_2` / `set_data_2`). A property takes the next
-  number when its setter name is taken, so a method `setFoo()` before a
-  property `foo` gives `foo_2` / `set_foo_2`. A parameter list numbers
-  without the underscore (`a` and `$a` give `a` and `a2`), since
-  wasm-bindgen's generated code names the ABI parts of a parameter `a`
-  `a_1` to `a_4`.
+  numbered. The name goes to the JS name spelled the same in Rust, then
+  to one that only changes case, then to one that loses or spells out
+  characters, and within each of those to the first declared. So `ajax`
+  keeps `ajax` and `$ajax` becomes `ajax_2` in either order, and
+  reordering a `.d.ts` only renames bindings within one of those groups.
+  A declared name also outranks a derived one: a method `try_count()`
+  keeps its name, and `count()`'s fallible variant becomes `try_count_2`.
+  * Free functions and statics share their module's value namespace: a
+    function `foo_bar` and statics `fooBar` and `FOO_BAR` become
+    `foo_bar`, `foo_bar_2` and `foo_bar_3`.
+  * A type's properties and methods are named together, after the
+    constructor's `new`. The getter, `set_` setter, and a dictionary's
+    factory parameter and builder method all follow the property's name
+    (`data` and `$data` give `data` / `set_data` and `data_2` /
+    `set_data_2`). A property takes the next number when its setter's
+    name is taken, so a property `setFoo` beside a property `foo` gives
+    `set_foo_2` / `set_set_foo_2` and `foo` / `set_foo`.
+  * A parameter list numbers without the underscore (`a` and `$a` give
+    `a` and `a2`), since wasm-bindgen's generated code names the ABI
+    parts of a parameter `a` `a_1` to `a_4`.
 * Reserved Rust keywords in fn, method, and accessor names get a trailing
   underscore (`type()` → `type_`). Elsewhere (parameters, variables) they
   are emitted as raw identifiers (`r#type`, `r#loop`), except `self`,

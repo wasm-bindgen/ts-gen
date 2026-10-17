@@ -20,23 +20,22 @@ extern "C" {
 extern "C" {
     #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2, js_name = "fooBar")]
-    pub static foo_bar: f64;
+    pub static foo_bar_2: f64;
 }
 #[wasm_bindgen]
 extern "C" {
     #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2, js_name = "FOO_BAR")]
-    pub static foo_bar_2: f64;
+    pub static foo_bar_3: f64;
 }
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(js_name = "foo_bar")]
-    pub fn foo_bar_3();
+    pub fn foo_bar();
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "foo_bar")]
-    pub fn try_foo_bar_3() -> Result<(), JsValue>;
+    pub fn try_foo_bar() -> Result<(), JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {

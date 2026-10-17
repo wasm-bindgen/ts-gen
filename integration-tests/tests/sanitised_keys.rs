@@ -27,7 +27,7 @@ fn sanitised_bindings_compile(pair: &Pair) {
     let _: f64 = Store::count();
     Store::set_count(1.0);
 
-    let _: Pair = dollar("#id");
+    let _: Pair = dollar_2("#id");
     let _: String = version.with(|v| v.clone());
 
     let _: Vec<Pair> = dollar_dollar("#id");
@@ -48,26 +48,27 @@ fn colliding_names_compile(collide: &Collide, methods: &MethodCollide) {
 
     let init = CollideInit::builder(1.0, 2.0).data("a").data_2("b").build();
     let _: f64 = init.foo_bar() + init.foo_bar_2();
+    init.set_foo_bar_2(3.0);
     let _ = CollideInit::new(1.0, 2.0);
 
     methods.data();
     let _: String = methods.data_2();
     methods.set_data_2("x");
-    methods.set_foo();
-    let _: String = methods.foo_2();
-    methods.set_foo_2("x");
+    methods.set_foo_2();
+    let _: String = methods.foo();
+    methods.set_foo("x");
     methods.call();
     methods.call_with_a("x");
     methods.call_with_a_2(1.0);
 
     let setters = SetterCollide::new("a", "b");
-    let _: String = setters.set_foo();
-    setters.set_set_foo("x");
-    let _: String = setters.foo_2();
-    setters.set_foo_2("x");
+    let _: String = setters.set_foo_2();
+    setters.set_set_foo_2("x");
+    let _: String = setters.foo();
+    setters.set_foo("x");
 
     ajax("/a");
     ajax_2("/b");
     collide_args("a", 1.0, "b", 2.0);
-    dollar_2();
+    dollar();
 }

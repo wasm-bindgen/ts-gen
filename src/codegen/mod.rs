@@ -845,7 +845,11 @@ impl<'d> ModTree<'d> {
 
     /// Generate this module's items. `path` is its `pub mod` path.
     fn generate(&self, path: &mut Vec<String>, cgctx: &CodegenContext) -> Vec<TokenStream> {
-        let mut value_names = functions::ValueNames::default();
+        let mut value_names =
+            functions::ValueNames::new(self.entries.iter().filter_map(|entry| match entry {
+                ModEntry::Item(decl, _) => Some(*decl),
+                ModEntry::Mod(_) => None,
+            }));
         let mut items = Vec::new();
         for entry in &self.entries {
             match entry {

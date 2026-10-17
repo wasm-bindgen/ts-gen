@@ -53,7 +53,8 @@ declare class Stream extends NodeJS.EventEmitter {
   pipe(destination: Stream): Stream;
 }
 
-// 1.4: try_ collision — class has both `count` and `try_count`
+// 1.4: try_ collision — class has both `count` and `try_count`; the declared
+// `try_count` keeps its name
 declare class Counter {
   count(): number;
   try_count(): number;
