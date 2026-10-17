@@ -144,6 +144,9 @@ pub fn generate_with_options(
         anyhow::anyhow!("generated tokens are not valid syn:\n{e}\n\nTokens:\n{tokens}")
     })?;
     split_unshared_views(&mut file.items);
+    if options.experimental_generic_mono {
+        signatures::state_abi_bounds(&mut file.items);
+    }
     let formatted = rustfmt(&quote::ToTokens::to_token_stream(&file).to_string())?;
     // Prepend a header comment. Line comments don't survive `quote!`
     // token generation, so they have to be emitted as plain text

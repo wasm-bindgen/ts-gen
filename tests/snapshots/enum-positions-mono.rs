@@ -25,15 +25,25 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Holder<T>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<T>(value: T) -> Result<Holder<T>, JsValue>;
+    pub fn new<T>(value: T) -> Result<Holder<T>, JsValue>
+    where
+        T: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method)]
-    pub fn get<T>(this: &Holder<T>) -> T;
+    pub fn get<T>(this: &Holder<T>) -> T
+    where
+        T: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get<T>(this: &Holder<T>) -> Result<T, JsValue>;
+    pub fn try_get<T>(this: &Holder<T>) -> Result<T, JsValue>
+    where
+        T: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method)]
-    pub fn set<T>(this: &Holder<T>, value: T);
+    pub fn set<T>(this: &Holder<T>, value: T)
+    where
+        T: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "set")]
-    pub fn try_set<T>(this: &Holder<T>, value: T) -> Result<(), JsValue>;
+    pub fn try_set<T>(this: &Holder<T>, value: T) -> Result<(), JsValue>
+    where
+        T: ::wasm_bindgen::convert::IntoWasmAbi;
 }
 #[wasm_bindgen(module = "enum-positions-mono", experimental_generic_mono)]
 extern "C" {
@@ -41,13 +51,21 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Details<T>;
     #[wasm_bindgen(method, getter)]
-    pub fn value<T>(this: &Details<T>) -> T;
+    pub fn value<T>(this: &Details<T>) -> T
+    where
+        T: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<T>(this: &Details<T>, val: T);
+    pub fn set_value<T>(this: &Details<T>, val: T)
+    where
+        T: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, getter)]
-    pub fn fallback<T>(this: &Details<T>) -> Option<T>;
+    pub fn fallback<T>(this: &Details<T>) -> Option<T>
+    where
+        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_fallback<T>(this: &Details<T>, val: T);
+    pub fn set_fallback<T>(this: &Details<T>, val: T)
+    where
+        T: ::wasm_bindgen::convert::IntoWasmAbi;
 }
 impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Details<T> {
     pub fn new(value: T) -> Details<T> {

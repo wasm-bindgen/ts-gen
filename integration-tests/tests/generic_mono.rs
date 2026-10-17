@@ -1,11 +1,12 @@
 #![cfg(target_arch = "wasm32")]
 
 use js_sys::{Array, ArrayTuple, Function, JsString, Map, Uint8Array};
+use wasm_bindgen::convert::{FromWasmAbi, IntoWasmAbi, OptionFromWasmAbi};
 use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::generic_mono::{
     identity, parse_string, parse_string_js_string, roundtrip_boolean, roundtrip_number,
-    try_parse_string, try_parse_string_js_string, EvaluationDetails, Flags, Holder, Pair,
+    try_parse_string, try_parse_string_js_string, EvaluationDetails, Flags, Holder, Pair, Store,
     TypedArrayOptions,
 };
 
@@ -69,4 +70,17 @@ async fn generic_mono_signatures_compile(flags: &Flags, js_string: &JsString) {
     let bytes = Uint8Array::new_with_length(1);
     let _ = TypedArrayOptions::new(&bytes);
     let _ = TypedArrayOptions::builder(&bytes).extra(&bytes).build();
+}
+
+// A generic caller needs exactly the bounds the declarations state.
+#[allow(dead_code)]
+async fn generic_mono_bounds_are_declared<T>(holder: &Holder<T>, store: &Store<T>, value: T)
+where
+    T: FromWasmAbi + IntoWasmAbi + OptionFromWasmAbi + 'static,
+{
+    holder.set(value);
+    let _: T = holder.get();
+    let _: Option<T> = store.find("key");
+    let _: Result<T, JsValue> = store.load().await;
+    let _: Result<Holder<T>, JsValue> = store.load_holder().await;
 }

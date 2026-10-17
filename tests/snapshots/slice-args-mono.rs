@@ -6,25 +6,32 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
-    pub fn generic<T>(#[wasm_bindgen(slice = "array")] values: &[T]) -> String;
+    pub fn generic<T>(#[wasm_bindgen(slice = "array")] values: &[T]) -> String
+    where
+        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
 }
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "generic")]
-    pub fn generic_js_string<T>(#[wasm_bindgen(slice = "array")] values: &[T]) -> JsString;
+    pub fn generic_js_string<T>(#[wasm_bindgen(slice = "array")] values: &[T]) -> JsString
+    where
+        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
 }
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "generic")]
-    pub fn try_generic<T>(#[wasm_bindgen(slice = "array")] values: &[T])
-        -> Result<String, JsValue>;
+    pub fn try_generic<T>(#[wasm_bindgen(slice = "array")] values: &[T]) -> Result<String, JsValue>
+    where
+        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
 }
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "generic")]
     pub fn try_generic_js_string<T>(
         #[wasm_bindgen(slice = "array")] values: &[T],
-    ) -> Result<JsString, JsValue>;
+    ) -> Result<JsString, JsValue>
+    where
+        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
 }
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
@@ -34,22 +41,30 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new<T>() -> Result<Bag<T>, JsValue>;
     #[wasm_bindgen(method)]
-    pub fn take<T>(this: &Bag<T>, #[wasm_bindgen(slice = "array")] values: &[T]) -> String;
+    pub fn take<T>(this: &Bag<T>, #[wasm_bindgen(slice = "array")] values: &[T]) -> String
+    where
+        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
     #[wasm_bindgen(method, js_name = "take")]
     pub fn take_js_string<T>(
         this: &Bag<T>,
         #[wasm_bindgen(slice = "array")] values: &[T],
-    ) -> JsString;
+    ) -> JsString
+    where
+        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "take")]
     pub fn try_take<T>(
         this: &Bag<T>,
         #[wasm_bindgen(slice = "array")] values: &[T],
-    ) -> Result<String, JsValue>;
+    ) -> Result<String, JsValue>
+    where
+        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "take")]
     pub fn try_take_js_string<T>(
         this: &Bag<T>,
         #[wasm_bindgen(slice = "array")] values: &[T],
-    ) -> Result<JsString, JsValue>;
+    ) -> Result<JsString, JsValue>
+    where
+        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
 }
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
@@ -57,7 +72,9 @@ extern "C" {
         #[wasm_bindgen(slice = "array")] values: &[T],
         #[wasm_bindgen(slice = "array")] weights: &[f64],
         #[wasm_bindgen(slice = "copy")] data: &[f64],
-    ) -> String;
+    ) -> String
+    where
+        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
 }
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
@@ -66,7 +83,9 @@ extern "C" {
         #[wasm_bindgen(slice = "array")] values: &[T],
         #[wasm_bindgen(slice = "array")] weights: &[f64],
         #[wasm_bindgen(slice = "copy")] data: &[f64],
-    ) -> JsString;
+    ) -> JsString
+    where
+        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
 }
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
@@ -75,7 +94,9 @@ extern "C" {
         #[wasm_bindgen(slice = "array")] values: &[T],
         #[wasm_bindgen(slice = "array")] weights: &[f64],
         #[wasm_bindgen(slice = "copy")] data: &[f64],
-    ) -> Result<String, JsValue>;
+    ) -> Result<String, JsValue>
+    where
+        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
 }
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
@@ -84,7 +105,9 @@ extern "C" {
         #[wasm_bindgen(slice = "array")] values: &[T],
         #[wasm_bindgen(slice = "array")] weights: &[f64],
         #[wasm_bindgen(slice = "copy")] data: &[f64],
-    ) -> Result<JsString, JsValue>;
+    ) -> Result<JsString, JsValue>
+    where
+        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
 }
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
@@ -93,7 +116,9 @@ extern "C" {
         #[wasm_bindgen(slice = "array")] values: &[T],
         #[wasm_bindgen(slice = "array")] weights: &[f64],
         data: &Float64Array,
-    ) -> String;
+    ) -> String
+    where
+        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
 }
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
@@ -102,7 +127,9 @@ extern "C" {
         #[wasm_bindgen(slice = "array")] values: &[T],
         #[wasm_bindgen(slice = "array")] weights: &[f64],
         data: &Float64Array,
-    ) -> JsString;
+    ) -> JsString
+    where
+        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
 }
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
@@ -111,7 +138,9 @@ extern "C" {
         #[wasm_bindgen(slice = "array")] values: &[T],
         #[wasm_bindgen(slice = "array")] weights: &[f64],
         data: &Float64Array,
-    ) -> Result<String, JsValue>;
+    ) -> Result<String, JsValue>
+    where
+        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
 }
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
@@ -120,5 +149,7 @@ extern "C" {
         #[wasm_bindgen(slice = "array")] values: &[T],
         #[wasm_bindgen(slice = "array")] weights: &[f64],
         data: &Float64Array,
-    ) -> Result<JsString, JsValue>;
+    ) -> Result<JsString, JsValue>
+    where
+        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
 }

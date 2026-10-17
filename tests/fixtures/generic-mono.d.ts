@@ -8,6 +8,12 @@ export declare class Holder<T> {
 
 export declare function identity<T>(value: T): T;
 
+export declare class Store<T> {
+  load(): Promise<T>;
+  loadHolder(): Promise<Holder<T>>;
+  find(key: string): T | undefined;
+}
+
 export interface EvaluationDetails<T> {
   flagKey: string;
   value: T;

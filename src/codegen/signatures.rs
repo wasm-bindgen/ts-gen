@@ -1507,8 +1507,8 @@ fn mono_argument_type(ty: &TypeRef) -> Option<TokenStream> {
 pub struct DictionaryParams {
     /// One `Tn: ::js_sys::TypedArray` bound per `ArrayBufferView` param.
     pub bounds: Vec<TokenStream>,
-    /// Extra `where` clause for Rust helper bodies. Extern declarations must
-    /// not use it; see [`generate_dictionary_params`].
+    /// Extra `where` clause for Rust helper bodies. Extern declarations get
+    /// theirs from [`state_abi_bounds`].
     pub helper_where_clause: TokenStream,
     /// The rendered `name: Type, …` list for Rust helper bodies.
     pub params: TokenStream,
@@ -1532,9 +1532,7 @@ pub struct DictionaryParams {
 /// `<...>` declaration carries every bound the `fn` needs.
 ///
 /// Under per-monomorphization codegen, ordinary Rust helpers that call an
-/// imported `&T` parameter must repeat the macro-generated reference ABI bound.
-/// Extern declarations ignore the returned clause because wasm-bindgen adds
-/// that requirement to their generated call shim itself.
+/// imported `&T` parameter repeat the import's reference ABI bound.
 pub fn generate_dictionary_params(
     params: &[ConcreteParam],
     cgctx: Option<&CodegenContext<'_>>,
@@ -1592,12 +1590,12 @@ pub fn generate_dictionary_params_in(
         .map(|g| quote! { #g: ::js_sys::TypedArray })
         .collect::<Vec<_>>();
 
-    // This must mirror wasm-bindgen's macro-generated import-shim bound: the
-    // ordinary Rust dictionary helper calls that shim with `&T` directly.
+    // This must mirror the import's reference ABI bound: the ordinary Rust
+    // dictionary helper calls the import with `&T` directly.
     let helper_where_clause = if CodegenContext::generic_mono(cgctx) && !generic_idents.is_empty() {
         quote! {
             where
-                #(for<'__wbg> &'__wbg #generic_idents: ::wasm_bindgen::convert::IntoWasmAbi),*
+                #(#generic_idents: ::wasm_bindgen::convert::RefIntoWasmAbi),*
         }
     } else {
         quote! {}
@@ -1608,6 +1606,267 @@ pub fn generate_dictionary_params_in(
         helper_where_clause,
         params: quote! { #(#items),* },
         extern_params: quote! { #(#extern_items),* },
+    }
+}
+
+/// Under per-monomorphization a type parameter crosses the ABI as itself,
+/// so a generic import states the ABI traits it needs in a `where` clause:
+/// `IntoWasmAbi` for an argument (`RefIntoWasmAbi` for a borrowed `&T`,
+/// `VectorRefIntoWasmAbi` on the element of a borrowed `&[T]`),
+/// `FromWasmAbi` for a return, and `'static` for an awaited one. An
+/// imported type implements its ABI for any arguments, so it is bounded
+/// only by `'static`; bare parameters and std containers of them are
+/// bounded in full.
+pub(crate) fn state_abi_bounds(items: &mut [syn::Item]) {
+    for item in items {
+        match item {
+            syn::Item::Mod(m) => {
+                if let Some((_, items)) = &mut m.content {
+                    state_abi_bounds(items);
+                }
+            }
+            syn::Item::ForeignMod(block)
+                if has_wasm_bindgen_flag(&block.attrs, "experimental_generic_mono") =>
+            {
+                for item in &mut block.items {
+                    if let syn::ForeignItem::Fn(f) = item {
+                        state_fn_abi_bounds(f);
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+}
+
+fn has_wasm_bindgen_flag(attrs: &[syn::Attribute], flag: &str) -> bool {
+    attrs.iter().any(|attr| match &attr.meta {
+        syn::Meta::List(list) if list.path.is_ident("wasm_bindgen") => list
+            .tokens
+            .clone()
+            .into_iter()
+            .any(|t| matches!(t, proc_macro2::TokenTree::Ident(i) if i == flag)),
+        _ => false,
+    })
+}
+
+enum AbiShape {
+    /// A type parameter, or a std container or slice of one, whose ABI
+    /// depends on the parameter.
+    Dependent,
+    /// An imported type, whose ABI does not.
+    Imported,
+    /// `impl Trait`, whose trait carries its ABI bound.
+    Opaque,
+}
+
+fn abi_shape(ty: &syn::Type, params: &std::collections::HashSet<String>) -> AbiShape {
+    match ty {
+        syn::Type::Path(p) if p.qself.is_none() => {
+            let last = p.path.segments.last().map(|s| s.ident.to_string());
+            let bare = p.path.segments.len() == 1
+                && matches!(p.path.segments[0].arguments, syn::PathArguments::None);
+            match last.as_deref() {
+                Some(name) if bare && params.contains(name) => AbiShape::Dependent,
+                Some("Option" | "Vec" | "Box") => AbiShape::Dependent,
+                _ => AbiShape::Imported,
+            }
+        }
+        syn::Type::Paren(p) => abi_shape(&p.elem, params),
+        syn::Type::Group(g) => abi_shape(&g.elem, params),
+        syn::Type::ImplTrait(_) => AbiShape::Opaque,
+        _ => AbiShape::Dependent,
+    }
+}
+
+fn mentioned_params(
+    tokens: TokenStream,
+    params: &std::collections::HashSet<String>,
+    out: &mut Vec<proc_macro2::Ident>,
+) {
+    for t in tokens {
+        match t {
+            proc_macro2::TokenTree::Ident(i) if params.contains(&i.to_string()) => {
+                if !out.contains(&i) {
+                    out.push(i);
+                }
+            }
+            proc_macro2::TokenTree::Group(g) => mentioned_params(g.stream(), params, out),
+            _ => {}
+        }
+    }
+}
+
+fn mentions_param(tokens: TokenStream, params: &std::collections::HashSet<String>) -> bool {
+    tokens.into_iter().any(|t| match t {
+        proc_macro2::TokenTree::Ident(i) => params.contains(&i.to_string()),
+        proc_macro2::TokenTree::Group(g) => mentions_param(g.stream(), params),
+        _ => false,
+    })
+}
+
+fn state_fn_abi_bounds(f: &mut syn::ForeignItemFn) {
+    use quote::ToTokens;
+    let params: std::collections::HashSet<String> = f
+        .sig
+        .generics
+        .type_params()
+        .map(|p| p.ident.to_string())
+        .collect();
+    if params.is_empty() {
+        return;
+    }
+    // Bounded type → its bounds, in first-seen order.
+    let mut predicates: Vec<(TokenStream, Vec<TokenStream>)> = Vec::new();
+    let mut bound = |ty: TokenStream, b: TokenStream| {
+        let key = ty.to_string();
+        match predicates.iter_mut().find(|(t, _)| t.to_string() == key) {
+            Some((_, bounds)) => {
+                if !bounds.iter().any(|x| x.to_string() == b.to_string()) {
+                    bounds.push(b);
+                }
+            }
+            None => predicates.push((ty, vec![b])),
+        }
+    };
+    let into = quote! { ::wasm_bindgen::convert::IntoWasmAbi };
+    let from = quote! { ::wasm_bindgen::convert::FromWasmAbi };
+    // `Option<T>` has its ABI exactly when `T: Option{Into,From}WasmAbi`,
+    // which is the form a generic caller writes.
+    let bounded = |ty: &syn::Type, abi: &TokenStream| -> (TokenStream, TokenStream) {
+        if let Some(inner) = option_param(ty, &params) {
+            let abi = match abi.to_string().contains("Into") {
+                true => quote! { ::wasm_bindgen::convert::OptionIntoWasmAbi },
+                false => quote! { ::wasm_bindgen::convert::OptionFromWasmAbi },
+            };
+            return (inner.to_token_stream(), abi);
+        }
+        (ty.to_token_stream(), abi.clone())
+    };
+
+    for input in &f.sig.inputs {
+        let syn::FnArg::Typed(arg) = input else {
+            continue;
+        };
+        if !mentions_param(arg.ty.to_token_stream(), &params) {
+            continue;
+        }
+        match &*arg.ty {
+            // wasm-bindgen marshals a borrowed type parameter through
+            // `RefIntoWasmAbi` and a borrowed slice through its element's
+            // `VectorRefIntoWasmAbi`; other referents through `&X` itself.
+            syn::Type::Reference(r) => match &*r.elem {
+                syn::Type::Path(p) if p.qself.is_none() && is_bare_param(&p.path, &params) => {
+                    bound(
+                        r.elem.to_token_stream(),
+                        quote! { ::wasm_bindgen::convert::RefIntoWasmAbi },
+                    );
+                }
+                syn::Type::Slice(slice) => {
+                    let elem = &slice.elem;
+                    bound(
+                        quote! { #elem },
+                        quote! { ::wasm_bindgen::convert::VectorRefIntoWasmAbi },
+                    );
+                }
+                elem => {
+                    if let AbiShape::Dependent = abi_shape(elem, &params) {
+                        bound(quote! { for<'__wbg> &'__wbg #elem }, into.clone());
+                    }
+                }
+            },
+            ty => {
+                if let AbiShape::Dependent = abi_shape(ty, &params) {
+                    let (ty, abi) = bounded(ty, &into);
+                    bound(ty, abi);
+                }
+            }
+        }
+    }
+
+    if let syn::ReturnType::Type(_, ret) = &f.sig.output {
+        let ret = if has_wasm_bindgen_flag(&f.attrs, "catch") {
+            result_ok_type(ret).unwrap_or(ret)
+        } else {
+            ret
+        };
+        if mentions_param(ret.to_token_stream(), &params) {
+            let is_async = f.sig.asyncness.is_some();
+            match abi_shape(ret, &params) {
+                AbiShape::Dependent => {
+                    let (ty, abi) = bounded(ret, &from);
+                    bound(ty.clone(), abi);
+                    if is_async {
+                        bound(ty, quote! { 'static });
+                    }
+                }
+                AbiShape::Imported if is_async => {
+                    let mut mentioned = Vec::new();
+                    mentioned_params(ret.to_token_stream(), &params, &mut mentioned);
+                    for p in mentioned {
+                        bound(p.to_token_stream(), quote! { 'static });
+                    }
+                }
+                _ => {}
+            }
+        }
+    }
+
+    if predicates.is_empty() {
+        return;
+    }
+    let where_clause = f.sig.generics.make_where_clause();
+    for (ty, bounds) in predicates {
+        where_clause
+            .predicates
+            .push(syn::parse_quote! { #ty: #(#bounds)+* });
+    }
+}
+
+fn is_bare_param(path: &syn::Path, params: &std::collections::HashSet<String>) -> bool {
+    path.get_ident()
+        .is_some_and(|i| params.contains(&i.to_string()))
+}
+
+/// `T` of an `Option<T>` whose `T` is a bare type parameter.
+fn option_param<'t>(
+    ty: &'t syn::Type,
+    params: &std::collections::HashSet<String>,
+) -> Option<&'t syn::Ident> {
+    let syn::Type::Path(p) = ty else {
+        return None;
+    };
+    let last = p.path.segments.last()?;
+    if last.ident != "Option" {
+        return None;
+    }
+    let syn::PathArguments::AngleBracketed(args) = &last.arguments else {
+        return None;
+    };
+    let Some(syn::GenericArgument::Type(syn::Type::Path(inner))) = args.args.first() else {
+        return None;
+    };
+    inner
+        .path
+        .get_ident()
+        .filter(|i| params.contains(&i.to_string()))
+}
+
+/// `T` of a `Result<T, E>`.
+fn result_ok_type(ty: &syn::Type) -> Option<&syn::Type> {
+    let syn::Type::Path(p) = ty else {
+        return None;
+    };
+    let last = p.path.segments.last()?;
+    if last.ident != "Result" {
+        return None;
+    }
+    let syn::PathArguments::AngleBracketed(args) = &last.arguments else {
+        return None;
+    };
+    match args.args.first()? {
+        syn::GenericArgument::Type(ty) => Some(ty),
+        _ => None,
     }
 }
 
@@ -1650,6 +1909,47 @@ mod tests {
 
     fn no_used() -> LocalScope {
         LocalScope::default()
+    }
+
+    #[test]
+    fn mono_externs_state_their_abi_bounds() {
+        let mut file: syn::File = syn::parse_quote! {
+            #[wasm_bindgen(experimental_generic_mono)]
+            extern "C" {
+                #[wasm_bindgen(method, catch)]
+                pub async fn load<T, U>(this: &Store<T>, u: U, key: impl JsStringLike) -> Result<Holder<T>, JsValue>;
+                pub fn find<T>(value: &T, rest: Vec<T>) -> Option<T>;
+                pub fn plain(value: f64) -> f64;
+            }
+        };
+        state_abi_bounds(&mut file.items);
+        let syn::Item::ForeignMod(block) = &file.items[0] else {
+            unreachable!()
+        };
+        let wheres: Vec<String> = block
+            .items
+            .iter()
+            .map(|item| match item {
+                syn::ForeignItem::Fn(f) => f
+                    .sig
+                    .generics
+                    .where_clause
+                    .as_ref()
+                    .map(|w| quote::ToTokens::to_token_stream(w).to_string())
+                    .unwrap_or_default(),
+                _ => unreachable!(),
+            })
+            .collect();
+        assert_eq!(
+            wheres,
+            [
+                "where U : :: wasm_bindgen :: convert :: IntoWasmAbi , T : 'static",
+                "where T : :: wasm_bindgen :: convert :: RefIntoWasmAbi + \
+                 :: wasm_bindgen :: convert :: OptionFromWasmAbi , \
+                 Vec < T > : :: wasm_bindgen :: convert :: IntoWasmAbi",
+                "",
+            ]
+        );
     }
 
     #[test]
@@ -1843,7 +2143,7 @@ mod tests {
         let mono = render(&cgctx);
         assert_eq!(
             mono.helper_where_clause.to_string(),
-            "where for < '__wbg > & '__wbg T : :: wasm_bindgen :: convert :: IntoWasmAbi"
+            "where T : :: wasm_bindgen :: convert :: RefIntoWasmAbi"
         );
         assert_eq!(
             mono.params.to_string(),

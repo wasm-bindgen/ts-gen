@@ -29,13 +29,21 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Pair<A, B>;
     #[wasm_bindgen(method, getter)]
-    pub fn a<A, B>(this: &Pair<A, B>) -> A;
+    pub fn a<A, B>(this: &Pair<A, B>) -> A
+    where
+        A: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_a<A, B>(this: &Pair<A, B>, val: A);
+    pub fn set_a<A, B>(this: &Pair<A, B>, val: A)
+    where
+        A: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, getter)]
-    pub fn b<A, B>(this: &Pair<A, B>) -> B;
+    pub fn b<A, B>(this: &Pair<A, B>) -> B
+    where
+        B: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_b<A, B>(this: &Pair<A, B>, val: B);
+    pub fn set_b<A, B>(this: &Pair<A, B>, val: B)
+    where
+        B: ::wasm_bindgen::convert::IntoWasmAbi;
 }
 impl<A: ::wasm_bindgen::convert::IntoWasmAbi, B: ::wasm_bindgen::convert::IntoWasmAbi> Pair<A, B> {
     pub fn new(a: A, b: B) -> Pair<A, B> {
