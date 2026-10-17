@@ -33,6 +33,9 @@ struct CollectCtx<'a> {
     /// scope chain once the whole file is collected, since the namespace
     /// may be declared after the module.
     outer_assignments: Vec<(ScopeId, String, String)>,
+    /// `(scope, name)` for each `export default <name>` in a module, resolved
+    /// once the whole file is collected as the declaration may follow.
+    default_identifiers: Vec<(ScopeId, String)>,
     /// Interfaces with a construct signature or `prototype` member.
     constructor_shaped: std::collections::HashSet<String>,
     /// `declare var X: Y` declarators, held back until the file is
@@ -59,6 +62,7 @@ pub fn collect_type_names(
         is_script: !super::is_module(program),
         export_specifiers: Vec::new(),
         outer_assignments: Vec::new(),
+        default_identifiers: Vec::new(),
         constructor_shaped: Default::default(),
         named_ctor_vars: Vec::new(),
     };
@@ -76,6 +80,35 @@ pub fn collect_type_names(
 
     for (scope, specifier, name) in std::mem::take(&mut ccx.outer_assignments) {
         ccx.assign_namespace(scope, &specifier, &name);
+    }
+
+    // A namespace's members would bind through a named export the module
+    // doesn't have, so a name with a namespace is the default only when a
+    // merged class, function or variable carries the value.
+    for (scope, name) in std::mem::take(&mut ccx.default_identifiers) {
+        let s = ccx.gctx.scopes.get(scope);
+        let has_namespace = s.namespace(&name).is_some();
+        let bound =
+            s.get(&name)
+                .is_some_and(|id| match ccx.gctx.get_type(id).kind {
+                    ir::TypeKind::Namespace(_) => false,
+                    // An interface merged with a constructor-shaped `var` is a
+                    // class, whose binding is still the interface placeholder.
+                    ir::TypeKind::Interface(_) => {
+                        !has_namespace
+                            || ccx.registry.types.get(&name).is_some_and(|info| {
+                                info.kind == ir::RegisteredKind::MergedClassLike
+                            })
+                    }
+                    // A TS `enum` binds no JS value of its own in Rust.
+                    ir::TypeKind::TypeAlias(_)
+                    | ir::TypeKind::StringEnum(_)
+                    | ir::TypeKind::NumericEnum(_) => !has_namespace,
+                    _ => true,
+                });
+        if bound {
+            ccx.export_default(scope, &name);
+        }
     }
 
     for (scope, local, public) in std::mem::take(&mut ccx.export_specifiers) {
@@ -180,13 +213,17 @@ impl<'a> CollectCtx<'a> {
                     }
                 }
             }
+            // `export default class Def` exports `default` only; `Def` is a
+            // local name (TS2614 on `import { Def }`), so it binds by
+            // `default` like a renamed export. Outside a module there is no
+            // export to bind.
             ast::Statement::ExportDefaultDeclaration(export) => match &export.declaration {
-                // `export default class Def` exports `default` only; `Def`
-                // is a local name (TS2614 on `import { Def }`).
                 ast::ExportDefaultDeclarationKind::ClassDeclaration(class) => {
                     if let Some(ref id) = class.id {
                         self.register_type(&id.name, ir::RegisteredKind::Class, ctx, scope, false);
-                        self.gctx.exports.insert(scope, "default", id.name.as_str());
+                        if matches!(ctx, ir::ModuleContext::Module(_)) {
+                            self.export_default(scope, &id.name);
+                        }
                     }
                 }
                 ast::ExportDefaultDeclarationKind::FunctionDeclaration(func) => {
@@ -198,7 +235,15 @@ impl<'a> CollectCtx<'a> {
                             scope,
                             false,
                         );
-                        self.gctx.exports.insert(scope, "default", id.name.as_str());
+                        if matches!(ctx, ir::ModuleContext::Module(_)) {
+                            self.export_default(scope, &id.name);
+                        }
+                    }
+                }
+                ast::ExportDefaultDeclarationKind::Identifier(ident) => {
+                    if matches!(ctx, ir::ModuleContext::Module(_)) {
+                        self.default_identifiers
+                            .push((scope, ident.name.to_string()));
                     }
                 }
                 other => {
@@ -215,14 +260,7 @@ impl<'a> CollectCtx<'a> {
                 if let (ir::ModuleContext::Module(_), ast::Expression::Identifier(ident)) =
                     (ctx, &assign.expression)
                 {
-                    self.gctx
-                        .exports
-                        .insert(scope, "default", ident.name.as_str());
-                    self.export_specifiers.push((
-                        scope,
-                        ident.name.to_string(),
-                        "default".to_string(),
-                    ));
+                    self.export_default(scope, &ident.name);
                 }
             }
             ast::Statement::TSNamespaceExportDeclaration(_) => {}
@@ -627,6 +665,13 @@ impl<'a> CollectCtx<'a> {
     fn earlier_global_namespace(&self, name: &str) -> Option<ScopeId> {
         let parent = self.gctx.scopes.get(self.file_scope).parent?;
         self.gctx.scopes.get(parent).namespace(name)
+    }
+
+    /// Record `local` as `scope`'s default export, binding by `default`.
+    fn export_default(&mut self, scope: ScopeId, local: &str) {
+        self.gctx.exports.insert(scope, "default", local);
+        self.export_specifiers
+            .push((scope, local.to_string(), "default".to_string()));
     }
 
     fn collect_namespace_names(

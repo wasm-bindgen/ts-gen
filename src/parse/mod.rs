@@ -1383,6 +1383,67 @@ mod tests {
     }
 
     #[test]
+    fn default_exports_bind_by_default() {
+        let dir = std::env::temp_dir().join(format!("ts-gen-default-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let decls = dir.join("decls.d.ts");
+        std::fs::write(
+            &decls,
+            r#"
+                declare module "a" { export default class C {} }
+                declare module "b" { export default function f(): void; }
+                declare module "c" { const v: string; export default v; }
+                declare module "d" { export default later; function later(): void; }
+                declare module "e" { namespace N { function x(): void; } export default N; }
+                declare module "g" { interface I { a: string } namespace I { function y(): void; } export default I; }
+                declare module "k" { enum E { A = 1 } namespace E { function y(): void; } export default E; }
+                declare module "h" {
+                    interface P { go(): void; }
+                    const P: { new (): P; prototype: P };
+                    namespace P { function z(): void; }
+                    export default P;
+                }
+            "#,
+        )
+        .unwrap();
+        let result = parse_dts_files(&[&decls], None);
+        std::fs::remove_dir_all(&dir).unwrap();
+        let (module, gctx) = result.unwrap();
+
+        let js_names: std::collections::HashMap<String, String> = module
+            .types
+            .iter()
+            .filter_map(|&id| match &gctx.get_type(id).kind {
+                TypeKind::Class(c) => Some((c.name.clone(), c.js_name.clone())),
+                TypeKind::Function(f) => Some((f.name.clone(), f.js_name.clone())),
+                TypeKind::Variable(v) => Some((v.name.clone(), v.js_name.clone())),
+                _ => None,
+            })
+            .collect();
+        for name in ["C", "f", "v", "later"] {
+            assert_eq!(
+                js_names.get(name).map(String::as_str),
+                Some("default"),
+                "{name}"
+            );
+        }
+        let c = gctx.ambient_module_scopes["c"][0];
+        assert_eq!(gctx.exports.local_name(c, "default"), Some("v"));
+        // A namespace has no value to bind as `default`, so stays unexported.
+        let e = gctx.ambient_module_scopes["e"][0];
+        assert_eq!(gctx.exports.local_name(e, "default"), None);
+        assert!(!gctx.exports.is_exported(e, "N"));
+        // Nor does an interface merged with one, unless a `var` makes it a
+        // class.
+        let g = gctx.ambient_module_scopes["g"][0];
+        assert_eq!(gctx.exports.local_name(g, "default"), None);
+        let k = gctx.ambient_module_scopes["k"][0];
+        assert_eq!(gctx.exports.local_name(k, "default"), None);
+        let h = gctx.ambient_module_scopes["h"][0];
+        assert_eq!(gctx.exports.local_name(h, "default"), Some("P"));
+    }
+
+    #[test]
     fn test_import_namespaces_between_ambient_modules() {
         let dir = std::env::temp_dir().join(format!("ts-gen-ambient-ns-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();

@@ -2376,6 +2376,46 @@ through the namespace, in either declaration order.
   aliased.
 * `export { X as Y } from "...";` (with source) → registered as an import
   from the named module.
+* `export default class C`, `export default function f` and `export
+  default x` (naming a declaration in the module) bind the declaration as
+  the module's `default` export. A default export has no name of its own,
+  so the Rust name stays the local one, as for the binding an `export =`
+  assigns: the class gets `js_name = "default"` and its constructor and
+  statics `js_class = "default"`, and the function or static gets
+  `js_name = "default"`. `export default x` of a namespace without a merged
+  class, function or variable, or of a name the module doesn't declare,
+  is skipped with a diagnostic. Outside a module there is no export to
+  bind: `export default class C` and `function f` are emitted as plain
+  globals, and `export default x` is skipped.
+
+  ```ts
+  declare module "processor" {
+    export default class Processor { constructor(name: string); }
+  }
+  declare module "version" {
+    const version: string;
+    export default version;
+  }
+  ```
+
+  ```rust
+  pub mod processor {
+      #[wasm_bindgen(module = "processor")]
+      extern "C" {
+          #[wasm_bindgen(extends = Object, js_name = "default")]
+          pub type Processor;
+          #[wasm_bindgen(constructor, js_class = "default", catch)]
+          pub fn new(name: &str) -> Result<Processor, JsValue>;
+      }
+  }
+  pub mod version {
+      #[wasm_bindgen(module = "version")]
+      extern "C" {
+          #[wasm_bindgen(thread_local_v2, js_name = "default")]
+          pub static version: String;
+      }
+  }
+  ```
 
 ## String and numeric enums
 

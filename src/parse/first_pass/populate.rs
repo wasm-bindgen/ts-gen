@@ -310,7 +310,10 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                         .for_span(export.span.start)
                         .or_else(|| self.docs.for_span(class.span.start));
                     let class_decl = convert_class_decl(class, ctx, scope, &mut self.parse_ctx());
-                    if let Some(decl) = class_decl {
+                    if let Some(mut decl) = class_decl {
+                        if let Some(public) = self.export_names(scope, &decl.name).first() {
+                            decl.js_name = public.clone();
+                        }
                         declarations.push(ir::TypeDeclaration {
                             kind: ir::TypeKind::Class(decl),
                             module_context: ctx.clone(),
@@ -341,13 +344,35 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                             &decl.js_name,
                             self.diag,
                         );
-                        declarations.push(ir::TypeDeclaration {
-                            kind: ir::TypeKind::Function(decl),
-                            module_context: ctx.clone(),
-                            doc,
-                            scope_id: scope,
-                            exported: true,
-                        });
+                        let names = self.export_names(scope, &decl.js_name);
+                        for (name, js_name) in value_bindings(&decl.js_name, names) {
+                            declarations.push(ir::TypeDeclaration {
+                                kind: ir::TypeKind::Function(ir::FunctionDecl {
+                                    name,
+                                    js_name,
+                                    ..decl.clone()
+                                }),
+                                module_context: ctx.clone(),
+                                doc: doc.clone(),
+                                scope_id: scope,
+                                exported: true,
+                            });
+                        }
+                    }
+                }
+                // Bound by its declaration, which takes `default` from the
+                // export map.
+                ast::ExportDefaultDeclarationKind::Identifier(ident) => {
+                    if !self
+                        .export_names(scope, &ident.name)
+                        .iter()
+                        .any(|name| name == "default")
+                    {
+                        self.diag.info(format!(
+                            "Skipping `export default {}` (only a class, function or variable \
+                             declared in the same module is supported)",
+                            ident.name
+                        ));
                     }
                 }
                 other => {

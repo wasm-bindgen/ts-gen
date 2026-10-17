@@ -1,0 +1,10 @@
+{
+  "name": "export-default",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./create": "./create.js",
+    "./version": "./version.js"
+  }
+}
