@@ -1,6 +1,6 @@
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{BigInt, Boolean, JsString, Uint8Array, Uint8ClampedArray};
+use js_sys::{BigInt, JsString, Uint8Array, Uint8ClampedArray};
 use wasm_bindgen::Clamped;
 use wasm_bindgen_test::*;
 
@@ -13,10 +13,7 @@ fn slice_arguments_arrive_as_arrays() {
     assert_eq!(literals(&[1.0, 2.0]), "Array(1,2)");
     assert_eq!(levels(&[2.0]), "Array(2)");
     assert_eq!(strings(&["a".to_string(), "b".to_string()]), "Array(a,b)");
-    assert_eq!(
-        flags(&[Boolean::from(true), Boolean::from(false)]),
-        "Array(true,false)"
-    );
+    assert_eq!(flags(&[true, false]), "Array(true,false)");
     assert_eq!(bigints(&[BigInt::from(7)]), "Array(7)");
     assert_eq!(
         items(&[Item::new("x").unwrap(), Item::new("y").unwrap()]),

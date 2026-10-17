@@ -127,12 +127,12 @@ extern "C" {
 }
 #[wasm_bindgen(module = "nested-arrays")]
 extern "C" {
-    pub fn flags(values: &[Boolean]) -> Vec<Boolean>;
+    pub fn flags(values: &[bool]) -> Vec<bool>;
 }
 #[wasm_bindgen(module = "nested-arrays")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "flags")]
-    pub fn try_flags(values: &[Boolean]) -> Result<Vec<Boolean>, JsValue>;
+    pub fn try_flags(values: &[bool]) -> Result<Vec<bool>, JsValue>;
 }
 #[wasm_bindgen(module = "nested-arrays")]
 extern "C" {

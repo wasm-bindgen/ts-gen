@@ -1972,7 +1972,8 @@ fn getter_js_string_variant(
 ) -> Option<(syn::Ident, TokenStream)> {
     let ctx = config.cgctx.filter(|ctx| {
         ctx.experimental_generic_mono
-            && super::typemap::has_mono_js_string_return(ty, ctx, config.scope)
+            && (super::typemap::has_mono_js_string_return(ty, ctx, config.scope)
+                || super::typemap::is_mono_string_list_return(ty, ctx, config.scope))
     })?;
     let js_name = names.declare(&format!("{rust_name}_js_string"), Suffix::Snake);
     let js_type =

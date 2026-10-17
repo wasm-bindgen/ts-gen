@@ -31,7 +31,7 @@ async fn nested_array_signatures_compile(
     let nullable: Vec<JsOption<Array<JsString>>> = nullable_rows(&[]);
     let _ = nullable_rows(&nullable);
 
-    let bools: Vec<Boolean> = flags(&[]);
+    let bools: Vec<bool> = flags(&[]);
     let _ = flags(&bools);
     let _: Vec<String> = ids(&["a".to_string()]);
     let _: Vec<String> = modes(&["a".to_string()]);

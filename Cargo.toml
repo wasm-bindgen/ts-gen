@@ -24,10 +24,10 @@ wasm-bindgen-test = "0.3.78"
 # #5376, #5377 and #5341, until these ship in a release. All four crates must
 # come from the same source.
 [patch.crates-io]
-js-sys = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "69d72955b2ee1cbf9cad77b47908c29fef532588" }
-wasm-bindgen = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "69d72955b2ee1cbf9cad77b47908c29fef532588" }
-wasm-bindgen-futures = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "69d72955b2ee1cbf9cad77b47908c29fef532588" }
-wasm-bindgen-test = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "69d72955b2ee1cbf9cad77b47908c29fef532588" }
+js-sys = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "3e5692ea94f22cd76377a4e219947593279ec6e7" }
+wasm-bindgen = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "3e5692ea94f22cd76377a4e219947593279ec6e7" }
+wasm-bindgen-futures = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "3e5692ea94f22cd76377a4e219947593279ec6e7" }
+wasm-bindgen-test = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "3e5692ea94f22cd76377a4e219947593279ec6e7" }
 
 [package]
 categories = ["wasm", "development-tools::ffi"]
