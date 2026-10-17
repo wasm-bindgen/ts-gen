@@ -96,3 +96,43 @@ pub mod m {
         pub fn try_make() -> Result<super::W, JsValue>;
     }
 }
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Multi;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<Multi, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Multi")]
+    pub fn new_with_n(n: f64) -> Result<Multi, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Multi")]
+    pub fn new_with_s_and_n(s: &str, n: f64) -> Result<Multi, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn m(this: &Multi);
+    #[wasm_bindgen(method, catch, js_name = "m")]
+    pub fn try_m(this: &Multi) -> Result<(), JsValue>;
+}
+pub mod ctors {
+    #[allow(unused_imports)]
+    use super::*;
+}
+pub mod q {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , js_namespace = "Q")]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type Qual;
+        #[wasm_bindgen(constructor, js_namespace = "Q", catch)]
+        pub fn new() -> Result<Qual, JsValue>;
+        # [wasm_bindgen (static_method_of = Qual , js_namespace = "Q")]
+        pub fn make() -> Qual;
+        # [wasm_bindgen (static_method_of = Qual , js_namespace = "Q" , catch , js_name = "make")]
+        pub fn try_make() -> Result<Qual, JsValue>;
+        #[wasm_bindgen(method)]
+        pub fn q(this: &Qual);
+        #[wasm_bindgen(method, catch, js_name = "q")]
+        pub fn try_q(this: &Qual) -> Result<(), JsValue>;
+    }
+}

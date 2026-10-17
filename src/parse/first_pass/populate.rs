@@ -620,10 +620,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
     ) -> ir::TypeDeclaration {
         let (ctor, static_members) = extract_var_members(members, dcx.scope, &mut self.parse_ctx());
 
-        let mut members = Vec::new();
-        if let Some(c) = ctor {
-            members.push(ir::Member::Constructor(c));
-        }
+        let mut members: Vec<ir::Member> = ctor.into_iter().map(ir::Member::Constructor).collect();
         members.extend(static_members);
 
         // Var-promoted classes have no surface

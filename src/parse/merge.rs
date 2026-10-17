@@ -86,14 +86,14 @@ pub fn extract_var_members(
     members: &[TSSignature<'_>],
     parent_scope: ScopeId,
     ctx: &mut ParseCtx<'_, '_>,
-) -> (Option<ConstructorMember>, Vec<Member>) {
-    let mut constructor = None;
+) -> (Vec<ConstructorMember>, Vec<Member>) {
+    let mut constructors = Vec::new();
     let mut static_members = Vec::new();
 
     for member in members {
         match member {
             TSSignature::TSConstructSignatureDeclaration(ctor) => {
-                constructor = Some(convert_construct_signature(ctor, parent_scope, ctx));
+                constructors.push(convert_construct_signature(ctor, parent_scope, ctx));
             }
             TSSignature::TSPropertySignature(prop) => {
                 let js_name = match property_key_name(&prop.key) {
@@ -162,5 +162,5 @@ pub fn extract_var_members(
         }
     }
 
-    (constructor, static_members)
+    (constructors, static_members)
 }

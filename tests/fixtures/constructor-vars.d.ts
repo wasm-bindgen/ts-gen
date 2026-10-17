@@ -4,7 +4,9 @@
 // are one class. The var's type, resolved from the var, gives the class its
 // constructor and statics, whichever comes first and wherever the
 // constructor interface is declared: `N.Foo`'s is outside `N`. A module's
-// constructor var alone is a class of its own.
+// constructor var alone is a class of its own. Construct signatures are
+// overloads (`Multi`), and a qualified annotation resolves from the var
+// like a bare one (`Q.Qual`).
 
 interface FooCtor {
   new (): N.Foo;
@@ -52,4 +54,29 @@ declare var W: WCtor;
 
 declare module "m" {
   const W: WCtor;
+}
+
+interface Multi {
+  m(): void;
+}
+interface MultiCtor {
+  new (): Multi;
+  new (n: number): Multi;
+  new (s: string, n: number): Multi;
+  readonly prototype: Multi;
+}
+declare var Multi: MultiCtor;
+
+declare namespace Ctors {
+  interface QualCtor {
+    new (): Q.Qual;
+    readonly prototype: Q.Qual;
+    make(): Q.Qual;
+  }
+}
+declare namespace Q {
+  interface Qual {
+    q(): void;
+  }
+  var Qual: Ctors.QualCtor;
 }

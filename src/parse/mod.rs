@@ -445,7 +445,7 @@ impl InsertCtx<'_> {
         }
         let gctx = &mut *self.gctx;
         if let crate::ir::TypeKind::Variable(v) = &gctx.get_type(type_id).kind {
-            if v.type_ref.as_ident().is_some() && !gctx.ctor_vars.contains(&(type_id, block)) {
+            if type_path(&v.type_ref).is_some() && !gctx.ctor_vars.contains(&(type_id, block)) {
                 gctx.ctor_vars.push((type_id, block));
             }
         }
@@ -813,7 +813,7 @@ fn populate_builtin_scope(gctx: &mut GlobalContext, scope: ScopeId) {
     for &name in crate::codegen::typemap::JS_SYS_RESERVED {
         let type_id = gctx.insert_type(crate::ir::TypeDeclaration {
             kind: crate::ir::TypeKind::Interface(crate::ir::InterfaceDecl {
-                construct: None,
+                construct: Vec::new(),
                 name: name.to_string(),
                 js_name: name.to_string(),
                 type_params: vec![],
@@ -840,7 +840,7 @@ fn populate_builtin_scope(gctx: &mut GlobalContext, scope: ScopeId) {
     for (name, _) in defaults {
         let type_id = gctx.insert_type(crate::ir::TypeDeclaration {
             kind: crate::ir::TypeKind::Interface(crate::ir::InterfaceDecl {
-                construct: None,
+                construct: Vec::new(),
                 name: name.to_string(),
                 js_name: name.to_string(),
                 type_params: vec![],
@@ -906,10 +906,8 @@ fn bind_constructor_vars(gctx: &mut GlobalContext, module: &mut Module) {
         let TypeKind::Variable(v) = &decl.kind else {
             continue;
         };
-        let Some(ctor) = v
-            .type_ref
-            .as_ident()
-            .and_then(|name| gctx.scopes.resolve(decl.scope_id, name))
+        let Some(ctor) =
+            type_path(&v.type_ref).and_then(|path| gctx.resolve_path(decl.scope_id, &path))
         else {
             continue;
         };
@@ -920,14 +918,14 @@ fn bind_constructor_vars(gctx: &mut GlobalContext, module: &mut Module) {
             .members
             .iter()
             .any(|m| matches!(m, Member::Getter(g) if g.js_name == "prototype"));
-        if side.construct.is_none() && !prototype {
+        if side.construct.is_empty() && !prototype {
             continue;
         }
         let mut members: Vec<Member> = side
             .construct
-            .clone()
+            .iter()
+            .cloned()
             .map(Member::Constructor)
-            .into_iter()
             .collect();
         members.extend(static_members(&side.members));
         let instance = gctx
@@ -995,7 +993,7 @@ fn bind_constructor_vars(gctx: &mut GlobalContext, module: &mut Module) {
     let mut stack = module.types.clone();
     while let Some(id) = stack.pop() {
         match &gctx.get_type(id).kind {
-            TypeKind::Interface(i) if i.construct.is_some() && !consumed.contains(&id) => {
+            TypeKind::Interface(i) if !i.construct.is_empty() && !consumed.contains(&id) => {
                 let name = i.name.clone();
                 gctx.diagnostics.warn(format!(
                     "Construct signature on `{name}` is not a class constructor, skipping"
@@ -1014,6 +1012,18 @@ fn bind_constructor_vars(gctx: &mut GlobalContext, module: &mut Module) {
         .map(|(specifier, root)| (specifier.clone(), root.exports))
         .collect();
     name_constructor_classes(gctx, &modules, &constructor_classes);
+}
+
+/// The path a reference to a non-generic named type names (`XConstructor`,
+/// `N.XConstructor`).
+fn type_path(ty: &crate::ir::TypeRef) -> Option<String> {
+    match ty {
+        crate::ir::TypeRef::Reference {
+            segments,
+            generic_args,
+        } if generic_args.is_empty() => Some(segments.join(".")),
+        _ => None,
+    }
 }
 
 /// An interface's members as statics, where an interface describes a
@@ -1286,9 +1296,9 @@ fn merge_class_pairs(
                 if let Some(&existing_idx) = iface_map.get(&key) {
                     if let TypeKind::Interface(ref mut existing) = result[existing_idx].kind {
                         merge_members(&mut existing.members, iface_decl.members.clone());
-                        if iface_decl.construct.is_some() {
-                            existing.construct = iface_decl.construct.clone();
-                        }
+                        existing
+                            .construct
+                            .extend(iface_decl.construct.iter().cloned());
                         // Merge extends
                         for ext in &iface_decl.extends {
                             if !existing.extends.contains(ext) {
@@ -1359,7 +1369,7 @@ mod tests {
 
     fn iface(name: &str, members: Vec<Member>) -> InterfaceDecl {
         InterfaceDecl {
-            construct: None,
+            construct: Vec::new(),
             name: name.to_string(),
             js_name: name.to_string(),
             type_params: vec![],
@@ -1615,9 +1625,9 @@ mod tests {
             declare var Arr: ArrConstructor;";
         let added = "interface ArrConstructor { new (n: number): Arr; from(x: any): Arr; }
             interface Arr { b(): void; }";
-        // The later file's construct signature wins, as a later block's does
-        // within one file.
-        for (i, (sources, ctor_params)) in [([class, added], 1), ([added, class], 0)]
+        // Every file's construct signatures are overloads, in file order, as
+        // a later block's follow an earlier one's within one file.
+        for (i, (sources, ctor_params)) in [([class, added], [0, 1]), ([added, class], [1, 0])]
             .iter()
             .enumerate()
         {
@@ -1641,25 +1651,27 @@ mod tests {
             let TypeKind::Class(arr) = &gctx.get_type(arrs[0]).kind else {
                 panic!("{i}: Arr is a class");
             };
+            let ctors: Vec<usize> = arr
+                .members
+                .iter()
+                .filter_map(|m| match m {
+                    Member::Constructor(c) => Some(c.params.len()),
+                    _ => None,
+                })
+                .collect();
+            assert_eq!(ctors, ctor_params, "{i}");
             let mut members: Vec<String> = arr
                 .members
                 .iter()
+                .filter(|m| !matches!(m, Member::Constructor(_)))
                 .map(|m| match m {
-                    Member::Constructor(c) => {
-                        assert_eq!(c.params.len(), *ctor_params, "{i}");
-                        "new".into()
-                    }
                     Member::StaticMethod(m) => format!("static {}", m.js_name),
                     Member::Method(m) => m.js_name.clone(),
                     other => panic!("{i}: {other:?}"),
                 })
                 .collect();
             members.sort();
-            assert_eq!(
-                members,
-                ["a", "b", "new", "static from", "static isArr"],
-                "{i}"
-            );
+            assert_eq!(members, ["a", "b", "static from", "static isArr"], "{i}");
             let ctor_interfaces = module.types.iter().filter(|&&id| {
                 matches!(&gctx.get_type(id).kind, TypeKind::Interface(i) if i.name == "ArrConstructor")
             });

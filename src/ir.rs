@@ -579,9 +579,10 @@ pub struct InterfaceDecl {
     pub type_params: Vec<TypeParam>,
     pub extends: Vec<TypeRef>,
     pub members: Vec<Member>,
-    /// Its construct signature (`new (…): T`). Only a constructor `var` the
-    /// interface types binds it, as its class's constructor.
-    pub construct: Option<ConstructorMember>,
+    /// Its construct signatures (`new (…): T`), overloads in declaration
+    /// order. Only a constructor `var` the interface types binds them, as
+    /// its class's constructors.
+    pub construct: Vec<ConstructorMember>,
     /// Classification determined during assembly.
     pub classification: InterfaceClassification,
     /// Scope inside this interface's body — see

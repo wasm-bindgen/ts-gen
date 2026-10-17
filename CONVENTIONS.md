@@ -1141,8 +1141,9 @@ to `JsValue` with an unresolved-type diagnostic, like any unmapped type.
 
 As TypeScript's checker types a declaration, the variable's type is
 resolved once every file is bound, from the variable's own location:
-`URIErrorConstructor` resolves from the variable's scope with every
-file's declarations of it merged, wherever it is declared. Only
+`URIErrorConstructor`, or a qualified `N.URIErrorConstructor`, resolves
+from the variable's scope with every file's declarations of it merged,
+wherever it is declared. Only
 declarations in the same container merge into the class, so an
 `interface URIError` inside a `declare module` is a different
 declaration and leaves the global class alone, and a constructor
@@ -2293,8 +2294,9 @@ file and its constructor `var` in another (`declare var X: { new(): X;
 class, as within a file. Every file's `interface XConstructor` blocks
 are the static side of that class and are not emitted as a type, so
 `from` and `of`, which lib.es2015.core adds to `ArrayConstructor`, are
-statics of `Array`. Of the construct signatures, the last file's wins,
-as a later block's does within a file. A value never takes a type's
+statics of `Array`. Its construct signatures, from every file in file
+order, are the class's constructor overloads, which expand as `new`,
+`new_with_…` like any overloads. A value never takes a type's
 name, so `interface F` and `declare function F(): F` in different files
 keep `F` the interface.
 

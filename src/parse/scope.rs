@@ -271,7 +271,7 @@ mod tests {
     fn make_iface_decl(name: &str, scope: ScopeId) -> crate::ir::TypeDeclaration {
         crate::ir::TypeDeclaration {
             kind: crate::ir::TypeKind::Interface(crate::ir::InterfaceDecl {
-                construct: None,
+                construct: Vec::new(),
                 name: name.to_string(),
                 js_name: name.to_string(),
                 type_params: vec![],

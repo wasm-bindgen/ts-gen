@@ -122,7 +122,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type XS;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new(n: f64) -> Result<XS, JsValue>;
+    pub fn new() -> Result<XS, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "XS")]
+    pub fn new_with_n(n: f64) -> Result<XS, JsValue>;
     # [wasm_bindgen (static_method_of = XS)]
     pub fn added() -> XS;
     # [wasm_bindgen (static_method_of = XS , catch , js_name = "added")]

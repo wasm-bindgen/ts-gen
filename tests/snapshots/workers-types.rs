@@ -10691,11 +10691,20 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<ReadableStream, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "ReadableStream")]
+    pub fn new_with_underlying_byte_source(
+        underlying_source: &UnderlyingByteSource,
+    ) -> Result<ReadableStream, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "ReadableStream")]
+    pub fn new_with_underlying_byte_source_and_queuing_strategy(
+        underlying_source: &UnderlyingByteSource,
+        strategy: &QueuingStrategy<Uint8Array>,
+    ) -> Result<ReadableStream, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "ReadableStream")]
     pub fn new_with_underlying_source(
         underlying_source: &UnderlyingSource<R>,
     ) -> Result<ReadableStream, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "ReadableStream")]
-    pub fn new_with_underlying_source_and_strategy(
+    pub fn new_with_underlying_source_and_queuing_strategy(
         underlying_source: &UnderlyingSource<R>,
         strategy: &QueuingStrategy<R>,
     ) -> Result<ReadableStream, JsValue>;

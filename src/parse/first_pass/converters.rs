@@ -114,12 +114,12 @@ pub fn interface_from_signatures(
     let js_name = name.clone();
     let parent = name.clone();
     let body_scope = create_body_scope(&type_params, parent_scope, ctx);
-    let mut construct = None;
+    let mut construct = Vec::new();
     let mut members: Vec<ir::Member> = Vec::new();
     for sig in signatures {
         match sig {
             ast::TSSignature::TSConstructSignatureDeclaration(ctor) => {
-                construct = Some(crate::parse::merge::convert_construct_signature(
+                construct.push(crate::parse::merge::convert_construct_signature(
                     ctor, body_scope, ctx,
                 ));
             }

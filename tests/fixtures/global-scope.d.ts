@@ -5,5 +5,6 @@
 // one type with the members of both. An interface and a constructor-shaped
 // `var` in different files are one class in either file order (`XV`, `VX`,
 // `XC`, `CX`). Members another file adds to the constructor interface are
-// statics of the class in either order (`XS`, `SX`). An interface keeps its
+// statics of the class in either order (`XS`, `SX`), and its construct
+// signatures are constructor overloads. An interface keeps its
 // name as a type beside a function of the same name (`XF`, `FX`).

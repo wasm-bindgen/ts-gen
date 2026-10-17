@@ -238,7 +238,7 @@ pub(crate) fn try_synthesize_iterable_return(
     });
 
     ctx.synth.push(InterfaceDecl {
-        construct: None,
+        construct: Vec::new(),
         name: synth_name.clone(),
         js_name: synth_name.clone(),
         type_params: synth_type_params.clone(),
@@ -459,7 +459,7 @@ pub(crate) fn synthesize_inline(
     let classification = crate::parse::classify::classify_interface(&members);
     Some(SynthesizedInline {
         iface: InterfaceDecl {
-            construct: None,
+            construct: Vec::new(),
             name: name.clone(),
             js_name: name,
             type_params,

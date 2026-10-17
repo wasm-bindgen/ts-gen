@@ -281,7 +281,7 @@ fn register_type(
             })
         }
         ir::RegisteredKind::Interface => ir::TypeKind::Interface(ir::InterfaceDecl {
-            construct: None,
+            construct: Vec::new(),
             name: name_str.clone(),
             js_name: name_str.clone(),
             type_params: vec![],

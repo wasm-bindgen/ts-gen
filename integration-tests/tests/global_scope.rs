@@ -28,7 +28,8 @@ fn constructor_vars_merge_across_files() -> Result<(), wasm_bindgen::JsValue> {
     XC::stat();
     CX::new()?.inst();
     CX::stat();
-    XS::new(1.0)?.inst();
+    XS::new()?.inst();
+    XS::new_with_n(1.0)?.inst();
     XS::added();
     SX::new()?.inst();
     SX::added();
