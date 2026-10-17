@@ -26,12 +26,12 @@ extern "C" {
 #[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "unwrapText")]
-    pub fn unwrap_text(stub: &Wrap<String>) -> Result<String, JsValue>;
+    pub fn unwrap_text(stub: &Stub<String>) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "unwrapText")]
-    pub fn unwrap_text_js_string(stub: &Wrap<String>) -> Result<JsString, JsValue>;
+    pub fn unwrap_text_js_string(stub: &Stub<String>) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
 extern "C" {

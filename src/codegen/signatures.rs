@@ -1084,8 +1084,6 @@ fn flatten_into(
         }
 
         // Bare references: resolve through aliases, then re-flatten.
-        // Generic instantiations and qualified paths don't follow
-        // aliases (they're already concrete at this level).
         //
         // The target flattens in the alias's own scope, but its
         // alternatives lower from the use site's. Where the use site
@@ -1108,6 +1106,18 @@ fn flatten_into(
                         out.push(ty.clone());
                     }
                     return true;
+                }
+            }
+            out.push(ty.clone());
+            true
+        }
+
+        // Generic alias instantiations substitute their arguments, then
+        // re-flatten from the use site, where the arguments were written.
+        TypeRef::Reference { .. } => {
+            if let Some(c) = cgctx {
+                if let Some(target) = c.resolve_alias_instance(ty, scope) {
+                    return flatten_into(&target, cgctx, scope, out);
                 }
             }
             out.push(ty.clone());
@@ -1164,6 +1174,14 @@ fn flatten_collapse_to_lub(
                     if c.resolves_alike(&lub, alias_scope, scope) {
                         return lub;
                     }
+                }
+            }
+            ty.clone()
+        }
+        TypeRef::Reference { .. } => {
+            if let Some(c) = cgctx {
+                if let Some(target) = c.resolve_alias_instance(ty, scope) {
+                    return flatten_collapse_to_lub(&target, cgctx, scope);
                 }
             }
             ty.clone()

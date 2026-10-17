@@ -488,7 +488,7 @@ pub type ViaStr = JsString;
 #[allow(dead_code)]
 pub type ViaViaStr = JsString;
 #[allow(dead_code)]
-pub type ViaBranded = Branded<Base>;
+pub type ViaBranded = Base;
 #[allow(dead_code)]
 pub type BaseAlias = Base;
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
@@ -513,11 +513,11 @@ impl ViaBaseAlias {
 #[allow(dead_code)]
 pub type Same<T> = T;
 #[allow(dead_code)]
-pub type ViaSame = Same<Base>;
+pub type ViaSame = Base;
 #[allow(dead_code)]
 pub type ProviderOf<T> = Provider<Array<T>>;
 #[allow(dead_code)]
-pub type ViaProviderOf = ProviderOf<String>;
+pub type ViaProviderOf = Provider<Array<JsString>>;
 #[wasm_bindgen(private)]
 pub enum RoleKind {
     User = "user",
