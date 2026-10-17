@@ -3,7 +3,7 @@
 use ts_gen_integration_tests::sanitised_keys::{
     ajax, ajax_2, collide_args, compare, dollar, dollar_2, dollar_dollar, each,
     underscore_underscore, version, Collide, CollideInit, DollarUnderscore, MethodCollide, Op,
-    Pair, SetterCollide, Sigil, Store,
+    Pair, ReadonlyCollide, SetterCollide, SetterNumbers, Sigil, Store,
 };
 
 // Compile-only coverage that wasm-bindgen accepts the `js_name` / `js_class`
@@ -40,7 +40,12 @@ fn sanitised_bindings_compile(pair: &Pair) {
 }
 
 #[allow(dead_code)]
-fn colliding_names_compile(collide: &Collide, methods: &MethodCollide) {
+fn colliding_names_compile(
+    collide: &Collide,
+    methods: &MethodCollide,
+    readonly: &ReadonlyCollide,
+    numbers: &SetterNumbers,
+) {
     let _: String = collide.data();
     collide.set_data("x");
     let _: String = collide.data_2();
@@ -54,18 +59,29 @@ fn colliding_names_compile(collide: &Collide, methods: &MethodCollide) {
     methods.data();
     let _: String = methods.data_2();
     methods.set_data_2("x");
-    methods.set_foo_2();
+    methods.set_foo();
     let _: String = methods.foo();
-    methods.set_foo("x");
+    methods.set_foo_2("x");
     methods.call();
     methods.call_with_a("x");
     methods.call_with_a_2(1.0);
 
     let setters = SetterCollide::new("a", "b");
-    let _: String = setters.set_foo_2();
-    setters.set_set_foo_2("x");
+    let _: String = setters.set_foo();
+    setters.set_set_foo("x");
     let _: String = setters.foo();
-    setters.set_foo("x");
+    setters.set_foo_2("x");
+
+    let _: String = numbers.data();
+    numbers.set_data_3("x");
+    let _: String = numbers.data_2();
+    numbers.set_data_2("x");
+    numbers.set_data();
+
+    let _: String = readonly.value();
+    readonly.set_value("x");
+    let _: f64 = ReadonlyCollide::level();
+    ReadonlyCollide::set_level(1.0);
 
     ajax("/a");
     ajax_2("/b");

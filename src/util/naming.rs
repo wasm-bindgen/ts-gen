@@ -119,7 +119,9 @@ pub(crate) fn ident_chars(name: &str) -> String {
 pub(crate) fn naming_priority(js_name: &str, rust_name: &str) -> u8 {
     if js_name == rust_name {
         0
-    } else if js_name.chars().all(|c| c.is_alphanumeric() || c == '_') {
+    } else if js_name.chars().any(char::is_alphanumeric)
+        && js_name.chars().all(|c| c.is_alphanumeric() || c == '_')
+    {
         1
     } else {
         2
@@ -374,7 +376,7 @@ mod tests {
         assert_eq!(naming_priority("foo_bar", "foo_bar"), 0);
         assert_eq!(naming_priority("type", "type"), 0);
         assert_eq!(naming_priority("fooBar", "foo_bar"), 1);
-        assert_eq!(naming_priority("_", "underscore"), 1);
+        assert_eq!(naming_priority("_", "underscore"), 2);
         assert_eq!(naming_priority("$fooBar", "foo_bar"), 2);
         assert_eq!(naming_priority("[Symbol.iterator]", "iterator"), 2);
     }

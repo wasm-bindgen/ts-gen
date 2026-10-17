@@ -226,13 +226,13 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "$data")]
     pub fn set_data_2(this: &MethodCollide, val: &str);
     #[wasm_bindgen(method, js_name = "setFoo")]
-    pub fn set_foo_2(this: &MethodCollide);
+    pub fn set_foo(this: &MethodCollide);
     #[wasm_bindgen(method, catch, js_name = "setFoo")]
-    pub fn try_set_foo_2(this: &MethodCollide) -> Result<(), JsValue>;
+    pub fn try_set_foo(this: &MethodCollide) -> Result<(), JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn foo(this: &MethodCollide) -> String;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_foo(this: &MethodCollide, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "foo")]
+    pub fn set_foo_2(this: &MethodCollide, val: &str);
     #[wasm_bindgen(method)]
     pub fn call(this: &MethodCollide);
     #[wasm_bindgen(method, catch, js_name = "call")]
@@ -252,21 +252,57 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SetterCollide;
     #[wasm_bindgen(method, getter, js_name = "setFoo")]
-    pub fn set_foo_2(this: &SetterCollide) -> String;
+    pub fn set_foo(this: &SetterCollide) -> String;
     #[wasm_bindgen(method, setter, js_name = "setFoo")]
-    pub fn set_set_foo_2(this: &SetterCollide, val: &str);
+    pub fn set_set_foo(this: &SetterCollide, val: &str);
     #[wasm_bindgen(method, getter)]
     pub fn foo(this: &SetterCollide) -> String;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_foo(this: &SetterCollide, val: &str);
+    #[wasm_bindgen(method, setter, js_name = "foo")]
+    pub fn set_foo_2(this: &SetterCollide, val: &str);
 }
 impl SetterCollide {
-    pub fn new(set_foo_2: &str, foo: &str) -> SetterCollide {
+    pub fn new(set_foo: &str, foo: &str) -> SetterCollide {
         let inner: SetterCollide = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_set_foo_2(set_foo_2);
-        inner.set_foo(foo);
+        inner.set_set_foo(set_foo);
+        inner.set_foo_2(foo);
         inner
     }
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type SetterNumbers;
+    #[wasm_bindgen(method, getter)]
+    pub fn data(this: &SetterNumbers) -> String;
+    #[wasm_bindgen(method, setter, js_name = "data")]
+    pub fn set_data_3(this: &SetterNumbers, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "$data")]
+    pub fn data_2(this: &SetterNumbers) -> String;
+    #[wasm_bindgen(method, setter, js_name = "$data")]
+    pub fn set_data_2(this: &SetterNumbers, val: &str);
+    #[wasm_bindgen(method, js_name = "setData")]
+    pub fn set_data(this: &SetterNumbers);
+    #[wasm_bindgen(method, catch, js_name = "setData")]
+    pub fn try_set_data(this: &SetterNumbers) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ReadonlyCollide;
+    #[wasm_bindgen(method, getter)]
+    pub fn value(this: &ReadonlyCollide) -> String;
+    #[wasm_bindgen(method, js_name = "setValue")]
+    pub fn set_value(this: &ReadonlyCollide, value: &str);
+    #[wasm_bindgen(method, catch, js_name = "setValue")]
+    pub fn try_set_value(this: &ReadonlyCollide, value: &str) -> Result<(), JsValue>;
+    # [wasm_bindgen (static_method_of = ReadonlyCollide , getter)]
+    pub fn level() -> f64;
+    # [wasm_bindgen (static_method_of = ReadonlyCollide , js_name = "setLevel")]
+    pub fn set_level(level: f64);
+    # [wasm_bindgen (static_method_of = ReadonlyCollide , catch , js_name = "setLevel")]
+    pub fn try_set_level(level: f64) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "sanitised-keys")]
 extern "C" {

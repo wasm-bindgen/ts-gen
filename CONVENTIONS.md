@@ -374,9 +374,10 @@ the setter is named `set_<snake_case>`.
     constructor's `new`. The getter, `set_` setter, and a dictionary's
     factory parameter and builder method all follow the property's name
     (`data` and `$data` give `data` / `set_data` and `data_2` /
-    `set_data_2`). A property takes the next number when its setter's
-    name is taken, so a property `setFoo` beside a property `foo` gives
-    `set_foo_2` / `set_set_foo_2` and `foo` / `set_foo`.
+    `set_data_2`). The setter's name is derived, so it yields to a
+    declared one and is numbered alone: a method `setTimeout()` keeps
+    `set_timeout` and a property `timeout` beside it gets `timeout` /
+    `set_timeout_2`. A read-only property has no setter to number.
   * A parameter list numbers without the underscore (`a` and `$a` give
     `a` and `a2`), since wasm-bindgen's generated code names the ABI
     parts of a parameter `a` `a_1` to `a_4`.
