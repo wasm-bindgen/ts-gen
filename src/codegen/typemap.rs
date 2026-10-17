@@ -2336,7 +2336,10 @@ pub fn param_slice_mode(
         other => other,
     };
     let inferred = match ty {
-        TypeRef::Array(elem) if is_numeric_array_element(elem, ctx, scope) => {
+        TypeRef::Array(elem)
+            if is_numeric_array_element(elem, ctx, scope)
+                || is_mono_type_param(elem, ctx, scope) =>
+        {
             Some(SliceMode::Array)
         }
         TypeRef::TypedSlice(_) => Some(SliceMode::Copy),
@@ -2357,34 +2360,11 @@ pub fn param_slice_mode(
     }
 }
 
-/// The fn-level `slice = "array"` a binding with these parameters needs:
-/// any `T[]` whose element per-monomorphization keeps as a bare `T`.
-/// wasm-bindgen resolves the mode per instantiation, so it turns
-/// `T = f64`'s view into an `Array` — but a non-numeric `T` can't take a
-/// mode at all, and only an *inherited* mode drops by shape there; a
-/// per-argument one is a hard error. So the mono case is the one mode
-/// ts-gen emits at the function level. Erased `T: JsGeneric` is always a
-/// handle and needs no mode.
-pub fn fn_mono_array_mode(
-    params: &[crate::codegen::signatures::ConcreteParam],
-    ctx: Option<&CodegenContext<'_>>,
-    scope: ScopeId,
-) -> Option<TokenStream> {
-    params
-        .iter()
-        .any(|p| {
-            if p.variadic {
-                return false;
-            }
-            let ty = match &p.type_ref {
-                TypeRef::Nullable(inner) => inner.as_ref(),
-                other => other,
-            };
-            matches!(ty, TypeRef::Array(elem) if is_mono_type_param(elem, ctx, scope))
-        })
-        .then(|| quote! { slice = "array" })
-}
-
+/// Whether `ty` is a type parameter that per-monomorphization keeps as a
+/// bare `T`. wasm-bindgen resolves a slice mode on `&[T]` per
+/// instantiation, so `slice = "array"` turns `T = f64`'s view into an
+/// `Array` and is a no-op for every non-numeric `T`. Erased `T: JsGeneric`
+/// is always a handle and needs no mode.
 fn is_mono_type_param(ty: &TypeRef, ctx: Option<&CodegenContext<'_>>, scope: ScopeId) -> bool {
     let Some(c) = ctx.filter(|c| c.experimental_generic_mono) else {
         return false;
@@ -2735,33 +2715,24 @@ mod tests {
             panic!("expected class");
         };
         let ts = TypeRef::Array(Box::new(TypeRef::ident("T")));
-        // The mono mode is fn-level (an explicit per-argument mode on a
-        // non-numeric instantiation is a hard wasm-bindgen error), so
-        // `param_slice_mode` stays `None` and `fn_mono_array_mode` is the
-        // signal.
         let modes = |mono: bool| {
             let ctx = CodegenContext::from_module_full(&module, &gctx, false, mono, HashSet::new());
             [
-                fn_mono_array_mode(&[cp("xs", ts.clone())], Some(&ctx), holder.body_scope)
-                    .is_some(),
-                fn_mono_array_mode(
-                    &[cp("xs", TypeRef::Nullable(Box::new(ts.clone())))],
+                param_slice_mode(&cp("xs", ts.clone()), Some(&ctx), holder.body_scope),
+                param_slice_mode(
+                    &cp("xs", TypeRef::Nullable(Box::new(ts.clone()))),
                     Some(&ctx),
                     holder.body_scope,
-                )
-                .is_some(),
+                ),
                 // Outside its declaring scope `T` is no type parameter.
-                fn_mono_array_mode(&[cp("xs", ts.clone())], Some(&ctx), scope).is_some(),
+                param_slice_mode(&cp("xs", ts.clone()), Some(&ctx), scope),
             ]
         };
-        assert_eq!(modes(true), [true, true, false]);
-        assert_eq!(modes(false), [false, false, false]);
-        with_mono_ctx("declare class Plain {}", |ctx, scope| {
-            assert_eq!(
-                param_slice_mode(&cp("xs", ts.clone()), Some(ctx), scope),
-                None
-            );
-        });
+        assert_eq!(
+            modes(true),
+            [Some(SliceMode::Array), Some(SliceMode::Array), None]
+        );
+        assert_eq!(modes(false), [None, None, None]);
     }
 
     #[test]
