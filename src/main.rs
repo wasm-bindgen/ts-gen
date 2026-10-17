@@ -157,7 +157,7 @@ struct Cli {
     provides_app: String,
 
     /// Module path of the generated bindings, for the `--provides` wrapper.
-    /// Defaults to `super::<output file stem>`.
+    /// Defaults to `super::<output file stem>`, with `-` and `.` replaced by `_`.
     #[arg(long)]
     provides_bindings: Option<String>,
 }
@@ -250,15 +250,10 @@ fn main() -> Result<()> {
     write_file(&cli.output, &source)?;
 
     if !provided.is_empty() {
-        let stem = cli
-            .output
-            .file_stem()
-            .map(|s| s.to_string_lossy().into_owned())
-            .unwrap_or_else(|| "bindings".into());
         let bindings = cli
             .provides_bindings
             .clone()
-            .unwrap_or_else(|| format!("super::{stem}"));
+            .unwrap_or_else(|| default_bindings_path(&cli.output));
         let app: syn::Path = syn::parse_str(&cli.provides_app)
             .with_context(|| format!("--provides-app {:?} is not a path", cli.provides_app))?;
         let app_file_stem = app
@@ -289,6 +284,34 @@ fn main() -> Result<()> {
     eprintln!("[ts-gen] Done");
 
     Ok(())
+}
+
+/// `super::<output stem>`, with characters that can't appear in an
+/// identifier replaced by `_` (`my-bindings.rs` is declared as
+/// `#[path = "my-bindings.rs"] mod my_bindings;`) and a keyword stem
+/// raw (`type.rs` → `r#type`).
+fn default_bindings_path(output: &Path) -> String {
+    let stem = output
+        .file_stem()
+        .map(|s| s.to_string_lossy().into_owned())
+        .unwrap_or_else(|| "bindings".into());
+    let ident: String = stem
+        .chars()
+        .map(|c| {
+            if c.is_alphanumeric() || c == '_' {
+                c
+            } else {
+                '_'
+            }
+        })
+        .collect();
+    let raw = format!("r#{ident}");
+    let is_ident = |s: &str| syn::parse_str::<syn::Ident>(s).is_ok();
+    if !is_ident(&ident) && is_ident(&raw) {
+        format!("super::{raw}")
+    } else {
+        format!("super::{ident}")
+    }
 }
 
 fn write_file(path: &std::path::Path, contents: impl AsRef<[u8]>) -> Result<()> {
@@ -486,6 +509,26 @@ fn print_member(member: &ts_gen::ir::Member, indent: usize) {
                 params.join(", "),
                 m.return_type
             );
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn default_bindings_path_is_a_rust_path() {
+        for (output, path) in [
+            ("src/bindings.rs", "super::bindings"),
+            ("src/my-bindings.rs", "super::my_bindings"),
+            ("src/my.bindings.rs", "super::my_bindings"),
+            ("src/bindings_2.rs", "super::bindings_2"),
+            ("src/MyBindings.rs", "super::MyBindings"),
+            ("src/type.rs", "super::r#type"),
+        ] {
+            assert_eq!(default_bindings_path(Path::new(output)), path);
+            assert!(syn::parse_str::<syn::Path>(path).is_ok(), "{path}");
         }
     }
 }

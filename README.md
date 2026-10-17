@@ -120,7 +120,7 @@ ts-gen --input worker.d.ts --output src/bindings.rs --provides ExportedHandler.f
 |------|-------------|
 | `--provides` | A `.d.ts` export surface, or `Name[.member,...]` |
 | `--provides-app` | Module path the wrapper delegates to; its last segment names the scaffold (default `super::app`) |
-| `--provides-bindings` | Module path of the bindings (default `super::<output stem>`) |
+| `--provides-bindings` | Module path of the bindings (default `super::<output stem>`, with `-` and `.` replaced by `_`) |
 
 ### Library API
 
