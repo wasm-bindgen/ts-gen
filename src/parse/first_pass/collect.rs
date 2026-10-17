@@ -11,7 +11,7 @@ use crate::parse::merge::{
 use crate::parse::scope::ScopeId;
 use crate::util::diagnostics::DiagnosticCollector;
 
-use super::converters::{classify_ts_enum_kind, export_default_kind_name};
+use super::converters::export_default_kind_name;
 use super::{is_string_literal_union, namespace_block_statements};
 
 /// Shared context for Phase 1 name collection.
@@ -102,7 +102,8 @@ pub fn collect_type_names(
                 // A TS `enum` binds no JS value of its own in Rust.
                 ir::TypeKind::TypeAlias(_)
                 | ir::TypeKind::StringEnum(_)
-                | ir::TypeKind::NumericEnum(_) => !has_namespace,
+                | ir::TypeKind::NumericEnum(_)
+                | ir::TypeKind::TsEnum(_) => !has_namespace,
                 _ => true,
             });
         if bound {
@@ -169,8 +170,7 @@ impl<'a> CollectCtx<'a> {
             }
             ast::Statement::TSEnumDeclaration(enum_decl) => {
                 let name = enum_decl.id.name.to_string();
-                let kind = classify_ts_enum_kind(enum_decl);
-                self.register_type(&name, kind, ctx, scope, exported);
+                self.register_type(&name, ir::RegisteredKind::TsEnum, ctx, scope, exported);
             }
             ast::Statement::TSGlobalDeclaration(global) => {
                 for s in &global.body.body {
@@ -353,8 +353,7 @@ impl<'a> CollectCtx<'a> {
             }
             ast::Declaration::TSEnumDeclaration(enum_decl) => {
                 let name = enum_decl.id.name.to_string();
-                let kind = classify_ts_enum_kind(enum_decl);
-                self.register_type(&name, kind, ctx, scope, exported);
+                self.register_type(&name, ir::RegisteredKind::TsEnum, ctx, scope, exported);
             }
             ast::Declaration::TSGlobalDeclaration(global) => {
                 for s in &global.body.body {

@@ -18,6 +18,7 @@ const _: () = {
     assert!(matches!(Kind::Fallback, Kind::Text));
     assert!(Bits::Both as u32 == 3);
     assert!(Unresolved::C as u32 == 2);
+    assert!(Unresolved::D as u32 == 7);
 };
 
 #[allow(dead_code)]

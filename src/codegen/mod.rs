@@ -640,6 +640,8 @@ fn generate_declaration(
         }
         TypeKind::StringEnum(e) => Some(enums::generate_string_enum(e, &[])),
         TypeKind::NumericEnum(e) => Some(enums::generate_numeric_enum(e, &[])),
+        // Evaluated into one of the above once parsing ends.
+        TypeKind::TsEnum(_) => None,
         TypeKind::Function(f) => Some(functions::generate_function(
             f,
             &decl.module_context,
@@ -951,6 +953,7 @@ fn generate_ns_declaration(
         )),
         TypeKind::StringEnum(e) => Some(enums::generate_string_enum(e, js_namespace)),
         TypeKind::NumericEnum(e) => Some(enums::generate_numeric_enum(e, js_namespace)),
+        TypeKind::TsEnum(_) => None,
         TypeKind::Variable(v) => Some(functions::generate_variable(
             v,
             &decl.module_context,

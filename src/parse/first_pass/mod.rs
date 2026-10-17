@@ -252,9 +252,9 @@ fn register_type(
             name: name_str.clone(),
             variants: vec![],
         }),
-        ir::RegisteredKind::NumericEnum => ir::TypeKind::NumericEnum(ir::NumericEnumDecl {
+        ir::RegisteredKind::TsEnum => ir::TypeKind::TsEnum(ir::TsEnumDecl {
             name: name_str.clone(),
-            variants: vec![],
+            members: vec![],
         }),
         ir::RegisteredKind::TypeAlias => ir::TypeKind::TypeAlias(ir::TypeAliasDecl {
             name: name_str.clone(),

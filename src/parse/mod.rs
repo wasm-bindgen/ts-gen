@@ -3,6 +3,7 @@
 pub mod classify;
 pub mod ctx;
 pub mod docs;
+mod enums;
 pub mod first_pass;
 pub mod literal_union;
 pub mod members;
@@ -77,6 +78,7 @@ pub fn parse_dts_files(
         &mut parsed_files,
         lib_name,
     )?;
+    enums::evaluate_ts_enums(&mut gctx, &mut input_type_ids);
 
     Ok((
         Module {
@@ -100,7 +102,8 @@ pub fn parse_single_source(
     populate_builtin_scope(&mut gctx, builtin);
     let file_scope = gctx.create_child_scope(builtin);
     let path = Path::new("<input>");
-    let type_ids = parse_single_file(source, path, lib_name, &mut gctx, file_scope)?;
+    let mut type_ids = parse_single_file(source, path, lib_name, &mut gctx, file_scope)?;
+    enums::evaluate_ts_enums(&mut gctx, &mut type_ids);
     Ok((
         Module {
             types: type_ids,
@@ -657,6 +660,7 @@ fn declaration_name(kind: &crate::ir::TypeKind) -> Option<String> {
         TypeKind::TypeAlias(a) => Some(a.name.clone()),
         TypeKind::StringEnum(e) => Some(e.name.clone()),
         TypeKind::NumericEnum(e) => Some(e.name.clone()),
+        TypeKind::TsEnum(e) => Some(e.name.clone()),
         TypeKind::Function(f) => Some(f.name.clone()),
         TypeKind::Variable(v) => Some(v.name.clone()),
         TypeKind::Namespace(n) => Some(n.name.clone()),

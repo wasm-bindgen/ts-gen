@@ -68,6 +68,7 @@ pub enum Other {
 pub enum Unresolved {
     A = 1u32,
     C = 2u32,
+    D = 7u32,
 }
 #[wasm_bindgen(module = "enum-aliases")]
 extern "C" {

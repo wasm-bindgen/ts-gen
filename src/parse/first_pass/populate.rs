@@ -16,8 +16,8 @@ use crate::util::diagnostics::DiagnosticCollector;
 use crate::util::naming::{to_snake_case, LocalScope};
 
 use super::converters::{
-    convert_class_decl, convert_function_decl, convert_interface_decl, convert_numeric_enum,
-    convert_string_enum, convert_string_ts_enum, export_default_kind_name,
+    convert_class_decl, convert_function_decl, convert_interface_decl, convert_string_enum,
+    convert_ts_enum, export_default_kind_name,
 };
 use super::namespace_block_statements;
 
@@ -925,19 +925,9 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         dcx: &DeclCtx<'_>,
         declarations: &mut Vec<ir::TypeDeclaration>,
     ) {
-        let name = enum_decl.id.name.to_string();
         let doc = self.docs.for_span(enum_decl.span.start);
-
-        let is_numeric =
-            self.registry.kind(dcx.scope, &name) == Some(&ir::RegisteredKind::NumericEnum);
-
-        if is_numeric {
-            let decl = convert_numeric_enum(enum_decl, self.docs, self.diag);
-            declarations.push(dcx.decl(ir::TypeKind::NumericEnum(decl), doc));
-        } else {
-            let decl = convert_string_ts_enum(enum_decl, self.diag);
-            declarations.push(dcx.decl(ir::TypeKind::StringEnum(decl), doc));
-        }
+        let decl = convert_ts_enum(enum_decl, self.docs);
+        declarations.push(dcx.decl(ir::TypeKind::TsEnum(decl), doc));
     }
 
     // ─── Helpers ─────────────────────────────────────────────────────

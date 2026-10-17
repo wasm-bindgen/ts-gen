@@ -40,17 +40,18 @@ export declare enum Bits {
   Both = Low | High,
 }
 
-// A member referencing something outside the enum has a value we cannot
-// evaluate, so it is skipped rather than given a guessed discriminant that
-// could collide with a real member.
+// A member referencing something that isn't a known enum member has no
+// value, so it is skipped rather than given a guessed discriminant that could
+// collide with a real member. Another enum's member has its value.
 export declare enum Other {
   X = 7,
 }
 
 export declare enum Unresolved {
   A = 1,
-  B = Other.X,
+  B = Undeclared.X,
   C = 2,
+  D = Other.X,
 }
 
 export interface Api {

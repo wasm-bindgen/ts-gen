@@ -2516,14 +2516,33 @@ Numeric enums lower similarly with explicit discriminant values and a
 Member initialisers are evaluated as TypeScript does: numeric and string
 literals, unary and binary constant expressions with JS numeric
 semantics (bitwise operators on int32, `>>>` on uint32), string
-concatenation, and references to earlier members, bare or qualified by
-the enum's own name. A member without an initialiser continues from the
-previous member's evaluated value. An enum is numeric when any member
+concatenation, references to earlier members of the same enum, bare or
+qualified, and references to another enum's members through its path
+(`Base.Default`, `Ns.Inner.Value`, `Base["Other"]`), including one declared
+later or in another file. A member without an initialiser continues from
+the previous member's evaluated value. An enum is numeric when any member
 evaluates to a number, so `Read = 1 << 0` alone is enough, and a string
 enum otherwise.
 
-A member whose value can't be evaluated, such as `B = Other.X`, or one
-continuing from it, is skipped with a diagnostic. Its value is only known
+The declarations of a merged enum are evaluated in order as one enum,
+whose members can reference each other's, and emitted once:
+
+```ts
+declare enum Mode { A = Base.Default, B, C = A | 8 }
+declare enum Base { Default = 2 }
+declare enum Merged { A = 1 }
+declare enum Merged { B = A + 1 }
+```
+
+```rust
+pub enum Mode { A = 2, B = 3, C = 10 }
+pub enum Base { Default = 2 }
+pub enum Merged { A = 1, B = 2 }
+```
+
+A member whose value can't be evaluated, such as `B = Undeclared.X` or
+one in a reference cycle, or one continuing from it, is skipped with a
+diagnostic. Its value is only known
 at runtime, and a guessed discriminant could repeat a real member's value
 and turn that member into an alias of it.
 

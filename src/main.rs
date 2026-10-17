@@ -252,6 +252,9 @@ fn print_declaration(
             let variants: Vec<_> = e.variants.iter().map(|v| &v.js_value).collect();
             eprintln!("{prefix}[{ctx}] string enum {} = {:?}", e.name, variants);
         }
+        ts_gen::ir::TypeKind::TsEnum(e) => {
+            eprintln!("{prefix}[{ctx}] enum {} (unevaluated)", e.name);
+        }
         ts_gen::ir::TypeKind::NumericEnum(e) => {
             let variants: Vec<_> = e
                 .variants

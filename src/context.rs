@@ -218,6 +218,18 @@ impl GlobalContext {
         &mut self.types[id.index()]
     }
 
+    /// Remove `dropped` from every module's and namespace's declarations.
+    pub(crate) fn drop_types(&mut self, dropped: &std::collections::HashSet<TypeId>) {
+        for module in &mut self.modules {
+            module.types.retain(|id| !dropped.contains(id));
+        }
+        for decl in &mut self.types {
+            if let crate::ir::TypeKind::Namespace(ns) = &mut decl.kind {
+                ns.declarations.retain(|id| !dropped.contains(id));
+            }
+        }
+    }
+
     /// Read-only access to the full type arena slice.
     pub fn type_arena(&self) -> &[TypeDeclaration] {
         &self.types

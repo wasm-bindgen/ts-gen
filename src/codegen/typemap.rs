@@ -970,6 +970,7 @@ impl<'a> CodegenContext<'a> {
             ir::TypeKind::DiscriminatedUnion(d) => (&d.name, Some(d.type_params.len())),
             ir::TypeKind::StringEnum(e) => (&e.name, None),
             ir::TypeKind::NumericEnum(e) => (&e.name, None),
+            ir::TypeKind::TsEnum(e) => (&e.name, None),
             // Plain references to an alias lower to its target, so only a
             // generic instantiation names the emitted alias.
             ir::TypeKind::TypeAlias(a) => (&a.name, Some(a.type_params.len())),
@@ -1091,6 +1092,7 @@ pub(crate) fn type_decl_name(kind: &ir::TypeKind) -> Option<&str> {
         ir::TypeKind::TypeAlias(a) => Some(&a.name),
         ir::TypeKind::StringEnum(e) => Some(&e.name),
         ir::TypeKind::NumericEnum(e) => Some(&e.name),
+        ir::TypeKind::TsEnum(e) => Some(&e.name),
         ir::TypeKind::Function(f) => Some(&f.name),
         ir::TypeKind::Variable(v) => Some(&v.name),
         ir::TypeKind::Namespace(n) => Some(&n.name),

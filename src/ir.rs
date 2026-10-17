@@ -528,6 +528,8 @@ pub enum TypeKind {
     TypeAlias(TypeAliasDecl),
     StringEnum(StringEnumDecl),
     NumericEnum(NumericEnumDecl),
+    /// A TS `enum` until parsing ends; see [`TsEnumDecl`].
+    TsEnum(TsEnumDecl),
     Function(FunctionDecl),
     Variable(VariableDecl),
     Namespace(NamespaceDecl),
@@ -658,6 +660,40 @@ pub struct StringEnumVariant {
     pub rust_name: String,
     /// Original string value.
     pub js_value: String,
+}
+
+// ─── TS Enum ─────────────────────────────────────────────────────────
+
+/// A TS `enum` declaration with its member initialisers unevaluated, since
+/// they can reference enums declared later or in another file. Once every
+/// file is parsed, each enum is evaluated across all its declarations and
+/// replaced by a [`StringEnumDecl`] or [`NumericEnumDecl`].
+#[derive(Clone, Debug)]
+pub struct TsEnumDecl {
+    pub name: String,
+    pub members: Vec<TsEnumMember>,
+}
+
+#[derive(Clone, Debug)]
+pub struct TsEnumMember {
+    pub name: String,
+    /// `None` when the member continues from the previous one.
+    pub init: Option<EnumInit>,
+    pub doc: Option<String>,
+}
+
+/// An enum member initialiser, in the forms TS evaluates at compile time.
+#[derive(Clone, Debug)]
+pub enum EnumInit {
+    Num(f64),
+    Str(String),
+    /// A member, bare or qualified by its enum's path (`A`, `E.A`,
+    /// `Ns.E["A"]`).
+    Ref(Vec<String>),
+    Unary(String, Box<EnumInit>),
+    Binary(String, Box<EnumInit>, Box<EnumInit>),
+    /// Anything else, which has no constant value.
+    Unknown,
 }
 
 // ─── Numeric Enum ────────────────────────────────────────────────────
@@ -979,8 +1015,8 @@ pub enum RegisteredKind {
     TypeAlias,
     /// Detected when a type alias is a union of string literals.
     StringEnum,
-    /// A TS enum with numeric (or auto-incrementing) values.
-    NumericEnum,
+    /// A TS `enum`, string or numeric once its members are evaluated.
+    TsEnum,
     Function,
     Variable,
     Namespace,
