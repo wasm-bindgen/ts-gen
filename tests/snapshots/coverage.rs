@@ -267,10 +267,10 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn next(this: &LinkedList) -> Option<LinkedList>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_next(this: &LinkedList, val: &LinkedList);
+    pub fn set_next(this: &LinkedList, val: &JsNullable<LinkedList>);
 }
 impl LinkedList {
-    pub fn new(data: &JsValue, next: &LinkedList) -> LinkedList {
+    pub fn new(data: &JsValue, next: &JsNullable<LinkedList>) -> LinkedList {
         let inner: LinkedList = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_data(data);
         inner.set_next(next);
@@ -481,7 +481,7 @@ extern "C" {
     pub async fn get(
         this: &Cache,
         key: &str,
-    ) -> Result<JsOption<Map<JsString, Array<JsString>>>, JsValue>;
+    ) -> Result<JsNullable<Map<JsString, Array<JsString>>>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn set(
         this: &Cache,
@@ -507,9 +507,9 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn body(this: &FetchOptions) -> Option<BodyKind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_body(this: &FetchOptions, val: &str);
+    pub fn set_body(this: &FetchOptions, val: &JsNullable<JsString>);
     #[wasm_bindgen(method, setter, js_name = "body")]
-    pub fn set_body_with_array_buffer(this: &FetchOptions, val: &ArrayBuffer);
+    pub fn set_body_with_array_buffer(this: &FetchOptions, val: &JsNullable<ArrayBuffer>);
     #[wasm_bindgen(method, getter)]
     pub fn redirect(this: &FetchOptions) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -545,11 +545,11 @@ impl FetchOptionsBuilder {
         self.inner.set_headers_with_record(val);
         self
     }
-    pub fn body(self, val: &str) -> Self {
+    pub fn body(self, val: &JsNullable<JsString>) -> Self {
         self.inner.set_body(val);
         self
     }
-    pub fn body_with_array_buffer(self, val: &ArrayBuffer) -> Self {
+    pub fn body_with_array_buffer(self, val: &JsNullable<ArrayBuffer>) -> Self {
         self.inner.set_body_with_array_buffer(val);
         self
     }

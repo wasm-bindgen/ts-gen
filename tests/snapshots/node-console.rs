@@ -16,27 +16,27 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn stderr(this: &ConsoleOptions) -> Option<Object>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_stderr(this: &ConsoleOptions, val: &Object);
+    pub fn set_stderr(this: &ConsoleOptions, val: Option<&Object>);
     #[doc = " Ignore errors when writing to the underlying streams."]
     #[doc = " @default true"]
     #[wasm_bindgen(method, getter, js_name = "ignoreErrors")]
     pub fn ignore_errors(this: &ConsoleOptions) -> Option<bool>;
     #[wasm_bindgen(method, setter, js_name = "ignoreErrors")]
-    pub fn set_ignore_errors(this: &ConsoleOptions, val: bool);
+    pub fn set_ignore_errors(this: &ConsoleOptions, val: Option<bool>);
     #[doc = " Set color support for this `Console` instance."]
     #[doc = " @default 'auto'"]
     #[wasm_bindgen(method, getter, js_name = "colorMode")]
     pub fn color_mode(this: &ConsoleOptions) -> Option<ColorModeKind>;
     #[wasm_bindgen(method, setter, js_name = "colorMode")]
-    pub fn set_color_mode(this: &ConsoleOptions, val: bool);
+    pub fn set_color_mode(this: &ConsoleOptions, val: Option<bool>);
     #[wasm_bindgen(method, setter, js_name = "colorMode")]
-    pub fn set_color_mode_with_str(this: &ConsoleOptions, val: &str);
+    pub fn set_color_mode_with_str(this: &ConsoleOptions, val: Option<&str>);
     #[doc = " Set group indentation."]
     #[doc = " @default 2"]
     #[wasm_bindgen(method, getter, js_name = "groupIndentation")]
     pub fn group_indentation(this: &ConsoleOptions) -> Option<f64>;
     #[wasm_bindgen(method, setter, js_name = "groupIndentation")]
-    pub fn set_group_indentation(this: &ConsoleOptions, val: f64);
+    pub fn set_group_indentation(this: &ConsoleOptions, val: Option<f64>);
 }
 impl ConsoleOptions {
     pub fn new(stdout: &Object) -> ConsoleOptions {
@@ -52,23 +52,23 @@ pub struct ConsoleOptionsBuilder {
     inner: ConsoleOptions,
 }
 impl ConsoleOptionsBuilder {
-    pub fn stderr(self, val: &Object) -> Self {
+    pub fn stderr(self, val: Option<&Object>) -> Self {
         self.inner.set_stderr(val);
         self
     }
-    pub fn ignore_errors(self, val: bool) -> Self {
+    pub fn ignore_errors(self, val: Option<bool>) -> Self {
         self.inner.set_ignore_errors(val);
         self
     }
-    pub fn color_mode(self, val: bool) -> Self {
+    pub fn color_mode(self, val: Option<bool>) -> Self {
         self.inner.set_color_mode(val);
         self
     }
-    pub fn color_mode_with_str(self, val: &str) -> Self {
+    pub fn color_mode_with_str(self, val: Option<&str>) -> Self {
         self.inner.set_color_mode_with_str(val);
         self
     }
-    pub fn group_indentation(self, val: f64) -> Self {
+    pub fn group_indentation(self, val: Option<f64>) -> Self {
         self.inner.set_group_indentation(val);
         self
     }

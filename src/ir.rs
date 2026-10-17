@@ -41,6 +41,36 @@ impl ModuleContext {
 
 // ─── Type References ─────────────────────────────────────────────────
 
+/// Which empty arms a [`TypeRef::Nullable`] coalesced. Both lower to
+/// `Option<T>` at top level; inner positions and the Wasm ABI care which.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct Nullability {
+    pub null: bool,
+    pub undefined: bool,
+}
+
+impl Nullability {
+    pub const NULL: Self = Self {
+        null: true,
+        undefined: false,
+    };
+    pub const UNDEFINED: Self = Self {
+        null: false,
+        undefined: true,
+    };
+    pub const BOTH: Self = Self {
+        null: true,
+        undefined: true,
+    };
+
+    pub fn union(self, other: Self) -> Self {
+        Self {
+            null: self.null || other.null,
+            undefined: self.undefined || other.undefined,
+        }
+    }
+}
+
 /// A reference to a TypeScript type, resolved from the AST.
 ///
 /// The IR mirrors TypeScript's own type system: only the syntactic
@@ -101,8 +131,9 @@ pub enum TypeRef {
     /// unaffected by local shadowing of `Array`.
     Array(Box<TypeRef>),
     /// `T | null` / `T | undefined` / `T?` — wraps the inner in
-    /// `Option<T>` at lowering. Coalesces `null`/`undefined` arms.
-    Nullable(Box<TypeRef>),
+    /// `Option<T>` at lowering. Coalesces `null`/`undefined` arms,
+    /// remembering which were present.
+    Nullable(Box<TypeRef>, Nullability),
     Union(Vec<TypeRef>),
     Intersection(Vec<TypeRef>),
     Tuple(Vec<TypeRef>),
@@ -237,6 +268,17 @@ impl TypedArrayElement {
 }
 
 impl TypeRef {
+    /// The type of an optional (`x?: T`) property as read: `T | undefined`,
+    /// folded into an existing `Nullable` rather than nesting.
+    pub fn or_undefined(self) -> TypeRef {
+        match self {
+            TypeRef::Nullable(inner, n) => {
+                TypeRef::Nullable(inner, n.union(Nullability::UNDEFINED))
+            }
+            other => TypeRef::Nullable(Box::new(other), Nullability::UNDEFINED),
+        }
+    }
+
     /// Construct a single-segment, non-generic reference: `Foo`.
     /// Convenience for the common case of a bare ident.
     pub fn ident(name: impl Into<String>) -> Self {
@@ -329,7 +371,7 @@ impl TypeRef {
                 // `A | B[]`.
                 let needs_parens = matches!(
                     inner.as_ref(),
-                    TypeRef::Union(_) | TypeRef::Intersection(_) | TypeRef::Nullable(_)
+                    TypeRef::Union(_) | TypeRef::Intersection(_) | TypeRef::Nullable(..)
                 );
                 if needs_parens {
                     format!("({})[]", inner.format_ts())
@@ -337,7 +379,16 @@ impl TypeRef {
                     format!("{}[]", inner.format_ts())
                 }
             }
-            TypeRef::Nullable(inner) => format!("{} | null", inner.format_ts()),
+            TypeRef::Nullable(inner, n) => {
+                let mut out = inner.format_ts();
+                if n.null {
+                    out.push_str(" | null");
+                }
+                if n.undefined {
+                    out.push_str(" | undefined");
+                }
+                out
+            }
             TypeRef::Union(members) => members
                 .iter()
                 .map(Self::format_ts)
@@ -449,10 +500,10 @@ impl SliceModeHint {
         if self == Self::Array {
             return None;
         }
-        if let TypeRef::Nullable(inner) = ty {
+        if let TypeRef::Nullable(inner, n) = ty {
             return self
                 .widen_bare_typed_array(inner)
-                .map(|t| TypeRef::Nullable(Box::new(t)));
+                .map(|t| TypeRef::Nullable(Box::new(t), *n));
         }
         let TypeRef::Reference { segments, .. } = ty else {
             return None;
@@ -1159,7 +1210,11 @@ mod tests {
 
     #[test]
     fn format_ts_nullable() {
-        let ty = TypeRef::Nullable(Box::new(TypeRef::String));
+        let ty = TypeRef::Nullable(Box::new(TypeRef::String), Nullability::NULL);
         assert_eq!(ty.format_ts(), "string | null");
+        let ty = TypeRef::Nullable(Box::new(TypeRef::String), Nullability::UNDEFINED);
+        assert_eq!(ty.format_ts(), "string | undefined");
+        let ty = TypeRef::Nullable(Box::new(TypeRef::String), Nullability::BOTH);
+        assert_eq!(ty.format_ts(), "string | null | undefined");
     }
 }
