@@ -28,7 +28,9 @@
 //!
 //! # Variadic
 //!
-//! A variadic param uses `#[wasm_bindgen(variadic)]` with a `&[JsValue]` type.
+//! A variadic param uses `#[wasm_bindgen(variadic)]` with a `&[JsValue]` type,
+//! or under `--experimental-generic-mono` its rest array's list type
+//! (`&[f64]`, `&[impl JsStringLike]`).
 //! Variadic params participate in `_with_`/`_and_` suffix computation — if a
 //! signature differs from its siblings only by having a trailing variadic param,
 //! the param name is used as a suffix (e.g. `_with_args`).
@@ -1744,24 +1746,26 @@ pub(crate) fn render_param_type(
     scope: ScopeId,
     from_module: &crate::ir::ModuleContext,
 ) -> TokenStream {
-    if param.variadic {
+    let mono = cgctx.filter(|ctx| ctx.experimental_generic_mono);
+    // A per-mono variadic spreads any sequence, so its rest array lowers like
+    // any other list argument.
+    if param.variadic && (mono.is_none() || !matches!(param.type_ref, TypeRef::Array(_))) {
         return quote! { &[JsValue] };
     }
-    cgctx
-        .filter(|ctx| ctx.experimental_generic_mono)
-        .and_then(|ctx| {
-            mono_argument_type(&param.type_ref)
-                .or_else(|| typemap::mono_string_list_argument(&param.type_ref, ctx, scope))
+    mono.and_then(|ctx| {
+        mono_argument_type(&param.type_ref).or_else(|| {
+            typemap::mono_string_like_argument(&param.type_ref, ctx, scope, from_module)
         })
-        .unwrap_or_else(|| {
-            typemap::to_syn_type(
-                &param.type_ref,
-                TypePosition::ARGUMENT,
-                cgctx,
-                scope,
-                from_module,
-            )
-        })
+    })
+    .unwrap_or_else(|| {
+        typemap::to_syn_type(
+            &param.type_ref,
+            TypePosition::ARGUMENT,
+            cgctx,
+            scope,
+            from_module,
+        )
+    })
 }
 
 /// Per-monomorphization argument bounds: strings become `impl

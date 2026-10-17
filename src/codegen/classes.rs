@@ -1923,6 +1923,7 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
         &config.from_module(),
     );
     let doc = super::doc_tokens(&sig.doc);
+    let has_variadic = sig.params.last().is_some_and(|p| p.variadic);
 
     // Type parameters the arguments mention — the class's own or the
     // construct signature's. A constructor-level `<T>` of the same
@@ -1972,6 +1973,9 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
 
     let mut wb_parts = vec![quote! { constructor }];
     wb_parts.extend(config.js_class_parts());
+    if has_variadic {
+        wb_parts.push(quote! { variadic });
+    }
     if sig.catch {
         wb_parts.push(quote! { catch });
     }

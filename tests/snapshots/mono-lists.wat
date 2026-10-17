@@ -34,6 +34,14 @@
   (import "mono-lists" "flags" (func $mono-lists:flags (param $values externref) (result externref)))
   ;; join(separator: string, ...parts: string[]): string
   (import "mono-lists" "join" (func $mono-lists:join (param $separator externref) (param $parts (ref null $anyrefs)) (result externref)))
+  ;; sum(...values: number[]): number
+  (import "mono-lists" "sum" (func $mono-lists:sum (param $values (ref null $anyrefs)) (result f64)))
+  ;; rows(values: string[][]): string
+  (import "mono-lists" "rows" (func $mono-lists:rows (param $values externref) (result externref)))
+  ;; unique(values: ReadonlySet<string>): string
+  (import "mono-lists" "unique" (func $mono-lists:unique (param $values externref) (result externref)))
+  ;; lookup(values: Map<string, number>, key: string): number
+  (import "mono-lists" "lookup" (func $mono-lists:lookup (param $values externref) (param $key externref) (result f64)))
   ;; getTags(): string[]
   (import "mono-lists" "getTags" (func $mono-lists:getTags (result externref)))
   ;; getMaybeTags(): Tag[] | undefined
@@ -71,6 +79,12 @@
   (import "mono-lists" "describeOptions" (func $mono-lists:describeOptions (param $options externref) (result externref)))
   ;; getValue(): string | boolean[]
   (import "mono-lists" "getValue" (func $mono-lists:getValue (result externref)))
+
+  ;; Total
+  ;; constructor(...values: number[])
+  (import "mono-lists" "Total.new" (func $mono-lists:Total.new (param $values (ref null $anyrefs)) (result externref)))
+  ;; value: number
+  (import "mono-lists" "Total.value" (func $mono-lists:Total.value (param $this externref) (result f64)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
