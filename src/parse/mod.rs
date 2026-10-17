@@ -153,7 +153,8 @@ fn parse_single_file(
     let allocator = Allocator::default();
     let source_type = SourceType::d_ts();
 
-    gctx.diagnostics.set_file(path, source);
+    let file = gctx.diagnostics.set_file(path, source);
+    gctx.scopes.get_mut(file_scope).file = Some(file);
 
     let parser_return = Parser::new(&allocator, source, source_type).parse();
 

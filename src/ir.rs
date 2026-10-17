@@ -11,6 +11,7 @@ use std::collections::HashMap;
 
 use crate::context::TypeId;
 use crate::parse::scope::ScopeId;
+use crate::util::diagnostics::Span;
 
 // ─── Module Context ──────────────────────────────────────────────────
 
@@ -700,6 +701,8 @@ pub struct TsEnumDecl {
     /// `declare global` block, so it merges with the global declarations of
     /// other files.
     pub global: bool,
+    /// The enum's name, in the file its scope is declared in.
+    pub span: Span,
 }
 
 #[derive(Clone, Debug)]
@@ -708,6 +711,7 @@ pub struct TsEnumMember {
     /// `None` when the member continues from the previous one.
     pub init: Option<EnumInit>,
     pub doc: Option<String>,
+    pub span: Span,
 }
 
 /// An enum member initialiser, in the forms TS evaluates at compile time.

@@ -52,18 +52,94 @@ pub enum DiagnosticLevel {
     Info,
 }
 
+/// An input file registered with [`DiagnosticCollector::set_file`].
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct FileId(u32);
+
+/// A byte range in a source file.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct Span {
+    pub start: u32,
+    pub end: u32,
+}
+
+#[derive(Clone, Debug)]
+struct SourceFile {
+    path: PathBuf,
+    source: String,
+    /// Byte offset of each line start, for O(log n) line lookup.
+    line_offsets: Vec<u32>,
+}
+
+impl SourceFile {
+    fn new(path: &Path, source: &str) -> Self {
+        let mut line_offsets = vec![0u32];
+        for (i, b) in source.bytes().enumerate() {
+            if b == b'\n' {
+                line_offsets.push((i + 1) as u32);
+            }
+        }
+        SourceFile {
+            path: path.to_path_buf(),
+            source: source.to_string(),
+            line_offsets,
+        }
+    }
+
+    /// The 1-indexed line and column of a byte offset.
+    fn line_col(&self, offset: u32) -> (u32, u32) {
+        let line_idx = match self.line_offsets.binary_search(&offset) {
+            Ok(i) => i,
+            Err(i) => i.saturating_sub(1),
+        };
+        let line = (line_idx as u32) + 1;
+        let col = offset - self.line_offsets[line_idx] + 1;
+        (line, col)
+    }
+
+    fn location(&self, offset: u32) -> SourceLocation {
+        let (line, col) = self.line_col(offset);
+        SourceLocation {
+            file: self.path.clone(),
+            line,
+            col,
+        }
+    }
+
+    /// The frame is clamped to the line containing `start`.
+    fn frame(&self, start: u32, end: u32, label: Option<String>) -> CodeFrame {
+        let (line, _) = self.line_col(start);
+        let line_start = self.line_offsets[line as usize - 1] as usize;
+        let line_end = self.source[line_start..]
+            .find('\n')
+            .map_or(self.source.len(), |i| line_start + i);
+        let text = self.source[line_start..line_end].trim_end_matches('\r');
+        let start = (start as usize - line_start).min(text.len());
+        let end = (end as usize)
+            .saturating_sub(line_start)
+            .clamp(start, text.len());
+        CodeFrame {
+            line,
+            text: text.to_string(),
+            start,
+            end,
+            label,
+        }
+    }
+}
+
 /// Collects diagnostics during a parse/codegen session.
 ///
 /// Call `set_file` before processing each file. `warn_at`/`error_at` accept
-/// byte offsets and automatically compute line:col from the source.
+/// byte offsets in it and compute line:col from the source. Every file's
+/// source is kept, so a pass that runs once all files are parsed can point
+/// into any of them with `warn_span_in`.
 #[derive(Clone, Debug, Default)]
 pub struct DiagnosticCollector {
     pub diagnostics: Vec<Diagnostic>,
-    /// The file currently being processed, with its source text.
-    current_file: Option<PathBuf>,
-    current_source: Option<String>,
-    /// Pre-computed byte offsets of each line start (0-indexed) for O(log n) line lookup.
-    line_offsets: Vec<u32>,
+    files: Vec<SourceFile>,
+    /// The file currently being processed.
+    current: Option<FileId>,
 }
 
 impl DiagnosticCollector {
@@ -71,19 +147,13 @@ impl DiagnosticCollector {
         Self::default()
     }
 
-    /// Set the current file and its source text for subsequent diagnostics.
-    /// Builds a line offset table for O(log n) offset-to-line lookup.
-    pub fn set_file(&mut self, path: &Path, source: &str) {
-        self.current_file = Some(path.to_path_buf());
-        // Build line offset table: line_offsets[i] = byte offset of start of line i+1.
-        let mut offsets = vec![0u32];
-        for (i, b) in source.bytes().enumerate() {
-            if b == b'\n' {
-                offsets.push((i + 1) as u32);
-            }
-        }
-        self.line_offsets = offsets;
-        self.current_source = Some(source.to_string());
+    /// Register a file and its source text, and make it current for
+    /// subsequent diagnostics.
+    pub fn set_file(&mut self, path: &Path, source: &str) -> FileId {
+        let id = FileId(self.files.len() as u32);
+        self.files.push(SourceFile::new(path, source));
+        self.current = Some(id);
+        id
     }
 
     /// Emit a warning with optional line/column.
@@ -100,7 +170,7 @@ impl DiagnosticCollector {
 
     /// Emit a warning at a byte offset in the current file.
     pub fn warn_at(&mut self, message: impl Into<String>, offset: u32) {
-        let location = self.make_location(offset);
+        let location = self.location(offset);
         self.diagnostics.push(Diagnostic {
             level: DiagnosticLevel::Warning,
             message: message.into(),
@@ -146,7 +216,7 @@ impl DiagnosticCollector {
 
     /// Emit an error at a byte offset in the current file.
     pub fn error_at(&mut self, message: impl Into<String>, offset: u32) {
-        let location = self.make_location(offset);
+        let location = self.location(offset);
         self.diagnostics.push(Diagnostic {
             level: DiagnosticLevel::Error,
             message: message.into(),
@@ -167,8 +237,22 @@ impl DiagnosticCollector {
         label: Option<String>,
         help: Option<String>,
     ) {
-        let location = self.make_location(start);
-        let frame = self.make_frame(start, end, label);
+        self.warn_span_in(self.current, message, Span { start, end }, label, help);
+    }
+
+    /// Emit a warning at `span` in `file`, rendered with a code frame
+    /// underlining the span.
+    pub fn warn_span_in(
+        &mut self,
+        file: Option<FileId>,
+        message: impl Into<String>,
+        span: Span,
+        label: Option<String>,
+        help: Option<String>,
+    ) {
+        let file = file.map(|id| &self.files[id.0 as usize]);
+        let location = file.map(|f| f.location(span.start));
+        let frame = file.map(|f| f.frame(span.start, span.end, label));
         self.diagnostics.push(Diagnostic {
             level: DiagnosticLevel::Warning,
             message: message.into(),
@@ -179,36 +263,9 @@ impl DiagnosticCollector {
         });
     }
 
-    /// The frame is clamped to the line containing `start`.
-    fn make_frame(&self, start: u32, end: u32, label: Option<String>) -> Option<CodeFrame> {
-        let source = self.current_source.as_ref()?;
-        let (line, _) = self.offset_to_line_col(start);
-        let line_start = self.line_offsets[line as usize - 1] as usize;
-        let line_end = source[line_start..]
-            .find('\n')
-            .map_or(source.len(), |i| line_start + i);
-        let text = source[line_start..line_end].trim_end_matches('\r');
-        let start = (start as usize - line_start).min(text.len());
-        let end = (end as usize)
-            .saturating_sub(line_start)
-            .clamp(start, text.len());
-        Some(CodeFrame {
-            line,
-            text: text.to_string(),
-            start,
-            end,
-            label,
-        })
-    }
-
-    fn make_location(&self, offset: u32) -> Option<SourceLocation> {
-        let file = self.current_file.as_ref()?;
-        let (line, col) = self.offset_to_line_col(offset);
-        Some(SourceLocation {
-            file: file.clone(),
-            line,
-            col,
-        })
+    fn location(&self, offset: u32) -> Option<SourceLocation> {
+        let file = &self.files[self.current?.0 as usize];
+        Some(file.location(offset))
     }
 
     /// Print all diagnostics to stderr, deduplicating identical messages.
@@ -282,23 +339,6 @@ impl DiagnosticCollector {
             }
         }
         out
-    }
-
-    /// Compute line and column from a byte offset using the pre-built line offset table.
-    /// Returns (line, col) where both are 1-indexed.
-    /// Uses binary search for O(log n) lookup.
-    fn offset_to_line_col(&self, offset: u32) -> (u32, u32) {
-        if self.line_offsets.is_empty() {
-            return (1, 1);
-        }
-        // Binary search: find the last line_offset <= offset
-        let line_idx = match self.line_offsets.binary_search(&offset) {
-            Ok(i) => i,
-            Err(i) => i.saturating_sub(1),
-        };
-        let line = (line_idx as u32) + 1;
-        let col = offset - self.line_offsets[line_idx] + 1;
-        (line, col)
     }
 
     pub fn has_warnings(&self) -> bool {

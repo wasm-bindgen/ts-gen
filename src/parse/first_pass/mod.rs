@@ -300,6 +300,7 @@ fn register_type(
             name: name_str.clone(),
             members: vec![],
             global: false,
+            span: Default::default(),
         }),
         ir::RegisteredKind::TypeAlias => ir::TypeKind::TypeAlias(ir::TypeAliasDecl {
             name: name_str.clone(),

@@ -15,7 +15,7 @@ use crate::ir::{
     StringEnumVariant, TsEnumDecl, TypeAliasDecl, TypeKind, TypeRef,
 };
 use crate::parse::scope::ScopeId;
-use crate::util::diagnostics::DiagnosticCollector;
+use crate::util::diagnostics::{DiagnosticCollector, FileId, Span};
 
 /// The value a TS enum member evaluates to.
 #[derive(Clone, Debug, PartialEq)]
@@ -34,6 +34,8 @@ struct Member<'g> {
     name: &'g str,
     init: Option<&'g EnumInit>,
     doc: &'g Option<String>,
+    file: Option<FileId>,
+    span: Span,
     /// The enum declaration's scope, where qualified references resolve.
     scope: ScopeId,
     /// The index of its declaration among the enum's.
@@ -238,7 +240,9 @@ pub(crate) fn evaluate_ts_enums(gctx: &mut GlobalContext, roots: &mut Vec<TypeId
         groups.entry(key).or_default().push(id);
     }
 
-    let mut diag = DiagnosticCollector::new();
+    // Taken out of `gctx`, which evaluation borrows, with every file's
+    // source, so a warning can point into the file its member is declared in.
+    let mut diag = std::mem::take(&mut gctx.diagnostics);
     let results: Vec<(Vec<TypeId>, TypeKind, Option<String>)> = {
         let gctx: &GlobalContext = gctx;
         let mut enums = Enums {
@@ -255,10 +259,13 @@ pub(crate) fn evaluate_ts_enums(gctx: &mut GlobalContext, roots: &mut Vec<TypeId
                     continue;
                 };
                 let index = members.last().map_or(0, |m: &Member<'_>| m.decl + 1);
+                let file = gctx.scopes.file_of(decl.scope_id);
                 members.extend(e.members.iter().map(|m| Member {
                     name: &m.name,
                     init: m.init.as_ref(),
                     doc: &m.doc,
+                    file,
+                    span: m.span,
                     scope: decl.scope_id,
                     decl: index,
                     state: State::Pending,
@@ -272,11 +279,13 @@ pub(crate) fn evaluate_ts_enums(gctx: &mut GlobalContext, roots: &mut Vec<TypeId
                     .map(|i| enums.value(key, i))
                     .collect();
                 let decl = gctx.get_type(key);
-                let TypeKind::TsEnum(TsEnumDecl { name, .. }) = &decl.kind else {
+                let TypeKind::TsEnum(TsEnumDecl { name, span, .. }) = &decl.kind else {
                     unreachable!("grouped under a TS enum declaration");
                 };
                 let kind = finish(
                     name,
+                    gctx.scopes.file_of(decl.scope_id),
+                    *span,
                     decl.scope_id,
                     &enums.members[&key],
                     &values,
@@ -288,7 +297,7 @@ pub(crate) fn evaluate_ts_enums(gctx: &mut GlobalContext, roots: &mut Vec<TypeId
             })
             .collect()
     };
-    gctx.diagnostics.diagnostics.extend(diag.diagnostics);
+    gctx.diagnostics = diag;
 
     let mut absorbed: HashMap<TypeId, TypeId> = HashMap::new();
     for (decls, kind, doc) in results {
@@ -312,26 +321,29 @@ pub(crate) fn evaluate_ts_enums(gctx: &mut GlobalContext, roots: &mut Vec<TypeId
 /// none is erased to `JsValue`.
 fn finish(
     name: &str,
+    file: Option<FileId>,
+    span: Span,
     scope: ScopeId,
     members: &[Member<'_>],
     values: &[Option<EnumValue>],
     diag: &mut DiagnosticCollector,
 ) -> TypeKind {
     let numeric = values.iter().any(|v| matches!(v, Some(EnumValue::Num(_))));
-    let mut warn_skipped = |member: &str, value: &Option<EnumValue>| {
+    let mut warn_skipped = |member: &Member<'_>, value: &Option<EnumValue>| {
         let reason = match value {
             Some(EnumValue::Str(_)) => "is a string in a numeric enum",
             Some(EnumValue::Num(_)) => "is a number in a string enum",
             None => "has no constant value",
         };
-        diag.warn(format!("Enum `{name}::{member}` {reason}, skipping it"));
+        let message = format!("Enum `{name}::{}` {reason}, skipping it", member.name);
+        diag.warn_span_in(member.file, message, member.span, None, None);
     };
     let mut kept: Vec<(&Member<'_>, &EnumValue)> = Vec::new();
     for (member, value) in members.iter().zip(values) {
         match value {
             Some(v @ EnumValue::Num(_)) if numeric => kept.push((member, v)),
             Some(v @ EnumValue::Str(_)) if !numeric => kept.push((member, v)),
-            _ => warn_skipped(member.name, value),
+            _ => warn_skipped(member, value),
         }
     }
     let mut rust_names: Vec<String> = kept
@@ -341,9 +353,13 @@ fn finish(
     crate::util::naming::dedup_names(&mut rust_names);
     let name = name.to_string();
     if kept.is_empty() {
-        diag.warn(format!(
-            "Enum `{name}` has no member with a constant value, erasing it to JsValue"
-        ));
+        diag.warn_span_in(
+            file,
+            format!("Enum `{name}` has no member with a constant value, erasing it to JsValue"),
+            span,
+            None,
+            None,
+        );
         return TypeKind::TypeAlias(TypeAliasDecl {
             name,
             type_params: vec![],
@@ -363,7 +379,7 @@ fn finish(
                 NumericEnumVariant {
                     rust_name,
                     js_name: member.name.to_string(),
-                    value: f64_to_i64(*value, member.name, &name, diag),
+                    value: f64_to_i64(*value, member, &name, diag),
                     doc: member.doc.clone(),
                 }
             })
@@ -399,24 +415,27 @@ fn to_int32(v: f64) -> i32 {
 /// an exact integer or is out of i64 range.
 fn f64_to_i64(
     value: f64,
-    member_name: &str,
+    member: &Member<'_>,
     enum_name: &str,
     diag: &mut DiagnosticCollector,
 ) -> i64 {
+    let member_name = member.name;
+    let mut warn =
+        |message: String| diag.warn_span_in(member.file, message, member.span, None, None);
     if value.fract() != 0.0 {
-        diag.warn(format!(
+        warn(format!(
             "Enum `{enum_name}::{member_name}` has non-integer value {value}, truncating to {}",
             value as i64
         ));
     } else if value > i64::MAX as f64 || value < i64::MIN as f64 {
-        diag.warn(format!(
+        warn(format!(
             "Enum `{enum_name}::{member_name}` value {value} is out of i64 range, truncating"
         ));
     }
     let result = value as i64;
     // Warn if value won't fit in the codegen repr (i32 for signed, u32 for unsigned)
     if i32::try_from(result).is_err() && u32::try_from(result).is_err() {
-        diag.warn(format!(
+        warn(format!(
             "Enum `{enum_name}::{member_name}` value {result} exceeds i32/u32 range, \
              will be truncated in generated code"
         ));
@@ -670,6 +689,48 @@ mod tests {
                 ("ME".to_string(), merged.clone()),
                 ("NE".to_string(), merged),
             ]
+        );
+    }
+
+    #[test]
+    fn warnings_point_at_the_declaring_file() {
+        let dir = std::env::temp_dir().join(format!("ts-gen-enum-warn-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let (a, b) = (dir.join("a.d.ts"), dir.join("b.d.ts"));
+        std::fs::write(
+            &a,
+            "declare enum E { A = Undeclared.X }\n\
+             declare namespace N { enum M { A = 1 } }\n",
+        )
+        .unwrap();
+        std::fs::write(&b, "declare namespace N { enum M { B = \"b\" } }\n").unwrap();
+        let (_, gctx) = crate::parse::parse_dts_files(&[&a, &b], None).unwrap();
+        std::fs::remove_dir_all(&dir).unwrap();
+
+        let prefix = format!("{}{}", dir.display(), std::path::MAIN_SEPARATOR);
+        let warnings: String = gctx
+            .diagnostics
+            .render(false)
+            .replace(&prefix, "")
+            .lines()
+            .filter(|l| !l.starts_with("[ts-gen info]"))
+            .map(|l| format!("{l}\n"))
+            .collect();
+        assert_eq!(
+            warnings,
+            r#"[ts-gen warning]: a.d.ts:1:18: Enum `E::A` has no constant value, skipping it
+  |
+1 | declare enum E { A = Undeclared.X }
+  |                  ^^^^^^^^^^^^^^^^
+[ts-gen warning]: a.d.ts:1:14: Enum `E` has no member with a constant value, erasing it to JsValue
+  |
+1 | declare enum E { A = Undeclared.X }
+  |              ^
+[ts-gen warning]: b.d.ts:1:32: Enum `M::B` is a string in a numeric enum, skipping it
+  |
+1 | declare namespace N { enum M { B = "b" } }
+  |                                ^^^^^^^
+"#
         );
     }
 

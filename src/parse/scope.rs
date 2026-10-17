@@ -33,6 +33,7 @@
 use std::collections::HashMap;
 
 use crate::context::TypeId;
+use crate::util::diagnostics::FileId;
 
 /// Index into a `ScopeArena`. Lightweight, Copy, and well-typed.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -68,6 +69,9 @@ pub struct TypeScope {
     /// block of the module, which a name resolves in after the block's own
     /// locals and before its parent, as in TypeScript.
     pub exports: Option<ScopeId>,
+    /// For a file's scope, the file, which every scope declared in it
+    /// reaches through its parents.
+    pub file: Option<FileId>,
     /// Types defined or imported in this scope: name → binding.
     names: HashMap<String, Binding>,
     /// Namespaces declared in this scope: name → member scope. Kept apart
@@ -81,6 +85,7 @@ impl TypeScope {
         Self {
             parent,
             exports: None,
+            file: None,
             names: HashMap::new(),
             namespaces: HashMap::new(),
         }
@@ -197,6 +202,20 @@ impl ScopeArena {
         s.namespace(name)
             .or_else(|| s.exports.and_then(|e| self.get(e).namespace(name)))
             .or_else(|| s.parent.and_then(|p| self.resolve_namespace(p, name)))
+    }
+
+    /// The file `scope` is declared in. The global scope and the built-in
+    /// types belong to no file.
+    pub fn file_of(&self, scope: ScopeId) -> Option<FileId> {
+        let mut at = Some(scope);
+        while let Some(id) = at {
+            let s = self.get(id);
+            if s.file.is_some() {
+                return s.file;
+            }
+            at = s.parent;
+        }
+        None
     }
 
     /// The scopes a name used in `scope` resolves through, innermost first.

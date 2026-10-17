@@ -14,6 +14,7 @@ use crate::parse::scope::ScopeId;
 use crate::parse::types::{
     convert_formal_params_scoped, convert_ts_type_scoped, convert_type_params,
 };
+use crate::util::diagnostics::Span;
 use crate::util::naming::to_snake_case;
 
 pub fn convert_class_decl(
@@ -249,6 +250,10 @@ pub fn convert_ts_enum(
                 name: enum_member_name(member)?,
                 init: member.initializer.as_ref().map(convert_enum_init),
                 doc: docs.for_span(member.span.start),
+                span: Span {
+                    start: member.span.start,
+                    end: member.span.end,
+                },
             })
         })
         .collect();
@@ -256,6 +261,10 @@ pub fn convert_ts_enum(
         name: enum_decl.id.name.to_string(),
         members,
         global: false,
+        span: Span {
+            start: enum_decl.id.span.start,
+            end: enum_decl.id.span.end,
+        },
     }
 }
 
