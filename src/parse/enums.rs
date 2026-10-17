@@ -172,8 +172,9 @@ enum Root {
 /// Declarations merge when they declare one name in the same namespace path
 /// of the same scope: the global scope of every file, one module's
 /// `declare module` blocks, or a module file's top level. The first takes
-/// the merged enum. The others are dropped from `roots` and every other list of
-/// declarations, and the names bound to them are rebound to the first.
+/// the merged enum. The others are dropped from `roots` and every other
+/// list of declarations, and the names bound to them are rebound to the
+/// first.
 pub(crate) fn evaluate_ts_enums(gctx: &mut GlobalContext, roots: &mut Vec<TypeId>) {
     // Phase 1 placeholders are in the arena but in no list.
     let listed: HashSet<TypeId> = roots.iter().copied().chain(gctx.listed_types()).collect();

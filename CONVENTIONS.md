@@ -2516,10 +2516,12 @@ Numeric enums lower similarly with explicit discriminant values and a
 Member initialisers are evaluated as TypeScript does: numeric and string
 literals, unary and binary constant expressions with JS numeric
 semantics (bitwise operators on int32, `>>>` on uint32), string
-concatenation, references to earlier members of the same enum, bare or
-qualified, and references to another enum's members through its path
+concatenation, references to the same enum's members, bare or qualified,
+and references to another enum's members through its path
 (`Base.Default`, `Ns.Inner.Value`, `Base["Other"]`), including one in
-another file. A member without an initialiser continues from the previous
+another file. A reference into the member's own declaration can only reach
+an earlier member, but one into another declaration of the enum can reach
+any. A member without an initialiser continues from the previous
 member's evaluated value, or is 0 as the first member of its declaration.
 An enum is numeric when any member evaluates to a number, so
 `Read = 1 << 0` alone is enough, and a string enum otherwise.
