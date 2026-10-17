@@ -8,8 +8,6 @@ pub mod wat;
 
 use std::collections::{HashMap, HashSet};
 
-use anyhow::{bail, Result};
-
 use crate::codegen::signatures::{base_rust_name, expand_signatures, SignatureKind};
 use crate::codegen::surface::Surface;
 use crate::codegen::GenerateOptions;
@@ -561,7 +559,7 @@ pub fn build(
     gctx: &GlobalContext,
     options: &GenerateOptions,
     provided: &[ProvidedFn],
-) -> Result<Abi> {
+) -> Abi {
     let mut abi = Abi {
         functions: sys_functions(),
         ..Default::default()
@@ -595,20 +593,6 @@ pub fn build(
             if let ModuleContext::Module(spec) = &decl.module_context {
                 for f in &mut abi.functions[start..] {
                     f.module = Some(spec.to_string());
-                    // A module export is reached as an externref global, so a
-                    // scalar-typed `const`/`let` has no wire representation.
-                    if let AbiOp::StaticGet { path, .. } = &f.op {
-                        if path.is_empty()
-                            && f.result
-                                .is_some_and(|r| !matches!(r, WasmType::ExternRef { .. }))
-                        {
-                            bail!(
-                            "{}: a scalar `{}` exported from module {spec:?} cannot be read; a module export is a reference",
-                            f.name,
-                            f.ts
-                        );
-                        }
-                    }
                 }
             }
         }
@@ -629,7 +613,7 @@ pub fn build(
         kept.push(f);
     }
     abi.functions = kept;
-    Ok(abi)
+    abi
 }
 
 fn build_declaration(
@@ -1168,7 +1152,7 @@ mod tests {
     use super::*;
 
     /// Every declared module is selected, as `--export <specifier>` would.
-    fn abi(src: &str) -> Result<Abi> {
+    fn abi(src: &str) -> Abi {
         let (module, gctx) = crate::parse_source(src, None).unwrap();
         let exports = module
             .types
@@ -1191,8 +1175,7 @@ mod tests {
                 function connect(address: string): Socket;
                 class Socket { startTls(): Socket; }
             }
-        "#)
-        .unwrap();
+        "#);
         assert_eq!(abi.function("fetch").unwrap().module, None);
         assert_eq!(
             abi.function("connect").unwrap().module.as_deref(),
@@ -1213,8 +1196,7 @@ mod tests {
                 let _Email: { new (from: string): Email };
                 export { _Email as Email };
             }
-        "#)
-        .unwrap();
+        "#);
         let new = abi.import("cloudflare:email", "Email.new").unwrap();
         assert!(matches!(new.op, AbiOp::Construct { .. }), "{:?}", new.op);
         let dict = abi.import(BINDINGS_SPECIFIER, "Email.new").unwrap();
@@ -1240,8 +1222,7 @@ mod tests {
             declare function clone<T>(value: T): T;
             declare function unknownName(): NotDeclaredAnywhere;
             declare class Event<T = any> { readonly detail: T; }
-        "#)
-        .unwrap();
+        "#);
         let result = |n: &str| abi.function(n).unwrap().result.unwrap();
         assert!(result("a").admits_null());
         assert!(result("b").admits_null());
@@ -1261,8 +1242,7 @@ mod tests {
             declare class Header { a(): void; }
             declare namespace TailStream { class Header { b(): void; } }
             declare namespace WebAssembly { class Module { constructor(bytes: ArrayBuffer); static exports(m: Module): string[]; } }
-        "#)
-        .unwrap();
+        "#);
         let names: Vec<&str> = abi
             .functions
             .iter()
@@ -1298,8 +1278,7 @@ mod tests {
                 static s(x: string): void;
                 static s(x: string, y: number): void;
             }
-        "#)
-        .unwrap();
+        "#);
         let names: Vec<&str> = abi
             .functions
             .iter()
@@ -1338,8 +1317,7 @@ mod tests {
                 viaId: Id<Headers>;
                 partial: Gen2;
             }
-        "#)
-        .unwrap();
+        "#);
         let f = |n: &str| abi.function(n).unwrap();
         // The type parameter may be `X | null`, so the other empty is admitted too.
         assert_eq!(f("Gen.opt_t").result, Some(WasmType::JS));
@@ -1373,8 +1351,7 @@ mod tests {
                 class _Foo { constructor(); get(): string; }
                 export { _Foo as Foo, _Foo as Bar };
             }
-        "#)
-        .unwrap();
+        "#);
         for (name, alias) in [("Foo.new", "Bar.new"), ("Foo.get", "Bar.get")] {
             assert_eq!(class.function(name).unwrap().aliases, [alias]);
         }
@@ -1387,8 +1364,7 @@ mod tests {
                 }
                 export { _N as N1, _N as N2 };
             }
-        "#)
-        .unwrap();
+        "#);
         for (name, alias) in [("N1.nf", "N2.nf"), ("N1.C.new", "N2.C.new")] {
             assert_eq!(ns.function(name).unwrap().aliases, [alias]);
         }
@@ -1404,8 +1380,7 @@ mod tests {
                 class Hidden { static make(): Hidden; m(): void; }
                 export { open };
             }
-        "#)
-        .unwrap();
+        "#);
         assert!(abi.function("open").is_some());
         assert!(abi.function("hidden").is_none());
         assert!(abi.function("secret").is_none());
@@ -1422,8 +1397,7 @@ mod tests {
                 namespace _N { function f(): void; }
                 export { _Foo as Foo, _N as N };
             }
-        "#)
-        .unwrap();
+        "#);
         let ctor = abi.function("Foo.new").unwrap();
         assert_eq!(ctor.result, Some(WasmType::JS_NON_NULL));
         assert_eq!(ctor.result_head.as_deref(), Some("Foo"));
@@ -1431,14 +1405,17 @@ mod tests {
     }
 
     #[test]
-    fn module_scalar_export_is_an_error() {
-        let err = abi(r#"declare module "m:a" { const K: number; }"#)
-            .unwrap_err()
-            .to_string();
-        assert!(
-            err.contains("K") && err.contains("m:a") && err.contains("scalar"),
-            "{err}"
-        );
+    fn module_scalar_exports_keep_their_type() {
+        let abi = abi(r#"
+            declare module "m:a" { const n: number; let b: boolean; const l: bigint; }
+        "#);
+        for (name, ty) in [
+            ("n", WasmType::F64),
+            ("b", WasmType::I32),
+            ("l", WasmType::I64),
+        ] {
+            assert_eq!(abi.import("m:a", name).unwrap().result, Some(ty), "{name}");
+        }
     }
 
     #[test]
@@ -1452,8 +1429,7 @@ mod tests {
                 both?: Headers | null;
             }
             declare function f(h: MaybeHeaders): Headers;
-        "#)
-        .unwrap();
+        "#);
         let f = |n: &str| abi.function(n).unwrap();
         let und = WasmType::ExternRef {
             null: false,
@@ -1488,8 +1464,7 @@ mod tests {
                 namespace constants { const O_RDONLY: Sock; }
                 class Sock {}
             }
-        "#)
-        .unwrap();
+        "#);
         for module in [BINDINGS_SPECIFIER, "cloudflare:sockets"] {
             assert!(abi.import(module, "connect").is_some(), "{module}");
         }
