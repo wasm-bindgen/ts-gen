@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "nested-arrays"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,46 +24,46 @@
 
   ;; Grid
   ;; rows(): Promise<string[][]>
-  (import "./bindings.wasm" "Grid.rows" (func $Grid.rows (param $this externref) (result externref)))
+  (import "nested-arrays" "Grid.rows" (func $nested-arrays:Grid.rows (param $this externref) (result externref)))
   ;; putRows(rows: number[][]): void
-  (import "./bindings.wasm" "Grid.put_rows" (func $Grid.put_rows (param $this externref) (param $rows externref)))
+  (import "nested-arrays" "Grid.put_rows" (func $nested-arrays:Grid.put_rows (param $this externref) (param $rows externref)))
   ;; names(): string[]
-  (import "./bindings.wasm" "Grid.names" (func $Grid.names (param $this externref) (result externref)))
+  (import "nested-arrays" "Grid.names" (func $nested-arrays:Grid.names (param $this externref) (result externref)))
   ;; tags: boolean[][]
-  (import "./bindings.wasm" "Grid.tags" (func $Grid.tags (param $this externref) (result externref)))
+  (import "nested-arrays" "Grid.tags" (func $nested-arrays:Grid.tags (param $this externref) (result externref)))
   ;; set tags(value: boolean[][])
-  (import "./bindings.wasm" "Grid.set_tags" (func $Grid.set_tags (param $this externref) (param $value externref)))
+  (import "nested-arrays" "Grid.set_tags" (func $nested-arrays:Grid.set_tags (param $this externref) (param $value externref)))
 
   ;; deep(): string[][][]
-  (import "./bindings.wasm" "deep" (func $deep (result externref)))
+  (import "nested-arrays" "deep" (func $nested-arrays:deep (result externref)))
   ;; putDeep(rows: string[][][]): void
-  (import "./bindings.wasm" "putDeep" (func $putDeep (param $rows externref)))
+  (import "nested-arrays" "putDeep" (func $nested-arrays:putDeep (param $rows externref)))
   ;; readonlyRows(rows: string[][]): string[][]
-  (import "./bindings.wasm" "readonlyRows" (func $readonlyRows (param $rows externref) (result externref)))
+  (import "nested-arrays" "readonlyRows" (func $nested-arrays:readonlyRows (param $rows externref) (result externref)))
   ;; genericRows(rows: string[][]): string[][]
-  (import "./bindings.wasm" "genericRows" (func $genericRows (param $rows externref) (result externref)))
+  (import "nested-arrays" "genericRows" (func $nested-arrays:genericRows (param $rows externref) (result externref)))
   ;; aliasRows(rows: Row[]): Row[]
-  (import "./bindings.wasm" "aliasRows" (func $aliasRows (param $rows externref) (result externref)))
+  (import "nested-arrays" "aliasRows" (func $nested-arrays:aliasRows (param $rows externref) (result externref)))
   ;; maybeRows(rows: string[][] | null): string[][] | null
-  (import "./bindings.wasm" "maybeRows" (func $maybeRows (param $rows externref) (result externref)))
+  (import "nested-arrays" "maybeRows" (func $nested-arrays:maybeRows (param $rows externref) (result externref)))
   ;; forEachRow(callback: (rows: string[][]) => void): void
-  (import "./bindings.wasm" "forEachRow" (func $forEachRow (param $callback externref)))
+  (import "nested-arrays" "forEachRow" (func $nested-arrays:forEachRow (param $callback externref)))
   ;; nullableStrings(values: (string | null)[]): (string | null)[]
-  (import "./bindings.wasm" "nullableStrings" (func $nullableStrings (param $values externref) (result externref)))
+  (import "nested-arrays" "nullableStrings" (func $nested-arrays:nullableStrings (param $values externref) (result externref)))
   ;; nullableRows(rows: (string[] | null)[]): (string[] | null)[]
-  (import "./bindings.wasm" "nullableRows" (func $nullableRows (param $rows externref) (result externref)))
+  (import "nested-arrays" "nullableRows" (func $nested-arrays:nullableRows (param $rows externref) (result externref)))
   ;; flags(values: boolean[]): boolean[]
-  (import "./bindings.wasm" "flags" (func $flags (param $values externref) (result externref)))
+  (import "nested-arrays" "flags" (func $nested-arrays:flags (param $values externref) (result externref)))
   ;; ids(values: Id[]): Id[]
-  (import "./bindings.wasm" "ids" (func $ids (param $values externref) (result externref)))
+  (import "nested-arrays" "ids" (func $nested-arrays:ids (param $values externref) (result externref)))
   ;; modes(values: ("a" | "b")[]): ("a" | "b")[]
-  (import "./bindings.wasm" "modes" (func $modes (param $values externref) (result externref)))
+  (import "nested-arrays" "modes" (func $nested-arrays:modes (param $values externref) (result externref)))
   ;; counts(values: (1 | 2)[]): (1 | 2)[]
-  (import "./bindings.wasm" "counts" (func $counts (param $values externref) (result externref)))
+  (import "nested-arrays" "counts" (func $nested-arrays:counts (param $values externref) (result externref)))
   ;; bigints(values: bigint[]): bigint[]
-  (import "./bindings.wasm" "bigints" (func $bigints (param $values externref) (result externref)))
+  (import "nested-arrays" "bigints" (func $nested-arrays:bigints (param $values externref) (result externref)))
   ;; grids(values: Grid[]): Grid[]
-  (import "./bindings.wasm" "grids" (func $grids (param $values externref) (result externref)))
+  (import "nested-arrays" "grids" (func $nested-arrays:grids (param $values externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

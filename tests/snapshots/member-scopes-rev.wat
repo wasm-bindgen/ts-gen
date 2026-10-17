@@ -9,12 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "ia"
-;;   "ib2"
-;;   "ic"
-;;   "ix"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -49,45 +44,47 @@
 
   ;; U
   ;; ub: T
-  (import "./bindings.wasm" "U.ub" (func $U.ub (param $this externref) (result externref)))
+  (import "ix" "U.ub" (func $ix:U.ub (param $this externref) (result externref)))
   ;; set ub(value: T)
-  (import "./bindings.wasm" "U.set_ub" (func $U.set_ub (param $this externref) (param $value externref)))
+  (import "ix" "U.set_ub" (func $ix:U.set_ub (param $this externref) (param $value externref)))
   ;; mb(): T
-  (import "./bindings.wasm" "U.mb" (func $U.mb (param $this externref) (result externref)))
+  (import "ix" "U.mb" (func $ix:U.mb (param $this externref) (result externref)))
   ;; ua: T
-  (import "./bindings.wasm" "U.ua" (func $U.ua (param $this externref) (result externref)))
+  (import "ix" "U.ua" (func $ix:U.ua (param $this externref) (result externref)))
   ;; set ua(value: T)
-  (import "./bindings.wasm" "U.set_ua" (func $U.set_ua (param $this externref) (param $value externref)))
+  (import "ix" "U.set_ua" (func $ix:U.set_ua (param $this externref) (param $value externref)))
   ;; ma(): T
-  (import "./bindings.wasm" "U.ma" (func $U.ma (param $this externref) (result externref)))
+  (import "ix" "U.ma" (func $ix:U.ma (param $this externref) (result externref)))
 
   ;; K
   ;; ka: T
-  (import "./bindings.wasm" "K.ka" (func $K.ka (param $this externref) (result externref)))
+  (import "ix" "K.ka" (func $ix:K.ka (param $this externref) (result externref)))
   ;; set ka(value: T)
-  (import "./bindings.wasm" "K.set_ka" (func $K.set_ka (param $this externref) (param $value externref)))
+  (import "ix" "K.set_ka" (func $ix:K.set_ka (param $this externref) (param $value externref)))
   ;; kb: T
-  (import "./bindings.wasm" "K.kb" (func $K.kb (param $this externref) (result externref)))
+  (import "ix" "K.kb" (func $ix:K.kb (param $this externref) (result externref)))
   ;; set kb(value: T)
-  (import "./bindings.wasm" "K.set_kb" (func $K.set_kb (param $this externref) (param $value externref)))
+  (import "ix" "K.set_kb" (func $ix:K.set_kb (param $this externref) (param $value externref)))
 
   ;; NS
   ;; gb(t: T): void
-  (import "./bindings.wasm" "NS.gb" (func $NS.gb (param $t externref)))
+  (import "ib2" "NS.gb" (func $ib2:NS.gb (param $t externref)))
   ;; ga(t: T): void
-  (import "./bindings.wasm" "NS.ga" (func $NS.ga (param $t externref)))
+  (import "ib2" "NS.ga" (func $ib2:NS.ga (param $t externref)))
 
   ;; T
   ;; {} as T
-  (import "./bindings.wasm" "T.new" (func $T.new (result externref)))
+  (import "ia" "T.new" (func $ia:T.new (result externref)))
   ;; a: number
-  (import "./bindings.wasm" "T.a" (func $T.a (param $this externref) (result f64)))
+  (import "ia" "T.a" (func $ia:T.a (param $this externref) (result f64)))
   ;; set a(value: number)
-  (import "./bindings.wasm" "T.set_a" (func $T.set_a (param $this externref) (param $value f64)))
+  (import "ia" "T.set_a" (func $ia:T.set_a (param $this externref) (param $value f64)))
+  ;; {} as T
+  (import "ic" "T.new" (func $ic:T.new (result externref)))
   ;; c: number
-  (import "./bindings.wasm" "T.c" (func $T.c (param $this externref) (result f64)))
+  (import "ic" "T.c" (func $ic:T.c (param $this externref) (result f64)))
   ;; set c(value: number)
-  (import "./bindings.wasm" "T.set_c" (func $T.set_c (param $this externref) (param $value f64)))
+  (import "ic" "T.set_c" (func $ic:T.set_c (param $this externref) (param $value f64)))
 
   ;; Ev
   ;; {} as Ev

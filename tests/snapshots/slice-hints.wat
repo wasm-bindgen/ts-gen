@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "slice-hints"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -25,44 +23,44 @@
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
   ;; keepView(data: number[]): void
-  (import "./bindings.wasm" "keepView" (func $keepView (param $data externref)))
+  (import "slice-hints" "keepView" (func $slice-hints:keepView (param $data externref)))
   ;; keepView(data: Float64Array): void
-  (import "./bindings.wasm" "keepView_with_float64_array" (func $keepView_with_float64_array (param $data externref)))
+  (import "slice-hints" "keepView_with_float64_array" (func $slice-hints:keepView_with_float64_array (param $data externref)))
   ;; keepCopy(data: number[]): void
-  (import "./bindings.wasm" "keepCopy" (func $keepCopy (param $data externref)))
+  (import "slice-hints" "keepCopy" (func $slice-hints:keepCopy (param $data externref)))
   ;; keepCopy(data: Float64Array): void
-  (import "./bindings.wasm" "keepCopy_with_float64_array" (func $keepCopy_with_float64_array (param $data externref)))
+  (import "slice-hints" "keepCopy_with_float64_array" (func $slice-hints:keepCopy_with_float64_array (param $data externref)))
   ;; first(): number
-  (import "./bindings.wasm" "first" (func $first (result f64)))
+  (import "slice-hints" "first" (func $slice-hints:first (result f64)))
   ;; entries(values: bigint[]): string
-  (import "./bindings.wasm" "entries" (func $entries (param $values externref) (result externref)))
+  (import "slice-hints" "entries" (func $slice-hints:entries (param $values externref) (result externref)))
   ;; entries(values: BigInt64Array): string
-  (import "./bindings.wasm" "entries_with_big_int64_array" (func $entries_with_big_int64_array (param $values externref) (result externref)))
+  (import "slice-hints" "entries_with_big_int64_array" (func $slice-hints:entries_with_big_int64_array (param $values externref) (result externref)))
   ;; digest(bytes: number[]): string
-  (import "./bindings.wasm" "digest" (func $digest (param $bytes externref) (result externref)))
+  (import "slice-hints" "digest" (func $slice-hints:digest (param $bytes externref) (result externref)))
   ;; digest(bytes: Uint8Array): string
-  (import "./bindings.wasm" "digest_with_uint8_array" (func $digest_with_uint8_array (param $bytes externref) (result externref)))
+  (import "slice-hints" "digest_with_uint8_array" (func $slice-hints:digest_with_uint8_array (param $bytes externref) (result externref)))
   ;; keepUnsharedView(data: number[]): void
-  (import "./bindings.wasm" "keepUnsharedView" (func $keepUnsharedView (param $data externref)))
+  (import "slice-hints" "keepUnsharedView" (func $slice-hints:keepUnsharedView (param $data externref)))
   ;; keepUnsharedView(data: Uint8Array<ArrayBuffer>): void
-  (import "./bindings.wasm" "keepUnsharedView_with_uint8_array" (func $keepUnsharedView_with_uint8_array (param $data externref)))
+  (import "slice-hints" "keepUnsharedView_with_uint8_array" (func $slice-hints:keepUnsharedView_with_uint8_array (param $data externref)))
   ;; keepSharedView(data: number[]): void
-  (import "./bindings.wasm" "keepSharedView" (func $keepSharedView (param $data externref)))
+  (import "slice-hints" "keepSharedView" (func $slice-hints:keepSharedView (param $data externref)))
   ;; keepSharedView(data: Uint8Array<ArrayBufferLike>): void
-  (import "./bindings.wasm" "keepSharedView_with_uint8_array" (func $keepSharedView_with_uint8_array (param $data externref)))
+  (import "slice-hints" "keepSharedView_with_uint8_array" (func $slice-hints:keepSharedView_with_uint8_array (param $data externref)))
 
   ;; Target
   ;; {} as Target
-  (import "./bindings.wasm" "Target.new" (func $Target.new (result externref)))
+  (import "slice-hints" "Target.new" (func $slice-hints:Target.new (result externref)))
   ;; buffer?: Float64Array | number[]
-  (import "./bindings.wasm" "Target.buffer" (func $Target.buffer (param $this externref) (result externref)))
+  (import "slice-hints" "Target.buffer" (func $slice-hints:Target.buffer (param $this externref) (result externref)))
   ;; set buffer(value: number[])
-  (import "./bindings.wasm" "Target.set_buffer" (func $Target.set_buffer (param $this externref) (param $value externref)))
+  (import "slice-hints" "Target.set_buffer" (func $slice-hints:Target.set_buffer (param $this externref) (param $value externref)))
   ;; set buffer(value: Float64Array)
-  (import "./bindings.wasm" "Target.set_buffer_with_float64_array" (func $Target.set_buffer_with_float64_array (param $this externref) (param $value externref)))
+  (import "slice-hints" "Target.set_buffer_with_float64_array" (func $slice-hints:Target.set_buffer_with_float64_array (param $this externref) (param $value externref)))
 
   ;; describeTarget(target: Target): string
-  (import "./bindings.wasm" "describeTarget" (func $describeTarget (param $target externref) (result externref)))
+  (import "slice-hints" "describeTarget" (func $slice-hints:describeTarget (param $target externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

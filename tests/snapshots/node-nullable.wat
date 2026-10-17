@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "node-nullable"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,26 +24,26 @@
 
   ;; Options
   ;; {} as Options
-  (import "./bindings.wasm" "Options.new" (func $Options.new (result externref)))
+  (import "node-nullable" "Options.new" (func $node-nullable:Options.new (result externref)))
   ;; label?: string | null
-  (import "./bindings.wasm" "Options.label" (func $Options.label (param $this externref) (result externref)))
+  (import "node-nullable" "Options.label" (func $node-nullable:Options.label (param $this externref) (result externref)))
   ;; set label(value: string | null)
-  (import "./bindings.wasm" "Options.set_label" (func $Options.set_label (param $this externref) (param $value externref)))
+  (import "node-nullable" "Options.set_label" (func $node-nullable:Options.set_label (param $this externref) (param $value externref)))
 
   ;; describe(name: string | null): string
-  (import "./bindings.wasm" "describe" (func $describe (param $name externref) (result externref)))
+  (import "node-nullable" "describe" (func $node-nullable:describe (param $name externref) (result externref)))
   ;; repeat(): string
-  (import "./bindings.wasm" "repeat" (func $repeat (result externref)))
+  (import "node-nullable" "repeat" (func $node-nullable:repeat (result externref)))
   ;; repeat(count: number): string
-  (import "./bindings.wasm" "repeat_with_count" (func $repeat_with_count (param $count f64) (result externref)))
+  (import "node-nullable" "repeat_with_count" (func $node-nullable:repeat_with_count (param $count f64) (result externref)))
   ;; greet(): string
-  (import "./bindings.wasm" "greet" (func $greet (result externref)))
+  (import "node-nullable" "greet" (func $node-nullable:greet (result externref)))
   ;; greet(name: string | null): string
-  (import "./bindings.wasm" "greet_with_name" (func $greet_with_name (param $name externref) (result externref)))
+  (import "node-nullable" "greet_with_name" (func $node-nullable:greet_with_name (param $name externref) (result externref)))
   ;; lookup(key: string): string | null | undefined
-  (import "./bindings.wasm" "lookup" (func $lookup (param $key externref) (result externref)))
+  (import "node-nullable" "lookup" (func $node-nullable:lookup (param $key externref) (result externref)))
   ;; configure(options: Options): string
-  (import "./bindings.wasm" "configure" (func $configure (param $options externref) (result externref)))
+  (import "node-nullable" "configure" (func $node-nullable:configure (param $options externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

@@ -3135,15 +3135,17 @@ other public name (`export { _N as N1, _N as N2 }` gives `N1.f` and
 `N2.f`):
 
 ```ts
-declare class _Conn { constructor(); get(): string; }
-export { _Conn as Conn, _Conn as Connection };
+declare module "db" {
+  class _Conn { constructor(); get(): string; }
+  export { _Conn as Conn, _Conn as Connection };
+}
 ```
 
 ```wat
-(import "./bindings.wasm" "Conn.new" (func $Conn.new (result externref)))
-(import "./bindings.wasm" "Connection.new" (func $Connection.new (result externref)))
-(import "./bindings.wasm" "Conn.get" (func $Conn.get (param $this externref) (result externref)))
-(import "./bindings.wasm" "Connection.get" (func $Connection.get (param $this externref) (result externref)))
+(import "db" "Conn.new" (func $db:Conn.new (result externref)))
+(import "db" "Connection.new" (func $db:Connection.new (result externref)))
+(import "db" "Conn.get" (func $db:Conn.get (param $this externref) (result externref)))
+(import "db" "Connection.get" (func $db:Connection.get (param $this externref) (result externref)))
 ```
 
 ### Member types
@@ -3204,12 +3206,26 @@ Free functions (global scope) use just the function name:
 
 ### Module-scoped declarations
 
-Declarations inside `declare module "cloudflare:sockets" { ... }` keep
-the same `Type.member` names; nothing in the language module names the
-specifier, which the model records on each function and the template
-header lists. The values are reached through the module's exports,
-which are references, so a scalar-typed `const` or `let` exported
-from a module is an error.
+Declarations inside `declare module "<spec>" { ... }` keep the same
+`Type.member` names, and the template imports them from `"<spec>"`
+instead of `./bindings.wasm`. The import module and name together are
+unique, so two modules exporting the same name are two imports:
+
+```wat
+(import "node:fs" "constants.O_RDONLY" (func $node:fs:constants.O_RDONLY (result f64)))
+(import "node:os" "constants.O_RDONLY" (func $node:os:constants.O_RDONLY (result f64)))
+```
+
+Every value is reached through one of the module's exports, as
+`(<spec>, path)`: `path[0]` is the export, each further segment a
+property read, so `constants.O_RDONLY` reads `O_RDONLY` from the
+`constants` export of `"node:fs"`. A function, variable or namespace
+member is reached this way; a class's constructor and statics go
+through the class's export, and its instance members through the
+receiver as for a global class. Types (interfaces, aliases) are not
+values and import nothing. An export is a reference, so a scalar-typed
+`const` or `let` that is itself an export is an error; one inside an
+exported namespace is a property read and is fine.
 
 ### Provided functions in the ABI
 
@@ -3240,11 +3256,11 @@ anyref)))`. The `anyref` element type lets GC languages build the
 array natively. Fixed parameters before the rest are allowed. This
 requires Wasm GC, not just reference-types.
 
-**Duplicate names.** ABI names carry no specifier, so the same
-`Type.member` declared both globally and in a `declare module` (or in
-two modules) is an error, with one exception: a dictionary's
-synthesized `Type.new` yields to a real constructor from another
-root, as `workers-types` declares `interface EmailMessage` globally
-and its constructor in `"cloudflare:email"`. Within one root, a
+**Duplicate names.** Within one module, or among the globals, a
 declaration merged from several `.d.ts` statements contributes each
-member once.
+member once. The same name in two modules, or globally and in a
+module, is two imports. `workers-types` declares `interface
+EmailMessage` globally, a dictionary, and its constructor in
+`"cloudflare:email"`, so `"./bindings.wasm" "EmailMessage.new"`
+creates `{}` and `"cloudflare:email" "EmailMessage.new"` constructs
+the class.

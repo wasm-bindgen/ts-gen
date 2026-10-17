@@ -9,10 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "node:other"
-;;   "node:thing"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,26 +23,26 @@
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
   ;; connect(address: string): Socket
-  (import "./bindings.wasm" "connect" (func $connect (param $address externref) (result externref)))
+  (import "node:thing" "connect" (func $node:thing:connect (param $address externref) (result externref)))
   ;; serve(port: number): void
-  (import "./bindings.wasm" "serve" (func $serve (param $port f64)))
+  (import "node:thing" "serve" (func $node:thing:serve (param $port f64)))
   ;; listenOn(port: number): void
-  (import "./bindings.wasm" "listenOn" (func $listenOn (param $port f64)))
+  (import "node:thing" "listenOn" (func $node:thing:listenOn (param $port f64)))
   ;; shutdown(): void
-  (import "./bindings.wasm" "shutdown" (func $shutdown))
+  (import "node:thing" "shutdown" (func $node:thing:shutdown))
   ;; const version: string
-  (import "./bindings.wasm" "version" (func $version (result externref)))
+  (import "node:thing" "version" (func $node:thing:version (result externref)))
 
   ;; Server
   ;; constructor(port: number)
-  (import "./bindings.wasm" "Server.new" (func $Server.new (param $port f64) (result externref)))
+  (import "node:thing" "Server.new" (func $node:thing:Server.new (param $port f64) (result externref)))
   ;; stop(): void
-  (import "./bindings.wasm" "Server.stop" (func $Server.stop (param $this externref)))
+  (import "node:thing" "Server.stop" (func $node:thing:Server.stop (param $this externref)))
 
   ;; _listen(host: string): void
   (import "./bindings.wasm" "_listen" (func $_listen (param $host externref)))
   ;; _close(): boolean
-  (import "./bindings.wasm" "_close" (func $_close (result i32)))
+  (import "node:other" "_close" (func $node:other:_close (result i32)))
 
   ;; Socket
   ;; close(): Promise<void>

@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "slice-args"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,78 +24,78 @@
 
   ;; Item
   ;; constructor(name: string)
-  (import "./bindings.wasm" "Item.new" (func $Item.new (param $name externref) (result externref)))
+  (import "slice-args" "Item.new" (func $slice-args:Item.new (param $name externref) (result externref)))
   ;; name: string
-  (import "./bindings.wasm" "Item.name" (func $Item.name (param $this externref) (result externref)))
+  (import "slice-args" "Item.name" (func $slice-args:Item.name (param $this externref) (result externref)))
 
   ;; numbers(values: number[]): string
-  (import "./bindings.wasm" "numbers" (func $numbers (param $values externref) (result externref)))
+  (import "slice-args" "numbers" (func $slice-args:numbers (param $values externref) (result externref)))
   ;; counts(values: Count[]): string
-  (import "./bindings.wasm" "counts" (func $counts (param $values externref) (result externref)))
+  (import "slice-args" "counts" (func $slice-args:counts (param $values externref) (result externref)))
   ;; literals(values: (1 | 2)[]): string
-  (import "./bindings.wasm" "literals" (func $literals (param $values externref) (result externref)))
+  (import "slice-args" "literals" (func $slice-args:literals (param $values externref) (result externref)))
   ;; levels(values: Level[]): string
-  (import "./bindings.wasm" "levels" (func $levels (param $values externref) (result externref)))
+  (import "slice-args" "levels" (func $slice-args:levels (param $values externref) (result externref)))
   ;; strings(values: string[]): string
-  (import "./bindings.wasm" "strings" (func $strings (param $values externref) (result externref)))
+  (import "slice-args" "strings" (func $slice-args:strings (param $values externref) (result externref)))
   ;; flags(values: boolean[]): string
-  (import "./bindings.wasm" "flags" (func $flags (param $values externref) (result externref)))
+  (import "slice-args" "flags" (func $slice-args:flags (param $values externref) (result externref)))
   ;; bigints(values: bigint[]): string
-  (import "./bindings.wasm" "bigints" (func $bigints (param $values externref) (result externref)))
+  (import "slice-args" "bigints" (func $slice-args:bigints (param $values externref) (result externref)))
   ;; items(values: Item[]): string
-  (import "./bindings.wasm" "items" (func $items (param $values externref) (result externref)))
+  (import "slice-args" "items" (func $slice-args:items (param $values externref) (result externref)))
   ;; generic(values: T[]): string
-  (import "./bindings.wasm" "generic" (func $generic (param $values externref) (result externref)))
+  (import "slice-args" "generic" (func $slice-args:generic (param $values externref) (result externref)))
   ;; bytes(values: number[]): string
-  (import "./bindings.wasm" "bytes" (func $bytes (param $values externref) (result externref)))
+  (import "slice-args" "bytes" (func $slice-args:bytes (param $values externref) (result externref)))
   ;; bytes(values: Uint8Array): string
-  (import "./bindings.wasm" "bytes_with_uint8_array" (func $bytes_with_uint8_array (param $values externref) (result externref)))
+  (import "slice-args" "bytes_with_uint8_array" (func $slice-args:bytes_with_uint8_array (param $values externref) (result externref)))
   ;; words(values: bigint[]): string
-  (import "./bindings.wasm" "words" (func $words (param $values externref) (result externref)))
+  (import "slice-args" "words" (func $slice-args:words (param $values externref) (result externref)))
   ;; words(values: BigInt64Array): string
-  (import "./bindings.wasm" "words_with_big_int64_array" (func $words_with_big_int64_array (param $values externref) (result externref)))
+  (import "slice-args" "words_with_big_int64_array" (func $slice-args:words_with_big_int64_array (param $values externref) (result externref)))
   ;; unsigned(values: bigint[]): string
-  (import "./bindings.wasm" "unsigned" (func $unsigned (param $values externref) (result externref)))
+  (import "slice-args" "unsigned" (func $slice-args:unsigned (param $values externref) (result externref)))
   ;; unsigned(values: BigUint64Array): string
-  (import "./bindings.wasm" "unsigned_with_big_uint64_array" (func $unsigned_with_big_uint64_array (param $values externref) (result externref)))
+  (import "slice-args" "unsigned_with_big_uint64_array" (func $slice-args:unsigned_with_big_uint64_array (param $values externref) (result externref)))
   ;; buffered(values: number[]): string
-  (import "./bindings.wasm" "buffered" (func $buffered (param $values externref) (result externref)))
+  (import "slice-args" "buffered" (func $slice-args:buffered (param $values externref) (result externref)))
   ;; buffered(values: Uint8Array<ArrayBuffer>): string
-  (import "./bindings.wasm" "buffered_with_uint8_array" (func $buffered_with_uint8_array (param $values externref) (result externref)))
+  (import "slice-args" "buffered_with_uint8_array" (func $slice-args:buffered_with_uint8_array (param $values externref) (result externref)))
   ;; clamped(values: number[]): string
-  (import "./bindings.wasm" "clamped" (func $clamped (param $values externref) (result externref)))
+  (import "slice-args" "clamped" (func $slice-args:clamped (param $values externref) (result externref)))
   ;; clamped(values: Uint8ClampedArray): string
-  (import "./bindings.wasm" "clamped_with_uint8_clamped_array" (func $clamped_with_uint8_clamped_array (param $values externref) (result externref)))
+  (import "slice-args" "clamped_with_uint8_clamped_array" (func $slice-args:clamped_with_uint8_clamped_array (param $values externref) (result externref)))
   ;; pixels(values: number[]): string
-  (import "./bindings.wasm" "pixels" (func $pixels (param $values externref) (result externref)))
+  (import "slice-args" "pixels" (func $slice-args:pixels (param $values externref) (result externref)))
   ;; pixels(values: Uint8Array): string
-  (import "./bindings.wasm" "pixels_with_uint8_array" (func $pixels_with_uint8_array (param $values externref) (result externref)))
+  (import "slice-args" "pixels_with_uint8_array" (func $slice-args:pixels_with_uint8_array (param $values externref) (result externref)))
   ;; pixels(values: Uint8ClampedArray): string
-  (import "./bindings.wasm" "pixels_with_uint8_clamped_array" (func $pixels_with_uint8_clamped_array (param $values externref) (result externref)))
+  (import "slice-args" "pixels_with_uint8_clamped_array" (func $slice-args:pixels_with_uint8_clamped_array (param $values externref) (result externref)))
   ;; floats(): string
-  (import "./bindings.wasm" "floats" (func $floats (result externref)))
+  (import "slice-args" "floats" (func $slice-args:floats (result externref)))
   ;; floats(values: number[]): string
-  (import "./bindings.wasm" "floats_with_slice" (func $floats_with_slice (param $values externref) (result externref)))
+  (import "slice-args" "floats_with_slice" (func $slice-args:floats_with_slice (param $values externref) (result externref)))
   ;; floats(values: Float64Array | null): string
-  (import "./bindings.wasm" "floats_with_float64_array" (func $floats_with_float64_array (param $values externref) (result externref)))
+  (import "slice-args" "floats_with_float64_array" (func $slice-args:floats_with_float64_array (param $values externref) (result externref)))
   ;; maybeBytes(values: number[] | undefined): string
-  (import "./bindings.wasm" "maybeBytes" (func $maybeBytes (param $values externref) (result externref)))
+  (import "slice-args" "maybeBytes" (func $slice-args:maybeBytes (param $values externref) (result externref)))
   ;; maybeBytes(values: Uint8Array | undefined): string
-  (import "./bindings.wasm" "maybeBytes_with_uint8_array" (func $maybeBytes_with_uint8_array (param $values externref) (result externref)))
+  (import "slice-args" "maybeBytes_with_uint8_array" (func $slice-args:maybeBytes_with_uint8_array (param $values externref) (result externref)))
   ;; maybeClamped(values: number[]): string
-  (import "./bindings.wasm" "maybeClamped" (func $maybeClamped (param $values externref) (result externref)))
+  (import "slice-args" "maybeClamped" (func $slice-args:maybeClamped (param $values externref) (result externref)))
   ;; maybeClamped(values: Uint8ClampedArray | undefined): string
-  (import "./bindings.wasm" "maybeClamped_with_uint8_clamped_array" (func $maybeClamped_with_uint8_clamped_array (param $values externref) (result externref)))
+  (import "slice-args" "maybeClamped_with_uint8_clamped_array" (func $slice-args:maybeClamped_with_uint8_clamped_array (param $values externref) (result externref)))
   ;; mixed(nums: number[], bytes: number[]): string
-  (import "./bindings.wasm" "mixed" (func $mixed (param $nums externref) (param $bytes externref) (result externref)))
+  (import "slice-args" "mixed" (func $slice-args:mixed (param $nums externref) (param $bytes externref) (result externref)))
   ;; mixed(nums: number[], bytes: Uint8Array): string
-  (import "./bindings.wasm" "mixed_with_uint8_array" (func $mixed_with_uint8_array (param $nums externref) (param $bytes externref) (result externref)))
+  (import "slice-args" "mixed_with_uint8_array" (func $slice-args:mixed_with_uint8_array (param $nums externref) (param $bytes externref) (result externref)))
   ;; spelled(values: string[]): string
-  (import "./bindings.wasm" "spelled" (func $spelled (param $values externref) (result externref)))
+  (import "slice-args" "spelled" (func $slice-args:spelled (param $values externref) (result externref)))
   ;; spelled_readonly(values: number[]): string
-  (import "./bindings.wasm" "spelled_readonly" (func $spelled_readonly (param $values externref) (result externref)))
+  (import "slice-args" "spelled_readonly" (func $slice-args:spelled_readonly (param $values externref) (result externref)))
   ;; array_like(values: ArrayLike<string>): string
-  (import "./bindings.wasm" "array_like" (func $array_like (param $values externref) (result externref)))
+  (import "slice-args" "array_like" (func $slice-args:array_like (param $values externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

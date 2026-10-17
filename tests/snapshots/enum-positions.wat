@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "enum-positions"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -28,43 +26,43 @@
 
   ;; Probe
   ;; level: Level
-  (import "./bindings.wasm" "Probe.level" (func $Probe.level (param $this externref) (result externref)))
+  (import "enum-positions" "Probe.level" (func $enum-positions:Probe.level (param $this externref) (result externref)))
   ;; set level(value: Level)
-  (import "./bindings.wasm" "Probe.set_level" (func $Probe.set_level (param $this externref) (param $value externref)))
+  (import "enum-positions" "Probe.set_level" (func $enum-positions:Probe.set_level (param $this externref) (param $value externref)))
   ;; region(r: Codes.Region): void
-  (import "./bindings.wasm" "Probe.region" (func $Probe.region (param $this externref) (param $r externref)))
+  (import "enum-positions" "Probe.region" (func $enum-positions:Probe.region (param $this externref) (param $r externref)))
   ;; regionOf(): Codes.Region
-  (import "./bindings.wasm" "Probe.region_of" (func $Probe.region_of (param $this externref) (result externref)))
+  (import "enum-positions" "Probe.region_of" (func $enum-positions:Probe.region_of (param $this externref) (result externref)))
   ;; alias(m: ModeAlias): void
-  (import "./bindings.wasm" "Probe.alias" (func $Probe.alias (param $this externref) (param $m externref)))
+  (import "enum-positions" "Probe.alias" (func $enum-positions:Probe.alias (param $this externref) (param $m externref)))
   ;; levels(ls: Level[]): Level[]
-  (import "./bindings.wasm" "Probe.levels" (func $Probe.levels (param $this externref) (param $ls externref) (result externref)))
+  (import "enum-positions" "Probe.levels" (func $enum-positions:Probe.levels (param $this externref) (param $ls externref) (result externref)))
   ;; modes(ms: Mode[]): Mode[]
-  (import "./bindings.wasm" "Probe.modes" (func $Probe.modes (param $this externref) (param $ms externref) (result externref)))
+  (import "enum-positions" "Probe.modes" (func $enum-positions:Probe.modes (param $this externref) (param $ms externref) (result externref)))
   ;; modeArray(ms: ArrayLike<Mode>): ArrayLike<Mode>
-  (import "./bindings.wasm" "Probe.mode_array" (func $Probe.mode_array (param $this externref) (param $ms externref) (result externref)))
+  (import "enum-positions" "Probe.mode_array" (func $enum-positions:Probe.mode_array (param $this externref) (param $ms externref) (result externref)))
   ;; rest(...ms: Mode[]): void
-  (import "./bindings.wasm" "Probe.rest" (func $Probe.rest (param $this externref) (param $ms (ref null $anyrefs))))
+  (import "enum-positions" "Probe.rest" (func $enum-positions:Probe.rest (param $this externref) (param $ms (ref null $anyrefs))))
   ;; onMode(cb: (m: Mode) => Level): void
-  (import "./bindings.wasm" "Probe.on_mode" (func $Probe.on_mode (param $this externref) (param $cb externref)))
+  (import "enum-positions" "Probe.on_mode" (func $enum-positions:Probe.on_mode (param $this externref) (param $cb externref)))
   ;; nextMode(): Promise<Mode>
-  (import "./bindings.wasm" "Probe.next_mode" (func $Probe.next_mode (param $this externref) (result externref)))
+  (import "enum-positions" "Probe.next_mode" (func $enum-positions:Probe.next_mode (param $this externref) (result externref)))
   ;; maybeMode(): Promise<Mode | null>
-  (import "./bindings.wasm" "Probe.maybe_mode" (func $Probe.maybe_mode (param $this externref) (result externref)))
+  (import "enum-positions" "Probe.maybe_mode" (func $enum-positions:Probe.maybe_mode (param $this externref) (result externref)))
   ;; modeMap(): Map<string, Mode>
-  (import "./bindings.wasm" "Probe.mode_map" (func $Probe.mode_map (param $this externref) (result externref)))
+  (import "enum-positions" "Probe.mode_map" (func $enum-positions:Probe.mode_map (param $this externref) (result externref)))
   ;; modeRecord(): Record<string, Mode>
-  (import "./bindings.wasm" "Probe.mode_record" (func $Probe.mode_record (param $this externref) (result externref)))
+  (import "enum-positions" "Probe.mode_record" (func $enum-positions:Probe.mode_record (param $this externref) (result externref)))
   ;; pair(): [Mode, Level]
-  (import "./bindings.wasm" "Probe.pair" (func $Probe.pair (param $this externref) (result externref)))
+  (import "enum-positions" "Probe.pair" (func $enum-positions:Probe.pair (param $this externref) (result externref)))
   ;; modeOrNumber(): Mode | number
-  (import "./bindings.wasm" "Probe.mode_or_number" (func $Probe.mode_or_number (param $this externref) (result externref)))
+  (import "enum-positions" "Probe.mode_or_number" (func $enum-positions:Probe.mode_or_number (param $this externref) (result externref)))
   ;; modeOrString(): Mode | string
-  (import "./bindings.wasm" "Probe.mode_or_string" (func $Probe.mode_or_string (param $this externref) (result externref)))
+  (import "enum-positions" "Probe.mode_or_string" (func $enum-positions:Probe.mode_or_string (param $this externref) (result externref)))
   ;; modeOrRegion(): Mode | Codes.Region
-  (import "./bindings.wasm" "Probe.mode_or_region" (func $Probe.mode_or_region (param $this externref) (result externref)))
+  (import "enum-positions" "Probe.mode_or_region" (func $enum-positions:Probe.mode_or_region (param $this externref) (result externref)))
   ;; levelOrString(): Level | string
-  (import "./bindings.wasm" "Probe.level_or_string" (func $Probe.level_or_string (param $this externref) (result externref)))
+  (import "enum-positions" "Probe.level_or_string" (func $enum-positions:Probe.level_or_string (param $this externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

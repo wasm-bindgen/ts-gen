@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "builtin-errors"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,11 +24,11 @@
 
   ;; Codec
   ;; decode(input: string): string
-  (import "./bindings.wasm" "Codec.decode" (func $Codec.decode (param $this externref) (param $input externref) (result externref)))
+  (import "builtin-errors" "Codec.decode" (func $builtin-errors:Codec.decode (param $this externref) (param $input externref) (result externref)))
   ;; decodeAll(input: string): string
-  (import "./bindings.wasm" "Codec.decode_all" (func $Codec.decode_all (param $this externref) (param $input externref) (result externref)))
+  (import "builtin-errors" "Codec.decode_all" (func $builtin-errors:Codec.decode_all (param $this externref) (param $input externref) (result externref)))
   ;; parse(input: string): Promise<string>
-  (import "./bindings.wasm" "Codec.parse" (func $Codec.parse (param $this externref) (param $input externref) (result externref)))
+  (import "builtin-errors" "Codec.parse" (func $builtin-errors:Codec.parse (param $this externref) (param $input externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
