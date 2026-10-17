@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "my-module"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -63,19 +61,19 @@
   (import "./bindings.wasm" "Serializable.serialize" (func $Serializable.serialize (param $this externref) (result externref)))
 
   ;; doWork(input: string): Promise<string>
-  (import "./bindings.wasm" "doWork" (func $doWork (param $input externref) (result externref)))
+  (import "my-module" "doWork" (func $my-module:doWork (param $input externref) (result externref)))
 
   ;; WorkResult
   ;; {} as WorkResult
-  (import "./bindings.wasm" "WorkResult.new" (func $WorkResult.new (result externref)))
+  (import "my-module" "WorkResult.new" (func $my-module:WorkResult.new (result externref)))
   ;; success: boolean
-  (import "./bindings.wasm" "WorkResult.success" (func $WorkResult.success (param $this externref) (result i32)))
+  (import "my-module" "WorkResult.success" (func $my-module:WorkResult.success (param $this externref) (result i32)))
   ;; set success(value: boolean)
-  (import "./bindings.wasm" "WorkResult.set_success" (func $WorkResult.set_success (param $this externref) (param $value i32)))
+  (import "my-module" "WorkResult.set_success" (func $my-module:WorkResult.set_success (param $this externref) (param $value i32)))
   ;; data?: string
-  (import "./bindings.wasm" "WorkResult.data" (func $WorkResult.data (param $this externref) (result externref)))
+  (import "my-module" "WorkResult.data" (func $my-module:WorkResult.data (param $this externref) (result externref)))
   ;; set data(value: string)
-  (import "./bindings.wasm" "WorkResult.set_data" (func $WorkResult.set_data (param $this externref) (param $value externref)))
+  (import "my-module" "WorkResult.set_data" (func $my-module:WorkResult.set_data (param $this externref) (param $value externref)))
 
   ;; GlobalMixin
   ;; customMethod(): void

@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "primitive-unions-mono"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -25,122 +23,122 @@
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
   ;; setValue(value: string): void
-  (import "./bindings.wasm" "setValue" (func $setValue (param $value externref)))
+  (import "primitive-unions-mono" "setValue" (func $primitive-unions-mono:setValue (param $value externref)))
   ;; setValue(value: number): void
-  (import "./bindings.wasm" "setValue_with_f64" (func $setValue_with_f64 (param $value f64)))
+  (import "primitive-unions-mono" "setValue_with_f64" (func $primitive-unions-mono:setValue_with_f64 (param $value f64)))
   ;; setFlag(value: boolean): void
-  (import "./bindings.wasm" "setFlag" (func $setFlag (param $value i32)))
+  (import "primitive-unions-mono" "setFlag" (func $primitive-unions-mono:setFlag (param $value i32)))
   ;; setFlag(value: bigint): void
-  (import "./bindings.wasm" "setFlag_with_big_int" (func $setFlag_with_big_int (param $value i64)))
+  (import "primitive-unions-mono" "setFlag_with_big_int" (func $primitive-unions-mono:setFlag_with_big_int (param $value i64)))
   ;; setAny(value: bigint): void
-  (import "./bindings.wasm" "setAny" (func $setAny (param $value i64)))
+  (import "primitive-unions-mono" "setAny" (func $primitive-unions-mono:setAny (param $value i64)))
   ;; setAny(value: boolean): void
-  (import "./bindings.wasm" "setAny_with_bool" (func $setAny_with_bool (param $value i32)))
+  (import "primitive-unions-mono" "setAny_with_bool" (func $primitive-unions-mono:setAny_with_bool (param $value i32)))
   ;; setAny(value: number): void
-  (import "./bindings.wasm" "setAny_with_f64" (func $setAny_with_f64 (param $value f64)))
+  (import "primitive-unions-mono" "setAny_with_f64" (func $primitive-unions-mono:setAny_with_f64 (param $value f64)))
   ;; setAny(value: string): void
-  (import "./bindings.wasm" "setAny_with_str" (func $setAny_with_str (param $value externref)))
+  (import "primitive-unions-mono" "setAny_with_str" (func $primitive-unions-mono:setAny_with_str (param $value externref)))
   ;; setAny(value: symbol): void
-  (import "./bindings.wasm" "setAny_with_symbol" (func $setAny_with_symbol (param $value externref)))
+  (import "primitive-unions-mono" "setAny_with_symbol" (func $primitive-unions-mono:setAny_with_symbol (param $value externref)))
   ;; setKeyed(value: string): void
-  (import "./bindings.wasm" "setKeyed" (func $setKeyed (param $value externref)))
+  (import "primitive-unions-mono" "setKeyed" (func $primitive-unions-mono:setKeyed (param $value externref)))
   ;; setKeyed(value: symbol): void
-  (import "./bindings.wasm" "setKeyed_with_symbol" (func $setKeyed_with_symbol (param $value externref)))
+  (import "primitive-unions-mono" "setKeyed_with_symbol" (func $primitive-unions-mono:setKeyed_with_symbol (param $value externref)))
   ;; setLevel(level: 1): void
-  (import "./bindings.wasm" "setLevel" (func $setLevel (param $level f64)))
+  (import "primitive-unions-mono" "setLevel" (func $primitive-unions-mono:setLevel (param $level f64)))
   ;; setLevel(level: "auto"): void
-  (import "./bindings.wasm" "setLevel_with_str" (func $setLevel_with_str (param $level externref)))
+  (import "primitive-unions-mono" "setLevel_with_str" (func $primitive-unions-mono:setLevel_with_str (param $level externref)))
   ;; setNullable(value: string): void
-  (import "./bindings.wasm" "setNullable" (func $setNullable (param $value externref)))
+  (import "primitive-unions-mono" "setNullable" (func $primitive-unions-mono:setNullable (param $value externref)))
   ;; setNullable(value: number): void
-  (import "./bindings.wasm" "setNullable_with_f64" (func $setNullable_with_f64 (param $value f64)))
+  (import "primitive-unions-mono" "setNullable_with_f64" (func $primitive-unions-mono:setNullable_with_f64 (param $value f64)))
   ;; setNullable(value: null): void
-  (import "./bindings.wasm" "setNullable_with_null" (func $setNullable_with_null (param $value externref)))
+  (import "primitive-unions-mono" "setNullable_with_null" (func $primitive-unions-mono:setNullable_with_null (param $value externref)))
   ;; setMaybe(): void
-  (import "./bindings.wasm" "setMaybe" (func $setMaybe))
+  (import "primitive-unions-mono" "setMaybe" (func $primitive-unions-mono:setMaybe))
   ;; setMaybe(value: string): void
-  (import "./bindings.wasm" "setMaybe_with_str" (func $setMaybe_with_str (param $value externref)))
+  (import "primitive-unions-mono" "setMaybe_with_str" (func $primitive-unions-mono:setMaybe_with_str (param $value externref)))
   ;; setMaybe(value: number): void
-  (import "./bindings.wasm" "setMaybe_with_f64" (func $setMaybe_with_f64 (param $value f64)))
+  (import "primitive-unions-mono" "setMaybe_with_f64" (func $primitive-unions-mono:setMaybe_with_f64 (param $value f64)))
   ;; lookup(id: Id): void
-  (import "./bindings.wasm" "lookup" (func $lookup (param $id externref)))
+  (import "primitive-unions-mono" "lookup" (func $primitive-unions-mono:lookup (param $id externref)))
   ;; hasKey(key: string): boolean
-  (import "./bindings.wasm" "hasKey" (func $hasKey (param $key externref) (result i32)))
+  (import "primitive-unions-mono" "hasKey" (func $primitive-unions-mono:hasKey (param $key externref) (result i32)))
   ;; hasKey(key: number): boolean
-  (import "./bindings.wasm" "hasKey_with_f64" (func $hasKey_with_f64 (param $key f64) (result i32)))
+  (import "primitive-unions-mono" "hasKey_with_f64" (func $primitive-unions-mono:hasKey_with_f64 (param $key f64) (result i32)))
   ;; hasKey(key: symbol): boolean
-  (import "./bindings.wasm" "hasKey_with_symbol" (func $hasKey_with_symbol (param $key externref) (result i32)))
+  (import "primitive-unions-mono" "hasKey_with_symbol" (func $primitive-unions-mono:hasKey_with_symbol (param $key externref) (result i32)))
   ;; hasKeyExplicit(key: string): boolean
-  (import "./bindings.wasm" "hasKeyExplicit" (func $hasKeyExplicit (param $key externref) (result i32)))
+  (import "primitive-unions-mono" "hasKeyExplicit" (func $primitive-unions-mono:hasKeyExplicit (param $key externref) (result i32)))
   ;; hasKeyExplicit(key: number): boolean
-  (import "./bindings.wasm" "hasKeyExplicit_with_f64" (func $hasKeyExplicit_with_f64 (param $key f64) (result i32)))
+  (import "primitive-unions-mono" "hasKeyExplicit_with_f64" (func $primitive-unions-mono:hasKeyExplicit_with_f64 (param $key f64) (result i32)))
   ;; hasKeyExplicit(key: symbol): boolean
-  (import "./bindings.wasm" "hasKeyExplicit_with_symbol" (func $hasKeyExplicit_with_symbol (param $key externref) (result i32)))
+  (import "primitive-unions-mono" "hasKeyExplicit_with_symbol" (func $primitive-unions-mono:hasKeyExplicit_with_symbol (param $key externref) (result i32)))
 
   ;; Target
   ;; {} as Target
-  (import "./bindings.wasm" "Target.new" (func $Target.new (result externref)))
+  (import "primitive-unions-mono" "Target.new" (func $primitive-unions-mono:Target.new (result externref)))
   ;; name: string
-  (import "./bindings.wasm" "Target.name" (func $Target.name (param $this externref) (result externref)))
+  (import "primitive-unions-mono" "Target.name" (func $primitive-unions-mono:Target.name (param $this externref) (result externref)))
   ;; set name(value: string)
-  (import "./bindings.wasm" "Target.set_name" (func $Target.set_name (param $this externref) (param $value externref)))
+  (import "primitive-unions-mono" "Target.set_name" (func $primitive-unions-mono:Target.set_name (param $this externref) (param $value externref)))
 
   ;; send(to: Target): void
-  (import "./bindings.wasm" "send" (func $send (param $to externref)))
+  (import "primitive-unions-mono" "send" (func $primitive-unions-mono:send (param $to externref)))
   ;; send(to: string): void
-  (import "./bindings.wasm" "send_with_str" (func $send_with_str (param $to externref)))
+  (import "primitive-unions-mono" "send_with_str" (func $primitive-unions-mono:send_with_str (param $to externref)))
   ;; send(to: number): void
-  (import "./bindings.wasm" "send_with_f64" (func $send_with_f64 (param $to f64)))
+  (import "primitive-unions-mono" "send_with_f64" (func $primitive-unions-mono:send_with_f64 (param $to f64)))
   ;; setMode(mode: "a"): void
-  (import "./bindings.wasm" "setMode" (func $setMode (param $mode externref)))
+  (import "primitive-unions-mono" "setMode" (func $primitive-unions-mono:setMode (param $mode externref)))
   ;; current(): string | number
-  (import "./bindings.wasm" "current" (func $current (result externref)))
+  (import "primitive-unions-mono" "current" (func $primitive-unions-mono:current (result externref)))
 
   ;; Store
   ;; constructor(key: string)
-  (import "./bindings.wasm" "Store.new" (func $Store.new (param $key externref) (result externref)))
+  (import "primitive-unions-mono" "Store.new" (func $primitive-unions-mono:Store.new (param $key externref) (result externref)))
   ;; constructor(key: number)
-  (import "./bindings.wasm" "Store.new_with_f64" (func $Store.new_with_f64 (param $key f64) (result externref)))
+  (import "primitive-unions-mono" "Store.new_with_f64" (func $primitive-unions-mono:Store.new_with_f64 (param $key f64) (result externref)))
   ;; constructor(key: symbol)
-  (import "./bindings.wasm" "Store.new_with_symbol" (func $Store.new_with_symbol (param $key externref) (result externref)))
+  (import "primitive-unions-mono" "Store.new_with_symbol" (func $primitive-unions-mono:Store.new_with_symbol (param $key externref) (result externref)))
   ;; get(key: string): string
-  (import "./bindings.wasm" "Store.get" (func $Store.get (param $this externref) (param $key externref) (result externref)))
+  (import "primitive-unions-mono" "Store.get" (func $primitive-unions-mono:Store.get (param $this externref) (param $key externref) (result externref)))
   ;; get(key: number): string
-  (import "./bindings.wasm" "Store.get_with_f64" (func $Store.get_with_f64 (param $this externref) (param $key f64) (result externref)))
+  (import "primitive-unions-mono" "Store.get_with_f64" (func $primitive-unions-mono:Store.get_with_f64 (param $this externref) (param $key f64) (result externref)))
   ;; of(value: boolean): Store
-  (import "./bindings.wasm" "Store.of" (func $Store.of (param $value i32) (result externref)))
+  (import "primitive-unions-mono" "Store.of" (func $primitive-unions-mono:Store.of (param $value i32) (result externref)))
   ;; of(value: number): Store
-  (import "./bindings.wasm" "Store.of_with_f64" (func $Store.of_with_f64 (param $value f64) (result externref)))
+  (import "primitive-unions-mono" "Store.of_with_f64" (func $primitive-unions-mono:Store.of_with_f64 (param $value f64) (result externref)))
 
   ;; Settings
   ;; {} as Settings
-  (import "./bindings.wasm" "Settings.new" (func $Settings.new (result externref)))
+  (import "primitive-unions-mono" "Settings.new" (func $primitive-unions-mono:Settings.new (result externref)))
   ;; level: "low" | "high" | number
-  (import "./bindings.wasm" "Settings.level" (func $Settings.level (param $this externref) (result externref)))
+  (import "primitive-unions-mono" "Settings.level" (func $primitive-unions-mono:Settings.level (param $this externref) (result externref)))
   ;; set level(value: "low")
-  (import "./bindings.wasm" "Settings.set_level" (func $Settings.set_level (param $this externref) (param $value externref)))
+  (import "primitive-unions-mono" "Settings.set_level" (func $primitive-unions-mono:Settings.set_level (param $this externref) (param $value externref)))
   ;; set level(value: number)
-  (import "./bindings.wasm" "Settings.set_level_with_f64" (func $Settings.set_level_with_f64 (param $this externref) (param $value f64)))
+  (import "primitive-unions-mono" "Settings.set_level_with_f64" (func $primitive-unions-mono:Settings.set_level_with_f64 (param $this externref) (param $value f64)))
   ;; id: string | number
-  (import "./bindings.wasm" "Settings.id" (func $Settings.id (param $this externref) (result externref)))
+  (import "primitive-unions-mono" "Settings.id" (func $primitive-unions-mono:Settings.id (param $this externref) (result externref)))
   ;; set id(value: string)
-  (import "./bindings.wasm" "Settings.set_id" (func $Settings.set_id (param $this externref) (param $value externref)))
+  (import "primitive-unions-mono" "Settings.set_id" (func $primitive-unions-mono:Settings.set_id (param $this externref) (param $value externref)))
   ;; set id(value: number)
-  (import "./bindings.wasm" "Settings.set_id_with_f64" (func $Settings.set_id_with_f64 (param $this externref) (param $value f64)))
+  (import "primitive-unions-mono" "Settings.set_id_with_f64" (func $primitive-unions-mono:Settings.set_id_with_f64 (param $this externref) (param $value f64)))
   ;; label?: string | boolean
-  (import "./bindings.wasm" "Settings.label" (func $Settings.label (param $this externref) (result externref)))
+  (import "primitive-unions-mono" "Settings.label" (func $primitive-unions-mono:Settings.label (param $this externref) (result externref)))
   ;; set label(value: string)
-  (import "./bindings.wasm" "Settings.set_label" (func $Settings.set_label (param $this externref) (param $value externref)))
+  (import "primitive-unions-mono" "Settings.set_label" (func $primitive-unions-mono:Settings.set_label (param $this externref) (param $value externref)))
   ;; set label(value: boolean)
-  (import "./bindings.wasm" "Settings.set_label_with_bool" (func $Settings.set_label_with_bool (param $this externref) (param $value i32)))
+  (import "primitive-unions-mono" "Settings.set_label_with_bool" (func $primitive-unions-mono:Settings.set_label_with_bool (param $this externref) (param $value i32)))
   ;; from: Target | string | boolean
-  (import "./bindings.wasm" "Settings.from" (func $Settings.from (param $this externref) (result externref)))
+  (import "primitive-unions-mono" "Settings.from" (func $primitive-unions-mono:Settings.from (param $this externref) (result externref)))
   ;; set from(value: Target)
-  (import "./bindings.wasm" "Settings.set_from" (func $Settings.set_from (param $this externref) (param $value externref)))
+  (import "primitive-unions-mono" "Settings.set_from" (func $primitive-unions-mono:Settings.set_from (param $this externref) (param $value externref)))
   ;; set from(value: string)
-  (import "./bindings.wasm" "Settings.set_from_with_str" (func $Settings.set_from_with_str (param $this externref) (param $value externref)))
+  (import "primitive-unions-mono" "Settings.set_from_with_str" (func $primitive-unions-mono:Settings.set_from_with_str (param $this externref) (param $value externref)))
   ;; set from(value: boolean)
-  (import "./bindings.wasm" "Settings.set_from_with_bool" (func $Settings.set_from_with_bool (param $this externref) (param $value i32)))
+  (import "primitive-unions-mono" "Settings.set_from_with_bool" (func $primitive-unions-mono:Settings.set_from_with_bool (param $this externref) (param $value i32)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

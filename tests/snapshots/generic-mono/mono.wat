@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "generic-mono"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,93 +24,93 @@
 
   ;; Holder
   ;; constructor(value: T)
-  (import "./bindings.wasm" "Holder.new" (func $Holder.new (param $value externref) (result externref)))
+  (import "generic-mono" "Holder.new" (func $generic-mono:Holder.new (param $value externref) (result externref)))
   ;; get(): T
-  (import "./bindings.wasm" "Holder.get" (func $Holder.get (param $this externref) (result externref)))
+  (import "generic-mono" "Holder.get" (func $generic-mono:Holder.get (param $this externref) (result externref)))
   ;; set(value: T): void
-  (import "./bindings.wasm" "Holder.set" (func $Holder.set (param $this externref) (param $value externref)))
+  (import "generic-mono" "Holder.set" (func $generic-mono:Holder.set (param $this externref) (param $value externref)))
 
   ;; identity(value: T): T
-  (import "./bindings.wasm" "identity" (func $identity (param $value externref) (result externref)))
+  (import "generic-mono" "identity" (func $generic-mono:identity (param $value externref) (result externref)))
 
   ;; Store
   ;; load(): Promise<T>
-  (import "./bindings.wasm" "Store.load" (func $Store.load (param $this externref) (result externref)))
+  (import "generic-mono" "Store.load" (func $generic-mono:Store.load (param $this externref) (result externref)))
   ;; loadHolder(): Promise<Holder<T>>
-  (import "./bindings.wasm" "Store.load_holder" (func $Store.load_holder (param $this externref) (result externref)))
+  (import "generic-mono" "Store.load_holder" (func $generic-mono:Store.load_holder (param $this externref) (result externref)))
   ;; find(key: string): T | undefined
-  (import "./bindings.wasm" "Store.find" (func $Store.find (param $this externref) (param $key externref) (result externref)))
+  (import "generic-mono" "Store.find" (func $generic-mono:Store.find (param $this externref) (param $key externref) (result externref)))
 
   ;; EvaluationDetails
   ;; {} as EvaluationDetails
-  (import "./bindings.wasm" "EvaluationDetails.new" (func $EvaluationDetails.new (result externref)))
+  (import "generic-mono" "EvaluationDetails.new" (func $generic-mono:EvaluationDetails.new (result externref)))
   ;; flagKey: string
-  (import "./bindings.wasm" "EvaluationDetails.flag_key" (func $EvaluationDetails.flag_key (param $this externref) (result externref)))
+  (import "generic-mono" "EvaluationDetails.flag_key" (func $generic-mono:EvaluationDetails.flag_key (param $this externref) (result externref)))
   ;; set flagKey(value: string)
-  (import "./bindings.wasm" "EvaluationDetails.set_flag_key" (func $EvaluationDetails.set_flag_key (param $this externref) (param $value externref)))
+  (import "generic-mono" "EvaluationDetails.set_flag_key" (func $generic-mono:EvaluationDetails.set_flag_key (param $this externref) (param $value externref)))
   ;; value: T
-  (import "./bindings.wasm" "EvaluationDetails.value" (func $EvaluationDetails.value (param $this externref) (result externref)))
+  (import "generic-mono" "EvaluationDetails.value" (func $generic-mono:EvaluationDetails.value (param $this externref) (result externref)))
   ;; set value(value: T)
-  (import "./bindings.wasm" "EvaluationDetails.set_value" (func $EvaluationDetails.set_value (param $this externref) (param $value externref)))
+  (import "generic-mono" "EvaluationDetails.set_value" (func $generic-mono:EvaluationDetails.set_value (param $this externref) (param $value externref)))
   ;; variant?: string
-  (import "./bindings.wasm" "EvaluationDetails.variant" (func $EvaluationDetails.variant (param $this externref) (result externref)))
+  (import "generic-mono" "EvaluationDetails.variant" (func $generic-mono:EvaluationDetails.variant (param $this externref) (result externref)))
   ;; set variant(value: string)
-  (import "./bindings.wasm" "EvaluationDetails.set_variant" (func $EvaluationDetails.set_variant (param $this externref) (param $value externref)))
+  (import "generic-mono" "EvaluationDetails.set_variant" (func $generic-mono:EvaluationDetails.set_variant (param $this externref) (param $value externref)))
 
   ;; Pair
   ;; {} as Pair
-  (import "./bindings.wasm" "Pair.new" (func $Pair.new (result externref)))
+  (import "generic-mono" "Pair.new" (func $generic-mono:Pair.new (result externref)))
   ;; first: A
-  (import "./bindings.wasm" "Pair.first" (func $Pair.first (param $this externref) (result externref)))
+  (import "generic-mono" "Pair.first" (func $generic-mono:Pair.first (param $this externref) (result externref)))
   ;; set first(value: A)
-  (import "./bindings.wasm" "Pair.set_first" (func $Pair.set_first (param $this externref) (param $value externref)))
+  (import "generic-mono" "Pair.set_first" (func $generic-mono:Pair.set_first (param $this externref) (param $value externref)))
   ;; second: B
-  (import "./bindings.wasm" "Pair.second" (func $Pair.second (param $this externref) (result externref)))
+  (import "generic-mono" "Pair.second" (func $generic-mono:Pair.second (param $this externref) (result externref)))
   ;; set second(value: B)
-  (import "./bindings.wasm" "Pair.set_second" (func $Pair.set_second (param $this externref) (param $value externref)))
+  (import "generic-mono" "Pair.set_second" (func $generic-mono:Pair.set_second (param $this externref) (param $value externref)))
 
   ;; TypedArrayOptions
   ;; {} as TypedArrayOptions
-  (import "./bindings.wasm" "TypedArrayOptions.new" (func $TypedArrayOptions.new (result externref)))
+  (import "generic-mono" "TypedArrayOptions.new" (func $generic-mono:TypedArrayOptions.new (result externref)))
   ;; value: ArrayBufferView
-  (import "./bindings.wasm" "TypedArrayOptions.value" (func $TypedArrayOptions.value (param $this externref) (result externref)))
+  (import "generic-mono" "TypedArrayOptions.value" (func $generic-mono:TypedArrayOptions.value (param $this externref) (result externref)))
   ;; set value(value: ArrayBufferView)
-  (import "./bindings.wasm" "TypedArrayOptions.set_value" (func $TypedArrayOptions.set_value (param $this externref) (param $value externref)))
+  (import "generic-mono" "TypedArrayOptions.set_value" (func $generic-mono:TypedArrayOptions.set_value (param $this externref) (param $value externref)))
   ;; extra?: ArrayBufferView
-  (import "./bindings.wasm" "TypedArrayOptions.extra" (func $TypedArrayOptions.extra (param $this externref) (result externref)))
+  (import "generic-mono" "TypedArrayOptions.extra" (func $generic-mono:TypedArrayOptions.extra (param $this externref) (result externref)))
   ;; set extra(value: ArrayBufferView)
-  (import "./bindings.wasm" "TypedArrayOptions.set_extra" (func $TypedArrayOptions.set_extra (param $this externref) (param $value externref)))
+  (import "generic-mono" "TypedArrayOptions.set_extra" (func $generic-mono:TypedArrayOptions.set_extra (param $this externref) (param $value externref)))
 
   ;; Flags
   ;; getStringValue(default_value: string): Promise<string>
-  (import "./bindings.wasm" "Flags.get_string_value" (func $Flags.get_string_value (param $this externref) (param $default_value externref) (result externref)))
+  (import "generic-mono" "Flags.get_string_value" (func $generic-mono:Flags.get_string_value (param $this externref) (param $default_value externref) (result externref)))
   ;; getStringDetails(default_value: string): Promise<EvaluationDetails<string>>
-  (import "./bindings.wasm" "Flags.get_string_details" (func $Flags.get_string_details (param $this externref) (param $default_value externref) (result externref)))
+  (import "generic-mono" "Flags.get_string_details" (func $generic-mono:Flags.get_string_details (param $this externref) (param $default_value externref) (result externref)))
   ;; getBooleanDetails(default_value: boolean): Promise<EvaluationDetails<boolean>>
-  (import "./bindings.wasm" "Flags.get_boolean_details" (func $Flags.get_boolean_details (param $this externref) (param $default_value i32) (result externref)))
+  (import "generic-mono" "Flags.get_boolean_details" (func $generic-mono:Flags.get_boolean_details (param $this externref) (param $default_value i32) (result externref)))
   ;; getNumberDetails(default_value: number): Promise<EvaluationDetails<number>>
-  (import "./bindings.wasm" "Flags.get_number_details" (func $Flags.get_number_details (param $this externref) (param $default_value f64) (result externref)))
+  (import "generic-mono" "Flags.get_number_details" (func $generic-mono:Flags.get_number_details (param $this externref) (param $default_value f64) (result externref)))
   ;; getNullableString(default_value: string): Promise<string | undefined>
-  (import "./bindings.wasm" "Flags.get_nullable_string" (func $Flags.get_nullable_string (param $this externref) (param $default_value externref) (result externref)))
+  (import "generic-mono" "Flags.get_nullable_string" (func $generic-mono:Flags.get_nullable_string (param $this externref) (param $default_value externref) (result externref)))
   ;; getStringPair(default_value: string): Promise<Pair<string, string>>
-  (import "./bindings.wasm" "Flags.get_string_pair" (func $Flags.get_string_pair (param $this externref) (param $default_value externref) (result externref)))
+  (import "generic-mono" "Flags.get_string_pair" (func $generic-mono:Flags.get_string_pair (param $this externref) (param $default_value externref) (result externref)))
   ;; getStringArray(): Promise<string[]>
-  (import "./bindings.wasm" "Flags.get_string_array" (func $Flags.get_string_array (param $this externref) (result externref)))
+  (import "generic-mono" "Flags.get_string_array" (func $generic-mono:Flags.get_string_array (param $this externref) (result externref)))
   ;; getStringMap(): Promise<Map<string, string>>
-  (import "./bindings.wasm" "Flags.get_string_map" (func $Flags.get_string_map (param $this externref) (result externref)))
+  (import "generic-mono" "Flags.get_string_map" (func $generic-mono:Flags.get_string_map (param $this externref) (result externref)))
   ;; getStringTuple(): Promise<[string, string]>
-  (import "./bindings.wasm" "Flags.get_string_tuple" (func $Flags.get_string_tuple (param $this externref) (result externref)))
+  (import "generic-mono" "Flags.get_string_tuple" (func $generic-mono:Flags.get_string_tuple (param $this externref) (result externref)))
   ;; getStringCallback(): Promise<(value: string) => string>
-  (import "./bindings.wasm" "Flags.get_string_callback" (func $Flags.get_string_callback (param $this externref) (result externref)))
+  (import "generic-mono" "Flags.get_string_callback" (func $generic-mono:Flags.get_string_callback (param $this externref) (result externref)))
   ;; compareStrings(left: string, right: string): boolean
-  (import "./bindings.wasm" "Flags.compare_strings" (func $Flags.compare_strings (param $this externref) (param $left externref) (param $right externref) (result i32)))
+  (import "generic-mono" "Flags.compare_strings" (func $generic-mono:Flags.compare_strings (param $this externref) (param $left externref) (param $right externref) (result i32)))
 
   ;; parseString(value: string): string
-  (import "./bindings.wasm" "parseString" (func $parseString (param $value externref) (result externref)))
+  (import "generic-mono" "parseString" (func $generic-mono:parseString (param $value externref) (result externref)))
   ;; roundtripBoolean(value: boolean): boolean
-  (import "./bindings.wasm" "roundtripBoolean" (func $roundtripBoolean (param $value i32) (result i32)))
+  (import "generic-mono" "roundtripBoolean" (func $generic-mono:roundtripBoolean (param $value i32) (result i32)))
   ;; roundtripNumber(value: number): number
-  (import "./bindings.wasm" "roundtripNumber" (func $roundtripNumber (param $value f64) (result f64)))
+  (import "generic-mono" "roundtripNumber" (func $generic-mono:roundtripNumber (param $value f64) (result f64)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "prelude-collision"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,38 +24,38 @@
 
   ;; Result
   ;; constructor(ok: boolean)
-  (import "./bindings.wasm" "Result.new" (func $Result.new (param $ok i32) (result externref)))
+  (import "prelude-collision" "Result.new" (func $prelude-collision:Result.new (param $ok i32) (result externref)))
   ;; ok: boolean
-  (import "./bindings.wasm" "Result.ok" (func $Result.ok (param $this externref) (result i32)))
+  (import "prelude-collision" "Result.ok" (func $prelude-collision:Result.ok (param $this externref) (result i32)))
 
   ;; Option
   ;; {} as Option
-  (import "./bindings.wasm" "Option.new" (func $Option.new (result externref)))
+  (import "prelude-collision" "Option.new" (func $prelude-collision:Option.new (result externref)))
   ;; value: string
-  (import "./bindings.wasm" "Option.value" (func $Option.value (param $this externref) (result externref)))
+  (import "prelude-collision" "Option.value" (func $prelude-collision:Option.value (param $this externref) (result externref)))
   ;; set value(value: string)
-  (import "./bindings.wasm" "Option.set_value" (func $Option.set_value (param $this externref) (param $value externref)))
+  (import "prelude-collision" "Option.set_value" (func $prelude-collision:Option.set_value (param $this externref) (param $value externref)))
 
   ;; Default
   ;; {} as Default
-  (import "./bindings.wasm" "Default.new" (func $Default.new (result externref)))
+  (import "prelude-collision" "Default.new" (func $prelude-collision:Default.new (result externref)))
   ;; limit?: number
-  (import "./bindings.wasm" "Default.limit" (func $Default.limit (param $this externref) (result externref)))
+  (import "prelude-collision" "Default.limit" (func $prelude-collision:Default.limit (param $this externref) (result externref)))
   ;; set limit(value: number)
-  (import "./bindings.wasm" "Default.set_limit" (func $Default.set_limit (param $this externref) (param $value f64)))
+  (import "prelude-collision" "Default.set_limit" (func $prelude-collision:Default.set_limit (param $this externref) (param $value f64)))
 
   ;; Vec
   ;; length: number
-  (import "./bindings.wasm" "Vec.length" (func $Vec.length (param $this externref) (result f64)))
+  (import "prelude-collision" "Vec.length" (func $prelude-collision:Vec.length (param $this externref) (result f64)))
   ;; set length(value: number)
-  (import "./bindings.wasm" "Vec.set_length" (func $Vec.set_length (param $this externref) (param $value f64)))
+  (import "prelude-collision" "Vec.set_length" (func $prelude-collision:Vec.set_length (param $this externref) (param $value f64)))
 
   ;; take(r: Result, o: Option): Vec
-  (import "./bindings.wasm" "take" (func $take (param $r externref) (param $o externref) (result externref)))
+  (import "prelude-collision" "take" (func $prelude-collision:take (param $r externref) (param $o externref) (result externref)))
   ;; take(r: Result, o: Option, d: Default): Vec
-  (import "./bindings.wasm" "take_with_d" (func $take_with_d (param $r externref) (param $o externref) (param $d externref) (result externref)))
+  (import "prelude-collision" "take_with_d" (func $prelude-collision:take_with_d (param $r externref) (param $o externref) (param $d externref) (result externref)))
   ;; label(s: string): string
-  (import "./bindings.wasm" "label" (func $label (param $s externref) (result externref)))
+  (import "prelude-collision" "label" (func $prelude-collision:label (param $s externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

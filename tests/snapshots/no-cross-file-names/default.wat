@@ -9,10 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "no-cross-file-names"
-;;   "no-cross-file-names-dep"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,15 +23,15 @@
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
   ;; useSecret(s: Secret): void
-  (import "./bindings.wasm" "useSecret" (func $useSecret (param $s externref)))
+  (import "no-cross-file-names" "useSecret" (func $no-cross-file-names:useSecret (param $s externref)))
   ;; useShared(s: Shared): void
-  (import "./bindings.wasm" "useShared" (func $useShared (param $s externref)))
+  (import "no-cross-file-names" "useShared" (func $no-cross-file-names:useShared (param $s externref)))
   ;; a(): void
-  (import "./bindings.wasm" "a" (func $a))
+  (import "no-cross-file-names" "a" (func $no-cross-file-names:a))
   ;; b(): void
-  (import "./bindings.wasm" "b" (func $b))
+  (import "no-cross-file-names" "b" (func $no-cross-file-names:b))
   ;; useHidden(h: Hidden): void
-  (import "./bindings.wasm" "useHidden" (func $useHidden (param $h externref)))
+  (import "no-cross-file-names-dep" "useHidden" (func $no-cross-file-names-dep:useHidden (param $h externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

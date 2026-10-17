@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "module-file-locals"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,33 +24,33 @@
 
   ;; Foo
   ;; constructor()
-  (import "./bindings.wasm" "Foo.new" (func $Foo.new (result externref)))
+  (import "module-file-locals" "Foo.new" (func $module-file-locals:Foo.new (result externref)))
   ;; bar(): void
-  (import "./bindings.wasm" "Foo.bar" (func $Foo.bar (param $this externref)))
+  (import "module-file-locals" "Foo.bar" (func $module-file-locals:Foo.bar (param $this externref)))
 
   ;; Server
   ;; listen(): void
-  (import "./bindings.wasm" "Server.listen" (func $Server.listen (param $this externref)))
+  (import "module-file-locals" "Server.listen" (func $module-file-locals:Server.listen (param $this externref)))
 
   ;; Options
   ;; {} as Options
-  (import "./bindings.wasm" "Options.new" (func $Options.new (result externref)))
+  (import "module-file-locals" "Options.new" (func $module-file-locals:Options.new (result externref)))
   ;; depth: number
-  (import "./bindings.wasm" "Options.depth" (func $Options.depth (param $this externref) (result f64)))
+  (import "module-file-locals" "Options.depth" (func $module-file-locals:Options.depth (param $this externref) (result f64)))
   ;; set depth(value: number)
-  (import "./bindings.wasm" "Options.set_depth" (func $Options.set_depth (param $this externref) (param $value f64)))
+  (import "module-file-locals" "Options.set_depth" (func $module-file-locals:Options.set_depth (param $this externref) (param $value f64)))
 
   ;; configure(o: Options): _Foo
-  (import "./bindings.wasm" "configure" (func $configure (param $o externref) (result externref)))
+  (import "module-file-locals" "configure" (func $module-file-locals:configure (param $o externref) (result externref)))
   ;; ren(): void
-  (import "./bindings.wasm" "ren" (func $ren))
+  (import "module-file-locals" "ren" (func $module-file-locals:ren))
 
   ;; Hidden
   ;; m(): void
-  (import "./bindings.wasm" "Hidden.m" (func $Hidden.m (param $this externref)))
+  (import "module-file-locals" "Hidden.m" (func $module-file-locals:Hidden.m (param $this externref)))
 
   ;; reveal(): Hidden
-  (import "./bindings.wasm" "reveal" (func $reveal (result externref)))
+  (import "module-file-locals" "reveal" (func $module-file-locals:reveal (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "union-alias-reads"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,110 +24,110 @@
 
   ;; Zoned
   ;; constructor(zone: string)
-  (import "./bindings.wasm" "Zoned.new" (func $Zoned.new (param $zone externref) (result externref)))
+  (import "union-alias-reads" "Zoned.new" (func $union-alias-reads:Zoned.new (param $zone externref) (result externref)))
   ;; zone: string
-  (import "./bindings.wasm" "Zoned.zone" (func $Zoned.zone (param $this externref) (result externref)))
+  (import "union-alias-reads" "Zoned.zone" (func $union-alias-reads:Zoned.zone (param $this externref) (result externref)))
 
   ;; Day
   ;; constructor(day: number)
-  (import "./bindings.wasm" "Day.new" (func $Day.new (param $day f64) (result externref)))
+  (import "union-alias-reads" "Day.new" (func $union-alias-reads:Day.new (param $day f64) (result externref)))
   ;; day: number
-  (import "./bindings.wasm" "Day.day" (func $Day.day (param $this externref) (result f64)))
+  (import "union-alias-reads" "Day.day" (func $union-alias-reads:Day.day (param $this externref) (result f64)))
   ;; from(item: DayLike): Day
-  (import "./bindings.wasm" "Day.from" (func $Day.from (param $item externref) (result externref)))
+  (import "union-alias-reads" "Day.from" (func $union-alias-reads:Day.from (param $item externref) (result externref)))
   ;; from(item: DayLike, options: FromOptions): Day
-  (import "./bindings.wasm" "Day.from_with_options" (func $Day.from_with_options (param $item externref) (param $options externref) (result externref)))
+  (import "union-alias-reads" "Day.from_with_options" (func $union-alias-reads:Day.from_with_options (param $item externref) (param $options externref) (result externref)))
   ;; compare(one: DayLike, two: DayLike): number
-  (import "./bindings.wasm" "Day.compare" (func $Day.compare (param $one externref) (param $two externref) (result f64)))
+  (import "union-alias-reads" "Day.compare" (func $union-alias-reads:Day.compare (param $one externref) (param $two externref) (result f64)))
   ;; equals(other: DayLike): boolean
-  (import "./bindings.wasm" "Day.equals" (func $Day.equals (param $this externref) (param $other externref) (result i32)))
+  (import "union-alias-reads" "Day.equals" (func $union-alias-reads:Day.equals (param $this externref) (param $other externref) (result i32)))
   ;; until(other: DayLike): number
-  (import "./bindings.wasm" "Day.until" (func $Day.until (param $this externref) (param $other externref) (result f64)))
+  (import "union-alias-reads" "Day.until" (func $union-alias-reads:Day.until (param $this externref) (param $other externref) (result f64)))
   ;; until(other: DayLike, options: FromOptions): number
-  (import "./bindings.wasm" "Day.until_with_options" (func $Day.until_with_options (param $this externref) (param $other externref) (param $options externref) (result f64)))
+  (import "union-alias-reads" "Day.until_with_options" (func $union-alias-reads:Day.until_with_options (param $this externref) (param $other externref) (param $options externref) (result f64)))
   ;; shift(offset: Offset): Day
-  (import "./bindings.wasm" "Day.shift" (func $Day.shift (param $this externref) (param $offset externref) (result externref)))
+  (import "union-alias-reads" "Day.shift" (func $union-alias-reads:Day.shift (param $this externref) (param $offset externref) (result externref)))
   ;; step(direction: "next", other: DayLike): string
-  (import "./bindings.wasm" "Day.step" (func $Day.step (param $this externref) (param $direction externref) (param $other externref) (result externref)))
+  (import "union-alias-reads" "Day.step" (func $union-alias-reads:Day.step (param $this externref) (param $direction externref) (param $other externref) (result externref)))
   ;; pick(): string
-  (import "./bindings.wasm" "Day.pick" (func $Day.pick (param $this externref) (result externref)))
+  (import "union-alias-reads" "Day.pick" (func $union-alias-reads:Day.pick (param $this externref) (result externref)))
   ;; pick(other: MaybeDay): string
-  (import "./bindings.wasm" "Day.pick_with_other" (func $Day.pick_with_other (param $this externref) (param $other externref) (result externref)))
+  (import "union-alias-reads" "Day.pick_with_other" (func $union-alias-reads:Day.pick_with_other (param $this externref) (param $other externref) (result externref)))
   ;; between(start: DayLike | undefined, end: DayLike): string
-  (import "./bindings.wasm" "Day.between" (func $Day.between (param $this externref) (param $start externref) (param $end externref) (result externref)))
+  (import "union-alias-reads" "Day.between" (func $union-alias-reads:Day.between (param $this externref) (param $start externref) (param $end externref) (result externref)))
   ;; later(other: DayLike): Promise<string>
-  (import "./bindings.wasm" "Day.later" (func $Day.later (param $this externref) (param $other externref) (result externref)))
+  (import "union-alias-reads" "Day.later" (func $union-alias-reads:Day.later (param $this externref) (param $other externref) (result externref)))
 
   ;; ZonedFields
   ;; {} as ZonedFields
-  (import "./bindings.wasm" "ZonedFields.new" (func $ZonedFields.new (result externref)))
+  (import "union-alias-reads" "ZonedFields.new" (func $union-alias-reads:ZonedFields.new (result externref)))
   ;; zone: string
-  (import "./bindings.wasm" "ZonedFields.zone" (func $ZonedFields.zone (param $this externref) (result externref)))
+  (import "union-alias-reads" "ZonedFields.zone" (func $union-alias-reads:ZonedFields.zone (param $this externref) (result externref)))
   ;; set zone(value: string)
-  (import "./bindings.wasm" "ZonedFields.set_zone" (func $ZonedFields.set_zone (param $this externref) (param $value externref)))
+  (import "union-alias-reads" "ZonedFields.set_zone" (func $union-alias-reads:ZonedFields.set_zone (param $this externref) (param $value externref)))
 
   ;; DayFields
   ;; {} as DayFields
-  (import "./bindings.wasm" "DayFields.new" (func $DayFields.new (result externref)))
+  (import "union-alias-reads" "DayFields.new" (func $union-alias-reads:DayFields.new (result externref)))
   ;; day: number
-  (import "./bindings.wasm" "DayFields.day" (func $DayFields.day (param $this externref) (result f64)))
+  (import "union-alias-reads" "DayFields.day" (func $union-alias-reads:DayFields.day (param $this externref) (result f64)))
   ;; set day(value: number)
-  (import "./bindings.wasm" "DayFields.set_day" (func $DayFields.set_day (param $this externref) (param $value f64)))
+  (import "union-alias-reads" "DayFields.set_day" (func $union-alias-reads:DayFields.set_day (param $this externref) (param $value f64)))
 
   ;; FromOptions
   ;; {} as FromOptions
-  (import "./bindings.wasm" "FromOptions.new" (func $FromOptions.new (result externref)))
+  (import "union-alias-reads" "FromOptions.new" (func $union-alias-reads:FromOptions.new (result externref)))
   ;; overflow?: "constrain" | "reject"
-  (import "./bindings.wasm" "FromOptions.overflow" (func $FromOptions.overflow (param $this externref) (result externref)))
+  (import "union-alias-reads" "FromOptions.overflow" (func $union-alias-reads:FromOptions.overflow (param $this externref) (result externref)))
   ;; set overflow(value: "constrain")
-  (import "./bindings.wasm" "FromOptions.set_overflow" (func $FromOptions.set_overflow (param $this externref) (param $value externref)))
+  (import "union-alias-reads" "FromOptions.set_overflow" (func $union-alias-reads:FromOptions.set_overflow (param $this externref) (param $value externref)))
 
   ;; RelativeOptions
   ;; {} as RelativeOptions
-  (import "./bindings.wasm" "RelativeOptions.new" (func $RelativeOptions.new (result externref)))
+  (import "union-alias-reads" "RelativeOptions.new" (func $union-alias-reads:RelativeOptions.new (result externref)))
   ;; relativeTo?: ZonedLike | DayLike
-  (import "./bindings.wasm" "RelativeOptions.relative_to" (func $RelativeOptions.relative_to (param $this externref) (result externref)))
+  (import "union-alias-reads" "RelativeOptions.relative_to" (func $union-alias-reads:RelativeOptions.relative_to (param $this externref) (result externref)))
   ;; set relativeTo(value: ZonedLike)
-  (import "./bindings.wasm" "RelativeOptions.set_relative_to" (func $RelativeOptions.set_relative_to (param $this externref) (param $value externref)))
+  (import "union-alias-reads" "RelativeOptions.set_relative_to" (func $union-alias-reads:RelativeOptions.set_relative_to (param $this externref) (param $value externref)))
   ;; zone: Zone
-  (import "./bindings.wasm" "RelativeOptions.zone" (func $RelativeOptions.zone (param $this externref) (result externref)))
+  (import "union-alias-reads" "RelativeOptions.zone" (func $union-alias-reads:RelativeOptions.zone (param $this externref) (result externref)))
   ;; set zone(value: Zone)
-  (import "./bindings.wasm" "RelativeOptions.set_zone" (func $RelativeOptions.set_zone (param $this externref) (param $value externref)))
+  (import "union-alias-reads" "RelativeOptions.set_zone" (func $union-alias-reads:RelativeOptions.set_zone (param $this externref) (param $value externref)))
   ;; zoned?: ZonedLike
-  (import "./bindings.wasm" "RelativeOptions.zoned" (func $RelativeOptions.zoned (param $this externref) (result externref)))
+  (import "union-alias-reads" "RelativeOptions.zoned" (func $union-alias-reads:RelativeOptions.zoned (param $this externref) (result externref)))
   ;; set zoned(value: ZonedLike)
-  (import "./bindings.wasm" "RelativeOptions.set_zoned" (func $RelativeOptions.set_zoned (param $this externref) (param $value externref)))
+  (import "union-alias-reads" "RelativeOptions.set_zoned" (func $union-alias-reads:RelativeOptions.set_zoned (param $this externref) (param $value externref)))
   ;; fields: Fields
-  (import "./bindings.wasm" "RelativeOptions.fields" (func $RelativeOptions.fields (param $this externref) (result externref)))
+  (import "union-alias-reads" "RelativeOptions.fields" (func $union-alias-reads:RelativeOptions.fields (param $this externref) (result externref)))
   ;; set fields(value: Fields)
-  (import "./bindings.wasm" "RelativeOptions.set_fields" (func $RelativeOptions.set_fields (param $this externref) (param $value externref)))
+  (import "union-alias-reads" "RelativeOptions.set_fields" (func $union-alias-reads:RelativeOptions.set_fields (param $this externref) (param $value externref)))
 
   ;; Span
   ;; {} as Span
-  (import "./bindings.wasm" "Span.new" (func $Span.new (result externref)))
+  (import "union-alias-reads" "Span.new" (func $union-alias-reads:Span.new (result externref)))
   ;; start: DayLike
-  (import "./bindings.wasm" "Span.start" (func $Span.start (param $this externref) (result externref)))
+  (import "union-alias-reads" "Span.start" (func $union-alias-reads:Span.start (param $this externref) (result externref)))
   ;; set start(value: DayLike)
-  (import "./bindings.wasm" "Span.set_start" (func $Span.set_start (param $this externref) (param $value externref)))
+  (import "union-alias-reads" "Span.set_start" (func $union-alias-reads:Span.set_start (param $this externref) (param $value externref)))
   ;; relativeTo?: DayLike
-  (import "./bindings.wasm" "Span.relative_to" (func $Span.relative_to (param $this externref) (result externref)))
+  (import "union-alias-reads" "Span.relative_to" (func $union-alias-reads:Span.relative_to (param $this externref) (result externref)))
   ;; set relativeTo(value: DayLike)
-  (import "./bindings.wasm" "Span.set_relative_to" (func $Span.set_relative_to (param $this externref) (param $value externref)))
+  (import "union-alias-reads" "Span.set_relative_to" (func $union-alias-reads:Span.set_relative_to (param $this externref) (param $value externref)))
 
   ;; options(kind: string): RelativeOptions
-  (import "./bindings.wasm" "options" (func $options (param $kind externref) (result externref)))
+  (import "union-alias-reads" "options" (func $union-alias-reads:options (param $kind externref) (result externref)))
   ;; relativeTo(kind: string): ZonedLike | DayLike
-  (import "./bindings.wasm" "relativeTo" (func $relativeTo (param $kind externref) (result externref)))
+  (import "union-alias-reads" "relativeTo" (func $union-alias-reads:relativeTo (param $kind externref) (result externref)))
   ;; describe(item: DayLike): string
-  (import "./bindings.wasm" "describe" (func $describe (param $item externref) (result externref)))
+  (import "union-alias-reads" "describe" (func $union-alias-reads:describe (param $item externref) (result externref)))
   ;; describeSpan(span: Span): string
-  (import "./bindings.wasm" "describeSpan" (func $describeSpan (param $span externref) (result externref)))
+  (import "union-alias-reads" "describeSpan" (func $union-alias-reads:describeSpan (param $span externref) (result externref)))
   ;; describeFields(fields: Fields): string
-  (import "./bindings.wasm" "describeFields" (func $describeFields (param $fields externref) (result externref)))
+  (import "union-alias-reads" "describeFields" (func $union-alias-reads:describeFields (param $fields externref) (result externref)))
   ;; either(item: Day): string
-  (import "./bindings.wasm" "either" (func $either (param $item externref) (result externref)))
+  (import "union-alias-reads" "either" (func $union-alias-reads:either (param $item externref) (result externref)))
   ;; either(item: string): string
-  (import "./bindings.wasm" "either_with_str" (func $either_with_str (param $item externref) (result externref)))
+  (import "union-alias-reads" "either_with_str" (func $union-alias-reads:either_with_str (param $item externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

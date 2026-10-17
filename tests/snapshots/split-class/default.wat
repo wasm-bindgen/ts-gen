@@ -9,12 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "cloudflare:email"
-;;   "late"
-;;   "msg:a"
-;;   "msg:b"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -33,30 +28,32 @@
 
   ;; EmailMessage
   ;; constructor(from: string, to: string, raw: string)
-  (import "./bindings.wasm" "EmailMessage.new" (func $EmailMessage.new (param $from externref) (param $to externref) (param $raw externref) (result externref)))
+  (import "cloudflare:email" "EmailMessage.new" (func $cloudflare:email:EmailMessage.new (param $from externref) (param $to externref) (param $raw externref) (result externref)))
   ;; from: string
-  (import "./bindings.wasm" "EmailMessage.from" (func $EmailMessage.from (param $this externref) (result externref)))
+  (import "cloudflare:email" "EmailMessage.from" (func $cloudflare:email:EmailMessage.from (param $this externref) (result externref)))
   ;; to: string
-  (import "./bindings.wasm" "EmailMessage.to" (func $EmailMessage.to (param $this externref) (result externref)))
+  (import "cloudflare:email" "EmailMessage.to" (func $cloudflare:email:EmailMessage.to (param $this externref) (result externref)))
 
   ;; Msg
   ;; constructor(from: string)
-  (import "./bindings.wasm" "Msg.new" (func $Msg.new (param $from externref) (result externref)))
+  (import "msg:a" "Msg.new" (func $msg:a:Msg.new (param $from externref) (result externref)))
   ;; from: string
-  (import "./bindings.wasm" "Msg.from" (func $Msg.from (param $this externref) (result externref)))
+  (import "msg:a" "Msg.from" (func $msg:a:Msg.from (param $this externref) (result externref)))
+  ;; {} as Msg
+  (import "msg:b" "Msg.new" (func $msg:b:Msg.new (result externref)))
   ;; other: number
-  (import "./bindings.wasm" "Msg.other" (func $Msg.other (param $this externref) (result f64)))
+  (import "msg:b" "Msg.other" (func $msg:b:Msg.other (param $this externref) (result f64)))
   ;; set other(value: number)
-  (import "./bindings.wasm" "Msg.set_other" (func $Msg.set_other (param $this externref) (param $value f64)))
+  (import "msg:b" "Msg.set_other" (func $msg:b:Msg.set_other (param $this externref) (param $value f64)))
 
   ;; use(m: Msg): void
-  (import "./bindings.wasm" "use" (func $use (param $m externref)))
+  (import "msg:b" "use" (func $msg:b:use (param $m externref)))
 
   ;; Late
   ;; constructor()
-  (import "./bindings.wasm" "Late.new" (func $Late.new (result externref)))
+  (import "late" "Late.new" (func $late:Late.new (result externref)))
   ;; at: number
-  (import "./bindings.wasm" "Late.at" (func $Late.at (param $this externref) (result f64)))
+  (import "late" "Late.at" (func $late:Late.at (param $this externref) (result f64)))
 
   ;; arrival(): Late
   (import "./bindings.wasm" "arrival" (func $arrival (result externref)))

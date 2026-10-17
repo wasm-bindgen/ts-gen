@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "builtin-errors"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,51 +24,51 @@
 
   ;; Codec
   ;; decode(input: string): string
-  (import "./bindings.wasm" "Codec.decode" (func $Codec.decode (param $this externref) (param $input externref) (result externref)))
+  (import "builtin-errors" "Codec.decode" (func $builtin-errors:Codec.decode (param $this externref) (param $input externref) (result externref)))
   ;; decodeAll(input: string): string
-  (import "./bindings.wasm" "Codec.decode_all" (func $Codec.decode_all (param $this externref) (param $input externref) (result externref)))
+  (import "builtin-errors" "Codec.decode_all" (func $builtin-errors:Codec.decode_all (param $this externref) (param $input externref) (result externref)))
   ;; parse(input: string): Promise<string>
-  (import "./bindings.wasm" "Codec.parse" (func $Codec.parse (param $this externref) (param $input externref) (result externref)))
+  (import "builtin-errors" "Codec.parse" (func $builtin-errors:Codec.parse (param $this externref) (param $input externref) (result externref)))
 
   ;; Formatter
   ;; constructor()
-  (import "./bindings.wasm" "Formatter.new" (func $Formatter.new (result externref)))
+  (import "builtin-errors" "Formatter.new" (func $builtin-errors:Formatter.new (result externref)))
   ;; constructor(locales: Intl.LocalesArgument)
-  (import "./bindings.wasm" "Formatter.new_with_locales" (func $Formatter.new_with_locales (param $locales externref) (result externref)))
+  (import "builtin-errors" "Formatter.new_with_locales" (func $builtin-errors:Formatter.new_with_locales (param $locales externref) (result externref)))
   ;; constructor(locales: Intl.LocalesArgument, options: Intl.DateTimeFormatOptions)
-  (import "./bindings.wasm" "Formatter.new_with_locales_and_options" (func $Formatter.new_with_locales_and_options (param $locales externref) (param $options externref) (result externref)))
+  (import "builtin-errors" "Formatter.new_with_locales_and_options" (func $builtin-errors:Formatter.new_with_locales_and_options (param $locales externref) (param $options externref) (result externref)))
   ;; received: string
-  (import "./bindings.wasm" "Formatter.received" (func $Formatter.received (param $this externref) (result externref)))
+  (import "builtin-errors" "Formatter.received" (func $builtin-errors:Formatter.received (param $this externref) (result externref)))
   ;; format(): string
-  (import "./bindings.wasm" "Formatter.format" (func $Formatter.format (param $this externref) (result externref)))
+  (import "builtin-errors" "Formatter.format" (func $builtin-errors:Formatter.format (param $this externref) (result externref)))
   ;; format(locales: Intl.LocalesArgument): string
-  (import "./bindings.wasm" "Formatter.format_with_locales" (func $Formatter.format_with_locales (param $this externref) (param $locales externref) (result externref)))
+  (import "builtin-errors" "Formatter.format_with_locales" (func $builtin-errors:Formatter.format_with_locales (param $this externref) (param $locales externref) (result externref)))
   ;; format(locales: Intl.LocalesArgument, options: Intl.NumberFormatOptions): string
-  (import "./bindings.wasm" "Formatter.format_with_locales_and_options" (func $Formatter.format_with_locales_and_options (param $this externref) (param $locales externref) (param $options externref) (result externref)))
+  (import "builtin-errors" "Formatter.format_with_locales_and_options" (func $builtin-errors:Formatter.format_with_locales_and_options (param $this externref) (param $locales externref) (param $options externref) (result externref)))
   ;; locale(tag: Intl.UnicodeBCP47LocaleIdentifier): Intl.Locale
-  (import "./bindings.wasm" "Formatter.locale" (func $Formatter.locale (param $this externref) (param $tag externref) (result externref)))
+  (import "builtin-errors" "Formatter.locale" (func $builtin-errors:Formatter.locale (param $this externref) (param $tag externref) (result externref)))
 
   ;; describe(): string
-  (import "./bindings.wasm" "describe" (func $describe (result externref)))
+  (import "builtin-errors" "describe" (func $builtin-errors:describe (result externref)))
   ;; describe(locales: Intl.LocalesArgument): string
-  (import "./bindings.wasm" "describe_with_locales" (func $describe_with_locales (param $locales externref) (result externref)))
+  (import "builtin-errors" "describe_with_locales" (func $builtin-errors:describe_with_locales (param $locales externref) (result externref)))
   ;; describe(locales: Intl.LocalesArgument, options: Intl.DateTimeFormatOptions): string
-  (import "./bindings.wasm" "describe_with_locales_and_options" (func $describe_with_locales_and_options (param $locales externref) (param $options externref) (result externref)))
+  (import "builtin-errors" "describe_with_locales_and_options" (func $builtin-errors:describe_with_locales_and_options (param $locales externref) (param $options externref) (result externref)))
 
   ;; FormatSettings
   ;; {} as FormatSettings
-  (import "./bindings.wasm" "FormatSettings.new" (func $FormatSettings.new (result externref)))
+  (import "builtin-errors" "FormatSettings.new" (func $builtin-errors:FormatSettings.new (result externref)))
   ;; locales?: Intl.LocalesArgument
-  (import "./bindings.wasm" "FormatSettings.locales" (func $FormatSettings.locales (param $this externref) (result externref)))
+  (import "builtin-errors" "FormatSettings.locales" (func $builtin-errors:FormatSettings.locales (param $this externref) (result externref)))
   ;; set locales(value: Intl.LocalesArgument)
-  (import "./bindings.wasm" "FormatSettings.set_locales" (func $FormatSettings.set_locales (param $this externref) (param $value externref)))
+  (import "builtin-errors" "FormatSettings.set_locales" (func $builtin-errors:FormatSettings.set_locales (param $this externref) (param $value externref)))
   ;; dateTime?: Intl.DateTimeFormatOptions
-  (import "./bindings.wasm" "FormatSettings.date_time" (func $FormatSettings.date_time (param $this externref) (result externref)))
+  (import "builtin-errors" "FormatSettings.date_time" (func $builtin-errors:FormatSettings.date_time (param $this externref) (result externref)))
   ;; set dateTime(value: Intl.DateTimeFormatOptions)
-  (import "./bindings.wasm" "FormatSettings.set_date_time" (func $FormatSettings.set_date_time (param $this externref) (param $value externref)))
+  (import "builtin-errors" "FormatSettings.set_date_time" (func $builtin-errors:FormatSettings.set_date_time (param $this externref) (param $value externref)))
 
   ;; settings(value: FormatSettings): string
-  (import "./bindings.wasm" "settings" (func $settings (param $value externref) (result externref)))
+  (import "builtin-errors" "settings" (func $builtin-errors:settings (param $value externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

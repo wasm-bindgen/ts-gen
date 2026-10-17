@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "cloudflare:sockets"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -107,35 +105,35 @@
   (import "./bindings.wasm" "ResponseInit.set_headers" (func $ResponseInit.set_headers (param $this externref) (param $value externref)))
 
   ;; connect(address: string): Socket
-  (import "./bindings.wasm" "connect" (func $connect (param $address externref) (result externref)))
+  (import "cloudflare:sockets" "connect" (func $cloudflare:sockets:connect (param $address externref) (result externref)))
   ;; connect(address: string, options: SocketOptions): Socket
-  (import "./bindings.wasm" "connect_with_options" (func $connect_with_options (param $address externref) (param $options externref) (result externref)))
+  (import "cloudflare:sockets" "connect_with_options" (func $cloudflare:sockets:connect_with_options (param $address externref) (param $options externref) (result externref)))
 
   ;; Socket
   ;; close(): Promise<void>
-  (import "./bindings.wasm" "Socket.close" (func $Socket.close (param $this externref) (result externref)))
+  (import "cloudflare:sockets" "Socket.close" (func $cloudflare:sockets:Socket.close (param $this externref) (result externref)))
   ;; closed: Promise<void>
-  (import "./bindings.wasm" "Socket.closed" (func $Socket.closed (param $this externref) (result externref)))
+  (import "cloudflare:sockets" "Socket.closed" (func $cloudflare:sockets:Socket.closed (param $this externref) (result externref)))
   ;; opened: Promise<void>
-  (import "./bindings.wasm" "Socket.opened" (func $Socket.opened (param $this externref) (result externref)))
+  (import "cloudflare:sockets" "Socket.opened" (func $cloudflare:sockets:Socket.opened (param $this externref) (result externref)))
   ;; readable: ReadableStream
-  (import "./bindings.wasm" "Socket.readable" (func $Socket.readable (param $this externref) (result externref)))
+  (import "cloudflare:sockets" "Socket.readable" (func $cloudflare:sockets:Socket.readable (param $this externref) (result externref)))
   ;; writable: WritableStream
-  (import "./bindings.wasm" "Socket.writable" (func $Socket.writable (param $this externref) (result externref)))
+  (import "cloudflare:sockets" "Socket.writable" (func $cloudflare:sockets:Socket.writable (param $this externref) (result externref)))
   ;; startTls(): Socket
-  (import "./bindings.wasm" "Socket.start_tls" (func $Socket.start_tls (param $this externref) (result externref)))
+  (import "cloudflare:sockets" "Socket.start_tls" (func $cloudflare:sockets:Socket.start_tls (param $this externref) (result externref)))
 
   ;; SocketOptions
   ;; {} as SocketOptions
-  (import "./bindings.wasm" "SocketOptions.new" (func $SocketOptions.new (result externref)))
+  (import "cloudflare:sockets" "SocketOptions.new" (func $cloudflare:sockets:SocketOptions.new (result externref)))
   ;; secureTransport?: string
-  (import "./bindings.wasm" "SocketOptions.secure_transport" (func $SocketOptions.secure_transport (param $this externref) (result externref)))
+  (import "cloudflare:sockets" "SocketOptions.secure_transport" (func $cloudflare:sockets:SocketOptions.secure_transport (param $this externref) (result externref)))
   ;; set secureTransport(value: string)
-  (import "./bindings.wasm" "SocketOptions.set_secure_transport" (func $SocketOptions.set_secure_transport (param $this externref) (param $value externref)))
+  (import "cloudflare:sockets" "SocketOptions.set_secure_transport" (func $cloudflare:sockets:SocketOptions.set_secure_transport (param $this externref) (param $value externref)))
   ;; allowHalfOpen?: boolean
-  (import "./bindings.wasm" "SocketOptions.allow_half_open" (func $SocketOptions.allow_half_open (param $this externref) (result externref)))
+  (import "cloudflare:sockets" "SocketOptions.allow_half_open" (func $cloudflare:sockets:SocketOptions.allow_half_open (param $this externref) (result externref)))
   ;; set allowHalfOpen(value: boolean)
-  (import "./bindings.wasm" "SocketOptions.set_allow_half_open" (func $SocketOptions.set_allow_half_open (param $this externref) (param $value i32)))
+  (import "cloudflare:sockets" "SocketOptions.set_allow_half_open" (func $cloudflare:sockets:SocketOptions.set_allow_half_open (param $this externref) (param $value i32)))
 
   ;; DurableObject
   ;; ctx: DurableObjectState

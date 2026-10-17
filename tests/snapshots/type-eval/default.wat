@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "type-eval"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -25,269 +23,269 @@
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
   ;; roundTo(unit: ExcludeUnitHour): void
-  (import "./bindings.wasm" "roundTo" (func $roundTo (param $unit externref)))
+  (import "type-eval" "roundTo" (func $type-eval:roundTo (param $unit externref)))
   ;; pickUnit(unit: ExtractUnitOrDayUnit): void
-  (import "./bindings.wasm" "pickUnit" (func $pickUnit (param $unit externref)))
+  (import "type-eval" "pickUnit" (func $type-eval:pickUnit (param $unit externref)))
   ;; present(value: string): void
-  (import "./bindings.wasm" "present" (func $present (param $value externref)))
+  (import "type-eval" "present" (func $type-eval:present (param $value externref)))
 
   ;; Options
   ;; {} as Options
-  (import "./bindings.wasm" "Options.new" (func $Options.new (result externref)))
+  (import "type-eval" "Options.new" (func $type-eval:Options.new (result externref)))
   ;; name: string
-  (import "./bindings.wasm" "Options.name" (func $Options.name (param $this externref) (result externref)))
+  (import "type-eval" "Options.name" (func $type-eval:Options.name (param $this externref) (result externref)))
   ;; set name(value: string)
-  (import "./bindings.wasm" "Options.set_name" (func $Options.set_name (param $this externref) (param $value externref)))
+  (import "type-eval" "Options.set_name" (func $type-eval:Options.set_name (param $this externref) (param $value externref)))
   ;; size?: number
-  (import "./bindings.wasm" "Options.size" (func $Options.size (param $this externref) (result externref)))
+  (import "type-eval" "Options.size" (func $type-eval:Options.size (param $this externref) (result externref)))
   ;; set size(value: number)
-  (import "./bindings.wasm" "Options.set_size" (func $Options.set_size (param $this externref) (param $value f64)))
+  (import "type-eval" "Options.set_size" (func $type-eval:Options.set_size (param $this externref) (param $value f64)))
   ;; fixed: boolean
-  (import "./bindings.wasm" "Options.fixed" (func $Options.fixed (param $this externref) (result i32)))
+  (import "type-eval" "Options.fixed" (func $type-eval:Options.fixed (param $this externref) (result i32)))
 
   ;; configure(partial: PartialOptions, required: RequiredOptions, frozen: ReadonlyOptions, picked: PickOptionsNameOrSize, omitted: PickOptionsNameOrSize, unchanged: Sized): void
-  (import "./bindings.wasm" "configure" (func $configure (param $partial externref) (param $required externref) (param $frozen externref) (param $picked externref) (param $omitted externref) (param $unchanged externref)))
+  (import "type-eval" "configure" (func $type-eval:configure (param $partial externref) (param $required externref) (param $frozen externref) (param $picked externref) (param $omitted externref) (param $unchanged externref)))
 
   ;; Sized
   ;; {} as Sized
-  (import "./bindings.wasm" "Sized.new" (func $Sized.new (result externref)))
+  (import "type-eval" "Sized.new" (func $type-eval:Sized.new (result externref)))
   ;; size?: number
-  (import "./bindings.wasm" "Sized.size" (func $Sized.size (param $this externref) (result externref)))
+  (import "type-eval" "Sized.size" (func $type-eval:Sized.size (param $this externref) (result externref)))
   ;; set size(value: number)
-  (import "./bindings.wasm" "Sized.set_size" (func $Sized.set_size (param $this externref) (param $value f64)))
+  (import "type-eval" "Sized.set_size" (func $type-eval:Sized.set_size (param $this externref) (param $value f64)))
 
   ;; keyed(picked: PickOptionsNameOrSize): void
-  (import "./bindings.wasm" "keyed" (func $keyed (param $picked externref)))
+  (import "type-eval" "keyed" (func $type-eval:keyed (param $picked externref)))
 
   ;; Named
   ;; {} as Named
-  (import "./bindings.wasm" "Named.new" (func $Named.new (result externref)))
+  (import "type-eval" "Named.new" (func $type-eval:Named.new (result externref)))
   ;; label?: string
-  (import "./bindings.wasm" "Named.label" (func $Named.label (param $this externref) (result externref)))
+  (import "type-eval" "Named.label" (func $type-eval:Named.label (param $this externref) (result externref)))
   ;; set label(value: string)
-  (import "./bindings.wasm" "Named.set_label" (func $Named.set_label (param $this externref) (param $value externref)))
+  (import "type-eval" "Named.set_label" (func $type-eval:Named.set_label (param $this externref) (param $value externref)))
   ;; name: string
-  (import "./bindings.wasm" "Named.name" (func $Named.name (param $this externref) (result externref)))
+  (import "type-eval" "Named.name" (func $type-eval:Named.name (param $this externref) (result externref)))
   ;; set name(value: string)
-  (import "./bindings.wasm" "Named.set_name" (func $Named.set_name (param $this externref) (param $value externref)))
+  (import "type-eval" "Named.set_name" (func $type-eval:Named.set_name (param $this externref) (param $value externref)))
   ;; fixed: boolean
-  (import "./bindings.wasm" "Named.fixed" (func $Named.fixed (param $this externref) (result i32)))
+  (import "type-eval" "Named.fixed" (func $type-eval:Named.fixed (param $this externref) (result i32)))
 
   ;; Mixed
   ;; {} as Mixed
-  (import "./bindings.wasm" "Mixed.new" (func $Mixed.new (result externref)))
+  (import "type-eval" "Mixed.new" (func $type-eval:Mixed.new (result externref)))
   ;; name: string
-  (import "./bindings.wasm" "Mixed.name" (func $Mixed.name (param $this externref) (result externref)))
+  (import "type-eval" "Mixed.name" (func $type-eval:Mixed.name (param $this externref) (result externref)))
   ;; set name(value: string)
-  (import "./bindings.wasm" "Mixed.set_name" (func $Mixed.set_name (param $this externref) (param $value externref)))
+  (import "type-eval" "Mixed.set_name" (func $type-eval:Mixed.set_name (param $this externref) (param $value externref)))
   ;; size?: number
-  (import "./bindings.wasm" "Mixed.size" (func $Mixed.size (param $this externref) (result externref)))
+  (import "type-eval" "Mixed.size" (func $type-eval:Mixed.size (param $this externref) (result externref)))
   ;; set size(value: number)
-  (import "./bindings.wasm" "Mixed.set_size" (func $Mixed.set_size (param $this externref) (param $value f64)))
+  (import "type-eval" "Mixed.set_size" (func $type-eval:Mixed.set_size (param $this externref) (param $value f64)))
 
   ;; mapped(loose: LooseOptions, strict: RequiredOptions, flags: FlagsAOrB): void
-  (import "./bindings.wasm" "mapped" (func $mapped (param $loose externref) (param $strict externref) (param $flags externref)))
+  (import "type-eval" "mapped" (func $type-eval:mapped (param $loose externref) (param $strict externref) (param $flags externref)))
   ;; size(opts: Options): number | undefined
-  (import "./bindings.wasm" "size" (func $size (param $opts externref) (result externref)))
+  (import "type-eval" "size" (func $type-eval:size (param $opts externref) (result externref)))
   ;; plural(all: Plural, some: PluralHourOrMinute): void
-  (import "./bindings.wasm" "plural" (func $plural (param $all externref) (param $some externref)))
+  (import "type-eval" "plural" (func $type-eval:plural (param $all externref) (param $some externref)))
 
   ;; Rounding
   ;; {} as Rounding
-  (import "./bindings.wasm" "Rounding.new" (func $Rounding.new (result externref)))
+  (import "type-eval" "Rounding.new" (func $type-eval:Rounding.new (result externref)))
   ;; smallestUnit?: Plural
-  (import "./bindings.wasm" "Rounding.smallest_unit" (func $Rounding.smallest_unit (param $this externref) (result externref)))
+  (import "type-eval" "Rounding.smallest_unit" (func $type-eval:Rounding.smallest_unit (param $this externref) (result externref)))
   ;; set smallestUnit(value: Plural)
-  (import "./bindings.wasm" "Rounding.set_smallest_unit" (func $Rounding.set_smallest_unit (param $this externref) (param $value externref)))
+  (import "type-eval" "Rounding.set_smallest_unit" (func $type-eval:Rounding.set_smallest_unit (param $this externref) (param $value externref)))
   ;; largestUnit?: "auto" | "hour" | "minute" | "second" | "hours" | "minutes" | "seconds"
-  (import "./bindings.wasm" "Rounding.largest_unit" (func $Rounding.largest_unit (param $this externref) (result externref)))
+  (import "type-eval" "Rounding.largest_unit" (func $type-eval:Rounding.largest_unit (param $this externref) (result externref)))
   ;; set largestUnit(value: "auto")
-  (import "./bindings.wasm" "Rounding.set_largest_unit" (func $Rounding.set_largest_unit (param $this externref) (param $value externref)))
+  (import "type-eval" "Rounding.set_largest_unit" (func $type-eval:Rounding.set_largest_unit (param $this externref) (param $value externref)))
 
   ;; round(opts: Rounding<"hour">): void
-  (import "./bindings.wasm" "round" (func $round (param $opts externref)))
+  (import "type-eval" "round" (func $type-eval:round (param $opts externref)))
 
   ;; Box
   ;; {} as Box
-  (import "./bindings.wasm" "Box.new" (func $Box.new (result externref)))
+  (import "type-eval" "Box.new" (func $type-eval:Box.new (result externref)))
   ;; value: T
-  (import "./bindings.wasm" "Box.value" (func $Box.value (param $this externref) (result externref)))
+  (import "type-eval" "Box.value" (func $type-eval:Box.value (param $this externref) (result externref)))
   ;; set value(value: T)
-  (import "./bindings.wasm" "Box.set_value" (func $Box.set_value (param $this externref) (param $value externref)))
+  (import "type-eval" "Box.set_value" (func $type-eval:Box.set_value (param $this externref) (param $value externref)))
   ;; label: string
-  (import "./bindings.wasm" "Box.label" (func $Box.label (param $this externref) (result externref)))
+  (import "type-eval" "Box.label" (func $type-eval:Box.label (param $this externref) (result externref)))
   ;; set label(value: string)
-  (import "./bindings.wasm" "Box.set_label" (func $Box.set_label (param $this externref) (param $value externref)))
+  (import "type-eval" "Box.set_label" (func $type-eval:Box.set_label (param $this externref) (param $value externref)))
 
   ;; Holder
   ;; {} as Holder
-  (import "./bindings.wasm" "Holder.new" (func $Holder.new (result externref)))
+  (import "type-eval" "Holder.new" (func $type-eval:Holder.new (result externref)))
   ;; partial: PartialBox<T>
-  (import "./bindings.wasm" "Holder.partial" (func $Holder.partial (param $this externref) (result externref)))
+  (import "type-eval" "Holder.partial" (func $type-eval:Holder.partial (param $this externref) (result externref)))
   ;; set partial(value: PartialBox<T>)
-  (import "./bindings.wasm" "Holder.set_partial" (func $Holder.set_partial (param $this externref) (param $value externref)))
+  (import "type-eval" "Holder.set_partial" (func $type-eval:Holder.set_partial (param $this externref) (param $value externref)))
 
   ;; Extended
   ;; {} as Extended
-  (import "./bindings.wasm" "Extended.new" (func $Extended.new (result externref)))
+  (import "type-eval" "Extended.new" (func $type-eval:Extended.new (result externref)))
   ;; extra: number
-  (import "./bindings.wasm" "Extended.extra" (func $Extended.extra (param $this externref) (result f64)))
+  (import "type-eval" "Extended.extra" (func $type-eval:Extended.extra (param $this externref) (result f64)))
   ;; set extra(value: number)
-  (import "./bindings.wasm" "Extended.set_extra" (func $Extended.set_extra (param $this externref) (param $value f64)))
+  (import "type-eval" "Extended.set_extra" (func $type-eval:Extended.set_extra (param $this externref) (param $value f64)))
 
   ;; extended(keys: KeyOfExtended, partial: PartialExtended): void
-  (import "./bindings.wasm" "extended" (func $extended (param $keys externref) (param $partial externref)))
+  (import "type-eval" "extended" (func $type-eval:extended (param $keys externref) (param $partial externref)))
   ;; fail(): never
-  (import "./bindings.wasm" "fail" (func $fail (result externref)))
+  (import "type-eval" "fail" (func $type-eval:fail (result externref)))
   ;; fallback(value: never): void
-  (import "./bindings.wasm" "fallback" (func $fallback (param $value externref)))
+  (import "type-eval" "fallback" (func $type-eval:fallback (param $value externref)))
 
   ;; Scoped.Settings
   ;; {} as Scoped.Settings
-  (import "./bindings.wasm" "Scoped.Settings.new" (func $Scoped.Settings.new (result externref)))
+  (import "type-eval" "Scoped.Settings.new" (func $type-eval:Scoped.Settings.new (result externref)))
   ;; mode?: Mode
-  (import "./bindings.wasm" "Scoped.Settings.mode" (func $Scoped.Settings.mode (param $this externref) (result externref)))
+  (import "type-eval" "Scoped.Settings.mode" (func $type-eval:Scoped.Settings.mode (param $this externref) (result externref)))
   ;; set mode(value: Mode)
-  (import "./bindings.wasm" "Scoped.Settings.set_mode" (func $Scoped.Settings.set_mode (param $this externref) (param $value externref)))
+  (import "type-eval" "Scoped.Settings.set_mode" (func $type-eval:Scoped.Settings.set_mode (param $this externref) (param $value externref)))
   ;; depth: number
-  (import "./bindings.wasm" "Scoped.Settings.depth" (func $Scoped.Settings.depth (param $this externref) (result f64)))
+  (import "type-eval" "Scoped.Settings.depth" (func $type-eval:Scoped.Settings.depth (param $this externref) (result f64)))
   ;; set depth(value: number)
-  (import "./bindings.wasm" "Scoped.Settings.set_depth" (func $Scoped.Settings.set_depth (param $this externref) (param $value f64)))
+  (import "type-eval" "Scoped.Settings.set_depth" (func $type-eval:Scoped.Settings.set_depth (param $this externref) (param $value f64)))
 
   ;; Scoped
   ;; apply(settings: PartialSettings, mode: NotFast): void
-  (import "./bindings.wasm" "Scoped.apply" (func $Scoped.apply (param $settings externref) (param $mode externref)))
+  (import "type-eval" "Scoped.apply" (func $type-eval:Scoped.apply (param $settings externref) (param $mode externref)))
 
   ;; Scoped.PartialSettings
   ;; {} as Scoped.PartialSettings
-  (import "./bindings.wasm" "Scoped.PartialSettings.new" (func $Scoped.PartialSettings.new (result externref)))
+  (import "type-eval" "Scoped.PartialSettings.new" (func $type-eval:Scoped.PartialSettings.new (result externref)))
   ;; mode?: Mode
-  (import "./bindings.wasm" "Scoped.PartialSettings.mode" (func $Scoped.PartialSettings.mode (param $this externref) (result externref)))
+  (import "type-eval" "Scoped.PartialSettings.mode" (func $type-eval:Scoped.PartialSettings.mode (param $this externref) (result externref)))
   ;; set mode(value: Mode)
-  (import "./bindings.wasm" "Scoped.PartialSettings.set_mode" (func $Scoped.PartialSettings.set_mode (param $this externref) (param $value externref)))
+  (import "type-eval" "Scoped.PartialSettings.set_mode" (func $type-eval:Scoped.PartialSettings.set_mode (param $this externref) (param $value externref)))
   ;; depth?: number
-  (import "./bindings.wasm" "Scoped.PartialSettings.depth" (func $Scoped.PartialSettings.depth (param $this externref) (result externref)))
+  (import "type-eval" "Scoped.PartialSettings.depth" (func $type-eval:Scoped.PartialSettings.depth (param $this externref) (result externref)))
   ;; set depth(value: number)
-  (import "./bindings.wasm" "Scoped.PartialSettings.set_depth" (func $Scoped.PartialSettings.set_depth (param $this externref) (param $value f64)))
+  (import "type-eval" "Scoped.PartialSettings.set_depth" (func $type-eval:Scoped.PartialSettings.set_depth (param $this externref) (param $value f64)))
 
   ;; Widget
   ;; size: number
-  (import "./bindings.wasm" "Widget.size" (func $Widget.size (param $this externref) (result f64)))
+  (import "type-eval" "Widget.size" (func $type-eval:Widget.size (param $this externref) (result f64)))
   ;; set size(value: number)
-  (import "./bindings.wasm" "Widget.set_size" (func $Widget.set_size (param $this externref) (param $value f64)))
+  (import "type-eval" "Widget.set_size" (func $type-eval:Widget.set_size (param $this externref) (param $value f64)))
   ;; render(): void
-  (import "./bindings.wasm" "Widget.render" (func $Widget.render (param $this externref)))
+  (import "type-eval" "Widget.render" (func $type-eval:Widget.render (param $this externref)))
 
   ;; widget(partial: Widget): void
-  (import "./bindings.wasm" "widget" (func $widget (param $partial externref)))
+  (import "type-eval" "widget" (func $type-eval:widget (param $partial externref)))
   ;; unbound(keys: keyof, partial: T): void
-  (import "./bindings.wasm" "unbound" (func $unbound (param $keys externref) (param $partial externref)))
+  (import "type-eval" "unbound" (func $type-eval:unbound (param $keys externref) (param $partial externref)))
 
   ;; PartialOptions
   ;; {} as PartialOptions
-  (import "./bindings.wasm" "PartialOptions.new" (func $PartialOptions.new (result externref)))
+  (import "type-eval" "PartialOptions.new" (func $type-eval:PartialOptions.new (result externref)))
   ;; name?: string
-  (import "./bindings.wasm" "PartialOptions.name" (func $PartialOptions.name (param $this externref) (result externref)))
+  (import "type-eval" "PartialOptions.name" (func $type-eval:PartialOptions.name (param $this externref) (result externref)))
   ;; set name(value: string)
-  (import "./bindings.wasm" "PartialOptions.set_name" (func $PartialOptions.set_name (param $this externref) (param $value externref)))
+  (import "type-eval" "PartialOptions.set_name" (func $type-eval:PartialOptions.set_name (param $this externref) (param $value externref)))
   ;; size?: number
-  (import "./bindings.wasm" "PartialOptions.size" (func $PartialOptions.size (param $this externref) (result externref)))
+  (import "type-eval" "PartialOptions.size" (func $type-eval:PartialOptions.size (param $this externref) (result externref)))
   ;; set size(value: number)
-  (import "./bindings.wasm" "PartialOptions.set_size" (func $PartialOptions.set_size (param $this externref) (param $value f64)))
+  (import "type-eval" "PartialOptions.set_size" (func $type-eval:PartialOptions.set_size (param $this externref) (param $value f64)))
   ;; fixed?: boolean
-  (import "./bindings.wasm" "PartialOptions.fixed" (func $PartialOptions.fixed (param $this externref) (result externref)))
+  (import "type-eval" "PartialOptions.fixed" (func $type-eval:PartialOptions.fixed (param $this externref) (result externref)))
 
   ;; RequiredOptions
   ;; {} as RequiredOptions
-  (import "./bindings.wasm" "RequiredOptions.new" (func $RequiredOptions.new (result externref)))
+  (import "type-eval" "RequiredOptions.new" (func $type-eval:RequiredOptions.new (result externref)))
   ;; name: string
-  (import "./bindings.wasm" "RequiredOptions.name" (func $RequiredOptions.name (param $this externref) (result externref)))
+  (import "type-eval" "RequiredOptions.name" (func $type-eval:RequiredOptions.name (param $this externref) (result externref)))
   ;; set name(value: string)
-  (import "./bindings.wasm" "RequiredOptions.set_name" (func $RequiredOptions.set_name (param $this externref) (param $value externref)))
+  (import "type-eval" "RequiredOptions.set_name" (func $type-eval:RequiredOptions.set_name (param $this externref) (param $value externref)))
   ;; size: number
-  (import "./bindings.wasm" "RequiredOptions.size" (func $RequiredOptions.size (param $this externref) (result f64)))
+  (import "type-eval" "RequiredOptions.size" (func $type-eval:RequiredOptions.size (param $this externref) (result f64)))
   ;; set size(value: number)
-  (import "./bindings.wasm" "RequiredOptions.set_size" (func $RequiredOptions.set_size (param $this externref) (param $value f64)))
+  (import "type-eval" "RequiredOptions.set_size" (func $type-eval:RequiredOptions.set_size (param $this externref) (param $value f64)))
   ;; fixed: boolean
-  (import "./bindings.wasm" "RequiredOptions.fixed" (func $RequiredOptions.fixed (param $this externref) (result i32)))
+  (import "type-eval" "RequiredOptions.fixed" (func $type-eval:RequiredOptions.fixed (param $this externref) (result i32)))
 
   ;; ReadonlyOptions
   ;; {} as ReadonlyOptions
-  (import "./bindings.wasm" "ReadonlyOptions.new" (func $ReadonlyOptions.new (result externref)))
+  (import "type-eval" "ReadonlyOptions.new" (func $type-eval:ReadonlyOptions.new (result externref)))
   ;; name: string
-  (import "./bindings.wasm" "ReadonlyOptions.name" (func $ReadonlyOptions.name (param $this externref) (result externref)))
+  (import "type-eval" "ReadonlyOptions.name" (func $type-eval:ReadonlyOptions.name (param $this externref) (result externref)))
   ;; size?: number
-  (import "./bindings.wasm" "ReadonlyOptions.size" (func $ReadonlyOptions.size (param $this externref) (result externref)))
+  (import "type-eval" "ReadonlyOptions.size" (func $type-eval:ReadonlyOptions.size (param $this externref) (result externref)))
   ;; fixed: boolean
-  (import "./bindings.wasm" "ReadonlyOptions.fixed" (func $ReadonlyOptions.fixed (param $this externref) (result i32)))
+  (import "type-eval" "ReadonlyOptions.fixed" (func $type-eval:ReadonlyOptions.fixed (param $this externref) (result i32)))
 
   ;; PickOptionsNameOrSize
   ;; {} as PickOptionsNameOrSize
-  (import "./bindings.wasm" "PickOptionsNameOrSize.new" (func $PickOptionsNameOrSize.new (result externref)))
+  (import "type-eval" "PickOptionsNameOrSize.new" (func $type-eval:PickOptionsNameOrSize.new (result externref)))
   ;; name: string
-  (import "./bindings.wasm" "PickOptionsNameOrSize.name" (func $PickOptionsNameOrSize.name (param $this externref) (result externref)))
+  (import "type-eval" "PickOptionsNameOrSize.name" (func $type-eval:PickOptionsNameOrSize.name (param $this externref) (result externref)))
   ;; set name(value: string)
-  (import "./bindings.wasm" "PickOptionsNameOrSize.set_name" (func $PickOptionsNameOrSize.set_name (param $this externref) (param $value externref)))
+  (import "type-eval" "PickOptionsNameOrSize.set_name" (func $type-eval:PickOptionsNameOrSize.set_name (param $this externref) (param $value externref)))
   ;; size?: number
-  (import "./bindings.wasm" "PickOptionsNameOrSize.size" (func $PickOptionsNameOrSize.size (param $this externref) (result externref)))
+  (import "type-eval" "PickOptionsNameOrSize.size" (func $type-eval:PickOptionsNameOrSize.size (param $this externref) (result externref)))
   ;; set size(value: number)
-  (import "./bindings.wasm" "PickOptionsNameOrSize.set_size" (func $PickOptionsNameOrSize.set_size (param $this externref) (param $value f64)))
+  (import "type-eval" "PickOptionsNameOrSize.set_size" (func $type-eval:PickOptionsNameOrSize.set_size (param $this externref) (param $value f64)))
 
   ;; LooseOptions
   ;; {} as LooseOptions
-  (import "./bindings.wasm" "LooseOptions.new" (func $LooseOptions.new (result externref)))
+  (import "type-eval" "LooseOptions.new" (func $type-eval:LooseOptions.new (result externref)))
   ;; name?: string
-  (import "./bindings.wasm" "LooseOptions.name" (func $LooseOptions.name (param $this externref) (result externref)))
+  (import "type-eval" "LooseOptions.name" (func $type-eval:LooseOptions.name (param $this externref) (result externref)))
   ;; set name(value: string)
-  (import "./bindings.wasm" "LooseOptions.set_name" (func $LooseOptions.set_name (param $this externref) (param $value externref)))
+  (import "type-eval" "LooseOptions.set_name" (func $type-eval:LooseOptions.set_name (param $this externref) (param $value externref)))
   ;; size?: number
-  (import "./bindings.wasm" "LooseOptions.size" (func $LooseOptions.size (param $this externref) (result externref)))
+  (import "type-eval" "LooseOptions.size" (func $type-eval:LooseOptions.size (param $this externref) (result externref)))
   ;; set size(value: number)
-  (import "./bindings.wasm" "LooseOptions.set_size" (func $LooseOptions.set_size (param $this externref) (param $value f64)))
+  (import "type-eval" "LooseOptions.set_size" (func $type-eval:LooseOptions.set_size (param $this externref) (param $value f64)))
   ;; fixed?: boolean
-  (import "./bindings.wasm" "LooseOptions.fixed" (func $LooseOptions.fixed (param $this externref) (result externref)))
+  (import "type-eval" "LooseOptions.fixed" (func $type-eval:LooseOptions.fixed (param $this externref) (result externref)))
 
   ;; FlagsAOrB
   ;; {} as FlagsAOrB
-  (import "./bindings.wasm" "FlagsAOrB.new" (func $FlagsAOrB.new (result externref)))
+  (import "type-eval" "FlagsAOrB.new" (func $type-eval:FlagsAOrB.new (result externref)))
   ;; a: boolean
-  (import "./bindings.wasm" "FlagsAOrB.a" (func $FlagsAOrB.a (param $this externref) (result i32)))
+  (import "type-eval" "FlagsAOrB.a" (func $type-eval:FlagsAOrB.a (param $this externref) (result i32)))
   ;; set a(value: boolean)
-  (import "./bindings.wasm" "FlagsAOrB.set_a" (func $FlagsAOrB.set_a (param $this externref) (param $value i32)))
+  (import "type-eval" "FlagsAOrB.set_a" (func $type-eval:FlagsAOrB.set_a (param $this externref) (param $value i32)))
   ;; b: boolean
-  (import "./bindings.wasm" "FlagsAOrB.b" (func $FlagsAOrB.b (param $this externref) (result i32)))
+  (import "type-eval" "FlagsAOrB.b" (func $type-eval:FlagsAOrB.b (param $this externref) (result i32)))
   ;; set b(value: boolean)
-  (import "./bindings.wasm" "FlagsAOrB.set_b" (func $FlagsAOrB.set_b (param $this externref) (param $value i32)))
+  (import "type-eval" "FlagsAOrB.set_b" (func $type-eval:FlagsAOrB.set_b (param $this externref) (param $value i32)))
 
   ;; PartialBox
   ;; {} as PartialBox
-  (import "./bindings.wasm" "PartialBox.new" (func $PartialBox.new (result externref)))
+  (import "type-eval" "PartialBox.new" (func $type-eval:PartialBox.new (result externref)))
   ;; value?: T
-  (import "./bindings.wasm" "PartialBox.value" (func $PartialBox.value (param $this externref) (result externref)))
+  (import "type-eval" "PartialBox.value" (func $type-eval:PartialBox.value (param $this externref) (result externref)))
   ;; set value(value: T)
-  (import "./bindings.wasm" "PartialBox.set_value" (func $PartialBox.set_value (param $this externref) (param $value externref)))
+  (import "type-eval" "PartialBox.set_value" (func $type-eval:PartialBox.set_value (param $this externref) (param $value externref)))
   ;; label?: string
-  (import "./bindings.wasm" "PartialBox.label" (func $PartialBox.label (param $this externref) (result externref)))
+  (import "type-eval" "PartialBox.label" (func $type-eval:PartialBox.label (param $this externref) (result externref)))
   ;; set label(value: string)
-  (import "./bindings.wasm" "PartialBox.set_label" (func $PartialBox.set_label (param $this externref) (param $value externref)))
+  (import "type-eval" "PartialBox.set_label" (func $type-eval:PartialBox.set_label (param $this externref) (param $value externref)))
 
   ;; PartialExtended
   ;; {} as PartialExtended
-  (import "./bindings.wasm" "PartialExtended.new" (func $PartialExtended.new (result externref)))
+  (import "type-eval" "PartialExtended.new" (func $type-eval:PartialExtended.new (result externref)))
   ;; extra?: number
-  (import "./bindings.wasm" "PartialExtended.extra" (func $PartialExtended.extra (param $this externref) (result externref)))
+  (import "type-eval" "PartialExtended.extra" (func $type-eval:PartialExtended.extra (param $this externref) (result externref)))
   ;; set extra(value: number)
-  (import "./bindings.wasm" "PartialExtended.set_extra" (func $PartialExtended.set_extra (param $this externref) (param $value f64)))
+  (import "type-eval" "PartialExtended.set_extra" (func $type-eval:PartialExtended.set_extra (param $this externref) (param $value f64)))
   ;; name?: string
-  (import "./bindings.wasm" "PartialExtended.name" (func $PartialExtended.name (param $this externref) (result externref)))
+  (import "type-eval" "PartialExtended.name" (func $type-eval:PartialExtended.name (param $this externref) (result externref)))
   ;; set name(value: string)
-  (import "./bindings.wasm" "PartialExtended.set_name" (func $PartialExtended.set_name (param $this externref) (param $value externref)))
+  (import "type-eval" "PartialExtended.set_name" (func $type-eval:PartialExtended.set_name (param $this externref) (param $value externref)))
   ;; size?: number
-  (import "./bindings.wasm" "PartialExtended.size" (func $PartialExtended.size (param $this externref) (result externref)))
+  (import "type-eval" "PartialExtended.size" (func $type-eval:PartialExtended.size (param $this externref) (result externref)))
   ;; set size(value: number)
-  (import "./bindings.wasm" "PartialExtended.set_size" (func $PartialExtended.set_size (param $this externref) (param $value f64)))
+  (import "type-eval" "PartialExtended.set_size" (func $type-eval:PartialExtended.set_size (param $this externref) (param $value f64)))
   ;; fixed?: boolean
-  (import "./bindings.wasm" "PartialExtended.fixed" (func $PartialExtended.fixed (param $this externref) (result externref)))
+  (import "type-eval" "PartialExtended.fixed" (func $type-eval:PartialExtended.fixed (param $this externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

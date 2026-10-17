@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "node:console"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -28,99 +26,99 @@
 
   ;; ConsoleOptions
   ;; {} as ConsoleOptions
-  (import "./bindings.wasm" "ConsoleOptions.new" (func $ConsoleOptions.new (result externref)))
+  (import "node:console" "ConsoleOptions.new" (func $node:console:ConsoleOptions.new (result externref)))
   ;; stdout: object
-  (import "./bindings.wasm" "ConsoleOptions.stdout" (func $ConsoleOptions.stdout (param $this externref) (result externref)))
+  (import "node:console" "ConsoleOptions.stdout" (func $node:console:ConsoleOptions.stdout (param $this externref) (result externref)))
   ;; set stdout(value: object)
-  (import "./bindings.wasm" "ConsoleOptions.set_stdout" (func $ConsoleOptions.set_stdout (param $this externref) (param $value externref)))
+  (import "node:console" "ConsoleOptions.set_stdout" (func $node:console:ConsoleOptions.set_stdout (param $this externref) (param $value externref)))
   ;; stderr?: object
-  (import "./bindings.wasm" "ConsoleOptions.stderr" (func $ConsoleOptions.stderr (param $this externref) (result externref)))
+  (import "node:console" "ConsoleOptions.stderr" (func $node:console:ConsoleOptions.stderr (param $this externref) (result externref)))
   ;; set stderr(value: object)
-  (import "./bindings.wasm" "ConsoleOptions.set_stderr" (func $ConsoleOptions.set_stderr (param $this externref) (param $value externref)))
+  (import "node:console" "ConsoleOptions.set_stderr" (func $node:console:ConsoleOptions.set_stderr (param $this externref) (param $value externref)))
   ;; ignoreErrors?: boolean
-  (import "./bindings.wasm" "ConsoleOptions.ignore_errors" (func $ConsoleOptions.ignore_errors (param $this externref) (result externref)))
+  (import "node:console" "ConsoleOptions.ignore_errors" (func $node:console:ConsoleOptions.ignore_errors (param $this externref) (result externref)))
   ;; set ignoreErrors(value: boolean)
-  (import "./bindings.wasm" "ConsoleOptions.set_ignore_errors" (func $ConsoleOptions.set_ignore_errors (param $this externref) (param $value i32)))
+  (import "node:console" "ConsoleOptions.set_ignore_errors" (func $node:console:ConsoleOptions.set_ignore_errors (param $this externref) (param $value i32)))
   ;; colorMode?: boolean | string
-  (import "./bindings.wasm" "ConsoleOptions.color_mode" (func $ConsoleOptions.color_mode (param $this externref) (result externref)))
+  (import "node:console" "ConsoleOptions.color_mode" (func $node:console:ConsoleOptions.color_mode (param $this externref) (result externref)))
   ;; set colorMode(value: boolean)
-  (import "./bindings.wasm" "ConsoleOptions.set_color_mode" (func $ConsoleOptions.set_color_mode (param $this externref) (param $value i32)))
+  (import "node:console" "ConsoleOptions.set_color_mode" (func $node:console:ConsoleOptions.set_color_mode (param $this externref) (param $value i32)))
   ;; set colorMode(value: string)
-  (import "./bindings.wasm" "ConsoleOptions.set_color_mode_with_str" (func $ConsoleOptions.set_color_mode_with_str (param $this externref) (param $value externref)))
+  (import "node:console" "ConsoleOptions.set_color_mode_with_str" (func $node:console:ConsoleOptions.set_color_mode_with_str (param $this externref) (param $value externref)))
   ;; groupIndentation?: number
-  (import "./bindings.wasm" "ConsoleOptions.group_indentation" (func $ConsoleOptions.group_indentation (param $this externref) (result externref)))
+  (import "node:console" "ConsoleOptions.group_indentation" (func $node:console:ConsoleOptions.group_indentation (param $this externref) (result externref)))
   ;; set groupIndentation(value: number)
-  (import "./bindings.wasm" "ConsoleOptions.set_group_indentation" (func $ConsoleOptions.set_group_indentation (param $this externref) (param $value f64)))
+  (import "node:console" "ConsoleOptions.set_group_indentation" (func $node:console:ConsoleOptions.set_group_indentation (param $this externref) (param $value f64)))
 
   ;; Console
   ;; constructor(stdout: object)
-  (import "./bindings.wasm" "Console.new" (func $Console.new (param $stdout externref) (result externref)))
+  (import "node:console" "Console.new" (func $node:console:Console.new (param $stdout externref) (result externref)))
   ;; constructor(stdout: object, stderr: object)
-  (import "./bindings.wasm" "Console.new_with_stderr" (func $Console.new_with_stderr (param $stdout externref) (param $stderr externref) (result externref)))
+  (import "node:console" "Console.new_with_stderr" (func $node:console:Console.new_with_stderr (param $stdout externref) (param $stderr externref) (result externref)))
   ;; constructor(stdout: object, stderr: object, ignore_errors: boolean)
-  (import "./bindings.wasm" "Console.new_with_stderr_and_ignore_errors" (func $Console.new_with_stderr_and_ignore_errors (param $stdout externref) (param $stderr externref) (param $ignore_errors i32) (result externref)))
+  (import "node:console" "Console.new_with_stderr_and_ignore_errors" (func $node:console:Console.new_with_stderr_and_ignore_errors (param $stdout externref) (param $stderr externref) (param $ignore_errors i32) (result externref)))
   ;; assert(...data: any[]): void
-  (import "./bindings.wasm" "Console.assert" (func $Console.assert (param $this externref) (param $data (ref null $anyrefs))))
+  (import "node:console" "Console.assert" (func $node:console:Console.assert (param $this externref) (param $data (ref null $anyrefs))))
   ;; assert(condition: boolean, ...data: any[]): void
-  (import "./bindings.wasm" "Console.assert_with_condition" (func $Console.assert_with_condition (param $this externref) (param $condition i32) (param $data (ref null $anyrefs))))
+  (import "node:console" "Console.assert_with_condition" (func $node:console:Console.assert_with_condition (param $this externref) (param $condition i32) (param $data (ref null $anyrefs))))
   ;; clear(): void
-  (import "./bindings.wasm" "Console.clear" (func $Console.clear (param $this externref)))
+  (import "node:console" "Console.clear" (func $node:console:Console.clear (param $this externref)))
   ;; count(): void
-  (import "./bindings.wasm" "Console.count" (func $Console.count (param $this externref)))
+  (import "node:console" "Console.count" (func $node:console:Console.count (param $this externref)))
   ;; count(label: string): void
-  (import "./bindings.wasm" "Console.count_with_label" (func $Console.count_with_label (param $this externref) (param $label externref)))
+  (import "node:console" "Console.count_with_label" (func $node:console:Console.count_with_label (param $this externref) (param $label externref)))
   ;; countReset(): void
-  (import "./bindings.wasm" "Console.count_reset" (func $Console.count_reset (param $this externref)))
+  (import "node:console" "Console.count_reset" (func $node:console:Console.count_reset (param $this externref)))
   ;; countReset(label: string): void
-  (import "./bindings.wasm" "Console.count_reset_with_label" (func $Console.count_reset_with_label (param $this externref) (param $label externref)))
+  (import "node:console" "Console.count_reset_with_label" (func $node:console:Console.count_reset_with_label (param $this externref) (param $label externref)))
   ;; debug(...data: any[]): void
-  (import "./bindings.wasm" "Console.debug" (func $Console.debug (param $this externref) (param $data (ref null $anyrefs))))
+  (import "node:console" "Console.debug" (func $node:console:Console.debug (param $this externref) (param $data (ref null $anyrefs))))
   ;; error(...data: any[]): void
-  (import "./bindings.wasm" "Console.error" (func $Console.error (param $this externref) (param $data (ref null $anyrefs))))
+  (import "node:console" "Console.error" (func $node:console:Console.error (param $this externref) (param $data (ref null $anyrefs))))
   ;; group(...data: any[]): void
-  (import "./bindings.wasm" "Console.group" (func $Console.group (param $this externref) (param $data (ref null $anyrefs))))
+  (import "node:console" "Console.group" (func $node:console:Console.group (param $this externref) (param $data (ref null $anyrefs))))
   ;; groupCollapsed(...data: any[]): void
-  (import "./bindings.wasm" "Console.group_collapsed" (func $Console.group_collapsed (param $this externref) (param $data (ref null $anyrefs))))
+  (import "node:console" "Console.group_collapsed" (func $node:console:Console.group_collapsed (param $this externref) (param $data (ref null $anyrefs))))
   ;; groupEnd(): void
-  (import "./bindings.wasm" "Console.group_end" (func $Console.group_end (param $this externref)))
+  (import "node:console" "Console.group_end" (func $node:console:Console.group_end (param $this externref)))
   ;; info(...data: any[]): void
-  (import "./bindings.wasm" "Console.info" (func $Console.info (param $this externref) (param $data (ref null $anyrefs))))
+  (import "node:console" "Console.info" (func $node:console:Console.info (param $this externref) (param $data (ref null $anyrefs))))
   ;; log(...data: any[]): void
-  (import "./bindings.wasm" "Console.log" (func $Console.log (param $this externref) (param $data (ref null $anyrefs))))
+  (import "node:console" "Console.log" (func $node:console:Console.log (param $this externref) (param $data (ref null $anyrefs))))
   ;; table(): void
-  (import "./bindings.wasm" "Console.table" (func $Console.table (param $this externref)))
+  (import "node:console" "Console.table" (func $node:console:Console.table (param $this externref)))
   ;; table(tabular_data: any): void
-  (import "./bindings.wasm" "Console.table_with_tabular_data" (func $Console.table_with_tabular_data (param $this externref) (param $tabular_data externref)))
+  (import "node:console" "Console.table_with_tabular_data" (func $node:console:Console.table_with_tabular_data (param $this externref) (param $tabular_data externref)))
   ;; table(tabular_data: any, properties: string[]): void
-  (import "./bindings.wasm" "Console.table_with_tabular_data_and_properties" (func $Console.table_with_tabular_data_and_properties (param $this externref) (param $tabular_data externref) (param $properties externref)))
+  (import "node:console" "Console.table_with_tabular_data_and_properties" (func $node:console:Console.table_with_tabular_data_and_properties (param $this externref) (param $tabular_data externref) (param $properties externref)))
   ;; time(): void
-  (import "./bindings.wasm" "Console.time" (func $Console.time (param $this externref)))
+  (import "node:console" "Console.time" (func $node:console:Console.time (param $this externref)))
   ;; time(label: string): void
-  (import "./bindings.wasm" "Console.time_with_label" (func $Console.time_with_label (param $this externref) (param $label externref)))
+  (import "node:console" "Console.time_with_label" (func $node:console:Console.time_with_label (param $this externref) (param $label externref)))
   ;; timeEnd(): void
-  (import "./bindings.wasm" "Console.time_end" (func $Console.time_end (param $this externref)))
+  (import "node:console" "Console.time_end" (func $node:console:Console.time_end (param $this externref)))
   ;; timeEnd(label: string): void
-  (import "./bindings.wasm" "Console.time_end_with_label" (func $Console.time_end_with_label (param $this externref) (param $label externref)))
+  (import "node:console" "Console.time_end_with_label" (func $node:console:Console.time_end_with_label (param $this externref) (param $label externref)))
   ;; timeLog(...data: any[]): void
-  (import "./bindings.wasm" "Console.time_log" (func $Console.time_log (param $this externref) (param $data (ref null $anyrefs))))
+  (import "node:console" "Console.time_log" (func $node:console:Console.time_log (param $this externref) (param $data (ref null $anyrefs))))
   ;; timeLog(label: string, ...data: any[]): void
-  (import "./bindings.wasm" "Console.time_log_with_label" (func $Console.time_log_with_label (param $this externref) (param $label externref) (param $data (ref null $anyrefs))))
+  (import "node:console" "Console.time_log_with_label" (func $node:console:Console.time_log_with_label (param $this externref) (param $label externref) (param $data (ref null $anyrefs))))
   ;; trace(...data: any[]): void
-  (import "./bindings.wasm" "Console.trace" (func $Console.trace (param $this externref) (param $data (ref null $anyrefs))))
+  (import "node:console" "Console.trace" (func $node:console:Console.trace (param $this externref) (param $data (ref null $anyrefs))))
   ;; warn(...data: any[]): void
-  (import "./bindings.wasm" "Console.warn" (func $Console.warn (param $this externref) (param $data (ref null $anyrefs))))
+  (import "node:console" "Console.warn" (func $node:console:Console.warn (param $this externref) (param $data (ref null $anyrefs))))
   ;; profile(): void
-  (import "./bindings.wasm" "Console.profile" (func $Console.profile (param $this externref)))
+  (import "node:console" "Console.profile" (func $node:console:Console.profile (param $this externref)))
   ;; profile(label: string): void
-  (import "./bindings.wasm" "Console.profile_with_label" (func $Console.profile_with_label (param $this externref) (param $label externref)))
+  (import "node:console" "Console.profile_with_label" (func $node:console:Console.profile_with_label (param $this externref) (param $label externref)))
   ;; profileEnd(): void
-  (import "./bindings.wasm" "Console.profile_end" (func $Console.profile_end (param $this externref)))
+  (import "node:console" "Console.profile_end" (func $node:console:Console.profile_end (param $this externref)))
   ;; profileEnd(label: string): void
-  (import "./bindings.wasm" "Console.profile_end_with_label" (func $Console.profile_end_with_label (param $this externref) (param $label externref)))
+  (import "node:console" "Console.profile_end_with_label" (func $node:console:Console.profile_end_with_label (param $this externref) (param $label externref)))
   ;; timeStamp(): void
-  (import "./bindings.wasm" "Console.time_stamp" (func $Console.time_stamp (param $this externref)))
+  (import "node:console" "Console.time_stamp" (func $node:console:Console.time_stamp (param $this externref)))
   ;; timeStamp(label: string): void
-  (import "./bindings.wasm" "Console.time_stamp_with_label" (func $Console.time_stamp_with_label (param $this externref) (param $label externref)))
+  (import "node:console" "Console.time_stamp_with_label" (func $node:console:Console.time_stamp_with_label (param $this externref) (param $label externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "generic-hoisting"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,38 +24,38 @@
 
   ;; Envelope
   ;; constructor(label: string)
-  (import "./bindings.wasm" "Envelope.new" (func $Envelope.new (param $label externref) (result externref)))
+  (import "generic-hoisting" "Envelope.new" (func $generic-hoisting:Envelope.new (param $label externref) (result externref)))
   ;; label: string
-  (import "./bindings.wasm" "Envelope.label" (func $Envelope.label (param $this externref) (result externref)))
+  (import "generic-hoisting" "Envelope.label" (func $generic-hoisting:Envelope.label (param $this externref) (result externref)))
   ;; forward(other: Envelope): string
-  (import "./bindings.wasm" "Envelope.forward" (func $Envelope.forward (param $this externref) (param $other externref) (result externref)))
+  (import "generic-hoisting" "Envelope.forward" (func $generic-hoisting:Envelope.forward (param $this externref) (param $other externref) (result externref)))
   ;; copy(): Envelope
-  (import "./bindings.wasm" "Envelope.copy" (func $Envelope.copy (param $this externref) (result externref)))
+  (import "generic-hoisting" "Envelope.copy" (func $generic-hoisting:Envelope.copy (param $this externref) (result externref)))
 
   ;; Courier
   ;; constructor(first: Envelope)
-  (import "./bindings.wasm" "Courier.new" (func $Courier.new (param $first externref) (result externref)))
+  (import "generic-hoisting" "Courier.new" (func $generic-hoisting:Courier.new (param $first externref) (result externref)))
   ;; send(envelope: Envelope): string
-  (import "./bindings.wasm" "Courier.send" (func $Courier.send (param $this externref) (param $envelope externref) (result externref)))
+  (import "generic-hoisting" "Courier.send" (func $generic-hoisting:Courier.send (param $this externref) (param $envelope externref) (result externref)))
   ;; sendLabelled(envelope: Envelope<string>): string
-  (import "./bindings.wasm" "Courier.send_labelled" (func $Courier.send_labelled (param $this externref) (param $envelope externref) (result externref)))
+  (import "generic-hoisting" "Courier.send_labelled" (func $generic-hoisting:Courier.send_labelled (param $this externref) (param $envelope externref) (result externref)))
   ;; sendAsync(envelope: Envelope): Promise<string>
-  (import "./bindings.wasm" "Courier.send_async" (func $Courier.send_async (param $this externref) (param $envelope externref) (result externref)))
+  (import "generic-hoisting" "Courier.send_async" (func $generic-hoisting:Courier.send_async (param $this externref) (param $envelope externref) (result externref)))
   ;; sendEither(envelope: Envelope): string
-  (import "./bindings.wasm" "Courier.send_either" (func $Courier.send_either (param $this externref) (param $envelope externref) (result externref)))
+  (import "generic-hoisting" "Courier.send_either" (func $generic-hoisting:Courier.send_either (param $this externref) (param $envelope externref) (result externref)))
   ;; sendEither(envelope: string): string
-  (import "./bindings.wasm" "Courier.send_either_with_str" (func $Courier.send_either_with_str (param $this externref) (param $envelope externref) (result externref)))
+  (import "generic-hoisting" "Courier.send_either_with_str" (func $generic-hoisting:Courier.send_either_with_str (param $this externref) (param $envelope externref) (result externref)))
   ;; sendMaybe(envelope: Envelope | undefined, tag: string): string
-  (import "./bindings.wasm" "Courier.send_maybe" (func $Courier.send_maybe (param $this externref) (param $envelope externref) (param $tag externref) (result externref)))
+  (import "generic-hoisting" "Courier.send_maybe" (func $generic-hoisting:Courier.send_maybe (param $this externref) (param $envelope externref) (param $tag externref) (result externref)))
   ;; check(envelope: Envelope): string
-  (import "./bindings.wasm" "Courier.check" (func $Courier.check (param $envelope externref) (result externref)))
+  (import "generic-hoisting" "Courier.check" (func $generic-hoisting:Courier.check (param $envelope externref) (result externref)))
 
   ;; post(envelope: Envelope): string
-  (import "./bindings.wasm" "post" (func $post (param $envelope externref) (result externref)))
+  (import "generic-hoisting" "post" (func $generic-hoisting:post (param $envelope externref) (result externref)))
   ;; postAsync(envelope: Envelope): Promise<string>
-  (import "./bindings.wasm" "postAsync" (func $postAsync (param $envelope externref) (result externref)))
+  (import "generic-hoisting" "postAsync" (func $generic-hoisting:postAsync (param $envelope externref) (result externref)))
   ;; relay(envelope: Envelope, meta: Meta): string
-  (import "./bindings.wasm" "relay" (func $relay (param $envelope externref) (param $meta externref) (result externref)))
+  (import "generic-hoisting" "relay" (func $generic-hoisting:relay (param $envelope externref) (param $meta externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "cloudflare:sockets"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -97,9 +95,9 @@
   (import "./bindings.wasm" "SocketOptions.set_secure_transport" (func $SocketOptions.set_secure_transport (param $this externref) (param $value externref)))
 
   ;; connect(address: string): Socket
-  (import "./bindings.wasm" "connect" (func $connect (param $address externref) (result externref)))
+  (import "cloudflare:sockets" "connect" (func $cloudflare:sockets:connect (param $address externref) (result externref)))
   ;; connect(address: string, options: SocketOptions): Socket
-  (import "./bindings.wasm" "connect_with_options" (func $connect_with_options (param $address externref) (param $options externref) (result externref)))
+  (import "cloudflare:sockets" "connect_with_options" (func $cloudflare:sockets:connect_with_options (param $address externref) (param $options externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

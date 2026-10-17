@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "property-key"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -25,19 +23,19 @@
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
   ;; hasKey(key: string): boolean
-  (import "./bindings.wasm" "hasKey" (func $hasKey (param $key externref) (result i32)))
+  (import "property-key" "hasKey" (func $property-key:hasKey (param $key externref) (result i32)))
   ;; hasKey(key: number): boolean
-  (import "./bindings.wasm" "hasKey_with_f64" (func $hasKey_with_f64 (param $key f64) (result i32)))
+  (import "property-key" "hasKey_with_f64" (func $property-key:hasKey_with_f64 (param $key f64) (result i32)))
   ;; hasKey(key: symbol): boolean
-  (import "./bindings.wasm" "hasKey_with_symbol" (func $hasKey_with_symbol (param $key externref) (result i32)))
+  (import "property-key" "hasKey_with_symbol" (func $property-key:hasKey_with_symbol (param $key externref) (result i32)))
   ;; firstKey(): PropertyKey
-  (import "./bindings.wasm" "firstKey" (func $firstKey (result externref)))
+  (import "property-key" "firstKey" (func $property-key:firstKey (result externref)))
   ;; keys(): PropertyKey[]
-  (import "./bindings.wasm" "keys" (func $keys (result externref)))
+  (import "property-key" "keys" (func $property-key:keys (result externref)))
   ;; setValue(value: string): void
-  (import "./bindings.wasm" "setValue" (func $setValue (param $value externref)))
+  (import "property-key" "setValue" (func $property-key:setValue (param $value externref)))
   ;; setValue(value: number): void
-  (import "./bindings.wasm" "setValue_with_f64" (func $setValue_with_f64 (param $value f64)))
+  (import "property-key" "setValue_with_f64" (func $property-key:setValue_with_f64 (param $value f64)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

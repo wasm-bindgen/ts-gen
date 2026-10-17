@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "enum-aliases"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,19 +24,19 @@
 
   ;; Api
   ;; {} as Api
-  (import "./bindings.wasm" "Api.new" (func $Api.new (result externref)))
+  (import "enum-aliases" "Api.new" (func $enum-aliases:Api.new (result externref)))
   ;; version: Version
-  (import "./bindings.wasm" "Api.version" (func $Api.version (param $this externref) (result externref)))
+  (import "enum-aliases" "Api.version" (func $enum-aliases:Api.version (param $this externref) (result externref)))
   ;; set version(value: Version)
-  (import "./bindings.wasm" "Api.set_version" (func $Api.set_version (param $this externref) (param $value externref)))
+  (import "enum-aliases" "Api.set_version" (func $enum-aliases:Api.set_version (param $this externref) (param $value externref)))
   ;; flags: Flags
-  (import "./bindings.wasm" "Api.flags" (func $Api.flags (param $this externref) (result externref)))
+  (import "enum-aliases" "Api.flags" (func $enum-aliases:Api.flags (param $this externref) (result externref)))
   ;; set flags(value: Flags)
-  (import "./bindings.wasm" "Api.set_flags" (func $Api.set_flags (param $this externref) (param $value externref)))
+  (import "enum-aliases" "Api.set_flags" (func $enum-aliases:Api.set_flags (param $this externref) (param $value externref)))
   ;; kind: Kind
-  (import "./bindings.wasm" "Api.kind" (func $Api.kind (param $this externref) (result externref)))
+  (import "enum-aliases" "Api.kind" (func $enum-aliases:Api.kind (param $this externref) (result externref)))
   ;; set kind(value: Kind)
-  (import "./bindings.wasm" "Api.set_kind" (func $Api.set_kind (param $this externref) (param $value externref)))
+  (import "enum-aliases" "Api.set_kind" (func $enum-aliases:Api.set_kind (param $this externref) (param $value externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "ambient-enum-members"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -25,7 +23,7 @@
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
   ;; useAll(computed: Computed, mixed: Mixed, numbered: Numbered, after_string: AfterString): void
-  (import "./bindings.wasm" "useAll" (func $useAll (param $computed externref) (param $mixed externref) (param $numbered externref) (param $after_string externref)))
+  (import "ambient-enum-members" "useAll" (func $ambient-enum-members:useAll (param $computed externref) (param $mixed externref) (param $numbered externref) (param $after_string externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

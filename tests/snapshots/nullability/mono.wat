@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "nullability"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,342 +24,342 @@
 
   ;; Settings
   ;; {} as Settings
-  (import "./bindings.wasm" "Settings.new" (func $Settings.new (result externref)))
+  (import "nullability" "Settings.new" (func $nullability:Settings.new (result externref)))
   ;; plain?: string
-  (import "./bindings.wasm" "Settings.plain" (func $Settings.plain (param $this externref) (result externref)))
+  (import "nullability" "Settings.plain" (func $nullability:Settings.plain (param $this externref) (result externref)))
   ;; set plain(value: string)
-  (import "./bindings.wasm" "Settings.set_plain" (func $Settings.set_plain (param $this externref) (param $value externref)))
+  (import "nullability" "Settings.set_plain" (func $nullability:Settings.set_plain (param $this externref) (param $value externref)))
   ;; explicit?: string
-  (import "./bindings.wasm" "Settings.explicit" (func $Settings.explicit (param $this externref) (result externref)))
+  (import "nullability" "Settings.explicit" (func $nullability:Settings.explicit (param $this externref) (result externref)))
   ;; set explicit(value: string)
-  (import "./bindings.wasm" "Settings.set_explicit" (func $Settings.set_explicit (param $this externref) (param $value externref)))
+  (import "nullability" "Settings.set_explicit" (func $nullability:Settings.set_explicit (param $this externref) (param $value externref)))
   ;; required: string | undefined
-  (import "./bindings.wasm" "Settings.required" (func $Settings.required (param $this externref) (result externref)))
+  (import "nullability" "Settings.required" (func $nullability:Settings.required (param $this externref) (result externref)))
   ;; set required(value: string)
-  (import "./bindings.wasm" "Settings.set_required" (func $Settings.set_required (param $this externref) (param $value externref)))
+  (import "nullability" "Settings.set_required" (func $nullability:Settings.set_required (param $this externref) (param $value externref)))
   ;; nullable: string | null
-  (import "./bindings.wasm" "Settings.nullable" (func $Settings.nullable (param $this externref) (result externref)))
+  (import "nullability" "Settings.nullable" (func $nullability:Settings.nullable (param $this externref) (result externref)))
   ;; set nullable(value: string)
-  (import "./bindings.wasm" "Settings.set_nullable" (func $Settings.set_nullable (param $this externref) (param $value externref)))
+  (import "nullability" "Settings.set_nullable" (func $nullability:Settings.set_nullable (param $this externref) (param $value externref)))
   ;; set nullable(value: null)
-  (import "./bindings.wasm" "Settings.set_nullable_with_null" (func $Settings.set_nullable_with_null (param $this externref) (param $value externref)))
+  (import "nullability" "Settings.set_nullable_with_null" (func $nullability:Settings.set_nullable_with_null (param $this externref) (param $value externref)))
   ;; both?: string | null
-  (import "./bindings.wasm" "Settings.both" (func $Settings.both (param $this externref) (result externref)))
+  (import "nullability" "Settings.both" (func $nullability:Settings.both (param $this externref) (result externref)))
   ;; set both(value: string)
-  (import "./bindings.wasm" "Settings.set_both" (func $Settings.set_both (param $this externref) (param $value externref)))
+  (import "nullability" "Settings.set_both" (func $nullability:Settings.set_both (param $this externref) (param $value externref)))
   ;; set both(value: null)
-  (import "./bindings.wasm" "Settings.set_both_with_null" (func $Settings.set_both_with_null (param $this externref) (param $value externref)))
+  (import "nullability" "Settings.set_both_with_null" (func $nullability:Settings.set_both_with_null (param $this externref) (param $value externref)))
   ;; aliased?: MaybeStr
-  (import "./bindings.wasm" "Settings.aliased" (func $Settings.aliased (param $this externref) (result externref)))
+  (import "nullability" "Settings.aliased" (func $nullability:Settings.aliased (param $this externref) (result externref)))
   ;; set aliased(value: MaybeStr)
-  (import "./bindings.wasm" "Settings.set_aliased" (func $Settings.set_aliased (param $this externref) (param $value externref)))
+  (import "nullability" "Settings.set_aliased" (func $nullability:Settings.set_aliased (param $this externref) (param $value externref)))
   ;; mode?: Mode | null
-  (import "./bindings.wasm" "Settings.mode" (func $Settings.mode (param $this externref) (result externref)))
+  (import "nullability" "Settings.mode" (func $nullability:Settings.mode (param $this externref) (result externref)))
   ;; set mode(value: Mode)
-  (import "./bindings.wasm" "Settings.set_mode" (func $Settings.set_mode (param $this externref) (param $value externref)))
+  (import "nullability" "Settings.set_mode" (func $nullability:Settings.set_mode (param $this externref) (param $value externref)))
   ;; set mode(value: null)
-  (import "./bindings.wasm" "Settings.set_mode_with_null" (func $Settings.set_mode_with_null (param $this externref) (param $value externref)))
+  (import "nullability" "Settings.set_mode_with_null" (func $nullability:Settings.set_mode_with_null (param $this externref) (param $value externref)))
   ;; empties: null | undefined
-  (import "./bindings.wasm" "Settings.empties" (func $Settings.empties (param $this externref) (result externref)))
+  (import "nullability" "Settings.empties" (func $nullability:Settings.empties (param $this externref) (result externref)))
   ;; set empties(value: null)
-  (import "./bindings.wasm" "Settings.set_empties_with_null" (func $Settings.set_empties_with_null (param $this externref) (param $value externref)))
+  (import "nullability" "Settings.set_empties_with_null" (func $nullability:Settings.set_empties_with_null (param $this externref) (param $value externref)))
   ;; limit?: number | null
-  (import "./bindings.wasm" "Settings.limit" (func $Settings.limit (param $this externref) (result externref)))
+  (import "nullability" "Settings.limit" (func $nullability:Settings.limit (param $this externref) (result externref)))
   ;; set limit(value: number)
-  (import "./bindings.wasm" "Settings.set_limit" (func $Settings.set_limit (param $this externref) (param $value f64)))
+  (import "nullability" "Settings.set_limit" (func $nullability:Settings.set_limit (param $this externref) (param $value f64)))
   ;; set limit(value: null)
-  (import "./bindings.wasm" "Settings.set_limit_with_null" (func $Settings.set_limit_with_null (param $this externref) (param $value externref)))
+  (import "nullability" "Settings.set_limit_with_null" (func $nullability:Settings.set_limit_with_null (param $this externref) (param $value externref)))
   ;; owner?: Registry | null
-  (import "./bindings.wasm" "Settings.owner" (func $Settings.owner (param $this externref) (result externref)))
+  (import "nullability" "Settings.owner" (func $nullability:Settings.owner (param $this externref) (result externref)))
   ;; set owner(value: Registry)
-  (import "./bindings.wasm" "Settings.set_owner" (func $Settings.set_owner (param $this externref) (param $value externref)))
+  (import "nullability" "Settings.set_owner" (func $nullability:Settings.set_owner (param $this externref) (param $value externref)))
   ;; set owner(value: null)
-  (import "./bindings.wasm" "Settings.set_owner_with_null" (func $Settings.set_owner_with_null (param $this externref) (param $value externref)))
+  (import "nullability" "Settings.set_owner_with_null" (func $nullability:Settings.set_owner_with_null (param $this externref) (param $value externref)))
   ;; values?: number[] | null
-  (import "./bindings.wasm" "Settings.values" (func $Settings.values (param $this externref) (result externref)))
+  (import "nullability" "Settings.values" (func $nullability:Settings.values (param $this externref) (result externref)))
   ;; set values(value: number[])
-  (import "./bindings.wasm" "Settings.set_values" (func $Settings.set_values (param $this externref) (param $value externref)))
+  (import "nullability" "Settings.set_values" (func $nullability:Settings.set_values (param $this externref) (param $value externref)))
   ;; set values(value: null)
-  (import "./bindings.wasm" "Settings.set_values_with_null" (func $Settings.set_values_with_null (param $this externref) (param $value externref)))
+  (import "nullability" "Settings.set_values_with_null" (func $nullability:Settings.set_values_with_null (param $this externref) (param $value externref)))
   ;; key?: string | number | null
-  (import "./bindings.wasm" "Settings.key" (func $Settings.key (param $this externref) (result externref)))
+  (import "nullability" "Settings.key" (func $nullability:Settings.key (param $this externref) (result externref)))
   ;; set key(value: string)
-  (import "./bindings.wasm" "Settings.set_key" (func $Settings.set_key (param $this externref) (param $value externref)))
+  (import "nullability" "Settings.set_key" (func $nullability:Settings.set_key (param $this externref) (param $value externref)))
   ;; set key(value: number)
-  (import "./bindings.wasm" "Settings.set_key_with_f64" (func $Settings.set_key_with_f64 (param $this externref) (param $value f64)))
+  (import "nullability" "Settings.set_key_with_f64" (func $nullability:Settings.set_key_with_f64 (param $this externref) (param $value f64)))
   ;; set key(value: null)
-  (import "./bindings.wasm" "Settings.set_key_with_null" (func $Settings.set_key_with_null (param $this externref) (param $value externref)))
+  (import "nullability" "Settings.set_key_with_null" (func $nullability:Settings.set_key_with_null (param $this externref) (param $value externref)))
 
   ;; Registry
   ;; static current: Registry
-  (import "./bindings.wasm" "Registry.current" (func $Registry.current (result externref)))
+  (import "nullability" "Registry.current" (func $nullability:Registry.current (result externref)))
   ;; set current(value: Registry)
-  (import "./bindings.wasm" "Registry.set_current" (func $Registry.set_current (param $value externref)))
+  (import "nullability" "Registry.set_current" (func $nullability:Registry.set_current (param $value externref)))
   ;; static fallback: Registry | null
-  (import "./bindings.wasm" "Registry.fallback" (func $Registry.fallback (result externref)))
+  (import "nullability" "Registry.fallback" (func $nullability:Registry.fallback (result externref)))
   ;; set fallback(value: Registry)
-  (import "./bindings.wasm" "Registry.set_fallback" (func $Registry.set_fallback (param $value externref)))
+  (import "nullability" "Registry.set_fallback" (func $nullability:Registry.set_fallback (param $value externref)))
   ;; set fallback(value: null)
-  (import "./bindings.wasm" "Registry.set_fallback_with_null" (func $Registry.set_fallback_with_null (param $value externref)))
+  (import "nullability" "Registry.set_fallback_with_null" (func $nullability:Registry.set_fallback_with_null (param $value externref)))
   ;; static last: Registry | null
-  (import "./bindings.wasm" "Registry.last" (func $Registry.last (result externref)))
+  (import "nullability" "Registry.last" (func $nullability:Registry.last (result externref)))
   ;; set last(value: Registry)
-  (import "./bindings.wasm" "Registry.set_last" (func $Registry.set_last (param $value externref)))
+  (import "nullability" "Registry.set_last" (func $nullability:Registry.set_last (param $value externref)))
   ;; set last(value: null)
-  (import "./bindings.wasm" "Registry.set_last_with_null" (func $Registry.set_last_with_null (param $value externref)))
+  (import "nullability" "Registry.set_last_with_null" (func $nullability:Registry.set_last_with_null (param $value externref)))
   ;; pending: Promise<string | null>
-  (import "./bindings.wasm" "Registry.pending" (func $Registry.pending (param $this externref) (result externref)))
+  (import "nullability" "Registry.pending" (func $nullability:Registry.pending (param $this externref) (result externref)))
   ;; settled: Promise<number | undefined>
-  (import "./bindings.wasm" "Registry.settled" (func $Registry.settled (param $this externref) (result externref)))
+  (import "nullability" "Registry.settled" (func $nullability:Registry.settled (param $this externref) (result externref)))
 
   ;; Holder
   ;; get(): T
-  (import "./bindings.wasm" "Holder.get" (func $Holder.get (param $this externref) (result externref)))
+  (import "nullability" "Holder.get" (func $nullability:Holder.get (param $this externref) (result externref)))
   ;; value: T | null
-  (import "./bindings.wasm" "Holder.value" (func $Holder.value (param $this externref) (result externref)))
+  (import "nullability" "Holder.value" (func $nullability:Holder.value (param $this externref) (result externref)))
 
   ;; Body
   ;; constructor(body: string)
-  (import "./bindings.wasm" "Body.new" (func $Body.new (param $body externref) (result externref)))
+  (import "nullability" "Body.new" (func $nullability:Body.new (param $body externref) (result externref)))
   ;; constructor(body: null)
-  (import "./bindings.wasm" "Body.new_with_body_null" (func $Body.new_with_body_null (param $body externref) (result externref)))
+  (import "nullability" "Body.new_with_body_null" (func $nullability:Body.new_with_body_null (param $body externref) (result externref)))
   ;; constructor(body: string, length: number)
-  (import "./bindings.wasm" "Body.new_with_length" (func $Body.new_with_length (param $body externref) (param $length f64) (result externref)))
+  (import "nullability" "Body.new_with_length" (func $nullability:Body.new_with_length (param $body externref) (param $length f64) (result externref)))
   ;; constructor(body: null, length: number)
-  (import "./bindings.wasm" "Body.new_with_body_null_and_length" (func $Body.new_with_body_null_and_length (param $body externref) (param $length f64) (result externref)))
+  (import "nullability" "Body.new_with_body_null_and_length" (func $nullability:Body.new_with_body_null_and_length (param $body externref) (param $length f64) (result externref)))
   ;; constructor(body: string, length: null)
-  (import "./bindings.wasm" "Body.new_with_length_null" (func $Body.new_with_length_null (param $body externref) (param $length externref) (result externref)))
+  (import "nullability" "Body.new_with_length_null" (func $nullability:Body.new_with_length_null (param $body externref) (param $length externref) (result externref)))
   ;; constructor(body: null, length: null)
-  (import "./bindings.wasm" "Body.new_with_body_null_and_length_null" (func $Body.new_with_body_null_and_length_null (param $body externref) (param $length externref) (result externref)))
+  (import "nullability" "Body.new_with_body_null_and_length_null" (func $nullability:Body.new_with_body_null_and_length_null (param $body externref) (param $length externref) (result externref)))
   ;; put(value: string): void
-  (import "./bindings.wasm" "Body.put" (func $Body.put (param $this externref) (param $value externref)))
+  (import "nullability" "Body.put" (func $nullability:Body.put (param $this externref) (param $value externref)))
   ;; put(value: null): void
-  (import "./bindings.wasm" "Body.put_with_null" (func $Body.put_with_null (param $this externref) (param $value externref)))
+  (import "nullability" "Body.put_with_null" (func $nullability:Body.put_with_null (param $this externref) (param $value externref)))
   ;; from(owner: Registry): Body
-  (import "./bindings.wasm" "Body.from" (func $Body.from (param $owner externref) (result externref)))
+  (import "nullability" "Body.from" (func $nullability:Body.from (param $owner externref) (result externref)))
   ;; from(owner: null): Body
-  (import "./bindings.wasm" "Body.from_with_null" (func $Body.from_with_null (param $owner externref) (result externref)))
+  (import "nullability" "Body.from_with_null" (func $nullability:Body.from_with_null (param $owner externref) (result externref)))
 
   ;; optional(): void
-  (import "./bindings.wasm" "optional" (func $optional))
+  (import "nullability" "optional" (func $nullability:optional))
   ;; optional(x: string): void
-  (import "./bindings.wasm" "optional_with_x" (func $optional_with_x (param $x externref)))
+  (import "nullability" "optional_with_x" (func $nullability:optional_with_x (param $x externref)))
   ;; nullable(x: string): void
-  (import "./bindings.wasm" "nullable" (func $nullable (param $x externref)))
+  (import "nullability" "nullable" (func $nullability:nullable (param $x externref)))
   ;; nullable(x: null): void
-  (import "./bindings.wasm" "nullable_with_null" (func $nullable_with_null (param $x externref)))
+  (import "nullability" "nullable_with_null" (func $nullability:nullable_with_null (param $x externref)))
   ;; both(): string | null | undefined
-  (import "./bindings.wasm" "both" (func $both (result externref)))
+  (import "nullability" "both" (func $nullability:both (result externref)))
   ;; both(x: string): string | null | undefined
-  (import "./bindings.wasm" "both_with_x" (func $both_with_x (param $x externref) (result externref)))
+  (import "nullability" "both_with_x" (func $nullability:both_with_x (param $x externref) (result externref)))
   ;; both(x: null): string | null | undefined
-  (import "./bindings.wasm" "both_with_null" (func $both_with_null (param $x externref) (result externref)))
+  (import "nullability" "both_with_null" (func $nullability:both_with_null (param $x externref) (result externref)))
   ;; optionalBoth(): void
-  (import "./bindings.wasm" "optionalBoth" (func $optionalBoth))
+  (import "nullability" "optionalBoth" (func $nullability:optionalBoth))
   ;; optionalBoth(x: string): void
-  (import "./bindings.wasm" "optionalBoth_with_x" (func $optionalBoth_with_x (param $x externref)))
+  (import "nullability" "optionalBoth_with_x" (func $nullability:optionalBoth_with_x (param $x externref)))
   ;; optionalBoth(x: null): void
-  (import "./bindings.wasm" "optionalBoth_with_null" (func $optionalBoth_with_null (param $x externref)))
+  (import "nullability" "optionalBoth_with_null" (func $nullability:optionalBoth_with_null (param $x externref)))
   ;; aliased(): MaybeStr | undefined
-  (import "./bindings.wasm" "aliased" (func $aliased (result externref)))
+  (import "nullability" "aliased" (func $nullability:aliased (result externref)))
   ;; aliased(x: MaybeStr): MaybeStr | undefined
-  (import "./bindings.wasm" "aliased_with_x" (func $aliased_with_x (param $x externref) (result externref)))
+  (import "nullability" "aliased_with_x" (func $nullability:aliased_with_x (param $x externref) (result externref)))
   ;; aliasedNull(x: MaybeStr): MaybeStr | null
-  (import "./bindings.wasm" "aliasedNull" (func $aliasedNull (param $x externref) (result externref)))
+  (import "nullability" "aliasedNull" (func $nullability:aliasedNull (param $x externref) (result externref)))
   ;; aliasedNull(x: null): MaybeStr | null
-  (import "./bindings.wasm" "aliasedNull_with_null" (func $aliasedNull_with_null (param $x externref) (result externref)))
+  (import "nullability" "aliasedNull_with_null" (func $nullability:aliasedNull_with_null (param $x externref) (result externref)))
   ;; optAliasedNull(x: OptStr): OptStr | null
-  (import "./bindings.wasm" "optAliasedNull" (func $optAliasedNull (param $x externref) (result externref)))
+  (import "nullability" "optAliasedNull" (func $nullability:optAliasedNull (param $x externref) (result externref)))
   ;; optAliasedNull(x: null): OptStr | null
-  (import "./bindings.wasm" "optAliasedNull_with_null" (func $optAliasedNull_with_null (param $x externref) (result externref)))
+  (import "nullability" "optAliasedNull_with_null" (func $nullability:optAliasedNull_with_null (param $x externref) (result externref)))
   ;; count(): number | null | undefined
-  (import "./bindings.wasm" "count" (func $count (result externref)))
+  (import "nullability" "count" (func $nullability:count (result externref)))
   ;; count(x: number): number | null | undefined
-  (import "./bindings.wasm" "count_with_x" (func $count_with_x (param $x f64) (result externref)))
+  (import "nullability" "count_with_x" (func $nullability:count_with_x (param $x f64) (result externref)))
   ;; count(x: null): number | null | undefined
-  (import "./bindings.wasm" "count_with_null" (func $count_with_null (param $x externref) (result externref)))
+  (import "nullability" "count_with_null" (func $nullability:count_with_null (param $x externref) (result externref)))
   ;; countNull(x: number): void
-  (import "./bindings.wasm" "countNull" (func $countNull (param $x f64)))
+  (import "nullability" "countNull" (func $nullability:countNull (param $x f64)))
   ;; countNull(x: null): void
-  (import "./bindings.wasm" "countNull_with_null" (func $countNull_with_null (param $x externref)))
+  (import "nullability" "countNull_with_null" (func $nullability:countNull_with_null (param $x externref)))
   ;; countOptional(): void
-  (import "./bindings.wasm" "countOptional" (func $countOptional))
+  (import "nullability" "countOptional" (func $nullability:countOptional))
   ;; countOptional(x: number): void
-  (import "./bindings.wasm" "countOptional_with_x" (func $countOptional_with_x (param $x f64)))
+  (import "nullability" "countOptional_with_x" (func $nullability:countOptional_with_x (param $x f64)))
   ;; countOptional(x: null): void
-  (import "./bindings.wasm" "countOptional_with_null" (func $countOptional_with_null (param $x externref)))
+  (import "nullability" "countOptional_with_null" (func $nullability:countOptional_with_null (param $x externref)))
   ;; flag(x: boolean): boolean | null
-  (import "./bindings.wasm" "flag" (func $flag (param $x i32) (result externref)))
+  (import "nullability" "flag" (func $nullability:flag (param $x i32) (result externref)))
   ;; flag(x: null): boolean | null
-  (import "./bindings.wasm" "flag_with_null" (func $flag_with_null (param $x externref) (result externref)))
+  (import "nullability" "flag_with_null" (func $nullability:flag_with_null (param $x externref) (result externref)))
   ;; registry(): Registry | null | undefined
-  (import "./bindings.wasm" "registry" (func $registry (result externref)))
+  (import "nullability" "registry" (func $nullability:registry (result externref)))
   ;; registry(r: Registry): Registry | null | undefined
-  (import "./bindings.wasm" "registry_with_r" (func $registry_with_r (param $r externref) (result externref)))
+  (import "nullability" "registry_with_r" (func $nullability:registry_with_r (param $r externref) (result externref)))
   ;; registry(r: null): Registry | null | undefined
-  (import "./bindings.wasm" "registry_with_null" (func $registry_with_null (param $r externref) (result externref)))
+  (import "nullability" "registry_with_null" (func $nullability:registry_with_null (param $r externref) (result externref)))
   ;; registryNull(r: Registry): void
-  (import "./bindings.wasm" "registryNull" (func $registryNull (param $r externref)))
+  (import "nullability" "registryNull" (func $nullability:registryNull (param $r externref)))
   ;; registryNull(r: null): void
-  (import "./bindings.wasm" "registryNull_with_null" (func $registryNull_with_null (param $r externref)))
+  (import "nullability" "registryNull_with_null" (func $nullability:registryNull_with_null (param $r externref)))
   ;; registryOptional(): void
-  (import "./bindings.wasm" "registryOptional" (func $registryOptional))
+  (import "nullability" "registryOptional" (func $nullability:registryOptional))
   ;; registryOptional(r: Registry): void
-  (import "./bindings.wasm" "registryOptional_with_r" (func $registryOptional_with_r (param $r externref)))
+  (import "nullability" "registryOptional_with_r" (func $nullability:registryOptional_with_r (param $r externref)))
   ;; registryOptional(r: null): void
-  (import "./bindings.wasm" "registryOptional_with_null" (func $registryOptional_with_null (param $r externref)))
+  (import "nullability" "registryOptional_with_null" (func $nullability:registryOptional_with_null (param $r externref)))
   ;; scalar(): void
-  (import "./bindings.wasm" "scalar" (func $scalar))
+  (import "nullability" "scalar" (func $nullability:scalar))
   ;; scalar(x: string): void
-  (import "./bindings.wasm" "scalar_with_str" (func $scalar_with_str (param $x externref)))
+  (import "nullability" "scalar_with_str" (func $nullability:scalar_with_str (param $x externref)))
   ;; scalar(x: number): void
-  (import "./bindings.wasm" "scalar_with_f64" (func $scalar_with_f64 (param $x f64)))
+  (import "nullability" "scalar_with_f64" (func $nullability:scalar_with_f64 (param $x f64)))
   ;; scalar(x: null): void
-  (import "./bindings.wasm" "scalar_with_null" (func $scalar_with_null (param $x externref)))
+  (import "nullability" "scalar_with_null" (func $nullability:scalar_with_null (param $x externref)))
   ;; scalarNull(x: string): void
-  (import "./bindings.wasm" "scalarNull" (func $scalarNull (param $x externref)))
+  (import "nullability" "scalarNull" (func $nullability:scalarNull (param $x externref)))
   ;; scalarNull(x: number): void
-  (import "./bindings.wasm" "scalarNull_with_f64" (func $scalarNull_with_f64 (param $x f64)))
+  (import "nullability" "scalarNull_with_f64" (func $nullability:scalarNull_with_f64 (param $x f64)))
   ;; scalarNull(x: null): void
-  (import "./bindings.wasm" "scalarNull_with_null" (func $scalarNull_with_null (param $x externref)))
+  (import "nullability" "scalarNull_with_null" (func $nullability:scalarNull_with_null (param $x externref)))
   ;; scalarOptional(): void
-  (import "./bindings.wasm" "scalarOptional" (func $scalarOptional))
+  (import "nullability" "scalarOptional" (func $nullability:scalarOptional))
   ;; scalarOptional(x: string): void
-  (import "./bindings.wasm" "scalarOptional_with_str" (func $scalarOptional_with_str (param $x externref)))
+  (import "nullability" "scalarOptional_with_str" (func $nullability:scalarOptional_with_str (param $x externref)))
   ;; scalarOptional(x: number): void
-  (import "./bindings.wasm" "scalarOptional_with_f64" (func $scalarOptional_with_f64 (param $x f64)))
+  (import "nullability" "scalarOptional_with_f64" (func $nullability:scalarOptional_with_f64 (param $x f64)))
   ;; scalarOptional(x: null): void
-  (import "./bindings.wasm" "scalarOptional_with_null" (func $scalarOptional_with_null (param $x externref)))
+  (import "nullability" "scalarOptional_with_null" (func $nullability:scalarOptional_with_null (param $x externref)))
   ;; pair(x: string): void
-  (import "./bindings.wasm" "pair" (func $pair (param $x externref)))
+  (import "nullability" "pair" (func $nullability:pair (param $x externref)))
   ;; pair(x: number): void
-  (import "./bindings.wasm" "pair_with_f64" (func $pair_with_f64 (param $x f64)))
+  (import "nullability" "pair_with_f64" (func $nullability:pair_with_f64 (param $x f64)))
   ;; leading(a: string | undefined, b: number): void
-  (import "./bindings.wasm" "leading" (func $leading (param $a externref) (param $b f64)))
+  (import "nullability" "leading" (func $nullability:leading (param $a externref) (param $b f64)))
   ;; leadingNull(a: string | undefined, b: number): void
-  (import "./bindings.wasm" "leadingNull" (func $leadingNull (param $a externref) (param $b f64)))
+  (import "nullability" "leadingNull" (func $nullability:leadingNull (param $a externref) (param $b f64)))
   ;; leadingNull(a: null, b: number): void
-  (import "./bindings.wasm" "leadingNull_with_null" (func $leadingNull_with_null (param $a externref) (param $b f64)))
+  (import "nullability" "leadingNull_with_null" (func $nullability:leadingNull_with_null (param $a externref) (param $b f64)))
   ;; trailing(a: number): void
-  (import "./bindings.wasm" "trailing" (func $trailing (param $a f64)))
+  (import "nullability" "trailing" (func $nullability:trailing (param $a f64)))
   ;; trailing(a: number, b: string): void
-  (import "./bindings.wasm" "trailing_with_b" (func $trailing_with_b (param $a f64) (param $b externref)))
+  (import "nullability" "trailing_with_b" (func $nullability:trailing_with_b (param $a f64) (param $b externref)))
   ;; chain(): void
-  (import "./bindings.wasm" "chain" (func $chain))
+  (import "nullability" "chain" (func $nullability:chain))
   ;; chain(a: string): void
-  (import "./bindings.wasm" "chain_with_a" (func $chain_with_a (param $a externref)))
+  (import "nullability" "chain_with_a" (func $nullability:chain_with_a (param $a externref)))
   ;; chain(a: string, b: number): void
-  (import "./bindings.wasm" "chain_with_a_and_b" (func $chain_with_a_and_b (param $a externref) (param $b f64)))
+  (import "nullability" "chain_with_a_and_b" (func $nullability:chain_with_a_and_b (param $a externref) (param $b f64)))
   ;; chain(a: string, b: null): void
-  (import "./bindings.wasm" "chain_with_a_and_null" (func $chain_with_a_and_null (param $a externref) (param $b externref)))
+  (import "nullability" "chain_with_a_and_null" (func $nullability:chain_with_a_and_null (param $a externref) (param $b externref)))
   ;; chainOptional(): void
-  (import "./bindings.wasm" "chainOptional" (func $chainOptional))
+  (import "nullability" "chainOptional" (func $nullability:chainOptional))
   ;; chainOptional(a: string): void
-  (import "./bindings.wasm" "chainOptional_with_a" (func $chainOptional_with_a (param $a externref)))
+  (import "nullability" "chainOptional_with_a" (func $nullability:chainOptional_with_a (param $a externref)))
   ;; chainOptional(a: string, b: number): void
-  (import "./bindings.wasm" "chainOptional_with_a_and_b" (func $chainOptional_with_a_and_b (param $a externref) (param $b f64)))
+  (import "nullability" "chainOptional_with_a_and_b" (func $nullability:chainOptional_with_a_and_b (param $a externref) (param $b f64)))
   ;; chainOptional(a: string, b: null): void
-  (import "./bindings.wasm" "chainOptional_with_a_and_null" (func $chainOptional_with_a_and_null (param $a externref) (param $b externref)))
+  (import "nullability" "chainOptional_with_a_and_null" (func $nullability:chainOptional_with_a_and_null (param $a externref) (param $b externref)))
   ;; chainThree(): void
-  (import "./bindings.wasm" "chainThree" (func $chainThree))
+  (import "nullability" "chainThree" (func $nullability:chainThree))
   ;; chainThree(a: string): void
-  (import "./bindings.wasm" "chainThree_with_a" (func $chainThree_with_a (param $a externref)))
+  (import "nullability" "chainThree_with_a" (func $nullability:chainThree_with_a (param $a externref)))
   ;; chainThree(a: string, b: number): void
-  (import "./bindings.wasm" "chainThree_with_a_and_b" (func $chainThree_with_a_and_b (param $a externref) (param $b f64)))
+  (import "nullability" "chainThree_with_a_and_b" (func $nullability:chainThree_with_a_and_b (param $a externref) (param $b f64)))
   ;; chainThree(a: string, b: null): void
-  (import "./bindings.wasm" "chainThree_with_a_and_null" (func $chainThree_with_a_and_null (param $a externref) (param $b externref)))
+  (import "nullability" "chainThree_with_a_and_null" (func $nullability:chainThree_with_a_and_null (param $a externref) (param $b externref)))
   ;; chainThree(a: string, b: number, c: boolean): void
-  (import "./bindings.wasm" "chainThree_with_a_and_b_and_c" (func $chainThree_with_a_and_b_and_c (param $a externref) (param $b f64) (param $c i32)))
+  (import "nullability" "chainThree_with_a_and_b_and_c" (func $nullability:chainThree_with_a_and_b_and_c (param $a externref) (param $b f64) (param $c i32)))
   ;; chainThree(a: string, b: null, c: boolean): void
-  (import "./bindings.wasm" "chainThree_with_a_and_null_and_c" (func $chainThree_with_a_and_null_and_c (param $a externref) (param $b externref) (param $c i32)))
+  (import "nullability" "chainThree_with_a_and_null_and_c" (func $nullability:chainThree_with_a_and_null_and_c (param $a externref) (param $b externref) (param $c i32)))
   ;; modeArg(m: Mode): Mode | null
-  (import "./bindings.wasm" "modeArg" (func $modeArg (param $m externref) (result externref)))
+  (import "nullability" "modeArg" (func $nullability:modeArg (param $m externref) (result externref)))
   ;; modeArg(m: null): Mode | null
-  (import "./bindings.wasm" "modeArg_with_null" (func $modeArg_with_null (param $m externref) (result externref)))
+  (import "nullability" "modeArg_with_null" (func $nullability:modeArg_with_null (param $m externref) (result externref)))
   ;; modeBoth(): Mode | null | undefined
-  (import "./bindings.wasm" "modeBoth" (func $modeBoth (result externref)))
+  (import "nullability" "modeBoth" (func $nullability:modeBoth (result externref)))
   ;; modeBoth(m: Mode): Mode | null | undefined
-  (import "./bindings.wasm" "modeBoth_with_m" (func $modeBoth_with_m (param $m externref) (result externref)))
+  (import "nullability" "modeBoth_with_m" (func $nullability:modeBoth_with_m (param $m externref) (result externref)))
   ;; modeBoth(m: null): Mode | null | undefined
-  (import "./bindings.wasm" "modeBoth_with_null" (func $modeBoth_with_null (param $m externref) (result externref)))
+  (import "nullability" "modeBoth_with_null" (func $nullability:modeBoth_with_null (param $m externref) (result externref)))
   ;; modeOptional(): void
-  (import "./bindings.wasm" "modeOptional" (func $modeOptional))
+  (import "nullability" "modeOptional" (func $nullability:modeOptional))
   ;; modeOptional(m: Mode): void
-  (import "./bindings.wasm" "modeOptional_with_m" (func $modeOptional_with_m (param $m externref)))
+  (import "nullability" "modeOptional_with_m" (func $nullability:modeOptional_with_m (param $m externref)))
   ;; modeOptional(m: null): void
-  (import "./bindings.wasm" "modeOptional_with_null" (func $modeOptional_with_null (param $m externref)))
+  (import "nullability" "modeOptional_with_null" (func $nullability:modeOptional_with_null (param $m externref)))
   ;; emptiesOnly(): null | undefined
-  (import "./bindings.wasm" "emptiesOnly" (func $emptiesOnly (result externref)))
+  (import "nullability" "emptiesOnly" (func $nullability:emptiesOnly (result externref)))
   ;; emptiesOnly(x: null): null | undefined
-  (import "./bindings.wasm" "emptiesOnly_with_null" (func $emptiesOnly_with_null (param $x externref) (result externref)))
+  (import "nullability" "emptiesOnly_with_null" (func $nullability:emptiesOnly_with_null (param $x externref) (result externref)))
   ;; generic(x: T): T | null
-  (import "./bindings.wasm" "generic" (func $generic (param $x externref) (result externref)))
+  (import "nullability" "generic" (func $nullability:generic (param $x externref) (result externref)))
   ;; generic(x: null): T | null
-  (import "./bindings.wasm" "generic_with_null" (func $generic_with_null (param $x externref) (result externref)))
+  (import "nullability" "generic_with_null" (func $nullability:generic_with_null (param $x externref) (result externref)))
   ;; genericBoth(): T | null | undefined
-  (import "./bindings.wasm" "genericBoth" (func $genericBoth (result externref)))
+  (import "nullability" "genericBoth" (func $nullability:genericBoth (result externref)))
   ;; genericBoth(x: T): T | null | undefined
-  (import "./bindings.wasm" "genericBoth_with_x" (func $genericBoth_with_x (param $x externref) (result externref)))
+  (import "nullability" "genericBoth_with_x" (func $nullability:genericBoth_with_x (param $x externref) (result externref)))
   ;; genericBoth(x: null): T | null | undefined
-  (import "./bindings.wasm" "genericBoth_with_null" (func $genericBoth_with_null (param $x externref) (result externref)))
+  (import "nullability" "genericBoth_with_null" (func $nullability:genericBoth_with_null (param $x externref) (result externref)))
   ;; inner(xs: Promise<string | null>, ys: (number | undefined)[]): void
-  (import "./bindings.wasm" "inner" (func $inner (param $xs externref) (param $ys externref)))
+  (import "nullability" "inner" (func $nullability:inner (param $xs externref) (param $ys externref)))
   ;; innerBoth(xs: Promise<string | null | undefined>): void
-  (import "./bindings.wasm" "innerBoth" (func $innerBoth (param $xs externref)))
+  (import "nullability" "innerBoth" (func $nullability:innerBoth (param $xs externref)))
   ;; callback(cb: (x: string | null) => void): void
-  (import "./bindings.wasm" "callback" (func $callback (param $cb externref)))
+  (import "nullability" "callback" (func $nullability:callback (param $cb externref)))
   ;; record(r: Record<string, string | null>): Record<string, number | undefined>
-  (import "./bindings.wasm" "record" (func $record (param $r externref) (result externref)))
+  (import "nullability" "record" (func $nullability:record (param $r externref) (result externref)))
   ;; holder(h: Holder<string | null>): Holder<number | undefined>
-  (import "./bindings.wasm" "holder" (func $holder (param $h externref) (result externref)))
+  (import "nullability" "holder" (func $nullability:holder (param $h externref) (result externref)))
   ;; fetchNull(): Promise<Registry | null>
-  (import "./bindings.wasm" "fetchNull" (func $fetchNull (result externref)))
+  (import "nullability" "fetchNull" (func $nullability:fetchNull (result externref)))
   ;; fetchOptional(): Promise<number | undefined>
-  (import "./bindings.wasm" "fetchOptional" (func $fetchOptional (result externref)))
+  (import "nullability" "fetchOptional" (func $nullability:fetchOptional (result externref)))
   ;; fetchBoth(): Promise<string | null | undefined>
-  (import "./bindings.wasm" "fetchBoth" (func $fetchBoth (result externref)))
+  (import "nullability" "fetchBoth" (func $nullability:fetchBoth (result externref)))
   ;; fetchGeneric(): Promise<T | null>
-  (import "./bindings.wasm" "fetchGeneric" (func $fetchGeneric (result externref)))
+  (import "nullability" "fetchGeneric" (func $nullability:fetchGeneric (result externref)))
   ;; numbers(xs: number[]): number[] | null
-  (import "./bindings.wasm" "numbers" (func $numbers (param $xs externref) (result externref)))
+  (import "nullability" "numbers" (func $nullability:numbers (param $xs externref) (result externref)))
   ;; numbers(xs: null): number[] | null
-  (import "./bindings.wasm" "numbers_with_null" (func $numbers_with_null (param $xs externref) (result externref)))
+  (import "nullability" "numbers_with_null" (func $nullability:numbers_with_null (param $xs externref) (result externref)))
   ;; numbersBoth(): number[] | null | undefined
-  (import "./bindings.wasm" "numbersBoth" (func $numbersBoth (result externref)))
+  (import "nullability" "numbersBoth" (func $nullability:numbersBoth (result externref)))
   ;; numbersBoth(xs: number[]): number[] | null | undefined
-  (import "./bindings.wasm" "numbersBoth_with_xs" (func $numbersBoth_with_xs (param $xs externref) (result externref)))
+  (import "nullability" "numbersBoth_with_xs" (func $nullability:numbersBoth_with_xs (param $xs externref) (result externref)))
   ;; numbersBoth(xs: null): number[] | null | undefined
-  (import "./bindings.wasm" "numbersBoth_with_null" (func $numbersBoth_with_null (param $xs externref) (result externref)))
+  (import "nullability" "numbersBoth_with_null" (func $nullability:numbersBoth_with_null (param $xs externref) (result externref)))
   ;; numbersOptional(): void
-  (import "./bindings.wasm" "numbersOptional" (func $numbersOptional))
+  (import "nullability" "numbersOptional" (func $nullability:numbersOptional))
   ;; numbersOptional(xs: number[]): void
-  (import "./bindings.wasm" "numbersOptional_with_xs" (func $numbersOptional_with_xs (param $xs externref)))
+  (import "nullability" "numbersOptional_with_xs" (func $nullability:numbersOptional_with_xs (param $xs externref)))
   ;; numbersOptional(xs: null): void
-  (import "./bindings.wasm" "numbersOptional_with_null" (func $numbersOptional_with_null (param $xs externref)))
+  (import "nullability" "numbersOptional_with_null" (func $nullability:numbersOptional_with_null (param $xs externref)))
   ;; bytes(xs: number[]): void
-  (import "./bindings.wasm" "bytes" (func $bytes (param $xs externref)))
+  (import "nullability" "bytes" (func $nullability:bytes (param $xs externref)))
   ;; bytes(xs: Uint8Array): void
-  (import "./bindings.wasm" "bytes_with_uint8_array" (func $bytes_with_uint8_array (param $xs externref)))
+  (import "nullability" "bytes_with_uint8_array" (func $nullability:bytes_with_uint8_array (param $xs externref)))
   ;; bytes(xs: null): void
-  (import "./bindings.wasm" "bytes_with_null" (func $bytes_with_null (param $xs externref)))
+  (import "nullability" "bytes_with_null" (func $nullability:bytes_with_null (param $xs externref)))
   ;; bytesBoth(): void
-  (import "./bindings.wasm" "bytesBoth" (func $bytesBoth))
+  (import "nullability" "bytesBoth" (func $nullability:bytesBoth))
   ;; bytesBoth(xs: number[]): void
-  (import "./bindings.wasm" "bytesBoth_with_slice" (func $bytesBoth_with_slice (param $xs externref)))
+  (import "nullability" "bytesBoth_with_slice" (func $nullability:bytesBoth_with_slice (param $xs externref)))
   ;; bytesBoth(xs: Uint8Array): void
-  (import "./bindings.wasm" "bytesBoth_with_uint8_array" (func $bytesBoth_with_uint8_array (param $xs externref)))
+  (import "nullability" "bytesBoth_with_uint8_array" (func $nullability:bytesBoth_with_uint8_array (param $xs externref)))
   ;; bytesBoth(xs: null): void
-  (import "./bindings.wasm" "bytesBoth_with_null" (func $bytesBoth_with_null (param $xs externref)))
+  (import "nullability" "bytesBoth_with_null" (func $nullability:bytesBoth_with_null (param $xs externref)))
   ;; jsdoc(x: string): void
-  (import "./bindings.wasm" "jsdoc" (func $jsdoc (param $x externref)))
+  (import "nullability" "jsdoc" (func $nullability:jsdoc (param $x externref)))
   ;; jsdoc(x: null): void
-  (import "./bindings.wasm" "jsdoc_with_null" (func $jsdoc_with_null (param $x externref)))
+  (import "nullability" "jsdoc_with_null" (func $nullability:jsdoc_with_null (param $x externref)))
   ;; send(attachment: Attachment): void
-  (import "./bindings.wasm" "send" (func $send (param $attachment externref)))
+  (import "nullability" "send" (func $nullability:send (param $attachment externref)))
   ;; upload(upload: Upload): void
-  (import "./bindings.wasm" "upload" (func $upload (param $upload externref)))
+  (import "nullability" "upload" (func $nullability:upload (param $upload externref)))
   ;; cover(cover: Cover): void
-  (import "./bindings.wasm" "cover" (func $cover (param $cover externref)))
+  (import "nullability" "cover" (func $nullability:cover (param $cover externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

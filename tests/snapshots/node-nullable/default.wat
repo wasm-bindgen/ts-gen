@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "node-nullable"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,56 +24,56 @@
 
   ;; Options
   ;; {} as Options
-  (import "./bindings.wasm" "Options.new" (func $Options.new (result externref)))
+  (import "node-nullable" "Options.new" (func $node-nullable:Options.new (result externref)))
   ;; label?: string | null
-  (import "./bindings.wasm" "Options.label" (func $Options.label (param $this externref) (result externref)))
+  (import "node-nullable" "Options.label" (func $node-nullable:Options.label (param $this externref) (result externref)))
   ;; set label(value: string)
-  (import "./bindings.wasm" "Options.set_label" (func $Options.set_label (param $this externref) (param $value externref)))
+  (import "node-nullable" "Options.set_label" (func $node-nullable:Options.set_label (param $this externref) (param $value externref)))
   ;; set label(value: null)
-  (import "./bindings.wasm" "Options.set_label_with_null" (func $Options.set_label_with_null (param $this externref) (param $value externref)))
+  (import "node-nullable" "Options.set_label_with_null" (func $node-nullable:Options.set_label_with_null (param $this externref) (param $value externref)))
 
   ;; describe(name: string): string
-  (import "./bindings.wasm" "describe" (func $describe (param $name externref) (result externref)))
+  (import "node-nullable" "describe" (func $node-nullable:describe (param $name externref) (result externref)))
   ;; describe(name: null): string
-  (import "./bindings.wasm" "describe_with_null" (func $describe_with_null (param $name externref) (result externref)))
+  (import "node-nullable" "describe_with_null" (func $node-nullable:describe_with_null (param $name externref) (result externref)))
   ;; repeat(): string
-  (import "./bindings.wasm" "repeat" (func $repeat (result externref)))
+  (import "node-nullable" "repeat" (func $node-nullable:repeat (result externref)))
   ;; repeat(count: number): string
-  (import "./bindings.wasm" "repeat_with_count" (func $repeat_with_count (param $count f64) (result externref)))
+  (import "node-nullable" "repeat_with_count" (func $node-nullable:repeat_with_count (param $count f64) (result externref)))
   ;; greet(): string
-  (import "./bindings.wasm" "greet" (func $greet (result externref)))
+  (import "node-nullable" "greet" (func $node-nullable:greet (result externref)))
   ;; greet(name: string): string
-  (import "./bindings.wasm" "greet_with_name" (func $greet_with_name (param $name externref) (result externref)))
+  (import "node-nullable" "greet_with_name" (func $node-nullable:greet_with_name (param $name externref) (result externref)))
   ;; greet(name: null): string
-  (import "./bindings.wasm" "greet_with_null" (func $greet_with_null (param $name externref) (result externref)))
+  (import "node-nullable" "greet_with_null" (func $node-nullable:greet_with_null (param $name externref) (result externref)))
   ;; lookup(key: string): string | null | undefined
-  (import "./bindings.wasm" "lookup" (func $lookup (param $key externref) (result externref)))
+  (import "node-nullable" "lookup" (func $node-nullable:lookup (param $key externref) (result externref)))
   ;; lookupAsync(key: string): Promise<string | null | undefined>
-  (import "./bindings.wasm" "lookupAsync" (func $lookupAsync (param $key externref) (result externref)))
+  (import "node-nullable" "lookupAsync" (func $node-nullable:lookupAsync (param $key externref) (result externref)))
   ;; find(key: string): Promise<Options | null>
-  (import "./bindings.wasm" "find" (func $find (param $key externref) (result externref)))
+  (import "node-nullable" "find" (func $node-nullable:find (param $key externref) (result externref)))
   ;; classify(): string
-  (import "./bindings.wasm" "classify" (func $classify (result externref)))
+  (import "node-nullable" "classify" (func $node-nullable:classify (result externref)))
   ;; classify(value: string): string
-  (import "./bindings.wasm" "classify_with_value" (func $classify_with_value (param $value externref) (result externref)))
+  (import "node-nullable" "classify_with_value" (func $node-nullable:classify_with_value (param $value externref) (result externref)))
   ;; classify(value: null): string
-  (import "./bindings.wasm" "classify_with_null" (func $classify_with_null (param $value externref) (result externref)))
+  (import "node-nullable" "classify_with_null" (func $node-nullable:classify_with_null (param $value externref) (result externref)))
   ;; options(label: string): Options
-  (import "./bindings.wasm" "options" (func $options (param $label externref) (result externref)))
+  (import "node-nullable" "options" (func $node-nullable:options (param $label externref) (result externref)))
   ;; configure(options: Options): string
-  (import "./bindings.wasm" "configure" (func $configure (param $options externref) (result externref)))
+  (import "node-nullable" "configure" (func $node-nullable:configure (param $options externref) (result externref)))
   ;; arity(): string
-  (import "./bindings.wasm" "arity" (func $arity (result externref)))
+  (import "node-nullable" "arity" (func $node-nullable:arity (result externref)))
   ;; arity(a: string): string
-  (import "./bindings.wasm" "arity_with_a" (func $arity_with_a (param $a externref) (result externref)))
+  (import "node-nullable" "arity_with_a" (func $node-nullable:arity_with_a (param $a externref) (result externref)))
   ;; arity(a: string, b: number): string
-  (import "./bindings.wasm" "arity_with_a_and_b" (func $arity_with_a_and_b (param $a externref) (param $b f64) (result externref)))
+  (import "node-nullable" "arity_with_a_and_b" (func $node-nullable:arity_with_a_and_b (param $a externref) (param $b f64) (result externref)))
   ;; arity(a: string, b: null): string
-  (import "./bindings.wasm" "arity_with_a_and_null" (func $arity_with_a_and_null (param $a externref) (param $b externref) (result externref)))
+  (import "node-nullable" "arity_with_a_and_null" (func $node-nullable:arity_with_a_and_null (param $a externref) (param $b externref) (result externref)))
   ;; pick(a: string | undefined, b: number): string
-  (import "./bindings.wasm" "pick" (func $pick (param $a externref) (param $b f64) (result externref)))
+  (import "node-nullable" "pick" (func $node-nullable:pick (param $a externref) (param $b f64) (result externref)))
   ;; onlyNull(value: null): string
-  (import "./bindings.wasm" "onlyNull_with_null" (func $onlyNull_with_null (param $value externref) (result externref)))
+  (import "node-nullable" "onlyNull_with_null" (func $node-nullable:onlyNull_with_null (param $value externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

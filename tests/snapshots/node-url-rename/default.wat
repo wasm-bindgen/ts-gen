@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "node:url"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,14 +24,14 @@
 
   ;; URL
   ;; constructor(input: string)
-  (import "./bindings.wasm" "URL.new" (func $URL.new (param $input externref) (result externref)))
+  (import "node:url" "URL.new" (func $node:url:URL.new (param $input externref) (result externref)))
   ;; href: string
-  (import "./bindings.wasm" "URL.href" (func $URL.href (param $this externref) (result externref)))
+  (import "node:url" "URL.href" (func $node:url:URL.href (param $this externref) (result externref)))
   ;; canParse(input: string): boolean
-  (import "./bindings.wasm" "URL.can_parse" (func $URL.can_parse (param $input externref) (result i32)))
+  (import "node:url" "URL.can_parse" (func $node:url:URL.can_parse (param $input externref) (result i32)))
 
   ;; fileURLToPath(url: string): string
-  (import "./bindings.wasm" "fileURLToPath" (func $fileURLToPath (param $url externref) (result externref)))
+  (import "node:url" "fileURLToPath" (func $node:url:fileURLToPath (param $url externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

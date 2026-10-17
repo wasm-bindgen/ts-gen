@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "generic-defaults"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -28,87 +26,87 @@
 
   ;; Box
   ;; value: T
-  (import "./bindings.wasm" "Box.value" (func $Box.value (param $this externref) (result externref)))
+  (import "generic-defaults" "Box.value" (func $generic-defaults:Box.value (param $this externref) (result externref)))
   ;; set(value: T): void
-  (import "./bindings.wasm" "Box.set" (func $Box.set (param $this externref) (param $value externref)))
+  (import "generic-defaults" "Box.set" (func $generic-defaults:Box.set (param $this externref) (param $value externref)))
 
   ;; Holder
   ;; constructor()
-  (import "./bindings.wasm" "Holder.new" (func $Holder.new (result externref)))
+  (import "generic-defaults" "Holder.new" (func $generic-defaults:Holder.new (result externref)))
   ;; get(): T
-  (import "./bindings.wasm" "Holder.get" (func $Holder.get (param $this externref) (result externref)))
+  (import "generic-defaults" "Holder.get" (func $generic-defaults:Holder.get (param $this externref) (result externref)))
   ;; boxed(): U
-  (import "./bindings.wasm" "Holder.boxed" (func $Holder.boxed (param $this externref) (result externref)))
+  (import "generic-defaults" "Holder.boxed" (func $generic-defaults:Holder.boxed (param $this externref) (result externref)))
   ;; make(): Holder<string, V>
-  (import "./bindings.wasm" "Holder.make" (func $Holder.make (result externref)))
+  (import "generic-defaults" "Holder.make" (func $generic-defaults:Holder.make (result externref)))
 
   ;; Options
   ;; {} as Options
-  (import "./bindings.wasm" "Options.new" (func $Options.new (result externref)))
+  (import "generic-defaults" "Options.new" (func $generic-defaults:Options.new (result externref)))
   ;; initial?: T
-  (import "./bindings.wasm" "Options.initial" (func $Options.initial (param $this externref) (result externref)))
+  (import "generic-defaults" "Options.initial" (func $generic-defaults:Options.initial (param $this externref) (result externref)))
   ;; set initial(value: T)
-  (import "./bindings.wasm" "Options.set_initial" (func $Options.set_initial (param $this externref) (param $value externref)))
+  (import "generic-defaults" "Options.set_initial" (func $generic-defaults:Options.set_initial (param $this externref) (param $value externref)))
 
   ;; looseBox(): Box<unknown>
-  (import "./bindings.wasm" "looseBox" (func $looseBox (result externref)))
+  (import "generic-defaults" "looseBox" (func $generic-defaults:looseBox (result externref)))
   ;; looseHolder(): Holder<Loose, Box<Loose>>
-  (import "./bindings.wasm" "looseHolder" (func $looseHolder (result externref)))
+  (import "generic-defaults" "looseHolder" (func $generic-defaults:looseHolder (result externref)))
   ;; stringHolder(): Holder<string, Box<string>>
-  (import "./bindings.wasm" "stringHolder" (func $stringHolder (result externref)))
+  (import "generic-defaults" "stringHolder" (func $generic-defaults:stringHolder (result externref)))
   ;; mixedHolder(): Holder<string, Box<unknown>>
-  (import "./bindings.wasm" "mixedHolder" (func $mixedHolder (result externref)))
+  (import "generic-defaults" "mixedHolder" (func $generic-defaults:mixedHolder (result externref)))
   ;; makeHolder(): Holder<string, V>
-  (import "./bindings.wasm" "makeHolder" (func $makeHolder (result externref)))
+  (import "generic-defaults" "makeHolder" (func $generic-defaults:makeHolder (result externref)))
 
   ;; Row
   ;; {} as Row
-  (import "./bindings.wasm" "Row.new" (func $Row.new (result externref)))
+  (import "generic-defaults" "Row.new" (func $generic-defaults:Row.new (result externref)))
   ;; results: T[]
-  (import "./bindings.wasm" "Row.results" (func $Row.results (param $this externref) (result externref)))
+  (import "generic-defaults" "Row.results" (func $generic-defaults:Row.results (param $this externref) (result externref)))
   ;; set results(value: T[])
-  (import "./bindings.wasm" "Row.set_results" (func $Row.set_results (param $this externref) (param $value externref)))
+  (import "generic-defaults" "Row.set_results" (func $generic-defaults:Row.set_results (param $this externref) (param $value externref)))
 
   ;; Cursor
   ;; next(): T
-  (import "./bindings.wasm" "Cursor.next" (func $Cursor.next (param $this externref) (result externref)))
+  (import "generic-defaults" "Cursor.next" (func $generic-defaults:Cursor.next (param $this externref) (result externref)))
 
   ;; Store
   ;; put(key: string, value: T): Promise<void>
-  (import "./bindings.wasm" "Store.put" (func $Store.put (param $this externref) (param $key externref) (param $value externref) (result externref)))
+  (import "generic-defaults" "Store.put" (func $generic-defaults:Store.put (param $this externref) (param $key externref) (param $value externref) (result externref)))
   ;; append(...items: T[]): Row<T>
-  (import "./bindings.wasm" "Store.append" (func $Store.append (param $this externref) (param $items (ref null $anyrefs)) (result externref)))
+  (import "generic-defaults" "Store.append" (func $generic-defaults:Store.append (param $this externref) (param $items (ref null $anyrefs)) (result externref)))
   ;; get(key: string): Promise<T | undefined>
-  (import "./bindings.wasm" "Store.get" (func $Store.get (param $this externref) (param $key externref) (result externref)))
+  (import "generic-defaults" "Store.get" (func $generic-defaults:Store.get (param $this externref) (param $key externref) (result externref)))
   ;; first(): Promise<T | null>
-  (import "./bindings.wasm" "Store.first" (func $Store.first (param $this externref) (result externref)))
+  (import "generic-defaults" "Store.first" (func $generic-defaults:Store.first (param $this externref) (result externref)))
   ;; json(): Promise<T>
-  (import "./bindings.wasm" "Store.json" (func $Store.json (param $this externref) (result externref)))
+  (import "generic-defaults" "Store.json" (func $generic-defaults:Store.json (param $this externref) (result externref)))
   ;; transaction(closure: (tx: Store) => Promise<T>): Promise<T>
-  (import "./bindings.wasm" "Store.transaction" (func $Store.transaction (param $this externref) (param $closure externref) (result externref)))
+  (import "generic-defaults" "Store.transaction" (func $generic-defaults:Store.transaction (param $this externref) (param $closure externref) (result externref)))
   ;; collect(make: () => Promise<T>): Promise<Map<string, T>>
-  (import "./bindings.wasm" "Store.collect" (func $Store.collect (param $this externref) (param $make externref) (result externref)))
+  (import "generic-defaults" "Store.collect" (func $generic-defaults:Store.collect (param $this externref) (param $make externref) (result externref)))
   ;; each(fn: (item: T) => void): Promise<Map<string, T>>
-  (import "./bindings.wasm" "Store.each" (func $Store.each (param $this externref) (param $fn externref) (result externref)))
+  (import "generic-defaults" "Store.each" (func $generic-defaults:Store.each (param $this externref) (param $fn externref) (result externref)))
   ;; eachRest(fn: (item: T, ...rest: unknown[]) => void): Promise<Map<string, T>>
-  (import "./bindings.wasm" "Store.each_rest" (func $Store.each_rest (param $this externref) (param $fn externref) (result externref)))
+  (import "generic-defaults" "Store.each_rest" (func $generic-defaults:Store.each_rest (param $this externref) (param $fn externref) (result externref)))
   ;; run(): Promise<Row<T>>
-  (import "./bindings.wasm" "Store.run" (func $Store.run (param $this externref) (result externref)))
+  (import "generic-defaults" "Store.run" (func $generic-defaults:Store.run (param $this externref) (result externref)))
   ;; list(): Promise<Map<string, T>>
-  (import "./bindings.wasm" "Store.list" (func $Store.list (param $this externref) (result externref)))
+  (import "generic-defaults" "Store.list" (func $generic-defaults:Store.list (param $this externref) (result externref)))
   ;; scan(): Cursor<T>
-  (import "./bindings.wasm" "Store.scan" (func $Store.scan (param $this externref) (result externref)))
+  (import "generic-defaults" "Store.scan" (func $generic-defaults:Store.scan (param $this externref) (result externref)))
   ;; schedule(callback: (...args: Args) => void, ...args: Args): number
-  (import "./bindings.wasm" "Store.schedule" (func $Store.schedule (param $this externref) (param $callback externref) (param $args (ref null $anyrefs)) (result f64)))
+  (import "generic-defaults" "Store.schedule" (func $generic-defaults:Store.schedule (param $this externref) (param $callback externref) (param $args (ref null $anyrefs)) (result f64)))
 
   ;; of(...items: T[]): Row<T>
-  (import "./bindings.wasm" "of" (func $of (param $items (ref null $anyrefs)) (result externref)))
+  (import "generic-defaults" "of" (func $generic-defaults:of (param $items (ref null $anyrefs)) (result externref)))
   ;; enterSpan(name: string, fn: (...args: A) => T, ...args: A): T
-  (import "./bindings.wasm" "enterSpan" (func $enterSpan (param $name externref) (param $fn externref) (param $args (ref null $anyrefs)) (result externref)))
+  (import "generic-defaults" "enterSpan" (func $generic-defaults:enterSpan (param $name externref) (param $fn externref) (param $args (ref null $anyrefs)) (result externref)))
   ;; lookup(): Map<string, T>
-  (import "./bindings.wasm" "lookup" (func $lookup (result externref)))
+  (import "generic-defaults" "lookup" (func $generic-defaults:lookup (result externref)))
   ;; lookup(key: string): void
-  (import "./bindings.wasm" "lookup_with_key" (func $lookup_with_key (param $key externref)))
+  (import "generic-defaults" "lookup_with_key" (func $generic-defaults:lookup_with_key (param $key externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
