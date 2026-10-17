@@ -183,6 +183,62 @@ extern "C" {
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
+    pub fn clamped(
+        #[wasm_bindgen(slice = "copy")] values: ::wasm_bindgen::Clamped<&[u8]>,
+    ) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "clamped")]
+    pub fn try_clamped(
+        #[wasm_bindgen(slice = "copy")] values: ::wasm_bindgen::Clamped<&[u8]>,
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "clamped")]
+    pub fn clamped_with_uint8_clamped_array(values: &Uint8ClampedArray) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "clamped")]
+    pub fn try_clamped_with_uint8_clamped_array(
+        values: &Uint8ClampedArray,
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    pub fn pixels(#[wasm_bindgen(slice = "copy")] values: &[u8]) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "pixels")]
+    pub fn try_pixels(#[wasm_bindgen(slice = "copy")] values: &[u8]) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "pixels")]
+    pub fn pixels_with_uint8_array(values: &Uint8Array) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "pixels")]
+    pub fn try_pixels_with_uint8_array(values: &Uint8Array) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "pixels")]
+    pub fn pixels_with_uint8_clamped_array(values: &Uint8ClampedArray) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "pixels")]
+    pub fn try_pixels_with_uint8_clamped_array(
+        values: &Uint8ClampedArray,
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
     pub fn floats() -> String;
 }
 #[wasm_bindgen(module = "slice-args")]

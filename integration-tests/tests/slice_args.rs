@@ -1,6 +1,7 @@
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{BigInt, Boolean, JsString, Uint8Array};
+use js_sys::{BigInt, Boolean, JsString, Uint8Array, Uint8ClampedArray};
+use wasm_bindgen::Clamped;
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::slice_args::*;
@@ -37,6 +38,12 @@ fn typed_array_unions_pass_a_typed_copy() {
         "BigUint64Array(18446744073709551615)"
     );
     assert_eq!(buffered(&[4]), "Uint8Array(4)");
+    assert_eq!(clamped(Clamped(&[5, 255])), "Uint8ClampedArray(5,255)");
+    assert_eq!(
+        clamped_with_uint8_clamped_array(&Uint8ClampedArray::new_from_slice(&[6])),
+        "Uint8ClampedArray(6)"
+    );
+    assert_eq!(pixels(&[7]), "Uint8Array(7)");
     assert_eq!(floats(), "none");
     assert_eq!(floats_with_slice(&[0.5]), "Float64Array(0.5)");
 }

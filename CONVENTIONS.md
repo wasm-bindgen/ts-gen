@@ -251,14 +251,26 @@ pub fn take64(#[wasm_bindgen(slice = "copy")] values: &[i64]); // a fresh `BigIn
 pub fn take64_with_big_int64_array(values: &BigInt64Array);
 ```
 
+`Uint8ClampedArray | number[]` pairs the same way, with the slice in
+the `wasm_bindgen::Clamped` wrapper that binds a `Uint8ClampedArray`:
+
+```ts
+function fill(data: Uint8ClampedArray | number[]): void;
+```
+
+```rs
+pub fn fill(#[wasm_bindgen(slice = "copy")] data: ::wasm_bindgen::Clamped<&[u8]>);
+pub fn fill_with_uint8_clamped_array(data: &Uint8ClampedArray);
+```
+
 The pairing applies after aliases, `null` and optional parameters are
 flattened, and to a generic member such as `Uint8Array<ArrayBuffer>`.
 It needs exactly one typed array whose element matches the array's
-(`bigint` for the 64-bit arrays, `number` for the rest);
-`Uint8ClampedArray` and `Float16Array` have no plain Rust slice and
-don't pair. Modes are per-argument, so a `string[]` or
-`number[]` parameter in the same overload doesn't affect the typed
-slice.
+(`bigint` for the 64-bit arrays, `number` for the rest), except that
+`Uint8Array | Uint8ClampedArray | number[]` pairs as the `Uint8Array`
+slice, since both hold `u8`. `Float16Array` has no Rust slice and
+doesn't pair. Modes are per-argument, so a `string[]` or `number[]`
+parameter in the same overload doesn't affect the typed slice.
 
 A bare typed array stays the `&Uint8Array` handle: only the union
 says the callee also accepts a copy. A bare `bigint[]` stays

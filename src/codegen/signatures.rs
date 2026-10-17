@@ -859,22 +859,30 @@ fn flatten_type_with(
 /// array's element slice (`&[u8]`), passed as a zero-copy view of that
 /// typed array, and goes first. The typed array keeps its handle
 /// alternative. With more than one typed array the element is ambiguous
-/// and nothing pairs.
+/// and nothing pairs, except for a `Uint8Array` beside a
+/// `Uint8ClampedArray`: both hold `u8`, so the slice is a `Uint8Array`.
 fn pair_typed_array_slice(
     alts: &mut Vec<TypeRef>,
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) {
-    let mut typed = alts.iter().filter_map(|t| match t {
-        TypeRef::Reference {
-            segments,
-            generic_args,
-        } if segments.len() == 1 => crate::ir::TypedArrayElement::of_typed_array(&segments[0])
-            .map(|elem| (elem, SharedMemory::of_typed_array_args(generic_args))),
-        _ => None,
-    });
-    let (Some((elem, shared)), None) = (typed.next(), typed.next()) else {
-        return;
+    use crate::ir::TypedArrayElement as E;
+    let typed: Vec<_> = alts
+        .iter()
+        .filter_map(|t| match t {
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            } if segments.len() == 1 => E::of_typed_array(&segments[0])
+                .map(|elem| (elem, SharedMemory::of_typed_array_args(generic_args))),
+            _ => None,
+        })
+        .collect();
+    let (elem, shared) = match typed[..] {
+        [only] => only,
+        [a, b] if a.0 == E::U8 && b.0 == E::U8Clamped => a,
+        [a, b] if b.0 == E::U8 && a.0 == E::U8Clamped => b,
+        _ => return,
     };
     let pairs = |inner: &TypeRef| {
         let inner = match cgctx {
@@ -2638,10 +2646,31 @@ mod tests {
                 TypeRef::generic("BigInt64Array", vec![TypeRef::ident("ArrayBuffer")]),
             ]
         );
+        assert_eq!(
+            flat(vec![
+                TypeRef::ident("Uint8ClampedArray"),
+                array(TypeRef::Number)
+            ]),
+            vec![
+                TypeRef::TypedSlice(E::U8Clamped, SharedMemory::Accepted),
+                TypeRef::ident("Uint8ClampedArray")
+            ]
+        );
+        assert_eq!(
+            flat(vec![
+                TypeRef::ident("Uint8ClampedArray"),
+                TypeRef::generic("Uint8Array", vec![TypeRef::ident("ArrayBuffer")]),
+                array(TypeRef::Number),
+            ]),
+            vec![
+                TypeRef::TypedSlice(E::U8, SharedMemory::Rejected),
+                TypeRef::ident("Uint8ClampedArray"),
+                TypeRef::generic("Uint8Array", vec![TypeRef::ident("ArrayBuffer")]),
+            ]
+        );
         for unpaired in [
             vec![TypeRef::ident("Uint8Array"), array(TypeRef::BigInt)],
             vec![TypeRef::ident("BigInt64Array"), array(TypeRef::Number)],
-            vec![TypeRef::ident("Uint8ClampedArray"), array(TypeRef::Number)],
             vec![
                 TypeRef::ident("Uint8Array"),
                 TypeRef::ident("Int8Array"),

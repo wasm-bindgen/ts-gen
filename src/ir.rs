@@ -175,6 +175,8 @@ impl SharedMemory {
 pub enum TypedArrayElement {
     I8,
     U8,
+    /// `Uint8ClampedArray`, whose Rust slice is wrapped in `Clamped`.
+    U8Clamped,
     I16,
     U16,
     I32,
@@ -186,9 +188,10 @@ pub enum TypedArrayElement {
 }
 
 impl TypedArrayElement {
-    const ALL: [(Self, &'static str, &'static str); 10] = [
+    const ALL: [(Self, &'static str, &'static str); 11] = [
         (Self::I8, "Int8Array", "i8"),
         (Self::U8, "Uint8Array", "u8"),
+        (Self::U8Clamped, "Uint8ClampedArray", "u8"),
         (Self::I16, "Int16Array", "i16"),
         (Self::U16, "Uint16Array", "u16"),
         (Self::I32, "Int32Array", "i32"),
@@ -199,8 +202,8 @@ impl TypedArrayElement {
         (Self::U64, "BigUint64Array", "u64"),
     ];
 
-    /// The element of the typed array named `name`. `Uint8ClampedArray`
-    /// and `Float16Array` have no plain Rust slice and are `None`.
+    /// The element of the typed array named `name`. `Float16Array` has no
+    /// Rust slice and is `None`.
     pub fn of_typed_array(name: &str) -> Option<Self> {
         Self::ALL
             .iter()
@@ -219,6 +222,11 @@ impl TypedArrayElement {
     /// The Rust scalar, e.g. `u8`.
     pub fn rust(self) -> &'static str {
         self.entry().2
+    }
+
+    /// Whether the Rust slice is wrapped in `wasm_bindgen::Clamped`.
+    pub fn is_clamped(self) -> bool {
+        self == Self::U8Clamped
     }
 
     /// Whether JS holds the values as `bigint` rather than `number`.

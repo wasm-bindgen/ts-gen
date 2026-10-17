@@ -319,7 +319,7 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
         TypeRef::Symbol => buf.push_str("Symbol"),
         TypeRef::ArrayBufferView => buf.push_str("ArrayBufferView"),
         TypeRef::PropertyKey => buf.push_str("PropertyKey"),
-        TypeRef::TypedSlice(e, _) => write!(buf, "slice:{}", e.rust()).unwrap(),
+        TypeRef::TypedSlice(e, _) => write!(buf, "slice:{}", e.typed_array()).unwrap(),
         TypeRef::StringLiteral(s) => write!(buf, "lit:{s:?}").unwrap(),
         TypeRef::NumberLiteral(n) => write!(buf, "lit:{n}").unwrap(),
         TypeRef::BooleanLiteral(b) => write!(buf, "lit:{b}").unwrap(),
@@ -1178,10 +1178,15 @@ pub fn to_syn_type(
                 quote! { #ident }
             } else {
                 let scalar = make_ident(elem.rust());
-                if pos.is_argument() {
+                let seq = if pos.is_argument() {
                     quote! { &[#scalar] }
                 } else {
                     quote! { Vec<#scalar> }
+                };
+                if elem.is_clamped() {
+                    quote! { ::wasm_bindgen::Clamped<#seq> }
+                } else {
+                    seq
                 }
             }
         }
@@ -1877,8 +1882,7 @@ fn with_generic_args(
 /// (`Uint8Array<ArrayBuffer>`). The js-sys types aren't, and dropping the
 /// argument is the intended lowering, so it isn't warned about.
 fn is_buffer_generic(name: &str) -> bool {
-    matches!(name, "Uint8ClampedArray" | "DataView")
-        || ir::TypedArrayElement::of_typed_array(name).is_some()
+    name == "DataView" || ir::TypedArrayElement::of_typed_array(name).is_some()
 }
 
 /// `alias`'s target with each type parameter replaced by its default, in
