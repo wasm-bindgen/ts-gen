@@ -1478,13 +1478,17 @@ pub fn generate_dictionary_params(
 ) -> DictionaryParams {
     let mut generic_idents: Vec<syn::Ident> = Vec::new();
     let mut extern_items: Vec<TokenStream> = Vec::new();
+    // Skips names already bound in scope, such as the dictionary's own `<T>`.
+    let mut letters = (0..)
+        .map(generic_letter)
+        .filter(|g| cgctx.is_none_or(|c| c.gctx.scopes.resolve_binding(scope, g).is_none()));
     let items: Vec<_> = params
         .iter()
         .map(|p| {
             let name = typemap::make_ident(&p.name);
             let ty = if !p.variadic && matches!(p.type_ref, TypeRef::ArrayBufferView) {
                 let g = syn::Ident::new(
-                    &generic_letter(generic_idents.len()),
+                    &letters.next().expect("unbounded"),
                     proc_macro2::Span::call_site(),
                 );
                 generic_idents.push(g.clone());
@@ -1749,6 +1753,26 @@ mod tests {
             mono.params.to_string(),
             "view : & T , label : impl :: wasm_bindgen :: JsStringLike"
         );
+    }
+
+    #[test]
+    fn dictionary_params_typed_array_generics_skip_names_in_scope() {
+        let (mut gctx, root) = test_ctx();
+        let scope = gctx.scopes.create_child(root);
+        gctx.scopes.insert_type_param(scope, "T".to_string());
+        gctx.scopes.insert_type_param(root, "V".to_string());
+        let cgctx = CodegenContext::empty(&gctx, root);
+        let params = [
+            concrete("a", TypeRef::ArrayBufferView, false),
+            concrete("b", TypeRef::ArrayBufferView, false),
+        ];
+        let rendered = generate_dictionary_params(
+            &params,
+            Some(&cgctx),
+            scope,
+            &crate::ir::ModuleContext::Global,
+        );
+        assert_eq!(rendered.params.to_string(), "a : & U , b : & W");
     }
 
     /// Create a GlobalContext + scope + CodegenContext for tests.

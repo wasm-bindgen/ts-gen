@@ -1508,7 +1508,9 @@ binding sites:
    `method<U>(…)` `U` lands here, behind any type-level params.
 3. **ABV widening synthetics** (`<Tn: TypedArray>`) emitted by
    `generate_dictionary_params` for `ArrayBufferView` arguments.
-   Always last.
+   Always last. They take the first of `T, U, V, …` not already bound
+   in scope, so `GenAbv<T>`'s setter is
+   `set_data<T: JsGeneric, U: TypedArray>(this: &GenAbv<T>, val: &U)`.
 
 `impl<T: …> Foo<T>` blocks (factories, builders) carry the type-level
 bounds on the `impl` header; methods inside the impl do **not**
