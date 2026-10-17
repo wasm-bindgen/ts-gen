@@ -976,9 +976,12 @@ pub struct TypeRegistry {
     /// scopes are different declarations, so a module's `interface C`
     /// doesn't change a global `interface C` + `var C` class merge.
     pub types: HashMap<(crate::parse::scope::ScopeId, String), TypeInfo>,
-    /// Body scope of each `declare module "x"` in the file. Repeated blocks
-    /// for one specifier share a scope, as TypeScript merges them.
+    /// The exports scope of each module the file has a `declare module "x"`
+    /// block of, shared with every other file's blocks of it.
     pub module_scopes: HashMap<String, crate::parse::scope::ScopeId>,
+    /// Each `declare module "x"` block's own scope, holding its imports and
+    /// locals, with its specifier, by the block's span start.
+    pub module_blocks: HashMap<u32, (String, crate::parse::scope::ScopeId)>,
     /// Member scope of each namespace declared outside the `declare module
     /// "x"` that assigns it with `export =`, → `"x"`. Such a namespace is
     /// the module, so it is populated into the module rather than as a

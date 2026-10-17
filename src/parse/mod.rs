@@ -195,7 +195,11 @@ fn parse_single_file(
     let mut diag = std::mem::take(&mut gctx.diagnostics);
     let registry = first_pass::collect_type_names(program, lib_name, &mut diag, gctx, file_scope);
     gctx.diagnostics = diag;
-    for (specifier, &scope) in &registry.module_scopes {
+    let blocks = registry
+        .module_blocks
+        .values()
+        .map(|(specifier, scope)| (specifier, scope));
+    for (specifier, &scope) in registry.module_scopes.iter().chain(blocks) {
         let scopes = gctx
             .ambient_module_scopes
             .entry(specifier.clone())
@@ -227,7 +231,11 @@ fn parse_single_file(
         .pending_imports
         .iter()
         .filter(|imp| {
-            imp.scope == file_scope || registry.module_scopes.values().any(|&s| s == imp.scope)
+            imp.scope == file_scope
+                || registry
+                    .module_blocks
+                    .values()
+                    .any(|&(_, s)| s == imp.scope)
         })
         .map(|imp| {
             format!(
@@ -268,7 +276,19 @@ fn parse_single_file(
     gctx.scopes = scopes;
     gctx.diagnostics = diag;
 
-    let merged = merge_declarations(declarations);
+    // A declaration a `declare module` block exports is in the module's
+    // exports, the others in the block's own scope.
+    let block_exports = &gctx.block_exports;
+    let scopes = &gctx.scopes;
+    let merged = merge_declarations(declarations, |decl| {
+        let exported = block_exports.get(&decl.scope_id).is_some_and(|names| {
+            binding_name(&decl.kind).is_some_and(|local| names.contains(&local))
+        });
+        match scopes.get(decl.scope_id).exports {
+            Some(exports) if exported => exports,
+            _ => decl.scope_id,
+        }
+    });
 
     let mut cx = InsertCtx {
         gctx,
@@ -354,7 +374,7 @@ impl InsertCtx<'_> {
                     .remove(&ns.child_scope)
                     .unwrap_or_default();
                 let mut ids = Vec::new();
-                for member in merge_declarations(member_decls) {
+                for member in merge_declarations(member_decls, |decl| decl.scope_id) {
                     let id = self.insert(member, false);
                     if !ids.contains(&id) {
                         ids.push(id);
@@ -379,13 +399,18 @@ impl InsertCtx<'_> {
         let global = (flat_scope.is_none() && decl_scope == file_scope)
             .then(|| self.gctx.scopes.get(file_scope).parent)
             .flatten();
+        // A declaration a `declare module` block exports is the module's,
+        // merging with every block's; any other is the block's own. So are
+        // the members an `export =` namespace of the module flattens into
+        // it, unless the namespace is a global one.
+        let module_export = top_level
+            && match self.gctx.block_exports.get(&decl_scope) {
+                Some(names) => binding_name(&decl.kind).is_some_and(|l| names.contains(&l)),
+                None => !self.assigned_namespaces.contains_key(&decl_scope),
+            };
         let block = match (global, flat_scope) {
             (Some(global), _) => global,
-            (None, Some(flat_scope))
-                if top_level && !self.assigned_namespaces.contains_key(&decl_scope) =>
-            {
-                flat_scope
-            }
+            (None, Some(flat_scope)) if module_export => flat_scope,
             _ => decl_scope,
         };
         let static_side = match &decl.kind {
@@ -448,7 +473,7 @@ impl InsertCtx<'_> {
         // upgrade for `NS.Member` to reach the populated declaration.
         if let Some(name) = name.as_ref().filter(|_| !yields(gctx, decl_scope)) {
             gctx.scopes.insert(decl_scope, name.clone(), type_id);
-            if let Some(flat_scope) = flat_scope.filter(|&s| s != decl_scope) {
+            if let Some(flat_scope) = flat_scope.filter(|&s| s != decl_scope && module_export) {
                 gctx.scopes.insert(flat_scope, name.clone(), type_id);
             }
         }
@@ -462,6 +487,9 @@ impl InsertCtx<'_> {
         }
         if let Some(local) = local {
             gctx.declare(block, &local, type_id);
+            if block != decl_scope && module_export {
+                gctx.declare(decl_scope, &local, type_id);
+            }
             if global.is_some() {
                 prefer_global_type(gctx, block, &local);
             }
@@ -512,7 +540,7 @@ impl InsertCtx<'_> {
             },
             _ => vec![base, incoming],
         };
-        let merged = merge_declarations(pair);
+        let merged = merge_declarations(pair, |_| ScopeId(0));
         match <[_; 1]>::try_from(merged) {
             Ok([merged]) => {
                 *self.gctx.get_type_mut(existing) = merged;
@@ -547,17 +575,17 @@ fn bind_import(
     }
     // An import names an export, which the module's export map binds to a
     // local name; they differ for `export { local as public }`.
-    let Some(name) = gctx.exports.local_name(target, &import.original_name) else {
+    let Some((name, bindings)) = gctx.exports.binding(target, &import.original_name) else {
         return false;
     };
     let name = &name.to_string();
     let (type_id, members) = if own_only {
-        let scope = gctx.scopes.get(target);
+        let scope = gctx.scopes.get(bindings);
         (scope.get(name), scope.namespace(name))
     } else {
         (
-            gctx.scopes.resolve(target, name),
-            gctx.scopes.resolve_namespace(target, name),
+            gctx.scopes.resolve(bindings, name),
+            gctx.scopes.resolve_namespace(bindings, name),
         )
     };
     if let Some(type_id) = type_id {
@@ -575,25 +603,37 @@ fn bind_import(
 /// body, a namespace body, or two files' declarations of one global) by
 /// name, as TypeScript merges the declarations of a symbol: an interface
 /// with a class, namespaces, and a function's overloads.
+///
+/// `container` gives the scope a declaration is bound in; only declarations
+/// in the same one merge.
 fn merge_declarations(
     declarations: Vec<crate::ir::TypeDeclaration>,
+    container: impl Fn(&crate::ir::TypeDeclaration) -> ScopeId + Copy,
 ) -> Vec<crate::ir::TypeDeclaration> {
-    merge_function_overloads(merge_namespaces(merge_class_pairs(declarations)))
+    merge_function_overloads(
+        merge_namespaces(merge_class_pairs(declarations, container)),
+        container,
+    )
 }
 
 /// Merge each function's declarations into its first, whose overloads the
 /// later ones become: TypeScript overloads are one JS function at runtime.
 fn merge_function_overloads(
     declarations: Vec<crate::ir::TypeDeclaration>,
+    container: impl Fn(&crate::ir::TypeDeclaration) -> ScopeId,
 ) -> Vec<crate::ir::TypeDeclaration> {
     use crate::ir::{FunctionOverload, ModuleContext, TypeKind};
 
-    let mut first: std::collections::HashMap<(String, ModuleContext), usize> =
+    let mut first: std::collections::HashMap<(String, ModuleContext, ScopeId), usize> =
         std::collections::HashMap::new();
     let mut result: Vec<crate::ir::TypeDeclaration> = Vec::new();
     for decl in declarations {
         if let TypeKind::Function(f) = &decl.kind {
-            let key = (f.js_name.clone(), decl.module_context.clone());
+            let key = (
+                f.js_name.clone(),
+                decl.module_context.clone(),
+                container(&decl),
+            );
             if let Some(&i) = first.get(&key) {
                 if let TypeKind::Function(base) = &mut result[i].kind {
                     base.overloads.push(FunctionOverload {
@@ -1024,17 +1064,17 @@ fn name_constructor_classes(
 ) {
     let mut named = std::collections::HashSet::new();
     for &(_, scope) in modules {
-        let mut entries: Vec<(String, String)> = gctx
+        let mut entries: Vec<(String, String, ScopeId)> = gctx
             .exports
-            .entries(scope)
-            .map(|(public, local)| (public.to_string(), local.to_string()))
+            .bindings(scope)
+            .map(|(public, local, bindings)| (public.to_string(), local.to_string(), bindings))
             .collect();
-        entries.sort_by_key(|(public, _)| public == "default");
-        for (public, local) in entries {
+        entries.sort_by_key(|(public, _, _)| public == "default");
+        for (public, local, bindings) in entries {
             if gctx.exports.local_name(scope, &local) == Some(local.as_str()) {
                 continue;
             }
-            for id in gctx.declarations(scope, &local).to_vec() {
+            for id in gctx.declarations(bindings, &local).to_vec() {
                 if !classes.contains(&id) || !named.insert(id) {
                     continue;
                 }
@@ -1166,11 +1206,12 @@ fn member_key(member: &crate::ir::Member) -> MemberKey {
 /// merge — they're distinct Rust types that happen to share a JS name.
 fn merge_class_pairs(
     declarations: Vec<crate::ir::TypeDeclaration>,
+    container: impl Fn(&crate::ir::TypeDeclaration) -> ScopeId,
 ) -> Vec<crate::ir::TypeDeclaration> {
     use crate::ir::{ModuleContext, TypeDeclaration, TypeKind};
     use std::collections::HashMap;
 
-    type Key = (String, ModuleContext);
+    type Key = (String, ModuleContext, ScopeId);
     let mut class_map: HashMap<Key, usize> = HashMap::new();
     let mut iface_map: HashMap<Key, usize> = HashMap::new();
     let mut result: Vec<TypeDeclaration> = Vec::new();
@@ -1178,7 +1219,11 @@ fn merge_class_pairs(
     for decl in declarations {
         match &decl.kind {
             TypeKind::Class(class_decl) => {
-                let key = (class_decl.name.clone(), decl.module_context.clone());
+                let key = (
+                    class_decl.name.clone(),
+                    decl.module_context.clone(),
+                    container(&decl),
+                );
 
                 // Merge into existing class
                 if let Some(&existing_idx) = class_map.get(&key) {
@@ -1217,7 +1262,11 @@ fn merge_class_pairs(
                 result.push(decl);
             }
             TypeKind::Interface(iface_decl) => {
-                let key = (iface_decl.name.clone(), decl.module_context.clone());
+                let key = (
+                    iface_decl.name.clone(),
+                    decl.module_context.clone(),
+                    container(&decl),
+                );
 
                 // Merge into existing class
                 if let Some(&class_idx) = class_map.get(&key) {
@@ -1385,7 +1434,7 @@ mod tests {
             TypeKind::Interface(iface("Widget", vec![method("bar")])),
             ModuleContext::Global,
         );
-        let merged = merge_class_pairs(vec![a, b]);
+        let merged = merge_class_pairs(vec![a, b], |d| d.scope_id);
         assert_eq!(merged.len(), 1);
         let TypeKind::Interface(merged_iface) = &merged[0].kind else {
             panic!("expected merged interface");
@@ -1409,7 +1458,7 @@ mod tests {
             )),
             ModuleContext::Global,
         );
-        let merged = merge_class_pairs(vec![iface_decl, class_decl]);
+        let merged = merge_class_pairs(vec![iface_decl, class_decl], |d| d.scope_id);
         assert_eq!(merged.len(), 1);
         let TypeKind::Class(merged_class) = &merged[0].kind else {
             panic!("expected merged class");
@@ -1440,7 +1489,7 @@ mod tests {
             module("cloudflare:email"),
         );
 
-        let merged = merge_class_pairs(vec![global_iface, module_class]);
+        let merged = merge_class_pairs(vec![global_iface, module_class], |d| d.scope_id);
         assert_eq!(
             merged.len(),
             2,
@@ -1465,7 +1514,7 @@ mod tests {
             TypeKind::Class(class("Foo", vec![method("b")], ModuleContext::Global)),
             ModuleContext::Global,
         );
-        let merged = merge_class_pairs(vec![a, b]);
+        let merged = merge_class_pairs(vec![a, b], |d| d.scope_id);
         assert_eq!(merged.len(), 1);
         let TypeKind::Class(c) = &merged[0].kind else {
             panic!("expected merged class");
@@ -1715,8 +1764,10 @@ mod tests {
         let (module, gctx) = crate::parse_source(src, None).unwrap();
 
         // Each block declares its own `_open`, once; `a` exports it twice.
+        // A module's scopes are its exports, then each block's own.
         let file_scope = module.file_scopes[0];
         let a_scope = gctx.ambient_module_scopes["a"][0];
+        let a_block = gctx.ambient_module_scopes["a"][1];
         let b_scope = gctx.ambient_module_scopes["b"][0];
         let declared = |scope| {
             let ids = gctx.declarations(scope, "_open");
@@ -1724,12 +1775,14 @@ mod tests {
             gctx.get_type(ids[0]).module_context.clone()
         };
         assert_eq!(declared(module.global_scope), ModuleContext::Global);
-        assert_eq!(declared(a_scope), ModuleContext::Module("a".into()));
+        assert_eq!(declared(a_block), ModuleContext::Module("a".into()));
         assert_eq!(declared(b_scope), ModuleContext::Module("b".into()));
         let exports: Vec<_> = gctx.exports.entries(a_scope).collect();
         assert_eq!(exports, [("open", "_open"), ("start", "_open")]);
 
-        assert!(gctx.scopes.resolve(a_scope, "Private").is_some());
+        // A block's unexported declaration is its own, not the module's.
+        assert!(gctx.scopes.resolve(a_block, "Private").is_some());
+        assert!(gctx.scopes.resolve(a_scope, "Private").is_none());
         assert!(gctx.scopes.resolve(file_scope, "Private").is_none());
     }
 
@@ -1876,7 +1929,8 @@ mod tests {
 
         let dep = gctx.ambient_module_scopes["dep"][0];
         let bare = gctx.ambient_module_scopes["bare"][0];
-        let main = gctx.ambient_module_scopes["main"][0];
+        // Imports are the block's own.
+        let main = gctx.ambient_module_scopes["main"][1];
         // `export { … }` / `export default` decide the block's exports.
         assert_eq!(gctx.exports.local_name(dep, "Foo"), Some("_Foo"));
         assert_eq!(gctx.exports.local_name(dep, "default"), Some("Def"));
@@ -1957,7 +2011,7 @@ mod tests {
             .iter()
             .any(|&id| matches!(gctx.get_type(id).kind, TypeKind::Namespace(_))));
 
-        let user = gctx.ambient_module_scopes["user"][0];
+        let user = gctx.ambient_module_scopes["user"][1];
         let entry = gctx
             .resolve_path(user, "Entry")
             .map(|id| &gctx.get_type(id).kind);
@@ -2189,7 +2243,7 @@ mod tests {
         std::fs::remove_dir_all(&dir).unwrap();
         let (_, gctx) = result.unwrap();
 
-        let b_scope = gctx.ambient_module_scopes["b"][0];
+        let b_scope = gctx.ambient_module_scopes["b"][1];
         let kind = |path: &str| {
             gctx.resolve_path(b_scope, path)
                 .map(|id| &gctx.get_type(id).kind)
@@ -2214,7 +2268,7 @@ mod tests {
             TypeKind::Interface(iface("Connection", vec![method("b")])),
             module("module:bar"),
         );
-        let merged = merge_class_pairs(vec![a, b]);
+        let merged = merge_class_pairs(vec![a, b], |d| d.scope_id);
         assert_eq!(merged.len(), 2);
     }
 

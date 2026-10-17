@@ -137,6 +137,24 @@ pub fn block_declared_names(stmts: &[ast::Statement<'_>]) -> Vec<String> {
     names
 }
 
+/// The names a `declare module` block declares as exports of the module:
+/// every declaration of a block without an export declaration, else those
+/// with an `export` modifier. TypeScript's binder puts these in the module
+/// symbol's exports, which every block of the module shares, and the rest
+/// of the block's declarations, with its imports, in the block's locals.
+pub fn block_module_exports(stmts: &[ast::Statement<'_>]) -> Vec<String> {
+    if !block_exports_explicitly(stmts) {
+        return block_implicit_exports(stmts);
+    }
+    let mut names = Vec::new();
+    for stmt in stmts {
+        if let ast::Statement::ExportDeclaration(export) = stmt {
+            declaration_names(&export.declaration, &mut names);
+        }
+    }
+    names
+}
+
 /// The names a block exports when it doesn't decide its exports explicitly:
 /// its own declarations, except that an `export default` declaration's
 /// local name is exported only as `default`.

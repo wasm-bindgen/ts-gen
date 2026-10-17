@@ -48,10 +48,6 @@ struct CollectCtx<'a> {
     /// collected so `Y` can be checked against `constructor_shaped`
     /// regardless of declaration order.
     named_ctor_vars: Vec<(String, String, ir::ModuleContext, ScopeId, bool)>,
-    /// Specifiers of the `declare module` blocks with an export declaration
-    /// (`export { … }`, `export =`, …), whose other declarations are locals
-    /// of the block rather than exports of the module.
-    local_modules: std::collections::HashSet<String>,
 }
 
 /// Walk the AST and collect all type names into the registry and scope arena.
@@ -80,21 +76,6 @@ pub fn collect_type_names(
         constructor_shaped: Default::default(),
         ctor_vars: Default::default(),
         named_ctor_vars: Vec::new(),
-        local_modules: program
-            .body
-            .iter()
-            .filter_map(|stmt| match stmt {
-                ast::Statement::TSExternalModuleDeclaration(module) => Some(module),
-                _ => None,
-            })
-            .filter(|module| {
-                module
-                    .body
-                    .as_ref()
-                    .is_some_and(|block| super::block_exports_explicitly(&block.body))
-            })
-            .map(|module| module.id.value.to_string())
-            .collect(),
     };
 
     ccx.collect_block(&program.body, &file_ctx, root_scope, false);
@@ -127,6 +108,14 @@ pub fn collect_type_names(
         }
     }
 
+    // Every block's exports, its `export default` too, are the module's,
+    // each resolving in its own block.
+    let blocks: Vec<ScopeId> = ccx.registry.module_blocks.values().map(|b| b.1).collect();
+    for block_scope in blocks {
+        if let Some(exports) = ccx.gctx.scopes.get(block_scope).exports {
+            ccx.gctx.exports.move_into(block_scope, exports);
+        }
+    }
     registry.globals = ccx.globals;
     registry
 }
@@ -564,33 +553,38 @@ impl<'a> CollectCtx<'a> {
     ) {
         let specifier = module.id.value.as_str();
         let module_ctx = ir::ModuleContext::Module(specifier.into());
-        // As in TypeScript, an ambient module's exports merge across files,
-        // so a script's blocks whose declarations are all exports share one
-        // scope, under the globals they resolve against. A block with locals
-        // and a module augmentation, which sees its file's imports, keep
-        // their own.
-        let shared = (self.is_script && !self.local_modules.contains(specifier))
-            .then(|| self.gctx.scopes.get(scope).parent)
-            .flatten();
-        let module_scope = match self.registry.module_scopes.get(specifier) {
-            Some(&module_scope) => module_scope,
-            None => {
-                let module_scope = match shared {
-                    Some(global) => *self
-                        .gctx
-                        .ambient_modules
-                        .entry(specifier.to_string())
-                        .or_insert_with(|| self.gctx.scopes.create_child(global)),
-                    None => self.gctx.scopes.create_child(scope),
-                };
-                self.registry
-                    .module_scopes
-                    .insert(specifier.to_string(), module_scope);
-                module_scope
-            }
-        };
+        // As in TypeScript's binder, what a block exports goes in the
+        // module's exports, one table for every block of the module in any
+        // file or augmentation, and its imports and other declarations in
+        // the block's own locals, which see the module's exports.
+        let global = self
+            .gctx
+            .scopes
+            .get(self.file_scope)
+            .parent
+            .unwrap_or(self.file_scope);
+        let exports = *self
+            .gctx
+            .ambient_modules
+            .entry(specifier.to_string())
+            .or_insert_with(|| self.gctx.scopes.create_child(global));
+        let block_scope = self.gctx.scopes.create_child(scope);
+        self.gctx.scopes.get_mut(block_scope).exports = Some(exports);
+        self.registry
+            .module_scopes
+            .insert(specifier.to_string(), exports);
+        self.registry
+            .module_blocks
+            .insert(module.span.start, (specifier.to_string(), block_scope));
         if let Some(block) = &module.body {
-            self.collect_block(&block.body, &module_ctx, module_scope, false);
+            let exported: std::collections::HashSet<String> =
+                super::block_module_exports(&block.body)
+                    .into_iter()
+                    .collect();
+            self.gctx
+                .block_exports
+                .insert(block_scope, exported.clone());
+            self.collect_block(&block.body, &module_ctx, block_scope, false);
         }
     }
 
@@ -643,32 +637,19 @@ impl<'a> CollectCtx<'a> {
     /// Phase 2 populates one file at a time, so only a namespace this file
     /// declares first can be: an earlier file's is already populated as a
     /// global.
-    /// The scope enclosing `scope` in this file. A `declare module` block is
-    /// in its file, though a script's shares its scope with other files'.
-    fn lexical_parent(&self, scope: ScopeId) -> Option<ScopeId> {
-        if self.registry.module_scopes.values().any(|&s| s == scope) {
-            Some(self.file_scope)
-        } else {
-            self.gctx.scopes.get(scope).parent
-        }
-    }
-
-    /// The scope `name` is declared in, seen from `scope` in this file.
+    /// The scope `name` is declared in, seen from `scope`.
     fn declaring_scope(&self, scope: ScopeId, name: &str) -> Option<ScopeId> {
-        let mut at = Some(scope);
-        while let Some(id) = at {
-            if self.gctx.scopes.get(id).get(name).is_some() {
-                return Some(id);
-            }
-            at = self.lexical_parent(id);
-        }
-        None
+        self.gctx
+            .scopes
+            .chain(scope)
+            .into_iter()
+            .find(|&id| self.gctx.scopes.get(id).get(name).is_some())
     }
 
     fn assign_namespace(&mut self, scope: ScopeId, specifier: &str, name: &str) {
-        let mut at = Some(scope);
+        let mut chain = self.gctx.scopes.chain(scope).into_iter();
         let (found_in, ns_scope) = loop {
-            let Some(id) = at else { return };
+            let Some(id) = chain.next() else { return };
             let s = self.gctx.scopes.get(id);
             let binding = s.get(name);
             if let Some(ns) = s.namespace(name) {
@@ -689,7 +670,6 @@ impl<'a> CollectCtx<'a> {
             if binding.is_some() {
                 return;
             }
-            at = self.lexical_parent(id);
         };
         if let Some(other) = self.gctx.assigned_namespaces.get(&ns_scope) {
             self.diag.warn(format!(
@@ -756,11 +736,28 @@ impl<'a> CollectCtx<'a> {
             .then(|| self.gctx.scopes.get(scope).parent)
             .flatten()
             .and_then(|global| self.gctx.scopes.get(global).namespace(&name));
+        // Likewise a namespace a `declare module` block exports merges with
+        // the module's other blocks' one.
+        let module_exports = self.gctx.scopes.get(scope).exports.filter(|_| {
+            self.gctx
+                .block_exports
+                .get(&scope)
+                .is_some_and(|names| names.contains(&name))
+        });
         let ns_scope = match self.gctx.scopes.get(scope).namespace(&name) {
             Some(ns_scope) => ns_scope,
             None => {
+                let earlier = global.or_else(|| {
+                    module_exports
+                        .and_then(|exports| self.gctx.scopes.get(exports).namespace(&name))
+                });
                 let ns_scope =
-                    self.create_namespace_scope(&name, parent_ctx, scope, exported, global);
+                    self.create_namespace_scope(&name, parent_ctx, scope, exported, earlier);
+                if let Some(exports) = module_exports {
+                    self.gctx
+                        .scopes
+                        .insert_namespace(exports, name.clone(), ns_scope);
+                }
                 // Reopening a global namespace an earlier file assigned to
                 // a module, whose declarations are the module's too.
                 let assigned = global

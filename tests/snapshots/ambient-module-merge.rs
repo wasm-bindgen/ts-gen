@@ -20,12 +20,17 @@ pub mod ovi {
         pub fn b(this: &I) -> f64;
         #[wasm_bindgen(method, setter)]
         pub fn set_b(this: &I, val: f64);
+        #[wasm_bindgen(method, getter)]
+        pub fn c(this: &I) -> f64;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_c(this: &I, val: f64);
     }
     impl I {
-        pub fn new(a: f64, b: f64) -> I {
+        pub fn new(a: f64, b: f64, c: f64) -> I {
             let inner: I = JsCast::unchecked_into(js_sys::Object::new());
             inner.set_a(a);
             inner.set_b(b);
+            inner.set_c(c);
             inner
         }
     }
@@ -47,6 +52,16 @@ pub mod ovi {
     extern "C" {
         #[wasm_bindgen(catch, js_name = "k")]
         pub fn try_k_with_f64(x: f64) -> Result<(), JsValue>;
+    }
+    #[wasm_bindgen(module = "ovi")]
+    extern "C" {
+        #[wasm_bindgen(js_name = "k")]
+        pub fn k_with_bool(x: bool);
+    }
+    #[wasm_bindgen(module = "ovi")]
+    extern "C" {
+        #[wasm_bindgen(catch, js_name = "k")]
+        pub fn try_k_with_bool(x: bool) -> Result<(), JsValue>;
     }
     pub mod ns {
         #[allow(unused_imports)]
@@ -90,6 +105,28 @@ pub mod loc {
             pub fn try_f() -> Result<(), JsValue>;
         }
     }
+    #[wasm_bindgen(module = "loc")]
+    extern "C" {
+        # [wasm_bindgen (extends = Object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type E;
+        #[wasm_bindgen(method, getter)]
+        pub fn a(this: &E) -> f64;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_a(this: &E, val: f64);
+        #[wasm_bindgen(method, getter)]
+        pub fn b(this: &E) -> f64;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_b(this: &E, val: f64);
+    }
+    impl E {
+        pub fn new(a: f64, b: f64) -> E {
+            let inner: E = JsCast::unchecked_into(js_sys::Object::new());
+            inner.set_a(a);
+            inner.set_b(b);
+            inner
+        }
+    }
     pub mod n {
         #[allow(unused_imports)]
         use super::*;
@@ -103,6 +140,70 @@ pub mod loc {
             #[wasm_bindgen(catch, js_name = "g", js_namespace = "N")]
             pub fn try_g() -> Result<(), JsValue>;
         }
+    }
+}
+pub mod ia {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen(module = "ia")]
+    extern "C" {
+        # [wasm_bindgen (extends = Object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type T;
+        #[wasm_bindgen(method, getter)]
+        pub fn a(this: &T) -> f64;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_a(this: &T, val: f64);
+    }
+    impl T {
+        pub fn new(a: f64) -> T {
+            let inner: T = JsCast::unchecked_into(js_sys::Object::new());
+            inner.set_a(a);
+            inner
+        }
+    }
+}
+pub mod ic {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen(module = "ic")]
+    extern "C" {
+        # [wasm_bindgen (extends = Object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type T;
+        #[wasm_bindgen(method, getter)]
+        pub fn c(this: &T) -> f64;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_c(this: &T, val: f64);
+    }
+    impl T {
+        pub fn new(c: f64) -> T {
+            let inner: T = JsCast::unchecked_into(js_sys::Object::new());
+            inner.set_c(c);
+            inner
+        }
+    }
+}
+pub mod ib {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen(module = "ib")]
+    extern "C" {
+        pub fn fa(t: &super::ia::T);
+    }
+    #[wasm_bindgen(module = "ib")]
+    extern "C" {
+        #[wasm_bindgen(catch, js_name = "fa")]
+        pub fn try_fa(t: &super::ia::T) -> Result<(), JsValue>;
+    }
+    #[wasm_bindgen(module = "ib")]
+    extern "C" {
+        pub fn fb(t: &super::ic::T);
+    }
+    #[wasm_bindgen(module = "ib")]
+    extern "C" {
+        #[wasm_bindgen(catch, js_name = "fb")]
+        pub fn try_fb(t: &super::ic::T) -> Result<(), JsValue>;
     }
 }
 pub mod dflt {

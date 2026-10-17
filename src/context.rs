@@ -61,13 +61,17 @@ pub struct GlobalContext {
     /// emission; treating them as "unresolved" would alias them to
     /// `JsValue` even though `js_sys` already provides them.
     pub builtin_type_ids: std::collections::HashSet<TypeId>,
-    /// Body scopes of every `declare module "x"`, by specifier: the one
-    /// every script file's block shares, and one per module augmentation.
+    /// Scopes of every `declare module "x"`, by specifier: the module's
+    /// exports scope and each block's own.
     pub ambient_module_scopes: std::collections::HashMap<String, Vec<ScopeId>>,
-    /// The body scope every script file's `declare module "x"` block shares,
-    /// by specifier. As in TypeScript, an ambient module is one global
-    /// symbol whose declarations merge across files.
+    /// The exports scope of each ambient module, by specifier. As in
+    /// TypeScript, an ambient module is one global symbol: what each of its
+    /// `declare module "x"` blocks exports, in any file and in a module
+    /// augmentation, merges here, while each block keeps its own locals.
     pub(crate) ambient_modules: std::collections::HashMap<String, ScopeId>,
+    /// The names each `declare module` block, by its scope, declares as
+    /// exports of the module (see `block_module_exports`).
+    pub(crate) block_exports: std::collections::HashMap<ScopeId, std::collections::HashSet<String>>,
     /// Member scope of each global namespace a module assigns with
     /// `export =`, → the module's specifier. A file reopening the namespace
     /// populates it into the module too.
@@ -100,11 +104,14 @@ pub struct GlobalContext {
 /// surface: a block exports every declaration unless it decides its
 /// exports explicitly (see `parse::first_pass::block_exports_explicitly`).
 ///
-/// Each entry maps a public name to the local name it is bound to in the
-/// scope; the two differ for `export { local as public }`.
+/// Each entry maps a public name to the local name it is bound to, and the
+/// scope binding it: the exporting scope's own, except for an ambient
+/// module's exports, where each export resolves in the block declaring it,
+/// as a TypeScript export specifier resolves in its block's locals. The
+/// names differ for `export { local as public }`.
 #[derive(Clone, Debug, Default)]
 pub struct ModuleExports {
-    by_scope: std::collections::HashMap<ScopeId, indexmap::IndexMap<String, String>>,
+    by_scope: std::collections::HashMap<ScopeId, indexmap::IndexMap<String, (String, ScopeId)>>,
 }
 
 impl ModuleExports {
@@ -113,7 +120,16 @@ impl ModuleExports {
         self.by_scope
             .entry(scope)
             .or_default()
-            .insert(public.into(), local.into());
+            .insert(public.into(), (local.into(), scope));
+    }
+
+    /// Make every export of the block scope `block` an export of `scope`,
+    /// still bound in the scope it was.
+    pub fn move_into(&mut self, block: ScopeId, scope: ScopeId) {
+        let Some(entries) = self.by_scope.remove(&block) else {
+            return;
+        };
+        self.by_scope.entry(scope).or_default().extend(entries);
     }
 
     /// Drop the export `public` of `scope`.
@@ -136,16 +152,30 @@ impl ModuleExports {
 
     /// The local name `scope` binds its export `public` to.
     pub fn local_name(&self, scope: ScopeId, public: &str) -> Option<&str> {
-        self.by_scope.get(&scope)?.get(public).map(String::as_str)
+        self.binding(scope, public).map(|(local, _)| local)
+    }
+
+    /// The local name the export `public` of `scope` is bound to, and the
+    /// scope binding it.
+    pub fn binding(&self, scope: ScopeId, public: &str) -> Option<(&str, ScopeId)> {
+        let (local, bindings) = self.by_scope.get(&scope)?.get(public)?;
+        Some((local.as_str(), *bindings))
     }
 
     /// Every export of `scope` as `(public, local)`, in declaration order.
     pub fn entries(&self, scope: ScopeId) -> impl Iterator<Item = (&str, &str)> {
+        self.bindings(scope)
+            .map(|(public, local, _)| (public, local))
+    }
+
+    /// Every export of `scope` as `(public, local, the scope binding it)`,
+    /// in declaration order.
+    pub fn bindings(&self, scope: ScopeId) -> impl Iterator<Item = (&str, &str, ScopeId)> {
         self.by_scope
             .get(&scope)
             .into_iter()
             .flatten()
-            .map(|(public, local)| (public.as_str(), local.as_str()))
+            .map(|(public, (local, bindings))| (public.as_str(), local.as_str(), *bindings))
     }
 }
 
@@ -159,6 +189,7 @@ impl GlobalContext {
             builtin_type_ids: std::collections::HashSet::new(),
             ambient_module_scopes: std::collections::HashMap::new(),
             ambient_modules: std::collections::HashMap::new(),
+            block_exports: std::collections::HashMap::new(),
             assigned_namespaces: std::collections::HashMap::new(),
             exports: ModuleExports::default(),
             declarations: std::collections::HashMap::new(),
@@ -281,18 +312,11 @@ impl GlobalContext {
         let mut namespaces = namespaces.split('.');
         let first = self.scopes.resolve_namespace(scope, namespaces.next()?)?;
         let members = namespaces.try_fold(first, |ns, name| {
-            self.scopes.get(ns).namespace(self.member_name(ns, name)?)
+            let (local, bindings) = self.exports.binding(ns, name)?;
+            self.scopes.get(bindings).namespace(local)
         })?;
-        self.scopes
-            .get(members)
-            .get(self.member_name(members, member)?)
-    }
-
-    /// The local name a member `public` of the block scope `ns` is bound
-    /// to: `A.Foo` through `import * as A`, or `NS.Foo`, names the export
-    /// `Foo` of that block.
-    fn member_name<'n>(&'n self, ns: ScopeId, public: &'n str) -> Option<&'n str> {
-        self.exports.local_name(ns, public)
+        let (local, bindings) = self.exports.binding(members, member)?;
+        self.scopes.get(bindings).get(local)
     }
 
     /// Record that `type_id` is a declaration of `scope` binding `name`.

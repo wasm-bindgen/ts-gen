@@ -154,15 +154,20 @@ impl<'d> Builder<'_, 'd> {
     /// alias the export declares.
     fn root(&mut self, root: Root) {
         let gctx = self.gctx;
-        let mut entries: Vec<_> = gctx.exports.entries(root.exports).collect();
+        let mut entries: Vec<_> = gctx.exports.bindings(root.exports).collect();
         // A default export takes the local's Rust name only when no named
         // export of the same declaration does.
-        entries.sort_by_key(|&(public, _)| public == "default");
-        for (public, local) in entries {
-            let ids = gctx.declarations(root.bindings, local);
+        entries.sort_by_key(|&(public, _, _)| public == "default");
+        for (public, local, bindings) in entries {
+            let bindings = if bindings == root.exports {
+                root.bindings
+            } else {
+                bindings
+            };
+            let ids = gctx.declarations(bindings, local);
             if ids.is_empty() {
                 let target = TypeRef::ident(local.to_string());
-                for &id in gctx.declarations(root.bindings, public) {
+                for &id in gctx.declarations(bindings, public) {
                     if matches!(&gctx.get_type(id).kind, TypeKind::TypeAlias(a) if a.target == target)
                     {
                         self.export(id, public, public);
@@ -367,8 +372,13 @@ impl<'d> Builder<'_, 'd> {
             if parent.is_some() || context.specifier().is_some() {
                 let mut names: Vec<String> = Vec::new();
                 for root in roots {
-                    for (public, local) in gctx.exports.entries(root.exports) {
-                        if gctx.declarations(root.bindings, local).contains(&id)
+                    for (public, local, bindings) in gctx.exports.bindings(root.exports) {
+                        let bindings = if bindings == root.exports {
+                            root.bindings
+                        } else {
+                            bindings
+                        };
+                        if gctx.declarations(bindings, local).contains(&id)
                             && !names.iter().any(|n| n == public)
                         {
                             names.push(public.to_string());

@@ -64,6 +64,10 @@ pub enum Binding {
 pub struct TypeScope {
     /// Optional parent scope — resolution walks up the chain.
     pub parent: Option<ScopeId>,
+    /// For a `declare module` block, the module's exports, shared by every
+    /// block of the module, which a name resolves in after the block's own
+    /// locals and before its parent, as in TypeScript.
+    pub exports: Option<ScopeId>,
     /// Types defined or imported in this scope: name → binding.
     names: HashMap<String, Binding>,
     /// Namespaces declared in this scope: name → member scope. Kept apart
@@ -76,6 +80,7 @@ impl TypeScope {
     fn new(parent: Option<ScopeId>) -> Self {
         Self {
             parent,
+            exports: None,
             names: HashMap::new(),
             namespaces: HashMap::new(),
         }
@@ -190,7 +195,21 @@ impl ScopeArena {
     pub fn resolve_namespace(&self, scope: ScopeId, name: &str) -> Option<ScopeId> {
         let s = self.get(scope);
         s.namespace(name)
+            .or_else(|| s.exports.and_then(|e| self.get(e).namespace(name)))
             .or_else(|| s.parent.and_then(|p| self.resolve_namespace(p, name)))
+    }
+
+    /// The scopes a name used in `scope` resolves through, innermost first.
+    pub fn chain(&self, scope: ScopeId) -> Vec<ScopeId> {
+        let mut chain = Vec::new();
+        let mut at = Some(scope);
+        while let Some(id) = at {
+            chain.push(id);
+            let s = self.get(id);
+            chain.extend(s.exports);
+            at = s.parent;
+        }
+        chain
     }
 
     /// Resolve a simple name to a declared `TypeId` by walking up the
@@ -212,6 +231,9 @@ impl ScopeArena {
     pub fn resolve_binding(&self, scope: ScopeId, name: &str) -> Option<Binding> {
         let s = self.get(scope);
         if let Some(b) = s.get_binding(name) {
+            return Some(b);
+        }
+        if let Some(b) = s.exports.and_then(|e| self.get(e).get_binding(name)) {
             return Some(b);
         }
         if let Some(parent) = s.parent {

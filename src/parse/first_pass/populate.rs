@@ -836,11 +836,12 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
     ) {
         let specifier = module.id.value.as_str();
         let module_ctx = ir::ModuleContext::Module(specifier.into());
-        let module_scope = *self
+        let module_scope = self
             .registry
-            .module_scopes
-            .get(specifier)
-            .expect("phase 1 creates a scope for every ambient module");
+            .module_blocks
+            .get(&module.span.start)
+            .expect("phase 1 creates a scope for every ambient module block")
+            .1;
         if let Some(block) = &module.body {
             let outer = std::mem::replace(
                 &mut self.export_assignment,

@@ -12,6 +12,14 @@ declare module "loc" {
   namespace N {
     function g(): void;
   }
+  interface E {
+    b: number;
+  }
+}
+
+declare module "ib" {
+  import { T } from "ic";
+  export function fb(t: T): void;
 }
 
 declare module "dflt" {
