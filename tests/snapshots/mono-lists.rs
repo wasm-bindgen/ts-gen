@@ -8,56 +8,44 @@ use wasm_bindgen::prelude::*;
 pub type Tag = JsString;
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
-    pub fn tags(
-        values: &[impl ::wasm_bindgen::JsStringLike + ::wasm_bindgen::convert::VectorRefIntoWasmAbi],
-    ) -> String;
+    pub fn tags(values: &[impl ::wasm_bindgen::JsStringLike]) -> String;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "tags")]
-    pub fn tags_js_string(
-        values: &[impl ::wasm_bindgen::JsStringLike + ::wasm_bindgen::convert::VectorRefIntoWasmAbi],
-    ) -> JsString;
+    pub fn tags_js_string(values: &[impl ::wasm_bindgen::JsStringLike]) -> JsString;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "tags")]
-    pub fn try_tags(
-        values: &[impl ::wasm_bindgen::JsStringLike + ::wasm_bindgen::convert::VectorRefIntoWasmAbi],
-    ) -> Result<String, JsValue>;
+    pub fn try_tags(values: &[impl ::wasm_bindgen::JsStringLike]) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "tags")]
     pub fn try_tags_js_string(
-        values: &[impl ::wasm_bindgen::JsStringLike + ::wasm_bindgen::convert::VectorRefIntoWasmAbi],
+        values: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
-    pub fn tagged(
-        values: &[impl ::wasm_bindgen::JsStringLike + ::wasm_bindgen::convert::VectorRefIntoWasmAbi],
-    ) -> String;
+    pub fn tagged(values: &[impl ::wasm_bindgen::JsStringLike]) -> String;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "tagged")]
-    pub fn tagged_js_string(
-        values: &[impl ::wasm_bindgen::JsStringLike + ::wasm_bindgen::convert::VectorRefIntoWasmAbi],
-    ) -> JsString;
+    pub fn tagged_js_string(values: &[impl ::wasm_bindgen::JsStringLike]) -> JsString;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "tagged")]
-    pub fn try_tagged(
-        values: &[impl ::wasm_bindgen::JsStringLike + ::wasm_bindgen::convert::VectorRefIntoWasmAbi],
-    ) -> Result<String, JsValue>;
+    pub fn try_tagged(values: &[impl ::wasm_bindgen::JsStringLike]) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "tagged")]
     pub fn try_tagged_js_string(
-        values: &[impl ::wasm_bindgen::JsStringLike + ::wasm_bindgen::convert::VectorRefIntoWasmAbi],
+        values: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
@@ -209,10 +197,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "values")]
     pub fn values_js_string(this: &Labels) -> Array<JsString>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_values(
-        this: &Labels,
-        val: &[impl ::wasm_bindgen::JsStringLike + ::wasm_bindgen::convert::VectorRefIntoWasmAbi],
-    );
+    pub fn set_values(this: &Labels, val: &[impl ::wasm_bindgen::JsStringLike]);
     #[wasm_bindgen(method, getter)]
     pub fn flags(this: &Labels) -> Vec<bool>;
     #[wasm_bindgen(method, setter)]
@@ -228,10 +213,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "values")]
     pub fn values_js_string(this: &LabelOptions) -> Option<Array<JsString>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_values(
-        this: &LabelOptions,
-        val: &[impl ::wasm_bindgen::JsStringLike + ::wasm_bindgen::convert::VectorRefIntoWasmAbi],
-    );
+    pub fn set_values(this: &LabelOptions, val: &[impl ::wasm_bindgen::JsStringLike]);
     #[wasm_bindgen(method, getter)]
     pub fn flags(this: &LabelOptions) -> Option<Vec<bool>>;
     #[wasm_bindgen(method, setter)]
@@ -251,10 +233,7 @@ pub struct LabelOptionsBuilder {
     inner: LabelOptions,
 }
 impl LabelOptionsBuilder {
-    pub fn values(
-        self,
-        val: &[impl ::wasm_bindgen::JsStringLike + ::wasm_bindgen::convert::VectorRefIntoWasmAbi],
-    ) -> Self {
+    pub fn values(self, val: &[impl ::wasm_bindgen::JsStringLike]) -> Self {
         self.inner.set_values(val);
         self
     }

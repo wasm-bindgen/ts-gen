@@ -123,7 +123,7 @@ fn test_console_table() {
     console.table();
 
     // With data
-    console.table_with_tabular_data(&JsValue::from(js_sys::Array::new()));
+    console.table_with_tabular_data(&JsValue::from(js_sys::Array::<JsValue>::new()));
 }
 
 // Note: profile(), profileEnd(), and timeStamp() are inspector-only APIs

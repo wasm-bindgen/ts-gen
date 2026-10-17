@@ -2064,14 +2064,15 @@ top-level union becomes a [dynamic-union enum](#erased-return-position-unions-be
 String lists follow the same split between Rust strings and JS handles, at
 the level of the list. A list argument that would be `&[String]` accepts any
 string element shape, which wasm-bindgen lowers per instantiation (`&[String]`,
-`&[&str]` or `&[JsString]`). The element also states `VectorRefIntoWasmAbi`,
-since not every `JsStringLike` shape has a slice ABI, which lets Rust-side
-callers such as dictionary builders forward it. `ArrayLike<string>` accepts
-the handle of the same elements. A string list return gets a `_js_string`
-variant returning the list as one handle rather than decoding every element:
+`&[&str]` or `&[JsString]`). As with `Option<impl JsStringLike>` and `None`,
+an empty list needs its type (`&[] as &[&str]`). `ArrayLike<string>` accepts
+the handle of the same elements, which under `js_sys_unstable_apis` can hold
+Rust strings (`Array<String>`) as well as `Array<JsString>`. A string list
+return gets a `_js_string` variant returning the list as one handle rather
+than decoding every element:
 
 ```rust
-pub fn set_tags(tags: &[impl ::wasm_bindgen::JsStringLike + ::wasm_bindgen::convert::VectorRefIntoWasmAbi]);
+pub fn set_tags(tags: &[impl ::wasm_bindgen::JsStringLike]);
 pub fn set_tags_like(tags: &Array<impl ::wasm_bindgen::JsStringLike>);
 pub fn get_tags() -> Vec<String>;
 #[wasm_bindgen(js_name = "getTags")]

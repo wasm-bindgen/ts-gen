@@ -17,10 +17,11 @@ pub fn add(a: f64, b: f64) -> f64 {
 
 /// Types from js_sys in a provider signature.
 pub fn sum(values: Object<Number>) -> f64 {
-    js_sys::Object::values(&values)
-        .iter()
-        .map(|v| v.as_f64().unwrap_or(0.0))
-        .sum()
+    #[cfg(js_sys_unstable_apis)]
+    let values = Object::values(&values).unwrap();
+    #[cfg(not(js_sys_unstable_apis))]
+    let values = Object::values(&values);
+    values.iter().map(|v| v.value_of()).sum()
 }
 
 pub fn describe_symbol(s: Symbol) -> String {

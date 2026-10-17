@@ -19,17 +19,18 @@ wasm-bindgen = "0.2.128"
 wasm-bindgen-futures = "0.4.78"
 wasm-bindgen-test = "0.3.78"
 
-# Temporarily track wasm-bindgen/wasm-bindgen#5384 (`slice = view | array |
-# copy` import argument modes, element-wise borrowed slices) on top of main,
-# which includes #5383 (unbounded `PartialEq`/`Eq` on imported types), #5381,
-# #5376, #5377 and #5341, until these ship in a release. All four crates must
-# come from the same source.
+# Temporarily track wasm-bindgen/wasm-bindgen#5390 (real-generic js-sys
+# element types under `js_sys_unstable_apis`), stacked on #5384 (`slice = view
+# | array | copy` import argument modes, element-wise borrowed slices) on top
+# of main, which includes #5383 (unbounded `PartialEq`/`Eq` on imported types),
+# #5381, #5376, #5377 and #5341, until these ship in a release. All four crates
+# must come from the same source.
 [patch.crates-io]
-js-sys = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "3e5692ea94f22cd76377a4e219947593279ec6e7" }
-wasm-bindgen = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "3e5692ea94f22cd76377a4e219947593279ec6e7" }
-wasm-bindgen-futures = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "3e5692ea94f22cd76377a4e219947593279ec6e7" }
-wasm-bindgen-test = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "3e5692ea94f22cd76377a4e219947593279ec6e7" }
-web-sys = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "3e5692ea94f22cd76377a4e219947593279ec6e7" }
+js-sys = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "67e24940f1865a02f25e07eb04267039023b9877" }
+wasm-bindgen = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "67e24940f1865a02f25e07eb04267039023b9877" }
+wasm-bindgen-futures = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "67e24940f1865a02f25e07eb04267039023b9877" }
+wasm-bindgen-test = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "67e24940f1865a02f25e07eb04267039023b9877" }
+web-sys = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "67e24940f1865a02f25e07eb04267039023b9877" }
 
 [package]
 categories = ["wasm", "development-tools::ffi"]
