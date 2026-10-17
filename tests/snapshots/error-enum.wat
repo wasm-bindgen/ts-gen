@@ -28,6 +28,10 @@
   ;; quota: number
   (import "./bindings.wasm" "QuotaError.quota" (func $QuotaError.quota (param $this externref) (result f64)))
 
+  ;; Lock.HeldError
+  ;; holder: string
+  (import "./bindings.wasm" "Lock.HeldError.holder" (func $Lock.HeldError.holder (param $this externref) (result externref)))
+
   ;; Store
   ;; put(key: string, value: string): void
   (import "./bindings.wasm" "Store.put" (func $Store.put (param $this externref) (param $key externref) (param $value externref)))
@@ -35,6 +39,8 @@
   (import "./bindings.wasm" "Store.get" (func $Store.get (param $this externref) (param $key externref) (result externref)))
   ;; grow(bytes: number): Promise<void>
   (import "./bindings.wasm" "Store.grow" (func $Store.grow (param $this externref) (param $bytes f64) (result externref)))
+  ;; lock(): void
+  (import "./bindings.wasm" "Store.lock" (func $Store.lock (param $this externref)))
   ;; size(): number
   (import "./bindings.wasm" "Store.size" (func $Store.size (param $this externref) (result f64)))
   ;; name: string

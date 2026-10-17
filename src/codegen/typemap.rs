@@ -1078,7 +1078,7 @@ impl<'a> CodegenContext<'a> {
 
     /// The `pub mod` path of the innermost emitted namespace enclosing
     /// `scope`.
-    fn namespace_path(&self, scope: ScopeId) -> &[String] {
+    pub(crate) fn namespace_path(&self, scope: ScopeId) -> &[String] {
         let mut scope = Some(scope);
         while let Some(id) = scope {
             if let Some(path) = self.namespace_paths.get(&id) {
