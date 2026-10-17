@@ -48,11 +48,6 @@ pub(crate) struct ClassConfig<'a> {
     js_name: String,
     /// The `extends` parents (wasm_bindgen supports chained `extends = ...`).
     extends: Vec<TokenStream>,
-    /// Whether the type can `derive(Eq)`. wasm-bindgen stores the first
-    /// parent as the type's field, and a generic parent is spelled bare in
-    /// `extends`, meaning `Parent<JsValue>`, whose derived `Eq` needs
-    /// `JsValue: Eq`. Such a type keeps `PartialEq` only.
-    derive_eq: bool,
     /// Module specifier for `#[wasm_bindgen(module = "...")]`.
     module: Option<std::rc::Rc<str>>,
     /// JS namespace path (e.g., `["WebAssembly"]`) for types inside a
@@ -118,7 +113,7 @@ impl<'a> ClassConfig<'a> {
         // scope to thread through name resolution everywhere inside
         // its extern block.
         let scope = decl.body_scope;
-        let (extends, derive_eq) = extends_list(decl.extends.as_slice(), cgctx, scope, ctx);
+        let extends = extends_list(decl.extends.as_slice(), cgctx, scope, ctx);
         let module = match ctx {
             ModuleContext::Module(m) => Some(m.clone()),
             ModuleContext::Global => None,
@@ -128,7 +123,6 @@ impl<'a> ClassConfig<'a> {
             rust_name: decl.name.clone(),
             js_name: decl.js_name.clone(),
             extends,
-            derive_eq,
             module,
             js_namespace: Vec::new(),
             is_abstract: decl.is_abstract,
@@ -146,7 +140,7 @@ impl<'a> ClassConfig<'a> {
         _enclosing_scope: ScopeId,
     ) -> Self {
         let scope = decl.body_scope;
-        let (extends, derive_eq) = extends_list(&decl.extends, cgctx, scope, ctx);
+        let extends = extends_list(&decl.extends, cgctx, scope, ctx);
         let module = match ctx {
             ModuleContext::Module(m) => Some(m.clone()),
             ModuleContext::Global => None,
@@ -156,7 +150,6 @@ impl<'a> ClassConfig<'a> {
             rust_name: decl.name.clone(),
             js_name: decl.js_name.clone(),
             extends,
-            derive_eq,
             module,
             js_namespace: Vec::new(),
             is_abstract: false,
@@ -187,7 +180,6 @@ impl<'a> ClassConfig<'a> {
             rust_name: decl.name.clone(),
             js_name: decl.js_name.clone(),
             extends: vec![quote! { Object }],
-            derive_eq: true,
             module,
             js_namespace: Vec::new(),
             is_abstract: false,
@@ -1425,11 +1417,10 @@ fn generate_type_decl(config: &ClassConfig) -> TokenStream {
     };
 
     let generics_decl = config.type_generics_decl();
-    let eq = config.derive_eq.then(|| quote! { , Eq });
 
     quote! {
         #wb_attr
-        #[derive(Debug, Clone, PartialEq #eq)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
         pub type #rust_ident #generics_decl;
     }
 }
@@ -1970,22 +1961,16 @@ fn generate_static_setter(
 /// `JsValue` is dropped rather than replaced: `JsValue` is implicit, and
 /// a stand-in `Object` would take the first slot, which wasm-bindgen
 /// makes the `Deref` target. `Object` closes the list when nothing else
-/// does. Also reports whether the type can `derive(Eq)`, which a generic
-/// first parent rules out (see [`ClassConfig::derive_eq`]).
+/// does.
 fn extends_list(
     parents: &[TypeRef],
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
     from_module: &ModuleContext,
-) -> (Vec<TokenStream>, bool) {
+) -> Vec<TokenStream> {
     let mut out = Vec::new();
-    let mut derive_eq = true;
     for parent in parents {
-        let TypeRef::Reference {
-            segments,
-            generic_args,
-        } = parent
-        else {
+        let TypeRef::Reference { segments, .. } = parent else {
             if let Some(ctx) = cgctx {
                 ctx.warn(format!(
                     "unsupported extends type `{}`, ignored",
@@ -2009,13 +1994,10 @@ fn extends_list(
         if tokens.to_string() == "JsValue" {
             continue;
         }
-        if out.is_empty() && !generic_args.is_empty() {
-            derive_eq = false;
-        }
         out.push(tokens);
     }
     if out.is_empty() {
         out.push(quote! { Object });
     }
-    (out, derive_eq)
+    out
 }

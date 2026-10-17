@@ -18,16 +18,15 @@ wasm-bindgen = "0.2.128"
 wasm-bindgen-futures = "0.4.78"
 wasm-bindgen-test = "0.3.78"
 
-# Temporarily track wasm-bindgen/wasm-bindgen#5381 (same-named private enums
-# and dynamic unions across modules of one crate) on top of main, which
-# includes #5376 (string enum `TryFromJsValue`), #5377 (attributes on imported
-# statics) and #5341 (primitive union traits + generic property keys), until
+# Temporarily track wasm-bindgen main, which includes #5383 (unbounded
+# `PartialEq`/`Eq` on imported types), #5381 (same-named private enums and
+# dynamic unions across modules of one crate), #5376, #5377 and #5341, until
 # these ship in a release. All four crates must come from the same source.
 [patch.crates-io]
-js-sys = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "2df31ba71529fb5a024a36c4e79410c41106d3f4" }
-wasm-bindgen = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "2df31ba71529fb5a024a36c4e79410c41106d3f4" }
-wasm-bindgen-futures = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "2df31ba71529fb5a024a36c4e79410c41106d3f4" }
-wasm-bindgen-test = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "2df31ba71529fb5a024a36c4e79410c41106d3f4" }
+js-sys = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "9bec40cf3a09e759ad1e3de6921f6dc5caef384b" }
+wasm-bindgen = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "9bec40cf3a09e759ad1e3de6921f6dc5caef384b" }
+wasm-bindgen-futures = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "9bec40cf3a09e759ad1e3de6921f6dc5caef384b" }
+wasm-bindgen-test = { git = "https://github.com/wasm-bindgen/wasm-bindgen", rev = "9bec40cf3a09e759ad1e3de6921f6dc5caef384b" }
 
 [package]
 categories = ["wasm", "development-tools::ffi"]

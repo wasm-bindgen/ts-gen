@@ -52,3 +52,12 @@ async fn intersection_bindings_compile(
     let fetcher: &Fetcher = generic_stub.as_ref();
     let _ = fetcher.fetch("x").await;
 }
+
+// A generic first parent (`Provider<T>`) no longer rules out `Eq`.
+#[allow(dead_code)]
+fn generic_parent_is_eq(a: &GenericStub<JsValue>, b: &GenericStub<JsValue>) -> bool {
+    fn eq<T: Eq>(a: &T, b: &T) -> bool {
+        a == b
+    }
+    eq(a, b)
+}

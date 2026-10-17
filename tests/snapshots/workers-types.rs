@@ -36307,7 +36307,7 @@ pub mod rpc {
     #[wasm_bindgen]
     extern "C" {
         # [wasm_bindgen (extends = StubBase , extends = Object , js_namespace = "Rpc")]
-        #[derive(Debug, Clone, PartialEq)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Stub<T: ::wasm_bindgen::JsGeneric>;
     }
     #[allow(dead_code)]

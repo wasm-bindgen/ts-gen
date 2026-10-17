@@ -286,7 +286,7 @@ extern "C" {
 #[wasm_bindgen(module = "intersection")]
 extern "C" {
     # [wasm_bindgen (extends = Provider , extends = Fetcher , extends = Object)]
-    #[derive(Debug, Clone, PartialEq)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
     pub type GenericStub<T: ::wasm_bindgen::JsGeneric>;
     #[wasm_bindgen(method, getter)]
     pub fn id<T: ::wasm_bindgen::JsGeneric>(this: &GenericStub<T>) -> String;
