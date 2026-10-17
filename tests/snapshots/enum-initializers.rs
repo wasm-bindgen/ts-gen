@@ -14,18 +14,18 @@ pub enum Base {
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
+pub enum Later {
+    X = 16u32,
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u32)]
 pub enum Mode {
     A = 2u32,
     B = 3u32,
     C = 10u32,
     D = 19u32,
     E = 4u32,
-}
-#[wasm_bindgen(private)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(u32)]
-pub enum Later {
-    X = 16u32,
 }
 pub mod ns {
     #[allow(unused_imports)]
@@ -53,6 +53,14 @@ pub enum Merged {
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
+pub enum Restart {
+    A = 5u32,
+    B = 0u32,
+    C = 1u32,
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u32)]
 pub enum Cycle {
     Fixed = 1u32,
 }
@@ -65,7 +73,14 @@ pub enum Loop {
 #[wasm_bindgen(module = "enum-initializers")]
 extern "C" {
     #[wasm_bindgen(js_name = "useAll")]
-    pub fn use_all(mode: Mode, label: Label, merged: Merged, cycle: Cycle, r#loop: Loop);
+    pub fn use_all(
+        mode: Mode,
+        label: Label,
+        merged: Merged,
+        restart: Restart,
+        cycle: Cycle,
+        r#loop: Loop,
+    );
 }
 #[wasm_bindgen(module = "enum-initializers")]
 extern "C" {
@@ -74,6 +89,7 @@ extern "C" {
         mode: Mode,
         label: Label,
         merged: Merged,
+        restart: Restart,
         cycle: Cycle,
         r#loop: Loop,
     ) -> Result<(), JsValue>;

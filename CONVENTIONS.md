@@ -2518,33 +2518,36 @@ literals, unary and binary constant expressions with JS numeric
 semantics (bitwise operators on int32, `>>>` on uint32), string
 concatenation, references to earlier members of the same enum, bare or
 qualified, and references to another enum's members through its path
-(`Base.Default`, `Ns.Inner.Value`, `Base["Other"]`), including one declared
-later or in another file. A member without an initialiser continues from
-the previous member's evaluated value. An enum is numeric when any member
+(`Base.Default`, `Ns.Inner.Value`, `Base["Other"]`), including one in
+another file. A member without an initialiser continues from the previous
+member's evaluated value, or is 0 as the first member of its declaration. An enum is numeric when any member
 evaluates to a number, so `Read = 1 << 0` alone is enough, and a string
 enum otherwise.
 
-The declarations of a merged enum are evaluated in order as one enum,
-whose members can reference each other's, and emitted once:
+The declarations of a merged enum, those of one name in the same module
+and namespace path, are evaluated in order as one enum, whose members can
+reference each other's, and emitted once at the first. They can be in
+different files or `declare module` blocks:
 
 ```ts
-declare enum Mode { A = Base.Default, B, C = A | 8 }
 declare enum Base { Default = 2 }
+declare enum Mode { A = Base.Default, B, C = A | 8 }
 declare enum Merged { A = 1 }
 declare enum Merged { B = A + 1 }
 ```
 
 ```rust
-pub enum Mode { A = 2, B = 3, C = 10 }
 pub enum Base { Default = 2 }
+pub enum Mode { A = 2, B = 3, C = 10 }
 pub enum Merged { A = 1, B = 2 }
 ```
 
 A member whose value can't be evaluated, such as `B = Undeclared.X` or
 one in a reference cycle, or one continuing from it, is skipped with a
-diagnostic. Its value is only known
-at runtime, and a guessed discriminant could repeat a real member's value
-and turn that member into an alias of it.
+diagnostic. Its value is only known at runtime, and a guessed discriminant
+could repeat a real member's value and turn that member into an alias of
+it. wasm-bindgen can't export an enum without variants, so an enum left
+with none is erased to `JsValue` with a diagnostic.
 
 A member whose value repeats an earlier member's is an alias, not a
 second variant: wasm-bindgen rejects duplicate discriminants, and two

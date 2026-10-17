@@ -1,12 +1,15 @@
 //! @ts-gen --lib-name enum-initializers --export enum-initializers
 
 // A member initialiser can reference another enum's members, including one
-// declared later or inside a namespace, and the members of every declaration
-// of a merged enum.
+// inside a namespace, and the members of every declaration of a merged enum.
 
 export declare enum Base {
   Default = 2,
   Other = 4,
+}
+
+export declare enum Later {
+  X = 16,
 }
 
 export declare enum Mode {
@@ -15,10 +18,6 @@ export declare enum Mode {
   C = A | 8,
   D = Later.X + Mode.B,
   E = Base["Other"],
-}
-
-export declare enum Later {
-  X = 16,
 }
 
 export declare namespace Ns {
@@ -41,6 +40,16 @@ export declare enum Merged {
   C,
 }
 
+// Each declaration's first member counts from 0 without an initialiser.
+export declare enum Restart {
+  A = 5,
+}
+
+export declare enum Restart {
+  B,
+  C,
+}
+
 // A cycle has no constant value.
 export declare enum Cycle {
   A = Loop.B,
@@ -52,4 +61,4 @@ export declare enum Loop {
   C = Cycle.Fixed,
 }
 
-export declare function useAll(mode: Mode, label: Label, merged: Merged, cycle: Cycle, loop: Loop): void;
+export declare function useAll(mode: Mode, label: Label, merged: Merged, restart: Restart, cycle: Cycle, loop: Loop): void;

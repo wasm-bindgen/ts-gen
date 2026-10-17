@@ -163,6 +163,19 @@ impl ScopeArena {
     }
 
     /// Insert a type-parameter binding into the given scope.
+    /// Point every binding of a key of `to` at its value instead.
+    pub fn rebind(&mut self, to: &HashMap<TypeId, TypeId>) {
+        for scope in &mut self.scopes {
+            for binding in scope.names.values_mut() {
+                if let Binding::Declared(id) = binding {
+                    if let Some(&target) = to.get(id) {
+                        *id = target;
+                    }
+                }
+            }
+        }
+    }
+
     pub fn insert_type_param(&mut self, scope: ScopeId, name: String) {
         self.get_mut(scope).insert_type_param(name);
     }

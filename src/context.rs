@@ -218,6 +218,16 @@ impl GlobalContext {
         &mut self.types[id.index()]
     }
 
+    /// The declarations every module and namespace lists.
+    pub(crate) fn listed_types(&self) -> impl Iterator<Item = TypeId> + '_ {
+        let modules = self.modules.iter().flat_map(|m| m.types.iter().copied());
+        let namespaces = self.types.iter().flat_map(|decl| match &decl.kind {
+            crate::ir::TypeKind::Namespace(ns) => ns.declarations.as_slice(),
+            _ => &[],
+        });
+        modules.chain(namespaces.copied())
+    }
+
     /// Remove `dropped` from every module's and namespace's declarations.
     pub(crate) fn drop_types(&mut self, dropped: &std::collections::HashSet<TypeId>) {
         for module in &mut self.modules {

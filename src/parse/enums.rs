@@ -1,18 +1,18 @@
 //! Evaluate TS `enum` members once every file is parsed.
 //!
-//! An initialiser can reference another enum's members, including one
-//! declared later, in a namespace or in another file, and a merged enum's
-//! members span all its declarations. So population leaves each enum as a
-//! [`TsEnumDecl`] and this pass evaluates them together, member by member as
-//! references reach them, then replaces each enum's declarations with one
-//! string or numeric enum.
+//! An initialiser can reference another enum's members, including one in a
+//! namespace or another file, and a merged enum's members span all its
+//! declarations, which can be in different files too. So population leaves
+//! each enum as a [`TsEnumDecl`] and this pass evaluates them together,
+//! member by member as references reach them, then replaces each enum's
+//! declarations with one string or numeric enum.
 
 use std::collections::{HashMap, HashSet};
 
 use crate::context::{GlobalContext, TypeId};
 use crate::ir::{
-    EnumInit, NumericEnumDecl, NumericEnumVariant, StringEnumDecl, StringEnumVariant, TsEnumDecl,
-    TypeKind,
+    EnumInit, ModuleContext, NumericEnumDecl, NumericEnumVariant, StringEnumDecl,
+    StringEnumVariant, TsEnumDecl, TypeAliasDecl, TypeKind, TypeRef,
 };
 use crate::parse::scope::ScopeId;
 use crate::util::diagnostics::DiagnosticCollector;
@@ -36,6 +36,9 @@ struct Member<'g> {
     doc: &'g Option<String>,
     /// The enum declaration's scope, where qualified references resolve.
     scope: ScopeId,
+    /// Whether it's the first member of its declaration, which starts from
+    /// 0 without an initialiser rather than continuing the previous one.
+    first: bool,
     state: State,
 }
 
@@ -58,10 +61,10 @@ impl<'g> Enums<'g> {
             State::InProgress => return None,
             State::Pending => member.state = State::InProgress,
         }
-        let (init, scope) = (member.init, member.scope);
+        let (init, scope, first) = (member.init, member.scope, member.first);
         let value = match init {
             Some(init) => self.eval(init, key, index, scope),
-            None if index == 0 => Some(EnumValue::Num(0.0)),
+            None if first => Some(EnumValue::Num(0.0)),
             None => match self.value(key, index - 1) {
                 Some(EnumValue::Num(prev)) => Some(EnumValue::Num(prev + 1.0)),
                 _ => None,
@@ -154,39 +157,61 @@ impl<'g> Enums<'g> {
 }
 
 /// Evaluate every TS enum and replace its declarations with one string or
-/// numeric enum, numeric when any member is a number. A merged enum keeps
-/// the declaration its name binds to, and the others are dropped from
-/// `roots` and every other list of declarations.
+/// numeric enum, numeric when any member is a number.
+///
+/// Declarations merge when they bind the same name in the same module and
+/// namespace path, whichever file or block they're in. The first takes the
+/// merged enum. The others are dropped from `roots` and every other list of
+/// declarations, and the names bound to them are rebound to the first.
 pub(crate) fn evaluate_ts_enums(gctx: &mut GlobalContext, roots: &mut Vec<TypeId>) {
+    // Phase 1 placeholders are in the arena but in no list.
+    let listed: HashSet<TypeId> = roots.iter().copied().chain(gctx.listed_types()).collect();
     let ids: Vec<TypeId> = gctx
         .iter_types()
-        .filter(|(_, decl)| matches!(decl.kind, TypeKind::TsEnum(_)))
+        .filter(|(id, decl)| matches!(decl.kind, TypeKind::TsEnum(_)) && listed.contains(id))
         .map(|(id, _)| id)
         .collect();
     if ids.is_empty() {
         return;
     }
+    let namespaces: HashMap<ScopeId, (ScopeId, &str)> = gctx
+        .iter_types()
+        .filter_map(|(_, decl)| match &decl.kind {
+            TypeKind::Namespace(ns) => Some((ns.child_scope, (decl.scope_id, ns.name.as_str()))),
+            _ => None,
+        })
+        .collect();
+    let namespace_path = |mut scope: ScopeId| {
+        let mut path = Vec::new();
+        while let Some(&(parent, name)) = namespaces.get(&scope) {
+            path.push(name.to_string());
+            scope = parent;
+        }
+        path.reverse();
+        path
+    };
     let mut keys: Vec<TypeId> = Vec::new();
     let mut groups: HashMap<TypeId, Vec<TypeId>> = HashMap::new();
+    let mut by_binding: HashMap<(ModuleContext, Vec<String>, String), TypeId> = HashMap::new();
     for &id in &ids {
         let decl = gctx.get_type(id);
         let TypeKind::TsEnum(e) = &decl.kind else {
             continue;
         };
-        let key = gctx
-            .scopes
-            .get(decl.scope_id)
-            .get(&e.name)
-            .filter(|bound| matches!(gctx.get_type(*bound).kind, TypeKind::TsEnum(_)))
-            .unwrap_or(id);
-        if !groups.contains_key(&key) {
-            keys.push(key);
-        }
+        let binding = (
+            decl.module_context.clone(),
+            namespace_path(decl.scope_id),
+            e.name.clone(),
+        );
+        let key = *by_binding.entry(binding).or_insert_with(|| {
+            keys.push(id);
+            id
+        });
         groups.entry(key).or_default().push(id);
     }
 
     let mut diag = DiagnosticCollector::new();
-    let results: Vec<(TypeId, Vec<TypeId>, TypeKind, Option<String>)> = {
+    let results: Vec<(Vec<TypeId>, TypeKind, Option<String>)> = {
         let gctx: &GlobalContext = gctx;
         let mut enums = Enums {
             gctx,
@@ -201,11 +226,12 @@ pub(crate) fn evaluate_ts_enums(gctx: &mut GlobalContext, roots: &mut Vec<TypeId
                 let TypeKind::TsEnum(e) = &decl.kind else {
                     continue;
                 };
-                members.extend(e.members.iter().map(|m| Member {
+                members.extend(e.members.iter().enumerate().map(|(i, m)| Member {
                     name: &m.name,
                     init: m.init.as_ref(),
                     doc: &m.doc,
                     scope: decl.scope_id,
+                    first: i == 0,
                     state: State::Pending,
                 }));
             }
@@ -216,36 +242,48 @@ pub(crate) fn evaluate_ts_enums(gctx: &mut GlobalContext, roots: &mut Vec<TypeId
                 let values: Vec<Option<EnumValue>> = (0..enums.members[&key].len())
                     .map(|i| enums.value(key, i))
                     .collect();
-                let TypeKind::TsEnum(TsEnumDecl { name, .. }) = &gctx.get_type(key).kind else {
+                let decl = gctx.get_type(key);
+                let TypeKind::TsEnum(TsEnumDecl { name, .. }) = &decl.kind else {
                     unreachable!("grouped under a TS enum declaration");
                 };
-                let kind = finish(name, &enums.members[&key], &values, &mut diag);
+                let kind = finish(
+                    name,
+                    decl.scope_id,
+                    &enums.members[&key],
+                    &values,
+                    &mut diag,
+                );
                 let decls = &groups[&key];
                 let doc = decls.iter().find_map(|&id| gctx.get_type(id).doc.clone());
-                (key, decls.clone(), kind, doc)
+                (decls.clone(), kind, doc)
             })
             .collect()
     };
     gctx.diagnostics.diagnostics.extend(diag.diagnostics);
 
-    let mut dropped = HashSet::new();
-    for (key, decls, kind, doc) in results {
-        let decl = gctx.get_type_mut(key);
+    let mut absorbed: HashMap<TypeId, TypeId> = HashMap::new();
+    for (decls, kind, doc) in results {
+        let decl = gctx.get_type_mut(decls[0]);
         decl.kind = kind;
         decl.doc = doc;
-        dropped.extend(decls.into_iter().filter(|&id| id != key));
+        absorbed.extend(decls[1..].iter().map(|&id| (id, decls[0])));
     }
-    if !dropped.is_empty() {
+    if !absorbed.is_empty() {
+        let dropped: HashSet<TypeId> = absorbed.keys().copied().collect();
         roots.retain(|id| !dropped.contains(id));
         gctx.drop_types(&dropped);
+        gctx.scopes.rebind(&absorbed);
     }
 }
 
 /// The string or numeric enum `members` evaluate to. A member whose value
 /// doesn't fit the kind is skipped with a warning: a guessed discriminant
 /// could repeat a real member's value and make that member an alias of it.
+/// wasm-bindgen can't export an enum without variants, so one left with
+/// none is erased to `JsValue`.
 fn finish(
     name: &str,
+    scope: ScopeId,
     members: &[Member<'_>],
     values: &[Option<EnumValue>],
     diag: &mut DiagnosticCollector,
@@ -273,6 +311,18 @@ fn finish(
         .collect();
     crate::util::naming::dedup_names(&mut rust_names);
     let name = name.to_string();
+    if kept.is_empty() {
+        diag.warn(format!(
+            "Enum `{name}` has no member with a constant value, erasing it to JsValue"
+        ));
+        return TypeKind::TypeAlias(TypeAliasDecl {
+            name,
+            type_params: vec![],
+            target: TypeRef::Any,
+            from_module: None,
+            body_scope: scope,
+        });
+    }
     if numeric {
         let variants = kept
             .into_iter()
@@ -525,6 +575,79 @@ mod tests {
         assert_eq!(kinds.len(), 1);
         assert!(warnings.is_empty(), "{warnings:?}");
         assert_eq!(numeric(src, "E"), pairs(&[("A", 1), ("B", 2), ("C", 3)]));
+    }
+
+    #[test]
+    fn each_declaration_counts_from_zero() {
+        let src = "declare enum M { A = 5 } declare enum M { B, C } declare enum M { D = A + C }";
+        assert_eq!(
+            numeric(src, "M"),
+            pairs(&[("A", 5), ("B", 0), ("C", 1), ("D", 6)])
+        );
+    }
+
+    #[test]
+    fn declarations_merge_across_files() {
+        let dir = std::env::temp_dir().join(format!("ts-gen-enum-merge-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let (a, b) = (dir.join("a.d.ts"), dir.join("b.d.ts"));
+        std::fs::write(
+            &a,
+            r#"
+                declare enum G { A = 1 }
+                declare namespace N { enum NE { A = 1 } }
+                declare module "m" { export enum ME { A = 1 } }
+            "#,
+        )
+        .unwrap();
+        std::fs::write(
+            &b,
+            r#"
+                declare enum G { B = A + 1 }
+                declare enum H { X = G.A }
+                declare namespace N { enum NE { B = A + 1 } }
+                declare module "m" { export enum ME { B = A + 1 } }
+            "#,
+        )
+        .unwrap();
+        let (_, gctx) = crate::parse::parse_dts_files(&[&a, &b], None).unwrap();
+        std::fs::remove_dir_all(&dir).unwrap();
+
+        let mut enums: Vec<(String, Vec<(String, i64)>)> = gctx
+            .iter_types()
+            .filter_map(|(_, decl)| match &decl.kind {
+                TypeKind::NumericEnum(e) => Some((
+                    e.name.clone(),
+                    e.variants
+                        .iter()
+                        .map(|v| (v.js_name.clone(), v.value))
+                        .collect(),
+                )),
+                _ => None,
+            })
+            .collect();
+        enums.sort();
+        let merged = pairs(&[("A", 1), ("B", 2)]);
+        assert_eq!(
+            enums,
+            vec![
+                ("G".to_string(), merged.clone()),
+                ("H".to_string(), pairs(&[("X", 1)])),
+                ("ME".to_string(), merged.clone()),
+                ("NE".to_string(), merged),
+            ]
+        );
+    }
+
+    #[test]
+    fn an_enum_without_values_is_erased() {
+        let src = "declare enum E { A = Undeclared.X }";
+        let (module, gctx) = crate::parse::parse_single_source(src, None).unwrap();
+        let kind = &gctx.get_type(module.types[0]).kind;
+        assert!(
+            matches!(kind, TypeKind::TypeAlias(a) if a.target == crate::ir::TypeRef::Any),
+            "{kind:?}"
+        );
     }
 
     #[test]
