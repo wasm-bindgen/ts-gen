@@ -350,7 +350,10 @@ pub fn expand_signatures(
         sig.iter()
             .map(|p| {
                 let ty = render_param_type(p, cgctx, scope, &from_module);
-                format!("{}: {}", p.name, ty)
+                // A per-mono variadic renders like the list overload it
+                // spreads, but is a distinct call form.
+                let spread = if p.variadic { "..." } else { "" };
+                format!("{spread}{}: {}", p.name, ty)
             })
             .collect()
     };
@@ -565,7 +568,9 @@ fn push_with_js_string_return(
 ) {
     let has_js_return = cgctx.is_some_and(|ctx| {
         ctx.experimental_generic_mono
-            && typemap::has_mono_js_string_return(&sig.return_type, ctx, scope)
+            && (typemap::has_mono_js_string_return(&sig.return_type, ctx, scope)
+                || (!sig.is_async
+                    && typemap::is_mono_string_list_return(&sig.return_type, ctx, scope)))
     });
     out.push(sig.clone());
     if has_js_return {
@@ -1440,21 +1445,30 @@ pub(crate) fn render_param_type(
     scope: ScopeId,
     from_module: &crate::ir::ModuleContext,
 ) -> TokenStream {
-    if param.variadic {
+    let mono = cgctx.filter(|ctx| ctx.experimental_generic_mono);
+    // A per-mono variadic spreads any sequence, so its rest array lowers like
+    // any other list argument.
+    let spreads_list = |ctx: &CodegenContext<'_>| {
+        let rest = typemap::peel_mono(&param.type_ref, ctx, scope, &mut Default::default());
+        matches!(rest.as_ref(), TypeRef::Array(_))
+    };
+    if param.variadic && !mono.is_some_and(spreads_list) {
         return quote! { &[JsValue] };
     }
-    cgctx
-        .filter(|ctx| ctx.experimental_generic_mono)
-        .and_then(|_| mono_argument_type(&param.type_ref))
-        .unwrap_or_else(|| {
-            typemap::to_syn_type(
-                &param.type_ref,
-                TypePosition::ARGUMENT,
-                cgctx,
-                scope,
-                from_module,
-            )
+    mono.and_then(|ctx| {
+        mono_argument_type(&param.type_ref).or_else(|| {
+            typemap::mono_string_like_argument(&param.type_ref, ctx, scope, from_module)
         })
+    })
+    .unwrap_or_else(|| {
+        typemap::to_syn_type(
+            &param.type_ref,
+            TypePosition::ARGUMENT,
+            cgctx,
+            scope,
+            from_module,
+        )
+    })
 }
 
 /// Per-monomorphization argument bounds: strings become `impl

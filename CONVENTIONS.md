@@ -96,11 +96,11 @@ element-wise materialisation (a bare `Array` does too):
   (see [slice modes](#slice-modes)).
 * **Return position** → `Vec<T>`.
 
-wasm-bindgen has both a slice and a `Vec` ABI for Rust-native `String`
-and `f64` elements and for JS handles. So an element that resolves,
-through aliases, unions and [enums](#string-and-numeric-enums), to a
-string or number keeps its return-position form; every other element
-takes its inner-position handle form:
+wasm-bindgen has both a slice and a `Vec` ABI for Rust-native `String`,
+`f64` and `bool` elements and for JS handles. So an element that
+resolves, through aliases, unions and [enums](#string-and-numeric-enums),
+to a string, number or boolean keeps its return-position form; every
+other element takes its inner-position handle form:
 
 | TypeScript element           | Slice / Vec element    |
 | ---------------------------- | ---------------------- |
@@ -108,13 +108,9 @@ takes its inner-position handle form:
 | `string`, `"a" \| "b"`       | `String`               |
 | `Foo` (named JS / Rust type) | `Foo`                  |
 | `any` / `unknown`            | `JsValue`              |
-| `boolean`                    | `Boolean`              |
+| `boolean`                    | `bool`                 |
 | `T \| null`                  | `JsOption<U>`          |
 | `T[]`                        | `Array<U>`             |
-
-`boolean` takes its handle because `bool` has a slice ABI but no `Vec`
-one, and the argument matches the return so a getter's value can be
-passed back to the setter.
 
 Strings stay owned (`Vec<String>`, not `Vec<&str>`); JS-imported
 classes stay unborrowed (`&[EmailAttachment]`, not
@@ -123,10 +119,10 @@ classes stay unborrowed (`&[EmailAttachment]`, not
 `&[Array<JsString>]` / `Vec<Array<JsString>>`, the same as
 `string[][]`.
 
-Inside an actual generic (`Promise<Array<T>>`, `Map<K, Array<V>>`,
-…) the legacy `Array<T'>` form is preserved — `Promise<T>` /
-`Map<K,V>` etc. require their generic argument to satisfy
-`T: JsGeneric`, which Rust's `Vec<T>` doesn't.
+Inside a built-in container (`Promise<Array<T>>`, `Map<K, Array<V>>`,
+…) the element stays the `Array<T'>` handle, which type-checks against
+both the stable js-sys API and `js_sys_unstable_apis`, where container
+elements are real generics.
 
 ### Slice modes
 
@@ -159,11 +155,12 @@ pub fn generic<T>(#[wasm_bindgen(slice = "array")] values: &[T]) -> String; // p
 ```
 
 Every other slice takes no mode, as the modes only act on numeric
-elements and wasm-bindgen already hands JS a fresh `Array`: handles
-(`&[Boolean]`, `&[WebSocket]`, an erased `T: JsGeneric`'s `&[T]`) are
-read in place, and `&[String]` (string enums included) is decoded
-element by element. Variadic rest parameters (`&[JsValue]`) don't take
-one either.
+elements and wasm-bindgen already hands JS a fresh `Array`: JS handles
+(`&[WebSocket]`, `&[JsString]`) are read in place, and Rust values
+(`&[String]`, `&[bool]`, string enums) are decoded element by element.
+Variadic rest parameters don't take one either: JS spreads the elements
+into the call, copying them out of a numeric view before the callee runs,
+so nothing can retain the view or re-enter wasm while it is live.
 
 The user-facing Rust signature is unchanged — only the JS-side wire
 format changes. The mode goes on the argument rather than the
@@ -1502,7 +1499,8 @@ so they stay named (`Details<Mode>`, `Details<Level>`), and an awaited
 stays a type parameter. This native-leaf rule is deliberately limited to user
 declarations. Built-in JS containers, tuples, iterators, and callbacks retain
 their established wrapper elements (`Array<JsString>`,
-`Map<JsString, JsString>`, and so on).
+`Map<JsString, JsString>`, and so on), except for the string leaves of an
+argument, below.
 
 Direct string arguments use argument-position `impl JsStringLike`, allowing
 `&str`, `String`, `&JsString`, and `JsString` without caller-side conversion.
@@ -1538,10 +1536,38 @@ pub fn flag_key<T>(this: &EvaluationDetails<T>) -> String;
 pub fn flag_key_js_string<T>(this: &EvaluationDetails<T>) -> JsString;
 ```
 
-No variant is generated when the return has no string leaf outside built-in
-containers (`Array<string>` keeps its single binding), or when a top-level
-union becomes a [dynamic-union enum](#erased-return-position-unions-become-dynamic-union-enums):
+No variant is generated when the return's only string leaves are inside
+built-in containers (`Promise<Array<string>>` keeps its single binding),
+except for a top-level string list (below), or when a top-level union becomes
+a [dynamic-union enum](#erased-return-position-unions-become-dynamic-union-enums):
 `"a" | "b"` returns its enum only.
+
+Lists and built-in containers follow the same split between Rust strings and
+JS handles. In an argument, every string leaf reached through slices and
+built-in containers (`ArrayLike`, `Set`, `Map`, `Promise`, `Iterator`,
+`AsyncIterator`) takes `impl JsStringLike`, which wasm-bindgen lowers per
+instantiation. A `string[]` accepts `&[String]`, `&[&str]` or `&[JsString]`,
+and an empty list needs its element type (`&[] as &[&str]`). Container
+handles accept `JsString` elements, and also `String` under
+`js_sys_unstable_apis`, where js-sys container elements are real generics
+(`Array<String>`, `Set<String>`). A variadic rest array lowers like any other
+list argument (`...parts: string[]` takes `&[impl JsStringLike]`,
+`...values: number[]` takes `&[f64]`), since wasm-bindgen spreads any
+sequence. A sync string list return gets a `_js_string` variant returning the
+list as one handle rather than decoding every element; an awaited list is
+already the handle:
+
+```rust
+pub fn set_tags(tags: &[impl ::wasm_bindgen::JsStringLike]);
+pub fn set_tags_like(tags: &Array<impl ::wasm_bindgen::JsStringLike>);
+pub fn set_rows(rows: &[Array<impl ::wasm_bindgen::JsStringLike>]);
+pub fn lookup(values: &Map<impl ::wasm_bindgen::JsStringLike, Number>);
+#[wasm_bindgen(variadic)]
+pub fn join(parts: &[impl ::wasm_bindgen::JsStringLike]) -> String;
+pub fn get_tags() -> Vec<String>;
+#[wasm_bindgen(js_name = "getTags")]
+pub fn get_tags_js_string() -> Array<JsString>;
+```
 
 Async returns use native Rust values in this mode when the resolved type is
 a primitive, a nullable primitive, or a locally declared generic type:

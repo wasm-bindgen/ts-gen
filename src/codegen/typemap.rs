@@ -2273,6 +2273,9 @@ fn to_mono_js_string_return_type_impl(
     let peeled = peel_mono(ty, ctx, scope, visited);
     match peeled.as_ref() {
         TypeRef::String | TypeRef::StringLiteral(_) => quote! { JsString },
+        TypeRef::Array(elem) if is_string_array_element(elem, ctx, scope) => {
+            quote! { Array<JsString> }
+        }
         TypeRef::Nullable(inner) => {
             let inner = to_mono_js_string_return_type_impl(inner, ctx, scope, from_module, visited);
             quote! { Option<#inner> }
@@ -2710,7 +2713,116 @@ fn is_native_array_element(
 ) -> bool {
     matches!(
         native_array_leaf(elem, ctx, scope).as_ref(),
-        TypeRef::String | TypeRef::StringLiteral(_) | TypeRef::Number | TypeRef::NumberLiteral(_)
+        TypeRef::String
+            | TypeRef::StringLiteral(_)
+            | TypeRef::Number
+            | TypeRef::NumberLiteral(_)
+            | TypeRef::Boolean
+            | TypeRef::BooleanLiteral(_)
+    )
+}
+
+/// Whether a top-level `T[]` element lowers to `String`.
+fn is_string_array_element(elem: &TypeRef, ctx: &CodegenContext<'_>, scope: ScopeId) -> bool {
+    matches!(
+        native_array_leaf(elem, Some(ctx), scope).as_ref(),
+        TypeRef::String | TypeRef::StringLiteral(_)
+    )
+}
+
+/// Per-monomorphization string leaves of a slice or built-in container
+/// argument. Every string leaf reached through slices and built-in containers
+/// takes `impl JsStringLike`, which wasm-bindgen lowers per instantiation:
+/// `string[]` accepts `&[String]`, `&[&str]` or `&[JsString]`, and
+/// `Set<string>` accepts `&Set<JsString>` or, under `js_sys_unstable_apis`,
+/// `&Set<String>`. `None` when there is no such leaf; a scalar string is
+/// handled by `signatures::mono_argument_type`.
+pub(crate) fn mono_string_like_argument(
+    ty: &TypeRef,
+    ctx: &CodegenContext<'_>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+) -> Option<TokenStream> {
+    mono_string_like(ty, true, ctx, scope, from_module)
+}
+
+fn mono_string_like(
+    ty: &TypeRef,
+    top: bool,
+    ctx: &CodegenContext<'_>,
+    scope: ScopeId,
+    from_module: &ModuleContext,
+) -> Option<TokenStream> {
+    if !top && is_string_array_element(ty, ctx, scope) {
+        return Some(quote! { impl ::wasm_bindgen::JsStringLike });
+    }
+    let borrow = top.then(|| quote! { & });
+    match peel_mono(ty, ctx, scope, &mut HashSet::new()).as_ref() {
+        TypeRef::Array(elem) => {
+            let elem = mono_string_like(elem, false, ctx, scope, from_module)?;
+            Some(if top {
+                quote! { &[#elem] }
+            } else {
+                quote! { Array<#elem> }
+            })
+        }
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } if segments.len() == 1 => {
+            let (base, arity) = match segments[0].as_str() {
+                "ArrayLike" => (quote! { Array }, 1),
+                "Promise" | "PromiseLike" => (quote! { Promise }, 1),
+                "Set" | "ReadonlySet" => (quote! { Set }, 1),
+                "Map" | "ReadonlyMap" => (quote! { Map }, 2),
+                "Iterator" | "IterableIterator" => (quote! { Iterator }, 1),
+                "AsyncIterator" | "AsyncIterableIterator" => (quote! { AsyncIterator }, 1),
+                _ => return None,
+            };
+            if generic_args.len() < arity {
+                return None;
+            }
+            let args = &generic_args[..arity];
+            let leaves: Vec<_> = args
+                .iter()
+                .map(|arg| mono_string_like(arg, false, ctx, scope, from_module))
+                .collect();
+            if leaves.iter().all(Option::is_none) {
+                return None;
+            }
+            let args = args.iter().zip(leaves).map(|(arg, leaf)| {
+                leaf.unwrap_or_else(|| {
+                    to_syn_type(
+                        arg,
+                        TypePosition::ARGUMENT.to_inner(),
+                        Some(ctx),
+                        scope,
+                        from_module,
+                    )
+                })
+            });
+            Some(quote! { #borrow #base<#(#args),*> })
+        }
+        _ => None,
+    }
+}
+
+/// Whether a sync return is a string list, which has both a list-of-elements
+/// form (`Vec<String>`) and a list-as-handle form (`Array<JsString>`), so it
+/// gets a `_js_string` variant like a string return. An awaited list already
+/// lowers to the handle.
+pub(crate) fn is_mono_string_list_return(
+    ty: &TypeRef,
+    ctx: &CodegenContext<'_>,
+    scope: ScopeId,
+) -> bool {
+    let list = match ty {
+        TypeRef::Nullable(inner) => inner.as_ref(),
+        other => other,
+    };
+    matches!(
+        peel_mono(list, ctx, scope, &mut HashSet::new()).as_ref(),
+        TypeRef::Array(elem) if is_string_array_element(elem, ctx, scope)
     )
 }
 
@@ -3615,7 +3727,67 @@ mod tests {
     }
 
     #[test]
-    fn array_elements_are_native_only_for_strings_and_numbers() {
+    fn mono_string_leaves_accept_any_string_shape() {
+        with_mono_ctx(MONO_SRC, |ctx, scope| {
+            let arg = |ty: TypeRef| {
+                mono_string_like_argument(&ty, ctx, scope, &ModuleContext::Global)
+                    .map(|t| t.to_string())
+            };
+            let list = |elem: TypeRef| TypeRef::Array(Box::new(elem));
+            let like = "impl :: wasm_bindgen :: JsStringLike";
+            let slice = format!("& [{like}]");
+            assert_eq!(arg(list(TypeRef::String)), Some(slice.clone()));
+            assert_eq!(arg(list(TypeRef::ident("IdChain"))), Some(slice.clone()));
+            assert_eq!(arg(list(TypeRef::ident("ModeAlias"))), Some(slice));
+            assert_eq!(
+                arg(TypeRef::generic("ArrayLike", vec![TypeRef::String])),
+                Some(format!("& Array < {like} >"))
+            );
+            assert_eq!(
+                arg(list(list(TypeRef::String))),
+                Some(format!("& [Array < {like} >]"))
+            );
+            assert_eq!(
+                arg(TypeRef::generic("ReadonlySet", vec![TypeRef::ident("Id")])),
+                Some(format!("& Set < {like} >"))
+            );
+            assert_eq!(
+                arg(TypeRef::generic(
+                    "Map",
+                    vec![TypeRef::String, list(TypeRef::String)]
+                )),
+                Some(format!("& Map < {like} , Array < {like} > >"))
+            );
+            assert_eq!(arg(list(TypeRef::Number)), None);
+            assert_eq!(arg(list(TypeRef::ident("MaybeId"))), None);
+            assert_eq!(arg(TypeRef::generic("Set", vec![TypeRef::Number])), None);
+            assert_eq!(arg(TypeRef::String), None);
+
+            assert!(is_mono_string_list_return(
+                &list(TypeRef::ident("Id")),
+                ctx,
+                scope
+            ));
+            assert!(is_mono_string_list_return(
+                &TypeRef::Nullable(Box::new(list(TypeRef::String))),
+                ctx,
+                scope
+            ));
+            assert!(!is_mono_string_list_return(
+                &list(TypeRef::Boolean),
+                ctx,
+                scope
+            ));
+            assert!(!is_mono_string_list_return(
+                &holder(list(TypeRef::String)),
+                ctx,
+                scope
+            ));
+        });
+    }
+
+    #[test]
+    fn array_elements_are_native_only_for_primitives() {
         with_mono_ctx(MONO_SRC, |ctx, scope| {
             let ret = |elem: TypeRef| {
                 to_syn_type(
@@ -3630,7 +3802,7 @@ mod tests {
             assert_eq!(ret(TypeRef::ident("IdChain")), "Vec < String >");
             assert_eq!(ret(lits(&["a", "b"])), "Vec < String >");
             assert_eq!(ret(TypeRef::Number), "Vec < f64 >");
-            assert_eq!(ret(TypeRef::Boolean), "Vec < Boolean >");
+            assert_eq!(ret(TypeRef::Boolean), "Vec < bool >");
             assert_eq!(
                 ret(TypeRef::ident("MaybeId")),
                 "Vec < JsOption < JsString > >"
