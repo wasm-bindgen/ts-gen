@@ -373,14 +373,14 @@ fn bind_import(
 }
 
 /// Deduplicate function overloads: when multiple `FunctionDecl` share the same
-/// name and module context, keep only the one with the most parameters (the most
-/// general signature). TypeScript overloads are a single JS function at runtime.
+/// JS name and module context, keep only the one with the most parameters (the
+/// most general signature). TypeScript overloads are a single JS function at
+/// runtime.
 fn dedup_function_overloads(
     declarations: Vec<crate::ir::TypeDeclaration>,
 ) -> Vec<crate::ir::TypeDeclaration> {
     use crate::ir::{ModuleContext, TypeDeclaration, TypeKind};
 
-    // Key: (function name, module context)
     let mut best: std::collections::HashMap<(String, ModuleContext), usize> =
         std::collections::HashMap::new();
     let mut result: Vec<TypeDeclaration> = Vec::new();
@@ -389,7 +389,7 @@ fn dedup_function_overloads(
     // First pass: find the best (most params) overload for each name
     for (i, decl) in declarations.iter().enumerate() {
         if let TypeKind::Function(ref f) = decl.kind {
-            let key = (f.name.clone(), decl.module_context.clone());
+            let key = (f.js_name.clone(), decl.module_context.clone());
             if let Some(&existing_idx) = best.get(&key) {
                 // Compare param counts — keep the one with more params
                 if let TypeKind::Function(ref existing_f) = declarations[existing_idx].kind {

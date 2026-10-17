@@ -9,7 +9,7 @@ use crate::codegen::signatures::{
 };
 use crate::codegen::typemap::{to_return_type, to_syn_type, CodegenContext, TypePosition};
 use crate::parse::scope::ScopeId;
-use crate::util::naming::{LocalScope, Suffix};
+use crate::util::naming::{ident_chars, LocalScope, Suffix};
 use std::collections::HashSet;
 
 use crate::ir::{FunctionDecl, ModuleContext, VariableDecl};
@@ -24,8 +24,9 @@ pub fn generate_function(
     cgctx: Option<&CodegenContext<'_>>,
     doc: &Option<String>,
     scope: ScopeId,
+    value_names: &mut ValueNames,
 ) -> TokenStream {
-    emit_function(decl, ctx, cgctx, doc, &[], scope)
+    emit_function(decl, ctx, cgctx, doc, &[], scope, value_names)
 }
 
 /// Generate wasm_bindgen extern blocks for a free function inside a namespace.
@@ -36,8 +37,9 @@ pub fn generate_function_with_js_namespace(
     cgctx: Option<&CodegenContext<'_>>,
     doc: &Option<String>,
     scope: ScopeId,
+    value_names: &mut ValueNames,
 ) -> TokenStream {
-    emit_function(decl, ctx, cgctx, doc, js_namespace, scope)
+    emit_function(decl, ctx, cgctx, doc, js_namespace, scope, value_names)
 }
 
 fn emit_function(
@@ -47,8 +49,8 @@ fn emit_function(
     doc: &Option<String>,
     js_namespace: &[String],
     scope: ScopeId,
+    value_names: &mut ValueNames,
 ) -> TokenStream {
-    let mut names = LocalScope::default();
     let overloads = [decl.params.as_slice()];
     let sigs = build_signatures(
         &CallableSpec {
@@ -61,7 +63,7 @@ fn emit_function(
             doc,
             body_scope: decl.body_scope,
         },
-        &mut names,
+        &mut value_names.idents,
         cgctx,
         decl.body_scope,
     );
@@ -176,13 +178,15 @@ fn generic_bounds_for_function(
         .collect()
 }
 
-/// Statics already emitted into one Rust module.
+/// The free functions and statics already emitted into one Rust module,
+/// which share its value namespace.
 ///
 /// `declare var` may be redeclared, including across input files, so a
 /// repeated JS binding is emitted once. Distinct bindings that convert to
-/// the same ident (`fooBar` / `FOO_BAR`) are numbered instead.
+/// the same ident (`fooBar` / `FOO_BAR`, `ajax` / `$ajax`) are numbered
+/// instead.
 #[derive(Default)]
-pub struct StaticNames {
+pub struct ValueNames {
     idents: LocalScope,
     bindings: HashSet<(Option<String>, String)>,
 }
@@ -195,14 +199,14 @@ pub fn generate_variable(
     doc: &Option<String>,
     js_namespace: &[String],
     scope: ScopeId,
-    static_names: &mut StaticNames,
+    value_names: &mut ValueNames,
 ) -> TokenStream {
     let binding = (ctx.specifier().map(str::to_string), decl.js_name.clone());
-    if !static_names.bindings.insert(binding) {
+    if !value_names.bindings.insert(binding) {
         return TokenStream::new();
     }
-    let base = super::typemap::make_ident(&decl.name).to_string();
-    let rust_name = static_names.idents.declare(&base, Suffix::Snake);
+    let base = ident_chars(&decl.name);
+    let rust_name = value_names.idents.declare(&base, Suffix::Snake);
     let rust_ident = super::typemap::make_ident(&rust_name);
     let ty = to_syn_type(&decl.type_ref, TypePosition::RETURN, cgctx, scope, ctx);
     let doc = super::doc_tokens(doc);

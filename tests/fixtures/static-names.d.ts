@@ -3,6 +3,7 @@ declare const $: unknown;
 declare const $foo: string;
 declare let fooBar: number;
 declare var FOO_BAR: number;
+declare function foo_bar(): void;
 declare const déjà: string;
 declare var console: string;
 declare var console: string;

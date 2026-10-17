@@ -147,3 +147,111 @@ pub enum Sigil {
     Dollar = 1u32,
     Underscore = 2u32,
 }
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Collide;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<Collide, JsValue>;
+    #[wasm_bindgen(method, getter)]
+    pub fn data(this: &Collide) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_data(this: &Collide, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "$data")]
+    pub fn data_2(this: &Collide) -> String;
+    #[wasm_bindgen(method, setter, js_name = "$data")]
+    pub fn set_data_2(this: &Collide, val: &str);
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type CollideInit;
+    #[wasm_bindgen(method, getter, js_name = "fooBar")]
+    pub fn foo_bar(this: &CollideInit) -> f64;
+    #[wasm_bindgen(method, setter, js_name = "fooBar")]
+    pub fn set_foo_bar(this: &CollideInit, val: f64);
+    #[wasm_bindgen(method, getter, js_name = "foo_bar")]
+    pub fn foo_bar_2(this: &CollideInit) -> f64;
+    #[wasm_bindgen(method, setter, js_name = "foo_bar")]
+    pub fn set_foo_bar_2(this: &CollideInit, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn data(this: &CollideInit) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_data(this: &CollideInit, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "$data")]
+    pub fn data_2(this: &CollideInit) -> Option<String>;
+    #[wasm_bindgen(method, setter, js_name = "$data")]
+    pub fn set_data_2(this: &CollideInit, val: &str);
+}
+impl CollideInit {
+    pub fn new(foo_bar: f64, foo_bar_2: f64) -> CollideInit {
+        Self::builder(foo_bar, foo_bar_2).build()
+    }
+    pub fn builder(foo_bar: f64, foo_bar_2: f64) -> CollideInitBuilder {
+        let inner: CollideInit = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_foo_bar(foo_bar);
+        inner.set_foo_bar_2(foo_bar_2);
+        CollideInitBuilder { inner }
+    }
+}
+pub struct CollideInitBuilder {
+    inner: CollideInit,
+}
+impl CollideInitBuilder {
+    pub fn data(self, val: &str) -> Self {
+        self.inner.set_data(val);
+        self
+    }
+    pub fn data_2(self, val: &str) -> Self {
+        self.inner.set_data_2(val);
+        self
+    }
+    pub fn build(self) -> CollideInit {
+        self.inner
+    }
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type MethodCollide;
+    #[wasm_bindgen(method)]
+    pub fn data(this: &MethodCollide);
+    #[wasm_bindgen(method, catch, js_name = "data")]
+    pub fn try_data(this: &MethodCollide) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, getter, js_name = "$data")]
+    pub fn data_2(this: &MethodCollide) -> String;
+    #[wasm_bindgen(method, setter, js_name = "$data")]
+    pub fn set_data_2(this: &MethodCollide, val: &str);
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    pub fn ajax(url: &str);
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "ajax")]
+    pub fn try_ajax(url: &str) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    #[wasm_bindgen(js_name = "$ajax")]
+    pub fn ajax_2(url: &str);
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "$ajax")]
+    pub fn try_ajax_2(url: &str) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    #[wasm_bindgen(js_name = "collideArgs")]
+    pub fn collide_args(a: &str, a2: f64, foo_bar: &str, foo_bar2: f64);
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "collideArgs")]
+    pub fn try_collide_args(a: &str, a2: f64, foo_bar: &str, foo_bar2: f64) -> Result<(), JsValue>;
+}

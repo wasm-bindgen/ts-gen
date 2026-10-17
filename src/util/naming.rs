@@ -96,6 +96,21 @@ pub fn to_snake_case(name: &str) -> String {
     out
 }
 
+/// The Rust identifier a JS name binds under: its `snake_case` form with
+/// the characters a Rust identifier can't hold removed (`$data` → `data`,
+/// `@cf/model` → `cfmodel`). Keywords and a leading digit are left to
+/// `make_ident`, after prefixes like `set_` are composed.
+pub(crate) fn snake_ident(js_name: &str) -> String {
+    ident_chars(&to_snake_case(js_name))
+}
+
+/// The characters of `name` a Rust identifier can hold.
+pub(crate) fn ident_chars(name: &str) -> String {
+    name.chars()
+        .filter(|c| c.is_alphanumeric() || *c == '_')
+        .collect()
+}
+
 /// Convert a JS identifier to a Rust PascalCase name (for types, enums).
 pub fn to_pascal_case(name: &str) -> String {
     match symbol_words(name) {
@@ -190,6 +205,9 @@ pub enum Suffix {
     Snake,
     /// `Foo2`, `Foo3`, …: a further synthesised PascalCase type.
     Pascal,
+    /// `a2`, `a3`, …: a further parameter. wasm-bindgen splits each
+    /// parameter `a` into `a_1` … `a_4` in the code it generates.
+    Param,
 }
 
 /// The names claimed in one Rust scope.
@@ -247,7 +265,7 @@ impl LocalScope {
         for n in 2u32.. {
             let name = match suffix {
                 Suffix::Trailing | Suffix::Snake => format!("{candidate}_{n}"),
-                Suffix::Pascal => format!("{candidate}{n}"),
+                Suffix::Pascal | Suffix::Param => format!("{candidate}{n}"),
             };
             if self.claim(name.clone()) {
                 return name;
@@ -304,6 +322,14 @@ mod tests {
         assert_eq!(to_enum_variant("_"), "Underscore");
         assert_eq!(to_enum_variant(""), "Empty");
         assert_eq!(to_snake_case("☃"), "☃");
+    }
+
+    #[test]
+    fn snake_ident_strips_invalid_characters() {
+        assert_eq!(snake_ident("$data"), "data");
+        assert_eq!(snake_ident("@cf/model"), "cfmodel");
+        assert_eq!(snake_ident("fooBar"), "foo_bar");
+        assert_eq!(snake_ident("$$"), "dollar_dollar");
     }
 
     #[test]

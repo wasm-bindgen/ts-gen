@@ -47,7 +47,7 @@ use crate::codegen::primitive_unions;
 use crate::codegen::typemap::{self, CodegenContext, TypePosition};
 use crate::ir::{Param, SharedMemory, Throws, TypeRef};
 use crate::parse::scope::ScopeId;
-use crate::util::naming::{to_snake_case, LocalScope, Suffix};
+use crate::util::naming::{ident_chars, snake_ident, to_snake_case, LocalScope, Suffix};
 
 /// What kind of callable an emitter is producing — drives default-naming
 /// (`new`, `set_x`, snake-case, …) and which `wasm_bindgen` attributes to
@@ -100,9 +100,9 @@ pub fn base_rust_name(js_name: &str, kind: SignatureKind) -> String {
     match kind {
         SignatureKind::Constructor => "new".to_string(),
         SignatureKind::Setter | SignatureKind::StaticSetter => {
-            format!("set_{}", to_snake_case(raw))
+            format!("set_{}", snake_ident(raw))
         }
-        _ => to_snake_case(raw),
+        _ => snake_ident(raw),
     }
 }
 
@@ -480,7 +480,7 @@ pub fn build_signatures(
 ) -> Vec<FunctionSignature> {
     let base = spec
         .rust_name
-        .map_or_else(|| base_rust_name(spec.js_name, spec.kind), str::to_string);
+        .map_or_else(|| base_rust_name(spec.js_name, spec.kind), ident_chars);
     let expansions = expand_signatures(spec.overloads, cgctx, scope);
 
     // Promise unwrap is per-callable, not per-overload — every expansion of a
@@ -1330,8 +1330,8 @@ pub fn generate_concrete_params(
 ) -> TokenStream {
     let items: Vec<_> = params
         .iter()
-        .map(|p| {
-            let name = typemap::make_ident(&p.name);
+        .zip(param_idents(params))
+        .map(|(p, name)| {
             let attr = param_attr(p, cgctx, scope);
             let ty = if p.variadic {
                 quote! { &[JsValue] }
@@ -1349,6 +1349,20 @@ pub fn generate_concrete_params(
         .collect();
 
     quote! { #(#items),* }
+}
+
+/// One ident per parameter, numbered where names collide once sanitised
+/// (`a` / `$a` → `a` / `a2`).
+fn param_idents(params: &[ConcreteParam]) -> Vec<syn::Ident> {
+    use syn::ext::IdentExt;
+    let mut names = LocalScope::default();
+    params
+        .iter()
+        .map(|p| {
+            let ident = typemap::make_ident(&p.name).unraw().to_string();
+            typemap::make_ident(&names.declare(&ident, Suffix::Param))
+        })
+        .collect()
 }
 
 /// The per-argument wasm-bindgen attribute for an extern parameter, or
@@ -1390,8 +1404,8 @@ pub(crate) fn generate_concrete_params_with_mono_bounds(
 
     let items = params
         .iter()
-        .map(|param| {
-            let name = typemap::make_ident(&param.name);
+        .zip(param_idents(params))
+        .map(|(param, name)| {
             let attr = param_attr(param, cgctx, scope);
             let ty = render_param_type(param, cgctx, scope, from_module);
             quote! { #attr #name: #ty }
@@ -1607,6 +1621,16 @@ mod tests {
                 .to_string(),
             "impl :: js_sys :: PropertyKey"
         );
+    }
+
+    #[test]
+    fn param_idents_number_sanitised_collisions_without_underscores() {
+        let params = ["a", "$a", "type", "type", "a2"].map(|n| concrete(n, TypeRef::Any, false));
+        let idents: Vec<String> = param_idents(&params)
+            .iter()
+            .map(|i| i.to_string())
+            .collect();
+        assert_eq!(idents, ["a", "a2", "r#type", "type2", "a22"]);
     }
 
     fn string_param(name: &str) -> Param {

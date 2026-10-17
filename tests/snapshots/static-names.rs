@@ -30,6 +30,16 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
+    #[wasm_bindgen(js_name = "foo_bar")]
+    pub fn foo_bar_3();
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "foo_bar")]
+    pub fn try_foo_bar_3() -> Result<(), JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
     #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2)]
     pub static déjà: String;

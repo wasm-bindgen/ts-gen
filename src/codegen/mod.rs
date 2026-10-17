@@ -603,7 +603,7 @@ fn dynamic_union_variant_name(ty: &TypeRef) -> String {
 fn generate_declaration(
     decl: &TypeDeclaration,
     cgctx: &CodegenContext,
-    static_names: &mut functions::StaticNames,
+    value_names: &mut functions::ValueNames,
 ) -> Option<TokenStream> {
     match &decl.kind {
         TypeKind::Class(c) => Some(classes::generate_class(
@@ -646,6 +646,7 @@ fn generate_declaration(
             Some(cgctx),
             &decl.doc,
             decl.scope_id,
+            value_names,
         )),
         TypeKind::Variable(v) => Some(functions::generate_variable(
             v,
@@ -654,7 +655,7 @@ fn generate_declaration(
             &decl.doc,
             &[],
             decl.scope_id,
-            static_names,
+            value_names,
         )),
         TypeKind::TypeAlias(alias) => Some(generate_type_alias(
             alias,
@@ -844,16 +845,16 @@ impl<'d> ModTree<'d> {
 
     /// Generate this module's items. `path` is its `pub mod` path.
     fn generate(&self, path: &mut Vec<String>, cgctx: &CodegenContext) -> Vec<TokenStream> {
-        let mut static_names = functions::StaticNames::default();
+        let mut value_names = functions::ValueNames::default();
         let mut items = Vec::new();
         for entry in &self.entries {
             match entry {
                 ModEntry::Item(decl, js_namespace) => {
                     cgctx.emit_path.replace(path.clone());
                     items.extend(if js_namespace.is_empty() {
-                        generate_declaration(decl, cgctx, &mut static_names)
+                        generate_declaration(decl, cgctx, &mut value_names)
                     } else {
-                        generate_ns_declaration(decl, js_namespace, cgctx, &mut static_names)
+                        generate_ns_declaration(decl, js_namespace, cgctx, &mut value_names)
                     });
                 }
                 ModEntry::Mod(name) => {
@@ -884,7 +885,7 @@ fn generate_ns_declaration(
     decl: &TypeDeclaration,
     js_namespace: &[String],
     cgctx: &CodegenContext,
-    static_names: &mut functions::StaticNames,
+    value_names: &mut functions::ValueNames,
 ) -> Option<TokenStream> {
     match &decl.kind {
         TypeKind::Class(c) => Some(classes::generate_class_with_js_namespace(
@@ -931,6 +932,7 @@ fn generate_ns_declaration(
             Some(cgctx),
             &decl.doc,
             decl.scope_id,
+            value_names,
         )),
         TypeKind::StringEnum(e) => Some(enums::generate_string_enum(e, js_namespace)),
         TypeKind::NumericEnum(e) => Some(enums::generate_numeric_enum(e, js_namespace)),
@@ -941,7 +943,7 @@ fn generate_ns_declaration(
             &decl.doc,
             js_namespace,
             decl.scope_id,
-            static_names,
+            value_names,
         )),
         TypeKind::TypeAlias(alias) => Some(generate_type_alias(
             alias,

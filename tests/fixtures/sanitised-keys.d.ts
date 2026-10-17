@@ -39,3 +39,23 @@ export declare enum Sigil {
   "$" = 1,
   "_" = 2,
 }
+
+// Names that sanitise to the same ident are numbered in declaration order.
+export declare class Collide {
+  constructor();
+  data: string;
+  $data: string;
+}
+export interface CollideInit {
+  fooBar: number;
+  foo_bar: number;
+  data?: string;
+  $data?: string;
+}
+export interface MethodCollide {
+  data(): void;
+  $data: string;
+}
+export declare function ajax(url: string): void;
+export declare function $ajax(url: string): void;
+export declare function collideArgs(a: string, $a: number, fooBar: string, foo_bar: number): void;
