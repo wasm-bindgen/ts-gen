@@ -53,7 +53,13 @@ struct PopulateCtx<'a, 'docs> {
     /// Whether declarations in the global module context are in the global
     /// scope: in a script file, or in a `declare global` block.
     global_scope: bool,
+    static_sides: StaticSides,
 }
+
+/// The static side of each global constructor-shaped `var` with no
+/// instance interface in its file, as a class, by the var's scope and name.
+/// Another file may declare the interface, which then merges with it.
+pub type StaticSides = std::collections::HashMap<(ScopeId, String), ir::TypeDeclaration>;
 
 /// Populated members of each global namespace, keyed by its member scope.
 /// They are inserted into the type arena after population, when the
@@ -117,7 +123,7 @@ pub fn populate_declarations<'a, 'docs>(
     scopes: &'a mut ScopeArena,
     type_arena: &'a [ir::TypeDeclaration],
     scope: ScopeId,
-) -> (Vec<ir::TypeDeclaration>, NamespaceMembers) {
+) -> (Vec<ir::TypeDeclaration>, NamespaceMembers, StaticSides) {
     let mut declarations = Vec::new();
     let file_ctx = super::file_context(program, lib_name);
     let used_type_names =
@@ -135,6 +141,7 @@ pub fn populate_declarations<'a, 'docs>(
         namespace_members: NamespaceMembers::new(),
         export_assignment: None,
         global_scope: !matches!(file_ctx, ir::ModuleContext::Module(_)),
+        static_sides: StaticSides::new(),
     };
 
     if let ir::ModuleContext::Module(_) = file_ctx {
@@ -144,7 +151,7 @@ pub fn populate_declarations<'a, 'docs>(
         pcx.populate_statement(stmt, &file_ctx, &mut declarations, scope);
     }
 
-    (declarations, pcx.namespace_members)
+    (declarations, pcx.namespace_members, pcx.static_sides)
 }
 
 /// The binding a module body's `export = <name>` assigns.
@@ -496,8 +503,20 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
             return;
         }
         let iface_decl = convert_interface_decl(iface, scope, &mut self.parse_ctx());
-        declarations.push(dcx.decl(ir::TypeKind::Interface(iface_decl), doc));
+        declarations.push(dcx.decl(ir::TypeKind::Interface(iface_decl), doc.clone()));
         declarations.extend(self.drain_synth(&module_context, scope));
+        let unpaired: Vec<(ScopeId, String)> = self
+            .registry
+            .unpaired_ctor_vars
+            .iter()
+            .filter(|(_, (ctor_scope, ctor))| *ctor_scope == scope && ctor == iface_name)
+            .map(|(var, _)| var.clone())
+            .collect();
+        for (var_scope, var) in unpaired {
+            let mut sides = self.static_side_class(&var, &iface.body.body, dcx, doc.clone());
+            declarations.extend(self.drain_synth(&module_context, scope));
+            self.static_sides.insert((var_scope, var), sides.remove(0));
+        }
     }
 
     fn populate_type_alias(
@@ -624,6 +643,19 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         doc: Option<String>,
         declarations: &mut Vec<ir::TypeDeclaration>,
     ) {
+        let decls = self.static_side_class(name, members, dcx, doc);
+        declarations.extend(decls);
+    }
+
+    /// The class a static side describes, then an alias per further public
+    /// name.
+    fn static_side_class(
+        &mut self,
+        name: &str,
+        members: &[ast::TSSignature<'_>],
+        dcx: &DeclCtx<'_>,
+        doc: Option<String>,
+    ) -> Vec<ir::TypeDeclaration> {
         let (ctor, static_members) = extract_var_members(members, dcx.scope, &mut self.parse_ctx());
 
         let mut members = Vec::new();
@@ -653,7 +685,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         // Var-promoted classes have no surface
         // type parameters; body scope = enclosing.
         let body_scope = dcx.scope;
-        declarations.push(dcx.decl(
+        let mut declarations = vec![dcx.decl(
             ir::TypeKind::Class(ir::ClassDecl {
                 name: class_name.clone(),
                 js_name,
@@ -666,7 +698,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                 body_scope,
             }),
             doc,
-        ));
+        )];
         for alias in aliases {
             declarations.push(dcx.decl(
                 ir::TypeKind::TypeAlias(ir::TypeAliasDecl {
@@ -679,6 +711,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                 None,
             ));
         }
+        declarations
     }
 
     fn populate_variable_decl(
@@ -725,6 +758,19 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                                 declarations,
                             );
                             continue;
+                        }
+                    }
+                }
+                let global =
+                    self.global_scope && matches!(dcx.module_context, ir::ModuleContext::Global);
+                if global && !alias_ctor && is_class_constructor_var(declarator) {
+                    if let Some(type_ann) = &declarator.type_annotation {
+                        if let ast::TSType::TSTypeLiteral(lit) = &type_ann.type_annotation {
+                            let mut sides =
+                                self.static_side_class(&name, &lit.members, dcx, doc.clone());
+                            declarations.extend(self.drain_synth(dcx.module_context, dcx.scope));
+                            self.static_sides
+                                .insert((dcx.scope, name.clone()), sides.remove(0));
                         }
                     }
                 }

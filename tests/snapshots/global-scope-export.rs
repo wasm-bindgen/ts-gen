@@ -39,6 +39,97 @@ impl OnlyA {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type XV;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<XV, JsValue>;
+    # [wasm_bindgen (static_method_of = XV)]
+    pub fn stat();
+    # [wasm_bindgen (static_method_of = XV , catch , js_name = "stat")]
+    pub fn try_stat() -> Result<(), JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn inst(this: &XV);
+    #[wasm_bindgen(method, catch, js_name = "inst")]
+    pub fn try_inst(this: &XV) -> Result<(), JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type VX;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<VX, JsValue>;
+    # [wasm_bindgen (static_method_of = VX)]
+    pub fn stat();
+    # [wasm_bindgen (static_method_of = VX , catch , js_name = "stat")]
+    pub fn try_stat() -> Result<(), JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn inst(this: &VX);
+    #[wasm_bindgen(method, catch, js_name = "inst")]
+    pub fn try_inst(this: &VX) -> Result<(), JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type XC;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<XC, JsValue>;
+    # [wasm_bindgen (static_method_of = XC)]
+    pub fn stat();
+    # [wasm_bindgen (static_method_of = XC , catch , js_name = "stat")]
+    pub fn try_stat() -> Result<(), JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn inst(this: &XC);
+    #[wasm_bindgen(method, catch, js_name = "inst")]
+    pub fn try_inst(this: &XC) -> Result<(), JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type CX;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<CX, JsValue>;
+    # [wasm_bindgen (static_method_of = CX)]
+    pub fn stat();
+    # [wasm_bindgen (static_method_of = CX , catch , js_name = "stat")]
+    pub fn try_stat() -> Result<(), JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn inst(this: &CX);
+    #[wasm_bindgen(method, catch, js_name = "inst")]
+    pub fn try_inst(this: &CX) -> Result<(), JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type XF;
+    #[wasm_bindgen(method, getter)]
+    pub fn a(this: &XF) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_a(this: &XF, val: f64);
+}
+impl XF {
+    pub fn new(a: f64) -> XF {
+        let inner: XF = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_a(a);
+        inner
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "FX")]
+    pub fn fx() -> FX;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "FX")]
+    pub fn try_fx() -> Result<FX, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Proc;
     #[wasm_bindgen(method, getter)]
     pub fn pid(this: &Proc) -> f64;
@@ -60,4 +151,43 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch, js_name = "f")]
     pub fn try_f(w: &Win, o: &OnlyA) -> Result<(), JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type XCConstructor;
+    #[wasm_bindgen(method, getter)]
+    pub fn prototype(this: &XCConstructor) -> XC;
+    #[wasm_bindgen(method)]
+    pub fn stat(this: &XCConstructor);
+    #[wasm_bindgen(method, catch, js_name = "stat")]
+    pub fn try_stat(this: &XCConstructor) -> Result<(), JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "XF")]
+    pub fn xf() -> XF;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "XF")]
+    pub fn try_xf() -> Result<XF, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type FX;
+    #[wasm_bindgen(method, getter)]
+    pub fn a(this: &FX) -> f64;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_a(this: &FX, val: f64);
+}
+impl FX {
+    pub fn new(a: f64) -> FX {
+        let inner: FX = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_a(a);
+        inner
+    }
 }
