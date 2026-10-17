@@ -17,6 +17,7 @@ use std::path::{Path, PathBuf};
 ///     The Rust `pub mod` name is always derived (snake_case) from the
 ///     `--lib-name` value (after stripping protocol prefixes like `node:`).
 ///   - `--experimental-generic-mono` enables per-monomorphization imports.
+///   - `--input <path>` adds a workspace-relative input beside the fixture.
 fn main() {
     let out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
     let crate_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
@@ -66,9 +67,13 @@ struct Entry {
     externals: Vec<String>,
     /// Whether this fixture opts into per-monomorphization generic imports.
     experimental_generic_mono: bool,
-    /// Further modules listed as `--export <specifier>`, emitted alongside
-    /// `lib_name`.
-    export_modules: Vec<String>,
+    /// Whether the fixture declares its own `--lib-name` (module mode).
+    /// Script-mode fixtures parse without one and export by `--export`.
+    module_mode: bool,
+    /// `--export` values from the directive, resolved as in the CLI.
+    export_specs: Vec<String>,
+    /// Further `--input` files, resolved against the workspace.
+    inputs: Vec<PathBuf>,
 }
 
 /// Pair every `integration-tests/tests/<name>.rs` with the fixture
@@ -104,16 +109,23 @@ fn discover_entries(tests_dir: &Path, fixtures_dir: &Path) -> Vec<Entry> {
         }
 
         let directive = parse_directive(&dts_path);
+        let workspace_dir = fixtures_dir.parent().unwrap().parent().unwrap();
 
         entries.push(Entry {
             mod_name: stem.to_string(),
+            module_mode: directive.lib_name.is_some(),
             // Directive override takes precedence (e.g. `node:console`),
             // otherwise default to the kebab-case fixture stem.
             lib_name: directive.lib_name.unwrap_or(kebab),
             dts_path,
             externals: directive.externals,
             experimental_generic_mono: directive.experimental_generic_mono,
-            export_modules: directive.export_modules,
+            export_specs: directive.export_specs,
+            inputs: directive
+                .inputs
+                .iter()
+                .map(|input| workspace_dir.join(input))
+                .collect(),
         });
     }
 
@@ -128,8 +140,10 @@ struct Directive {
     externals: Vec<String>,
     /// Whether `--experimental-generic-mono` is present.
     experimental_generic_mono: bool,
-    /// `--export` values that name a module rather than a fixture file.
-    export_modules: Vec<String>,
+    /// All `--export <spec>` (or `-E <spec>`) values.
+    export_specs: Vec<String>,
+    /// All `--input <path>` (or `-i <path>`) values.
+    inputs: Vec<String>,
 }
 
 /// Parse the `//! @ts-gen ...` directive lines at the top of the fixture
@@ -139,7 +153,8 @@ fn parse_directive(dts_path: &Path) -> Directive {
     let mut lib_name = None;
     let mut externals = Vec::new();
     let mut experimental_generic_mono = false;
-    let mut export_modules = Vec::new();
+    let mut export_specs = Vec::new();
+    let mut inputs = Vec::new();
 
     for line in content.lines() {
         let trimmed = line.trim();
@@ -156,15 +171,17 @@ fn parse_directive(dts_path: &Path) -> Directive {
                         externals.push(args[i + 1].clone());
                         i += 2;
                     }
-                    "--export" | "-E" if i + 1 < args.len() => {
-                        if !args[i + 1].ends_with(".d.ts") {
-                            export_modules.push(args[i + 1].clone());
-                        }
-                        i += 2;
-                    }
                     "--experimental-generic-mono" => {
                         experimental_generic_mono = true;
                         i += 1;
+                    }
+                    "--export" | "-E" if i + 1 < args.len() => {
+                        export_specs.push(args[i + 1].clone());
+                        i += 2;
+                    }
+                    "--input" | "-i" if i + 1 < args.len() => {
+                        inputs.push(args[i + 1].clone());
+                        i += 2;
                     }
                     _ => i += 1,
                 }
@@ -178,7 +195,8 @@ fn parse_directive(dts_path: &Path) -> Directive {
         lib_name,
         externals,
         experimental_generic_mono,
-        export_modules,
+        export_specs,
+        inputs,
     }
 }
 
@@ -206,9 +224,12 @@ fn shell_split(s: &str) -> Vec<String> {
 }
 
 fn generate_bindings(entry: &Entry, out_dir: &Path) {
-    let path_refs: Vec<&PathBuf> = vec![&entry.dts_path];
+    let path_refs: Vec<&PathBuf> = std::iter::once(&entry.dts_path)
+        .chain(&entry.inputs)
+        .collect();
 
-    let (module, mut gctx) = ts_gen::parse(&path_refs, Some(&entry.lib_name))
+    let lib_name = entry.module_mode.then_some(entry.lib_name.as_str());
+    let (module, mut gctx) = ts_gen::parse(&path_refs, lib_name)
         .unwrap_or_else(|e| panic!("Failed to parse {}: {e}", entry.dts_path.display()));
 
     for mapping in &entry.externals {
@@ -228,20 +249,39 @@ fn generate_bindings(entry: &Entry, out_dir: &Path) {
         );
     }
 
-    // The fixture's `--lib-name` causes every declaration to land in
-    // `ModuleContext::Module(lib_name)`, which codegen emits at the top
-    // level once selected via `ExportSpec::Module`. Further `--export`
-    // modules are emitted in their own `pub mod`. The file export covers
-    // any `declare global` block in the fixture.
+    // A module-mode fixture's `--lib-name` puts every declaration in
+    // `ModuleContext::Module(lib_name)`; lift it via `ExportSpec::Module`
+    // so codegen emits it at global scope. A script-mode fixture lists its
+    // own `--export`s, which resolve as in the CLI: an existing path is a
+    // file export, anything else a module specifier.
     let mut exports: std::collections::HashSet<ts_gen::codegen::ExportSpec> =
         std::collections::HashSet::new();
-    exports.insert(ts_gen::codegen::ExportSpec::Module(entry.lib_name.clone()));
-    for module in &entry.export_modules {
-        exports.insert(ts_gen::codegen::ExportSpec::Module(module.clone()));
+    if entry.module_mode {
+        exports.insert(ts_gen::codegen::ExportSpec::Module(entry.lib_name.clone()));
+        // Ambient declarations in a `--lib-name` fixture are file exports.
+        let canonical = entry
+            .dts_path
+            .canonicalize()
+            .unwrap_or(entry.dts_path.clone());
+        exports.insert(ts_gen::codegen::ExportSpec::File(canonical));
     }
-    exports.insert(ts_gen::codegen::ExportSpec::File(
-        entry.dts_path.canonicalize().unwrap(),
-    ));
+    let workspace_dir = entry
+        .dts_path
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap();
+    for spec in &entry.export_specs {
+        let as_path = workspace_dir.join(spec);
+        if as_path.exists() {
+            let canonical = as_path.canonicalize().unwrap_or(as_path);
+            exports.insert(ts_gen::codegen::ExportSpec::File(canonical));
+        } else {
+            exports.insert(ts_gen::codegen::ExportSpec::Module(spec.clone()));
+        }
+    }
     let options = ts_gen::codegen::GenerateOptions::new()
         .experimental_generic_mono(entry.experimental_generic_mono)
         .exports(exports);
@@ -258,6 +298,9 @@ fn generate_bindings(entry: &Entry, out_dir: &Path) {
         .unwrap_or_else(|e| panic!("Failed to write {}: {e}", out_file.display()));
 
     println!("cargo:rerun-if-changed={}", entry.dts_path.display());
+    for input in &entry.inputs {
+        println!("cargo:rerun-if-changed={}", input.display());
+    }
 }
 
 fn strip_inner_attributes(code: &str) -> String {

@@ -70,6 +70,10 @@ pub struct GlobalContext {
     pub assigned_namespaces: std::collections::HashMap<ScopeId, String>,
     /// What each module scope exports, by public name.
     pub exports: ModuleExports,
+    /// Each block scope's declarations, by the local name they bind: what
+    /// an export map's local names refer to. The global scope holds every
+    /// global, with the declarations of all files merged.
+    declarations: std::collections::HashMap<ScopeId, indexmap::IndexMap<String, Vec<TypeId>>>,
     types: Vec<TypeDeclaration>,
     modules: Vec<ParsedModule>,
     /// Map from module specifier to ModuleId for fast lookup.
@@ -100,10 +104,11 @@ impl ModuleExports {
             .insert(public.into(), local.into());
     }
 
-    /// Forget everything recorded for `scope`. A script file's globals
-    /// are declarations, not a module's exports.
-    pub fn clear(&mut self, scope: ScopeId) {
-        self.by_scope.remove(&scope);
+    /// Drop the export `public` of `scope`.
+    pub fn remove(&mut self, scope: ScopeId, public: &str) {
+        if let Some(m) = self.by_scope.get_mut(&scope) {
+            m.shift_remove(public);
+        }
     }
 
     /// Re-export everything `from` exports as exports of `scope`, under the
@@ -134,13 +139,13 @@ impl ModuleExports {
             .map(|(public, _)| public.as_str())
     }
 
-    /// Whether `scope` exports its binding `local` under any name. A
-    /// renamed constructor variable's class takes its public name as its
-    /// Rust name, so a public name counts as well.
-    pub fn is_exported(&self, scope: ScopeId, local: &str) -> bool {
+    /// Every export of `scope` as `(public, local)`, in declaration order.
+    pub fn entries(&self, scope: ScopeId) -> impl Iterator<Item = (&str, &str)> {
         self.by_scope
             .get(&scope)
-            .is_some_and(|m| m.contains_key(local) || m.values().any(|l| l == local))
+            .into_iter()
+            .flatten()
+            .map(|(public, local)| (public.as_str(), local.as_str()))
     }
 }
 
@@ -155,6 +160,7 @@ impl GlobalContext {
             ambient_module_scopes: std::collections::HashMap::new(),
             assigned_namespaces: std::collections::HashMap::new(),
             exports: ModuleExports::default(),
+            declarations: std::collections::HashMap::new(),
             types: Vec::new(),
             modules: Vec::new(),
             module_index: std::collections::HashMap::new(),
@@ -240,7 +246,8 @@ impl GlobalContext {
         modules.chain(namespaces.copied())
     }
 
-    /// Remove `dropped` from every module's and namespace's declarations.
+    /// Remove `dropped` from every module's, namespace's and block's
+    /// declarations.
     pub(crate) fn drop_types(&mut self, dropped: &std::collections::HashSet<TypeId>) {
         for module in &mut self.modules {
             module.types.retain(|id| !dropped.contains(id));
@@ -249,6 +256,9 @@ impl GlobalContext {
             if let crate::ir::TypeKind::Namespace(ns) = &mut decl.kind {
                 ns.declarations.retain(|id| !dropped.contains(id));
             }
+        }
+        for ids in self.declarations.values_mut().flat_map(|m| m.values_mut()) {
+            ids.retain(|id| !dropped.contains(id));
         }
     }
 
@@ -280,6 +290,28 @@ impl GlobalContext {
     /// `Foo` of that block.
     fn member_name<'n>(&'n self, ns: ScopeId, public: &'n str) -> Option<&'n str> {
         self.exports.local_name(ns, public)
+    }
+
+    /// Record that `type_id` is a declaration of `scope` binding `name`.
+    pub fn declare(&mut self, scope: ScopeId, name: &str, type_id: TypeId) {
+        let ids = self
+            .declarations
+            .entry(scope)
+            .or_default()
+            .entry(name.to_string())
+            .or_default();
+        if !ids.contains(&type_id) {
+            ids.push(type_id);
+        }
+    }
+
+    /// The declarations of `scope` binding `name`: a class and a merged
+    /// namespace, say.
+    pub fn declarations(&self, scope: ScopeId, name: &str) -> &[TypeId] {
+        self.declarations
+            .get(&scope)
+            .and_then(|m| m.get(name))
+            .map_or(&[], Vec::as_slice)
     }
 
     /// Iterate all types in the arena.

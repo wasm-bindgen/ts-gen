@@ -12,8 +12,6 @@ pub mod dep {
         # [wasm_bindgen (extends = Object , js_name = "Foo")]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type _Foo;
-        #[wasm_bindgen(constructor, js_class = "Foo", catch)]
-        pub fn new() -> Result<_Foo, JsValue>;
         #[wasm_bindgen(method)]
         pub fn bar(this: &_Foo);
         #[wasm_bindgen(method, catch, js_name = "bar")]

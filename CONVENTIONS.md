@@ -2118,9 +2118,11 @@ A module-context declaration has exactly three possible states:
    plus a bare-ident use site).
 
 3. **Resolution-only** — `<spec>` is in the type universe but listed
-   in neither `--export` nor `--external`. The declaration is not
-   emitted. Any cross-reference from an emitted decl produces a
-   codegen **error**:
+   in neither `--export` nor `--external`. Its exports are not emitted,
+   but a type an emitted signature reaches through an import is, as a
+   type only (see [Global scope](#global-scope)). A reference to a
+   module's declaration that is not in scope at the use site, which
+   codegen finds by name, produces a codegen **error**:
 
    ```text
    error: type `Bar` from module "x:foo" is referenced by exported
@@ -2138,7 +2140,7 @@ externalised, not emitted.
 
 For `Global` declarations (top-level `declare class`, `declare
 function`, `declare const`, etc. in a script file) the rule is simpler:
-emit when the decl's source file is in `--export`, otherwise skip.
+a file's globals are emitted when the file is in `--export`.
 
 A file with any top-level `import` or `export` is a module, and with
 `--lib-name` every top-level declaration in it is `Module("<lib>")`,
@@ -2166,8 +2168,15 @@ Imports look up public names and bind the local: `export { _Foo as
 Foo }` makes `import { Foo }`, `D.Foo` and `extends Foo` all reach
 `_Foo`, and the Rust reference is `_Foo`.
 
-Unexported functions, variables and namespaces are not emitted; an
-unexported class keeps only its instance members. Types are unaffected.
+The output is built from export maps: each export of a selected file or
+module is emitted under its public name, a function or variable once
+per name and a type under its local name with an alias per public name
+(see [Type aliases and `export { X as Y }`](#type-aliases-and-export--x-as-y-)).
+A default export takes its local's Rust name, or `default` when a named
+export of the same declaration has it: `export { f, f as default }`
+binds `f()` and `default()`. An `export default` declaration's local
+name is not exported, also in a block without `export { … }`, so
+`export default function f()` binds only `default`, as `f()`.
 
 Qualification keys off the *resolved* declaration's `module_context`,
 not the textual name, so a global `interface Foo` and a module-scoped
@@ -2179,14 +2188,46 @@ are not visible to the file or to other modules, and repeated
 file or module reaches them with `import { Foo } from "<spec>"`, which
 resolves against the module's scopes before looking for a file.
 
+### Global scope
+
+As in TypeScript, there is one global scope. A script file's top-level
+declarations and every `declare global` block declare into it, after the
+built-in types, so declarations of a name in different files merge into
+one, as they do within a file:
+
+```ts
+// a.d.ts
+interface Win { a(): void; }
+// b.d.ts
+interface Win { b(): void; }
+```
+
+```rust
+pub type Win;
+pub fn a(this: &Win);
+pub fn b(this: &Win);
+```
+
+A file without `--lib-name` is read as a script, its globals are its
+exports, and selecting it emits each of them whole, members from other
+files included. Without `--export`, every input file is selected.
+
+What a selected export's signatures reach and no selected export
+provides is emitted as a type only: an interface, alias or enum as is,
+a class without its constructor and statics, and a namespace only as
+the `pub mod` path to what is emitted. A function or variable is
+emitted only as an export. With `--export b.d.ts`, a function in
+`b.d.ts` taking `OnlyA` from `a.d.ts` emits `OnlyA` but not `a.d.ts`'s
+functions.
+
 ### Output surface: `--export` and `--input`
 
 `--input` defines the *type universe* — every file gets parsed so
 resolution sees the full set. `--export` defines the *output surface* —
 what actually gets emitted as public Rust code. Two forms:
 
-* **File path** (e.g. `--export types/email.d.ts`) — emit that file's
-  **global-scope** declarations.
+* **File path** (e.g. `--export types/email.d.ts`) — emit the globals
+  that file declares.
 * **Module specifier** (e.g. `--export cloudflare:email`) — emit that
   module's declarations in its `pub mod`, attribute-attached.
 

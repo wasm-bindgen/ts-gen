@@ -269,7 +269,6 @@ mod tests {
             module_context: crate::ir::ModuleContext::Global,
             doc: None,
             scope_id: scope,
-            exported: false,
         }
     }
 
