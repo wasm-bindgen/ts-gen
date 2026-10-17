@@ -976,11 +976,6 @@ pub struct TypeRegistry {
     /// the module, so it is populated into the module rather than as a
     /// global.
     pub assigned_namespaces: HashMap<crate::parse::scope::ScopeId, String>,
-    /// Public names given by source-less `export { local as public }`,
-    /// keyed by the Phase 1 `TypeId` that `local` binds directly in the
-    /// exporting scope. A same-named declaration in any other scope is a
-    /// different binding and keeps its own name.
-    pub export_names: HashMap<crate::context::TypeId, Vec<String>>,
     /// `declare var X: XConstructor` pairs, `(scope, X)` → the scope
     /// declaring `XConstructor` and its name. The interface supplies the
     /// class constructor and statics and is not emitted as a type of its own.

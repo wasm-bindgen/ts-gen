@@ -12,6 +12,8 @@ pub mod dep {
         # [wasm_bindgen (extends = Object , js_name = "Foo")]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type _Foo;
+        #[wasm_bindgen(constructor, js_class = "Foo", catch)]
+        pub fn new() -> Result<_Foo, JsValue>;
         #[wasm_bindgen(method)]
         pub fn bar(this: &_Foo);
         #[wasm_bindgen(method, catch, js_name = "bar")]
@@ -19,6 +21,26 @@ pub mod dep {
     }
     #[allow(dead_code)]
     pub type Foo = _Foo;
+    pub mod foo {
+        #[allow(unused_imports)]
+        use super::*;
+        #[wasm_bindgen(private, js_namespace = "Foo")]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+        pub enum Mode {
+            A = "a",
+            B = "b",
+        }
+        #[wasm_bindgen(module = "dep")]
+        extern "C" {
+            #[wasm_bindgen(js_namespace = "Foo")]
+            pub fn helper();
+        }
+        #[wasm_bindgen(module = "dep")]
+        extern "C" {
+            #[wasm_bindgen(catch, js_name = "helper", js_namespace = "Foo")]
+            pub fn try_helper() -> Result<(), JsValue>;
+        }
+    }
     #[allow(dead_code)]
     pub type Alias = _Foo;
     #[wasm_bindgen(module = "dep")]
@@ -51,26 +73,6 @@ pub mod dep {
             inner.set_foo(foo);
             inner.set_alias(alias);
             inner
-        }
-    }
-    pub mod foo {
-        #[allow(unused_imports)]
-        use super::*;
-        #[wasm_bindgen(private, js_namespace = "Foo")]
-        #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-        pub enum Mode {
-            A = "a",
-            B = "b",
-        }
-        #[wasm_bindgen(module = "dep")]
-        extern "C" {
-            #[wasm_bindgen(js_namespace = "Foo")]
-            pub fn helper();
-        }
-        #[wasm_bindgen(module = "dep")]
-        extern "C" {
-            #[wasm_bindgen(catch, js_name = "helper", js_namespace = "Foo")]
-            pub fn try_helper() -> Result<(), JsValue>;
         }
     }
 }

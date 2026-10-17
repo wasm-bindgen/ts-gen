@@ -324,10 +324,10 @@ fn generate_tokens(
     for &type_id in &module.types {
         for decl in surface.get(type_id) {
             root.at(&cgctx.module_path(&decl.module_context)).insert(
+                type_id,
                 decl,
                 Vec::new(),
                 &surface,
-                gctx,
             );
         }
     }
@@ -613,7 +613,13 @@ fn generate_type_alias(
                 .resolve_binding(alias.body_scope, target_name),
             Some(crate::parse::scope::Binding::TypeParam)
         );
+        let resolves_local = cgctx
+            .gctx
+            .scopes
+            .resolve(alias.body_scope, target_name)
+            .is_some_and(|id| cgctx.local_type_ids.contains(&id));
         if !is_type_param
+            && !resolves_local
             && !cgctx.local_types.contains_key(target_name)
             && !crate::codegen::typemap::JS_SYS_RESERVED.contains(&target_name)
         {
@@ -724,32 +730,21 @@ impl<'d> ModTree<'d> {
 
     /// Add `decl`, whose enclosing namespaces have the JS path
     /// `js_namespace`. A namespace becomes a child holding those of its
-    /// members that are in the surface.
-    ///
-    /// A module's namespace is reached through the module's export of it,
-    /// which a renamed or default export of a merged value names
-    /// differently (`export { make as create }` makes `create.helper`).
+    /// members that are in the surface, under the name it binds by in JS.
     fn insert(
         &mut self,
+        id: crate::context::TypeId,
         decl: &'d TypeDeclaration,
         mut js_namespace: Vec<String>,
         surface: &'d surface::Surface<'d>,
-        gctx: &crate::context::GlobalContext,
     ) {
         match &decl.kind {
             TypeKind::Namespace(ns) => {
                 let child = self.child(&crate::util::naming::to_snake_case(&ns.name));
-                let js_name = match decl.module_context {
-                    crate::ir::ModuleContext::Module(_) if js_namespace.is_empty() => gctx
-                        .exports
-                        .public_name(decl.scope_id, &ns.name)
-                        .unwrap_or(&ns.name),
-                    _ => &ns.name,
-                };
-                js_namespace.push(js_name.to_string());
+                js_namespace.push(surface.js_name(id, &ns.name).to_string());
                 for &member in &ns.declarations {
                     for decl in surface.get(member) {
-                        child.insert(decl, js_namespace.clone(), surface, gctx);
+                        child.insert(member, decl, js_namespace.clone(), surface);
                     }
                 }
             }

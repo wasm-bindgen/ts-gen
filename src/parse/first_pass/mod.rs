@@ -15,7 +15,7 @@ mod populate;
 
 // Re-export public entry points.
 pub use collect::collect_type_names;
-pub use populate::{populate_declarations, NamespaceMembers, StaticSides};
+pub use populate::{populate_declarations, NamespaceMembers, Populated, StaticSides};
 
 // ─── Script vs Module Detection ─────────────────────────────────────
 
