@@ -447,6 +447,13 @@ the setter is named `set_<snake_case>`.
     instead: `new_` / `set_new`, with `new_` as its factory parameter and
     builder method. A method's derived names (`try_new`, `new_with_x`)
     can clash more than once, so a method `new()` is numbered `new_2`.
+  * Instance and static members share one extern block, and an instance
+    member keeps its name whatever the declaration order: a static named
+    like one takes `_static`, MDN's spelling for the same clash.
+    `Response.json(data)` → `json_static(data)` /
+    `json_static_with_init(data, init)` beside `response.json()` →
+    `json(this)`, and a `static readonly ok` beside an instance `ok` →
+    `ok_static()`.
   * A parameter can't shadow a static (E0530), so one named like a static
     in scope, including one a namespace's module imports from its parent,
     takes a trailing underscore (`url_`). So does a dictionary helper's
