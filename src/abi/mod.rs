@@ -400,9 +400,12 @@ pub struct Abi {
 }
 
 impl Abi {
-    /// The first function named `name`, from any module.
+    /// The first function named `name`, its own or an alias, from any
+    /// module.
     pub fn function(&self, name: &str) -> Option<&AbiFunction> {
-        self.functions.iter().find(|f| f.name == name)
+        self.functions
+            .iter()
+            .find(|f| f.name == name || f.aliases.iter().any(|a| a == name))
     }
 
     /// The function a language module imports as `name` from `module`:

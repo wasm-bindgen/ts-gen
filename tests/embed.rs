@@ -675,3 +675,50 @@ fn embed_without_exports_passes_the_module_through() {
     );
     ts_gen::abi::embed::assemble(&out.wrapper_wat).unwrap();
 }
+
+#[test]
+fn embed_binds_one_function_under_every_alias() {
+    let (ir, mut gctx) = ts_gen::parse_source(
+        r#"
+        declare module "m:lib" {
+            class _Conn { constructor(); get(): string; }
+            export { _Conn as Conn, _Conn as Connection };
+        }
+        interface ExportedHandler { fetch?(request: string): string; }
+        "#,
+        None,
+    )
+    .unwrap();
+    let provided = ts_gen::provides::resolve("ExportedHandler.fetch", &ir, &mut gctx).unwrap();
+    let abi = build_abi(&ir, &gctx, &provided);
+    // The two `new` imports differ in result type, so they need two functions.
+    let module = r#"(module
+        (import "./bindings.wasm" "Conn.get" (func (param externref) (result externref)))
+        (import "./bindings.wasm" "Connection.get" (func (param externref) (result externref)))
+        (import "./bindings.wasm" "Conn.new" (func (result externref)))
+        (import "./bindings.wasm" "Connection.new" (func (result (ref extern))))
+        (func (export "fetch") (param externref) (result externref) unreachable))"#;
+    let bytes = ts_gen::abi::embed::assemble(module).unwrap();
+    let options = ts_gen::abi::embed::Options {
+        module_specifier: "./m.wasm".into(),
+    };
+    let out = ts_gen::abi::embed::embed(&abi, &bytes, &options).unwrap();
+    ts_gen::abi::embed::assemble(&out.bindings_wat).unwrap();
+    let b = &out.bindings_wat;
+    assert!(
+        b.contains(r#"(func (export "Conn.get") (export "Connection.get")"#),
+        "{b}"
+    );
+    assert!(
+        b.contains(r#"(func (export "Conn.new") (result externref)"#),
+        "{b}"
+    );
+    assert!(
+        b.contains(r#"(func (export "Connection.new") (result (ref extern))"#),
+        "{b}"
+    );
+    assert_eq!(
+        out.used,
+        ["Conn.get", "Connection.get", "Conn.new", "Connection.new"]
+    );
+}

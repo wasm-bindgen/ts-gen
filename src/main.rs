@@ -23,43 +23,14 @@ struct Cli {
     #[arg(long, value_enum, default_value_t = Target::Rust)]
     target: Target,
 
-    /// Output surface: files and/or JS module specifiers to emit. The
-    /// `--input` set defines the full type universe for resolution;
-    /// `--export` is authoritative about what gets emitted as public
-    /// Rust code.
-    ///
-    /// Two forms:
-    ///   - File path (e.g. `types/email.d.ts`) — emits the globals that
-    ///     file declares.
-    ///   - Module specifier (e.g. `cloudflare:email`) — emits that
-    ///     module's declarations in a `pub mod` named by the specifier
-    ///     (`cloudflare::email`). The `--lib-name` module is emitted at
-    ///     the top level instead.
-    ///
-    /// When omitted entirely, every `--input` file becomes an implicit
-    /// file export. NO modules are emitted by the implicit default —
-    /// modules must be explicitly listed. As soon as one `--export` is
-    /// passed, the implicit default is disabled and only what's listed
-    /// contributes to the output.
-    #[arg(short = 'E', long = "export", num_args = 1..)]
-    export: Vec<String>,
+    #[command(flatten)]
+    selection: Selection,
 
     /// JS module specifier (required when .d.ts has top-level exports).
     /// This module is the library the output binds, so it is emitted at
     /// the top level rather than in a `pub mod`.
     #[arg(long)]
     lib_name: Option<String>,
-
-    /// External type mappings for imported types.
-    ///
-    /// Format: `LHS=RHS` where:
-    ///   - `Blob=::web_sys::Blob` maps a specific type
-    ///   - `node:buffer=node_buffer_sys` maps a module
-    ///   - `node:*=node_sys::*` maps a module prefix with wildcard
-    ///
-    /// Multiple mappings can be comma-separated or specified multiple times.
-    #[arg(short = 'e', long = "external", num_args = 1..)]
-    external: Vec<String>,
 
     /// Disable the built-in web platform → `web_sys` defaults.
     ///
@@ -116,6 +87,57 @@ struct Cli {
     provides_bindings: Option<String>,
 }
 
+/// What the output covers, shared by the main command and `embed`, which
+/// binds the surface the template lists.
+#[derive(clap::Args, Debug)]
+struct Selection {
+    /// Output surface: files and/or JS module specifiers to emit. The
+    /// `--input` set defines the full type universe for resolution;
+    /// `--export` is authoritative about what gets emitted as public
+    /// Rust code.
+    ///
+    /// Two forms:
+    ///   - File path (e.g. `types/email.d.ts`) — emits the globals that
+    ///     file declares.
+    ///   - Module specifier (e.g. `cloudflare:email`) — emits that
+    ///     module's declarations in a `pub mod` named by the specifier
+    ///     (`cloudflare::email`). The `--lib-name` module is emitted at
+    ///     the top level instead.
+    ///
+    /// When omitted entirely, every `--input` file becomes an implicit
+    /// file export. NO modules are emitted by the implicit default —
+    /// modules must be explicitly listed. As soon as one `--export` is
+    /// passed, the implicit default is disabled and only what's listed
+    /// contributes to the output.
+    #[arg(short = 'E', long = "export", num_args = 1..)]
+    export: Vec<String>,
+
+    /// External type mappings for imported types.
+    ///
+    /// Format: `LHS=RHS` where:
+    ///   - `Blob=::web_sys::Blob` maps a specific type
+    ///   - `node:buffer=node_buffer_sys` maps a module
+    ///   - `node:*=node_sys::*` maps a module prefix with wildcard
+    ///
+    /// Multiple mappings can be comma-separated or specified multiple times.
+    #[arg(short = 'e', long = "external", num_args = 1..)]
+    external: Vec<String>,
+}
+
+impl Selection {
+    /// Register the `--external` mappings and resolve the `--export`s.
+    fn apply(
+        &self,
+        gctx: &mut ts_gen::context::GlobalContext,
+        input_files: &[PathBuf],
+    ) -> Result<std::collections::HashSet<ts_gen::codegen::ExportSpec>> {
+        for mapping in &self.external {
+            gctx.external_map.add_mappings(mapping);
+        }
+        resolve_exports(&self.export, input_files)
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, clap::ValueEnum)]
 enum Target {
     /// wasm-bindgen extern declarations.
@@ -166,9 +188,8 @@ struct EmbedArgs {
     #[arg(long)]
     provides: Option<String>,
 
-    /// What the template covers; see the main command's `--export`.
-    #[arg(short = 'E', long = "export", num_args = 1..)]
-    export: Vec<String>,
+    #[command(flatten)]
+    selection: Selection,
 }
 
 fn main() -> Result<()> {
@@ -193,10 +214,7 @@ fn main() -> Result<()> {
         gctx.external_map.clear_defaults();
     }
 
-    // Apply external type mappings
-    for mapping in &cli.external {
-        gctx.external_map.add_mappings(mapping);
-    }
+    let exports = cli.selection.apply(&mut gctx, &input_files)?;
 
     let provided = match &cli.provides {
         Some(spec) => ts_gen::provides::resolve(spec, &module, &mut gctx)?,
@@ -211,8 +229,6 @@ fn main() -> Result<()> {
             print_declaration(&gctx, decl, 0);
         }
     }
-
-    let exports = resolve_exports(&cli.export, &input_files)?;
 
     let options = ts_gen::codegen::GenerateOptions::new()
         .errors_as_error(cli.errors_as_error)
@@ -331,13 +347,13 @@ fn embed(args: EmbedArgs) -> Result<()> {
     }
     let (module, mut gctx) =
         ts_gen::parse::parse_dts_files(&input_files, args.lib_name.as_deref())?;
+    let exports = args.selection.apply(&mut gctx, &input_files)?;
     let provided = match &args.provides {
         Some(spec) => ts_gen::provides::resolve(spec, &module, &mut gctx)?,
         None => Vec::new(),
     };
     gctx.diagnostics.emit();
-    let options = ts_gen::codegen::GenerateOptions::new()
-        .exports(resolve_exports(&args.export, &input_files)?);
+    let options = ts_gen::codegen::GenerateOptions::new().exports(exports);
     let abi = ts_gen::abi::build(&module, &gctx, &options, &provided);
 
     let wasm = std::fs::read(&args.module)

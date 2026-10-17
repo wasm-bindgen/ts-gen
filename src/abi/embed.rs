@@ -50,9 +50,11 @@ pub struct Output {
     pub handlers: Vec<String>,
 }
 
-/// A bindings import the module uses, with the types it declared for it.
+/// An ABI function the module uses with one signature, and the names it
+/// imports it by: one bindings function exported under each.
 struct UsedFunction {
-    name: String,
+    function: String,
+    names: Vec<String>,
     param_types: Vec<WasmType>,
     result_type: Option<WasmType>,
 }
@@ -97,7 +99,7 @@ pub fn embed(abi: &Abi, module: &[u8], options: &Options) -> Result<Output> {
         wrapper_wat,
         builtins_js: builtins.render(),
         jspi: info.jspi,
-        used: info.used.iter().map(|u| u.name.clone()).collect(),
+        used: info.used.iter().flat_map(|u| u.names.clone()).collect(),
         handlers: info.handlers.iter().map(|h| h.name.clone()).collect(),
     })
 }
@@ -333,12 +335,22 @@ fn inspect(abi: &Abi, module: &[u8]) -> Result<ModuleInfo> {
                 import: true,
             };
             let sig = check_signature(&expected, actual, &types)?;
-            if !used.iter().any(|u: &UsedFunction| u.name == *field) {
-                used.push(UsedFunction {
-                    name: field.clone(),
+            if used.iter().any(|u: &UsedFunction| u.names.contains(field)) {
+                continue;
+            }
+            let same = used.iter_mut().find(|u| {
+                u.function == f.name
+                    && u.param_types == sig.param_types
+                    && u.result_type == sig.result_type
+            });
+            match same {
+                Some(u) => u.names.push(field.clone()),
+                None => used.push(UsedFunction {
+                    function: f.name.clone(),
+                    names: vec![field.clone()],
                     param_types: sig.param_types,
                     result_type: sig.result_type,
-                });
+                }),
             }
         } else if module_name == BUILTINS_SPECIFIER && field == UNDEFINED_GLOBAL {
             if !matches!(ty, TypeRef::Global(g) if !g.mutable && ref_type_of(&g.content_type).is_some())
@@ -1038,7 +1050,7 @@ fn generate_bindings(abi: &Abi, used: &[UsedFunction], builtins: &mut Builtins) 
     let mut funcs = String::new();
 
     for uf in used {
-        let f = abi.function(&uf.name).expect("checked in inspect");
+        let f = abi.function(&uf.function).expect("checked in inspect");
         let mut body = Body {
             imports: &mut imports,
             builtins,
@@ -1056,10 +1068,15 @@ fn generate_bindings(abi: &Abi, used: &[UsedFunction], builtins: &mut Builtins) 
         } else {
             fb.value
         };
+        let exports: String = uf
+            .names
+            .iter()
+            .map(|n| format!(" (export {n:?})"))
+            .collect();
         let _ = writeln!(
             funcs,
-            "  (func (export {:?}){}{}{}\n    {}{value})",
-            f.name, params_str, result_str, fb.locals, fb.stmts
+            "  (func{exports}{}{}{}\n    {}{value})",
+            params_str, result_str, fb.locals, fb.stmts
         );
     }
 
