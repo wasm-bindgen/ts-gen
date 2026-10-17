@@ -3289,15 +3289,16 @@ each further path segment a `reflect_get` keyed by a
 
 A static import is a snapshot of the export at instantiation, not a
 live binding: a module that reassigns an exported `let` later is not
-seen. A module's free function is called with `globalThis` as `this`;
-a class export is constructed with `call_new`, and its statics and
-nested namespaces are read with `reflect_get` as for globals. A
-`const`/`let` export is the global's value, under the per-position
-reference rule above (`anyref` converts, `(ref extern)` narrows). A
-scalar one is a global of its type, `(global f64)` for a `number` and
-`(global i64)` for a `bigint`. The JS API rejects a boolean for an
-`i32` global, so a `boolean` stays an `externref` global, read as `i32`
-through a call to `Boolean` whose import returns `i32`:
+seen. A module's free function is called with `this` undefined, as an
+imported function is. A class export is constructed with `call_new`,
+and its statics and nested namespaces are read with `reflect_get` as
+for globals. A `const`/`let` export is the global's value, under the
+per-position reference rule above (`anyref` converts, `(ref extern)`
+narrows). A scalar one is a global of its type, `(global f64)` for a
+`number` and `(global i64)` for a `bigint`. The JS API rejects a
+boolean for an `i32` global, so a `boolean` stays an `externref`
+global, read as `i32` through a call to `Boolean` whose import returns
+`i32`:
 
 ```wat
 (import "embed:values" "count" (global $m:embed:values:count_f f64))
