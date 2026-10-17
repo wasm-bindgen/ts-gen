@@ -4,7 +4,8 @@
 
 interface KeyValueStore {
   // Generic — synthesized wrapper carries `<T>` and the inner iterator
-  // sees the same `T`.
+  // sees the same `T`; the method itself cannot infer `T`, so it returns
+  // the wrapper at `JsValue`.
   list<T>(): Iterable<[string, T]>;
   // Same for async.
   listAsync<T>(): AsyncIterable<[string, T]>;

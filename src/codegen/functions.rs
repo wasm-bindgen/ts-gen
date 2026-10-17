@@ -52,6 +52,26 @@ fn emit_function(
     scope: ScopeId,
     value_names: &mut ValueNames,
 ) -> TokenStream {
+    let mut decl = decl.clone();
+    if let Some(cgctx) = cgctx {
+        super::type_params::erase_uninferrable(
+            &mut decl.type_params,
+            &mut decl.params,
+            &mut decl.return_type,
+            cgctx,
+            decl.body_scope,
+        );
+        for o in &mut decl.overloads {
+            super::type_params::erase_uninferrable(
+                &mut o.type_params,
+                &mut o.params,
+                &mut o.return_type,
+                cgctx,
+                o.body_scope,
+            );
+        }
+    }
+    let decl = &decl;
     let rust_name = value_names.take(
         &binding_key(ctx, js_namespace, &decl.js_name),
         public_rust_name(&ident_chars(&decl.name)),
