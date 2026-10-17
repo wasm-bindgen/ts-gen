@@ -311,6 +311,9 @@ fn parse_single_file(
         modules.insert(0, (lib.to_string(), file_scope));
     }
     name_constructor_classes(gctx, &modules, &constructor_class_ids);
+    let mut constructor_class_ids: Vec<_> = constructor_class_ids.into_iter().collect();
+    constructor_class_ids.sort_by_key(|id| id.index());
+    gctx.constructor_classes.extend(constructor_class_ids);
     Ok(ParsedFile {
         types,
         dropped,
@@ -985,6 +988,95 @@ fn bind_constructor_vars(gctx: &mut GlobalContext, module: &mut Module) {
         .map(|(specifier, root)| (specifier.clone(), root.exports))
         .collect();
     name_constructor_classes(gctx, &modules, &constructor_classes);
+    absorb_instance_interfaces(gctx, module);
+}
+
+/// Collapse the split-declaration pattern
+///
+/// ```ts
+/// interface EmailMessage { readonly from: string; }
+/// declare module "cloudflare:email" {
+///   let _EmailMessage: { new (from: string, …): EmailMessage };
+///   export { _EmailMessage as EmailMessage };
+/// }
+/// ```
+///
+/// into one class: the module-scoped constructor variable is the class, and
+/// the global interface its construct signature returns, named like the
+/// class's export, is its instance shape. The interface's members move onto
+/// the class and the interface is dropped. The class keeps its module scope
+/// (its exports decide its surface), and every binding of the interface is
+/// rebound to it, so every reference to the interface resolves to the
+/// class. Every file's declarations of the interface have merged by now, so
+/// file and declaration order don't matter.
+///
+/// The construct signature names the instance type by its public name, and
+/// it is the global interface only if that is what the name resolves to
+/// from the module (or the class itself, which its export names there), so
+/// a module declaring its own type of that name keeps it.
+fn absorb_instance_interfaces(gctx: &mut GlobalContext, module: &mut Module) {
+    use crate::ir::{Heritage, ModuleContext, TypeKind};
+    let global = module.global_scope;
+    let mut absorbed = std::collections::HashMap::new();
+    for class_id in std::mem::take(&mut gctx.constructor_classes) {
+        let decl = gctx.get_type(class_id);
+        let TypeKind::Class(class) = &decl.kind else {
+            continue;
+        };
+        if !matches!(decl.module_context, ModuleContext::Module(_)) {
+            continue;
+        }
+        let Some(Heritage { type_ref, scope }) = &class.extends else {
+            continue;
+        };
+        let Some(public) = type_ref.as_ident() else {
+            continue;
+        };
+        let exports = gctx
+            .scopes
+            .get(decl.scope_id)
+            .exports
+            .unwrap_or(decl.scope_id);
+        let exported = gctx
+            .exports
+            .binding(exports, public)
+            .is_some_and(|(local, bound)| gctx.declarations(bound, local).contains(&class_id));
+        if !exported {
+            continue;
+        }
+        let iface_id = gctx
+            .scopes
+            .get(global)
+            .get(public)
+            .filter(|&id| matches!(gctx.get_type(id).kind, TypeKind::Interface(_)));
+        let Some(iface_id) = iface_id else {
+            continue;
+        };
+        let from_module = gctx.scopes.resolve(*scope, public);
+        if from_module != Some(iface_id) && from_module != Some(class_id) {
+            continue;
+        }
+        let TypeKind::Interface(iface) = gctx.get_type(iface_id).kind.clone() else {
+            unreachable!()
+        };
+        let TypeKind::Class(class) = &mut gctx.get_type_mut(class_id).kind else {
+            unreachable!()
+        };
+        merge_members(&mut class.members, iface.members);
+        class.extends = iface.extends.into_iter().next();
+        if class.type_params.is_empty() {
+            class.type_params = iface.type_params;
+            class.body_scope = iface.body_scope;
+        }
+        absorbed.insert(iface_id, class_id);
+    }
+    if absorbed.is_empty() {
+        return;
+    }
+    gctx.scopes.rebind(&absorbed);
+    let dropped: std::collections::HashSet<_> = absorbed.into_keys().collect();
+    gctx.drop_types(&dropped);
+    module.types.retain(|id| !dropped.contains(id));
 }
 
 /// The path a reference to a non-generic named type names (`XConstructor`,
@@ -1741,6 +1833,58 @@ mod tests {
     }
 
     #[test]
+    fn instance_interface_collapses_into_module_class_across_files() {
+        let iface = "interface Email { readonly from: string; }";
+        let module = "declare module \"m\" {
+              let _Email: { new (): Email };
+              export { _Email as Email };
+            }
+            interface Email { readonly to: string; }";
+        for (i, sources) in [[iface, module], [module, iface]].iter().enumerate() {
+            let dir =
+                std::env::temp_dir().join(format!("ts-gen-split-class-{}-{i}", std::process::id()));
+            std::fs::create_dir_all(&dir).unwrap();
+            let paths: Vec<_> = sources
+                .iter()
+                .enumerate()
+                .map(|(n, src)| {
+                    let path = dir.join(format!("{n}.d.ts"));
+                    std::fs::write(&path, src).unwrap();
+                    path
+                })
+                .collect();
+            let result = parse_dts_files(&paths, None);
+            std::fs::remove_dir_all(&dir).unwrap();
+            let (module, gctx) = result.unwrap();
+
+            let email = gctx.resolve_path(module.global_scope, "Email").unwrap();
+            let decl = gctx.get_type(email);
+            assert!(
+                matches!(decl.module_context, crate::ir::ModuleContext::Module(_)),
+                "{i}"
+            );
+            let TypeKind::Class(class) = &decl.kind else {
+                panic!("{i}: Email is a class");
+            };
+            let mut members: Vec<String> = class
+                .members
+                .iter()
+                .map(|m| match m {
+                    Member::Constructor(_) => "new".into(),
+                    Member::Getter(g) => g.js_name.clone(),
+                    other => panic!("{i}: {other:?}"),
+                })
+                .collect();
+            members.sort();
+            assert_eq!(members, ["from", "new", "to"], "{i}");
+            assert!(!module.types.iter().any(|&id| matches!(
+                &gctx.get_type(id).kind,
+                TypeKind::Interface(iface) if iface.name == "Email"
+            )));
+        }
+    }
+
+    #[test]
     fn instance_interface_wins_over_construct_return_across_files() {
         let iface = "interface Bar { a(): void; }";
         let var = "declare var Bar: { new (): Baz; prototype: Bar };
@@ -1783,6 +1927,60 @@ mod tests {
                 .collect();
             members.sort();
             assert_eq!(members, ["a", "new"], "{i}");
+        }
+    }
+
+    #[test]
+    fn instance_interfaces_absorb_across_files() {
+        let iface = "interface Email { a(): void; }";
+        let module = r#"declare module "m" {
+                let _Email: { new (): Email };
+                export { _Email as Email };
+            }"#;
+        let reopen = "interface Email { b(): void; }";
+        for (i, sources) in [
+            vec![iface, module],
+            vec![&format!("{iface} {module}"), reopen],
+        ]
+        .iter()
+        .enumerate()
+        {
+            let dir =
+                std::env::temp_dir().join(format!("ts-gen-instance-{}-{i}", std::process::id()));
+            std::fs::create_dir_all(&dir).unwrap();
+            let paths: Vec<_> = sources
+                .iter()
+                .enumerate()
+                .map(|(n, src)| {
+                    let path = dir.join(format!("{n}.d.ts"));
+                    std::fs::write(&path, src).unwrap();
+                    path
+                })
+                .collect();
+            let result = parse_dts_files(&paths, None);
+            std::fs::remove_dir_all(&dir).unwrap();
+            let (module, gctx) = result.unwrap();
+
+            let id = gctx.scopes.get(module.global_scope).get("Email").unwrap();
+            let TypeKind::Class(class) = &gctx.get_type(id).kind else {
+                panic!("{i}: Email is a class");
+            };
+            assert_eq!(class.js_name, "Email", "{i}");
+            let mut members: Vec<_> = class
+                .members
+                .iter()
+                .filter_map(|m| match m {
+                    Member::Method(m) => Some(m.js_name.as_str()),
+                    _ => None,
+                })
+                .collect();
+            members.sort();
+            let expected: &[&str] = if i == 0 { &["a"] } else { &["a", "b"] };
+            assert_eq!(members, expected, "{i}");
+            let ifaces = module.types.iter().filter(|&&id| {
+                matches!(&gctx.get_type(id).kind, TypeKind::Interface(i) if i.name == "Email")
+            });
+            assert_eq!(ifaces.count(), 0, "{i}");
         }
     }
 

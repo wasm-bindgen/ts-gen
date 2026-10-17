@@ -91,6 +91,10 @@ pub struct GlobalContext {
     /// whose type `bind_constructor_vars` resolves once every file is
     /// inserted.
     pub(crate) ctor_vars: Vec<(TypeId, ScopeId)>,
+    /// The class of each constructor-shaped `var` nothing else describes
+    /// the instance of, whose construct signature's return type
+    /// `bind_constructor_vars` may find to be a global instance interface.
+    pub(crate) constructor_classes: Vec<TypeId>,
     types: Vec<TypeDeclaration>,
     modules: Vec<ParsedModule>,
     /// Map from module specifier to ModuleId for fast lookup.
@@ -196,6 +200,7 @@ impl GlobalContext {
             declarations: std::collections::HashMap::new(),
             static_sides: std::collections::HashMap::new(),
             ctor_vars: Vec::new(),
+            constructor_classes: Vec::new(),
             types: Vec::new(),
             modules: Vec::new(),
             module_index: std::collections::HashMap::new(),
