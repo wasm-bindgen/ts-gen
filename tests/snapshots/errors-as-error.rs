@@ -14,10 +14,10 @@ extern "C" {
     pub fn bar(this: &Foo, x: f64) -> String;
     #[doc = " Plain method — fallible variant uses the new default error type."]
     #[wasm_bindgen(method, catch, js_name = "bar")]
-    pub fn try_bar(this: &Foo, x: f64) -> Result<String, Error>;
+    pub fn try_bar(this: &Foo, x: f64) -> Result<String, ::js_sys::Error>;
     #[doc = " Async method — `Result<T, Error>` instead of `Result<T, JsValue>`."]
     #[wasm_bindgen(method, catch)]
-    pub async fn baz(this: &Foo) -> Result<Number, Error>;
+    pub async fn baz(this: &Foo) -> Result<Number, ::js_sys::Error>;
     #[doc = " Method with explicit `@throws` — the typed error wins regardless"]
     #[doc = " of the flag."]
     #[doc = ""]
@@ -42,11 +42,11 @@ extern "C" {
     pub type Resource;
     #[doc = " Constructor — wasm-bindgen always catches; default error follows the flag."]
     #[wasm_bindgen(constructor, catch)]
-    pub fn new(path: &str) -> Result<Resource, Error>;
+    pub fn new(path: &str) -> Result<Resource, ::js_sys::Error>;
 }
 #[wasm_bindgen]
 extern "C" {
     #[doc = " Free function — same default-error rule."]
     #[wasm_bindgen(catch, js_name = "fetchData")]
-    pub async fn fetch_data(url: &str) -> Result<JsString, Error>;
+    pub async fn fetch_data(url: &str) -> Result<JsString, ::js_sys::Error>;
 }
