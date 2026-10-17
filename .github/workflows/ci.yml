@@ -50,8 +50,13 @@ jobs:
     - run: just test
 
   test_integration:
-    name: Test (wasm-bindgen integration)
+    name: Test (wasm-bindgen integration${{ matrix.rustflags && ', unstable js-sys' || '' }})
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Generated bindings compile against both js-sys APIs; real-generic
+        # element types (`Array<String>`) need the unstable one.
+        rustflags: ['', '--cfg=js_sys_unstable_apis']
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
@@ -63,3 +68,5 @@ jobs:
     - uses: extractions/setup-just@v2
     - run: just install-wasm-bindgen-cli
     - run: just test-integration
+      env:
+        RUSTFLAGS: ${{ matrix.rustflags }}

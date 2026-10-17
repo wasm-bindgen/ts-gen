@@ -2768,9 +2768,7 @@ fn is_string_array_element(elem: &TypeRef, ctx: &CodegenContext<'_>, scope: Scop
 /// Per-monomorphization string lists. A `string[]` argument that would be
 /// `&[String]` takes `&[impl JsStringLike]`, which wasm-bindgen lowers per
 /// element shape (`&[String]`, `&[&str]`, `&[JsString]`), and
-/// `ArrayLike<string>` takes `&Array<impl JsStringLike>`. Not every string
-/// shape has a slice ABI (`&[&String]` doesn't), so the element states
-/// `VectorRefIntoWasmAbi` for Rust-side callers such as builders.
+/// `ArrayLike<string>` takes `&Array<impl JsStringLike>`.
 pub(crate) fn mono_string_list_argument(
     ty: &TypeRef,
     ctx: &CodegenContext<'_>,
@@ -2782,9 +2780,9 @@ pub(crate) fn mono_string_list_argument(
     };
     let (peeled, scope) = peel_mono(list, ctx, scope, &mut HashSet::new());
     let tokens = match peeled.as_ref() {
-        TypeRef::Array(elem) if is_string_array_element(elem, ctx, scope) => quote! {
-            &[impl ::wasm_bindgen::JsStringLike + ::wasm_bindgen::convert::VectorRefIntoWasmAbi]
-        },
+        TypeRef::Array(elem) if is_string_array_element(elem, ctx, scope) => {
+            quote! { &[impl ::wasm_bindgen::JsStringLike] }
+        }
         TypeRef::Reference {
             segments,
             generic_args,
@@ -3971,7 +3969,7 @@ mod tests {
             let arg =
                 |ty: TypeRef| mono_string_list_argument(&ty, ctx, scope).map(|t| t.to_string());
             let list = |elem: TypeRef| TypeRef::Array(Box::new(elem));
-            let slice = "& [impl :: wasm_bindgen :: JsStringLike + :: wasm_bindgen :: convert :: VectorRefIntoWasmAbi]";
+            let slice = "& [impl :: wasm_bindgen :: JsStringLike]";
             assert_eq!(arg(list(TypeRef::String)).as_deref(), Some(slice));
             assert_eq!(arg(list(TypeRef::ident("IdChain"))).as_deref(), Some(slice));
             assert_eq!(
