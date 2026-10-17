@@ -1,9 +1,9 @@
 // Runs one embedded fixture: node embed.mjs <fixture> <merged.wasm> <builtins.js>
 //
 // Instantiates the merged module the way a host would (js-string builtins,
-// imported string constants, `builtins.js`, and the `cloudflare:sockets`
-// module the fixture `.d.ts` declares), then exercises the published
-// handlers and checks what reached JS.
+// imported string constants, `builtins.js`, and the modules the fixture
+// `.d.ts` declares, whose exports are passed as values, as ESM integration
+// does), then exercises the published handlers and checks what reached JS.
 
 import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
@@ -23,9 +23,12 @@ class Socket {
   startTls() { return this; }
   get closed() { return Promise.resolve(); }
 }
-const sockets = {
-  connect: (address) => { connected.push(address); return new Socket(); },
-  Socket,
+const modules = {
+  'cloudflare:sockets': {
+    connect: (address) => { connected.push(address); return new Socket(); },
+    Socket,
+  },
+  'embed:values': { count: 42, enabled: true, disabled: false, big: 7n },
 };
 
 const builtins = await import(pathToFileURL(builtinsPath));
@@ -35,8 +38,8 @@ const module = await WebAssembly.compile(await readFile(wasmPath), {
 });
 const imports = { './builtins.js': builtins };
 for (const { module: m, name } of WebAssembly.Module.imports(module)) {
-  if (m === 'cloudflare:sockets') {
-    (imports[m] ??= {})[name] = new WebAssembly.Global({ value: 'externref' }, sockets[name]);
+  if (Object.hasOwn(modules, m)) {
+    (imports[m] ??= {})[name] = modules[m][name];
   } else if (m !== './builtins.js') {
     throw new Error(`unexpected import ${m} ${name}`);
   }
@@ -84,6 +87,13 @@ switch (fixture) {
   case 'module_imports': {
     assert.equal(await fetch(get).text(), 'tls: ');
     assert.deepEqual(connected, ['example.com:443']);
+    break;
+  }
+  case 'module_values': {
+    assert.equal(published.count(), 42);
+    assert.equal(published.enabled(), 1);
+    assert.equal(published.disabled(), 0);
+    assert.equal(published.big(), 7n);
     break;
   }
   case 'sys': {
