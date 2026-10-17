@@ -249,7 +249,7 @@ fn main() -> Result<()> {
     let source = match cli.target {
         Target::Rust => ts_gen::codegen::generate_with_options(&module, &gctx, &options)?,
         Target::Wat => {
-            ts_gen::abi::wat::generate(&ts_gen::abi::build(&module, &gctx, &options, &provided)?)
+            ts_gen::abi::wat::generate(&ts_gen::abi::build(&module, &gctx, &options, &provided))
         }
     };
 

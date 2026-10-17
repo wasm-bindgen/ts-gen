@@ -52,7 +52,6 @@ tests/
 ├── fixtures/*.d.ts            # input declarations
 ├── snapshots/<name>/*.rs      # expected output per CLI configuration (default, mono)
 ├── snapshots/<name>/*.wat     # --target wat output per configuration
-├── snapshots/<name>/*.wat.err # --target wat error, for a fixture the ABI rejects
 └── snapshot.rs                # the Rust and WAT snapshot harness
 
 integration-tests/
