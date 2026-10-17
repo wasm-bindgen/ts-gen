@@ -2295,6 +2295,12 @@ fn is_integer_literal_union(members: &[TypeRef]) -> bool {
 /// default.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum SliceMode {
+    /// A typed-array view of wasm linear memory — zero-copy, and sound
+    /// only when the callee neither retains the buffer past the call nor
+    /// re-enters wasm. Never inferred; only a `{@slice view}` JSDoc hint
+    /// produces it, and it is emitted explicitly so the assertion is
+    /// greppable in generated code.
+    View,
     /// A fresh plain `Array`. A `T[]` parameter is a plain JS `Array` the
     /// callee may keep, so a slice of numbers takes this rather than
     /// arriving as a `Float64Array` view of linear memory.
@@ -2324,7 +2330,7 @@ pub fn param_slice_mode(
         TypeRef::Nullable(inner) => inner.as_ref(),
         other => other,
     };
-    match ty {
+    let inferred = match ty {
         TypeRef::Array(elem)
             if is_numeric_array_element(elem, ctx, scope)
                 || is_mono_type_param(elem, ctx, scope) =>
@@ -2333,6 +2339,19 @@ pub fn param_slice_mode(
         }
         TypeRef::TypedSlice(_) => Some(SliceMode::Copy),
         _ => None,
+    };
+    // A `{@slice mode}` JSDoc hint overrides the inferred mode when the
+    // lowering is slice-shaped, and is dropped by shape otherwise — the
+    // same rule wasm-bindgen applies to an inherited mode, which is what
+    // lets one hint cover a union whose other alternatives (the
+    // typed-array handle overload) aren't slices.
+    match (p.slice_mode, inferred) {
+        (Some(hint), Some(_)) => Some(match hint {
+            crate::ir::SliceModeHint::View => SliceMode::View,
+            crate::ir::SliceModeHint::Array => SliceMode::Array,
+            crate::ir::SliceModeHint::Copy => SliceMode::Copy,
+        }),
+        (_, inferred) => inferred,
     }
 }
 
@@ -2633,6 +2652,7 @@ mod tests {
             name: name.to_string(),
             type_ref: ty,
             variadic: false,
+            slice_mode: None,
         }
     }
 
@@ -2731,6 +2751,23 @@ mod tests {
             let mut typed_rest = cp("rest", typed());
             typed_rest.variadic = true;
             assert_eq!(mode(&typed_rest), None);
+
+            // A `{@slice mode}` hint overrides where the lowering is
+            // slice-shaped, and is dropped by shape otherwise.
+            use crate::ir::SliceModeHint as H;
+            let hinted = |ty: TypeRef, h: H| {
+                let mut p = cp("xs", ty);
+                p.slice_mode = Some(h);
+                p
+            };
+            assert_eq!(mode(&hinted(typed(), H::View)), Some(SliceMode::View));
+            assert_eq!(mode(&hinted(typed(), H::Array)), Some(SliceMode::Array));
+            assert_eq!(mode(&hinted(numbers(), H::View)), Some(SliceMode::View));
+            // A string slice has no mode to select (its only shape is a
+            // fresh `Array`), so a hint on it is dropped by shape.
+            let string_slice = TypeRef::Array(Box::new(TypeRef::String));
+            assert_eq!(mode(&hinted(string_slice, H::View)), None);
+            assert_eq!(mode(&hinted(TypeRef::ident("Plain"), H::View)), None);
         });
     }
 
@@ -2796,6 +2833,7 @@ mod tests {
                 type_ref: TypeRef::Number,
                 optional: false,
                 variadic: false,
+                slice_mode: None,
             }],
             return_type: Box::new(TypeRef::Boolean),
         };
@@ -2812,6 +2850,7 @@ mod tests {
                 type_ref: TypeRef::Any,
                 optional: false,
                 variadic: false,
+                slice_mode: None,
             }],
             return_type: Box::new(TypeRef::Any),
         };

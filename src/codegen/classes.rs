@@ -88,16 +88,25 @@ impl ClassConfig<'_> {
 
     /// A setter's single parameter, typed so literal members route through
     /// the getter's enum.
-    fn setter_param(&self, js_name: &str, ty: &TypeRef) -> crate::ir::Param {
-        let type_ref = match self.setter_enum(js_name, ty) {
+    fn setter_param(
+        &self,
+        js_name: &str,
+        ty: &TypeRef,
+        slice_mode: Option<crate::ir::SliceModeHint>,
+    ) -> crate::ir::Param {
+        let mut type_ref = match self.setter_enum(js_name, ty) {
             Some(e) => e.param_type(ty),
             None => ty.clone(),
         };
+        if let Some(widened) = slice_mode.and_then(|m| m.widen_bare_typed_array(&type_ref)) {
+            type_ref = widened;
+        }
         crate::ir::Param {
             name: "val".to_string(),
             type_ref,
             optional: false,
             variadic: false,
+            slice_mode,
         }
     }
 }
@@ -519,8 +528,16 @@ pub(crate) fn generate_dictionary_factory_with_passes(
     // for `from: string | EmailAddress`) produce multiple sigs — we
     // cartesian-product across required fields below to expose every
     // combination as its own `new` / `builder` variant.
+    // A factory/builder argument takes the property's `{@slice mode}`
+    // hint, carried on the corresponding setter member.
+    let slice_mode_of = |js_name: &str| {
+        config.members.iter().find_map(|m| match m {
+            Member::Setter(s) if s.js_name == js_name => s.slice_mode,
+            _ => None,
+        })
+    };
     let resolve_setter_sigs = |g: &crate::ir::GetterMember| -> Vec<FunctionSignature> {
-        let setter_param = config.setter_param(&g.js_name, &g.type_ref);
+        let setter_param = config.setter_param(&g.js_name, &g.type_ref, slice_mode_of(&g.js_name));
         let mut setter_used = LocalScope::default();
         let setter_overloads = [&[setter_param][..]];
         let void = crate::ir::TypeRef::Void;
@@ -646,6 +663,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                     name: String::new(),
                     type_ref: target.clone(),
                     variadic: false,
+                    slice_mode: None,
                 });
                 setters
                     .iter()
@@ -740,6 +758,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                     name: param_name.clone(),
                     type_ref: m.clone(),
                     variadic: false,
+                    slice_mode: None,
                 };
                 options.push(FieldOption::Value {
                     field_doc: g.doc.clone(),
@@ -1746,7 +1765,7 @@ fn generate_setter(
     let doc = setter.doc.clone();
 
     // Treat the setter as a single-param method and expand through signatures
-    let param = config.setter_param(&setter.js_name, &setter.type_ref);
+    let param = config.setter_param(&setter.js_name, &setter.type_ref, setter.slice_mode);
 
     let overloads = [&[param][..]];
     let void = crate::ir::TypeRef::Void;
@@ -1878,7 +1897,7 @@ fn generate_static_setter(
     let class_ident = super::typemap::make_ident(&config.effective_rust_name());
     let doc = setter.doc.clone();
 
-    let param = config.setter_param(&setter.js_name, &setter.type_ref);
+    let param = config.setter_param(&setter.js_name, &setter.type_ref, None);
 
     let overloads = [&[param][..]];
     let void = crate::ir::TypeRef::Void;

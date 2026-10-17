@@ -184,6 +184,10 @@ pub struct ConcreteParam {
     pub type_ref: TypeRef,
     /// Whether this param is variadic (only the last param can be).
     pub variadic: bool,
+    /// `{@slice mode}` hint from the source [`crate::ir::Param`], applied
+    /// where this alternative's lowering is slice-shaped (see
+    /// [`crate::codegen::typemap::param_slice_mode`]).
+    pub slice_mode: Option<crate::ir::SliceModeHint>,
 }
 
 /// One concrete parameter-list variant produced by overload expansion,
@@ -690,6 +694,7 @@ fn expand_single_overload(
                     name: param.name.clone(),
                     type_ref: alt,
                     variadic: false,
+                    slice_mode: param.slice_mode,
                 };
                 if j == 0 {
                     for sig in extendable.iter_mut().take(cur) {
@@ -716,6 +721,7 @@ fn expand_single_overload(
                     name: param.name.clone(),
                     type_ref: alt,
                     variadic: false,
+                    slice_mode: param.slice_mode,
                 };
                 if j == 0 {
                     for sig in sigs.iter_mut().take(cur) {
@@ -740,6 +746,7 @@ fn expand_single_overload(
                 name: vp.name.clone(),
                 type_ref: vp.type_ref.clone(),
                 variadic: true,
+                slice_mode: None,
             });
         }
     }
@@ -1354,6 +1361,7 @@ fn param_attr(
     // only normalises `name = <literal>` attribute arms, leaving
     // `slice = array` token-spaced verbatim.
     match typemap::param_slice_mode(p, cgctx, scope) {
+        Some(typemap::SliceMode::View) => quote! { #[wasm_bindgen(slice = "view")] },
         Some(typemap::SliceMode::Array) => quote! { #[wasm_bindgen(slice = "array")] },
         Some(typemap::SliceMode::Copy) => quote! { #[wasm_bindgen(slice = "copy")] },
         None => quote! {},
@@ -1597,11 +1605,13 @@ mod tests {
             type_ref: TypeRef::String,
             optional: false,
             variadic: false,
+            slice_mode: None,
         }
     }
 
     fn concrete(name: &str, type_ref: TypeRef, variadic: bool) -> ConcreteParam {
         ConcreteParam {
+            slice_mode: None,
             name: name.into(),
             type_ref,
             variadic,
@@ -1824,6 +1834,7 @@ mod tests {
             type_ref: TypeRef::Any,
             optional: false,
             variadic: false,
+            slice_mode: None,
         }
     }
 
@@ -1833,6 +1844,7 @@ mod tests {
             type_ref: ty,
             optional: false,
             variadic: false,
+            slice_mode: None,
         }
     }
 
@@ -1842,6 +1854,7 @@ mod tests {
             type_ref: TypeRef::Any,
             optional: true,
             variadic: false,
+            slice_mode: None,
         }
     }
 
@@ -1851,6 +1864,7 @@ mod tests {
             type_ref: ty,
             optional: true,
             variadic: false,
+            slice_mode: None,
         }
     }
 
@@ -1860,6 +1874,7 @@ mod tests {
             type_ref: TypeRef::Any,
             optional: false,
             variadic: true,
+            slice_mode: None,
         }
     }
 

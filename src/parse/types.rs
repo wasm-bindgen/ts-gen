@@ -418,6 +418,7 @@ fn convert_formal_params_with_arena(
             type_ref,
             optional: param.optional,
             variadic: false,
+            slice_mode: None,
         });
     }
 
@@ -435,6 +436,7 @@ fn convert_formal_params_with_arena(
             type_ref,
             optional: false,
             variadic: true,
+            slice_mode: None,
         });
     }
 

@@ -204,6 +204,7 @@ pub(crate) fn merge_member_branches(branches: &[Vec<Member>], mode: MergeMode) -
             js_name: name.to_string(),
             type_ref,
             doc,
+            slice_mode: None,
         }))
     };
 
@@ -359,6 +360,7 @@ mod tests {
                 js_name: name.to_string(),
                 type_ref: ty,
                 doc: None,
+                slice_mode: None,
             }));
         }
         out

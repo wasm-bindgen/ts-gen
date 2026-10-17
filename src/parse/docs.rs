@@ -37,6 +37,17 @@ pub struct JsDocInfo {
     /// if other named types also appeared, the `never` is ignored and the
     /// other types win (see [`Self::throws`]).
     pub nothrow: bool,
+
+    /// `(param name, mode name)` for each `{@slice <mode>}` inline tag found
+    /// in a `@param` description, in source order. Mode names are kept raw;
+    /// [`crate::ir::SliceModeHint::parse`] validates them at the attach
+    /// point, where a diagnostic can name the declaration.
+    pub param_slice_modes: Vec<(String, String)>,
+
+    /// Mode name from a `{@slice <mode>}` inline tag in the description
+    /// body (outside any `@param`) — the property-doc form, applied to the
+    /// setter's value argument.
+    pub slice_mode: Option<String>,
 }
 
 impl JsDocInfo {
@@ -170,7 +181,17 @@ fn convert_jsdoc_tags(lines: &[&str]) -> (String, JsDocInfo) {
 
         if let Some(rest) = line.strip_prefix("@param ") {
             // @param name - description  or  @param name description
-            params.push(format_param(rest));
+            // A `{@slice mode}` inline tag is binding metadata, not prose:
+            // record it against the param name and strip it from the
+            // rendered bullet. Extracted before `format_param`, whose
+            // leading-`{type}` stripping would otherwise eat the tag.
+            let (rest, mode) = extract_slice_tag(rest);
+            if let Some(mode) = mode {
+                if let Some(name) = param_name(&rest) {
+                    info.param_slice_modes.push((name, mode));
+                }
+            }
+            params.push(format_param(&rest));
         } else if let Some(rest) = line
             .strip_prefix("@returns ")
             .or_else(|| line.strip_prefix("@return "))
@@ -218,7 +239,13 @@ fn convert_jsdoc_tags(lines: &[&str]) -> (String, JsDocInfo) {
             // Unknown tag — pass through as-is
             description.push(line.to_string());
         } else {
-            description.push(line.to_string());
+            // The property-doc form: a bare `{@slice mode}` in the
+            // description applies to the setter's value argument.
+            let (line, mode) = extract_slice_tag(line);
+            if let Some(mode) = mode {
+                info.slice_mode.get_or_insert(mode);
+            }
+            description.push(line);
         }
 
         i += 1;
@@ -388,6 +415,39 @@ fn is_primitive_type_name(s: &str) -> bool {
     )
 }
 
+/// Extract a `{@slice <mode>}` inline tag from `text`, returning the text
+/// with the tag (and any doubled spacing it leaves) removed, and the mode
+/// name. Only the first tag is recognised.
+fn extract_slice_tag(text: &str) -> (String, Option<String>) {
+    let Some(start) = text.find("{@slice ") else {
+        return (text.to_string(), None);
+    };
+    let Some(len) = text[start..].find('}') else {
+        return (text.to_string(), None);
+    };
+    let mode = text[start + "{@slice ".len()..start + len]
+        .trim()
+        .to_string();
+    let cleaned = format!("{}{}", &text[..start], &text[start + len + 1..]).replace("  ", " ");
+    (cleaned.trim_end().to_string(), Some(mode))
+}
+
+/// The parameter name from a `@param` rest string, after any `{type}`
+/// annotation, with optionality brackets (`[name]`, `[name=default]`)
+/// removed.
+fn param_name(rest: &str) -> Option<String> {
+    let rest = rest.trim();
+    let rest = if rest.starts_with('{') {
+        rest.split_once('}').map_or(rest, |(_, r)| r.trim())
+    } else {
+        rest
+    };
+    let name = rest.split_whitespace().next()?;
+    let name = name.trim_start_matches('[').trim_end_matches(']');
+    let name = name.split_once('=').map_or(name, |(n, _)| n);
+    (!name.is_empty()).then(|| name.to_string())
+}
+
 /// Format a `@param` rest string into a Rust-style argument list item.
 ///
 /// Input forms:
@@ -489,6 +549,36 @@ mod tests {
             format_param("{string} name - the name"),
             "* `name` - the name"
         );
+    }
+
+    #[test]
+    fn slice_tags_are_recorded_and_stripped() {
+        let raw = "\n * Writes data.\n * @param data {@slice view} consumed synchronously\n * @param other - untouched\n ";
+        let (doc, info) = clean_jsdoc_with_info(raw);
+        assert_eq!(
+            info.param_slice_modes,
+            vec![("data".to_string(), "view".to_string())]
+        );
+        assert!(doc.contains("* `data` - consumed synchronously"));
+        assert!(!doc.contains("@slice"));
+
+        // The property-doc form: a bare tag in the description.
+        let raw = "\n * Buffer contents. {@slice copy}\n ";
+        let (doc, info) = clean_jsdoc_with_info(raw);
+        assert_eq!(info.slice_mode.as_deref(), Some("copy"));
+        assert_eq!(doc, "Buffer contents.");
+    }
+
+    #[test]
+    fn slice_tag_param_name_forms() {
+        assert_eq!(param_name("data - desc"), Some("data".to_string()));
+        assert_eq!(param_name("{number[]} data desc"), Some("data".to_string()));
+        assert_eq!(param_name("[data=1] desc"), Some("data".to_string()));
+        assert_eq!(param_name(""), None);
+        // Unknown modes are recorded raw; the attach point validates.
+        let (rest, mode) = extract_slice_tag("data {@slice bogus} desc");
+        assert_eq!(mode.as_deref(), Some("bogus"));
+        assert_eq!(rest, "data desc");
     }
 
     #[test]

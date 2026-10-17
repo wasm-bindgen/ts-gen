@@ -27,6 +27,49 @@ fn split_info(opt: Option<(String, JsDocInfo)>) -> (Option<String>, JsDocInfo) {
     }
 }
 
+/// Parse a `{@slice <mode>}` mode name into a [`SliceModeHint`], warning
+/// on an unknown mode.
+fn slice_hint(
+    mode: Option<&str>,
+    site: &str,
+    diag: &mut crate::util::diagnostics::DiagnosticCollector,
+) -> Option<crate::ir::SliceModeHint> {
+    let mode = mode?;
+    let hint = crate::ir::SliceModeHint::parse(mode);
+    if hint.is_none() {
+        diag.warn(format!(
+            "unknown slice mode `{{@slice {mode}}}` on `{site}`; expected `view`, `array` or `copy`"
+        ));
+    }
+    hint
+}
+
+/// Attach `{@slice mode}` hints from `@param` tags to the matching
+/// parameters, warning when a tag names no parameter.
+pub(crate) fn apply_slice_hints(
+    params: &mut [Param],
+    info: &JsDocInfo,
+    site: &str,
+    diag: &mut crate::util::diagnostics::DiagnosticCollector,
+) {
+    for (name, mode) in &info.param_slice_modes {
+        let Some(hint) = slice_hint(Some(mode), site, diag) else {
+            continue;
+        };
+        match params.iter_mut().find(|p| p.name == *name) {
+            Some(p) => {
+                p.slice_mode = Some(hint);
+                if let Some(widened) = hint.widen_bare_typed_array(&p.type_ref) {
+                    p.type_ref = widened;
+                }
+            }
+            None => diag.warn(format!(
+                "`{{@slice {mode}}}` on `{site}` names unknown parameter `{name}`"
+            )),
+        }
+    }
+}
+
 /// Push the given type parameters into a fresh child of `parent_scope`
 /// and return the new scope. Used by every member converter that
 /// declares its own `<T, U, ...>` — methods, free functions, hoisted
@@ -269,6 +312,7 @@ pub(crate) fn convert_formal_params_with_synthesis(
             type_ref,
             optional,
             variadic: false,
+            slice_mode: None,
         });
     }
 
@@ -284,6 +328,7 @@ pub(crate) fn convert_formal_params_with_synthesis(
             type_ref,
             optional: false,
             variadic: true,
+            slice_mode: None,
         });
     }
 
@@ -554,7 +599,8 @@ fn convert_property_signature(
         Some(n) => n,
         None => return vec![],
     };
-    let doc = ctx.docs.for_span(prop.span.start);
+    let (doc, info) = split_info(ctx.docs.info_for_span(prop.span.start));
+    let slice_mode = slice_hint(info.slice_mode.as_deref(), &js_name, ctx.diag);
 
     let type_ref = prop
         .type_annotation
@@ -574,6 +620,7 @@ fn convert_property_signature(
             js_name,
             type_ref,
             doc: None,
+            slice_mode,
         }));
     }
 
@@ -604,12 +651,15 @@ fn convert_method_signature(
     // when we know the surrounding parent name. Without `parent` we
     // can't generate a sensible name, so fall back to the regular
     // path that erases inline objects to `Object`.
-    let params = match parent {
+    let mut params = match parent {
         Some(p) => {
             convert_formal_params_with_synthesis(&method.params, p, &js_name, body_scope, ctx)
         }
         None => convert_formal_params_scoped(&method.params, body_scope, ctx),
     };
+    apply_slice_hints(&mut params, &info, &js_name, ctx.diag);
+    let slice_mode = slice_hint(info.slice_mode.as_deref(), &js_name, ctx.diag)
+        .or_else(|| params.first().and_then(|p| p.slice_mode));
     let mut return_type = method
         .return_type
         .as_ref()
@@ -643,6 +693,7 @@ fn convert_method_signature(
                 js_name,
                 type_ref,
                 doc,
+                slice_mode,
             })]
         }
         TSMethodSignatureKind::Method => vec![Member::Method(MethodMember {
@@ -718,6 +769,10 @@ fn convert_class_method(
         }
         None => convert_formal_params_scoped(&func.params, body_scope, ctx),
     };
+    let mut params = params;
+    apply_slice_hints(&mut params, &info, &js_name, ctx.diag);
+    let slice_mode = slice_hint(info.slice_mode.as_deref(), &js_name, ctx.diag)
+        .or_else(|| params.first().and_then(|p| p.slice_mode));
     let mut return_type = func
         .return_type
         .as_ref()
@@ -779,6 +834,7 @@ fn convert_class_method(
                     js_name,
                     type_ref,
                     doc,
+                    slice_mode,
                 })]
             }
         }
@@ -820,7 +876,8 @@ fn convert_class_property(
         Some(n) => n,
         None => return vec![],
     };
-    let doc = ctx.docs.for_span(prop.span.start);
+    let (doc, info) = split_info(ctx.docs.info_for_span(prop.span.start));
+    let slice_mode = slice_hint(info.slice_mode.as_deref(), &js_name, ctx.diag);
 
     let type_ref = prop
         .type_annotation
@@ -854,6 +911,7 @@ fn convert_class_property(
                 js_name,
                 type_ref,
                 doc: None,
+                slice_mode,
             }));
         }
         members
@@ -902,6 +960,7 @@ fn convert_accessor_property(
                 js_name,
                 type_ref,
                 doc: None,
+                slice_mode: None,
             }),
         ]
     }

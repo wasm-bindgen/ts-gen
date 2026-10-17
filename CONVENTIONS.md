@@ -171,6 +171,40 @@ function: a fn-level mode is inherited by every slice parameter of
 the binding, which would also turn a typed-array union's typed copy
 (see below) into an `Array` when the two share a signature.
 
+### `{@slice}` JSDoc hints
+
+A `{@slice view|array|copy}` inline tag in a `@param` description (or
+in a property's JSDoc, for its setter value) selects the mode for that
+parameter, overriding the inferred one where the lowering is
+slice-shaped:
+
+```ts
+/**
+ * @param data {@slice view} the queue copies the data before returning
+ */
+writeBuffer(offset: number, data: Uint8Array | number[]): void;
+```
+
+```rs
+pub fn write_buffer(this: &GPUQueue, offset: f64, #[wasm_bindgen(slice = "view")] data: &[u8]);
+```
+
+`view` is the author asserting, as a fact about the host API, that the
+callee neither retains the buffer past the call nor re-enters wasm —
+ts-gen never infers it, and emits it explicitly rather than as the
+bare default so the assertion is greppable in generated code.
+
+On a bare typed array, `copy` or `view` lowers the parameter to the
+element slice (`&[u8]`), the "Rust callers hold native bytes here"
+form, with the typed array kept as a `_with_` handle overload — the
+same shape a `TypedArray | number[]` union produces.
+
+The tag is stripped from the rendered doc comment. A hint whose
+parameter's lowering isn't slice-shaped is dropped by shape, the same
+rule wasm-bindgen applies to an inherited mode (which is what lets one
+hint cover a union whose typed-array handle overload isn't a slice).
+An unknown mode or parameter name warns and is ignored.
+
 ### Typed-array unions
 
 `TypedArray | number[]` (or `bigint[]` with `BigInt64Array` /

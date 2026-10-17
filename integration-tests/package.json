@@ -7,6 +7,7 @@
     "module-file-locals": "file:./js/module-file-locals",
     "module-namespace-values": "file:./js/module-namespace-values",
     "slice-args": "file:./js/slice-args",
-    "slice-args-mono": "file:./js/slice-args-mono"
+    "slice-args-mono": "file:./js/slice-args-mono",
+    "slice-hints": "file:./js/slice-hints"
   }
 }

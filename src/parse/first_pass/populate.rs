@@ -328,13 +328,19 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                         .docs
                         .info_for_span(export.span.start)
                         .or_else(|| self.docs.info_for_span(func.span.start));
-                    let (doc, throws) = match info {
-                        Some((d, i)) => (Some(d), i.throws()),
-                        None => (None, ir::Throws::None),
+                    let (doc, jsinfo) = match info {
+                        Some((d, i)) => (Some(d), i),
+                        None => (None, Default::default()),
                     };
-                    if let Some(decl) =
-                        convert_function_decl(func, throws, scope, &mut self.parse_ctx())
+                    if let Some(mut decl) =
+                        convert_function_decl(func, jsinfo.throws(), scope, &mut self.parse_ctx())
                     {
+                        crate::parse::members::apply_slice_hints(
+                            &mut decl.params,
+                            &jsinfo,
+                            &decl.js_name,
+                            self.diag,
+                        );
                         declarations.push(ir::TypeDeclaration {
                             kind: ir::TypeKind::Function(decl),
                             module_context: ctx.clone(),
@@ -603,8 +609,12 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         dcx: &DeclCtx<'_>,
         declarations: &mut Vec<ir::TypeDeclaration>,
     ) {
-        let (doc, throws) = self.lookup_callable_doc(dcx.export_span_start, func.span.start);
-        if let Some(d) = convert_function_decl(func, throws, dcx.scope, &mut self.parse_ctx()) {
+        let (doc, info) = self.lookup_callable_doc(dcx.export_span_start, func.span.start);
+        if let Some(mut d) =
+            convert_function_decl(func, info.throws(), dcx.scope, &mut self.parse_ctx())
+        {
+            crate::parse::members::apply_slice_hints(&mut d.params, &info, &d.js_name, self.diag);
+            let d = d;
             let names = self.export_names(dcx.scope, &d.js_name);
             for (name, js_name) in value_bindings(&d.js_name, names) {
                 let d = ir::FunctionDecl {
@@ -925,13 +935,13 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         &self,
         export_span_start: Option<u32>,
         inner_span_start: u32,
-    ) -> (Option<String>, ir::Throws) {
+    ) -> (Option<String>, crate::parse::docs::JsDocInfo) {
         let info = export_span_start
             .and_then(|s| self.docs.info_for_span(s))
             .or_else(|| self.docs.info_for_span(inner_span_start));
         match info {
-            Some((doc, info)) => (Some(doc), info.throws()),
-            None => (None, ir::Throws::None),
+            Some((doc, info)) => (Some(doc), info),
+            None => (None, Default::default()),
         }
     }
 

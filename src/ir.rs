@@ -377,6 +377,67 @@ pub struct Param {
     pub type_ref: TypeRef,
     pub optional: bool,
     pub variadic: bool,
+    /// Slice mode requested by a `{@slice mode}` JSDoc inline tag in this
+    /// parameter's `@param` description (or the property doc, for a
+    /// setter's value). Applied where the parameter's lowering is
+    /// slice-shaped; dropped by shape otherwise, mirroring wasm-bindgen.
+    pub slice_mode: Option<SliceModeHint>,
+}
+
+/// A slice mode named by a `{@slice view|array|copy}` JSDoc inline tag,
+/// mapping 1:1 to wasm-bindgen's `#[wasm_bindgen(slice = "..")]`.
+///
+/// `View` is the author asserting, as a fact about the host API, that the
+/// callee neither retains the buffer past the call nor re-enters wasm —
+/// ts-gen never infers it.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum SliceModeHint {
+    View,
+    Array,
+    Copy,
+}
+
+impl SliceModeHint {
+    /// Parse the mode name from a `{@slice <mode>}` tag.
+    pub fn parse(name: &str) -> Option<Self> {
+        match name {
+            "view" => Some(Self::View),
+            "array" => Some(Self::Array),
+            "copy" => Some(Self::Copy),
+            _ => None,
+        }
+    }
+
+    /// Widen a bare typed-array reference under a `view` / `copy` hint
+    /// into the `TypedArray | number[]` (or `bigint[]`) union shape, so
+    /// the hinted type takes the element-slice lowering with the typed
+    /// array kept as a handle overload — "Rust callers hold native
+    /// elements here". `Nullable` is preserved around the union.
+    pub fn widen_bare_typed_array(self, ty: &TypeRef) -> Option<TypeRef> {
+        if self == Self::Array {
+            return None;
+        }
+        if let TypeRef::Nullable(inner) = ty {
+            return self
+                .widen_bare_typed_array(inner)
+                .map(|t| TypeRef::Nullable(Box::new(t)));
+        }
+        let TypeRef::Reference { segments, .. } = ty else {
+            return None;
+        };
+        let elem = (segments.len() == 1)
+            .then(|| TypedArrayElement::of_typed_array(&segments[0]))
+            .flatten()?;
+        let array_elem = if elem.is_bigint() {
+            TypeRef::BigInt
+        } else {
+            TypeRef::Number
+        };
+        Some(TypeRef::Union(vec![
+            ty.clone(),
+            TypeRef::Array(Box::new(array_elem)),
+        ]))
+    }
 }
 
 // ─── Type Parameters (Generics) ──────────────────────────────────────
@@ -724,6 +785,9 @@ pub struct SetterMember {
     /// Parameter type of the setter.
     pub type_ref: TypeRef,
     pub doc: Option<String>,
+    /// Slice mode from a `{@slice mode}` inline tag in the property's
+    /// JSDoc, applied to the setter's value argument.
+    pub slice_mode: Option<SliceModeHint>,
 }
 
 #[derive(Clone, Debug)]

@@ -1,0 +1,6 @@
+{
+  "name": "slice-hints",
+  "private": true,
+  "type": "module",
+  "main": "index.js"
+}
