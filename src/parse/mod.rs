@@ -170,6 +170,17 @@ fn parse_single_file(
             .or_default()
             .push(scope);
     }
+    // An assigned namespace's members are the module's own declarations, so
+    // they resolve and qualify like the module's body.
+    for (&scope, specifier) in &registry.assigned_namespaces {
+        let scopes = gctx
+            .ambient_module_scopes
+            .entry(specifier.clone())
+            .or_default();
+        if !scopes.contains(&scope) {
+            scopes.push(scope);
+        }
+    }
 
     gctx.info(format!(
         "Collected {} type names from {}",
@@ -1243,6 +1254,132 @@ mod tests {
         assert_eq!(resolve("A.default").as_deref(), Some("S"));
         // `export default class` is a declaration, not an export assignment.
         assert_eq!(resolve("helper").as_deref(), Some("helper"));
+    }
+
+    #[test]
+    fn export_assigned_global_namespace_is_the_module() {
+        let dir = std::env::temp_dir().join(format!("ts-gen-assigned-ns-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let decls = dir.join("decls.d.ts");
+        std::fs::write(
+            &decls,
+            r#"
+                declare module "m" {
+                    export = Shared;
+                }
+                declare namespace Shared {
+                    class Entry {}
+                    function run(): void;
+                }
+                declare module "user" {
+                    import { Entry } from "m";
+                }
+            "#,
+        )
+        .unwrap();
+        let result = parse_dts_files(&[&decls], None);
+        std::fs::remove_dir_all(&dir).unwrap();
+        let (module, gctx) = result.unwrap();
+
+        // Declared after the module, and still populated into it.
+        let m_scope = gctx.ambient_module_scopes["m"][0];
+        assert!(gctx.exports.is_exported(m_scope, "Entry"));
+        assert!(gctx.exports.is_exported(m_scope, "run"));
+        let contexts: Vec<_> = module
+            .types
+            .iter()
+            .map(|&id| gctx.get_type(id))
+            .filter(|d| !matches!(d.kind, TypeKind::Namespace(_)))
+            .map(|d| d.module_context.clone())
+            .collect();
+        assert!(contexts
+            .iter()
+            .all(|c| *c == ModuleContext::Module("m".into())));
+        assert!(!module
+            .types
+            .iter()
+            .any(|&id| matches!(gctx.get_type(id).kind, TypeKind::Namespace(_))));
+
+        let user = gctx.ambient_module_scopes["user"][0];
+        let entry = gctx
+            .resolve_path(user, "Entry")
+            .map(|id| &gctx.get_type(id).kind);
+        assert!(matches!(entry, Some(TypeKind::Class(_))));
+    }
+
+    #[test]
+    fn export_assigned_global_namespace_limits() {
+        let dir = std::env::temp_dir().join(format!("ts-gen-assigned-lim-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let files = [
+            r#"
+                declare namespace S { function one(): void; }
+                declare module "m" { export = S; }
+                declare module "second" { export = S; }
+                declare namespace NS { function g(): void; }
+                declare module "own" { class NS {} export = NS; }
+                declare function f(): void;
+                declare namespace f { function h(): void; }
+                declare module "merged" { export = f; }
+                interface C { a(): void; }
+                declare var C: { prototype: C; new(): C };
+                declare namespace C { function k(): void; }
+                declare module "classlike" { export = C; }
+            "#,
+            r#"
+                declare namespace S { class Two {} }
+                declare namespace X { function x(): void; }
+            "#,
+            r#"declare module "late" { export = X; }"#,
+        ];
+        let paths: Vec<_> = files
+            .iter()
+            .enumerate()
+            .map(|(i, src)| {
+                let path = dir.join(format!("f{i}.d.ts"));
+                std::fs::write(&path, src).unwrap();
+                path
+            })
+            .collect();
+        let result = parse_dts_files(&paths, None);
+        std::fs::remove_dir_all(&dir).unwrap();
+        let (module, gctx) = result.unwrap();
+
+        // Where each declaration is emitted: a module, a global namespace,
+        // or the global scope.
+        let mut placed = std::collections::HashMap::new();
+        for &id in &module.types {
+            let d = gctx.get_type(id);
+            if let TypeKind::Namespace(ns) = &d.kind {
+                for &member in &ns.declarations {
+                    let name = crate::codegen::typemap::type_decl_name(&gctx.get_type(member).kind);
+                    placed.insert(name.unwrap().to_string(), format!("namespace {}", ns.name));
+                }
+            } else if let Some(name) = crate::codegen::typemap::type_decl_name(&d.kind) {
+                let at = match &d.module_context {
+                    ModuleContext::Module(m) => format!("module {m}"),
+                    ModuleContext::Global => "global".to_string(),
+                };
+                placed.insert(name.to_string(), at);
+            }
+        }
+        let place = |name: &str| placed[name].as_str();
+        // A later file reopening an assigned namespace adds to the module.
+        assert_eq!(place("one"), "module m");
+        assert_eq!(place("Two"), "module m");
+        // The module's own binding is what it assigns.
+        assert_eq!(place("NS"), "module own");
+        assert_eq!(place("g"), "namespace NS");
+        // A merged function carries the value, so the namespace stays.
+        assert_eq!(place("f"), "global");
+        assert_eq!(place("h"), "namespace f");
+        assert_eq!(place("k"), "namespace C");
+        // An earlier file's namespace is already populated as a global.
+        assert_eq!(place("x"), "namespace X");
+
+        let scope_of = |m: &str| gctx.ambient_module_scopes[m][0];
+        assert!(!gctx.exports.is_exported(scope_of("second"), "one"));
+        assert!(!gctx.exports.is_exported(scope_of("late"), "x"));
     }
 
     #[test]

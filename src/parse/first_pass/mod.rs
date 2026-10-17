@@ -90,6 +90,25 @@ pub fn export_assigned_name<'s>(stmts: &'s [ast::Statement<'_>]) -> Option<&'s s
     })
 }
 
+/// The local names a block's imports bind.
+pub fn block_imported_names(stmts: &[ast::Statement<'_>]) -> Vec<String> {
+    let mut names = Vec::new();
+    for stmt in stmts {
+        match stmt {
+            ast::Statement::ImportDeclaration(import) => {
+                for spec in import.specifiers.iter().flatten() {
+                    names.push(spec.local().name.to_string());
+                }
+            }
+            ast::Statement::TSImportEqualsDeclaration(import) => {
+                names.push(import.id.name.to_string());
+            }
+            _ => {}
+        }
+    }
+    names
+}
+
 /// The names a block's own declarations bind, with or without an `export`
 /// modifier. Imports and nested `declare module` / `declare global` blocks
 /// bind nothing here.

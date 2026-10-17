@@ -2303,8 +2303,22 @@ facade do. A plain CommonJS `module.exports = f; f.x = …` exposes only
 the default, since `cjs-module-lexer` does not detect `f.x`.
 
 A `--lib-name` module file's top-level `export =` is handled the same
-way. Only an `export =` of a binding declared in the same module is
-handled; one naming a global is skipped with a diagnostic.
+way. The assigned namespace may also be declared outside the module, as
+`workers-types` does with `declare namespace CloudflareWorkersModule`
+and `declare module "cloudflare:workers" { export = CloudflareWorkersModule; }`.
+It is then the module's rather than a global, so its members are emitted
+in the module's `pub mod` with `module = "cloudflare:workers"`, imports
+from the module resolve to them, and global references such as
+`CloudflareWorkersModule.WorkerEntrypoint` qualify to that `pub mod`.
+Emitting them takes `--export cloudflare:workers`.
+
+This needs the namespace to be the global the name binds as a value, and
+first declared in the module's file; a later file reopening it adds to
+the module. A binding of the module's own with that name is what it
+assigns instead. A global function or class merged with the namespace,
+a namespace an earlier file declares, a second module assigning the same
+namespace, and any other `export =` of a global are skipped with a
+diagnostic.
 
 A namespace merged with a same-named class, function or interface
 (`class Foo {}` + `namespace Foo { interface Options {} }`) leaves

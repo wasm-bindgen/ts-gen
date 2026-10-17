@@ -65,4 +65,29 @@ pub mod module_export_assignment {
             pub fn try_increment(this: &Counter) -> Result<(), JsValue>;
         }
     }
+    pub mod global {
+        #[allow(unused_imports)]
+        use super::*;
+        #[wasm_bindgen(module = "module-export-assignment/global")]
+        extern "C" {
+            pub fn greet(name: &str) -> String;
+        }
+        #[wasm_bindgen(module = "module-export-assignment/global")]
+        extern "C" {
+            #[wasm_bindgen(catch, js_name = "greet")]
+            pub fn try_greet(name: &str) -> Result<String, JsValue>;
+        }
+        #[wasm_bindgen(module = "module-export-assignment/global")]
+        extern "C" {
+            # [wasm_bindgen (extends = Object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type Greeter;
+            #[wasm_bindgen(constructor, catch)]
+            pub fn new(prefix: &str) -> Result<Greeter, JsValue>;
+            #[wasm_bindgen(method)]
+            pub fn greet(this: &Greeter, name: &str) -> String;
+            #[wasm_bindgen(method, catch, js_name = "greet")]
+            pub fn try_greet(this: &Greeter, name: &str) -> Result<String, JsValue>;
+        }
+    }
 }

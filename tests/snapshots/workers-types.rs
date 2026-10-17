@@ -16,6 +16,8 @@ use JsValue as Data;
 use JsValue as R;
 #[allow(dead_code)]
 use JsValue as Readonly;
+#[allow(dead_code)]
+use JsValue as T;
 #[wasm_bindgen]
 extern "C" {
     #[allow(non_upper_case_globals)]
@@ -34098,6 +34100,626 @@ pub mod cloudflare {
     pub type MainModule = GlobalProp<JsString, Object>;
     #[allow(dead_code)]
     pub type Exports = JsValue;
+    pub mod workers {
+        #[allow(unused_imports)]
+        use super::*;
+        #[allow(dead_code)]
+        pub type RpcStub<T> = super::super::rpc::Stub<T>;
+        #[wasm_bindgen(module = "cloudflare:workers")]
+        extern "C" {
+            # [wasm_bindgen (extends = Object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type RpcStub;
+            #[wasm_bindgen(constructor, catch)]
+            pub fn new(value: &T) -> Result<RpcStub, JsValue>;
+        }
+        #[wasm_bindgen(module = "cloudflare:workers")]
+        extern "C" {
+            # [wasm_bindgen (extends = Object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type RpcTarget;
+        }
+        #[wasm_bindgen(module = "cloudflare:workers")]
+        extern "C" {
+            # [wasm_bindgen (extends = Object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type WorkerEntrypoint<
+                Env: ::wasm_bindgen::JsGeneric,
+                Props: ::wasm_bindgen::JsGeneric,
+            >;
+            #[wasm_bindgen(method, getter)]
+            pub fn ctx<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &WorkerEntrypoint<Env, Props>,
+            ) -> super::super::ExecutionContext<Props>;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_ctx<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &WorkerEntrypoint<Env, Props>,
+                val: &super::super::ExecutionContext<Props>,
+            );
+            #[wasm_bindgen(method, getter)]
+            pub fn env<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &WorkerEntrypoint<Env, Props>,
+            ) -> Env;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_env<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &WorkerEntrypoint<Env, Props>,
+                val: &Env,
+            );
+            #[wasm_bindgen(method)]
+            pub fn email<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &WorkerEntrypoint<Env, Props>,
+                message: &super::super::ForwardableEmailMessage,
+            ) -> Option<Promise<Undefined>>;
+            #[wasm_bindgen(method, catch, js_name = "email")]
+            pub fn try_email<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &WorkerEntrypoint<Env, Props>,
+                message: &super::super::ForwardableEmailMessage,
+            ) -> Result<Option<Promise<Undefined>>, JsValue>;
+            #[wasm_bindgen(method)]
+            pub fn fetch<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &WorkerEntrypoint<Env, Props>,
+                request: &super::super::Request,
+            ) -> FetchReturnKind;
+            #[wasm_bindgen(method, catch, js_name = "fetch")]
+            pub fn try_fetch<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &WorkerEntrypoint<Env, Props>,
+                request: &super::super::Request,
+            ) -> Result<FetchReturnKind, JsValue>;
+            #[wasm_bindgen(method)]
+            pub fn queue<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &WorkerEntrypoint<Env, Props>,
+                batch: &super::super::MessageBatch<JsValue>,
+            ) -> Option<Promise<Undefined>>;
+            #[wasm_bindgen(method, catch, js_name = "queue")]
+            pub fn try_queue<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &WorkerEntrypoint<Env, Props>,
+                batch: &super::super::MessageBatch<JsValue>,
+            ) -> Result<Option<Promise<Undefined>>, JsValue>;
+            #[wasm_bindgen(method)]
+            pub fn scheduled<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &WorkerEntrypoint<Env, Props>,
+                controller: &super::super::ScheduledController,
+            ) -> Option<Promise<Undefined>>;
+            #[wasm_bindgen(method, catch, js_name = "scheduled")]
+            pub fn try_scheduled<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &WorkerEntrypoint<Env, Props>,
+                controller: &super::super::ScheduledController,
+            ) -> Result<Option<Promise<Undefined>>, JsValue>;
+            #[wasm_bindgen(method)]
+            pub fn tail<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &WorkerEntrypoint<Env, Props>,
+                events: &[super::super::TraceItem],
+            ) -> Option<Promise<Undefined>>;
+            #[wasm_bindgen(method, catch, js_name = "tail")]
+            pub fn try_tail<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &WorkerEntrypoint<Env, Props>,
+                events: &[super::super::TraceItem],
+            ) -> Result<Option<Promise<Undefined>>, JsValue>;
+            #[wasm_bindgen(method, js_name = "tailStream")]
+            pub fn tail_stream<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &WorkerEntrypoint<Env, Props>,
+                event: &super::super::tail_stream::TailEvent<super::super::tail_stream::Onset>,
+            ) -> TailStreamReturnKind;
+            #[wasm_bindgen(method, catch, js_name = "tailStream")]
+            pub fn try_tail_stream<
+                Env: ::wasm_bindgen::JsGeneric,
+                Props: ::wasm_bindgen::JsGeneric,
+            >(
+                this: &WorkerEntrypoint<Env, Props>,
+                event: &super::super::tail_stream::TailEvent<super::super::tail_stream::Onset>,
+            ) -> Result<TailStreamReturnKind, JsValue>;
+            #[wasm_bindgen(method)]
+            pub fn test<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &WorkerEntrypoint<Env, Props>,
+                controller: &super::super::TestController,
+            ) -> Option<Promise<Undefined>>;
+            #[wasm_bindgen(method, catch, js_name = "test")]
+            pub fn try_test<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &WorkerEntrypoint<Env, Props>,
+                controller: &super::super::TestController,
+            ) -> Result<Option<Promise<Undefined>>, JsValue>;
+            #[wasm_bindgen(method)]
+            pub fn trace<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &WorkerEntrypoint<Env, Props>,
+                traces: &[super::super::TraceItem],
+            ) -> Option<Promise<Undefined>>;
+            #[wasm_bindgen(method, catch, js_name = "trace")]
+            pub fn try_trace<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &WorkerEntrypoint<Env, Props>,
+                traces: &[super::super::TraceItem],
+            ) -> Result<Option<Promise<Undefined>>, JsValue>;
+        }
+        #[wasm_bindgen(module = "cloudflare:workers")]
+        extern "C" {
+            # [wasm_bindgen (extends = Object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type DurableObject<
+                Env: ::wasm_bindgen::JsGeneric,
+                Props: ::wasm_bindgen::JsGeneric,
+            >;
+            #[wasm_bindgen(method, getter)]
+            pub fn ctx<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &DurableObject<Env, Props>,
+            ) -> super::super::DurableObjectState<Props>;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_ctx<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &DurableObject<Env, Props>,
+                val: &super::super::DurableObjectState<Props>,
+            );
+            #[wasm_bindgen(method, getter)]
+            pub fn env<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &DurableObject<Env, Props>,
+            ) -> Env;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_env<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &DurableObject<Env, Props>,
+                val: &Env,
+            );
+            #[wasm_bindgen(method)]
+            pub fn alarm<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &DurableObject<Env, Props>,
+            ) -> Option<Promise<Undefined>>;
+            #[wasm_bindgen(method, catch, js_name = "alarm")]
+            pub fn try_alarm<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &DurableObject<Env, Props>,
+            ) -> Result<Option<Promise<Undefined>>, JsValue>;
+            #[wasm_bindgen(method, js_name = "alarm")]
+            pub fn alarm_with_alarm_info<
+                Env: ::wasm_bindgen::JsGeneric,
+                Props: ::wasm_bindgen::JsGeneric,
+            >(
+                this: &DurableObject<Env, Props>,
+                alarm_info: &super::super::AlarmInvocationInfo,
+            ) -> Option<Promise<Undefined>>;
+            #[wasm_bindgen(method, catch, js_name = "alarm")]
+            pub fn try_alarm_with_alarm_info<
+                Env: ::wasm_bindgen::JsGeneric,
+                Props: ::wasm_bindgen::JsGeneric,
+            >(
+                this: &DurableObject<Env, Props>,
+                alarm_info: &super::super::AlarmInvocationInfo,
+            ) -> Result<Option<Promise<Undefined>>, JsValue>;
+            #[wasm_bindgen(method)]
+            pub fn fetch<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &DurableObject<Env, Props>,
+                request: &super::super::Request,
+            ) -> FetchReturnKind;
+            #[wasm_bindgen(method, catch, js_name = "fetch")]
+            pub fn try_fetch<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
+                this: &DurableObject<Env, Props>,
+                request: &super::super::Request,
+            ) -> Result<FetchReturnKind, JsValue>;
+            #[wasm_bindgen(method, js_name = "webSocketMessage")]
+            pub fn web_socket_message<
+                Env: ::wasm_bindgen::JsGeneric,
+                Props: ::wasm_bindgen::JsGeneric,
+            >(
+                this: &DurableObject<Env, Props>,
+                ws: &super::super::WebSocket,
+                message: &str,
+            ) -> Option<Promise<Undefined>>;
+            #[wasm_bindgen(method, catch, js_name = "webSocketMessage")]
+            pub fn try_web_socket_message<
+                Env: ::wasm_bindgen::JsGeneric,
+                Props: ::wasm_bindgen::JsGeneric,
+            >(
+                this: &DurableObject<Env, Props>,
+                ws: &super::super::WebSocket,
+                message: &str,
+            ) -> Result<Option<Promise<Undefined>>, JsValue>;
+            #[wasm_bindgen(method, js_name = "webSocketMessage")]
+            pub fn web_socket_message_with_array_buffer<
+                Env: ::wasm_bindgen::JsGeneric,
+                Props: ::wasm_bindgen::JsGeneric,
+            >(
+                this: &DurableObject<Env, Props>,
+                ws: &super::super::WebSocket,
+                message: &ArrayBuffer,
+            ) -> Option<Promise<Undefined>>;
+            #[wasm_bindgen(method, catch, js_name = "webSocketMessage")]
+            pub fn try_web_socket_message_with_array_buffer<
+                Env: ::wasm_bindgen::JsGeneric,
+                Props: ::wasm_bindgen::JsGeneric,
+            >(
+                this: &DurableObject<Env, Props>,
+                ws: &super::super::WebSocket,
+                message: &ArrayBuffer,
+            ) -> Result<Option<Promise<Undefined>>, JsValue>;
+            #[wasm_bindgen(method, js_name = "webSocketClose")]
+            pub fn web_socket_close<
+                Env: ::wasm_bindgen::JsGeneric,
+                Props: ::wasm_bindgen::JsGeneric,
+            >(
+                this: &DurableObject<Env, Props>,
+                ws: &super::super::WebSocket,
+                code: f64,
+                reason: &str,
+                was_clean: bool,
+            ) -> Option<Promise<Undefined>>;
+            #[wasm_bindgen(method, catch, js_name = "webSocketClose")]
+            pub fn try_web_socket_close<
+                Env: ::wasm_bindgen::JsGeneric,
+                Props: ::wasm_bindgen::JsGeneric,
+            >(
+                this: &DurableObject<Env, Props>,
+                ws: &super::super::WebSocket,
+                code: f64,
+                reason: &str,
+                was_clean: bool,
+            ) -> Result<Option<Promise<Undefined>>, JsValue>;
+            #[wasm_bindgen(method, js_name = "webSocketError")]
+            pub fn web_socket_error<
+                Env: ::wasm_bindgen::JsGeneric,
+                Props: ::wasm_bindgen::JsGeneric,
+            >(
+                this: &DurableObject<Env, Props>,
+                ws: &super::super::WebSocket,
+                error: &JsValue,
+            ) -> Option<Promise<Undefined>>;
+            #[wasm_bindgen(method, catch, js_name = "webSocketError")]
+            pub fn try_web_socket_error<
+                Env: ::wasm_bindgen::JsGeneric,
+                Props: ::wasm_bindgen::JsGeneric,
+            >(
+                this: &DurableObject<Env, Props>,
+                ws: &super::super::WebSocket,
+                error: &JsValue,
+            ) -> Result<Option<Promise<Undefined>>, JsValue>;
+        }
+        #[wasm_bindgen(private)]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+        pub enum WorkflowDurationLabel {
+            Second = "second",
+            Minute = "minute",
+            Hour = "hour",
+            Day = "day",
+            Week = "week",
+            Month = "month",
+            Year = "year",
+        }
+        #[allow(dead_code)]
+        pub type WorkflowSleepDuration = JsValue;
+        #[allow(dead_code)]
+        pub type WorkflowDelayDuration = JsValue;
+        #[allow(dead_code)]
+        pub type WorkflowTimeoutDuration = JsValue;
+        #[allow(dead_code)]
+        pub type WorkflowRetentionDuration = JsValue;
+        #[wasm_bindgen(private)]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+        pub enum WorkflowBackoff {
+            Constant = "constant",
+            Linear = "linear",
+            Exponential = "exponential",
+        }
+        #[wasm_bindgen(module = "cloudflare:workers")]
+        extern "C" {
+            # [wasm_bindgen (extends = Object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type WorkflowStepConfig;
+            #[wasm_bindgen(method, getter)]
+            pub fn retries(this: &WorkflowStepConfig) -> Option<Object>;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_retries(this: &WorkflowStepConfig, val: &Object);
+            #[wasm_bindgen(method, getter)]
+            pub fn timeout(this: &WorkflowStepConfig) -> Option<TimeoutKind>;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_timeout(this: &WorkflowStepConfig, val: &str);
+            #[wasm_bindgen(method, setter, js_name = "timeout")]
+            pub fn set_timeout_with_f64(this: &WorkflowStepConfig, val: f64);
+        }
+        impl WorkflowStepConfig {
+            pub fn new() -> WorkflowStepConfig {
+                Self::builder().build()
+            }
+            pub fn builder() -> WorkflowStepConfigBuilder {
+                WorkflowStepConfigBuilder {
+                    inner: JsCast::unchecked_into(js_sys::Object::new()),
+                }
+            }
+        }
+        pub struct WorkflowStepConfigBuilder {
+            inner: WorkflowStepConfig,
+        }
+        impl WorkflowStepConfigBuilder {
+            pub fn retries(self, val: &Object) -> Self {
+                self.inner.set_retries(val);
+                self
+            }
+            pub fn timeout(self, val: &str) -> Self {
+                self.inner.set_timeout(val);
+                self
+            }
+            pub fn timeout_with_f64(self, val: f64) -> Self {
+                self.inner.set_timeout_with_f64(val);
+                self
+            }
+            pub fn build(self) -> WorkflowStepConfig {
+                self.inner
+            }
+        }
+        #[wasm_bindgen(module = "cloudflare:workers")]
+        extern "C" {
+            # [wasm_bindgen (extends = Object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type WorkflowEvent<T: ::wasm_bindgen::JsGeneric>;
+            #[wasm_bindgen(method, getter)]
+            pub fn payload<T: ::wasm_bindgen::JsGeneric>(this: &WorkflowEvent<T>) -> Readonly;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_payload<T: ::wasm_bindgen::JsGeneric>(
+                this: &WorkflowEvent<T>,
+                val: &Readonly,
+            );
+            #[wasm_bindgen(method, getter)]
+            pub fn timestamp<T: ::wasm_bindgen::JsGeneric>(this: &WorkflowEvent<T>) -> Date;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_timestamp<T: ::wasm_bindgen::JsGeneric>(this: &WorkflowEvent<T>, val: &Date);
+            #[wasm_bindgen(method, getter, js_name = "instanceId")]
+            pub fn instance_id<T: ::wasm_bindgen::JsGeneric>(this: &WorkflowEvent<T>) -> String;
+            #[wasm_bindgen(method, setter, js_name = "instanceId")]
+            pub fn set_instance_id<T: ::wasm_bindgen::JsGeneric>(
+                this: &WorkflowEvent<T>,
+                val: &str,
+            );
+        }
+        impl<T: ::wasm_bindgen::JsGeneric> WorkflowEvent<T> {
+            pub fn new(
+                payload: &Readonly,
+                timestamp: &Date,
+                instance_id: &str,
+            ) -> WorkflowEvent<T> {
+                let inner: WorkflowEvent<T> = JsCast::unchecked_into(js_sys::Object::new());
+                inner.set_payload(payload);
+                inner.set_timestamp(timestamp);
+                inner.set_instance_id(instance_id);
+                inner
+            }
+        }
+        #[wasm_bindgen(module = "cloudflare:workers")]
+        extern "C" {
+            # [wasm_bindgen (extends = Object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type WorkflowStepEvent<T: ::wasm_bindgen::JsGeneric>;
+            #[wasm_bindgen(method, getter)]
+            pub fn payload<T: ::wasm_bindgen::JsGeneric>(this: &WorkflowStepEvent<T>) -> Readonly;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_payload<T: ::wasm_bindgen::JsGeneric>(
+                this: &WorkflowStepEvent<T>,
+                val: &Readonly,
+            );
+            #[wasm_bindgen(method, getter)]
+            pub fn timestamp<T: ::wasm_bindgen::JsGeneric>(this: &WorkflowStepEvent<T>) -> Date;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_timestamp<T: ::wasm_bindgen::JsGeneric>(
+                this: &WorkflowStepEvent<T>,
+                val: &Date,
+            );
+            #[wasm_bindgen(method, getter, js_name = "type")]
+            pub fn type_<T: ::wasm_bindgen::JsGeneric>(this: &WorkflowStepEvent<T>) -> String;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_type<T: ::wasm_bindgen::JsGeneric>(this: &WorkflowStepEvent<T>, val: &str);
+        }
+        impl<T: ::wasm_bindgen::JsGeneric> WorkflowStepEvent<T> {
+            pub fn new(payload: &Readonly, timestamp: &Date, r#type: &str) -> WorkflowStepEvent<T> {
+                let inner: WorkflowStepEvent<T> = JsCast::unchecked_into(js_sys::Object::new());
+                inner.set_payload(payload);
+                inner.set_timestamp(timestamp);
+                inner.set_type(r#type);
+                inner
+            }
+        }
+        #[wasm_bindgen(module = "cloudflare:workers")]
+        extern "C" {
+            # [wasm_bindgen (extends = Object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type WorkflowStepContext;
+            #[wasm_bindgen(method, getter)]
+            pub fn attempt(this: &WorkflowStepContext) -> f64;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_attempt(this: &WorkflowStepContext, val: f64);
+        }
+        impl WorkflowStepContext {
+            pub fn new(attempt: f64) -> WorkflowStepContext {
+                let inner: WorkflowStepContext = JsCast::unchecked_into(js_sys::Object::new());
+                inner.set_attempt(attempt);
+                inner
+            }
+        }
+        #[wasm_bindgen(module = "cloudflare:workers")]
+        extern "C" {
+            # [wasm_bindgen (extends = Object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type WorkflowStep;
+            #[wasm_bindgen(method, catch, js_name = "do")]
+            pub async fn do_<T: ::wasm_bindgen::JsGeneric>(
+                this: &WorkflowStep,
+                name: &str,
+                callback: &Function<fn(WorkflowStepContext) -> Promise<T>>,
+            ) -> Result<T, JsValue>;
+            #[wasm_bindgen(method, catch, js_name = "do")]
+            pub async fn do_with_config<T: ::wasm_bindgen::JsGeneric>(
+                this: &WorkflowStep,
+                name: &str,
+                config: &WorkflowStepConfig,
+                callback: &Function<fn(WorkflowStepContext) -> Promise<T>>,
+            ) -> Result<T, JsValue>;
+            #[wasm_bindgen(method, getter)]
+            pub fn sleep(
+                this: &WorkflowStep,
+            ) -> Function<fn(JsString, JsValue) -> Promise<Undefined>>;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_sleep(
+                this: &WorkflowStep,
+                val: &Function<fn(JsString, JsValue) -> Promise<Undefined>>,
+            );
+            #[wasm_bindgen(method, getter, js_name = "sleepUntil")]
+            pub fn sleep_until(
+                this: &WorkflowStep,
+            ) -> Function<fn(JsString, JsValue) -> Promise<Undefined>>;
+            #[wasm_bindgen(method, setter, js_name = "sleepUntil")]
+            pub fn set_sleep_until(
+                this: &WorkflowStep,
+                val: &Function<fn(JsString, JsValue) -> Promise<Undefined>>,
+            );
+            #[wasm_bindgen(method, catch, js_name = "waitForEvent")]
+            pub async fn wait_for_event<T: ::wasm_bindgen::JsGeneric>(
+                this: &WorkflowStep,
+                name: &str,
+                options: &WorkflowStepOptions,
+            ) -> Result<WorkflowStepEvent<T>, JsValue>;
+        }
+        #[wasm_bindgen(module = "cloudflare:workers")]
+        extern "C" {
+            # [wasm_bindgen (extends = Object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type WorkflowStepOptions;
+            #[wasm_bindgen(method, getter, js_name = "type")]
+            pub fn type_(this: &WorkflowStepOptions) -> String;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_type(this: &WorkflowStepOptions, val: &str);
+            #[wasm_bindgen(method, getter)]
+            pub fn timeout(this: &WorkflowStepOptions) -> Option<TimeoutKind>;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_timeout(this: &WorkflowStepOptions, val: &str);
+            #[wasm_bindgen(method, setter, js_name = "timeout")]
+            pub fn set_timeout_with_f64(this: &WorkflowStepOptions, val: f64);
+        }
+        impl WorkflowStepOptions {
+            pub fn new(r#type: &str) -> WorkflowStepOptions {
+                Self::builder(r#type).build()
+            }
+            pub fn builder(r#type: &str) -> WorkflowStepOptionsBuilder {
+                let inner: WorkflowStepOptions = JsCast::unchecked_into(js_sys::Object::new());
+                inner.set_type(r#type);
+                WorkflowStepOptionsBuilder { inner }
+            }
+        }
+        pub struct WorkflowStepOptionsBuilder {
+            inner: WorkflowStepOptions,
+        }
+        impl WorkflowStepOptionsBuilder {
+            pub fn timeout(self, val: &str) -> Self {
+                self.inner.set_timeout(val);
+                self
+            }
+            pub fn timeout_with_f64(self, val: f64) -> Self {
+                self.inner.set_timeout_with_f64(val);
+                self
+            }
+            pub fn build(self) -> WorkflowStepOptions {
+                self.inner
+            }
+        }
+        #[wasm_bindgen(private)]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+        pub enum WorkflowInstanceStatus {
+            Queued = "queued",
+            Running = "running",
+            Paused = "paused",
+            Errored = "errored",
+            Terminated = "terminated",
+            Complete = "complete",
+            Waiting = "waiting",
+            WaitingForPause = "waitingForPause",
+            Unknown = "unknown",
+        }
+        #[wasm_bindgen(module = "cloudflare:workers")]
+        extern "C" {
+            # [wasm_bindgen (extends = Object)]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type WorkflowEntrypoint<
+                Env: ::wasm_bindgen::JsGeneric,
+                T: ::wasm_bindgen::JsGeneric,
+            >;
+            #[wasm_bindgen(method, getter)]
+            pub fn ctx<Env: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
+                this: &WorkflowEntrypoint<Env, T>,
+            ) -> super::super::ExecutionContext;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_ctx<Env: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
+                this: &WorkflowEntrypoint<Env, T>,
+                val: &super::super::ExecutionContext,
+            );
+            #[wasm_bindgen(method, getter)]
+            pub fn env<Env: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
+                this: &WorkflowEntrypoint<Env, T>,
+            ) -> Env;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_env<Env: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
+                this: &WorkflowEntrypoint<Env, T>,
+                val: &Env,
+            );
+            #[wasm_bindgen(method, catch)]
+            pub async fn run<Env: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
+                this: &WorkflowEntrypoint<Env, T>,
+                event: &Readonly,
+                step: &WorkflowStep,
+            ) -> Result<JsValue, JsValue>;
+        }
+        #[wasm_bindgen(module = "cloudflare:workers")]
+        extern "C" {
+            #[wasm_bindgen(js_name = "waitUntil")]
+            pub fn wait_until(promise: &Promise);
+        }
+        #[wasm_bindgen(module = "cloudflare:workers")]
+        extern "C" {
+            #[wasm_bindgen(catch, js_name = "waitUntil")]
+            pub fn try_wait_until(promise: &Promise) -> Result<(), JsValue>;
+        }
+        #[wasm_bindgen(module = "cloudflare:workers")]
+        extern "C" {
+            #[wasm_bindgen(js_name = "withEnv")]
+            pub fn with_env(new_env: &JsValue, r#fn: &Function) -> JsValue;
+        }
+        #[wasm_bindgen(module = "cloudflare:workers")]
+        extern "C" {
+            #[wasm_bindgen(catch, js_name = "withEnv")]
+            pub fn try_with_env(new_env: &JsValue, r#fn: &Function) -> Result<JsValue, JsValue>;
+        }
+        #[wasm_bindgen(module = "cloudflare:workers")]
+        extern "C" {
+            #[wasm_bindgen(js_name = "withExports")]
+            pub fn with_exports(new_exports: &JsValue, r#fn: &Function) -> JsValue;
+        }
+        #[wasm_bindgen(module = "cloudflare:workers")]
+        extern "C" {
+            #[wasm_bindgen(catch, js_name = "withExports")]
+            pub fn try_with_exports(
+                new_exports: &JsValue,
+                r#fn: &Function,
+            ) -> Result<JsValue, JsValue>;
+        }
+        #[wasm_bindgen(module = "cloudflare:workers")]
+        extern "C" {
+            #[wasm_bindgen(js_name = "withEnvAndExports")]
+            pub fn with_env_and_exports(
+                new_env: &JsValue,
+                new_exports: &JsValue,
+                r#fn: &Function,
+            ) -> JsValue;
+        }
+        #[wasm_bindgen(module = "cloudflare:workers")]
+        extern "C" {
+            #[wasm_bindgen(catch, js_name = "withEnvAndExports")]
+            pub fn try_with_env_and_exports(
+                new_env: &JsValue,
+                new_exports: &JsValue,
+                r#fn: &Function,
+            ) -> Result<JsValue, JsValue>;
+        }
+        #[wasm_bindgen(module = "cloudflare:workers")]
+        extern "C" {
+            #[allow(non_upper_case_globals)]
+            #[wasm_bindgen(thread_local_v2)]
+            pub static env: super::Env;
+        }
+        #[wasm_bindgen(module = "cloudflare:workers")]
+        extern "C" {
+            #[allow(non_upper_case_globals)]
+            #[wasm_bindgen(thread_local_v2)]
+            pub static exports: JsValue;
+        }
+    }
     pub mod sockets {
         #[allow(unused_imports)]
         use super::*;
@@ -36369,607 +36991,6 @@ pub mod rpc {
     pub type MaybeCallableProvider<T> = JsValue;
     #[allow(dead_code)]
     pub type Provider<T, Reserved> = JsValue;
-}
-pub mod cloudflare_workers_module {
-    #[allow(unused_imports)]
-    use super::*;
-    #[allow(dead_code)]
-    pub type RpcStub<T> = super::rpc::Stub<T>;
-    #[wasm_bindgen]
-    extern "C" {
-        #[allow(non_upper_case_globals)]
-        #[wasm_bindgen(
-            thread_local_v2,
-            js_name = "RpcStub",
-            js_namespace = "CloudflareWorkersModule"
-        )]
-        pub static rpc_stub: Object;
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "CloudflareWorkersModule")]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type RpcTarget;
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "CloudflareWorkersModule")]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type WorkerEntrypoint<
-            Env: ::wasm_bindgen::JsGeneric,
-            Props: ::wasm_bindgen::JsGeneric,
-        >;
-        #[wasm_bindgen(method, getter)]
-        pub fn ctx<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &WorkerEntrypoint<Env, Props>,
-        ) -> super::ExecutionContext<Props>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_ctx<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &WorkerEntrypoint<Env, Props>,
-            val: &super::ExecutionContext<Props>,
-        );
-        #[wasm_bindgen(method, getter)]
-        pub fn env<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &WorkerEntrypoint<Env, Props>,
-        ) -> Env;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_env<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &WorkerEntrypoint<Env, Props>,
-            val: &Env,
-        );
-        #[wasm_bindgen(method)]
-        pub fn email<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &WorkerEntrypoint<Env, Props>,
-            message: &super::ForwardableEmailMessage,
-        ) -> Option<Promise<Undefined>>;
-        #[wasm_bindgen(method, catch, js_name = "email")]
-        pub fn try_email<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &WorkerEntrypoint<Env, Props>,
-            message: &super::ForwardableEmailMessage,
-        ) -> Result<Option<Promise<Undefined>>, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn fetch<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &WorkerEntrypoint<Env, Props>,
-            request: &super::Request,
-        ) -> FetchReturnKind;
-        #[wasm_bindgen(method, catch, js_name = "fetch")]
-        pub fn try_fetch<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &WorkerEntrypoint<Env, Props>,
-            request: &super::Request,
-        ) -> Result<FetchReturnKind, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn queue<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &WorkerEntrypoint<Env, Props>,
-            batch: &super::MessageBatch<JsValue>,
-        ) -> Option<Promise<Undefined>>;
-        #[wasm_bindgen(method, catch, js_name = "queue")]
-        pub fn try_queue<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &WorkerEntrypoint<Env, Props>,
-            batch: &super::MessageBatch<JsValue>,
-        ) -> Result<Option<Promise<Undefined>>, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn scheduled<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &WorkerEntrypoint<Env, Props>,
-            controller: &super::ScheduledController,
-        ) -> Option<Promise<Undefined>>;
-        #[wasm_bindgen(method, catch, js_name = "scheduled")]
-        pub fn try_scheduled<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &WorkerEntrypoint<Env, Props>,
-            controller: &super::ScheduledController,
-        ) -> Result<Option<Promise<Undefined>>, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn tail<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &WorkerEntrypoint<Env, Props>,
-            events: &[super::TraceItem],
-        ) -> Option<Promise<Undefined>>;
-        #[wasm_bindgen(method, catch, js_name = "tail")]
-        pub fn try_tail<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &WorkerEntrypoint<Env, Props>,
-            events: &[super::TraceItem],
-        ) -> Result<Option<Promise<Undefined>>, JsValue>;
-        #[wasm_bindgen(method, js_name = "tailStream")]
-        pub fn tail_stream<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &WorkerEntrypoint<Env, Props>,
-            event: &super::tail_stream::TailEvent<super::tail_stream::Onset>,
-        ) -> TailStreamReturnKind;
-        #[wasm_bindgen(method, catch, js_name = "tailStream")]
-        pub fn try_tail_stream<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &WorkerEntrypoint<Env, Props>,
-            event: &super::tail_stream::TailEvent<super::tail_stream::Onset>,
-        ) -> Result<TailStreamReturnKind, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn test<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &WorkerEntrypoint<Env, Props>,
-            controller: &super::TestController,
-        ) -> Option<Promise<Undefined>>;
-        #[wasm_bindgen(method, catch, js_name = "test")]
-        pub fn try_test<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &WorkerEntrypoint<Env, Props>,
-            controller: &super::TestController,
-        ) -> Result<Option<Promise<Undefined>>, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn trace<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &WorkerEntrypoint<Env, Props>,
-            traces: &[super::TraceItem],
-        ) -> Option<Promise<Undefined>>;
-        #[wasm_bindgen(method, catch, js_name = "trace")]
-        pub fn try_trace<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &WorkerEntrypoint<Env, Props>,
-            traces: &[super::TraceItem],
-        ) -> Result<Option<Promise<Undefined>>, JsValue>;
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "CloudflareWorkersModule")]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type DurableObject<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>;
-        #[wasm_bindgen(method, getter)]
-        pub fn ctx<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &DurableObject<Env, Props>,
-        ) -> super::DurableObjectState<Props>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_ctx<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &DurableObject<Env, Props>,
-            val: &super::DurableObjectState<Props>,
-        );
-        #[wasm_bindgen(method, getter)]
-        pub fn env<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &DurableObject<Env, Props>,
-        ) -> Env;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_env<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &DurableObject<Env, Props>,
-            val: &Env,
-        );
-        #[wasm_bindgen(method)]
-        pub fn alarm<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &DurableObject<Env, Props>,
-        ) -> Option<Promise<Undefined>>;
-        #[wasm_bindgen(method, catch, js_name = "alarm")]
-        pub fn try_alarm<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &DurableObject<Env, Props>,
-        ) -> Result<Option<Promise<Undefined>>, JsValue>;
-        #[wasm_bindgen(method, js_name = "alarm")]
-        pub fn alarm_with_alarm_info<
-            Env: ::wasm_bindgen::JsGeneric,
-            Props: ::wasm_bindgen::JsGeneric,
-        >(
-            this: &DurableObject<Env, Props>,
-            alarm_info: &super::AlarmInvocationInfo,
-        ) -> Option<Promise<Undefined>>;
-        #[wasm_bindgen(method, catch, js_name = "alarm")]
-        pub fn try_alarm_with_alarm_info<
-            Env: ::wasm_bindgen::JsGeneric,
-            Props: ::wasm_bindgen::JsGeneric,
-        >(
-            this: &DurableObject<Env, Props>,
-            alarm_info: &super::AlarmInvocationInfo,
-        ) -> Result<Option<Promise<Undefined>>, JsValue>;
-        #[wasm_bindgen(method)]
-        pub fn fetch<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &DurableObject<Env, Props>,
-            request: &super::Request,
-        ) -> FetchReturnKind;
-        #[wasm_bindgen(method, catch, js_name = "fetch")]
-        pub fn try_fetch<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &DurableObject<Env, Props>,
-            request: &super::Request,
-        ) -> Result<FetchReturnKind, JsValue>;
-        #[wasm_bindgen(method, js_name = "webSocketMessage")]
-        pub fn web_socket_message<
-            Env: ::wasm_bindgen::JsGeneric,
-            Props: ::wasm_bindgen::JsGeneric,
-        >(
-            this: &DurableObject<Env, Props>,
-            ws: &super::WebSocket,
-            message: &str,
-        ) -> Option<Promise<Undefined>>;
-        #[wasm_bindgen(method, catch, js_name = "webSocketMessage")]
-        pub fn try_web_socket_message<
-            Env: ::wasm_bindgen::JsGeneric,
-            Props: ::wasm_bindgen::JsGeneric,
-        >(
-            this: &DurableObject<Env, Props>,
-            ws: &super::WebSocket,
-            message: &str,
-        ) -> Result<Option<Promise<Undefined>>, JsValue>;
-        #[wasm_bindgen(method, js_name = "webSocketMessage")]
-        pub fn web_socket_message_with_array_buffer<
-            Env: ::wasm_bindgen::JsGeneric,
-            Props: ::wasm_bindgen::JsGeneric,
-        >(
-            this: &DurableObject<Env, Props>,
-            ws: &super::WebSocket,
-            message: &ArrayBuffer,
-        ) -> Option<Promise<Undefined>>;
-        #[wasm_bindgen(method, catch, js_name = "webSocketMessage")]
-        pub fn try_web_socket_message_with_array_buffer<
-            Env: ::wasm_bindgen::JsGeneric,
-            Props: ::wasm_bindgen::JsGeneric,
-        >(
-            this: &DurableObject<Env, Props>,
-            ws: &super::WebSocket,
-            message: &ArrayBuffer,
-        ) -> Result<Option<Promise<Undefined>>, JsValue>;
-        #[wasm_bindgen(method, js_name = "webSocketClose")]
-        pub fn web_socket_close<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &DurableObject<Env, Props>,
-            ws: &super::WebSocket,
-            code: f64,
-            reason: &str,
-            was_clean: bool,
-        ) -> Option<Promise<Undefined>>;
-        #[wasm_bindgen(method, catch, js_name = "webSocketClose")]
-        pub fn try_web_socket_close<
-            Env: ::wasm_bindgen::JsGeneric,
-            Props: ::wasm_bindgen::JsGeneric,
-        >(
-            this: &DurableObject<Env, Props>,
-            ws: &super::WebSocket,
-            code: f64,
-            reason: &str,
-            was_clean: bool,
-        ) -> Result<Option<Promise<Undefined>>, JsValue>;
-        #[wasm_bindgen(method, js_name = "webSocketError")]
-        pub fn web_socket_error<Env: ::wasm_bindgen::JsGeneric, Props: ::wasm_bindgen::JsGeneric>(
-            this: &DurableObject<Env, Props>,
-            ws: &super::WebSocket,
-            error: &JsValue,
-        ) -> Option<Promise<Undefined>>;
-        #[wasm_bindgen(method, catch, js_name = "webSocketError")]
-        pub fn try_web_socket_error<
-            Env: ::wasm_bindgen::JsGeneric,
-            Props: ::wasm_bindgen::JsGeneric,
-        >(
-            this: &DurableObject<Env, Props>,
-            ws: &super::WebSocket,
-            error: &JsValue,
-        ) -> Result<Option<Promise<Undefined>>, JsValue>;
-    }
-    #[wasm_bindgen(private, js_namespace = "CloudflareWorkersModule")]
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum WorkflowDurationLabel {
-        Second = "second",
-        Minute = "minute",
-        Hour = "hour",
-        Day = "day",
-        Week = "week",
-        Month = "month",
-        Year = "year",
-    }
-    #[allow(dead_code)]
-    pub type WorkflowSleepDuration = JsValue;
-    #[allow(dead_code)]
-    pub type WorkflowDelayDuration = JsValue;
-    #[allow(dead_code)]
-    pub type WorkflowTimeoutDuration = JsValue;
-    #[allow(dead_code)]
-    pub type WorkflowRetentionDuration = JsValue;
-    #[wasm_bindgen(private, js_namespace = "CloudflareWorkersModule")]
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum WorkflowBackoff {
-        Constant = "constant",
-        Linear = "linear",
-        Exponential = "exponential",
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "CloudflareWorkersModule")]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type WorkflowStepConfig;
-        #[wasm_bindgen(method, getter)]
-        pub fn retries(this: &WorkflowStepConfig) -> Option<Object>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_retries(this: &WorkflowStepConfig, val: &Object);
-        #[wasm_bindgen(method, getter)]
-        pub fn timeout(this: &WorkflowStepConfig) -> Option<TimeoutKind>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_timeout(this: &WorkflowStepConfig, val: &str);
-        #[wasm_bindgen(method, setter, js_name = "timeout")]
-        pub fn set_timeout_with_f64(this: &WorkflowStepConfig, val: f64);
-    }
-    impl WorkflowStepConfig {
-        pub fn new() -> WorkflowStepConfig {
-            Self::builder().build()
-        }
-        pub fn builder() -> WorkflowStepConfigBuilder {
-            WorkflowStepConfigBuilder {
-                inner: JsCast::unchecked_into(js_sys::Object::new()),
-            }
-        }
-    }
-    pub struct WorkflowStepConfigBuilder {
-        inner: WorkflowStepConfig,
-    }
-    impl WorkflowStepConfigBuilder {
-        pub fn retries(self, val: &Object) -> Self {
-            self.inner.set_retries(val);
-            self
-        }
-        pub fn timeout(self, val: &str) -> Self {
-            self.inner.set_timeout(val);
-            self
-        }
-        pub fn timeout_with_f64(self, val: f64) -> Self {
-            self.inner.set_timeout_with_f64(val);
-            self
-        }
-        pub fn build(self) -> WorkflowStepConfig {
-            self.inner
-        }
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "CloudflareWorkersModule")]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type WorkflowEvent<T: ::wasm_bindgen::JsGeneric>;
-        #[wasm_bindgen(method, getter)]
-        pub fn payload<T: ::wasm_bindgen::JsGeneric>(this: &WorkflowEvent<T>) -> Readonly;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_payload<T: ::wasm_bindgen::JsGeneric>(this: &WorkflowEvent<T>, val: &Readonly);
-        #[wasm_bindgen(method, getter)]
-        pub fn timestamp<T: ::wasm_bindgen::JsGeneric>(this: &WorkflowEvent<T>) -> Date;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_timestamp<T: ::wasm_bindgen::JsGeneric>(this: &WorkflowEvent<T>, val: &Date);
-        #[wasm_bindgen(method, getter, js_name = "instanceId")]
-        pub fn instance_id<T: ::wasm_bindgen::JsGeneric>(this: &WorkflowEvent<T>) -> String;
-        #[wasm_bindgen(method, setter, js_name = "instanceId")]
-        pub fn set_instance_id<T: ::wasm_bindgen::JsGeneric>(this: &WorkflowEvent<T>, val: &str);
-    }
-    impl<T: ::wasm_bindgen::JsGeneric> WorkflowEvent<T> {
-        pub fn new(payload: &Readonly, timestamp: &Date, instance_id: &str) -> WorkflowEvent<T> {
-            let inner: WorkflowEvent<T> = JsCast::unchecked_into(js_sys::Object::new());
-            inner.set_payload(payload);
-            inner.set_timestamp(timestamp);
-            inner.set_instance_id(instance_id);
-            inner
-        }
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "CloudflareWorkersModule")]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type WorkflowStepEvent<T: ::wasm_bindgen::JsGeneric>;
-        #[wasm_bindgen(method, getter)]
-        pub fn payload<T: ::wasm_bindgen::JsGeneric>(this: &WorkflowStepEvent<T>) -> Readonly;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_payload<T: ::wasm_bindgen::JsGeneric>(
-            this: &WorkflowStepEvent<T>,
-            val: &Readonly,
-        );
-        #[wasm_bindgen(method, getter)]
-        pub fn timestamp<T: ::wasm_bindgen::JsGeneric>(this: &WorkflowStepEvent<T>) -> Date;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_timestamp<T: ::wasm_bindgen::JsGeneric>(this: &WorkflowStepEvent<T>, val: &Date);
-        #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type_<T: ::wasm_bindgen::JsGeneric>(this: &WorkflowStepEvent<T>) -> String;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_type<T: ::wasm_bindgen::JsGeneric>(this: &WorkflowStepEvent<T>, val: &str);
-    }
-    impl<T: ::wasm_bindgen::JsGeneric> WorkflowStepEvent<T> {
-        pub fn new(payload: &Readonly, timestamp: &Date, r#type: &str) -> WorkflowStepEvent<T> {
-            let inner: WorkflowStepEvent<T> = JsCast::unchecked_into(js_sys::Object::new());
-            inner.set_payload(payload);
-            inner.set_timestamp(timestamp);
-            inner.set_type(r#type);
-            inner
-        }
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "CloudflareWorkersModule")]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type WorkflowStepContext;
-        #[wasm_bindgen(method, getter)]
-        pub fn attempt(this: &WorkflowStepContext) -> f64;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_attempt(this: &WorkflowStepContext, val: f64);
-    }
-    impl WorkflowStepContext {
-        pub fn new(attempt: f64) -> WorkflowStepContext {
-            let inner: WorkflowStepContext = JsCast::unchecked_into(js_sys::Object::new());
-            inner.set_attempt(attempt);
-            inner
-        }
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "CloudflareWorkersModule")]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type WorkflowStep;
-        #[wasm_bindgen(method, catch, js_name = "do")]
-        pub async fn do_<T: ::wasm_bindgen::JsGeneric>(
-            this: &WorkflowStep,
-            name: &str,
-            callback: &Function<fn(WorkflowStepContext) -> Promise<T>>,
-        ) -> Result<T, JsValue>;
-        #[wasm_bindgen(method, catch, js_name = "do")]
-        pub async fn do_with_config<T: ::wasm_bindgen::JsGeneric>(
-            this: &WorkflowStep,
-            name: &str,
-            config: &WorkflowStepConfig,
-            callback: &Function<fn(WorkflowStepContext) -> Promise<T>>,
-        ) -> Result<T, JsValue>;
-        #[wasm_bindgen(method, getter)]
-        pub fn sleep(this: &WorkflowStep) -> Function<fn(JsString, JsValue) -> Promise<Undefined>>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_sleep(
-            this: &WorkflowStep,
-            val: &Function<fn(JsString, JsValue) -> Promise<Undefined>>,
-        );
-        #[wasm_bindgen(method, getter, js_name = "sleepUntil")]
-        pub fn sleep_until(
-            this: &WorkflowStep,
-        ) -> Function<fn(JsString, JsValue) -> Promise<Undefined>>;
-        #[wasm_bindgen(method, setter, js_name = "sleepUntil")]
-        pub fn set_sleep_until(
-            this: &WorkflowStep,
-            val: &Function<fn(JsString, JsValue) -> Promise<Undefined>>,
-        );
-        #[wasm_bindgen(method, catch, js_name = "waitForEvent")]
-        pub async fn wait_for_event<T: ::wasm_bindgen::JsGeneric>(
-            this: &WorkflowStep,
-            name: &str,
-            options: &WorkflowStepOptions,
-        ) -> Result<WorkflowStepEvent<T>, JsValue>;
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "CloudflareWorkersModule")]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type WorkflowStepOptions;
-        #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type_(this: &WorkflowStepOptions) -> String;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_type(this: &WorkflowStepOptions, val: &str);
-        #[wasm_bindgen(method, getter)]
-        pub fn timeout(this: &WorkflowStepOptions) -> Option<TimeoutKind>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_timeout(this: &WorkflowStepOptions, val: &str);
-        #[wasm_bindgen(method, setter, js_name = "timeout")]
-        pub fn set_timeout_with_f64(this: &WorkflowStepOptions, val: f64);
-    }
-    impl WorkflowStepOptions {
-        pub fn new(r#type: &str) -> WorkflowStepOptions {
-            Self::builder(r#type).build()
-        }
-        pub fn builder(r#type: &str) -> WorkflowStepOptionsBuilder {
-            let inner: WorkflowStepOptions = JsCast::unchecked_into(js_sys::Object::new());
-            inner.set_type(r#type);
-            WorkflowStepOptionsBuilder { inner }
-        }
-    }
-    pub struct WorkflowStepOptionsBuilder {
-        inner: WorkflowStepOptions,
-    }
-    impl WorkflowStepOptionsBuilder {
-        pub fn timeout(self, val: &str) -> Self {
-            self.inner.set_timeout(val);
-            self
-        }
-        pub fn timeout_with_f64(self, val: f64) -> Self {
-            self.inner.set_timeout_with_f64(val);
-            self
-        }
-        pub fn build(self) -> WorkflowStepOptions {
-            self.inner
-        }
-    }
-    #[wasm_bindgen(private, js_namespace = "CloudflareWorkersModule")]
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum WorkflowInstanceStatus {
-        Queued = "queued",
-        Running = "running",
-        Paused = "paused",
-        Errored = "errored",
-        Terminated = "terminated",
-        Complete = "complete",
-        Waiting = "waiting",
-        WaitingForPause = "waitingForPause",
-        Unknown = "unknown",
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        # [wasm_bindgen (extends = Object , js_namespace = "CloudflareWorkersModule")]
-        #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type WorkflowEntrypoint<Env: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>;
-        #[wasm_bindgen(method, getter)]
-        pub fn ctx<Env: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
-            this: &WorkflowEntrypoint<Env, T>,
-        ) -> super::ExecutionContext;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_ctx<Env: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
-            this: &WorkflowEntrypoint<Env, T>,
-            val: &super::ExecutionContext,
-        );
-        #[wasm_bindgen(method, getter)]
-        pub fn env<Env: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
-            this: &WorkflowEntrypoint<Env, T>,
-        ) -> Env;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_env<Env: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
-            this: &WorkflowEntrypoint<Env, T>,
-            val: &Env,
-        );
-        #[wasm_bindgen(method, catch)]
-        pub async fn run<Env: ::wasm_bindgen::JsGeneric, T: ::wasm_bindgen::JsGeneric>(
-            this: &WorkflowEntrypoint<Env, T>,
-            event: &Readonly,
-            step: &WorkflowStep,
-        ) -> Result<JsValue, JsValue>;
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        #[wasm_bindgen(js_name = "waitUntil", js_namespace = "CloudflareWorkersModule")]
-        pub fn wait_until(promise: &Promise);
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "waitUntil", js_namespace = "CloudflareWorkersModule")]
-        pub fn try_wait_until(promise: &Promise) -> Result<(), JsValue>;
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        #[wasm_bindgen(js_name = "withEnv", js_namespace = "CloudflareWorkersModule")]
-        pub fn with_env(new_env: &JsValue, r#fn: &Function) -> JsValue;
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "withEnv", js_namespace = "CloudflareWorkersModule")]
-        pub fn try_with_env(new_env: &JsValue, r#fn: &Function) -> Result<JsValue, JsValue>;
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        #[wasm_bindgen(js_name = "withExports", js_namespace = "CloudflareWorkersModule")]
-        pub fn with_exports(new_exports: &JsValue, r#fn: &Function) -> JsValue;
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        #[wasm_bindgen(
-            catch,
-            js_name = "withExports",
-            js_namespace = "CloudflareWorkersModule"
-        )]
-        pub fn try_with_exports(new_exports: &JsValue, r#fn: &Function)
-            -> Result<JsValue, JsValue>;
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        #[wasm_bindgen(
-            js_name = "withEnvAndExports",
-            js_namespace = "CloudflareWorkersModule"
-        )]
-        pub fn with_env_and_exports(
-            new_env: &JsValue,
-            new_exports: &JsValue,
-            r#fn: &Function,
-        ) -> JsValue;
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        #[wasm_bindgen(
-            catch,
-            js_name = "withEnvAndExports",
-            js_namespace = "CloudflareWorkersModule"
-        )]
-        pub fn try_with_env_and_exports(
-            new_env: &JsValue,
-            new_exports: &JsValue,
-            r#fn: &Function,
-        ) -> Result<JsValue, JsValue>;
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        #[allow(non_upper_case_globals)]
-        #[wasm_bindgen(thread_local_v2, js_namespace = "CloudflareWorkersModule")]
-        pub static env: super::cloudflare::Env;
-    }
-    #[wasm_bindgen]
-    extern "C" {
-        #[allow(non_upper_case_globals)]
-        #[wasm_bindgen(thread_local_v2, js_namespace = "CloudflareWorkersModule")]
-        pub static exports: JsValue;
-    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -41942,6 +41963,16 @@ pub enum FromKind {
     EmailAddress(EmailAddress),
 }
 #[wasm_bindgen(private)]
+pub enum TailStreamReturnKind {
+    TailEventHandlerType(JsValue),
+    Promise(Promise),
+}
+#[wasm_bindgen(private)]
+pub enum TimeoutKind {
+    WorkflowTimeoutDuration(JsValue),
+    F64(f64),
+}
+#[wasm_bindgen(private)]
 pub enum ImageInfoResponseFormatKind {
     Imagesvgxml = "image/svg+xml",
     String(String),
@@ -42012,16 +42043,6 @@ pub enum MediaTransformationOutputOptionsFormatKind {
 pub enum PayloadKind {
     String(String),
     Uint8Array(Uint8Array),
-}
-#[wasm_bindgen(private)]
-pub enum TailStreamReturnKind {
-    TailEventHandlerType(JsValue),
-    Promise(Promise),
-}
-#[wasm_bindgen(private)]
-pub enum TimeoutKind {
-    WorkflowTimeoutDuration(JsValue),
-    F64(f64),
 }
 #[wasm_bindgen(private)]
 pub enum StreamCaptionStatusKind {

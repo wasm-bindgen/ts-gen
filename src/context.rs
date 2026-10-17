@@ -64,6 +64,10 @@ pub struct GlobalContext {
     /// Body scopes of every `declare module "x"`, by specifier, one per
     /// declaring file.
     pub ambient_module_scopes: std::collections::HashMap<String, Vec<ScopeId>>,
+    /// Member scope of each global namespace a module assigns with
+    /// `export =`, → the module's specifier. A file reopening the namespace
+    /// populates it into the module too.
+    pub assigned_namespaces: std::collections::HashMap<ScopeId, String>,
     /// What each module scope exports, by public name.
     pub exports: ModuleExports,
     types: Vec<TypeDeclaration>,
@@ -137,6 +141,7 @@ impl GlobalContext {
             pending_imports: Vec::new(),
             builtin_type_ids: std::collections::HashSet::new(),
             ambient_module_scopes: std::collections::HashMap::new(),
+            assigned_namespaces: std::collections::HashMap::new(),
             exports: ModuleExports::default(),
             types: Vec::new(),
             modules: Vec::new(),

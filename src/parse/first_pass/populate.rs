@@ -364,7 +364,15 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                 let declared = match &assign.expression {
                     ast::Expression::Identifier(ident) => {
                         matches!(ctx, ir::ModuleContext::Module(_))
-                            && self.scopes.get(scope).get(&ident.name).is_some()
+                            && (self.scopes.get(scope).get(&ident.name).is_some()
+                                || self
+                                    .scopes
+                                    .resolve_namespace(scope, &ident.name)
+                                    .and_then(|ns| self.registry.assigned_namespaces.get(&ns))
+                                    .is_some_and(|assigned| {
+                                        matches!(ctx, ir::ModuleContext::Module(m)
+                                            if **m == **assigned)
+                                    }))
                     }
                     _ => false,
                 };
@@ -857,7 +865,8 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         let stmts = namespace_block_statements(ns);
 
         // A namespace the module assigns with `export =` is the module
-        // itself, so its members are module exports and are emitted flat.
+        // itself, so its members are module exports and are emitted flat,
+        // also when the namespace is declared outside the module.
         if self
             .export_assignment
             .as_ref()
@@ -865,6 +874,13 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         {
             for stmt in stmts {
                 self.populate_statement(stmt, parent_ctx, declarations, ns_scope, exported);
+            }
+            return;
+        }
+        if let Some(specifier) = self.registry.assigned_namespaces.get(&ns_scope) {
+            let module_ctx = ir::ModuleContext::Module(specifier.as_str().into());
+            for stmt in stmts {
+                self.populate_statement(stmt, &module_ctx, declarations, ns_scope, exported);
             }
             return;
         }

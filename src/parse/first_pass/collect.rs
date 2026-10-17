@@ -21,10 +21,18 @@ struct CollectCtx<'a> {
     gctx: &'a mut crate::context::GlobalContext,
     diag: &'a mut DiagnosticCollector,
     file_scope: ScopeId,
+    /// Whether the file is a script, whose top-level declarations are
+    /// globals visible to later files.
+    is_script: bool,
     /// `(scope, local, public)` for each source-less export specifier.
     /// Resolved once the whole file is collected, since a specifier may
     /// precede the declaration it names.
     export_specifiers: Vec<(ScopeId, String, String)>,
+    /// `(module scope, specifier, name)` for each `export = name` that
+    /// doesn't name a namespace of the module's own. Resolved through the
+    /// scope chain once the whole file is collected, since the namespace
+    /// may be declared after the module.
+    outer_assignments: Vec<(ScopeId, String, String)>,
     /// Interfaces with a construct signature or `prototype` member.
     constructor_shaped: std::collections::HashSet<String>,
     /// `declare var X: Y` declarators, held back until the file is
@@ -48,7 +56,9 @@ pub fn collect_type_names(
         gctx,
         diag,
         file_scope: root_scope,
+        is_script: !super::is_module(program),
         export_specifiers: Vec::new(),
+        outer_assignments: Vec::new(),
         constructor_shaped: Default::default(),
         named_ctor_vars: Vec::new(),
     };
@@ -62,6 +72,10 @@ pub fn collect_type_names(
 
     for (name, iface, ctx, scope, exported) in std::mem::take(&mut ccx.named_ctor_vars) {
         ccx.resolve_named_ctor_var(&name, &iface, &ctx, scope, exported);
+    }
+
+    for (scope, specifier, name) in std::mem::take(&mut ccx.outer_assignments) {
+        ccx.assign_namespace(scope, &specifier, &name);
     }
 
     for (scope, local, public) in std::mem::take(&mut ccx.export_specifiers) {
@@ -516,8 +530,103 @@ impl<'a> CollectCtx<'a> {
         if let Some(assigned) = super::export_assigned_name(stmts) {
             if let Some(ns_scope) = self.gctx.scopes.get(scope).namespace(assigned) {
                 self.gctx.exports.extend_from(scope, ns_scope);
+            } else if let ir::ModuleContext::Module(specifier) = ctx {
+                // A binding of the module's own, imported or declared, is
+                // what it assigns.
+                if !super::block_declared_names(stmts)
+                    .iter()
+                    .chain(&super::block_imported_names(stmts))
+                    .any(|name| name == assigned)
+                {
+                    self.outer_assignments.push((
+                        scope,
+                        specifier.to_string(),
+                        assigned.to_string(),
+                    ));
+                }
             }
         }
+    }
+
+    /// Make the namespace `name` resolves to from the module scope `scope`
+    /// the module `specifier`, when it is the name's only runtime binding.
+    /// A merged class, function or variable carries the value and stays
+    /// where it is declared, so its namespace does too.
+    ///
+    /// Phase 2 populates one file at a time, so only a namespace this file
+    /// declares first can be: an earlier file's is already populated as a
+    /// global.
+    fn assign_namespace(&mut self, scope: ScopeId, specifier: &str, name: &str) {
+        let mut at = Some(scope);
+        let (found_in, ns_scope) = loop {
+            let Some(id) = at else { return };
+            let s = self.gctx.scopes.get(id);
+            let binding = s.get(name);
+            if let Some(ns) = s.namespace(name) {
+                // An interface merged with a constructor-shaped `var` is a
+                // class, whose binding is still the interface placeholder.
+                let class_like = self
+                    .registry
+                    .types
+                    .get(name)
+                    .is_some_and(|info| info.kind == ir::RegisteredKind::MergedClassLike);
+                let type_only = binding.is_none_or(|t| match self.gctx.get_type(t).kind {
+                    ir::TypeKind::Namespace(_) | ir::TypeKind::TypeAlias(_) => true,
+                    ir::TypeKind::Interface(_) => !class_like,
+                    _ => false,
+                });
+                if !type_only {
+                    return;
+                }
+                break (id, ns);
+            }
+            if binding.is_some() {
+                return;
+            }
+            at = s.parent;
+        };
+        if let Some(other) = self.gctx.assigned_namespaces.get(&ns_scope) {
+            self.diag.warn(format!(
+                "`export = {name}` in \"{specifier}\" names the namespace \"{other}\" \
+                 already assigns, skipping"
+            ));
+            return;
+        }
+        if found_in != self.file_scope || self.earlier_global_namespace(name).is_some() {
+            self.diag.warn(format!(
+                "`export = {name}` in \"{specifier}\" names a global namespace another \
+                 file also declares, skipping"
+            ));
+            return;
+        }
+        self.gctx.exports.extend_from(scope, ns_scope);
+        self.assign_global_namespace(name, ns_scope, specifier.to_string());
+    }
+
+    /// Record `ns_scope` as the module `specifier`. A global namespace
+    /// assigned to a module is never populated as a `Namespace`, which is
+    /// what hoists the rest, so it is hoisted here for later files to see.
+    fn assign_global_namespace(&mut self, name: &str, ns_scope: ScopeId, specifier: String) {
+        if self.is_script {
+            if let Some(parent) = self.gctx.scopes.get(self.file_scope).parent {
+                self.gctx
+                    .scopes
+                    .insert_namespace(parent, name.to_string(), ns_scope);
+            }
+        }
+        self.gctx
+            .assigned_namespaces
+            .insert(ns_scope, specifier.clone());
+        self.registry
+            .assigned_namespaces
+            .insert(ns_scope, specifier);
+    }
+
+    /// The member scope of a global namespace `name` an earlier script file
+    /// declares, hoisted to the scope above this file's.
+    fn earlier_global_namespace(&self, name: &str) -> Option<ScopeId> {
+        let parent = self.gctx.scopes.get(self.file_scope).parent?;
+        self.gctx.scopes.get(parent).namespace(name)
     }
 
     fn collect_namespace_names(
@@ -532,7 +641,21 @@ impl<'a> CollectCtx<'a> {
         // but still gets its own scope so `NS.Member` resolves.
         let ns_scope = match self.gctx.scopes.get(scope).namespace(&name) {
             Some(ns_scope) => ns_scope,
-            None => self.create_namespace_scope(&name, parent_ctx, scope, exported),
+            None => {
+                let ns_scope = self.create_namespace_scope(&name, parent_ctx, scope, exported);
+                // Reopening a global namespace an earlier file assigned to
+                // a module, whose declarations are the module's too.
+                if scope == self.file_scope && matches!(parent_ctx, ir::ModuleContext::Global) {
+                    let assigned = self
+                        .earlier_global_namespace(&name)
+                        .and_then(|earlier| self.gctx.assigned_namespaces.get(&earlier))
+                        .cloned();
+                    if let Some(specifier) = assigned {
+                        self.assign_global_namespace(&name, ns_scope, specifier);
+                    }
+                }
+                ns_scope
+            }
         };
         self.collect_block(namespace_block_statements(ns), parent_ctx, ns_scope, false);
     }

@@ -903,6 +903,11 @@ pub struct TypeRegistry {
     /// Body scope of each `declare module "x"` in the file. Repeated blocks
     /// for one specifier share a scope, as TypeScript merges them.
     pub module_scopes: HashMap<String, crate::parse::scope::ScopeId>,
+    /// Member scope of each namespace declared outside the `declare module
+    /// "x"` that assigns it with `export =`, → `"x"`. Such a namespace is
+    /// the module, so it is populated into the module rather than as a
+    /// global.
+    pub assigned_namespaces: HashMap<crate::parse::scope::ScopeId, String>,
     /// Public names given by source-less `export { local as public }`,
     /// keyed by the Phase 1 `TypeId` that `local` binds directly in the
     /// exporting scope. A same-named declaration in any other scope is a

@@ -4,7 +4,9 @@ use wasm_bindgen::JsValue;
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::module_export_assignment::{
-    check, module_export_assignment::counter::Counter, nested, strict_equal, version,
+    check,
+    module_export_assignment::{counter::Counter, global},
+    nested, strict_equal, version,
 };
 
 // The members of the namespace the module assigns with `export =` are module
@@ -25,4 +27,13 @@ fn export_assigned_binding_is_the_default_export() {
     let counter = Counter::new(1.0).unwrap();
     counter.increment();
     assert_eq!(counter.value(), 2.0);
+}
+
+// A global namespace the module assigns is the module, so its members bind as
+// the module's exports rather than through a `SharedGreeter` global.
+#[wasm_bindgen_test]
+fn export_assigned_global_namespace_members_are_module_exports() {
+    assert_eq!(global::greet("a"), "hello a");
+    let greeter = global::Greeter::new("hi").unwrap();
+    assert_eq!(greeter.greet("b"), "hi b");
 }

@@ -4,6 +4,7 @@
   "type": "module",
   "exports": {
     ".": "./index.js",
-    "./counter": "./counter.js"
+    "./counter": "./counter.js",
+    "./global": "./global.js"
   }
 }
