@@ -61,9 +61,13 @@ pub struct GlobalContext {
     /// emission; treating them as "unresolved" would alias them to
     /// `JsValue` even though `js_sys` already provides them.
     pub builtin_type_ids: std::collections::HashSet<TypeId>,
-    /// Body scopes of every `declare module "x"`, by specifier, one per
-    /// declaring file.
+    /// Body scopes of every `declare module "x"`, by specifier: the one
+    /// every script file's block shares, and one per module augmentation.
     pub ambient_module_scopes: std::collections::HashMap<String, Vec<ScopeId>>,
+    /// The body scope every script file's `declare module "x"` block shares,
+    /// by specifier. As in TypeScript, an ambient module is one global
+    /// symbol whose declarations merge across files.
+    pub(crate) ambient_modules: std::collections::HashMap<String, ScopeId>,
     /// Member scope of each global namespace a module assigns with
     /// `export =`, → the module's specifier. A file reopening the namespace
     /// populates it into the module too.
@@ -154,6 +158,7 @@ impl GlobalContext {
             pending_imports: Vec::new(),
             builtin_type_ids: std::collections::HashSet::new(),
             ambient_module_scopes: std::collections::HashMap::new(),
+            ambient_modules: std::collections::HashMap::new(),
             assigned_namespaces: std::collections::HashMap::new(),
             exports: ModuleExports::default(),
             declarations: std::collections::HashMap::new(),

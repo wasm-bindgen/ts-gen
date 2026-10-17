@@ -2148,6 +2148,15 @@ declarations whose `module_context` is `Module("<spec>")`. They are
 whether they are **emitted** is governed by `--export` and
 `--external`.
 
+As in TypeScript, an ambient module is one symbol: the blocks of one
+specifier, in one file or across input files, share one scope, and
+their declarations merge as globals do. An interface declared in two
+files' `declare module "x"` blocks is one type with the members of
+both, a function's declarations are its overloads, and a namespace's
+members are one module. A block with an export declaration
+(`export { … }`, `export =`) has locals: its other declarations are its
+own and merge with no other block's.
+
 An input describes an environment: its globals and the host modules
 it can import. The output mirrors it, with the globals at the top
 level and each emitted module in its own `pub mod`, one segment per

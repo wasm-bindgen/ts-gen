@@ -48,6 +48,10 @@ struct CollectCtx<'a> {
     /// collected so `Y` can be checked against `constructor_shaped`
     /// regardless of declaration order.
     named_ctor_vars: Vec<(String, String, ir::ModuleContext, ScopeId, bool)>,
+    /// Specifiers of the `declare module` blocks with an export declaration
+    /// (`export { … }`, `export =`, …), whose other declarations are locals
+    /// of the block rather than exports of the module.
+    local_modules: std::collections::HashSet<String>,
 }
 
 /// Walk the AST and collect all type names into the registry and scope arena.
@@ -76,6 +80,21 @@ pub fn collect_type_names(
         constructor_shaped: Default::default(),
         ctor_vars: Default::default(),
         named_ctor_vars: Vec::new(),
+        local_modules: program
+            .body
+            .iter()
+            .filter_map(|stmt| match stmt {
+                ast::Statement::TSExternalModuleDeclaration(module) => Some(module),
+                _ => None,
+            })
+            .filter(|module| {
+                module
+                    .body
+                    .as_ref()
+                    .is_some_and(|block| super::block_exports_explicitly(&block.body))
+            })
+            .map(|module| module.id.value.to_string())
+            .collect(),
     };
 
     ccx.collect_block(&program.body, &file_ctx, root_scope, false);
@@ -521,8 +540,6 @@ impl<'a> CollectCtx<'a> {
     ) {
         // `XConstructor` resolves from the var like any type reference.
         let ctor_scope = self
-            .gctx
-            .scopes
             .declaring_scope(scope, iface)
             .filter(|&s| self.constructor_shaped.contains(&(s, iface.to_string())));
         if ctor_scope.is_some() && iface != name {
@@ -547,11 +564,31 @@ impl<'a> CollectCtx<'a> {
     ) {
         let specifier = module.id.value.as_str();
         let module_ctx = ir::ModuleContext::Module(specifier.into());
-        let module_scope = *self
-            .registry
-            .module_scopes
-            .entry(specifier.to_string())
-            .or_insert_with(|| self.gctx.scopes.create_child(scope));
+        // As in TypeScript, an ambient module's exports merge across files,
+        // so a script's blocks whose declarations are all exports share one
+        // scope, under the globals they resolve against. A block with locals
+        // and a module augmentation, which sees its file's imports, keep
+        // their own.
+        let shared = (self.is_script && !self.local_modules.contains(specifier))
+            .then(|| self.gctx.scopes.get(scope).parent)
+            .flatten();
+        let module_scope = match self.registry.module_scopes.get(specifier) {
+            Some(&module_scope) => module_scope,
+            None => {
+                let module_scope = match shared {
+                    Some(global) => *self
+                        .gctx
+                        .ambient_modules
+                        .entry(specifier.to_string())
+                        .or_insert_with(|| self.gctx.scopes.create_child(global)),
+                    None => self.gctx.scopes.create_child(scope),
+                };
+                self.registry
+                    .module_scopes
+                    .insert(specifier.to_string(), module_scope);
+                module_scope
+            }
+        };
         if let Some(block) = &module.body {
             self.collect_block(&block.body, &module_ctx, module_scope, false);
         }
@@ -606,6 +643,28 @@ impl<'a> CollectCtx<'a> {
     /// Phase 2 populates one file at a time, so only a namespace this file
     /// declares first can be: an earlier file's is already populated as a
     /// global.
+    /// The scope enclosing `scope` in this file. A `declare module` block is
+    /// in its file, though a script's shares its scope with other files'.
+    fn lexical_parent(&self, scope: ScopeId) -> Option<ScopeId> {
+        if self.registry.module_scopes.values().any(|&s| s == scope) {
+            Some(self.file_scope)
+        } else {
+            self.gctx.scopes.get(scope).parent
+        }
+    }
+
+    /// The scope `name` is declared in, seen from `scope` in this file.
+    fn declaring_scope(&self, scope: ScopeId, name: &str) -> Option<ScopeId> {
+        let mut at = Some(scope);
+        while let Some(id) = at {
+            if self.gctx.scopes.get(id).get(name).is_some() {
+                return Some(id);
+            }
+            at = self.lexical_parent(id);
+        }
+        None
+    }
+
     fn assign_namespace(&mut self, scope: ScopeId, specifier: &str, name: &str) {
         let mut at = Some(scope);
         let (found_in, ns_scope) = loop {
@@ -630,7 +689,7 @@ impl<'a> CollectCtx<'a> {
             if binding.is_some() {
                 return;
             }
-            at = s.parent;
+            at = self.lexical_parent(id);
         };
         if let Some(other) = self.gctx.assigned_namespaces.get(&ns_scope) {
             self.diag.warn(format!(

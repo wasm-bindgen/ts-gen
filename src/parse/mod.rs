@@ -196,10 +196,13 @@ fn parse_single_file(
     let registry = first_pass::collect_type_names(program, lib_name, &mut diag, gctx, file_scope);
     gctx.diagnostics = diag;
     for (specifier, &scope) in &registry.module_scopes {
-        gctx.ambient_module_scopes
+        let scopes = gctx
+            .ambient_module_scopes
             .entry(specifier.clone())
-            .or_default()
-            .push(scope);
+            .or_default();
+        if !scopes.contains(&scope) {
+            scopes.push(scope);
+        }
     }
     // An assigned namespace's members are the module's own declarations, so
     // they resolve and qualify like the module's body.
