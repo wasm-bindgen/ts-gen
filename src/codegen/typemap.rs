@@ -164,6 +164,9 @@ pub struct CodegenContext<'a> {
     pub names: RefCell<LocalScope>,
     /// Local types that collide with js_sys reserved names — maps original name → renamed name.
     pub renamed_locals: HashMap<String, String>,
+    /// Types the surface emits under another name than their own (see
+    /// [`crate::codegen::surface::Surface::type_names`]).
+    renamed_types: HashMap<TypeId, String>,
     /// Types a constructor-shaped variable already binds `new` on, which
     /// a second such variable would redefine.
     pub constructed: RefCell<HashSet<TypeId>>,
@@ -677,6 +680,7 @@ impl<'a> CodegenContext<'a> {
             local_type_ids: HashSet::new(),
             names: RefCell::new(LocalScope::with_claimed(reserved_names())),
             renamed_locals: HashMap::new(),
+            renamed_types: surface.map(|s| s.type_names().clone()).unwrap_or_default(),
             constructed: RefCell::default(),
             local_type_param_counts: HashMap::new(),
             namespace_paths: HashMap::new(),
@@ -718,6 +722,7 @@ impl<'a> CodegenContext<'a> {
             local_type_ids: HashSet::new(),
             names: RefCell::new(LocalScope::with_claimed(reserved_names())),
             renamed_locals: HashMap::new(),
+            renamed_types: HashMap::new(),
             constructed: RefCell::default(),
             local_type_param_counts: HashMap::new(),
             namespace_paths: HashMap::new(),
@@ -1004,6 +1009,7 @@ impl<'a> CodegenContext<'a> {
             }
             ir::TypeKind::Function(_) | ir::TypeKind::Variable(_) => return,
         };
+        let name = self.renamed_types.get(&type_id).unwrap_or(name);
         self.local_types.insert(name.clone(), mctx.clone());
         self.local_type_ids.insert(type_id);
         if let Some(arity) = arity {
@@ -1667,7 +1673,12 @@ fn emit_type_name(
         // through `export { _Foo as Foo }` is referred to as `Foo` but
         // emitted as `_Foo`.
         let declared = resolved
-            .and_then(|id| type_decl_name(&ctx.gctx.get_type(id).kind))
+            .and_then(|id| {
+                ctx.renamed_types
+                    .get(&id)
+                    .map(String::as_str)
+                    .or_else(|| type_decl_name(&ctx.gctx.get_type(id).kind))
+            })
             .unwrap_or(ident_name);
         let rust_name = ctx
             .renamed_locals

@@ -268,6 +268,62 @@ pub mod mm2 {
         pub fn try_w(this: &W) -> Result<(), JsValue>;
     }
 }
+pub mod lh {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen(module = "lh")]
+    extern "C" {
+        # [wasm_bindgen (extends = Object , js_name = "H")]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type H2;
+        #[wasm_bindgen(method, getter)]
+        pub fn x(this: &H2) -> f64;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_x(this: &H2, val: f64);
+    }
+    impl H2 {
+        pub fn new(x: f64) -> H2 {
+            let inner: H2 = JsCast::unchecked_into(js_sys::Object::new());
+            inner.set_x(x);
+            inner
+        }
+    }
+    #[wasm_bindgen(module = "lh")]
+    extern "C" {
+        pub fn u(h: &H2);
+    }
+    #[wasm_bindgen(module = "lh")]
+    extern "C" {
+        #[wasm_bindgen(catch, js_name = "u")]
+        pub fn try_u(h: &H2) -> Result<(), JsValue>;
+    }
+    #[wasm_bindgen(module = "lh")]
+    extern "C" {
+        # [wasm_bindgen (extends = Object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type H;
+        #[wasm_bindgen(method, getter)]
+        pub fn y(this: &H) -> f64;
+        #[wasm_bindgen(method, setter)]
+        pub fn set_y(this: &H, val: f64);
+    }
+    impl H {
+        pub fn new(y: f64) -> H {
+            let inner: H = JsCast::unchecked_into(js_sys::Object::new());
+            inner.set_y(y);
+            inner
+        }
+    }
+    #[wasm_bindgen(module = "lh")]
+    extern "C" {
+        pub fn v(h: &H);
+    }
+    #[wasm_bindgen(module = "lh")]
+    extern "C" {
+        #[wasm_bindgen(catch, js_name = "v")]
+        pub fn try_v(h: &H) -> Result<(), JsValue>;
+    }
+}
 pub mod mm {
     #[allow(unused_imports)]
     use super::*;

@@ -2690,7 +2690,10 @@ namespace exported under its own name as well keeps it.
     by name (a local, or the default export) takes a suffix where an
     exported one has its name: with a local `namespace M` beside
     `export { N as M }`, `N` is `pub mod m` and the local `M` is
-    `pub mod m_2`.
+    `pub mod m_2`. A type takes a suffix the same way, numbered as a
+    type is: a block's local `interface H`, which only a signature
+    reaches, beside another block's exported `H` is `H2` with
+    `js_name = "H"`.
 
   A `Local` declared outside the exporting block (an import) is left alone
   and only aliased.

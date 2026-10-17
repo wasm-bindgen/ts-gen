@@ -22,6 +22,7 @@ pub struct Surface<'d> {
     items: HashMap<TypeId, Vec<Cow<'d, TypeDeclaration>>>,
     names: HashMap<TypeId, Vec<String>>,
     mod_names: HashMap<TypeId, String>,
+    type_names: HashMap<TypeId, String>,
 }
 
 impl<'d> Surface<'d> {
@@ -57,11 +58,20 @@ impl<'d> Surface<'d> {
         }
         builder.close();
         let mod_names = builder.name_namespaces();
+        let type_names = builder.name_types();
         Surface {
             items: builder.items,
             names: builder.names,
             mod_names,
+            type_names,
         }
+    }
+
+    /// The types emitted under another Rust name than their own: one its
+    /// container doesn't export takes a suffix where an exported one has
+    /// its name, as a namespace does (see [`Surface::mod_name`]).
+    pub fn type_names(&self) -> &HashMap<TypeId, String> {
+        &self.type_names
     }
 
     /// The forms `id` is emitted in, empty if it is not emitted.
@@ -428,6 +438,57 @@ impl<'d> Builder<'_, 'd> {
         mod_names
     }
 
+    /// Rename each emitted type its container doesn't export, which only a
+    /// signature reaches, whose name an exported type of the container has
+    /// (a block's local `interface H` beside another block's exported `H`).
+    fn name_types(&mut self) -> HashMap<TypeId, String> {
+        let gctx = self.gctx;
+        let mut types: Vec<TypeId> = self
+            .items
+            .keys()
+            .copied()
+            .filter(|&id| {
+                !matches!(
+                    gctx.get_type(id).kind,
+                    TypeKind::Namespace(_) | TypeKind::Function(_) | TypeKind::Variable(_)
+                )
+            })
+            .collect();
+        types.sort_by_key(|id| id.index());
+        let mut containers: HashMap<(Option<TypeId>, ModuleContext), Vec<TypeId>> = HashMap::new();
+        for id in types {
+            let key = (
+                self.parents.get(&id).copied(),
+                gctx.get_type(id).module_context.clone(),
+            );
+            containers.entry(key).or_default().push(id);
+        }
+        let own = |id: TypeId| super::typemap::type_decl_name(&gctx.get_type(id).kind).unwrap();
+        let mut renamed = HashMap::new();
+        for ids in containers.into_values() {
+            let mut taken = crate::util::naming::LocalScope::default();
+            let (exported, local): (Vec<_>, Vec<_>) = ids
+                .into_iter()
+                .partition(|id| self.names.get(id).is_some_and(|n| !n.is_empty()));
+            for id in exported {
+                taken.claim(own(id));
+                for public in self.names[&id].iter().filter(|&p| p != "default") {
+                    taken.claim(public.clone());
+                }
+            }
+            for id in local {
+                let name = taken.declare(own(id), crate::util::naming::Suffix::Pascal);
+                if name != own(id) {
+                    if let Some(form) = self.items.get_mut(&id).and_then(|f| f.first_mut()) {
+                        rename_type(&mut form.to_mut().kind, &name);
+                    }
+                    renamed.insert(id, name);
+                }
+            }
+        }
+        renamed
+    }
+
     /// Follow the signatures of everything emitted to the declarations
     /// they name.
     fn close(&mut self) {
@@ -482,6 +543,20 @@ fn public_rust_name(local: &str, public: &str) -> String {
 }
 
 /// Every type name `decl` refers to, with the scope it is resolved from.
+fn rename_type(kind: &mut TypeKind, name: &str) {
+    let own = match kind {
+        TypeKind::Class(c) => &mut c.name,
+        TypeKind::Interface(i) => &mut i.name,
+        TypeKind::DiscriminatedUnion(d) => &mut d.name,
+        TypeKind::TypeAlias(a) => &mut a.name,
+        TypeKind::StringEnum(e) => &mut e.name,
+        TypeKind::NumericEnum(e) => &mut e.name,
+        TypeKind::TsEnum(e) => &mut e.name,
+        TypeKind::Function(_) | TypeKind::Variable(_) | TypeKind::Namespace(_) => return,
+    };
+    *own = name.to_string();
+}
+
 fn declaration_refs(decl: &TypeDeclaration, out: &mut Vec<(String, ScopeId)>) {
     let mut walk = |ty: &TypeRef, scope: ScopeId| type_refs(ty, scope, out);
     match &decl.kind {
