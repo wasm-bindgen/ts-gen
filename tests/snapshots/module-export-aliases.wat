@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "module-export-aliases"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,25 +24,25 @@
 
   ;; _Foo
   ;; bar(): void
-  (import "./bindings.wasm" "_Foo.bar" (func $_Foo.bar (param $this externref)))
-  (import "./bindings.wasm" "Foo.bar" (func $Foo.bar (param $this externref)))
-  (import "./bindings.wasm" "Bar.bar" (func $Bar.bar (param $this externref)))
+  (import "module-export-aliases" "_Foo.bar" (func $module-export-aliases:_Foo.bar (param $this externref)))
+  (import "module-export-aliases" "Foo.bar" (func $module-export-aliases:Foo.bar (param $this externref)))
+  (import "module-export-aliases" "Bar.bar" (func $module-export-aliases:Bar.bar (param $this externref)))
 
   ;; a(): void
-  (import "./bindings.wasm" "a" (func $a))
+  (import "module-export-aliases" "a" (func $module-export-aliases:a))
   ;; b(): void
-  (import "./bindings.wasm" "b" (func $b))
+  (import "module-export-aliases" "b" (func $module-export-aliases:b))
 
   ;; Conn
   ;; constructor()
-  (import "./bindings.wasm" "Conn.new" (func $Conn.new (result externref)))
-  (import "./bindings.wasm" "Connection.new" (func $Connection.new (result externref)))
+  (import "module-export-aliases" "Conn.new" (func $module-export-aliases:Conn.new (result externref)))
+  (import "module-export-aliases" "Connection.new" (func $module-export-aliases:Connection.new (result externref)))
   ;; get(): string
-  (import "./bindings.wasm" "Conn.get" (func $Conn.get (param $this externref) (result externref)))
-  (import "./bindings.wasm" "Connection.get" (func $Connection.get (param $this externref) (result externref)))
+  (import "module-export-aliases" "Conn.get" (func $module-export-aliases:Conn.get (param $this externref) (result externref)))
+  (import "module-export-aliases" "Connection.get" (func $module-export-aliases:Connection.get (param $this externref) (result externref)))
   ;; open(): _Conn
-  (import "./bindings.wasm" "Conn.open" (func $Conn.open (result externref)))
-  (import "./bindings.wasm" "Connection.open" (func $Connection.open (result externref)))
+  (import "module-export-aliases" "Conn.open" (func $module-export-aliases:Conn.open (result externref)))
+  (import "module-export-aliases" "Connection.open" (func $module-export-aliases:Connection.open (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

@@ -9,10 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "ns"
-;;   "pc"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -27,19 +24,19 @@
 
   ;; _Bar
   ;; {} as _Bar
-  (import "./bindings.wasm" "_Bar.new" (func $_Bar.new (result externref)))
-  (import "./bindings.wasm" "Foo.new" (func $Foo.new (result externref)))
+  (import "pc" "_Bar.new" (func $pc:_Bar.new (result externref)))
+  (import "pc" "Foo.new" (func $pc:Foo.new (result externref)))
   ;; b: number
-  (import "./bindings.wasm" "_Bar.b" (func $_Bar.b (param $this externref) (result f64)))
-  (import "./bindings.wasm" "Foo.b" (func $Foo.b (param $this externref) (result f64)))
+  (import "pc" "_Bar.b" (func $pc:_Bar.b (param $this externref) (result f64)))
+  (import "pc" "Foo.b" (func $pc:Foo.b (param $this externref) (result f64)))
   ;; set b(value: number)
-  (import "./bindings.wasm" "_Bar.set_b" (func $_Bar.set_b (param $this externref) (param $value f64)))
-  (import "./bindings.wasm" "Foo.set_b" (func $Foo.set_b (param $this externref) (param $value f64)))
+  (import "pc" "_Bar.set_b" (func $pc:_Bar.set_b (param $this externref) (param $value f64)))
+  (import "pc" "Foo.set_b" (func $pc:Foo.set_b (param $this externref) (param $value f64)))
 
   ;; N1
   ;; f(): void
-  (import "./bindings.wasm" "N1.f" (func $N1.f))
-  (import "./bindings.wasm" "N2.f" (func $N2.f))
+  (import "ns" "N1.f" (func $ns:N1.f))
+  (import "ns" "N2.f" (func $ns:N2.f))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

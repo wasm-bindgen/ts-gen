@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "export-default-module-file"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,9 +24,9 @@
 
   ;; default
   ;; constructor(name: string)
-  (import "./bindings.wasm" "default.new" (func $default.new (param $name externref) (result externref)))
+  (import "export-default-module-file" "default.new" (func $export-default-module-file:default.new (param $name externref) (result externref)))
   ;; create(): Widget
-  (import "./bindings.wasm" "default.create" (func $default.create (result externref)))
+  (import "export-default-module-file" "default.create" (func $export-default-module-file:default.create (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

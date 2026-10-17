@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "namespace-merge"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,37 +24,37 @@
 
   ;; Foo
   ;; m(options: Foo.Options): void
-  (import "./bindings.wasm" "Foo.m" (func $Foo.m (param $this externref) (param $options externref)))
+  (import "namespace-merge" "Foo.m" (func $namespace-merge:Foo.m (param $this externref) (param $options externref)))
 
   ;; Foo.Options
   ;; {} as Foo.Options
-  (import "./bindings.wasm" "Foo.Options.new" (func $Foo.Options.new (result externref)))
+  (import "namespace-merge" "Foo.Options.new" (func $namespace-merge:Foo.Options.new (result externref)))
   ;; a: string
-  (import "./bindings.wasm" "Foo.Options.a" (func $Foo.Options.a (param $this externref) (result externref)))
+  (import "namespace-merge" "Foo.Options.a" (func $namespace-merge:Foo.Options.a (param $this externref) (result externref)))
   ;; set a(value: string)
-  (import "./bindings.wasm" "Foo.Options.set_a" (func $Foo.Options.set_a (param $this externref) (param $value externref)))
+  (import "namespace-merge" "Foo.Options.set_a" (func $namespace-merge:Foo.Options.set_a (param $this externref) (param $value externref)))
 
   ;; makeFoo(): Foo
-  (import "./bindings.wasm" "makeFoo" (func $makeFoo (result externref)))
+  (import "namespace-merge" "makeFoo" (func $namespace-merge:makeFoo (result externref)))
 
   ;; Bar
   ;; power(power: Bar.Power): Bar
-  (import "./bindings.wasm" "Bar.power" (func $Bar.power (param $this externref) (param $power externref) (result externref)))
+  (import "namespace-merge" "Bar.power" (func $namespace-merge:Bar.power (param $this externref) (param $power externref) (result externref)))
 
   ;; make(config: make.Config): void
-  (import "./bindings.wasm" "make" (func $make (param $config externref)))
+  (import "namespace-merge" "make" (func $namespace-merge:make (param $config externref)))
 
   ;; make.Config
   ;; {} as make.Config
-  (import "./bindings.wasm" "make.Config.new" (func $make.Config.new (result externref)))
+  (import "namespace-merge" "make.Config.new" (func $namespace-merge:make.Config.new (result externref)))
   ;; c: string
-  (import "./bindings.wasm" "make.Config.c" (func $make.Config.c (param $this externref) (result externref)))
+  (import "namespace-merge" "make.Config.c" (func $namespace-merge:make.Config.c (param $this externref) (result externref)))
   ;; set c(value: string)
-  (import "./bindings.wasm" "make.Config.set_c" (func $make.Config.set_c (param $this externref) (param $value externref)))
+  (import "namespace-merge" "make.Config.set_c" (func $namespace-merge:make.Config.set_c (param $this externref) (param $value externref)))
 
   ;; Shape
   ;; axis(axis: Shape.Axis): void
-  (import "./bindings.wasm" "Shape.axis" (func $Shape.axis (param $this externref) (param $axis externref)))
+  (import "namespace-merge" "Shape.axis" (func $namespace-merge:Shape.axis (param $this externref) (param $axis externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

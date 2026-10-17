@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "module-namespace-values"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,30 +24,30 @@
 
   ;; InspectOptions
   ;; {} as InspectOptions
-  (import "./bindings.wasm" "InspectOptions.new" (func $InspectOptions.new (result externref)))
+  (import "module-namespace-values" "InspectOptions.new" (func $module-namespace-values:InspectOptions.new (result externref)))
   ;; depth: number
-  (import "./bindings.wasm" "InspectOptions.depth" (func $InspectOptions.depth (param $this externref) (result f64)))
+  (import "module-namespace-values" "InspectOptions.depth" (func $module-namespace-values:InspectOptions.depth (param $this externref) (result f64)))
   ;; set depth(value: number)
-  (import "./bindings.wasm" "InspectOptions.set_depth" (func $InspectOptions.set_depth (param $this externref) (param $value f64)))
+  (import "module-namespace-values" "InspectOptions.set_depth" (func $module-namespace-values:InspectOptions.set_depth (param $this externref) (param $value f64)))
 
   ;; inspect(value: unknown): string
-  (import "./bindings.wasm" "inspect" (func $inspect (param $value externref) (result externref)))
+  (import "module-namespace-values" "inspect" (func $module-namespace-values:inspect (param $value externref) (result externref)))
 
   ;; inspect
   ;; const defaultOptions: InspectOptions
-  (import "./bindings.wasm" "inspect.defaultOptions" (func $inspect.defaultOptions (result externref)))
+  (import "module-namespace-values" "inspect.defaultOptions" (func $module-namespace-values:inspect.defaultOptions (result externref)))
   ;; withDepth(depth: number): Formatter<string>
-  (import "./bindings.wasm" "inspect.withDepth" (func $inspect.withDepth (param $depth f64) (result externref)))
+  (import "module-namespace-values" "inspect.withDepth" (func $module-namespace-values:inspect.withDepth (param $depth f64) (result externref)))
 
   ;; inspect.Formatter
   ;; format(value: T): string
-  (import "./bindings.wasm" "inspect.Formatter.format" (func $inspect.Formatter.format (param $this externref) (param $value externref) (result externref)))
+  (import "module-namespace-values" "inspect.Formatter.format" (func $module-namespace-values:inspect.Formatter.format (param $this externref) (param $value externref) (result externref)))
 
   ;; outer.inner
   ;; const LIMIT: number
-  (import "./bindings.wasm" "outer.inner.LIMIT" (func $outer.inner.LIMIT (result f64)))
+  (import "module-namespace-values" "outer.inner.LIMIT" (func $module-namespace-values:outer.inner.LIMIT (result f64)))
   ;; run(style: inspect.Style): string
-  (import "./bindings.wasm" "outer.inner.run" (func $outer.inner.run (param $style externref) (result externref)))
+  (import "module-namespace-values" "outer.inner.run" (func $module-namespace-values:outer.inner.run (param $style externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

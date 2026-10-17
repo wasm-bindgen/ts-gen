@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "x"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,30 +24,30 @@
 
   ;; Foo
   ;; constructor()
-  (import "./bindings.wasm" "Foo.new" (func $Foo.new (result externref)))
+  (import "x" "Foo.new" (func $x:Foo.new (result externref)))
   ;; from(n: number): _Foo
-  (import "./bindings.wasm" "Foo.from" (func $Foo.from (param $n f64) (result externref)))
+  (import "x" "Foo.from" (func $x:Foo.from (param $n f64) (result externref)))
   ;; bar(): void
-  (import "./bindings.wasm" "Foo.bar" (func $Foo.bar (param $this externref)))
+  (import "x" "Foo.bar" (func $x:Foo.bar (param $this externref)))
 
   ;; Bar
   ;; constructor(n: number)
-  (import "./bindings.wasm" "Bar.new" (func $Bar.new (param $n f64) (result externref)))
+  (import "x" "Bar.new" (func $x:Bar.new (param $n f64) (result externref)))
   ;; static VERSION: string
-  (import "./bindings.wasm" "Bar.version" (func $Bar.version (result externref)))
+  (import "x" "Bar.version" (func $x:Bar.version (result externref)))
   ;; baz(): string
-  (import "./bindings.wasm" "Bar.baz" (func $Bar.baz (param $this externref) (result externref)))
+  (import "x" "Bar.baz" (func $x:Bar.baz (param $this externref) (result externref)))
 
   ;; Late
   ;; constructor()
-  (import "./bindings.wasm" "Late.new" (func $Late.new (result externref)))
+  (import "x" "Late.new" (func $x:Late.new (result externref)))
   ;; go(): void
-  (import "./bindings.wasm" "Late.go" (func $Late.go (param $this externref)))
+  (import "x" "Late.go" (func $x:Late.go (param $this externref)))
 
   ;; Plain
   ;; constructor()
-  (import "./bindings.wasm" "Plain.new" (func $Plain.new (result externref)))
-  (import "./bindings.wasm" "AlsoPlain.new" (func $AlsoPlain.new (result externref)))
+  (import "x" "Plain.new" (func $x:Plain.new (result externref)))
+  (import "x" "AlsoPlain.new" (func $x:AlsoPlain.new (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

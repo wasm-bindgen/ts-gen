@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "intersection"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,145 +24,145 @@
 
   ;; Conditional
   ;; {} as Conditional
-  (import "./bindings.wasm" "Conditional.new" (func $Conditional.new (result externref)))
+  (import "intersection" "Conditional.new" (func $intersection:Conditional.new (result externref)))
   ;; etag?: string
-  (import "./bindings.wasm" "Conditional.etag" (func $Conditional.etag (param $this externref) (result externref)))
+  (import "intersection" "Conditional.etag" (func $intersection:Conditional.etag (param $this externref) (result externref)))
   ;; set etag(value: string)
-  (import "./bindings.wasm" "Conditional.set_etag" (func $Conditional.set_etag (param $this externref) (param $value externref)))
+  (import "intersection" "Conditional.set_etag" (func $intersection:Conditional.set_etag (param $this externref) (param $value externref)))
 
   ;; GetOptions
   ;; {} as GetOptions
-  (import "./bindings.wasm" "GetOptions.new" (func $GetOptions.new (result externref)))
+  (import "intersection" "GetOptions.new" (func $intersection:GetOptions.new (result externref)))
   ;; onlyIf?: Conditional
-  (import "./bindings.wasm" "GetOptions.only_if" (func $GetOptions.only_if (param $this externref) (result externref)))
+  (import "intersection" "GetOptions.only_if" (func $intersection:GetOptions.only_if (param $this externref) (result externref)))
   ;; set onlyIf(value: Conditional)
-  (import "./bindings.wasm" "GetOptions.set_only_if" (func $GetOptions.set_only_if (param $this externref) (param $value externref)))
+  (import "intersection" "GetOptions.set_only_if" (func $intersection:GetOptions.set_only_if (param $this externref) (param $value externref)))
   ;; range?: string
-  (import "./bindings.wasm" "GetOptions.range" (func $GetOptions.range (param $this externref) (result externref)))
+  (import "intersection" "GetOptions.range" (func $intersection:GetOptions.range (param $this externref) (result externref)))
   ;; set range(value: string)
-  (import "./bindings.wasm" "GetOptions.set_range" (func $GetOptions.set_range (param $this externref) (param $value externref)))
+  (import "intersection" "GetOptions.set_range" (func $intersection:GetOptions.set_range (param $this externref) (param $value externref)))
 
   ;; Base
   ;; {} as Base
-  (import "./bindings.wasm" "Base.new" (func $Base.new (result externref)))
+  (import "intersection" "Base.new" (func $intersection:Base.new (result externref)))
   ;; id: string
-  (import "./bindings.wasm" "Base.id" (func $Base.id (param $this externref) (result externref)))
+  (import "intersection" "Base.id" (func $intersection:Base.id (param $this externref) (result externref)))
   ;; set id(value: string)
-  (import "./bindings.wasm" "Base.set_id" (func $Base.set_id (param $this externref) (param $value externref)))
+  (import "intersection" "Base.set_id" (func $intersection:Base.set_id (param $this externref) (param $value externref)))
 
   ;; Derived
   ;; {} as Derived
-  (import "./bindings.wasm" "Derived.new" (func $Derived.new (result externref)))
+  (import "intersection" "Derived.new" (func $intersection:Derived.new (result externref)))
   ;; extra: string
-  (import "./bindings.wasm" "Derived.extra" (func $Derived.extra (param $this externref) (result externref)))
+  (import "intersection" "Derived.extra" (func $intersection:Derived.extra (param $this externref) (result externref)))
   ;; set extra(value: string)
-  (import "./bindings.wasm" "Derived.set_extra" (func $Derived.set_extra (param $this externref) (param $value externref)))
+  (import "intersection" "Derived.set_extra" (func $intersection:Derived.set_extra (param $this externref) (param $value externref)))
 
   ;; Unrelated
   ;; {} as Unrelated
-  (import "./bindings.wasm" "Unrelated.new" (func $Unrelated.new (result externref)))
+  (import "intersection" "Unrelated.new" (func $intersection:Unrelated.new (result externref)))
   ;; other: string
-  (import "./bindings.wasm" "Unrelated.other" (func $Unrelated.other (param $this externref) (result externref)))
+  (import "intersection" "Unrelated.other" (func $intersection:Unrelated.other (param $this externref) (result externref)))
   ;; set other(value: string)
-  (import "./bindings.wasm" "Unrelated.set_other" (func $Unrelated.set_other (param $this externref) (param $value externref)))
+  (import "intersection" "Unrelated.set_other" (func $intersection:Unrelated.set_other (param $this externref) (param $value externref)))
 
   ;; Store
   ;; get(key: string): Promise<string | null>
-  (import "./bindings.wasm" "Store.get" (func $Store.get (param $this externref) (param $key externref) (result externref)))
+  (import "intersection" "Store.get" (func $intersection:Store.get (param $this externref) (param $key externref) (result externref)))
   ;; get(key: string, options: StoreOptions): Promise<string | null>
-  (import "./bindings.wasm" "Store.get_with_options" (func $Store.get_with_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
+  (import "intersection" "Store.get_with_options" (func $intersection:Store.get_with_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
   ;; refine(value: Derived & Base): void
-  (import "./bindings.wasm" "Store.refine" (func $Store.refine (param $this externref) (param $value externref)))
+  (import "intersection" "Store.refine" (func $intersection:Store.refine (param $this externref) (param $value externref)))
   ;; same(value: Derived): void
-  (import "./bindings.wasm" "Store.same" (func $Store.same (param $this externref) (param $value externref)))
+  (import "intersection" "Store.same" (func $intersection:Store.same (param $this externref) (param $value externref)))
   ;; unrelated(value: Derived & Unrelated): void
-  (import "./bindings.wasm" "Store.unrelated" (func $Store.unrelated (param $this externref) (param $value externref)))
+  (import "intersection" "Store.unrelated" (func $intersection:Store.unrelated (param $this externref) (param $value externref)))
   ;; shape(value: StoreValue): void
-  (import "./bindings.wasm" "Store.shape" (func $Store.shape (param $this externref) (param $value externref)))
+  (import "intersection" "Store.shape" (func $intersection:Store.shape (param $this externref) (param $value externref)))
   ;; generic(value: T): void
-  (import "./bindings.wasm" "Store.generic" (func $Store.generic (param $this externref) (param $value externref)))
+  (import "intersection" "Store.generic" (func $intersection:Store.generic (param $this externref) (param $value externref)))
   ;; primitive(value: Str): void
-  (import "./bindings.wasm" "Store.primitive" (func $Store.primitive (param $this externref) (param $value externref)))
+  (import "intersection" "Store.primitive" (func $intersection:Store.primitive (param $this externref) (param $value externref)))
   ;; anything(value: any): void
-  (import "./bindings.wasm" "Store.anything" (func $Store.anything (param $this externref) (param $value externref)))
+  (import "intersection" "Store.anything" (func $intersection:Store.anything (param $this externref) (param $value externref)))
 
   ;; StoreOptions
   ;; {} as StoreOptions
-  (import "./bindings.wasm" "StoreOptions.new" (func $StoreOptions.new (result externref)))
+  (import "intersection" "StoreOptions.new" (func $intersection:StoreOptions.new (result externref)))
   ;; onlyIf: Conditional
-  (import "./bindings.wasm" "StoreOptions.only_if" (func $StoreOptions.only_if (param $this externref) (result externref)))
+  (import "intersection" "StoreOptions.only_if" (func $intersection:StoreOptions.only_if (param $this externref) (result externref)))
   ;; set onlyIf(value: Conditional)
-  (import "./bindings.wasm" "StoreOptions.set_only_if" (func $StoreOptions.set_only_if (param $this externref) (param $value externref)))
+  (import "intersection" "StoreOptions.set_only_if" (func $intersection:StoreOptions.set_only_if (param $this externref) (param $value externref)))
 
   ;; StoreValue
   ;; {} as StoreValue
-  (import "./bindings.wasm" "StoreValue.new" (func $StoreValue.new (result externref)))
+  (import "intersection" "StoreValue.new" (func $intersection:StoreValue.new (result externref)))
   ;; a: string
-  (import "./bindings.wasm" "StoreValue.a" (func $StoreValue.a (param $this externref) (result externref)))
+  (import "intersection" "StoreValue.a" (func $intersection:StoreValue.a (param $this externref) (result externref)))
   ;; set a(value: string)
-  (import "./bindings.wasm" "StoreValue.set_a" (func $StoreValue.set_a (param $this externref) (param $value externref)))
+  (import "intersection" "StoreValue.set_a" (func $intersection:StoreValue.set_a (param $this externref) (param $value externref)))
   ;; b: number
-  (import "./bindings.wasm" "StoreValue.b" (func $StoreValue.b (param $this externref) (result f64)))
+  (import "intersection" "StoreValue.b" (func $intersection:StoreValue.b (param $this externref) (result f64)))
   ;; set b(value: number)
-  (import "./bindings.wasm" "StoreValue.set_b" (func $StoreValue.set_b (param $this externref) (param $value f64)))
+  (import "intersection" "StoreValue.set_b" (func $intersection:StoreValue.set_b (param $this externref) (param $value f64)))
 
   ;; Refined
   ;; {} as Refined
-  (import "./bindings.wasm" "Refined.new" (func $Refined.new (result externref)))
+  (import "intersection" "Refined.new" (func $intersection:Refined.new (result externref)))
   ;; onlyIf: Conditional
-  (import "./bindings.wasm" "Refined.only_if" (func $Refined.only_if (param $this externref) (result externref)))
+  (import "intersection" "Refined.only_if" (func $intersection:Refined.only_if (param $this externref) (result externref)))
   ;; set onlyIf(value: Conditional)
-  (import "./bindings.wasm" "Refined.set_only_if" (func $Refined.set_only_if (param $this externref) (param $value externref)))
+  (import "intersection" "Refined.set_only_if" (func $intersection:Refined.set_only_if (param $this externref) (param $value externref)))
 
   ;; Fetcher
   ;; fetch(input: string): Promise<string>
-  (import "./bindings.wasm" "Fetcher.fetch" (func $Fetcher.fetch (param $this externref) (param $input externref) (result externref)))
+  (import "intersection" "Fetcher.fetch" (func $intersection:Fetcher.fetch (param $this externref) (param $input externref) (result externref)))
 
   ;; Stub
   ;; {} as Stub
-  (import "./bindings.wasm" "Stub.new" (func $Stub.new (result externref)))
+  (import "intersection" "Stub.new" (func $intersection:Stub.new (result externref)))
   ;; id: string
-  (import "./bindings.wasm" "Stub.id" (func $Stub.id (param $this externref) (result externref)))
+  (import "intersection" "Stub.id" (func $intersection:Stub.id (param $this externref) (result externref)))
 
   ;; Provider
   ;; call(): T
-  (import "./bindings.wasm" "Provider.call" (func $Provider.call (param $this externref) (result externref)))
+  (import "intersection" "Provider.call" (func $intersection:Provider.call (param $this externref) (result externref)))
 
   ;; GenericStub
   ;; {} as GenericStub
-  (import "./bindings.wasm" "GenericStub.new" (func $GenericStub.new (result externref)))
+  (import "intersection" "GenericStub.new" (func $intersection:GenericStub.new (result externref)))
   ;; id: string
-  (import "./bindings.wasm" "GenericStub.id" (func $GenericStub.id (param $this externref) (result externref)))
+  (import "intersection" "GenericStub.id" (func $intersection:GenericStub.id (param $this externref) (result externref)))
 
   ;; Unknown
   ;; {} as Unknown
-  (import "./bindings.wasm" "Unknown.new" (func $Unknown.new (result externref)))
+  (import "intersection" "Unknown.new" (func $intersection:Unknown.new (result externref)))
   ;; id: string
-  (import "./bindings.wasm" "Unknown.id" (func $Unknown.id (param $this externref) (result externref)))
+  (import "intersection" "Unknown.id" (func $intersection:Unknown.id (param $this externref) (result externref)))
 
   ;; Ext
   ;; {} as Ext
-  (import "./bindings.wasm" "Ext.new" (func $Ext.new (result externref)))
+  (import "intersection" "Ext.new" (func $intersection:Ext.new (result externref)))
   ;; extra: string
-  (import "./bindings.wasm" "Ext.extra" (func $Ext.extra (param $this externref) (result externref)))
+  (import "intersection" "Ext.extra" (func $intersection:Ext.extra (param $this externref) (result externref)))
   ;; set extra(value: string)
-  (import "./bindings.wasm" "Ext.set_extra" (func $Ext.set_extra (param $this externref) (param $value externref)))
+  (import "intersection" "Ext.set_extra" (func $intersection:Ext.set_extra (param $this externref) (param $value externref)))
 
   ;; Message
   ;; {} as Message
-  (import "./bindings.wasm" "Message.new" (func $Message.new (result externref)))
+  (import "intersection" "Message.new" (func $intersection:Message.new (result externref)))
   ;; role: "user" | "assistant" | string
-  (import "./bindings.wasm" "Message.role" (func $Message.role (param $this externref) (result externref)))
+  (import "intersection" "Message.role" (func $intersection:Message.role (param $this externref) (result externref)))
   ;; set role(value: "user")
-  (import "./bindings.wasm" "Message.set_role" (func $Message.set_role (param $this externref) (param $value externref)))
+  (import "intersection" "Message.set_role" (func $intersection:Message.set_role (param $this externref) (param $value externref)))
 
   ;; ViaBaseAlias
   ;; {} as ViaBaseAlias
-  (import "./bindings.wasm" "ViaBaseAlias.new" (func $ViaBaseAlias.new (result externref)))
+  (import "intersection" "ViaBaseAlias.new" (func $intersection:ViaBaseAlias.new (result externref)))
   ;; w: string
-  (import "./bindings.wasm" "ViaBaseAlias.w" (func $ViaBaseAlias.w (param $this externref) (result externref)))
+  (import "intersection" "ViaBaseAlias.w" (func $intersection:ViaBaseAlias.w (param $this externref) (result externref)))
   ;; set w(value: string)
-  (import "./bindings.wasm" "ViaBaseAlias.set_w" (func $ViaBaseAlias.set_w (param $this externref) (param $value externref)))
+  (import "intersection" "ViaBaseAlias.set_w" (func $intersection:ViaBaseAlias.set_w (param $this externref) (param $value externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

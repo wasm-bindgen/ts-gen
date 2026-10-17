@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "generic-mono-review"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,35 +24,35 @@
 
   ;; S
   ;; x: number
-  (import "./bindings.wasm" "S.x" (func $S.x (param $this externref) (result f64)))
+  (import "generic-mono-review" "S.x" (func $generic-mono-review:S.x (param $this externref) (result f64)))
 
   ;; S2
   ;; x: number
-  (import "./bindings.wasm" "S2.x" (func $S2.x (param $this externref) (result f64)))
+  (import "generic-mono-review" "S2.x" (func $generic-mono-review:S2.x (param $this externref) (result f64)))
 
   ;; byAlias(id: Id): Id
-  (import "./bindings.wasm" "byAlias" (func $byAlias (param $id externref) (result externref)))
+  (import "generic-mono-review" "byAlias" (func $generic-mono-review:byAlias (param $id externref) (result externref)))
   ;; asyncByAlias(id: Id): Promise<Id>
-  (import "./bindings.wasm" "asyncByAlias" (func $asyncByAlias (param $id externref) (result externref)))
+  (import "generic-mono-review" "asyncByAlias" (func $generic-mono-review:asyncByAlias (param $id externref) (result externref)))
   ;; withS(s: S, s2: S2, name: string): void
-  (import "./bindings.wasm" "withS" (func $withS (param $s externref) (param $s2 externref) (param $name externref)))
+  (import "generic-mono-review" "withS" (func $generic-mono-review:withS (param $s externref) (param $s2 externref) (param $name externref)))
 
   ;; Holder
   ;; constructor(value: T)
-  (import "./bindings.wasm" "Holder.new" (func $Holder.new (param $value externref) (result externref)))
+  (import "generic-mono-review" "Holder.new" (func $generic-mono-review:Holder.new (param $value externref) (result externref)))
   ;; get(): T
-  (import "./bindings.wasm" "Holder.get" (func $Holder.get (param $this externref) (result externref)))
+  (import "generic-mono-review" "Holder.get" (func $generic-mono-review:Holder.get (param $this externref) (result externref)))
 
   ;; takesHolder(h: Holder<Id>, g: Holder<string>): void
-  (import "./bindings.wasm" "takesHolder" (func $takesHolder (param $h externref) (param $g externref)))
+  (import "generic-mono-review" "takesHolder" (func $generic-mono-review:takesHolder (param $h externref) (param $g externref)))
   ;; holderOfId(): Holder<Id>
-  (import "./bindings.wasm" "holderOfId" (func $holderOfId (result externref)))
+  (import "generic-mono-review" "holderOfId" (func $generic-mono-review:holderOfId (result externref)))
   ;; literalHolder(): Holder<"a" | "b">
-  (import "./bindings.wasm" "literalHolder" (func $literalHolder (result externref)))
+  (import "generic-mono-review" "literalHolder" (func $generic-mono-review:literalHolder (result externref)))
   ;; literalUnion(): "a" | "b"
-  (import "./bindings.wasm" "literalUnion" (func $literalUnion (result externref)))
+  (import "generic-mono-review" "literalUnion" (func $generic-mono-review:literalUnion (result externref)))
   ;; shadowsAlias(h: Holder<Id>): Holder<Id>
-  (import "./bindings.wasm" "shadowsAlias" (func $shadowsAlias (param $h externref) (result externref)))
+  (import "generic-mono-review" "shadowsAlias" (func $generic-mono-review:shadowsAlias (param $h externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

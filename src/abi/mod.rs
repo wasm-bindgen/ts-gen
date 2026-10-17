@@ -445,8 +445,16 @@ pub struct AbiFunction {
     pub variadic: bool,
     /// For declarations inside `declare module "spec"`: the specifier whose
     /// export roots the op's path (or is the callee itself when the path is
-    /// empty). `None` roots at `globalThis`.
+    /// empty), and which the language module imports the function from.
+    /// `None` roots at `globalThis` and imports from `./bindings.wasm`.
     pub module: Option<String>,
+}
+
+impl AbiFunction {
+    /// The module a language module imports this function from.
+    pub fn import_module(&self) -> &str {
+        self.module.as_deref().unwrap_or(BINDINGS_SPECIFIER)
+    }
 }
 
 /// A function the module provides, lowered from a [`ProvidedFn`]: the
@@ -481,8 +489,17 @@ pub struct Abi {
 }
 
 impl Abi {
+    /// The first function named `name`, from any module.
     pub fn function(&self, name: &str) -> Option<&AbiFunction> {
         self.functions.iter().find(|f| f.name == name)
+    }
+
+    /// The function a language module imports as `name` from `module`:
+    /// its own name or an alias.
+    pub fn import(&self, module: &str, name: &str) -> Option<&AbiFunction> {
+        self.functions.iter().find(|f| {
+            f.import_module() == module && (f.name == name || f.aliases.iter().any(|a| a == name))
+        })
     }
 
     /// Module specifiers the ABI imports from, sorted and deduplicated.
@@ -596,55 +613,23 @@ pub fn build(
             }
         }
     }
-    // ABI names carry no specifier, so the same name from two roots would
-    // be ambiguous. Within one root, merged declarations repeat and the
-    // first occurrence wins. Across roots the only sanctioned overlap is a
-    // dictionary's synthesized `Type.new` against a real constructor (as
-    // workers-types declares `interface EmailMessage` globally and its
-    // constructor in "cloudflare:email"): the constructor wins.
-    let mut by_name: std::collections::HashMap<String, usize> = Default::default();
+    // A merged declaration repeats its members; the first occurrence wins.
+    // The same name in two modules is two imports, told apart by module.
+    let mut seen: HashSet<(Option<String>, String)> = HashSet::new();
     let mut kept: Vec<AbiFunction> = Vec::with_capacity(abi.functions.len());
     for f in std::mem::take(&mut abi.functions) {
-        let names: Vec<String> = std::iter::once(&f.name)
+        let names: Vec<_> = std::iter::once(&f.name)
             .chain(&f.aliases)
-            .cloned()
+            .map(|n| (f.module.clone(), n.clone()))
             .collect();
-        let Some(i) = names.iter().find_map(|n| by_name.get(n).copied()) else {
-            for n in names {
-                by_name.insert(n, kept.len());
-            }
-            kept.push(f);
-            continue;
-        };
-        let prev = &kept[i];
-        if prev.module == f.module {
+        if names.iter().any(|n| seen.contains(n)) {
             continue;
         }
-        match (&prev.op, &f.op) {
-            (AbiOp::NewObject, _) => {
-                for n in names {
-                    by_name.insert(n, i);
-                }
-                kept[i] = f;
-            }
-            (_, AbiOp::NewObject) => {}
-            _ => bail!(
-                "ABI name {:?} is declared both {} and {}",
-                f.name,
-                describe_root(prev.module.as_deref()),
-                describe_root(f.module.as_deref())
-            ),
-        }
+        seen.extend(names);
+        kept.push(f);
     }
     abi.functions = kept;
     Ok(abi)
-}
-
-fn describe_root(module: Option<&str>) -> String {
-    match module {
-        Some(spec) => format!("in module {spec:?}"),
-        None => "globally".into(),
-    }
 }
 
 fn build_declaration(
@@ -1221,7 +1206,7 @@ mod tests {
     }
 
     #[test]
-    fn real_constructor_wins_over_dictionary_new_across_roots() {
+    fn dictionary_new_and_module_constructor_are_two_imports() {
         let abi = abi(r#"
             interface Email { readonly from: string; }
             declare module "cloudflare:email" {
@@ -1230,9 +1215,10 @@ mod tests {
             }
         "#)
         .unwrap();
-        let new = abi.function("Email.new").unwrap();
+        let new = abi.import("cloudflare:email", "Email.new").unwrap();
         assert!(matches!(new.op, AbiOp::Construct { .. }), "{:?}", new.op);
-        assert_eq!(new.module.as_deref(), Some("cloudflare:email"));
+        let dict = abi.import(BINDINGS_SPECIFIER, "Email.new").unwrap();
+        assert_eq!(dict.op, AbiOp::NewObject);
         assert_eq!(abi.function("Email.from").unwrap().module, None);
     }
 
@@ -1488,20 +1474,34 @@ mod tests {
     }
 
     #[test]
-    fn same_name_from_two_roots_is_an_error() {
-        let err = abi(r#"
+    fn same_name_in_two_roots_is_two_imports() {
+        let abi = abi(r#"
             declare function connect(address: string): void;
             declare module "cloudflare:sockets" {
                 function connect(address: string): void;
             }
+            declare module "node:net" {
+                namespace constants { const O_RDONLY: Sock; }
+                class Sock {}
+            }
+            declare module "node:fs" {
+                namespace constants { const O_RDONLY: Sock; }
+                class Sock {}
+            }
         "#)
-        .unwrap_err()
-        .to_string();
-        assert!(
-            err.contains("\"connect\"")
-                && err.contains("globally")
-                && err.contains("cloudflare:sockets"),
-            "{err}"
-        );
+        .unwrap();
+        for module in [BINDINGS_SPECIFIER, "cloudflare:sockets"] {
+            assert!(abi.import(module, "connect").is_some(), "{module}");
+        }
+        for module in ["node:net", "node:fs"] {
+            let f = abi.import(module, "constants.O_RDONLY").unwrap();
+            assert_eq!(
+                f.op,
+                AbiOp::StaticGet {
+                    path: vec!["constants".into()],
+                    name: "O_RDONLY".into()
+                }
+            );
+        }
     }
 }
