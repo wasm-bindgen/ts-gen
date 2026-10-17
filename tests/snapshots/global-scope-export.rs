@@ -154,18 +154,6 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type XCConstructor;
-    #[wasm_bindgen(method, getter)]
-    pub fn prototype(this: &XCConstructor) -> XC;
-    #[wasm_bindgen(method)]
-    pub fn stat(this: &XCConstructor);
-    #[wasm_bindgen(method, catch, js_name = "stat")]
-    pub fn try_stat(this: &XCConstructor) -> Result<(), JsValue>;
-}
-#[wasm_bindgen]
-extern "C" {
     #[wasm_bindgen(js_name = "XF")]
     pub fn xf() -> XF;
 }
@@ -190,4 +178,20 @@ impl FX {
         inner.set_a(a);
         inner
     }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type SX;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<SX, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn inst(this: &SX);
+    #[wasm_bindgen(method, catch, js_name = "inst")]
+    pub fn try_inst(this: &SX) -> Result<(), JsValue>;
+    # [wasm_bindgen (static_method_of = SX)]
+    pub fn added() -> SX;
+    # [wasm_bindgen (static_method_of = SX , catch , js_name = "added")]
+    pub fn try_added() -> Result<SX, JsValue>;
 }

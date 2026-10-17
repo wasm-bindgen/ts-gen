@@ -103,6 +103,7 @@ impl Module {
     }
 
     fn add_file(&mut self, path: PathBuf, file_scope: ScopeId, parsed: ParsedFile) {
+        self.types.retain(|id| !parsed.dropped.contains(id));
         for id in parsed.types {
             if !self.types.contains(&id) {
                 self.types.push(id);
@@ -130,10 +131,12 @@ impl Module {
     }
 }
 
-/// What parsing one file adds: its declarations, the key of the export map
-/// of the globals it declares, and the modules it declares by specifier.
+/// What parsing one file adds: its declarations, the earlier declarations
+/// they absorbed, the key of the export map of the globals it declares,
+/// and the modules it declares by specifier.
 struct ParsedFile {
     types: Vec<crate::context::TypeId>,
+    dropped: std::collections::HashSet<crate::context::TypeId>,
     globals: Option<ScopeId>,
     modules: Vec<(String, ScopeId)>,
 }
@@ -188,8 +191,17 @@ fn parse_single_file(
     // Swap out diagnostics temporarily to avoid double-borrowing gctx.
     let file_start = gctx.type_arena().len();
     let mut diag = std::mem::take(&mut gctx.diagnostics);
-    let registry = first_pass::collect_type_names(program, lib_name, &mut diag, gctx, file_scope);
+    let mut registry =
+        first_pass::collect_type_names(program, lib_name, &mut diag, gctx, file_scope);
     gctx.diagnostics = diag;
+    registry.global_ctor_classes = gctx
+        .global_ctor_interfaces
+        .iter()
+        .filter_map(|(iface, &id)| match &gctx.get_type(id).kind {
+            crate::ir::TypeKind::Class(c) => Some((iface.clone(), c.name.clone())),
+            _ => None,
+        })
+        .collect();
     for (specifier, &scope) in &registry.module_scopes {
         gctx.ambient_module_scopes
             .entry(specifier.clone())
@@ -247,6 +259,7 @@ fn parse_single_file(
         mut namespace_members,
         mut static_sides,
         constructor_classes,
+        ctor_interfaces,
     } = first_pass::populate_declarations(
         program,
         &registry,
@@ -273,14 +286,18 @@ fn parse_single_file(
         assigned_namespaces: &registry.assigned_namespaces,
         constructor_classes: &constructor_classes,
         constructor_class_ids: std::collections::HashSet::new(),
+        ctor_interfaces: &ctor_interfaces,
+        dropped: std::collections::HashSet::new(),
         file_scope,
         file_start,
     };
-    let types = merged
+    let mut types: Vec<_> = merged
         .into_iter()
         .map(|decl| cx.insert(decl, true))
         .collect();
     let constructor_class_ids = cx.constructor_class_ids;
+    let dropped = cx.dropped;
+    types.retain(|id| !dropped.contains(id));
 
     // A global namespace a module assigns with `export =` exports the
     // module's names, also those a later file reopening it declares.
@@ -302,6 +319,7 @@ fn parse_single_file(
     name_constructor_classes(gctx, &modules, &constructor_class_ids);
     Ok(ParsedFile {
         types,
+        dropped,
         globals: registry.globals,
         modules,
     })
@@ -316,6 +334,10 @@ struct InsertCtx<'a> {
     constructor_classes: &'a [(ScopeId, String)],
     /// The inserted ids of `constructor_classes`.
     constructor_class_ids: std::collections::HashSet<crate::context::TypeId>,
+    ctor_interfaces: &'a first_pass::CtorInterfaces,
+    /// Earlier declarations that merged into a later one and are no longer
+    /// declarations of their own.
+    dropped: std::collections::HashSet<crate::context::TypeId>,
     file_scope: ScopeId,
     /// Arena length before this file: a lower id is an earlier file's
     /// declaration.
@@ -376,9 +398,25 @@ impl InsertCtx<'_> {
             }
             _ => decl_scope,
         };
+        if let (Some(_), crate::ir::TypeKind::Interface(iface)) = (global, &decl.kind) {
+            if let Some(&class) = self.gctx.global_ctor_interfaces.get(&iface.name) {
+                self.add_statics(class, &iface.members);
+                return class;
+            }
+        }
         let static_side = match &decl.kind {
             crate::ir::TypeKind::Variable(v) => {
                 self.static_sides.remove(&(decl_scope, v.js_name.clone()))
+            }
+            _ => None,
+        };
+        let ctor_interface = match &decl.kind {
+            crate::ir::TypeKind::Class(_) | crate::ir::TypeKind::Variable(_)
+                if global.is_some() =>
+            {
+                binding_name(&decl.kind)
+                    .and_then(|name| self.ctor_interfaces.get(&(decl_scope, name)))
+                    .cloned()
             }
             _ => None,
         };
@@ -392,6 +430,9 @@ impl InsertCtx<'_> {
         if let Some(class) = static_side {
             self.gctx.static_sides.insert(type_id, class);
         }
+        if let Some(iface) = ctor_interface {
+            self.gctx.ctor_interface_of.insert(type_id, iface);
+        }
         let earlier: Vec<_> = placeholder
             .as_ref()
             .map(|local| self.gctx.declarations(block, local))
@@ -402,8 +443,20 @@ impl InsertCtx<'_> {
             .collect();
         for existing in earlier {
             if self.merge_into(existing, type_id) {
+                if let Some(iface) = self.gctx.ctor_interface_of.remove(&type_id) {
+                    self.gctx.ctor_interface_of.entry(existing).or_insert(iface);
+                }
                 type_id = existing;
                 break;
+            }
+        }
+        if let Some(global) = global {
+            let class = matches!(
+                self.gctx.get_type(type_id).kind,
+                crate::ir::TypeKind::Class(_)
+            );
+            if let Some(iface) = self.gctx.ctor_interface_of.get(&type_id).filter(|_| class) {
+                self.adopt_ctor_interface(global, &iface.clone(), type_id);
             }
         }
         let gctx = &mut *self.gctx;
@@ -450,6 +503,89 @@ impl InsertCtx<'_> {
             }
         }
         type_id
+    }
+
+    /// `class` takes its constructor and statics from the interface `iface`,
+    /// so every file's declarations of `iface` are statics of `class`, as
+    /// within one file, rather than an interface: those inserted so far
+    /// merge now, and later ones as they are inserted.
+    fn adopt_ctor_interface(
+        &mut self,
+        global: ScopeId,
+        iface: &str,
+        class: crate::context::TypeId,
+    ) {
+        if self
+            .gctx
+            .global_ctor_interfaces
+            .insert(iface.to_string(), class)
+            == Some(class)
+        {
+            return;
+        }
+        let ifaces: Vec<_> = self
+            .gctx
+            .declarations(global, iface)
+            .iter()
+            .copied()
+            .filter(|&id| {
+                matches!(
+                    self.gctx.get_type(id).kind,
+                    crate::ir::TypeKind::Interface(_)
+                )
+            })
+            .collect();
+        if ifaces.is_empty() {
+            return;
+        }
+        for &id in &ifaces {
+            if let crate::ir::TypeKind::Interface(i) = &self.gctx.get_type(id).kind {
+                let members = i.members.clone();
+                self.add_statics(class, &members);
+            }
+        }
+        let ifaces: std::collections::HashSet<_> = ifaces.into_iter().collect();
+        self.gctx.drop_types(&ifaces);
+        self.dropped.extend(ifaces);
+    }
+
+    /// Merge an interface's members into `class` as its statics. A construct
+    /// signature never reaches an interface's members.
+    fn add_statics(&mut self, class: crate::context::TypeId, members: &[crate::ir::Member]) {
+        use crate::ir::Member;
+        let statics = members
+            .iter()
+            .filter_map(|m| match m {
+                Member::Getter(g) if g.js_name != "prototype" => {
+                    Some(Member::StaticGetter(crate::ir::StaticGetterMember {
+                        js_name: g.js_name.clone(),
+                        type_ref: g.type_ref.clone(),
+                        doc: g.doc.clone(),
+                    }))
+                }
+                Member::Setter(s) if s.js_name != "prototype" => {
+                    Some(Member::StaticSetter(crate::ir::StaticSetterMember {
+                        js_name: s.js_name.clone(),
+                        type_ref: s.type_ref.clone(),
+                        doc: s.doc.clone(),
+                    }))
+                }
+                Member::Method(m) => Some(Member::StaticMethod(crate::ir::StaticMethodMember {
+                    name: m.name.clone(),
+                    js_name: m.js_name.clone(),
+                    type_params: m.type_params.clone(),
+                    params: m.params.clone(),
+                    return_type: m.return_type.clone(),
+                    doc: m.doc.clone(),
+                    throws: m.throws.clone(),
+                    body_scope: m.body_scope,
+                })),
+                _ => None,
+            })
+            .collect();
+        if let crate::ir::TypeKind::Class(c) = &mut self.gctx.get_type_mut(class).kind {
+            merge_members(&mut c.members, statics);
+        }
     }
 
     /// Merge the declaration `new` into `existing` where the two would merge
@@ -1324,6 +1460,65 @@ mod tests {
             assert_eq!(root.bindings, module.global_scope);
             let exports: Vec<_> = gctx.exports.entries(root.exports).collect();
             assert_eq!(exports, [("Win", "Win"), ("N", "N")]);
+        }
+    }
+
+    #[test]
+    fn constructor_interfaces_are_statics_across_files() {
+        let class = "interface Arr { a(): void; }
+            interface ArrConstructor { new (): Arr; isArr(x: any): boolean; }
+            declare var Arr: ArrConstructor;";
+        let added = "interface ArrConstructor { new (n: number): Arr; from(x: any): Arr; }
+            interface Arr { b(): void; }";
+        // The later file's construct signature wins, as a later block's does
+        // within one file.
+        for (i, (sources, ctor_params)) in [([class, added], 1), ([added, class], 0)]
+            .iter()
+            .enumerate()
+        {
+            let dir = std::env::temp_dir().join(format!("ts-gen-ctor-{}-{i}", std::process::id()));
+            std::fs::create_dir_all(&dir).unwrap();
+            let paths: Vec<_> = sources
+                .iter()
+                .enumerate()
+                .map(|(n, src)| {
+                    let path = dir.join(format!("{n}.d.ts"));
+                    std::fs::write(&path, src).unwrap();
+                    path
+                })
+                .collect();
+            let result = parse_dts_files(&paths, None);
+            std::fs::remove_dir_all(&dir).unwrap();
+            let (module, gctx) = result.unwrap();
+
+            let arrs = gctx.declarations(module.global_scope, "Arr");
+            assert_eq!(arrs.len(), 1, "{i}");
+            let TypeKind::Class(arr) = &gctx.get_type(arrs[0]).kind else {
+                panic!("{i}: Arr is a class");
+            };
+            let mut members: Vec<String> = arr
+                .members
+                .iter()
+                .map(|m| match m {
+                    Member::Constructor(c) => {
+                        assert_eq!(c.params.len(), *ctor_params, "{i}");
+                        "new".into()
+                    }
+                    Member::StaticMethod(m) => format!("static {}", m.js_name),
+                    Member::Method(m) => m.js_name.clone(),
+                    other => panic!("{i}: {other:?}"),
+                })
+                .collect();
+            members.sort();
+            assert_eq!(
+                members,
+                ["a", "b", "new", "static from", "static isArr"],
+                "{i}"
+            );
+            let ctor_interfaces = module.types.iter().filter(|&&id| {
+                matches!(&gctx.get_type(id).kind, TypeKind::Interface(i) if i.name == "ArrConstructor")
+            });
+            assert_eq!(ctor_interfaces.count(), 0, "{i}");
         }
     }
 

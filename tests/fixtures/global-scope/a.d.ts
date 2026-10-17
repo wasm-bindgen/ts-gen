@@ -22,3 +22,14 @@ interface XF {
   a: number;
 }
 declare function FX(): FX;
+interface XS {
+  inst(): void;
+}
+interface XSConstructor {
+  new (): XS;
+  readonly prototype: XS;
+}
+declare var XS: XSConstructor;
+interface SXConstructor {
+  added(): SX;
+}

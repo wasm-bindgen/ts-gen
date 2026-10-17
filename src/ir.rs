@@ -995,6 +995,10 @@ pub struct TypeRegistry {
         (crate::parse::scope::ScopeId, String),
         (crate::parse::scope::ScopeId, String),
     >,
+    /// The global classes of earlier files by the constructor interface
+    /// they take their statics from, → the class name. This file's global
+    /// declarations of that interface are its static side.
+    pub global_ctor_classes: std::collections::HashMap<String, String>,
     /// Key of the export map listing the globals the file declares, if it
     /// declares any (see [`Module::file_roots`]).
     pub globals: Option<crate::parse::scope::ScopeId>,
