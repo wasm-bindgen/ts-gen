@@ -124,10 +124,11 @@ declare module "cloudflare:sockets" {
   }
 }
 
-// === Scalar module exports ===
+// === Scalar module exports, and a module function's `this` ===
 declare module "embed:values" {
   const count: number;
   const enabled: boolean;
   const disabled: boolean;
   const big: bigint;
+  function receiver(): string;
 }
