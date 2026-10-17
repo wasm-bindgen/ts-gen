@@ -640,12 +640,12 @@ pub(crate) fn generate_dictionary_factory_with_passes(
     // If any getter lacks a corresponding setter the type has readonly
     // properties, which means it is not constructible via setters — skip
     // the builder entirely and only emit a bare `new()`.
-    let setter_names: std::collections::HashSet<&str> = config
+    let setter_types: std::collections::HashMap<&str, &crate::ir::TypeRef> = config
         .members
         .iter()
         .filter_map(|m| {
             if let Member::Setter(s) = m {
-                Some(s.js_name.as_str())
+                Some((s.js_name.as_str(), &s.type_ref))
             } else {
                 None
             }
@@ -653,7 +653,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         .collect();
     let has_readonly = config.members.iter().any(|m| {
         if let Member::Getter(g) = m {
-            !setter_names.contains(g.js_name.as_str())
+            !setter_types.contains_key(g.js_name.as_str())
         } else {
             false
         }
@@ -731,8 +731,18 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             _ => None,
         })
     };
+    // Factories call the setter the extern block emits, so they take its
+    // type. A discriminated-union branch narrows its getter
+    // (`disposition: "inline"`), while the setter keeps the merged type
+    // (`"inline" | "attachment"`) and with it the enum a literal is passed as.
+    let assigned_type = |g: &crate::ir::GetterMember| -> crate::ir::TypeRef {
+        setter_types
+            .get(g.js_name.as_str())
+            .map_or_else(|| g.type_ref.clone(), |t| (*t).clone())
+    };
     let resolve_setter_sigs = |g: &crate::ir::GetterMember| -> Vec<FunctionSignature> {
-        let setter_param = config.setter_param(&g.js_name, &g.type_ref, slice_mode_of(&g.js_name));
+        let setter_param =
+            config.setter_param(&g.js_name, &assigned_type(g), slice_mode_of(&g.js_name));
         let mut setter_used = LocalScope::default();
         let setter_overloads = [&[setter_param][..]];
         let void = crate::ir::TypeRef::Void;
@@ -814,7 +824,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             // via the same `pick_setter` lookup.
             let mut options: Vec<FieldOption> = Vec::new();
             let members = split_union(&g.type_ref);
-            let setter_enum = config.setter_enum(&g.js_name, &g.type_ref);
+            let setter_enum = config.setter_enum(&g.js_name, &assigned_type(g));
             let any_literal = members.iter().any(|m| {
                 matches!(
                     m,
@@ -882,8 +892,8 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             // only synthesised one setter for the whole union).
             let default_setter = super::typemap::make_ident(&setters[0].rust_name);
 
-            // A literal the setter routes through the getter's enum is
-            // passed as that enum's variant.
+            // A literal the setter routes through its enum is passed as
+            // that enum's variant.
             let enum_literal = |m: &crate::ir::TypeRef| {
                 let e = setter_enum.as_ref()?;
                 let variant = super::typemap::make_ident(e.variant(m)?);

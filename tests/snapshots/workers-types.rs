@@ -33583,7 +33583,7 @@ impl EmailAttachment {
         content: &str,
     ) -> EmailAttachment {
         let inner: EmailAttachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition("inline");
+        inner.set_disposition(DispositionKind::Inline);
         inner.set_content_id(content_id);
         inner.set_filename(filename);
         inner.set_type(r#type);
@@ -33600,7 +33600,7 @@ impl EmailAttachment {
         content: &ArrayBuffer,
     ) -> EmailAttachment {
         let inner: EmailAttachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition("inline");
+        inner.set_disposition(DispositionKind::Inline);
         inner.set_content_id(content_id);
         inner.set_filename(filename);
         inner.set_type(r#type);
@@ -33617,7 +33617,7 @@ impl EmailAttachment {
         content: &T,
     ) -> EmailAttachment {
         let inner: EmailAttachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition("inline");
+        inner.set_disposition(DispositionKind::Inline);
         inner.set_content_id(content_id);
         inner.set_filename(filename);
         inner.set_type(r#type);
@@ -33659,7 +33659,7 @@ impl EmailAttachment {
         content: &str,
     ) -> EmailAttachmentBuilder {
         let inner: EmailAttachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition("attachment");
+        inner.set_disposition(DispositionKind::Attachment);
         inner.set_filename(filename);
         inner.set_type(r#type);
         inner.set_content(content);
@@ -33674,7 +33674,7 @@ impl EmailAttachment {
         content: &ArrayBuffer,
     ) -> EmailAttachmentBuilder {
         let inner: EmailAttachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition("attachment");
+        inner.set_disposition(DispositionKind::Attachment);
         inner.set_filename(filename);
         inner.set_type(r#type);
         inner.set_content_with_array_buffer(content);
@@ -33689,7 +33689,7 @@ impl EmailAttachment {
         content: &T,
     ) -> EmailAttachmentBuilder {
         let inner: EmailAttachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition("attachment");
+        inner.set_disposition(DispositionKind::Attachment);
         inner.set_filename(filename);
         inner.set_type(r#type);
         inner.set_content_with_typed_array(content);
@@ -39033,7 +39033,7 @@ impl ConversionResponse {
         inner.set_id(id);
         inner.set_name(name);
         inner.set_mime_type(mime_type);
-        inner.set_format("markdown");
+        inner.set_format(ConversionResponseFormatKind::Markdown);
         inner.set_tokens(tokens);
         inner.set_data(data);
         ConversionResponseBuilder { inner }
@@ -39051,7 +39051,7 @@ impl ConversionResponse {
         inner.set_id(id);
         inner.set_name(name);
         inner.set_mime_type(mime_type);
-        inner.set_format("error");
+        inner.set_format(ConversionResponseFormatKind::Error);
         inner.set_error(error);
         ConversionResponseBuilder { inner }
     }

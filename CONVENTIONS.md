@@ -673,7 +673,7 @@ setter, and names its factory with `.` and a leading `-` spelled out
 (`scale: -1 | 0.5` → `new_neg_1()` setting `-1.0`, `new_0_5()` setting
 `0.5`).
 
-A literal that the field's [setter takes through the getter's
+A literal that the field's [setter takes through its
 enum](#literal-union-setters) is passed as that enum's variant instead
 (`mode: true | "x" | "y"` → `new_x()` calling
 `set_mode_with_mode_kind(ModeKind::X)`).
@@ -1021,6 +1021,22 @@ The literal-collapse, value-union expansion, and `_with_<type>`
 suffixing rules described in [Dictionary builders](#dictionary-builders)
 all apply *within each branch* — branches don't influence each
 other's suffix decisions.
+
+The setter each factory calls is the merged shape's, so a discriminant
+the merged setter takes as an enum is passed as that enum's variant,
+though each branch narrows it to one literal:
+
+```rust
+pub fn set_disposition(this: &EmailAttachment, val: DispositionKind);
+// in new_inline:
+inner.set_disposition(DispositionKind::Inline);
+// in Status::new_200:
+inner.set_code(CodeKind::N200);
+```
+
+Likewise a field a branch narrows to one member of the merged union
+(`data: ArrayBuffer` of `string | ArrayBuffer`) calls that member's
+overload, `inner.set_data_with_array_buffer(data)`, not the first one.
 
 ### Wrapper builder remains merged
 
