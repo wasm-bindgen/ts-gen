@@ -750,27 +750,32 @@ fn generate_type_alias(
     // undeclared. Type aliases use plain `<T, U>` (no `JsGeneric`
     // bound) — they're erased at use-site monomorphisation. Parameters
     // the target doesn't mention are dropped, matching every use site.
-    let params = cgctx.alias_params(alias, from_module);
-    let params = alias
-        .type_params
-        .iter()
-        .enumerate()
-        .filter(|(i, _)| params.as_ref().is_none_or(|p| p.kept[*i]))
-        .map(|(i, tp)| {
-            let ident = typemap::make_ident(&tp.name);
-            match &tp.default {
-                Some(default) if params.as_ref().is_some_and(|p| p.defaulted[i]) => {
-                    let default = cgctx.alias_param_default(default, alias, from_module);
-                    quote! { #ident = #default }
-                }
-                _ => quote! { #ident },
+    // `None` for an alias without type parameters.
+    let generics = match cgctx.alias_params(alias, from_module) {
+        Some(params) => {
+            let idents = alias
+                .type_params
+                .iter()
+                .enumerate()
+                .filter(|&(i, _)| params.kept[i])
+                .map(|(i, tp)| {
+                    let ident = typemap::make_ident(&tp.name);
+                    match &tp.default {
+                        Some(default) if params.defaulted[i] => {
+                            let default = cgctx.alias_param_default(default, alias, from_module);
+                            quote! { #ident = #default }
+                        }
+                        _ => quote! { #ident },
+                    }
+                })
+                .collect::<Vec<_>>();
+            if idents.is_empty() {
+                quote! {}
+            } else {
+                quote! { <#(#idents),*> }
             }
-        })
-        .collect::<Vec<_>>();
-    let generics = if params.is_empty() {
-        quote! {}
-    } else {
-        quote! { <#(#params),*> }
+        }
+        None => quote! {},
     };
 
     let _ = scope;

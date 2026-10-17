@@ -62,7 +62,19 @@ declare enum Color {
   Green = "green",
 }
 type ColorAlias<T> = Color;
-declare function misc(handler: Handler<string>, color: ColorAlias<number>): void;
+declare namespace Ns {
+  type ColorOf<T> = Color;
+}
+// A parameter target is an enum only through its argument or default.
+type Chosen<T = Color> = T;
+declare function misc(
+  handler: Handler<string>,
+  color: ColorAlias<number>,
+  qualified: Ns.ColorOf<string>,
+  chosen: Chosen,
+  given: Pair<Chosen<number>, string>,
+): void;
+declare function qualifiedReturn(): Ns.WithInner<string>;
 
 interface Holder<T> {
   get(): Erased<T>;

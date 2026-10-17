@@ -832,21 +832,47 @@ impl<'a> CodegenContext<'a> {
     /// The string or numeric enum declaration `ty` names, through aliases
     /// and qualified paths.
     pub(crate) fn enum_kind(&self, ty: &ir::TypeRef, scope: ScopeId) -> Option<&TypeKind> {
-        // An enum, or an alias to one, takes no arguments, so any given
-        // don't matter.
-        let resolved = match ty {
-            ir::TypeRef::Reference { segments, .. } if segments.len() == 1 => {
-                self.resolve_alias(&segments[0], scope)
+        let mut ty = std::borrow::Cow::Borrowed(ty);
+        let mut scope = scope;
+        // Bounded, since an alias chain can be circular.
+        for _ in 0..32 {
+            let ir::TypeRef::Reference {
+                segments,
+                generic_args,
+            } = ty.as_ref()
+            else {
+                return None;
+            };
+            let id = self.gctx.resolve_path(scope, &segments.join("."))?;
+            let kind = &self.gctx.get_type(id).kind;
+            let alias = match kind {
+                // An enum takes no arguments, so any given don't matter.
+                TypeKind::StringEnum(_) | TypeKind::NumericEnum(_) => return Some(kind),
+                TypeKind::TypeAlias(alias) => alias,
+                _ => return None,
+            };
+            // A target that is one of the alias's parameters is the argument
+            // given for it, resolved where it's given, or its default.
+            let param = alias
+                .target
+                .as_ident()
+                .and_then(|name| alias.type_params.iter().position(|tp| tp.name == name));
+            match param {
+                Some(i) => match (generic_args.get(i), &alias.type_params[i].default) {
+                    (Some(arg), _) => ty = std::borrow::Cow::Owned(arg.clone()),
+                    (None, Some(default)) => {
+                        ty = std::borrow::Cow::Borrowed(default);
+                        scope = alias.body_scope;
+                    }
+                    (None, None) => return None,
+                },
+                None => {
+                    ty = std::borrow::Cow::Borrowed(&alias.target);
+                    scope = alias.body_scope;
+                }
             }
-            _ => None,
-        };
-        let ty = resolved.as_deref().unwrap_or(ty);
-        let ir::TypeRef::Reference { segments, .. } = ty else {
-            return None;
-        };
-        let id = self.gctx.resolve_path(scope, &segments.join("."))?;
-        let kind = &self.gctx.get_type(id).kind;
-        matches!(kind, TypeKind::StringEnum(_) | TypeKind::NumericEnum(_)).then_some(kind)
+        }
+        None
     }
 
     /// The primitive an enum reference carries on the JS side.
@@ -2231,7 +2257,7 @@ fn to_mono_js_string_return_type_impl(
             quote! { Option<#inner> }
         }
         t @ TypeRef::Reference { segments, .. } if local_generic_args(t, ctx, scope).is_some() => {
-            let base = named_type_to_rust(&segments[0], Some(ctx), scope, from_module);
+            let base = named_type_to_rust(&segments.join("."), Some(ctx), scope, from_module);
             let args = local_generic_args(t, ctx, scope).unwrap_or_default();
             if args.is_empty() {
                 return base;

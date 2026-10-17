@@ -2,8 +2,9 @@
 
 use js_sys::{Boolean, JsString, Number, Undefined};
 use ts_gen_integration_tests::alias_unused_params::{
-    brand, default_return, defaults, erase, misc, ns, skip, skip_return, Branded, Chained, Color,
-    Erased, Fetcher, Handler, Holder, Local, Pair, Partly, Skip, WithDefault,
+    brand, default_return, defaults, erase, misc, ns, qualified_return, skip, skip_return, Branded,
+    Chained, Chosen, Color, Erased, Fetcher, Handler, Holder, Local, Pair, Partly, Skip,
+    WithDefault,
 };
 use wasm_bindgen::JsValue;
 
@@ -25,7 +26,8 @@ fn alias_unused_params_compile(holder: &Holder<JsString>, local: Local) {
     ) = defaults;
     let _: fn() -> WithDefault<Number> = default_return;
     let _: fn() -> Skip<Number, Boolean> = skip_return;
-    let _: fn(&Handler, Color) = misc;
+    let _: fn(&Handler, Color, Color, Color, &Pair<Chosen<Number>, JsString>) = misc;
+    let _: fn() -> ns::WithInner<JsString> = qualified_return;
     let _: Option<WithDefault<Number>> = None::<Pair<Number, JsString>>;
     let _: Option<ns::WithInner<JsString>> = None::<Pair<JsString, ns::Inner>>;
     let _: Option<Fetcher> = None::<Pair<Undefined, Undefined>>;
