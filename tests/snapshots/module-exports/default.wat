@@ -9,10 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "dep"
-;;   "main"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -27,29 +24,29 @@
 
   ;; Foo
   ;; constructor()
-  (import "./bindings.wasm" "Foo.new" (func $Foo.new (result externref)))
+  (import "dep" "Foo.new" (func $dep:Foo.new (result externref)))
   ;; bar(): void
-  (import "./bindings.wasm" "Foo.bar" (func $Foo.bar (param $this externref)))
+  (import "dep" "Foo.bar" (func $dep:Foo.bar (param $this externref)))
   ;; helper(): void
-  (import "./bindings.wasm" "Foo.helper" (func $Foo.helper))
+  (import "dep" "Foo.helper" (func $dep:Foo.helper))
 
   ;; makeFoo(): _Foo
-  (import "./bindings.wasm" "makeFoo" (func $makeFoo (result externref)))
+  (import "dep" "makeFoo" (func $dep:makeFoo (result externref)))
 
   ;; Holder
   ;; {} as Holder
-  (import "./bindings.wasm" "Holder.new" (func $Holder.new (result externref)))
+  (import "dep" "Holder.new" (func $dep:Holder.new (result externref)))
   ;; foo: _Foo
-  (import "./bindings.wasm" "Holder.foo" (func $Holder.foo (param $this externref) (result externref)))
+  (import "dep" "Holder.foo" (func $dep:Holder.foo (param $this externref) (result externref)))
   ;; set foo(value: _Foo)
-  (import "./bindings.wasm" "Holder.set_foo" (func $Holder.set_foo (param $this externref) (param $value externref)))
+  (import "dep" "Holder.set_foo" (func $dep:Holder.set_foo (param $this externref) (param $value externref)))
   ;; alias: Alias
-  (import "./bindings.wasm" "Holder.alias" (func $Holder.alias (param $this externref) (result externref)))
+  (import "dep" "Holder.alias" (func $dep:Holder.alias (param $this externref) (result externref)))
   ;; set alias(value: Alias)
-  (import "./bindings.wasm" "Holder.set_alias" (func $Holder.set_alias (param $this externref) (param $value externref)))
+  (import "dep" "Holder.set_alias" (func $dep:Holder.set_alias (param $this externref) (param $value externref)))
 
   ;; take(f: Foo, a: Alias, h: Holder, d: D.Foo, da: D.Alias, m: Foo.Mode): Foo
-  (import "./bindings.wasm" "take" (func $take (param $f externref) (param $a externref) (param $h externref) (param $d externref) (param $da externref) (param $m externref) (result externref)))
+  (import "main" "take" (func $main:take (param $f externref) (param $a externref) (param $h externref) (param $d externref) (param $da externref) (param $m externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

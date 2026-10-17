@@ -9,10 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "x:foo"
-;;   "x:uses"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -27,13 +24,13 @@
 
   ;; Bar
   ;; constructor(name: string)
-  (import "./bindings.wasm" "Bar.new" (func $Bar.new (param $name externref) (result externref)))
+  (import "x:foo" "Bar.new" (func $x:foo:Bar.new (param $name externref) (result externref)))
   ;; name(): string
-  (import "./bindings.wasm" "Bar.name" (func $Bar.name (param $this externref) (result externref)))
+  (import "x:foo" "Bar.name" (func $x:foo:Bar.name (param $this externref) (result externref)))
 
   ;; UsesBar
   ;; method(b: Bar): void
-  (import "./bindings.wasm" "UsesBar.method" (func $UsesBar.method (param $this externref) (param $b externref)))
+  (import "x:uses" "UsesBar.method" (func $x:uses:UsesBar.method (param $this externref) (param $b externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

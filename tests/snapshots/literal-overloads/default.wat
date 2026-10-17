@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "literal-overloads"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,94 +24,94 @@
 
   ;; KVNamespace
   ;; get(key: string): Promise<string | null>
-  (import "./bindings.wasm" "KVNamespace.get" (func $KVNamespace.get (param $this externref) (param $key externref) (result externref)))
+  (import "literal-overloads" "KVNamespace.get" (func $literal-overloads:KVNamespace.get (param $this externref) (param $key externref) (result externref)))
   ;; get(key: string, type: "text"): Promise<string | null>
-  (import "./bindings.wasm" "KVNamespace.get_2" (func $KVNamespace.get_2 (param $this externref) (param $key externref) (param $type externref) (result externref)))
+  (import "literal-overloads" "KVNamespace.get_2" (func $literal-overloads:KVNamespace.get_2 (param $this externref) (param $key externref) (param $type externref) (result externref)))
   ;; get(key: string[], type: "text"): Promise<Map<string, string | null>>
-  (import "./bindings.wasm" "KVNamespace.get_with_slice" (func $KVNamespace.get_with_slice (param $this externref) (param $key externref) (param $type externref) (result externref)))
+  (import "literal-overloads" "KVNamespace.get_with_slice" (func $literal-overloads:KVNamespace.get_with_slice (param $this externref) (param $key externref) (param $type externref) (result externref)))
   ;; mode(kind: "fast"): boolean
-  (import "./bindings.wasm" "KVNamespace.mode" (func $KVNamespace.mode (param $this externref) (param $kind externref) (result i32)))
+  (import "literal-overloads" "KVNamespace.mode" (func $literal-overloads:KVNamespace.mode (param $this externref) (param $kind externref) (result i32)))
 
   ;; Headers
   ;; getAll(name: "Set-Cookie"): string[]
-  (import "./bindings.wasm" "Headers.get_all" (func $Headers.get_all (param $this externref) (param $name externref) (result externref)))
+  (import "literal-overloads" "Headers.get_all" (func $literal-overloads:Headers.get_all (param $this externref) (param $name externref) (result externref)))
 
   ;; SubtleCrypto
   ;; exportKey(format: "jwk", key: string): Promise<object>
-  (import "./bindings.wasm" "SubtleCrypto.export_key" (func $SubtleCrypto.export_key (param $this externref) (param $format externref) (param $key externref) (result externref)))
+  (import "literal-overloads" "SubtleCrypto.export_key" (func $literal-overloads:SubtleCrypto.export_key (param $this externref) (param $format externref) (param $key externref) (result externref)))
   ;; describe(format: "jwk"): string
-  (import "./bindings.wasm" "SubtleCrypto.describe" (func $SubtleCrypto.describe (param $format externref) (result externref)))
+  (import "literal-overloads" "SubtleCrypto.describe" (func $literal-overloads:SubtleCrypto.describe (param $format externref) (result externref)))
 
   ;; KVStore
   ;; get(key: Key, type: "text"): Promise<string | null>
-  (import "./bindings.wasm" "KVStore.get" (func $KVStore.get (param $this externref) (param $key externref) (param $type externref) (result externref)))
+  (import "literal-overloads" "KVStore.get" (func $literal-overloads:KVStore.get (param $this externref) (param $key externref) (param $type externref) (result externref)))
   ;; put(key: Key, kind: "a", value: string): void
-  (import "./bindings.wasm" "KVStore.put" (func $KVStore.put (param $this externref) (param $key externref) (param $kind externref) (param $value externref)))
+  (import "literal-overloads" "KVStore.put" (func $literal-overloads:KVStore.put (param $this externref) (param $key externref) (param $kind externref) (param $value externref)))
   ;; put(key: Key, kind: "a", value: null): void
-  (import "./bindings.wasm" "KVStore.put_with_null" (func $KVStore.put_with_null (param $this externref) (param $key externref) (param $kind externref) (param $value externref)))
+  (import "literal-overloads" "KVStore.put_with_null" (func $literal-overloads:KVStore.put_with_null (param $this externref) (param $key externref) (param $kind externref) (param $value externref)))
 
   ;; Picker
   ;; pick(kind: "a", x: ArrayBuffer): void
-  (import "./bindings.wasm" "Picker.pick" (func $Picker.pick (param $this externref) (param $kind externref) (param $x externref)))
+  (import "literal-overloads" "Picker.pick" (func $literal-overloads:Picker.pick (param $this externref) (param $kind externref) (param $x externref)))
   ;; pick(kind: "a", x: null): void
-  (import "./bindings.wasm" "Picker.pick_with_null" (func $Picker.pick_with_null (param $this externref) (param $kind externref) (param $x externref)))
+  (import "literal-overloads" "Picker.pick_with_null" (func $literal-overloads:Picker.pick_with_null (param $this externref) (param $kind externref) (param $x externref)))
   ;; make(kind: "a", x: string): Picker
-  (import "./bindings.wasm" "Picker.make" (func $Picker.make (param $kind externref) (param $x externref) (result externref)))
+  (import "literal-overloads" "Picker.make" (func $literal-overloads:Picker.make (param $kind externref) (param $x externref) (result externref)))
   ;; make(kind: "a", x: null): Picker
-  (import "./bindings.wasm" "Picker.make_with_null" (func $Picker.make_with_null (param $kind externref) (param $x externref) (result externref)))
+  (import "literal-overloads" "Picker.make_with_null" (func $literal-overloads:Picker.make_with_null (param $kind externref) (param $x externref) (result externref)))
   ;; put(kind: "a", x: T): void
-  (import "./bindings.wasm" "Picker.put" (func $Picker.put (param $this externref) (param $kind externref) (param $x externref)))
+  (import "literal-overloads" "Picker.put" (func $literal-overloads:Picker.put (param $this externref) (param $kind externref) (param $x externref)))
   ;; put(kind: "a", x: null): void
-  (import "./bindings.wasm" "Picker.put_with_null" (func $Picker.put_with_null (param $this externref) (param $kind externref) (param $x externref)))
+  (import "literal-overloads" "Picker.put_with_null" (func $literal-overloads:Picker.put_with_null (param $this externref) (param $kind externref) (param $x externref)))
   ;; name(kind: "a", x: ArrayBuffer): string
-  (import "./bindings.wasm" "Picker.name" (func $Picker.name (param $this externref) (param $kind externref) (param $x externref) (result externref)))
+  (import "literal-overloads" "Picker.name" (func $literal-overloads:Picker.name (param $this externref) (param $kind externref) (param $x externref) (result externref)))
   ;; name(kind: "a", x: null): string
-  (import "./bindings.wasm" "Picker.name_with_null" (func $Picker.name_with_null (param $this externref) (param $kind externref) (param $x externref) (result externref)))
+  (import "literal-overloads" "Picker.name_with_null" (func $literal-overloads:Picker.name_with_null (param $this externref) (param $kind externref) (param $x externref) (result externref)))
   ;; load(kind: "a", x: ArrayBuffer): Promise<string | null>
-  (import "./bindings.wasm" "Picker.load" (func $Picker.load (param $this externref) (param $kind externref) (param $x externref) (result externref)))
+  (import "literal-overloads" "Picker.load" (func $literal-overloads:Picker.load (param $this externref) (param $kind externref) (param $x externref) (result externref)))
   ;; load(kind: "a", x: null): Promise<string | null>
-  (import "./bindings.wasm" "Picker.load_with_null" (func $Picker.load_with_null (param $this externref) (param $kind externref) (param $x externref) (result externref)))
+  (import "literal-overloads" "Picker.load_with_null" (func $literal-overloads:Picker.load_with_null (param $this externref) (param $kind externref) (param $x externref) (result externref)))
 
   ;; Clash
   ;; mode(kind: "x"): void
-  (import "./bindings.wasm" "Clash.mode" (func $Clash.mode (param $this externref) (param $kind externref)))
+  (import "literal-overloads" "Clash.mode" (func $literal-overloads:Clash.mode (param $this externref) (param $kind externref)))
   ;; mode(kind: null): void
-  (import "./bindings.wasm" "Clash.mode_with_null" (func $Clash.mode_with_null (param $this externref) (param $kind externref)))
+  (import "literal-overloads" "Clash.mode_with_null" (func $literal-overloads:Clash.mode_with_null (param $this externref) (param $kind externref)))
   ;; f(x: ArrayBuffer): void
-  (import "./bindings.wasm" "Clash.f" (func $Clash.f (param $this externref) (param $x externref)))
+  (import "literal-overloads" "Clash.f" (func $literal-overloads:Clash.f (param $this externref) (param $x externref)))
   ;; f(x: null): void
-  (import "./bindings.wasm" "Clash.f_with_null" (func $Clash.f_with_null (param $this externref) (param $x externref)))
+  (import "literal-overloads" "Clash.f_with_null" (func $literal-overloads:Clash.f_with_null (param $this externref) (param $x externref)))
   ;; f(kind: "a", x: ArrayBuffer): void
-  (import "./bindings.wasm" "Clash.f_2" (func $Clash.f_2 (param $this externref) (param $kind externref) (param $x externref)))
+  (import "literal-overloads" "Clash.f_2" (func $literal-overloads:Clash.f_2 (param $this externref) (param $kind externref) (param $x externref)))
   ;; f(kind: "a", x: null): void
-  (import "./bindings.wasm" "Clash.f_with_null_2" (func $Clash.f_with_null_2 (param $this externref) (param $kind externref) (param $x externref)))
+  (import "literal-overloads" "Clash.f_with_null_2" (func $literal-overloads:Clash.f_with_null_2 (param $this externref) (param $kind externref) (param $x externref)))
 
   ;; Repeats
   ;; tag(m: "a"): string
-  (import "./bindings.wasm" "Repeats.tag" (func $Repeats.tag (param $this externref) (param $m externref) (result externref)))
+  (import "literal-overloads" "Repeats.tag" (func $literal-overloads:Repeats.tag (param $this externref) (param $m externref) (result externref)))
 
   ;; Boxed
   ;; constructor(kind: "a")
-  (import "./bindings.wasm" "Boxed.new" (func $Boxed.new (param $kind externref) (result externref)))
+  (import "literal-overloads" "Boxed.new" (func $literal-overloads:Boxed.new (param $kind externref) (result externref)))
   ;; label(kind: "a"): string
-  (import "./bindings.wasm" "Boxed.label" (func $Boxed.label (param $kind externref) (result externref)))
+  (import "literal-overloads" "Boxed.label" (func $literal-overloads:Boxed.label (param $kind externref) (result externref)))
   ;; of(kind: "a", value: T): Boxed<T>
-  (import "./bindings.wasm" "Boxed.of" (func $Boxed.of (param $kind externref) (param $value externref) (result externref)))
+  (import "literal-overloads" "Boxed.of" (func $literal-overloads:Boxed.of (param $kind externref) (param $value externref) (result externref)))
   ;; from(kind: "a", value: T): Boxed<T>
-  (import "./bindings.wasm" "Boxed.from" (func $Boxed.from (param $kind externref) (param $value externref) (result externref)))
+  (import "literal-overloads" "Boxed.from" (func $literal-overloads:Boxed.from (param $kind externref) (param $value externref) (result externref)))
   ;; from(kind: "a", value: null): Boxed<T>
-  (import "./bindings.wasm" "Boxed.from_with_null" (func $Boxed.from_with_null (param $kind externref) (param $value externref) (result externref)))
+  (import "literal-overloads" "Boxed.from_with_null" (func $literal-overloads:Boxed.from_with_null (param $kind externref) (param $value externref) (result externref)))
 
   ;; pickFree(kind: "a", x: T): void
-  (import "./bindings.wasm" "pickFree" (func $pickFree (param $kind externref) (param $x externref)))
+  (import "literal-overloads" "pickFree" (func $literal-overloads:pickFree (param $kind externref) (param $x externref)))
   ;; pickFree(kind: "a", x: null): void
-  (import "./bindings.wasm" "pickFree_with_null" (func $pickFree_with_null (param $kind externref) (param $x externref)))
+  (import "literal-overloads" "pickFree_with_null" (func $literal-overloads:pickFree_with_null (param $kind externref) (param $x externref)))
 
   ;; Opener
   ;; constructor(kind: "a", x: ArrayBuffer)
-  (import "./bindings.wasm" "Opener.new" (func $Opener.new (param $kind externref) (param $x externref) (result externref)))
+  (import "literal-overloads" "Opener.new" (func $literal-overloads:Opener.new (param $kind externref) (param $x externref) (result externref)))
   ;; constructor(kind: "a", x: null)
-  (import "./bindings.wasm" "Opener.new_with_null" (func $Opener.new_with_null (param $kind externref) (param $x externref) (result externref)))
+  (import "literal-overloads" "Opener.new_with_null" (func $literal-overloads:Opener.new_with_null (param $kind externref) (param $x externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

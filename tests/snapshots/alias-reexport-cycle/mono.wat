@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "alias-reexport-cycle"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,13 +24,13 @@
 
   ;; Position
   ;; lineNumber: number
-  (import "./bindings.wasm" "Position.line_number" (func $Position.line_number (param $this externref) (result f64)))
+  (import "alias-reexport-cycle" "Position.line_number" (func $alias-reexport-cycle:Position.line_number (param $this externref) (result f64)))
   ;; set lineNumber(value: number)
-  (import "./bindings.wasm" "Position.set_line_number" (func $Position.set_line_number (param $this externref) (param $value f64)))
+  (import "alias-reexport-cycle" "Position.set_line_number" (func $alias-reexport-cycle:Position.set_line_number (param $this externref) (param $value f64)))
 
   ;; m
   ;; at(p: Position): Position
-  (import "./bindings.wasm" "m.at" (func $m.at (param $p externref) (result externref)))
+  (import "alias-reexport-cycle" "m.at" (func $alias-reexport-cycle:m.at (param $p externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

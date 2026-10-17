@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "namespace-members"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -25,7 +23,7 @@
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
   ;; make(): Events.Emitter
-  (import "./bindings.wasm" "make" (func $make (result externref)))
+  (import "namespace-members" "make" (func $namespace-members:make (result externref)))
 
   ;; Emitter
   ;; emit(event: string): boolean

@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "enum-args"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,23 +24,23 @@
 
   ;; SendOptions
   ;; {} as SendOptions
-  (import "./bindings.wasm" "SendOptions.new" (func $SendOptions.new (result externref)))
+  (import "enum-args" "SendOptions.new" (func $enum-args:SendOptions.new (result externref)))
   ;; kind?: Kind
-  (import "./bindings.wasm" "SendOptions.kind" (func $SendOptions.kind (param $this externref) (result externref)))
+  (import "enum-args" "SendOptions.kind" (func $enum-args:SendOptions.kind (param $this externref) (result externref)))
   ;; set kind(value: Kind)
-  (import "./bindings.wasm" "SendOptions.set_kind" (func $SendOptions.set_kind (param $this externref) (param $value externref)))
+  (import "enum-args" "SendOptions.set_kind" (func $enum-args:SendOptions.set_kind (param $this externref) (param $value externref)))
   ;; payload?: ArrayBufferView
-  (import "./bindings.wasm" "SendOptions.payload" (func $SendOptions.payload (param $this externref) (result externref)))
+  (import "enum-args" "SendOptions.payload" (func $enum-args:SendOptions.payload (param $this externref) (result externref)))
   ;; set payload(value: ArrayBufferView)
-  (import "./bindings.wasm" "SendOptions.set_payload" (func $SendOptions.set_payload (param $this externref) (param $value externref)))
+  (import "enum-args" "SendOptions.set_payload" (func $enum-args:SendOptions.set_payload (param $this externref) (param $value externref)))
 
   ;; Sender
   ;; send(kind: Kind): void
-  (import "./bindings.wasm" "Sender.send" (func $Sender.send (param $this externref) (param $kind externref)))
+  (import "enum-args" "Sender.send" (func $enum-args:Sender.send (param $this externref) (param $kind externref)))
   ;; send(kind: Kind, options: SendOptions): void
-  (import "./bindings.wasm" "Sender.send_with_options" (func $Sender.send_with_options (param $this externref) (param $kind externref) (param $options externref)))
+  (import "enum-args" "Sender.send_with_options" (func $enum-args:Sender.send_with_options (param $this externref) (param $kind externref) (param $options externref)))
   ;; kind: Kind
-  (import "./bindings.wasm" "Sender.kind" (func $Sender.kind (param $this externref) (result externref)))
+  (import "enum-args" "Sender.kind" (func $enum-args:Sender.kind (param $this externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "mono-lists"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -27,89 +25,89 @@
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
   ;; tags(values: string[]): string
-  (import "./bindings.wasm" "tags" (func $tags (param $values externref) (result externref)))
+  (import "mono-lists" "tags" (func $mono-lists:tags (param $values externref) (result externref)))
   ;; tagged(values: Tag[]): string
-  (import "./bindings.wasm" "tagged" (func $tagged (param $values externref) (result externref)))
+  (import "mono-lists" "tagged" (func $mono-lists:tagged (param $values externref) (result externref)))
   ;; tagsLike(values: ArrayLike<string>): string
-  (import "./bindings.wasm" "tagsLike" (func $tagsLike (param $values externref) (result externref)))
+  (import "mono-lists" "tagsLike" (func $mono-lists:tagsLike (param $values externref) (result externref)))
   ;; flags(values: boolean[]): string
-  (import "./bindings.wasm" "flags" (func $flags (param $values externref) (result externref)))
+  (import "mono-lists" "flags" (func $mono-lists:flags (param $values externref) (result externref)))
   ;; join(separator: string, ...parts: string[]): string
-  (import "./bindings.wasm" "join" (func $join (param $separator externref) (param $parts (ref null $anyrefs)) (result externref)))
+  (import "mono-lists" "join" (func $mono-lists:join (param $separator externref) (param $parts (ref null $anyrefs)) (result externref)))
   ;; sum(...values: number[]): number
-  (import "./bindings.wasm" "sum" (func $sum (param $values (ref null $anyrefs)) (result f64)))
+  (import "mono-lists" "sum" (func $mono-lists:sum (param $values (ref null $anyrefs)) (result f64)))
   ;; bagOf(...items: T[]): Bag<T>
-  (import "./bindings.wasm" "bagOf" (func $bagOf (param $items (ref null $anyrefs)) (result externref)))
+  (import "mono-lists" "bagOf" (func $mono-lists:bagOf (param $items (ref null $anyrefs)) (result externref)))
 
   ;; Bag
   ;; size: number
-  (import "./bindings.wasm" "Bag.size" (func $Bag.size (param $this externref) (result f64)))
+  (import "mono-lists" "Bag.size" (func $mono-lists:Bag.size (param $this externref) (result f64)))
   ;; first(): T
-  (import "./bindings.wasm" "Bag.first" (func $Bag.first (param $this externref) (result externref)))
+  (import "mono-lists" "Bag.first" (func $mono-lists:Bag.first (param $this externref) (result externref)))
 
   ;; rows(values: string[][]): string
-  (import "./bindings.wasm" "rows" (func $rows (param $values externref) (result externref)))
+  (import "mono-lists" "rows" (func $mono-lists:rows (param $values externref) (result externref)))
   ;; unique(values: ReadonlySet<string>): string
-  (import "./bindings.wasm" "unique" (func $unique (param $values externref) (result externref)))
+  (import "mono-lists" "unique" (func $mono-lists:unique (param $values externref) (result externref)))
   ;; lookup(values: Map<string, number>, key: string): number
-  (import "./bindings.wasm" "lookup" (func $lookup (param $values externref) (param $key externref) (result f64)))
+  (import "mono-lists" "lookup" (func $mono-lists:lookup (param $values externref) (param $key externref) (result f64)))
   ;; joinTags(...tags: Tags): string
-  (import "./bindings.wasm" "joinTags" (func $joinTags (param $tags (ref null $anyrefs)) (result externref)))
+  (import "mono-lists" "joinTags" (func $mono-lists:joinTags (param $tags (ref null $anyrefs)) (result externref)))
   ;; awaitTag(tag: Promise<string>): string
-  (import "./bindings.wasm" "awaitTag" (func $awaitTag (param $tag externref) (result externref)))
+  (import "mono-lists" "awaitTag" (func $mono-lists:awaitTag (param $tag externref) (result externref)))
   ;; firstTag(tags: Iterator<string>): string
-  (import "./bindings.wasm" "firstTag" (func $firstTag (param $tags externref) (result externref)))
+  (import "mono-lists" "firstTag" (func $mono-lists:firstTag (param $tags externref) (result externref)))
   ;; nextTag(tags: AsyncIterator<string>): string
-  (import "./bindings.wasm" "nextTag" (func $nextTag (param $tags externref) (result externref)))
+  (import "mono-lists" "nextTag" (func $mono-lists:nextTag (param $tags externref) (result externref)))
   ;; getTags(): string[]
-  (import "./bindings.wasm" "getTags" (func $getTags (result externref)))
+  (import "mono-lists" "getTags" (func $mono-lists:getTags (result externref)))
   ;; getMaybeTags(): Tag[] | undefined
-  (import "./bindings.wasm" "getMaybeTags" (func $getMaybeTags (result externref)))
+  (import "mono-lists" "getMaybeTags" (func $mono-lists:getMaybeTags (result externref)))
   ;; getFlags(): boolean[]
-  (import "./bindings.wasm" "getFlags" (func $getFlags (result externref)))
+  (import "mono-lists" "getFlags" (func $mono-lists:getFlags (result externref)))
   ;; fetchTags(): Promise<string[]>
-  (import "./bindings.wasm" "fetchTags" (func $fetchTags (result externref)))
+  (import "mono-lists" "fetchTags" (func $mono-lists:fetchTags (result externref)))
   ;; fetchMaybeTags(): Promise<Tag[] | null>
-  (import "./bindings.wasm" "fetchMaybeTags" (func $fetchMaybeTags (result externref)))
+  (import "mono-lists" "fetchMaybeTags" (func $mono-lists:fetchMaybeTags (result externref)))
 
   ;; Labels
   ;; constructor()
-  (import "./bindings.wasm" "Labels.new" (func $Labels.new (result externref)))
+  (import "mono-lists" "Labels.new" (func $mono-lists:Labels.new (result externref)))
   ;; add(values: string[]): string
-  (import "./bindings.wasm" "Labels.add" (func $Labels.add (param $this externref) (param $values externref) (result externref)))
+  (import "mono-lists" "Labels.add" (func $mono-lists:Labels.add (param $this externref) (param $values externref) (result externref)))
   ;; add(...values: string[]): string
-  (import "./bindings.wasm" "Labels.add_2" (func $Labels.add_2 (param $this externref) (param $values (ref null $anyrefs)) (result externref)))
+  (import "mono-lists" "Labels.add_2" (func $mono-lists:Labels.add_2 (param $this externref) (param $values (ref null $anyrefs)) (result externref)))
   ;; values: string[]
-  (import "./bindings.wasm" "Labels.values" (func $Labels.values (param $this externref) (result externref)))
+  (import "mono-lists" "Labels.values" (func $mono-lists:Labels.values (param $this externref) (result externref)))
   ;; set values(value: string[])
-  (import "./bindings.wasm" "Labels.set_values" (func $Labels.set_values (param $this externref) (param $value externref)))
+  (import "mono-lists" "Labels.set_values" (func $mono-lists:Labels.set_values (param $this externref) (param $value externref)))
   ;; flags: boolean[]
-  (import "./bindings.wasm" "Labels.flags" (func $Labels.flags (param $this externref) (result externref)))
+  (import "mono-lists" "Labels.flags" (func $mono-lists:Labels.flags (param $this externref) (result externref)))
   ;; set flags(value: boolean[])
-  (import "./bindings.wasm" "Labels.set_flags" (func $Labels.set_flags (param $this externref) (param $value externref)))
+  (import "mono-lists" "Labels.set_flags" (func $mono-lists:Labels.set_flags (param $this externref) (param $value externref)))
 
   ;; LabelOptions
   ;; {} as LabelOptions
-  (import "./bindings.wasm" "LabelOptions.new" (func $LabelOptions.new (result externref)))
+  (import "mono-lists" "LabelOptions.new" (func $mono-lists:LabelOptions.new (result externref)))
   ;; values?: string[]
-  (import "./bindings.wasm" "LabelOptions.values" (func $LabelOptions.values (param $this externref) (result externref)))
+  (import "mono-lists" "LabelOptions.values" (func $mono-lists:LabelOptions.values (param $this externref) (result externref)))
   ;; set values(value: string[])
-  (import "./bindings.wasm" "LabelOptions.set_values" (func $LabelOptions.set_values (param $this externref) (param $value externref)))
+  (import "mono-lists" "LabelOptions.set_values" (func $mono-lists:LabelOptions.set_values (param $this externref) (param $value externref)))
   ;; flags?: boolean[]
-  (import "./bindings.wasm" "LabelOptions.flags" (func $LabelOptions.flags (param $this externref) (result externref)))
+  (import "mono-lists" "LabelOptions.flags" (func $mono-lists:LabelOptions.flags (param $this externref) (result externref)))
   ;; set flags(value: boolean[])
-  (import "./bindings.wasm" "LabelOptions.set_flags" (func $LabelOptions.set_flags (param $this externref) (param $value externref)))
+  (import "mono-lists" "LabelOptions.set_flags" (func $mono-lists:LabelOptions.set_flags (param $this externref) (param $value externref)))
 
   ;; describeOptions(options: LabelOptions): string
-  (import "./bindings.wasm" "describeOptions" (func $describeOptions (param $options externref) (result externref)))
+  (import "mono-lists" "describeOptions" (func $mono-lists:describeOptions (param $options externref) (result externref)))
   ;; getValue(): string | boolean[]
-  (import "./bindings.wasm" "getValue" (func $getValue (result externref)))
+  (import "mono-lists" "getValue" (func $mono-lists:getValue (result externref)))
 
   ;; Total
   ;; constructor(...values: number[])
-  (import "./bindings.wasm" "Total.new" (func $Total.new (param $values (ref null $anyrefs)) (result externref)))
+  (import "mono-lists" "Total.new" (func $mono-lists:Total.new (param $values (ref null $anyrefs)) (result externref)))
   ;; value: number
-  (import "./bindings.wasm" "Total.value" (func $Total.value (param $this externref) (result f64)))
+  (import "mono-lists" "Total.value" (func $mono-lists:Total.value (param $this externref) (result f64)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

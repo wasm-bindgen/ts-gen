@@ -9,11 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "module-export-assignment"
-;;   "module-export-assignment/counter"
-;;   "module-export-assignment/global"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -27,32 +23,32 @@
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
   ;; default(value: unknown): void
-  (import "./bindings.wasm" "default" (func $default (param $value externref)))
+  (import "module-export-assignment" "default" (func $module-export-assignment:default (param $value externref)))
   ;; strictEqual(actual: unknown, expected: unknown): boolean
-  (import "./bindings.wasm" "strictEqual" (func $strictEqual (param $actual externref) (param $expected externref) (result i32)))
+  (import "module-export-assignment" "strictEqual" (func $module-export-assignment:strictEqual (param $actual externref) (param $expected externref) (result i32)))
   ;; const VERSION: string
-  (import "./bindings.wasm" "VERSION" (func $VERSION (result externref)))
+  (import "module-export-assignment" "VERSION" (func $module-export-assignment:VERSION (result externref)))
 
   ;; nested
   ;; run(): string
-  (import "./bindings.wasm" "nested.run" (func $nested.run (result externref)))
+  (import "module-export-assignment" "nested.run" (func $module-export-assignment:nested.run (result externref)))
 
   ;; default
   ;; constructor(start: number)
-  (import "./bindings.wasm" "default.new" (func $default.new (param $start f64) (result externref)))
+  (import "module-export-assignment/counter" "default.new" (func $module-export-assignment/counter:default.new (param $start f64) (result externref)))
   ;; value: number
-  (import "./bindings.wasm" "default.value" (func $default.value (param $this externref) (result f64)))
+  (import "module-export-assignment/counter" "default.value" (func $module-export-assignment/counter:default.value (param $this externref) (result f64)))
   ;; increment(): void
-  (import "./bindings.wasm" "default.increment" (func $default.increment (param $this externref)))
+  (import "module-export-assignment/counter" "default.increment" (func $module-export-assignment/counter:default.increment (param $this externref)))
 
   ;; greet(name: string): string
-  (import "./bindings.wasm" "greet" (func $greet (param $name externref) (result externref)))
+  (import "module-export-assignment/global" "greet" (func $module-export-assignment/global:greet (param $name externref) (result externref)))
 
   ;; Greeter
   ;; constructor(prefix: string)
-  (import "./bindings.wasm" "Greeter.new" (func $Greeter.new (param $prefix externref) (result externref)))
+  (import "module-export-assignment/global" "Greeter.new" (func $module-export-assignment/global:Greeter.new (param $prefix externref) (result externref)))
   ;; greet(name: string): string
-  (import "./bindings.wasm" "Greeter.greet" (func $Greeter.greet (param $this externref) (param $name externref) (result externref)))
+  (import "module-export-assignment/global" "Greeter.greet" (func $module-export-assignment/global:Greeter.greet (param $this externref) (param $name externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

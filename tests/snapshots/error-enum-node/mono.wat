@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "error-enum-node"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -25,17 +23,17 @@
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
   ;; raise(kind: string): string
-  (import "./bindings.wasm" "raise" (func $raise (param $kind externref) (result externref)))
+  (import "error-enum-node" "raise" (func $error-enum-node:raise (param $kind externref) (result externref)))
   ;; raiseNamed(kind: string): string
-  (import "./bindings.wasm" "raiseNamed" (func $raiseNamed (param $kind externref) (result externref)))
+  (import "error-enum-node" "raiseNamed" (func $error-enum-node:raiseNamed (param $kind externref) (result externref)))
   ;; raiseUntyped(kind: string): string
-  (import "./bindings.wasm" "raiseUntyped" (func $raiseUntyped (param $kind externref) (result externref)))
+  (import "error-enum-node" "raiseUntyped" (func $error-enum-node:raiseUntyped (param $kind externref) (result externref)))
 
   ;; Gate
   ;; constructor(open: boolean)
-  (import "./bindings.wasm" "Gate.new" (func $Gate.new (param $open i32) (result externref)))
+  (import "error-enum-node" "Gate.new" (func $error-enum-node:Gate.new (param $open i32) (result externref)))
   ;; value: number
-  (import "./bindings.wasm" "Gate.value" (func $Gate.value (param $this externref) (result f64)))
+  (import "error-enum-node" "Gate.value" (func $error-enum-node:Gate.value (param $this externref) (result f64)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

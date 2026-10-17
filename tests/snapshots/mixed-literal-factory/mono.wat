@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "mixed-literal-factory"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,59 +24,59 @@
 
   ;; BoolOrStrings
   ;; {} as BoolOrStrings
-  (import "./bindings.wasm" "BoolOrStrings.new" (func $BoolOrStrings.new (result externref)))
+  (import "mixed-literal-factory" "BoolOrStrings.new" (func $mixed-literal-factory:BoolOrStrings.new (result externref)))
   ;; mode: true | "x" | "y"
-  (import "./bindings.wasm" "BoolOrStrings.mode" (func $BoolOrStrings.mode (param $this externref) (result externref)))
+  (import "mixed-literal-factory" "BoolOrStrings.mode" (func $mixed-literal-factory:BoolOrStrings.mode (param $this externref) (result externref)))
   ;; set mode(value: true)
-  (import "./bindings.wasm" "BoolOrStrings.set_mode" (func $BoolOrStrings.set_mode (param $this externref) (param $value i32)))
+  (import "mixed-literal-factory" "BoolOrStrings.set_mode" (func $mixed-literal-factory:BoolOrStrings.set_mode (param $this externref) (param $value i32)))
   ;; set mode(value: "x")
-  (import "./bindings.wasm" "BoolOrStrings.set_mode_with_str" (func $BoolOrStrings.set_mode_with_str (param $this externref) (param $value externref)))
+  (import "mixed-literal-factory" "BoolOrStrings.set_mode_with_str" (func $mixed-literal-factory:BoolOrStrings.set_mode_with_str (param $this externref) (param $value externref)))
 
   ;; NumberOrStrings
   ;; {} as NumberOrStrings
-  (import "./bindings.wasm" "NumberOrStrings.new" (func $NumberOrStrings.new (result externref)))
+  (import "mixed-literal-factory" "NumberOrStrings.new" (func $mixed-literal-factory:NumberOrStrings.new (result externref)))
   ;; mode: 0 | "x" | "y"
-  (import "./bindings.wasm" "NumberOrStrings.mode" (func $NumberOrStrings.mode (param $this externref) (result externref)))
+  (import "mixed-literal-factory" "NumberOrStrings.mode" (func $mixed-literal-factory:NumberOrStrings.mode (param $this externref) (result externref)))
   ;; set mode(value: 0)
-  (import "./bindings.wasm" "NumberOrStrings.set_mode" (func $NumberOrStrings.set_mode (param $this externref) (param $value f64)))
+  (import "mixed-literal-factory" "NumberOrStrings.set_mode" (func $mixed-literal-factory:NumberOrStrings.set_mode (param $this externref) (param $value f64)))
   ;; set mode(value: "x")
-  (import "./bindings.wasm" "NumberOrStrings.set_mode_with_str" (func $NumberOrStrings.set_mode_with_str (param $this externref) (param $value externref)))
+  (import "mixed-literal-factory" "NumberOrStrings.set_mode_with_str" (func $mixed-literal-factory:NumberOrStrings.set_mode_with_str (param $this externref) (param $value externref)))
 
   ;; Mixed
   ;; {} as Mixed
-  (import "./bindings.wasm" "Mixed.new" (func $Mixed.new (result externref)))
+  (import "mixed-literal-factory" "Mixed.new" (func $mixed-literal-factory:Mixed.new (result externref)))
   ;; mode: "x" | "y" | 1 | 2 | false
-  (import "./bindings.wasm" "Mixed.mode" (func $Mixed.mode (param $this externref) (result externref)))
+  (import "mixed-literal-factory" "Mixed.mode" (func $mixed-literal-factory:Mixed.mode (param $this externref) (result externref)))
   ;; set mode(value: "x")
-  (import "./bindings.wasm" "Mixed.set_mode" (func $Mixed.set_mode (param $this externref) (param $value externref)))
+  (import "mixed-literal-factory" "Mixed.set_mode" (func $mixed-literal-factory:Mixed.set_mode (param $this externref) (param $value externref)))
   ;; set mode(value: 1)
-  (import "./bindings.wasm" "Mixed.set_mode_with_f64" (func $Mixed.set_mode_with_f64 (param $this externref) (param $value f64)))
+  (import "mixed-literal-factory" "Mixed.set_mode_with_f64" (func $mixed-literal-factory:Mixed.set_mode_with_f64 (param $this externref) (param $value f64)))
   ;; set mode(value: false)
-  (import "./bindings.wasm" "Mixed.set_mode_with_bool" (func $Mixed.set_mode_with_bool (param $this externref) (param $value i32)))
+  (import "mixed-literal-factory" "Mixed.set_mode_with_bool" (func $mixed-literal-factory:Mixed.set_mode_with_bool (param $this externref) (param $value i32)))
 
   ;; Level
   ;; {} as Level
-  (import "./bindings.wasm" "Level.new" (func $Level.new (result externref)))
+  (import "mixed-literal-factory" "Level.new" (func $mixed-literal-factory:Level.new (result externref)))
   ;; level: 0 | 1 | 2
-  (import "./bindings.wasm" "Level.level" (func $Level.level (param $this externref) (result externref)))
+  (import "mixed-literal-factory" "Level.level" (func $mixed-literal-factory:Level.level (param $this externref) (result externref)))
   ;; set level(value: 0)
-  (import "./bindings.wasm" "Level.set_level" (func $Level.set_level (param $this externref) (param $value f64)))
+  (import "mixed-literal-factory" "Level.set_level" (func $mixed-literal-factory:Level.set_level (param $this externref) (param $value f64)))
 
   ;; Open
   ;; {} as Open
-  (import "./bindings.wasm" "Open.new" (func $Open.new (result externref)))
+  (import "mixed-literal-factory" "Open.new" (func $mixed-literal-factory:Open.new (result externref)))
   ;; mode: "x" | string
-  (import "./bindings.wasm" "Open.mode" (func $Open.mode (param $this externref) (result externref)))
+  (import "mixed-literal-factory" "Open.mode" (func $mixed-literal-factory:Open.mode (param $this externref) (result externref)))
   ;; set mode(value: "x")
-  (import "./bindings.wasm" "Open.set_mode" (func $Open.set_mode (param $this externref) (param $value externref)))
+  (import "mixed-literal-factory" "Open.set_mode" (func $mixed-literal-factory:Open.set_mode (param $this externref) (param $value externref)))
 
   ;; Optional
   ;; {} as Optional
-  (import "./bindings.wasm" "Optional.new" (func $Optional.new (result externref)))
+  (import "mixed-literal-factory" "Optional.new" (func $mixed-literal-factory:Optional.new (result externref)))
   ;; mode?: "x" | "y"
-  (import "./bindings.wasm" "Optional.mode" (func $Optional.mode (param $this externref) (result externref)))
+  (import "mixed-literal-factory" "Optional.mode" (func $mixed-literal-factory:Optional.mode (param $this externref) (result externref)))
   ;; set mode(value: "x")
-  (import "./bindings.wasm" "Optional.set_mode" (func $Optional.set_mode (param $this externref) (param $value externref)))
+  (import "mixed-literal-factory" "Optional.set_mode" (func $mixed-literal-factory:Optional.set_mode (param $this externref) (param $value externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

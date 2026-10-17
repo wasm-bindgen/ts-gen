@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "namespace-type-aliases"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -25,20 +23,20 @@
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
   ;; emit(name: Events.Name, options: Events.Opts): Events.Label
-  (import "./bindings.wasm" "emit" (func $emit (param $name externref) (param $options externref) (result externref)))
+  (import "namespace-type-aliases" "emit" (func $namespace-type-aliases:emit (param $name externref) (param $options externref) (result externref)))
   ;; onEvent(listener: Events.Listener<string>): void
-  (import "./bindings.wasm" "onEvent" (func $onEvent (param $listener externref)))
+  (import "namespace-type-aliases" "onEvent" (func $namespace-type-aliases:onEvent (param $listener externref)))
   ;; outerPair(r: Events.Result<number>): void
-  (import "./bindings.wasm" "outerPair" (func $outerPair (param $r externref)))
+  (import "namespace-type-aliases" "outerPair" (func $namespace-type-aliases:outerPair (param $r externref)))
   ;; loose(x: Events.Loose<string>): void
-  (import "./bindings.wasm" "loose" (func $loose (param $x externref)))
+  (import "namespace-type-aliases" "loose" (func $namespace-type-aliases:loose (param $x externref)))
 
   ;; Holder
   ;; on(listener: Events.Listener<T>): void
-  (import "./bindings.wasm" "Holder.on" (func $Holder.on (param $this externref) (param $listener externref)))
+  (import "namespace-type-aliases" "Holder.on" (func $namespace-type-aliases:Holder.on (param $this externref) (param $listener externref)))
 
   ;; tagged(t: Events.Inner.Tagged<number>): void
-  (import "./bindings.wasm" "tagged" (func $tagged (param $t externref)))
+  (import "namespace-type-aliases" "tagged" (func $namespace-type-aliases:tagged (param $t externref)))
 
   ;; Shadowed
   ;; {} as Shadowed

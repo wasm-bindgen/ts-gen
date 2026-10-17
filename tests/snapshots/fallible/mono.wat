@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "fallible"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -25,27 +23,27 @@
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
   ;; checkedSqrt(n: number): number
-  (import "./bindings.wasm" "checkedSqrt" (func $checkedSqrt (param $n f64) (result f64)))
+  (import "fallible" "checkedSqrt" (func $fallible:checkedSqrt (param $n f64) (result f64)))
   ;; double(n: number): number
-  (import "./bindings.wasm" "double" (func $double (param $n f64) (result f64)))
+  (import "fallible" "double" (func $fallible:double (param $n f64) (result f64)))
   ;; clampIndex(n: number, len: number): number
-  (import "./bindings.wasm" "clampIndex" (func $clampIndex (param $n f64) (param $len f64) (result f64)))
+  (import "fallible" "clampIndex" (func $fallible:clampIndex (param $n f64) (param $len f64) (result f64)))
   ;; parseLater(s: string): Promise<number>
-  (import "./bindings.wasm" "parseLater" (func $parseLater (param $s externref) (result externref)))
+  (import "fallible" "parseLater" (func $fallible:parseLater (param $s externref) (result externref)))
 
   ;; Counter
   ;; constructor(start: number)
-  (import "./bindings.wasm" "Counter.new" (func $Counter.new (param $start f64) (result externref)))
+  (import "fallible" "Counter.new" (func $fallible:Counter.new (param $start f64) (result externref)))
   ;; increment(): number
-  (import "./bindings.wasm" "Counter.increment" (func $Counter.increment (param $this externref) (result f64)))
+  (import "fallible" "Counter.increment" (func $fallible:Counter.increment (param $this externref) (result f64)))
   ;; increment(by: number): number
-  (import "./bindings.wasm" "Counter.increment_with_by" (func $Counter.increment_with_by (param $this externref) (param $by f64) (result f64)))
+  (import "fallible" "Counter.increment_with_by" (func $fallible:Counter.increment_with_by (param $this externref) (param $by f64) (result f64)))
   ;; value: number
-  (import "./bindings.wasm" "Counter.value" (func $Counter.value (param $this externref) (result f64)))
+  (import "fallible" "Counter.value" (func $fallible:Counter.value (param $this externref) (result f64)))
   ;; max: number
-  (import "./bindings.wasm" "Counter.max" (func $Counter.max (param $this externref) (result f64)))
+  (import "fallible" "Counter.max" (func $fallible:Counter.max (param $this externref) (result f64)))
   ;; set max(value: number)
-  (import "./bindings.wasm" "Counter.set_max" (func $Counter.set_max (param $this externref) (param $value f64)))
+  (import "fallible" "Counter.set_max" (func $fallible:Counter.set_max (param $this externref) (param $value f64)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

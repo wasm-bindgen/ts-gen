@@ -9,10 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "dep"
-;;   "import-require-module"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -27,20 +24,20 @@
 
   ;; Walker
   ;; constructor(o: dep.Options)
-  (import "./bindings.wasm" "Walker.new" (func $Walker.new (param $o externref) (result externref)))
+  (import "import-require-module" "Walker.new" (func $import-require-module:Walker.new (param $o externref) (result externref)))
   ;; walk(): void
-  (import "./bindings.wasm" "Walker.walk" (func $Walker.walk (param $this externref)))
+  (import "import-require-module" "Walker.walk" (func $import-require-module:Walker.walk (param $this externref)))
 
   ;; walk(o: dep.Options): Walker
-  (import "./bindings.wasm" "walk" (func $walk (param $o externref) (result externref)))
+  (import "import-require-module" "walk" (func $import-require-module:walk (param $o externref) (result externref)))
 
   ;; Options
   ;; {} as Options
-  (import "./bindings.wasm" "Options.new" (func $Options.new (result externref)))
+  (import "dep" "Options.new" (func $dep:Options.new (result externref)))
   ;; depth: number
-  (import "./bindings.wasm" "Options.depth" (func $Options.depth (param $this externref) (result f64)))
+  (import "dep" "Options.depth" (func $dep:Options.depth (param $this externref) (result f64)))
   ;; set depth(value: number)
-  (import "./bindings.wasm" "Options.set_depth" (func $Options.set_depth (param $this externref) (param $value f64)))
+  (import "dep" "Options.set_depth" (func $dep:Options.set_depth (param $this externref) (param $value f64)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "symbol"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -25,41 +23,41 @@
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
   ;; describe(value: symbol): string
-  (import "./bindings.wasm" "describe" (func $describe (param $value externref) (result externref)))
+  (import "symbol" "describe" (func $symbol:describe (param $value externref) (result externref)))
   ;; create(): symbol
-  (import "./bindings.wasm" "create" (func $create (result externref)))
+  (import "symbol" "create" (func $symbol:create (result externref)))
   ;; create(description: string): symbol
-  (import "./bindings.wasm" "create_with_description" (func $create_with_description (param $description externref) (result externref)))
+  (import "symbol" "create_with_description" (func $symbol:create_with_description (param $description externref) (result externref)))
   ;; find(name: string): symbol | null
-  (import "./bindings.wasm" "find" (func $find (param $name externref) (result externref)))
+  (import "symbol" "find" (func $symbol:find (param $name externref) (result externref)))
   ;; all(): symbol[]
-  (import "./bindings.wasm" "all" (func $all (result externref)))
+  (import "symbol" "all" (func $symbol:all (result externref)))
   ;; forEach(callback: (value: symbol) => void): void
-  (import "./bindings.wasm" "forEach" (func $forEach (param $callback externref)))
+  (import "symbol" "forEach" (func $symbol:forEach (param $callback externref)))
   ;; setKey(key: string): void
-  (import "./bindings.wasm" "setKey" (func $setKey (param $key externref)))
+  (import "symbol" "setKey" (func $symbol:setKey (param $key externref)))
   ;; setKey(key: symbol): void
-  (import "./bindings.wasm" "setKey_with_symbol" (func $setKey_with_symbol (param $key externref)))
+  (import "symbol" "setKey_with_symbol" (func $symbol:setKey_with_symbol (param $key externref)))
   ;; lookup(): string | symbol
-  (import "./bindings.wasm" "lookup" (func $lookup (result externref)))
+  (import "symbol" "lookup" (func $symbol:lookup (result externref)))
   ;; const marker: symbol
-  (import "./bindings.wasm" "marker" (func $marker (result externref)))
+  (import "symbol" "marker" (func $symbol:marker (result externref)))
 
   ;; Kinded
   ;; static kind: symbol
-  (import "./bindings.wasm" "Kinded.kind" (func $Kinded.kind (result externref)))
+  (import "symbol" "Kinded.kind" (func $symbol:Kinded.kind (result externref)))
 
   ;; Tagged
   ;; {} as Tagged
-  (import "./bindings.wasm" "Tagged.new" (func $Tagged.new (result externref)))
+  (import "symbol" "Tagged.new" (func $symbol:Tagged.new (result externref)))
   ;; tag: symbol
-  (import "./bindings.wasm" "Tagged.tag" (func $Tagged.tag (param $this externref) (result externref)))
+  (import "symbol" "Tagged.tag" (func $symbol:Tagged.tag (param $this externref) (result externref)))
   ;; set tag(value: symbol)
-  (import "./bindings.wasm" "Tagged.set_tag" (func $Tagged.set_tag (param $this externref) (param $value externref)))
+  (import "symbol" "Tagged.set_tag" (func $symbol:Tagged.set_tag (param $this externref) (param $value externref)))
   ;; alias?: symbol
-  (import "./bindings.wasm" "Tagged.alias" (func $Tagged.alias (param $this externref) (result externref)))
+  (import "symbol" "Tagged.alias" (func $symbol:Tagged.alias (param $this externref) (result externref)))
   ;; set alias(value: symbol)
-  (import "./bindings.wasm" "Tagged.set_alias" (func $Tagged.set_alias (param $this externref) (param $value externref)))
+  (import "symbol" "Tagged.set_alias" (func $symbol:Tagged.set_alias (param $this externref) (param $value externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

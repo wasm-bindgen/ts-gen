@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "optional-reads"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,60 +24,60 @@
 
   ;; Moment
   ;; constructor()
-  (import "./bindings.wasm" "Moment.new" (func $Moment.new (result externref)))
+  (import "optional-reads" "Moment.new" (func $optional-reads:Moment.new (result externref)))
 
   ;; Tagged
   ;; constructor()
-  (import "./bindings.wasm" "Tagged.new" (func $Tagged.new (result externref)))
+  (import "optional-reads" "Tagged.new" (func $optional-reads:Tagged.new (result externref)))
 
   ;; Settings
   ;; {} as Settings
-  (import "./bindings.wasm" "Settings.new" (func $Settings.new (result externref)))
+  (import "optional-reads" "Settings.new" (func $optional-reads:Settings.new (result externref)))
   ;; data?: any
-  (import "./bindings.wasm" "Settings.data" (func $Settings.data (param $this externref) (result externref)))
+  (import "optional-reads" "Settings.data" (func $optional-reads:Settings.data (param $this externref) (result externref)))
   ;; set data(value: any)
-  (import "./bindings.wasm" "Settings.set_data" (func $Settings.set_data (param $this externref) (param $value externref)))
+  (import "optional-reads" "Settings.set_data" (func $optional-reads:Settings.set_data (param $this externref) (param $value externref)))
   ;; detail?: unknown
-  (import "./bindings.wasm" "Settings.detail" (func $Settings.detail (param $this externref) (result externref)))
+  (import "optional-reads" "Settings.detail" (func $optional-reads:Settings.detail (param $this externref) (result externref)))
   ;; set detail(value: unknown)
-  (import "./bindings.wasm" "Settings.set_detail" (func $Settings.set_detail (param $this externref) (param $value externref)))
+  (import "optional-reads" "Settings.set_detail" (func $optional-reads:Settings.set_detail (param $this externref) (param $value externref)))
   ;; stamp?: Moment & Tagged
-  (import "./bindings.wasm" "Settings.stamp" (func $Settings.stamp (param $this externref) (result externref)))
+  (import "optional-reads" "Settings.stamp" (func $optional-reads:Settings.stamp (param $this externref) (result externref)))
   ;; set stamp(value: Moment & Tagged)
-  (import "./bindings.wasm" "Settings.set_stamp" (func $Settings.set_stamp (param $this externref) (param $value externref)))
+  (import "optional-reads" "Settings.set_stamp" (func $optional-reads:Settings.set_stamp (param $this externref) (param $value externref)))
   ;; cleared?: Moment & Tagged | null
-  (import "./bindings.wasm" "Settings.cleared" (func $Settings.cleared (param $this externref) (result externref)))
+  (import "optional-reads" "Settings.cleared" (func $optional-reads:Settings.cleared (param $this externref) (result externref)))
   ;; set cleared(value: Moment & Tagged)
-  (import "./bindings.wasm" "Settings.set_cleared" (func $Settings.set_cleared (param $this externref) (param $value externref)))
+  (import "optional-reads" "Settings.set_cleared" (func $optional-reads:Settings.set_cleared (param $this externref) (param $value externref)))
   ;; set cleared(value: null)
-  (import "./bindings.wasm" "Settings.set_cleared_with_null" (func $Settings.set_cleared_with_null (param $this externref) (param $value externref)))
+  (import "optional-reads" "Settings.set_cleared_with_null" (func $optional-reads:Settings.set_cleared_with_null (param $this externref) (param $value externref)))
   ;; maybe: Moment & Tagged | undefined
-  (import "./bindings.wasm" "Settings.maybe" (func $Settings.maybe (param $this externref) (result externref)))
+  (import "optional-reads" "Settings.maybe" (func $optional-reads:Settings.maybe (param $this externref) (result externref)))
   ;; set maybe(value: Moment & Tagged)
-  (import "./bindings.wasm" "Settings.set_maybe" (func $Settings.set_maybe (param $this externref) (param $value externref)))
+  (import "optional-reads" "Settings.set_maybe" (func $optional-reads:Settings.set_maybe (param $this externref) (param $value externref)))
   ;; value: Moment & Tagged
-  (import "./bindings.wasm" "Settings.value" (func $Settings.value (param $this externref) (result externref)))
+  (import "optional-reads" "Settings.value" (func $optional-reads:Settings.value (param $this externref) (result externref)))
   ;; set value(value: Moment & Tagged)
-  (import "./bindings.wasm" "Settings.set_value" (func $Settings.set_value (param $this externref) (param $value externref)))
+  (import "optional-reads" "Settings.set_value" (func $optional-reads:Settings.set_value (param $this externref) (param $value externref)))
 
   ;; Registry
   ;; static missing: Moment & Tagged
-  (import "./bindings.wasm" "Registry.missing" (func $Registry.missing (result externref)))
+  (import "optional-reads" "Registry.missing" (func $optional-reads:Registry.missing (result externref)))
   ;; set missing(value: Moment & Tagged)
-  (import "./bindings.wasm" "Registry.set_missing" (func $Registry.set_missing (param $value externref)))
+  (import "optional-reads" "Registry.set_missing" (func $optional-reads:Registry.set_missing (param $value externref)))
   ;; static cleared: Moment & Tagged | null
-  (import "./bindings.wasm" "Registry.cleared" (func $Registry.cleared (result externref)))
+  (import "optional-reads" "Registry.cleared" (func $optional-reads:Registry.cleared (result externref)))
   ;; set cleared(value: Moment & Tagged)
-  (import "./bindings.wasm" "Registry.set_cleared" (func $Registry.set_cleared (param $value externref)))
+  (import "optional-reads" "Registry.set_cleared" (func $optional-reads:Registry.set_cleared (param $value externref)))
   ;; set cleared(value: null)
-  (import "./bindings.wasm" "Registry.set_cleared_with_null" (func $Registry.set_cleared_with_null (param $value externref)))
+  (import "optional-reads" "Registry.set_cleared_with_null" (func $optional-reads:Registry.set_cleared_with_null (param $value externref)))
   ;; static anything: any
-  (import "./bindings.wasm" "Registry.anything" (func $Registry.anything (result externref)))
+  (import "optional-reads" "Registry.anything" (func $optional-reads:Registry.anything (result externref)))
   ;; set anything(value: any)
-  (import "./bindings.wasm" "Registry.set_anything" (func $Registry.set_anything (param $value externref)))
+  (import "optional-reads" "Registry.set_anything" (func $optional-reads:Registry.set_anything (param $value externref)))
 
   ;; settings(kind: string): Settings
-  (import "./bindings.wasm" "settings" (func $settings (param $kind externref) (result externref)))
+  (import "optional-reads" "settings" (func $optional-reads:settings (param $kind externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

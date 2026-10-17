@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "x:shapes"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,18 +24,18 @@
 
   ;; Base
   ;; base(): void
-  (import "./bindings.wasm" "Base.base" (func $Base.base (param $this externref)))
+  (import "x:shapes" "Base.base" (func $x:shapes:Base.base (param $this externref)))
 
   ;; A
   ;; a(): void
-  (import "./bindings.wasm" "A.a" (func $A.a (param $this externref)))
+  (import "x:shapes" "A.a" (func $x:shapes:A.a (param $this externref)))
 
   ;; B
   ;; b(): void
-  (import "./bindings.wasm" "B.b" (func $B.b (param $this externref)))
+  (import "x:shapes" "B.b" (func $x:shapes:B.b (param $this externref)))
 
   ;; list(): Id[] | Promise<A | B>
-  (import "./bindings.wasm" "list" (func $list (result externref)))
+  (import "x:shapes" "list" (func $x:shapes:list (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

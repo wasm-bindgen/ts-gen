@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "es-module-lexer"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,58 +24,58 @@
 
   ;; ImportSpecifier
   ;; {} as ImportSpecifier
-  (import "./bindings.wasm" "ImportSpecifier.new" (func $ImportSpecifier.new (result externref)))
+  (import "es-module-lexer" "ImportSpecifier.new" (func $es-module-lexer:ImportSpecifier.new (result externref)))
   ;; n: string | undefined
-  (import "./bindings.wasm" "ImportSpecifier.n" (func $ImportSpecifier.n (param $this externref) (result externref)))
+  (import "es-module-lexer" "ImportSpecifier.n" (func $es-module-lexer:ImportSpecifier.n (param $this externref) (result externref)))
   ;; t: ImportType
-  (import "./bindings.wasm" "ImportSpecifier.t" (func $ImportSpecifier.t (param $this externref) (result externref)))
+  (import "es-module-lexer" "ImportSpecifier.t" (func $es-module-lexer:ImportSpecifier.t (param $this externref) (result externref)))
   ;; s: number
-  (import "./bindings.wasm" "ImportSpecifier.s" (func $ImportSpecifier.s (param $this externref) (result f64)))
+  (import "es-module-lexer" "ImportSpecifier.s" (func $es-module-lexer:ImportSpecifier.s (param $this externref) (result f64)))
   ;; e: number
-  (import "./bindings.wasm" "ImportSpecifier.e" (func $ImportSpecifier.e (param $this externref) (result f64)))
+  (import "es-module-lexer" "ImportSpecifier.e" (func $es-module-lexer:ImportSpecifier.e (param $this externref) (result f64)))
   ;; ss: number
-  (import "./bindings.wasm" "ImportSpecifier.ss" (func $ImportSpecifier.ss (param $this externref) (result f64)))
+  (import "es-module-lexer" "ImportSpecifier.ss" (func $es-module-lexer:ImportSpecifier.ss (param $this externref) (result f64)))
   ;; se: number
-  (import "./bindings.wasm" "ImportSpecifier.se" (func $ImportSpecifier.se (param $this externref) (result f64)))
+  (import "es-module-lexer" "ImportSpecifier.se" (func $es-module-lexer:ImportSpecifier.se (param $this externref) (result f64)))
   ;; d: number
-  (import "./bindings.wasm" "ImportSpecifier.d" (func $ImportSpecifier.d (param $this externref) (result f64)))
+  (import "es-module-lexer" "ImportSpecifier.d" (func $es-module-lexer:ImportSpecifier.d (param $this externref) (result f64)))
   ;; a: number
-  (import "./bindings.wasm" "ImportSpecifier.a" (func $ImportSpecifier.a (param $this externref) (result f64)))
+  (import "es-module-lexer" "ImportSpecifier.a" (func $es-module-lexer:ImportSpecifier.a (param $this externref) (result f64)))
   ;; at: [string, string][] | null
-  (import "./bindings.wasm" "ImportSpecifier.at" (func $ImportSpecifier.at (param $this externref) (result externref)))
+  (import "es-module-lexer" "ImportSpecifier.at" (func $es-module-lexer:ImportSpecifier.at (param $this externref) (result externref)))
 
   ;; ExportSpecifier
   ;; {} as ExportSpecifier
-  (import "./bindings.wasm" "ExportSpecifier.new" (func $ExportSpecifier.new (result externref)))
+  (import "es-module-lexer" "ExportSpecifier.new" (func $es-module-lexer:ExportSpecifier.new (result externref)))
   ;; n: string
-  (import "./bindings.wasm" "ExportSpecifier.n" (func $ExportSpecifier.n (param $this externref) (result externref)))
+  (import "es-module-lexer" "ExportSpecifier.n" (func $es-module-lexer:ExportSpecifier.n (param $this externref) (result externref)))
   ;; ln: string | undefined
-  (import "./bindings.wasm" "ExportSpecifier.ln" (func $ExportSpecifier.ln (param $this externref) (result externref)))
+  (import "es-module-lexer" "ExportSpecifier.ln" (func $es-module-lexer:ExportSpecifier.ln (param $this externref) (result externref)))
   ;; s: number
-  (import "./bindings.wasm" "ExportSpecifier.s" (func $ExportSpecifier.s (param $this externref) (result f64)))
+  (import "es-module-lexer" "ExportSpecifier.s" (func $es-module-lexer:ExportSpecifier.s (param $this externref) (result f64)))
   ;; e: number
-  (import "./bindings.wasm" "ExportSpecifier.e" (func $ExportSpecifier.e (param $this externref) (result f64)))
+  (import "es-module-lexer" "ExportSpecifier.e" (func $es-module-lexer:ExportSpecifier.e (param $this externref) (result f64)))
   ;; ls: number
-  (import "./bindings.wasm" "ExportSpecifier.ls" (func $ExportSpecifier.ls (param $this externref) (result f64)))
+  (import "es-module-lexer" "ExportSpecifier.ls" (func $es-module-lexer:ExportSpecifier.ls (param $this externref) (result f64)))
   ;; le: number
-  (import "./bindings.wasm" "ExportSpecifier.le" (func $ExportSpecifier.le (param $this externref) (result f64)))
+  (import "es-module-lexer" "ExportSpecifier.le" (func $es-module-lexer:ExportSpecifier.le (param $this externref) (result f64)))
 
   ;; ParseError
   ;; {} as ParseError
-  (import "./bindings.wasm" "ParseError.new" (func $ParseError.new (result externref)))
+  (import "es-module-lexer" "ParseError.new" (func $es-module-lexer:ParseError.new (result externref)))
   ;; idx: number
-  (import "./bindings.wasm" "ParseError.idx" (func $ParseError.idx (param $this externref) (result f64)))
+  (import "es-module-lexer" "ParseError.idx" (func $es-module-lexer:ParseError.idx (param $this externref) (result f64)))
   ;; set idx(value: number)
-  (import "./bindings.wasm" "ParseError.set_idx" (func $ParseError.set_idx (param $this externref) (param $value f64)))
+  (import "es-module-lexer" "ParseError.set_idx" (func $es-module-lexer:ParseError.set_idx (param $this externref) (param $value f64)))
 
   ;; parse(source: string): [ImportSpecifier[], ExportSpecifier[], boolean, boolean]
-  (import "./bindings.wasm" "parse" (func $parse (param $source externref) (result externref)))
+  (import "es-module-lexer" "parse" (func $es-module-lexer:parse (param $source externref) (result externref)))
   ;; parse(source: string, name: string): [ImportSpecifier[], ExportSpecifier[], boolean, boolean]
-  (import "./bindings.wasm" "parse_with_name" (func $parse_with_name (param $source externref) (param $name externref) (result externref)))
+  (import "es-module-lexer" "parse_with_name" (func $es-module-lexer:parse_with_name (param $source externref) (param $name externref) (result externref)))
   ;; const init: Promise<void>
-  (import "./bindings.wasm" "init" (func $init (result externref)))
+  (import "es-module-lexer" "init" (func $es-module-lexer:init (result externref)))
   ;; initSync(): void
-  (import "./bindings.wasm" "initSync" (func $initSync))
+  (import "es-module-lexer" "initSync" (func $es-module-lexer:initSync))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

@@ -9,11 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "hidden"
-;;   "shapes"
-;;   "uses"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -46,26 +42,26 @@
 
   ;; _Shape
   ;; {} as _Shape
-  (import "./bindings.wasm" "_Shape.new" (func $_Shape.new (result externref)))
-  (import "./bindings.wasm" "Shape.new" (func $Shape.new (result externref)))
-  (import "./bindings.wasm" "Polygon.new" (func $Polygon.new (result externref)))
+  (import "shapes" "_Shape.new" (func $shapes:_Shape.new (result externref)))
+  (import "shapes" "Shape.new" (func $shapes:Shape.new (result externref)))
+  (import "shapes" "Polygon.new" (func $shapes:Polygon.new (result externref)))
   ;; sides: number
-  (import "./bindings.wasm" "_Shape.sides" (func $_Shape.sides (param $this externref) (result f64)))
-  (import "./bindings.wasm" "Shape.sides" (func $Shape.sides (param $this externref) (result f64)))
-  (import "./bindings.wasm" "Polygon.sides" (func $Polygon.sides (param $this externref) (result f64)))
+  (import "shapes" "_Shape.sides" (func $shapes:_Shape.sides (param $this externref) (result f64)))
+  (import "shapes" "Shape.sides" (func $shapes:Shape.sides (param $this externref) (result f64)))
+  (import "shapes" "Polygon.sides" (func $shapes:Polygon.sides (param $this externref) (result f64)))
 
   ;; Hidden
   ;; {} as Hidden
-  (import "./bindings.wasm" "Hidden.new" (func $Hidden.new (result externref)))
+  (import "hidden" "Hidden.new" (func $hidden:Hidden.new (result externref)))
   ;; h: number
-  (import "./bindings.wasm" "Hidden.h" (func $Hidden.h (param $this externref) (result f64)))
+  (import "hidden" "Hidden.h" (func $hidden:Hidden.h (param $this externref) (result f64)))
 
   ;; tag(t: S.Tagged<string>): void
-  (import "./bindings.wasm" "tag" (func $tag (param $t externref)))
+  (import "uses" "tag" (func $uses:tag (param $t externref)))
   ;; triple(t: H.Triple<number>): void
-  (import "./bindings.wasm" "triple" (func $triple (param $t externref)))
+  (import "uses" "triple" (func $uses:triple (param $t externref)))
   ;; either(e: H.Either<number>): void
-  (import "./bindings.wasm" "either" (func $either (param $e externref)))
+  (import "uses" "either" (func $uses:either (param $e externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

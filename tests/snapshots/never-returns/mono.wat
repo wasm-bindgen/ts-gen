@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "never-returns"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -25,45 +23,45 @@
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
   ;; fail(message: string): never
-  (import "./bindings.wasm" "fail" (func $fail (param $message externref) (result externref)))
+  (import "never-returns" "fail" (func $never-returns:fail (param $message externref) (result externref)))
   ;; failRange(n: number): never
-  (import "./bindings.wasm" "failRange" (func $failRange (param $n f64) (result externref)))
+  (import "never-returns" "failRange" (func $never-returns:failRange (param $n f64) (result externref)))
   ;; failAnyway(): never
-  (import "./bindings.wasm" "failAnyway" (func $failAnyway (result externref)))
+  (import "never-returns" "failAnyway" (func $never-returns:failAnyway (result externref)))
   ;; rejectLater(message: string): Promise<never>
-  (import "./bindings.wasm" "rejectLater" (func $rejectLater (param $message externref) (result externref)))
+  (import "never-returns" "rejectLater" (func $never-returns:rejectLater (param $message externref) (result externref)))
   ;; check(value: string): string
-  (import "./bindings.wasm" "check" (func $check (param $value externref) (result externref)))
+  (import "never-returns" "check" (func $never-returns:check (param $value externref) (result externref)))
   ;; check(value: number): never
-  (import "./bindings.wasm" "check_with_f64" (func $check_with_f64 (param $value f64) (result externref)))
+  (import "never-returns" "check_with_f64" (func $never-returns:check_with_f64 (param $value f64) (result externref)))
   ;; raise(kind: "type", message: string): never
-  (import "./bindings.wasm" "raise" (func $raise (param $kind externref) (param $message externref) (result externref)))
+  (import "never-returns" "raise" (func $never-returns:raise (param $kind externref) (param $message externref) (result externref)))
   ;; read(kind: "text"): string
-  (import "./bindings.wasm" "read" (func $read (param $kind externref) (result externref)))
+  (import "never-returns" "read" (func $never-returns:read (param $kind externref) (result externref)))
   ;; abort(code: number): never
-  (import "./bindings.wasm" "abort" (func $abort (param $code f64) (result externref)))
+  (import "never-returns" "abort" (func $never-returns:abort (param $code f64) (result externref)))
 
   ;; Guard
   ;; constructor()
-  (import "./bindings.wasm" "Guard.new" (func $Guard.new (result externref)))
+  (import "never-returns" "Guard.new" (func $never-returns:Guard.new (result externref)))
   ;; valueOf(): never
-  (import "./bindings.wasm" "Guard.value_of" (func $Guard.value_of (param $this externref) (result externref)))
+  (import "never-returns" "Guard.value_of" (func $never-returns:Guard.value_of (param $this externref) (result externref)))
   ;; failLater(): Promise<never>
-  (import "./bindings.wasm" "Guard.fail_later" (func $Guard.fail_later (param $this externref) (result externref)))
+  (import "never-returns" "Guard.fail_later" (func $never-returns:Guard.fail_later (param $this externref) (result externref)))
   ;; unreachable(reason: string): never
-  (import "./bindings.wasm" "Guard.unreachable" (func $Guard.unreachable (param $reason externref) (result externref)))
+  (import "never-returns" "Guard.unreachable" (func $never-returns:Guard.unreachable (param $reason externref) (result externref)))
   ;; reject(kind: "soft"): never
-  (import "./bindings.wasm" "Guard.reject" (func $Guard.reject (param $this externref) (param $kind externref) (result externref)))
+  (import "never-returns" "Guard.reject" (func $never-returns:Guard.reject (param $this externref) (param $kind externref) (result externref)))
   ;; impossible: never
-  (import "./bindings.wasm" "Guard.impossible" (func $Guard.impossible (param $this externref) (result externref)))
+  (import "never-returns" "Guard.impossible" (func $never-returns:Guard.impossible (param $this externref) (result externref)))
 
   ;; Halt
   ;; constructor()
-  (import "./bindings.wasm" "Halt.new" (func $Halt.new (result externref)))
+  (import "never-returns" "Halt.new" (func $never-returns:Halt.new (result externref)))
   ;; stop(code: number): never
-  (import "./bindings.wasm" "Halt.stop" (func $Halt.stop (param $code f64) (result externref)))
+  (import "never-returns" "Halt.stop" (func $never-returns:Halt.stop (param $code f64) (result externref)))
   ;; ok(): boolean
-  (import "./bindings.wasm" "Halt.ok" (func $Halt.ok (param $this externref) (result i32)))
+  (import "never-returns" "Halt.ok" (func $never-returns:Halt.ok (param $this externref) (result i32)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

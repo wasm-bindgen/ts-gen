@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "shape-checks"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -86,11 +84,11 @@
 
   ;; ModuleOptions
   ;; {} as ModuleOptions
-  (import "./bindings.wasm" "ModuleOptions.new" (func $ModuleOptions.new (result externref)))
+  (import "shape-checks" "ModuleOptions.new" (func $shape-checks:ModuleOptions.new (result externref)))
   ;; verbose?: boolean
-  (import "./bindings.wasm" "ModuleOptions.verbose" (func $ModuleOptions.verbose (param $this externref) (result externref)))
+  (import "shape-checks" "ModuleOptions.verbose" (func $shape-checks:ModuleOptions.verbose (param $this externref) (result externref)))
   ;; set verbose(value: boolean)
-  (import "./bindings.wasm" "ModuleOptions.set_verbose" (func $ModuleOptions.set_verbose (param $this externref) (param $value i32)))
+  (import "shape-checks" "ModuleOptions.set_verbose" (func $shape-checks:ModuleOptions.set_verbose (param $this externref) (param $value i32)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

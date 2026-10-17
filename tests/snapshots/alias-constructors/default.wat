@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "alias-constructors"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,77 +24,77 @@
 
   ;; Stub
   ;; get(): T
-  (import "./bindings.wasm" "Stub.get" (func $Stub.get (param $this externref) (result externref)))
+  (import "alias-constructors" "Stub.get" (func $alias-constructors:Stub.get (param $this externref) (result externref)))
 
   ;; const Wrap: object
-  (import "./bindings.wasm" "Wrap" (func $Wrap (result externref)))
+  (import "alias-constructors" "Wrap" (func $alias-constructors:Wrap (result externref)))
   ;; unwrapText(stub: Wrap<string>): string
-  (import "./bindings.wasm" "unwrapText" (func $unwrapText (param $stub externref) (result externref)))
+  (import "alias-constructors" "unwrapText" (func $alias-constructors:unwrapText (param $stub externref) (result externref)))
   ;; const Label: object
-  (import "./bindings.wasm" "Label" (func $Label (result externref)))
+  (import "alias-constructors" "Label" (func $alias-constructors:Label (result externref)))
 
   ;; Labelled
   ;; text(): string
-  (import "./bindings.wasm" "Labelled.text" (func $Labelled.text (param $this externref) (result externref)))
+  (import "alias-constructors" "Labelled.text" (func $alias-constructors:Labelled.text (param $this externref) (result externref)))
 
   ;; Point
   ;; {} as Point
-  (import "./bindings.wasm" "Point.new" (func $Point.new (result externref)))
+  (import "alias-constructors" "Point.new" (func $alias-constructors:Point.new (result externref)))
   ;; x?: number
-  (import "./bindings.wasm" "Point.x" (func $Point.x (param $this externref) (result externref)))
+  (import "alias-constructors" "Point.x" (func $alias-constructors:Point.x (param $this externref) (result externref)))
   ;; set x(value: number)
-  (import "./bindings.wasm" "Point.set_x" (func $Point.set_x (param $this externref) (param $value f64)))
+  (import "alias-constructors" "Point.set_x" (func $alias-constructors:Point.set_x (param $this externref) (param $value f64)))
 
   ;; const Pt: object
-  (import "./bindings.wasm" "Pt" (func $Pt (result externref)))
+  (import "alias-constructors" "Pt" (func $alias-constructors:Pt (result externref)))
   ;; const Wrap2: object
-  (import "./bindings.wasm" "Wrap2" (func $Wrap2 (result externref)))
+  (import "alias-constructors" "Wrap2" (func $alias-constructors:Wrap2 (result externref)))
 
   ;; Proto
   ;; p(): void
-  (import "./bindings.wasm" "Proto.p" (func $Proto.p (param $this externref)))
+  (import "alias-constructors" "Proto.p" (func $alias-constructors:Proto.p (param $this externref)))
 
   ;; const ProtoOnly: object
-  (import "./bindings.wasm" "ProtoOnly" (func $ProtoOnly (result externref)))
+  (import "alias-constructors" "ProtoOnly" (func $alias-constructors:ProtoOnly (result externref)))
   ;; const WithStatics: object
-  (import "./bindings.wasm" "WithStatics" (func $WithStatics (result externref)))
+  (import "alias-constructors" "WithStatics" (func $alias-constructors:WithStatics (result externref)))
 
   ;; Wrapped
   ;; get(): T
-  (import "./bindings.wasm" "Wrapped.get" (func $Wrapped.get (param $this externref) (result externref)))
+  (import "alias-constructors" "Wrapped.get" (func $alias-constructors:Wrapped.get (param $this externref) (result externref)))
 
   ;; StaticNew
   ;; new(): StaticNew
-  (import "./bindings.wasm" "StaticNew.new" (func $StaticNew.new (result externref)))
+  (import "alias-constructors" "StaticNew.new" (func $alias-constructors:StaticNew.new (result externref)))
   ;; y(): void
-  (import "./bindings.wasm" "StaticNew.y" (func $StaticNew.y (param $this externref)))
+  (import "alias-constructors" "StaticNew.y" (func $alias-constructors:StaticNew.y (param $this externref)))
 
   ;; const SN: object
-  (import "./bindings.wasm" "SN" (func $SN (result externref)))
+  (import "alias-constructors" "SN" (func $alias-constructors:SN (result externref)))
 
   ;; CapNew
   ;; New(): void
-  (import "./bindings.wasm" "CapNew.new" (func $CapNew.new (param $this externref)))
+  (import "alias-constructors" "CapNew.new" (func $alias-constructors:CapNew.new (param $this externref)))
 
   ;; const CN: object
-  (import "./bindings.wasm" "CN" (func $CN (result externref)))
+  (import "alias-constructors" "CN" (func $alias-constructors:CN (result externref)))
   ;; const Count: object
-  (import "./bindings.wasm" "Count" (func $Count (result externref)))
+  (import "alias-constructors" "Count" (func $alias-constructors:Count (result externref)))
 
   ;; Counter
   ;; count(): number
-  (import "./bindings.wasm" "Counter.count" (func $Counter.count (param $this externref) (result f64)))
+  (import "alias-constructors" "Counter.count" (func $alias-constructors:Counter.count (param $this externref) (result f64)))
 
   ;; const Multi: object
-  (import "./bindings.wasm" "Multi" (func $Multi (result externref)))
+  (import "alias-constructors" "Multi" (func $alias-constructors:Multi (result externref)))
 
   ;; MultiA
   ;; a(): string
-  (import "./bindings.wasm" "MultiA.a" (func $MultiA.a (param $this externref) (result externref)))
+  (import "alias-constructors" "MultiA.a" (func $alias-constructors:MultiA.a (param $this externref) (result externref)))
 
   ;; MultiB
   ;; b(): number
-  (import "./bindings.wasm" "MultiB.b" (func $MultiB.b (param $this externref) (result f64)))
+  (import "alias-constructors" "MultiB.b" (func $alias-constructors:MultiB.b (param $this externref) (result f64)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

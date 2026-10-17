@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "lib"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -25,13 +23,13 @@
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
   ;; fromPackage(p: Pkg): void
-  (import "./bindings.wasm" "fromPackage" (func $fromPackage (param $p externref)))
+  (import "lib" "fromPackage" (func $lib:fromPackage (param $p externref)))
   ;; fromRelative(r: Rel): void
-  (import "./bindings.wasm" "fromRelative" (func $fromRelative (param $r externref)))
+  (import "lib" "fromRelative" (func $lib:fromRelative (param $r externref)))
   ;; augmented(r: Rel): void
-  (import "./bindings.wasm" "augmented" (func $augmented (param $r externref)))
+  (import "lib" "augmented" (func $lib:augmented (param $r externref)))
   ;; augmentedPkg(p: Pkg): void
-  (import "./bindings.wasm" "augmentedPkg" (func $augmentedPkg (param $p externref)))
+  (import "lib" "augmentedPkg" (func $lib:augmentedPkg (param $p externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
