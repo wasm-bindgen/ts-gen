@@ -129,6 +129,8 @@ pub mod ns {
     pub type WithInner<X, T = Inner> = super::Pair<X, T>;
     #[allow(dead_code)]
     pub type Fetcher<T = Undefined> = super::Pair<T, T>;
+    #[allow(dead_code)]
+    pub type ColorOf = super::Color;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -206,14 +208,48 @@ pub enum Color {
 }
 #[allow(dead_code)]
 pub type ColorAlias = Color;
+#[allow(dead_code)]
+pub type Chosen<T = Color> = T;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    pub fn misc(handler: &Handler, color: ColorAlias);
+    pub fn misc(
+        handler: &Handler,
+        color: ColorAlias,
+        qualified: ns::ColorOf,
+        chosen: Color,
+        given: &Pair<Chosen<f64>, String>,
+    );
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "misc")]
-    pub fn try_misc(handler: &Handler, color: ColorAlias) -> Result<(), JsValue>;
+    pub fn try_misc(
+        handler: &Handler,
+        color: ColorAlias,
+        qualified: ns::ColorOf,
+        chosen: Color,
+        given: &Pair<Chosen<f64>, String>,
+    ) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "qualifiedReturn")]
+    pub fn qualified_return() -> ns::WithInner<String>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "qualifiedReturn")]
+    pub fn qualified_return_js_string() -> ns::WithInner<JsString>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "qualifiedReturn")]
+    pub fn try_qualified_return() -> Result<ns::WithInner<String>, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "qualifiedReturn")]
+    pub fn try_qualified_return_js_string() -> Result<ns::WithInner<JsString>, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
