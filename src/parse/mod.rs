@@ -276,36 +276,19 @@ fn parse_single_file(
     gctx.scopes = scopes;
     gctx.diagnostics = diag;
 
-    // A declaration a `declare module` block exports is in the module's
-    // exports, the others in the block's own scope.
-    let block_exports = &gctx.block_exports;
-    let scopes = &gctx.scopes;
-    let merged = merge_declarations(declarations, |decl| {
-        let exported = block_exports.get(&decl.scope_id).is_some_and(|names| {
-            binding_name(&decl.kind).is_some_and(|local| names.contains(&local))
-        });
-        match scopes.get(decl.scope_id).exports {
-            Some(exports) if exported => exports,
-            _ => decl.scope_id,
-        }
-    });
+    let merged = merge_declarations(declarations, |decl| binding_scope(gctx, decl));
 
     let mut cx = InsertCtx {
         gctx,
         namespace_members: &mut namespace_members,
         static_sides: &mut static_sides,
-        module_scopes: &registry.module_scopes,
-        assigned_namespaces: &registry.assigned_namespaces,
         constructor_classes: &constructor_classes,
         constructor_class_ids: std::collections::HashSet::new(),
         dropped: std::collections::HashSet::new(),
         file_scope,
         file_start,
     };
-    let mut types: Vec<_> = merged
-        .into_iter()
-        .map(|decl| cx.insert(decl, true))
-        .collect();
+    let mut types: Vec<_> = merged.into_iter().map(|decl| cx.insert(decl)).collect();
     let constructor_class_ids = cx.constructor_class_ids;
     let dropped = cx.dropped;
     types.retain(|id| !dropped.contains(id));
@@ -340,8 +323,6 @@ struct InsertCtx<'a> {
     gctx: &'a mut GlobalContext,
     namespace_members: &'a mut first_pass::NamespaceMembers,
     static_sides: &'a mut first_pass::StaticSides,
-    module_scopes: &'a std::collections::HashMap<String, ScopeId>,
-    assigned_namespaces: &'a std::collections::HashMap<ScopeId, String>,
     constructor_classes: &'a [(ScopeId, String)],
     /// The inserted ids of `constructor_classes`.
     constructor_class_ids: std::collections::HashSet<crate::context::TypeId>,
@@ -359,23 +340,22 @@ impl InsertCtx<'_> {
     /// over the phase 1 placeholder, so scope lookups reach the populated
     /// declaration. A namespace's members are inserted the same way first,
     /// giving the namespace their ids. A global also binds in the global
-    /// scope; there, and in a namespace scope the files share, a name an
-    /// earlier file declared merges as within one file, and the id of the
-    /// merged declaration is returned.
-    fn insert(
-        &mut self,
-        mut decl: crate::ir::TypeDeclaration,
-        top_level: bool,
-    ) -> crate::context::TypeId {
+    /// scope, and what a `declare module` block or namespace declaration
+    /// exports in the exports its blocks share (`binding_scope`); there, a
+    /// name an earlier file declared merges as within one file, and the id
+    /// of the merged declaration is returned.
+    fn insert(&mut self, mut decl: crate::ir::TypeDeclaration) -> crate::context::TypeId {
         let members = match &mut decl.kind {
             crate::ir::TypeKind::Namespace(ns) => {
                 let member_decls = self
                     .namespace_members
                     .remove(&ns.child_scope)
                     .unwrap_or_default();
+                let gctx = &*self.gctx;
+                let member_decls = merge_declarations(member_decls, |d| binding_scope(gctx, d));
                 let mut ids = Vec::new();
-                for member in merge_declarations(member_decls, |decl| decl.scope_id) {
-                    let id = self.insert(member, false);
+                for member in member_decls {
+                    let id = self.insert(member);
                     if !ids.contains(&id) {
                         ids.push(id);
                     }
@@ -387,32 +367,12 @@ impl InsertCtx<'_> {
         };
         let file_scope = self.file_scope;
         let decl_scope = decl.scope_id;
-        let flat_scope = match &decl.module_context {
-            crate::ir::ModuleContext::Module(m) => Some(
-                self.module_scopes
-                    .get(m.as_ref())
-                    .copied()
-                    .unwrap_or(file_scope),
-            ),
-            crate::ir::ModuleContext::Global => None,
-        };
-        let global = (flat_scope.is_none() && decl_scope == file_scope)
+        let global = (decl.module_context == crate::ir::ModuleContext::Global
+            && decl_scope == file_scope)
             .then(|| self.gctx.scopes.get(file_scope).parent)
             .flatten();
-        // A declaration a `declare module` block exports is the module's,
-        // merging with every block's; any other is the block's own. So are
-        // the members an `export =` namespace of the module flattens into
-        // it, unless the namespace is a global one.
-        let module_export = top_level
-            && match self.gctx.block_exports.get(&decl_scope) {
-                Some(names) => binding_name(&decl.kind).is_some_and(|l| names.contains(&l)),
-                None => !self.assigned_namespaces.contains_key(&decl_scope),
-            };
-        let block = match (global, flat_scope) {
-            (Some(global), _) => global,
-            (None, Some(flat_scope)) if module_export => flat_scope,
-            _ => decl_scope,
-        };
+        let shared = Some(binding_scope(self.gctx, &decl)).filter(|&s| s != decl_scope);
+        let block = global.or(shared).unwrap_or(decl_scope);
         let static_side = match &decl.kind {
             crate::ir::TypeKind::Variable(v) => {
                 self.static_sides.remove(&(decl_scope, v.js_name.clone()))
@@ -468,14 +428,9 @@ impl InsertCtx<'_> {
                 })
             })
         };
-        // Members of a namespace inside a module are flattened into the
-        // module but declared in the namespace scope, which also needs the
-        // upgrade for `NS.Member` to reach the populated declaration.
-        if let Some(name) = name.as_ref().filter(|_| !yields(gctx, decl_scope)) {
-            gctx.scopes.insert(decl_scope, name.clone(), type_id);
-            if let Some(flat_scope) = flat_scope.filter(|&s| s != decl_scope && module_export) {
-                gctx.scopes.insert(flat_scope, name.clone(), type_id);
-            }
+        let binds = shared.unwrap_or(decl_scope);
+        if let Some(name) = name.as_ref().filter(|_| !yields(gctx, binds)) {
+            gctx.scopes.insert(binds, name.clone(), type_id);
         }
         if let (Some(global), Some(name)) = (global, name.as_ref()) {
             if let Some(members) = members {
@@ -487,7 +442,7 @@ impl InsertCtx<'_> {
         }
         if let Some(local) = local {
             gctx.declare(block, &local, type_id);
-            if block != decl_scope && module_export {
+            if shared.is_some() {
                 gctx.declare(decl_scope, &local, type_id);
             }
             if global.is_some() {
@@ -875,6 +830,13 @@ fn merge_namespaces(
         .collect()
 }
 
+/// The scope a declaration is bound in (see `GlobalContext::binding_scope`).
+pub(crate) fn binding_scope(gctx: &GlobalContext, decl: &crate::ir::TypeDeclaration) -> ScopeId {
+    binding_name(&decl.kind).map_or(decl.scope_id, |local| {
+        gctx.binding_scope(decl.scope_id, &local)
+    })
+}
+
 /// The local name a declaration binds in its block: what an export map
 /// refers to it by. A function or variable's own name is its Rust name, so
 /// this is its JS name.
@@ -957,12 +919,6 @@ fn bind_constructor_vars(gctx: &mut GlobalContext, module: &mut Module) {
                     },
                     _ => unreachable!(),
                 };
-                // The var's scope names the class too, where its phase 1
-                // placeholder for the value stood.
-                let placeholder = gctx.scopes.get(decl.scope_id).get(&v.js_name);
-                if placeholder.is_some_and(|p| p != id && is_value(&gctx.get_type(p).kind)) {
-                    gctx.scopes.insert(decl.scope_id, v.js_name.clone(), id);
-                }
                 (id, class)
             }
             None if matches!(decl.module_context, ModuleContext::Module(_)) => {
@@ -1041,6 +997,7 @@ fn static_members(members: &[crate::ir::Member]) -> Vec<crate::ir::Member> {
         .filter_map(|m| match m {
             Member::Getter(g) if g.js_name != "prototype" => {
                 Some(Member::StaticGetter(crate::ir::StaticGetterMember {
+                    scope: g.scope,
                     js_name: g.js_name.clone(),
                     type_ref: g.type_ref.clone(),
                     doc: g.doc.clone(),
@@ -1048,6 +1005,7 @@ fn static_members(members: &[crate::ir::Member]) -> Vec<crate::ir::Member> {
             }
             Member::Setter(s) if s.js_name != "prototype" => {
                 Some(Member::StaticSetter(crate::ir::StaticSetterMember {
+                    scope: s.scope,
                     js_name: s.js_name.clone(),
                     type_ref: s.type_ref.clone(),
                     doc: s.doc.clone(),
@@ -1354,6 +1312,7 @@ mod tests {
 
     fn getter(name: &str) -> Member {
         Member::Getter(GetterMember {
+            scope: ScopeId::DUMMY,
             js_name: name.to_string(),
             type_ref: TypeRef::String,
             optional: false,

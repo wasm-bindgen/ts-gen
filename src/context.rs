@@ -69,8 +69,9 @@ pub struct GlobalContext {
     /// `declare module "x"` blocks exports, in any file and in a module
     /// augmentation, merges here, while each block keeps its own locals.
     pub(crate) ambient_modules: std::collections::HashMap<String, ScopeId>,
-    /// The names each `declare module` block, by its scope, declares as
-    /// exports of the module (see `block_module_exports`).
+    /// The names each `declare module` block or namespace declaration, by
+    /// its scope, exports into the exports its module's or namespace's
+    /// blocks share (see `block_module_exports`).
     pub(crate) block_exports: std::collections::HashMap<ScopeId, std::collections::HashSet<String>>,
     /// Member scope of each global namespace a module assigns with
     /// `export =`, → the module's specifier. A file reopening the namespace
@@ -317,6 +318,22 @@ impl GlobalContext {
         })?;
         let (local, bindings) = self.exports.binding(members, member)?;
         self.scopes.get(bindings).get(local)
+    }
+
+    /// The scope a declaration of `name` in `scope` binds in: the exports a
+    /// `declare module` block or namespace declaration shares with the
+    /// others of its module or namespace, where it exports the name, as
+    /// TypeScript's binder puts it there rather than in the block's locals;
+    /// else `scope`.
+    pub(crate) fn binding_scope(&self, scope: ScopeId, name: &str) -> ScopeId {
+        let exported = self
+            .block_exports
+            .get(&scope)
+            .is_some_and(|names| names.contains(name));
+        match self.scopes.get(scope).exports {
+            Some(exports) if exported => exports,
+            _ => scope,
+        }
     }
 
     /// Record that `type_id` is a declaration of `scope` binding `name`.

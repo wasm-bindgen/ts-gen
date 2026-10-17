@@ -211,7 +211,7 @@ fn print_declaration(
             let extends = c
                 .extends
                 .as_ref()
-                .map(|e| format!(" extends {:?}", e))
+                .map(|e| format!(" extends {:?}", e.type_ref))
                 .unwrap_or_default();
             let abstract_ = if c.is_abstract { " abstract" } else { "" };
             eprintln!(

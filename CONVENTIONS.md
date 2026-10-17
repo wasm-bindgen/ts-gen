@@ -1143,7 +1143,9 @@ As TypeScript's checker types a declaration, the variable's type is
 resolved once every file is bound, from the variable's own location:
 `URIErrorConstructor`, or a qualified `N.URIErrorConstructor`, resolves
 from the variable's scope with every file's declarations of it merged,
-wherever it is declared. Only
+wherever it is declared. Its constructors and statics resolve from
+the constructor interface, so a `Loc` in `FooCtor` below is the global
+one even if `N` declares a `Loc` of its own. Only
 declarations in the same container merge into the class, so an
 `interface URIError` inside a `declare module` is a different
 declaration and leaves the global class alone, and a constructor
@@ -2161,7 +2163,20 @@ declarations are its own: they merge with no other block's, and a name
 in the block resolves through them first, then through the module's
 exports, its file and the globals. A block without an export
 declaration exports every declaration; one with an export declaration
-exports those with an `export` modifier and those it names.
+exports those with an `export` modifier and those it names. Each
+`namespace N { … }` declaration is bound the same way: what it exports
+is a member of the namespace, shared with its other declarations in any
+file, and the rest is its own.
+
+A name in a merged declaration resolves from the declaration it is
+written in, as in TypeScript: each method, property, construct
+signature and `extends` clause from its own interface or class body,
+and each namespace member from its own `namespace` block. Two files'
+`declare module "x"` blocks importing different `T`s each keep theirs
+in one merged interface, and with `import { T as Ev } from "ia"; declare
+global { interface Win { b: Ev } }` in a module file, `b` is `ia`'s `T`
+while a script's `interface Win { a: Ev }` keeps the global `Ev` for
+`a`.
 
 An input describes an environment: its globals and the host modules
 it can import. The output mirrors it, with the globals at the top

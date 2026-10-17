@@ -241,6 +241,8 @@ fn is_string_literal_union(ts_type: &ast::TSType<'_>) -> bool {
     }
 }
 
+/// Register `name`'s phase 1 placeholder, declared in `scope` and bound in
+/// `bind`, if given.
 #[allow(clippy::too_many_arguments)]
 fn register_type(
     name: &str,
@@ -250,7 +252,7 @@ fn register_type(
     gctx: &mut crate::context::GlobalContext,
     scope: ScopeId,
     exported: bool,
-    bind: bool,
+    bind: Option<ScopeId>,
 ) {
     registry.types.insert(
         (scope, name.to_string()),
@@ -342,8 +344,8 @@ fn register_type(
     if exported {
         gctx.exports.insert(scope, name, name);
     }
-    if bind {
-        gctx.scopes.insert(scope, name_str, type_id);
+    if let Some(binds) = bind {
+        gctx.scopes.insert(binds, name_str, type_id);
     }
 }
 

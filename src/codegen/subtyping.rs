@@ -94,10 +94,14 @@ fn user_parents(name: &str, ctx: &CodegenContext<'_>, scope: ScopeId) -> Vec<Str
     let decl = ctx.gctx.get_type(type_id);
     match &decl.kind {
         TypeKind::Class(c) => match &c.extends {
-            Some(parent) => parent_typeref_to_names(parent),
+            Some(parent) => parent_typeref_to_names(&parent.type_ref),
             None => Vec::new(),
         },
-        TypeKind::Interface(i) => i.extends.iter().flat_map(parent_typeref_to_names).collect(),
+        TypeKind::Interface(i) => i
+            .extends
+            .iter()
+            .flat_map(|parent| parent_typeref_to_names(&parent.type_ref))
+            .collect(),
         _ => Vec::new(),
     }
 }

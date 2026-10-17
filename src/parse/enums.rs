@@ -186,10 +186,15 @@ pub(crate) fn evaluate_ts_enums(gctx: &mut GlobalContext, roots: &mut Vec<TypeId
     if ids.is_empty() {
         return;
     }
+    // Declarations are grouped by the scope binding them, which the blocks
+    // of a module or namespace share.
     let namespaces: HashMap<ScopeId, (ScopeId, &str)> = gctx
         .iter_types()
         .filter_map(|(_, decl)| match &decl.kind {
-            TypeKind::Namespace(ns) => Some((ns.child_scope, (decl.scope_id, ns.name.as_str()))),
+            TypeKind::Namespace(ns) => Some((
+                ns.child_scope,
+                (super::binding_scope(gctx, decl), ns.name.as_str()),
+            )),
             _ => None,
         })
         .collect();
@@ -217,7 +222,7 @@ pub(crate) fn evaluate_ts_enums(gctx: &mut GlobalContext, roots: &mut Vec<TypeId
         let TypeKind::TsEnum(e) = &decl.kind else {
             continue;
         };
-        let (path, scope) = namespace_path(decl.scope_id);
+        let (path, scope) = namespace_path(super::binding_scope(gctx, decl));
         let root = if e.global {
             Root::Global
         } else if ambient.contains(&scope) {

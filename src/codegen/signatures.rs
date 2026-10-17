@@ -1518,6 +1518,25 @@ pub fn generate_dictionary_params(
     scope: ScopeId,
     from_module: &crate::ir::ModuleContext,
 ) -> DictionaryParams {
+    generate_dictionary_params_in(
+        params,
+        &vec![scope; params.len()],
+        cgctx,
+        scope,
+        from_module,
+    )
+}
+
+/// [`generate_dictionary_params`] for params each resolving in its own
+/// scope, as a dictionary's fields from different declarations do.
+/// `scope` is the dictionary's body scope.
+pub fn generate_dictionary_params_in(
+    params: &[ConcreteParam],
+    scopes: &[ScopeId],
+    cgctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+    from_module: &crate::ir::ModuleContext,
+) -> DictionaryParams {
     let mut generic_idents: Vec<syn::Ident> = Vec::new();
     let mut extern_items: Vec<TokenStream> = Vec::new();
     // Skips names already bound in scope, such as the dictionary's own `<T>`.
@@ -1526,7 +1545,8 @@ pub fn generate_dictionary_params(
         .filter(|g| cgctx.is_none_or(|c| c.gctx.scopes.resolve_binding(scope, g).is_none()));
     let items: Vec<_> = params
         .iter()
-        .map(|p| {
+        .zip(scopes)
+        .map(|(p, &scope)| {
             let name = dictionary_param_ident(&p.name, cgctx);
             let ty = if !p.variadic && matches!(p.type_ref, TypeRef::ArrayBufferView) {
                 let g = syn::Ident::new(

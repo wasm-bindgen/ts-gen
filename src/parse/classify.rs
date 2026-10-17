@@ -50,6 +50,7 @@ mod tests {
 
     fn getter(name: &str, optional: bool) -> Member {
         Member::Getter(GetterMember {
+            scope: crate::parse::scope::ScopeId::DUMMY,
             js_name: name.to_string(),
             type_ref: TypeRef::Any,
             optional,
@@ -59,6 +60,7 @@ mod tests {
 
     fn static_getter(name: &str) -> Member {
         Member::StaticGetter(StaticGetterMember {
+            scope: crate::parse::scope::ScopeId::DUMMY,
             js_name: name.to_string(),
             type_ref: TypeRef::Any,
             doc: None,

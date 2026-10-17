@@ -548,6 +548,15 @@ pub enum TypeKind {
 
 // ─── Class ───────────────────────────────────────────────────────────
 
+/// A type an `extends` clause names, with the body scope of the declaration
+/// whose clause it is, where it resolves: a merged declaration's parents
+/// can come from declarations in different scopes.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Heritage {
+    pub type_ref: TypeRef,
+    pub scope: crate::parse::scope::ScopeId,
+}
+
 #[derive(Clone, Debug)]
 
 pub struct ClassDecl {
@@ -556,7 +565,7 @@ pub struct ClassDecl {
     pub js_name: String,
     pub type_params: Vec<TypeParam>,
     /// Immediate parent class.
-    pub extends: Option<TypeRef>,
+    pub extends: Option<Heritage>,
     pub implements: Vec<TypeRef>,
     pub is_abstract: bool,
     pub members: Vec<Member>,
@@ -577,7 +586,7 @@ pub struct InterfaceDecl {
     pub name: String,
     pub js_name: String,
     pub type_params: Vec<TypeParam>,
-    pub extends: Vec<TypeRef>,
+    pub extends: Vec<Heritage>,
     pub members: Vec<Member>,
     /// Its construct signatures (`new (…): T`), overloads in declaration
     /// order. Only a constructor `var` the interface types binds them, as
@@ -862,6 +871,10 @@ pub enum Member {
 #[derive(Clone, Debug)]
 
 pub struct GetterMember {
+    /// The scope its types resolve in: the body scope of the declaration it
+    /// is written in, which a merged declaration's other members needn't
+    /// share.
+    pub scope: crate::parse::scope::ScopeId,
     /// Original JS property name (source of truth for naming).
     pub js_name: String,
     /// Return type of the getter.
@@ -877,6 +890,10 @@ pub struct GetterMember {
 #[derive(Clone, Debug)]
 
 pub struct SetterMember {
+    /// The scope its types resolve in: the body scope of the declaration it
+    /// is written in, which a merged declaration's other members needn't
+    /// share.
+    pub scope: crate::parse::scope::ScopeId,
     /// Original JS property name (source of truth for naming).
     pub js_name: String,
     /// Parameter type of the setter.
@@ -908,6 +925,10 @@ pub struct MethodMember {
 #[derive(Clone, Debug)]
 
 pub struct ConstructorMember {
+    /// The scope its types resolve in: the body scope of the declaration it
+    /// is written in, which a merged declaration's other members needn't
+    /// share.
+    pub scope: crate::parse::scope::ScopeId,
     pub params: Vec<Param>,
     pub doc: Option<String>,
     /// Failure-mode info from `@throws` — see [`Throws`].
@@ -921,6 +942,10 @@ pub struct ConstructorMember {
 #[derive(Clone, Debug)]
 
 pub struct IndexSigMember {
+    /// The scope its types resolve in: the body scope of the declaration it
+    /// is written in, which a merged declaration's other members needn't
+    /// share.
+    pub scope: crate::parse::scope::ScopeId,
     pub key_type: TypeRef,
     pub value_type: TypeRef,
     pub readonly: bool,
@@ -932,6 +957,10 @@ pub struct IndexSigMember {
 #[derive(Clone, Debug)]
 
 pub struct StaticGetterMember {
+    /// The scope its types resolve in: the body scope of the declaration it
+    /// is written in, which a merged declaration's other members needn't
+    /// share.
+    pub scope: crate::parse::scope::ScopeId,
     /// Original JS property name (source of truth for naming).
     pub js_name: String,
     pub type_ref: TypeRef,
@@ -944,6 +973,10 @@ pub struct StaticGetterMember {
 #[derive(Clone, Debug)]
 
 pub struct StaticSetterMember {
+    /// The scope its types resolve in: the body scope of the declaration it
+    /// is written in, which a merged declaration's other members needn't
+    /// share.
+    pub scope: crate::parse::scope::ScopeId,
     /// Original JS property name (source of truth for naming).
     pub js_name: String,
     pub type_ref: TypeRef,
@@ -983,6 +1016,9 @@ pub struct TypeRegistry {
     /// Each `declare module "x"` block's own scope, holding its imports and
     /// locals, with its specifier, by the block's span start.
     pub module_blocks: HashMap<u32, (String, crate::parse::scope::ScopeId)>,
+    /// Each namespace declaration's own scope, by the declaration's span
+    /// start. Its `exports` is the namespace's member scope.
+    pub namespace_blocks: HashMap<u32, crate::parse::scope::ScopeId>,
     /// Member scope of each namespace declared outside the `declare module
     /// "x"` that assigns it with `export =`, → `"x"`. Such a namespace is
     /// the module, so it is populated into the module rather than as a

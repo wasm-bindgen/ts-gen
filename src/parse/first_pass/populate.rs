@@ -862,6 +862,11 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         let ns_name = ns.id.name.to_string();
         // Use the namespace's child scope from Phase 1 (fixes Item 10).
         let ns_scope = self.resolve_namespace_scope(&ns_name, scope);
+        let block = *self
+            .registry
+            .namespace_blocks
+            .get(&ns.span.start)
+            .expect("phase 1 creates a scope for every namespace declaration");
         let stmts = namespace_block_statements(ns);
 
         // A namespace the module assigns with `export =` is the module
@@ -873,14 +878,14 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
             .is_some_and(|(module_scope, name)| *module_scope == scope && *name == ns_name)
         {
             for stmt in stmts {
-                self.populate_statement(stmt, parent_ctx, declarations, ns_scope);
+                self.populate_statement(stmt, parent_ctx, declarations, block);
             }
             return;
         }
         if let Some(specifier) = self.registry.assigned_namespaces.get(&ns_scope) {
             let module_ctx = ir::ModuleContext::Module(specifier.as_str().into());
             for stmt in stmts {
-                self.populate_statement(stmt, &module_ctx, declarations, ns_scope);
+                self.populate_statement(stmt, &module_ctx, declarations, block);
             }
             return;
         }
@@ -889,7 +894,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         // `module = "…"` as well as the namespace path.
         let mut ns_decls = Vec::new();
         for stmt in stmts {
-            self.populate_statement(stmt, parent_ctx, &mut ns_decls, ns_scope);
+            self.populate_statement(stmt, parent_ctx, &mut ns_decls, block);
         }
         self.namespace_members
             .entry(ns_scope)

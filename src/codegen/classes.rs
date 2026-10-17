@@ -307,7 +307,7 @@ impl<'a> ClassConfig<'a> {
         // scope to thread through name resolution everywhere inside
         // its extern block.
         let scope = decl.body_scope;
-        let extends = extends_list(decl.extends.as_slice(), cgctx, scope, ctx);
+        let extends = extends_list(decl.extends.as_slice(), cgctx, ctx);
         let module = match ctx {
             ModuleContext::Module(m) => Some(m.clone()),
             ModuleContext::Global => None,
@@ -339,7 +339,7 @@ impl<'a> ClassConfig<'a> {
         dictionary: bool,
     ) -> Self {
         let scope = decl.body_scope;
-        let extends = extends_list(&decl.extends, cgctx, scope, ctx);
+        let extends = extends_list(&decl.extends, cgctx, ctx);
         let module = match ctx {
             ModuleContext::Module(m) => Some(m.clone()),
             ModuleContext::Global => None,
@@ -748,7 +748,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         let setter_overloads = [Overload {
             params: &[setter_param],
             return_type: &void,
-            body_scope: config.scope,
+            body_scope: g.scope,
             throws: &crate::ir::Throws::None,
             doc: &None,
         }];
@@ -790,6 +790,8 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         Value {
             field_doc: Option<String>,
             param: ConcreteParam,
+            /// The scope the field's type resolves in.
+            scope: ScopeId,
             setter_ident: syn::Ident,
         },
     }
@@ -799,8 +801,8 @@ pub(crate) fn generate_dictionary_factory_with_passes(
 
     // Decompose a getter's `type_ref` into union members + ABI
     // fan-out flavors.
-    let split_union = |ty: &crate::ir::TypeRef| -> Vec<crate::ir::TypeRef> {
-        crate::codegen::signatures::flatten_dictionary_field(ty, config.cgctx, config.scope)
+    let split_union = |ty: &crate::ir::TypeRef, scope: ScopeId| -> Vec<crate::ir::TypeRef> {
+        crate::codegen::signatures::flatten_dictionary_field(ty, config.cgctx, scope)
     };
 
     // Helper that turns one required-getter list into a list of
@@ -824,7 +826,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             // pick up their matching setter (`set_from_with_js_string`)
             // via the same `pick_setter` lookup.
             let mut options: Vec<FieldOption> = Vec::new();
-            let members = split_union(&g.type_ref);
+            let members = split_union(&g.type_ref, g.scope);
             let setter_enum = config.setter_enum(&g.js_name, &assigned_type(g));
             let any_literal = members.iter().any(|m| {
                 matches!(
@@ -861,7 +863,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                     super::signatures::render_param_type(
                         param,
                         config.cgctx,
-                        config.scope,
+                        g.scope,
                         &crate::ir::ModuleContext::Global,
                     )
                     .to_string()
@@ -970,6 +972,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 options.push(FieldOption::Value {
                     field_doc: g.doc.clone(),
                     param,
+                    scope: g.scope,
                     setter_ident,
                 });
             }
@@ -989,6 +992,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
     struct ComboPlan {
         literal_suffix: String,
         value_params: Vec<ConcreteParam>,
+        value_scopes: Vec<ScopeId>,
         init_calls: Vec<TokenStream>,
         arg_idents: Vec<syn::Ident>,
         /// Lines like `` `disposition: "inline"`: <getter doc> `` that
@@ -1080,6 +1084,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         for combo in &combos {
             let mut literal_suffix = String::new();
             let mut value_params: Vec<ConcreteParam> = Vec::new();
+            let mut value_scopes: Vec<ScopeId> = Vec::new();
             let mut init_calls: Vec<TokenStream> = Vec::new();
             let mut arg_idents: Vec<syn::Ident> = Vec::new();
             let mut literal_doc_bullets: Vec<String> = Vec::new();
@@ -1105,6 +1110,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                     FieldOption::Value {
                         field_doc,
                         param,
+                        scope,
                         setter_ident,
                     } => {
                         let arg_ident =
@@ -1112,6 +1118,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                         arg_idents.push(arg_ident.clone());
                         init_calls.push(quote! { inner.#setter_ident(#arg_ident); });
                         value_params.push(param.clone());
+                        value_scopes.push(*scope);
                         if let Some(doc) = field_doc {
                             let bullet_head = format!("`{}`", param.name);
                             provided_doc_bullets.push(format!("* {bullet_head} - {}", doc.trim()));
@@ -1122,6 +1129,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             plans.push(ComboPlan {
                 literal_suffix,
                 value_params,
+                value_scopes,
                 init_calls,
                 arg_idents,
                 literal_doc_bullets,
@@ -1167,8 +1175,9 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 helper_where_clause,
                 params: params_tokens,
                 ..
-            } = generate_dictionary_params(
+            } = super::signatures::generate_dictionary_params_in(
                 &plan.value_params,
+                &plan.value_scopes,
                 config.cgctx,
                 config.scope,
                 &config.from_module(),
@@ -1320,7 +1329,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             } = generate_dictionary_params(
                 &sig.params,
                 config.cgctx,
-                config.scope,
+                sig.body_scope,
                 &config.from_module(),
             );
             let generics = render_generic_bounds(&abv_bounds);
@@ -1452,14 +1461,14 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                     TypeRef::ident(config.rust_name.clone())
                 };
                 // Constructors don't have their own type parameter scope —
-                // they instantiate the class's. `config.scope` is the class
-                // body.
+                // they instantiate the class's, and resolve in the body of
+                // the declaration each is written in.
                 let overloads: Vec<Overload> = constructor_overloads
                     .iter()
                     .map(|c| Overload {
                         params: &c.params,
                         return_type: &return_type,
-                        body_scope: config.scope,
+                        body_scope: c.scope,
                         throws: &c.throws,
                         doc: &c.doc,
                     })
@@ -1706,6 +1715,7 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
 
     // Constructors always return the constructed type, wrapped in Result
     // when `catch` (which is always-true here per `SignatureKind::Constructor`).
+    // The class is named from its own body, wherever the params resolve.
     let ret = to_return_type(
         &sig.return_type,
         sig.catch,
@@ -1713,7 +1723,7 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
         sig.js_string_return,
         sig.error_type.as_ref(),
         config.cgctx,
-        scope,
+        config.scope,
         &config.from_module(),
         super::typemap::ReturnAnchor {
             base: &sig.rust_name,
@@ -1917,7 +1927,7 @@ fn generate_getter(
     let getter_type = super::typemap::to_getter_return_type(
         &lowered_ty,
         config.cgctx,
-        config.scope,
+        getter.scope,
         &config.from_module(),
         anchor,
     );
@@ -1934,20 +1944,21 @@ fn generate_getter(
     // mention bare type params — fold those in alongside type-level
     // ones via `local_generic_bounds`.
     let mut bounds = config.type_param_bounds();
-    bounds.extend(config.local_generic_bounds(config.scope, &[&getter.type_ref]));
+    bounds.extend(config.local_generic_bounds(getter.scope, &[&getter.type_ref]));
     let fn_generics = render_generic_bounds(&bounds);
     let this_generics = config.type_generics_args();
 
     let source_name = &getter.js_name;
-    let js_string_variant = getter_js_string_variant(config, &lowered_ty, &rust_name, names).map(
-        |(js_ident, js_type)| {
-            quote! {
-                #doc
-                #[wasm_bindgen(method, getter, js_name = #source_name)]
-                pub fn #js_ident #fn_generics (this: &#this_type #this_generics) -> #js_type;
-            }
-        },
-    );
+    let js_string_variant =
+        getter_js_string_variant(config, &lowered_ty, getter.scope, &rust_name, names).map(
+            |(js_ident, js_type)| {
+                quote! {
+                    #doc
+                    #[wasm_bindgen(method, getter, js_name = #source_name)]
+                    pub fn #js_ident #fn_generics (this: &#this_type #this_generics) -> #js_type;
+                }
+            },
+        );
 
     quote! {
         #doc
@@ -1964,16 +1975,16 @@ fn generate_getter(
 fn getter_js_string_variant(
     config: &ClassConfig,
     ty: &TypeRef,
+    scope: ScopeId,
     rust_name: &str,
     names: &mut LocalScope,
 ) -> Option<(syn::Ident, TokenStream)> {
     let ctx = config.cgctx.filter(|ctx| {
-        ctx.experimental_generic_mono
-            && super::typemap::has_mono_js_string_return(ty, ctx, config.scope)
+        ctx.experimental_generic_mono && super::typemap::has_mono_js_string_return(ty, ctx, scope)
     })?;
     let js_name = names.declare(&format!("{rust_name}_js_string"), Suffix::Snake);
     let js_type =
-        super::typemap::to_mono_js_string_return_type(ty, ctx, config.scope, &config.from_module());
+        super::typemap::to_mono_js_string_return_type(ty, ctx, scope, &config.from_module());
     Some((super::typemap::make_ident(&js_name), js_type))
 }
 
@@ -1993,7 +2004,7 @@ fn generate_setter(
     let overloads = [Overload {
         params: &[param],
         return_type: &void,
-        body_scope: config.scope,
+        body_scope: setter.scope,
         throws: &crate::ir::Throws::None,
         doc: &doc,
     }];
@@ -2020,7 +2031,7 @@ fn generate_setter(
             } = generate_dictionary_params(
                 &sig.params,
                 config.cgctx,
-                config.scope,
+                sig.body_scope,
                 &config.from_module(),
             );
 
@@ -2031,7 +2042,7 @@ fn generate_setter(
             // keeps method/getter/setter generics aligned.
             let mut bounds = config.type_param_bounds();
             let sig_tys: Vec<&TypeRef> = sig.params.iter().map(|p| &p.type_ref).collect();
-            bounds.extend(config.local_generic_bounds(config.scope, &sig_tys));
+            bounds.extend(config.local_generic_bounds(sig.body_scope, &sig_tys));
             bounds.extend(abv_bounds);
             let fn_generics = render_generic_bounds(&bounds);
 
@@ -2068,7 +2079,7 @@ fn generate_static_getter(
     let getter_type = super::typemap::to_getter_return_type(
         &getter.type_ref,
         config.cgctx,
-        config.scope,
+        getter.scope,
         &config.from_module(),
         super::typemap::ReturnAnchor {
             base: &getter.js_name,
@@ -2089,13 +2100,13 @@ fn generate_static_getter(
     // need plumbing — but the bounds still need redeclaring on the
     // `fn` for any type params mentioned by the return type.
     let mut bounds = config.type_param_bounds();
-    bounds.extend(config.local_generic_bounds(config.scope, &[&getter.type_ref]));
+    bounds.extend(config.local_generic_bounds(getter.scope, &[&getter.type_ref]));
     let fn_generics = render_generic_bounds(&bounds);
 
     let source_name = &getter.js_name;
     let js_class = config.js_class_parts();
     let js_string_variant =
-        getter_js_string_variant(config, &getter.type_ref, &rust_name, names).map(
+        getter_js_string_variant(config, &getter.type_ref, getter.scope, &rust_name, names).map(
             |(js_ident, js_type)| {
                 quote! {
                     #doc
@@ -2128,7 +2139,7 @@ fn generate_static_setter(
     let overloads = [Overload {
         params: &[param],
         return_type: &void,
-        body_scope: config.scope,
+        body_scope: setter.scope,
         throws: &crate::ir::Throws::None,
         doc: &doc,
     }];
@@ -2154,7 +2165,7 @@ fn generate_static_setter(
             } = generate_dictionary_params(
                 &sig.params,
                 config.cgctx,
-                config.scope,
+                sig.body_scope,
                 &config.from_module(),
             );
 
@@ -2165,7 +2176,7 @@ fn generate_static_setter(
             // last (see [`generate_setter`]).
             let mut bounds = config.type_param_bounds();
             let sig_tys: Vec<&TypeRef> = sig.params.iter().map(|p| &p.type_ref).collect();
-            bounds.extend(config.local_generic_bounds(config.scope, &sig_tys));
+            bounds.extend(config.local_generic_bounds(sig.body_scope, &sig_tys));
             bounds.extend(abv_bounds);
             let fn_generics = render_generic_bounds(&bounds);
 
@@ -2196,13 +2207,16 @@ fn generate_static_setter(
 /// makes the `Deref` target. `Object` closes the list when nothing else
 /// does.
 fn extends_list(
-    parents: &[TypeRef],
+    parents: &[crate::ir::Heritage],
     cgctx: Option<&CodegenContext<'_>>,
-    scope: ScopeId,
     from_module: &ModuleContext,
 ) -> Vec<TokenStream> {
-    let mut out = Vec::new();
-    for parent in parents {
+    let mut out: Vec<TokenStream> = Vec::new();
+    for crate::ir::Heritage {
+        type_ref: parent,
+        scope,
+    } in parents
+    {
         let TypeRef::Reference { segments, .. } = parent else {
             if let Some(ctx) = cgctx {
                 ctx.warn(format!(
@@ -2221,10 +2235,12 @@ fn extends_list(
             },
             TypePosition::ARGUMENT.to_inner(),
             cgctx,
-            scope,
+            *scope,
             from_module,
         );
-        if tokens.to_string() == "JsValue" {
+        // Two declarations' clauses can name one parent.
+        let rendered = tokens.to_string();
+        if rendered == "JsValue" || out.iter().any(|t| t.to_string() == rendered) {
             continue;
         }
         out.push(tokens);

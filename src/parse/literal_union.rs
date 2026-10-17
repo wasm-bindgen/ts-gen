@@ -172,6 +172,7 @@ pub(crate) fn merge_member_branches(branches: &[Vec<Member>], mode: MergeMode) -
         let doc = present.iter().find_map(|g| g.doc.clone());
 
         Some(Member::Getter(GetterMember {
+            scope: present[0].scope,
             js_name: name.to_string(),
             type_ref,
             optional,
@@ -201,6 +202,7 @@ pub(crate) fn merge_member_branches(branches: &[Vec<Member>], mode: MergeMode) -
         let type_ref = merge_member_types(present.iter().map(|s| s.type_ref.clone()), mode);
         let doc = present.iter().find_map(|s| s.doc.clone());
         Some(Member::Setter(SetterMember {
+            scope: present[0].scope,
             js_name: name.to_string(),
             type_ref,
             doc,
@@ -350,6 +352,7 @@ mod tests {
 
     fn prop(name: &str, ty: TypeRef, optional: bool, readonly: bool) -> Vec<Member> {
         let mut out = vec![Member::Getter(GetterMember {
+            scope: crate::parse::scope::ScopeId::DUMMY,
             js_name: name.to_string(),
             type_ref: ty.clone(),
             optional,
@@ -357,6 +360,7 @@ mod tests {
         })];
         if !readonly {
             out.push(Member::Setter(SetterMember {
+                scope: crate::parse::scope::ScopeId::DUMMY,
                 js_name: name.to_string(),
                 type_ref: ty,
                 doc: None,

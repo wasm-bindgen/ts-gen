@@ -463,7 +463,13 @@ pub(crate) fn synthesize_inline(
             name: name.clone(),
             js_name: name,
             type_params,
-            extends,
+            extends: extends
+                .into_iter()
+                .map(|type_ref| crate::ir::Heritage {
+                    type_ref,
+                    scope: body_scope,
+                })
+                .collect(),
             members,
             classification,
             body_scope,
@@ -511,7 +517,10 @@ fn is_extendable_in(
     };
     let extendable = match &decl.kind {
         TypeKind::Class(_) => true,
-        TypeKind::Interface(i) => i.extends.iter().all(|parent| follows(parent, visited)),
+        TypeKind::Interface(i) => i
+            .extends
+            .iter()
+            .all(|parent| follows(&parent.type_ref, visited)),
         // Lowering the target doesn't substitute the alias's arguments, so
         // `Id<Local>` for `type Id<T> = T` would lower to a bare `T`.
         TypeKind::TypeAlias(a) if mentions_param(&a.target, &a.type_params) => false,
@@ -660,6 +669,7 @@ fn convert_property_signature(
         .unwrap_or(TypeRef::Any);
 
     let mut members = vec![Member::Getter(GetterMember {
+        scope: parent_scope,
         js_name: js_name.clone(),
         type_ref: type_ref.clone(),
         optional: prop.optional,
@@ -668,6 +678,7 @@ fn convert_property_signature(
 
     if !prop.readonly {
         members.push(Member::Setter(SetterMember {
+            scope: parent_scope,
             js_name,
             type_ref,
             doc: None,
@@ -729,6 +740,7 @@ fn convert_method_signature(
 
     match method.kind {
         TSMethodSignatureKind::Get => vec![Member::Getter(GetterMember {
+            scope: parent_scope,
             js_name,
             type_ref: return_type,
             optional: method.optional,
@@ -741,6 +753,7 @@ fn convert_method_signature(
                 .map(|p| p.type_ref)
                 .unwrap_or(TypeRef::Any);
             vec![Member::Setter(SetterMember {
+                scope: parent_scope,
                 js_name,
                 type_ref,
                 doc,
@@ -776,6 +789,7 @@ fn convert_index_signature(
         convert_ts_type_scoped(&idx.type_annotation.type_annotation, parent_scope, ctx);
 
     Some(Member::IndexSignature(IndexSigMember {
+        scope: parent_scope,
         key_type,
         value_type,
         readonly: idx.readonly,
@@ -847,6 +861,7 @@ fn convert_class_method(
     match method.kind {
         MethodDefinitionKind::Constructor => {
             vec![Member::Constructor(ConstructorMember {
+                scope: parent_scope,
                 params,
                 doc,
                 throws: info.throws(),
@@ -855,12 +870,14 @@ fn convert_class_method(
         MethodDefinitionKind::Get => {
             if is_static {
                 vec![Member::StaticGetter(StaticGetterMember {
+                    scope: parent_scope,
                     js_name,
                     type_ref: return_type,
                     doc,
                 })]
             } else {
                 vec![Member::Getter(GetterMember {
+                    scope: parent_scope,
                     js_name,
                     type_ref: return_type,
                     optional: method.optional,
@@ -876,12 +893,14 @@ fn convert_class_method(
                 .unwrap_or(TypeRef::Any);
             if is_static {
                 vec![Member::StaticSetter(StaticSetterMember {
+                    scope: parent_scope,
                     js_name,
                     type_ref,
                     doc,
                 })]
             } else {
                 vec![Member::Setter(SetterMember {
+                    scope: parent_scope,
                     js_name,
                     type_ref,
                     doc,
@@ -938,12 +957,14 @@ fn convert_class_property(
 
     if prop.r#static {
         let mut members = vec![Member::StaticGetter(StaticGetterMember {
+            scope: parent_scope,
             js_name: js_name.clone(),
             type_ref: type_ref.clone(),
             doc,
         })];
         if !prop.readonly {
             members.push(Member::StaticSetter(StaticSetterMember {
+                scope: parent_scope,
                 js_name,
                 type_ref,
                 doc: None,
@@ -952,6 +973,7 @@ fn convert_class_property(
         members
     } else {
         let mut members = vec![Member::Getter(GetterMember {
+            scope: parent_scope,
             js_name: js_name.clone(),
             type_ref: type_ref.clone(),
             optional: prop.optional,
@@ -959,6 +981,7 @@ fn convert_class_property(
         })];
         if !prop.readonly {
             members.push(Member::Setter(SetterMember {
+                scope: parent_scope,
                 js_name,
                 type_ref,
                 doc: None,
@@ -989,11 +1012,13 @@ fn convert_accessor_property(
     if acc.r#static {
         vec![
             Member::StaticGetter(StaticGetterMember {
+                scope: parent_scope,
                 js_name: js_name.clone(),
                 type_ref: type_ref.clone(),
                 doc,
             }),
             Member::StaticSetter(StaticSetterMember {
+                scope: parent_scope,
                 js_name,
                 type_ref,
                 doc: None,
@@ -1002,12 +1027,14 @@ fn convert_accessor_property(
     } else {
         vec![
             Member::Getter(GetterMember {
+                scope: parent_scope,
                 js_name: js_name.clone(),
                 type_ref: type_ref.clone(),
                 optional: false,
                 doc,
             }),
             Member::Setter(SetterMember {
+                scope: parent_scope,
                 js_name,
                 type_ref,
                 doc: None,

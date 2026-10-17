@@ -76,6 +76,7 @@ pub fn convert_construct_signature(
         None => (None, crate::parse::docs::JsDocInfo::default()),
     };
     ConstructorMember {
+        scope: parent_scope,
         params,
         doc,
         throws: info.throws(),
@@ -110,12 +111,14 @@ pub fn extract_var_members(
                     .map(|ann| convert_ts_type_scoped(&ann.type_annotation, parent_scope, ctx))
                     .unwrap_or(TypeRef::Any);
                 static_members.push(Member::StaticGetter(StaticGetterMember {
+                    scope: parent_scope,
                     js_name: js_name.clone(),
                     type_ref: type_ref.clone(),
                     doc,
                 }));
                 if !prop.readonly {
                     static_members.push(Member::StaticSetter(StaticSetterMember {
+                        scope: parent_scope,
                         js_name,
                         type_ref,
                         doc: None,

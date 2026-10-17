@@ -487,23 +487,26 @@ fn declaration_refs(decl: &TypeDeclaration, out: &mut Vec<(String, ScopeId)>) {
     match &decl.kind {
         TypeKind::Class(c) => {
             type_params(&c.type_params, c.body_scope, &mut walk);
-            for ty in c.extends.iter().chain(&c.implements) {
+            if let Some(parent) = &c.extends {
+                walk(&parent.type_ref, parent.scope);
+            }
+            for ty in &c.implements {
                 walk(ty, c.body_scope);
             }
-            members(&c.members, c.body_scope, &mut walk);
+            members(&c.members, &mut walk);
         }
         TypeKind::Interface(i) => {
             type_params(&i.type_params, i.body_scope, &mut walk);
-            for ty in &i.extends {
-                walk(ty, i.body_scope);
+            for parent in &i.extends {
+                walk(&parent.type_ref, parent.scope);
             }
-            members(&i.members, i.body_scope, &mut walk);
+            members(&i.members, &mut walk);
         }
         TypeKind::DiscriminatedUnion(d) => {
             type_params(&d.type_params, d.body_scope, &mut walk);
-            members(&d.members, d.body_scope, &mut walk);
+            members(&d.members, &mut walk);
             for branch in &d.branches {
-                members(branch, d.body_scope, &mut walk);
+                members(branch, &mut walk);
             }
         }
         TypeKind::TypeAlias(a) => {
@@ -553,23 +556,23 @@ fn type_params(
     }
 }
 
-fn members(members: &[Member], scope: ScopeId, walk: &mut impl FnMut(&TypeRef, ScopeId)) {
+fn members(members: &[Member], walk: &mut impl FnMut(&TypeRef, ScopeId)) {
     for m in members {
         match m {
-            Member::Getter(g) => walk(&g.type_ref, scope),
-            Member::Setter(s) => walk(&s.type_ref, scope),
-            Member::StaticGetter(g) => walk(&g.type_ref, scope),
-            Member::StaticSetter(s) => walk(&s.type_ref, scope),
+            Member::Getter(g) => walk(&g.type_ref, g.scope),
+            Member::Setter(s) => walk(&s.type_ref, s.scope),
+            Member::StaticGetter(g) => walk(&g.type_ref, g.scope),
+            Member::StaticSetter(s) => walk(&s.type_ref, s.scope),
             Member::IndexSignature(i) => {
-                walk(&i.key_type, scope);
-                walk(&i.value_type, scope);
+                walk(&i.key_type, i.scope);
+                walk(&i.value_type, i.scope);
             }
             Member::Constructor(c) => {
                 for p in &c.params {
-                    walk(&p.type_ref, scope);
+                    walk(&p.type_ref, c.scope);
                 }
                 if let Some(ty) = c.throws.as_type() {
-                    walk(ty, scope);
+                    walk(ty, c.scope);
                 }
             }
             Member::Method(m) => {

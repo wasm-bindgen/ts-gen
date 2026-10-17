@@ -57,6 +57,10 @@ pub fn convert_class_decl(
         .iter()
         .flat_map(|elem| convert_class_element(elem, Some(&name), body_scope, ctx))
         .collect();
+    let extends = extends.map(|type_ref| ir::Heritage {
+        type_ref,
+        scope: body_scope,
+    });
 
     Some(ir::ClassDecl {
         name,
@@ -127,6 +131,13 @@ pub fn interface_from_signatures(
         }
     }
     let classification = classify_interface(&members);
+    let extends = extends
+        .into_iter()
+        .map(|type_ref| ir::Heritage {
+            type_ref,
+            scope: body_scope,
+        })
+        .collect();
     ir::InterfaceDecl {
         name,
         js_name,

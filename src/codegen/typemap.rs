@@ -1067,14 +1067,12 @@ impl<'a> CodegenContext<'a> {
     /// The `pub mod` path of the innermost emitted namespace enclosing
     /// `scope`.
     fn namespace_path(&self, scope: ScopeId) -> &[String] {
-        let mut scope = Some(scope);
-        while let Some(id) = scope {
-            if let Some(path) = self.namespace_paths.get(&id) {
-                return path;
-            }
-            scope = self.gctx.scopes.get(id).parent;
-        }
-        &[]
+        self.gctx
+            .scopes
+            .chain(scope)
+            .into_iter()
+            .find_map(|id| self.namespace_paths.get(&id))
+            .map_or(&[], Vec::as_slice)
     }
 
     /// Returns the names of types in `type_ids` whose

@@ -113,16 +113,7 @@ pub fn collect_type_names(
     // merged with every block's, and an export specifier in its block.
     let blocks: Vec<ScopeId> = ccx.registry.module_blocks.values().map(|b| b.1).collect();
     for block_scope in blocks {
-        let Some(exports) = ccx.gctx.scopes.get(block_scope).exports else {
-            continue;
-        };
-        ccx.gctx.exports.move_into(block_scope, exports);
-        let declared = ccx.gctx.block_exports.get(&block_scope).cloned();
-        for name in declared.into_iter().flatten() {
-            if ccx.gctx.exports.binding(exports, &name) == Some((name.as_str(), block_scope)) {
-                ccx.gctx.exports.insert(exports, &name, &name);
-            }
-        }
+        ccx.move_block_exports(block_scope);
     }
     registry.globals = ccx.globals;
     registry
@@ -477,7 +468,13 @@ impl<'a> CollectCtx<'a> {
                     .collect();
             }
             ir::TypeKind::Interface(i) => {
-                i.extends = parents.into_iter().map(ir::TypeRef::ident).collect();
+                i.extends = parents
+                    .into_iter()
+                    .map(|parent| ir::Heritage {
+                        type_ref: ir::TypeRef::ident(parent),
+                        scope,
+                    })
+                    .collect();
             }
             _ => {}
         }
@@ -637,14 +634,23 @@ impl<'a> CollectCtx<'a> {
         }
     }
 
-    /// Make the namespace `name` resolves to from the module scope `scope`
-    /// the module `specifier`, when it is the name's only runtime binding.
-    /// A merged class, function or variable carries the value and stays
-    /// where it is declared, so its namespace does too.
-    ///
-    /// Phase 2 populates one file at a time, so only a namespace this file
-    /// declares first can be: an earlier file's is already populated as a
-    /// global.
+    /// Make the export map of a block whose exports are shared, a
+    /// `declare module` or namespace block, part of the shared one. A
+    /// declaration the block exports resolves in the shared exports, merged
+    /// with every block's, and an export specifier in its block.
+    fn move_block_exports(&mut self, block_scope: ScopeId) {
+        let Some(exports) = self.gctx.scopes.get(block_scope).exports else {
+            return;
+        };
+        self.gctx.exports.move_into(block_scope, exports);
+        let declared = self.gctx.block_exports.get(&block_scope).cloned();
+        for name in declared.into_iter().flatten() {
+            if self.gctx.exports.binding(exports, &name) == Some((name.as_str(), block_scope)) {
+                self.gctx.exports.insert(exports, &name, &name);
+            }
+        }
+    }
+
     /// The scope `name` is declared in, seen from `scope`.
     fn declaring_scope(&self, scope: ScopeId, name: &str) -> Option<ScopeId> {
         self.gctx
@@ -654,6 +660,14 @@ impl<'a> CollectCtx<'a> {
             .find(|&id| self.gctx.scopes.get(id).get(name).is_some())
     }
 
+    /// Make the namespace `name` resolves to from the module scope `scope`
+    /// the module `specifier`, when it is the name's only runtime binding.
+    /// A merged class, function or variable carries the value and stays
+    /// where it is declared, so its namespace does too.
+    ///
+    /// Phase 2 populates one file at a time, so only a namespace this file
+    /// declares first can be: an earlier file's is already populated as a
+    /// global.
     fn assign_namespace(&mut self, scope: ScopeId, specifier: &str, name: &str) {
         let mut chain = self.gctx.scopes.chain(scope).into_iter();
         let (found_in, ns_scope) = loop {
@@ -777,7 +791,19 @@ impl<'a> CollectCtx<'a> {
                 ns_scope
             }
         };
-        self.collect_block(namespace_block_statements(ns), parent_ctx, ns_scope, false);
+        // As in TypeScript's binder, and as a `declare module` block, each
+        // declaration of the namespace has its own scope for what it
+        // doesn't export, which sees the members every declaration shares.
+        let block_scope = self.gctx.scopes.create_child(scope);
+        self.gctx.scopes.get_mut(block_scope).exports = Some(ns_scope);
+        self.registry
+            .namespace_blocks
+            .insert(ns.span.start, block_scope);
+        let stmts = namespace_block_statements(ns);
+        let exported = super::block_module_exports(stmts).into_iter().collect();
+        self.gctx.block_exports.insert(block_scope, exported);
+        self.collect_block(stmts, parent_ctx, block_scope, false);
+        self.move_block_exports(block_scope);
     }
 
     // ─── Registration helpers ────────────────────────────────────────
@@ -792,10 +818,11 @@ impl<'a> CollectCtx<'a> {
     ) {
         // An earlier file's declaration in a shared namespace scope stays
         // bound, so this file's declaration of the name merges into it.
+        let binds = self.gctx.binding_scope(scope, name);
         let earlier = self
             .gctx
             .scopes
-            .get(scope)
+            .get(binds)
             .get(name)
             .is_some_and(|id| id.index() < self.file_start);
         super::register_type(
@@ -806,7 +833,7 @@ impl<'a> CollectCtx<'a> {
             self.gctx,
             scope,
             exported,
-            !earlier,
+            (!earlier).then_some(binds),
         );
     }
 
@@ -838,7 +865,8 @@ impl<'a> CollectCtx<'a> {
             self.gctx.exports.insert(scope, name, name);
         }
         // A same-named class, function or interface stays the name's type.
-        if self.gctx.scopes.get(scope).get(name).is_some() {
+        let binds = self.gctx.binding_scope(scope, name);
+        if self.gctx.scopes.get(binds).get(name).is_some() {
             return ns_scope;
         }
         let ns_type_id = self.gctx.insert_type(ir::TypeDeclaration {
@@ -851,7 +879,7 @@ impl<'a> CollectCtx<'a> {
             doc: None,
             scope_id: scope,
         });
-        self.gctx.scopes.insert(scope, name.to_string(), ns_type_id);
+        self.gctx.scopes.insert(binds, name.to_string(), ns_type_id);
         self.registry.types.insert(
             (scope, name.to_string()),
             ir::TypeInfo {
