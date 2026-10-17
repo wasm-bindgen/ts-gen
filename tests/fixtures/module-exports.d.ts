@@ -1,25 +1,26 @@
 //! @ts-gen --export dep --export main
 
 // A module's export map is built up front, so an import names an export
-// rather than a local: `import { Foo }` and `D.Foo` both reach the class
-// `_Foo` that `dep` exports as `Foo`, through every indirection, and the
-// Rust reference is the declaration's own name.
+// rather than a local: `import { Foo }`, `D.Foo`, `Foo.Mode` and `extends Foo`
+// all reach the class `_Foo`, and the namespace merged with it, that `dep`
+// exports as `Foo`. The Rust reference is the declaration's own name, and the
+// namespace binds by `Foo` in JS.
 
 declare module "dep" {
-  interface _Foo {
+  class _Foo {
+    constructor();
     bar(): void;
   }
-  var _Foo: { new (): _Foo };
-  export { _Foo as Foo };
-  export type Alias = Foo;
-  export function makeFoo(): Foo;
-  export interface Holder {
-    foo: Foo;
-    alias: Alias;
-  }
-  export namespace Foo {
+  namespace _Foo {
     type Mode = "a" | "b";
     function helper(): void;
+  }
+  export { _Foo as Foo };
+  export type Alias = _Foo;
+  export function makeFoo(): _Foo;
+  export interface Holder {
+    foo: _Foo;
+    alias: Alias;
   }
   function hidden(): void;
 }

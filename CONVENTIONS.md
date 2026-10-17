@@ -40,6 +40,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [Multiple-context name resolution](#multiple-context-name-resolution)
 * [External type mapping and web platform defaults](#external-type-mapping-and-web-platform-defaults)
 * [Provided functions (`--provides`)](#provided-functions---provides)
+* [Wasm ABI (`--target wat`)](#wasm-abi---target-wat)
 
 ---
 
@@ -2149,9 +2150,11 @@ A module-context declaration has exactly three possible states:
    plus a bare-ident use site).
 
 3. **Resolution-only** — `<spec>` is in the type universe but listed
-   in neither `--export` nor `--external`. The declaration is not
-   emitted. Any cross-reference from an emitted decl produces a
-   codegen **error**:
+   in neither `--export` nor `--external`. Its exports are not emitted,
+   but a type an emitted signature reaches through an import is, as a
+   type only (see [Global scope](#global-scope)). A reference to a
+   module's declaration that is not in scope at the use site, which
+   codegen finds by name, produces a codegen **error**:
 
    ```text
    error: type `Bar` from module "x:foo" is referenced by exported
@@ -2169,7 +2172,7 @@ externalised, not emitted.
 
 For `Global` declarations (top-level `declare class`, `declare
 function`, `declare const`, etc. in a script file) the rule is simpler:
-emit when the decl's source file is in `--export`, otherwise skip.
+a file's globals are emitted when the file is in `--export`.
 
 A file with any top-level `import` or `export` is a module, and with
 `--lib-name` every top-level declaration in it is `Module("<lib>")`,
@@ -2197,8 +2200,15 @@ Imports look up public names and bind the local: `export { _Foo as
 Foo }` makes `import { Foo }`, `D.Foo` and `extends Foo` all reach
 `_Foo`, and the Rust reference is `_Foo`.
 
-Unexported functions, variables and namespaces are not emitted; an
-unexported class keeps only its instance members. Types are unaffected.
+The output is built from export maps: each export of a selected file or
+module is emitted under its public name, a function or variable once
+per name and a type under its local name with an alias per public name
+(see [Type aliases and `export { X as Y }`](#type-aliases-and-export--x-as-y-)).
+A default export takes its local's Rust name, or `default` when a named
+export of the same declaration has it: `export { f, f as default }`
+binds `f()` and `default()`. An `export default` declaration's local
+name is not exported, also in a block without `export { … }`, so
+`export default function f()` binds only `default`, as `f()`.
 
 Qualification keys off the *resolved* declaration's `module_context`,
 not the textual name, so a global `interface Foo` and a module-scoped
@@ -2210,14 +2220,59 @@ are not visible to the file or to other modules, and repeated
 file or module reaches them with `import { Foo } from "<spec>"`, which
 resolves against the module's scopes before looking for a file.
 
+### Global scope
+
+As in TypeScript, there is one global scope. A script file's top-level
+declarations and every `declare global` block declare into it, after the
+built-in types, so declarations of a name in different files merge into
+one, as they do within a file:
+
+```ts
+// a.d.ts
+interface Win { a(): void; }
+// b.d.ts
+interface Win { b(): void; }
+```
+
+```rust
+pub type Win;
+pub fn a(this: &Win);
+pub fn b(this: &Win);
+```
+
+That includes the split TypeScript's own libs use, an interface in one
+file and its constructor `var` in another (`declare var X: { new(): X;
+… }` or `declare var X: XConstructor`): in either order they are one
+class, as within a file. Every file's `interface XConstructor` blocks
+are the static side of that class and are not emitted as a type, so
+`from` and `of`, which lib.es2015.core adds to `ArrayConstructor`, are
+statics of `Array`. Of the construct signatures, the last file's wins,
+as a later block's does within a file. A value never takes a type's
+name, so `interface F` and `declare function F(): F` in different files
+keep `F` the interface.
+
+A file without `--lib-name` is read as a script, its globals are its
+exports, and selecting it emits each of them whole, members from other
+files included. Without `--export`, every input file is selected.
+
+What a selected export's signatures reach and no selected export
+provides is emitted as a type only: an interface, alias or enum as is,
+a class without its constructor and statics, and a namespace only as
+the `pub mod` path to what is emitted. A function or variable is
+emitted only as an export. With `--export b.d.ts`, a function in
+`b.d.ts` taking `OnlyA` from `a.d.ts` emits `OnlyA` but not `a.d.ts`'s
+functions. A type that no selected export provides and no emitted
+signature reaches is not emitted, so an interface a module with `export
+{ … }` doesn't export and none of its exports use is left out.
+
 ### Output surface: `--export` and `--input`
 
 `--input` defines the *type universe* — every file gets parsed so
 resolution sees the full set. `--export` defines the *output surface* —
 what actually gets emitted as public Rust code. Two forms:
 
-* **File path** (e.g. `--export types/email.d.ts`) — emit that file's
-  **global-scope** declarations.
+* **File path** (e.g. `--export types/email.d.ts`) — emit the globals
+  that file declares.
 * **Module specifier** (e.g. `--export cloudflare:email`) — emit that
   module's declarations in its `pub mod`, attribute-attached.
 
@@ -2531,32 +2586,37 @@ A namespace exported under its own name as well keeps it.
   pub type Fetcher<T = Undefined> = Pair<T, T>;
   pub fn defaults(a: &WithDefault<Number>, b: &Chained<Number>, c: &Pair<Undefined, Undefined>);
   ```
-* `export { Local as Public };` (sourceless) → names the binding `Local`
-  declares in the exporting scope, recorded against its `TypeId` in
-  `TypeRegistry::export_names`. Each `declare module "x"` body is its own
-  scope, so the same local name in another module or at global scope is a
-  different binding and keeps its own name. The public names are what the
-  module exports, so value bindings import by them:
+* `export { Local as Public };` (sourceless) → exports what the binding
+  `Local` declares in the exporting block under the public name, as an
+  entry in its [export map](#the-export-map). A declaration of the block
+  named `Public` is a different binding and is not that export. The
+  public names are what the module exports, so value bindings import by
+  them. The first public name is the declaration's JS name, unless it is
+  also exported under its own name; `default` comes last:
   * Functions and variables are emitted once per public name, with no
-    alias stub: `function _connect(...); export { _connect as connect };`
+    alias: `function _connect(...); export { _connect as connect };`
     emits `pub fn connect(...)` bound to the JS export `connect`.
   * A constructor variable on its own is a value nothing refers to by its
-    local name, so its class takes the first public name; any further
-    names alias it.
+    local name, so its class takes the JS name as its Rust name; any
+    further names alias it.
   * A class keeps its local name as the Rust type, since the module refers
-    to it by that name, but binds `js_name` to the first public name, and
-    its constructors and static members carry `js_class` with the same
-    name. Each public name gets an alias stub (`pub type Server = _Server;`).
+    to it by that name, but binds `js_name` to the JS name, and its
+    constructors and static members carry `js_class` with the same name.
+    Each other public name gets an alias (`pub type Server = _Server;`).
     A constructor variable with an instance interface of the same name
     (`interface _Foo {…}; var _Foo: { new(): _Foo }`, or `var _Foo:
     _FooConstructor`) is a class in this sense: the interface's members
     refer to `_Foo`, so the merged class is `_Foo` with `js_name = "Foo"`
     and `pub type Foo = _Foo;`.
   * Types without a runtime binding (interfaces, type aliases, enums) get
-    an alias stub only.
+    an alias only.
+  * A namespace keeps its local name as the Rust module and binds its
+    members with `js_namespace` set to the JS name. Each other public name
+    is a module re-exporting it (`pub mod n2 { pub use super::n::*; }`),
+    since `pub use n as n2;` would also import a function `n` as `n2`.
 
-  A `Local` declared outside the exporting scope is left alone and only
-  aliased.
+  A `Local` declared outside the exporting block (an import) is left alone
+  and only aliased.
 * `export { X as Y } from "...";` (with source) → registered as an import
   from the named module.
 * `export default class C`, `export default function f` and `export
@@ -2855,3 +2915,222 @@ Two files are written next to the output:
 * the app scaffold, named after the last segment of `--provides-app`
   (`app.rs`), only if absent: the same signatures with the TS JSDoc as
   doc comments and placeholder bodies, for the author to fill in.
+
+## Wasm ABI (`--target wat`)
+
+Besides the default `--target rust` output (wasm-bindgen extern
+blocks), ts-gen can emit a lower-level **Wasm ABI** suitable for
+languages that compile directly to WebAssembly without wasm-bindgen.
+`--target wat` prints it as an import template: every ABI function as
+an import from `./bindings.wasm`, with its TS declaration alongside,
+and a stub export per provided function.
+
+The ABI covers what the Rust bindings emit: each
+[export](#the-export-map) of the files and modules `--export` selects,
+less externalised modules, and the types their signatures reach, a
+class reached that way with only its instance members (see
+[Global scope](#global-scope)).
+
+### Scalar mapping
+
+| TypeScript         | Wasm type    | Notes                                |
+| ------------------ | ------------ | ------------------------------------ |
+| `number`           | `f64`        |                                      |
+| `boolean`          | `i32`        | `0` = false, non-zero = true         |
+| `bigint`           | `i64`        |                                      |
+| everything else    | `externref`  | strings, objects, null, undefined, numeric enums, `never` |
+
+Nullable scalars (`number | null`) cross as a nullable reference;
+there is no sentinel for "null" in `i32`/`f64`/`i64`. `Number.value`
+unboxes one that is present, and reads a numeric enum member. A
+`void`/`undefined` return has no result slot, while `null` and `never`
+returns are `(result externref)`.
+
+### Nullability and the sys surface
+
+The wire type is `externref` = wasm-bindgen's `JsValue`: values cross
+exactly as JS produced them, with no `?? null` normalisation, and
+every consumer reproduces wasm-bindgen's `sys` surface over it
+(`JsValue`, `JsNullable<T>` = `T | null | undefined`, `JsOption<T>` =
+`T | undefined`, `Null`, `Undefined`). The ABI records for each
+reference position whether its TS type admits `null` and whether it
+admits `undefined`; the template spells both `externref`. Only `null`
+is a wasm null, so a consumer may take a position that does not admit
+`null` as `(ref extern)`. The bits are computed through type aliases
+(including generic instantiations, with the arguments substituted),
+qualified paths (`NS.Inner`) and union arms; a type parameter may be
+instantiated with anything and so admits both, as does a name that
+does not resolve. Discriminants are read from the value, never
+encoded in the signature, and errors cross as `externref`, one type.
+
+Two ABI functions and one global exist for every `.d.ts`:
+
+| Import                                    | Meaning                          |
+| ----------------------------------------- | -------------------------------- |
+| `"./bindings.wasm" "JsValue.is_undefined"`| `x === undefined` → `i32`        |
+| `"./bindings.wasm" "Number.value"`        | `Number(x)` → `f64`              |
+| `"./builtins.js" "undefined"`             | immutable `externref` global     |
+
+`is_null` needs nothing: `ref.is_null` in the language. `Number.value`
+is JS coercion, not a type test: `Number(null)` is `0`,
+`Number(undefined)`, non-numeric strings and plain objects are `NaN`,
+`Number("5")` is `5`, and `Number(Symbol())` throws; test
+`ref.is_null` / `is_undefined` first when the distinction matters.
+
+### Export naming
+
+Each callable gets an import name of the form `Type.member`, where
+`Type` is the owner's dotted JS path (`WebAssembly.Module.exports`
+for a class inside a namespace):
+
+```wat
+(import "./bindings.wasm" "Response.status" (func ...))
+(import "./bindings.wasm" "Response.clone" (func ...))
+```
+
+Overloads of one member expand together, so variant suffixes are the
+Rust bindings' `_with_<x>` names:
+
+```wat
+(import "./bindings.wasm" "Response.new" (func ...))
+(import "./bindings.wasm" "Response.new_with_body" (func ...))
+(import "./bindings.wasm" "Response.new_with_body_and_init" (func ...))
+```
+
+A type or namespace exported under several names has each member under
+each name, as one function `bindings.wasm` exports under all of them.
+`Type` is first the name it binds by, the class's `js_name`, the
+interface's local name or the namespace's `js_namespace`, then each
+other public name (`export { _N as N1, _N as N2 }` gives `N1.f` and
+`N2.f`):
+
+```ts
+declare module "db" {
+  class _Conn { constructor(); get(): string; }
+  export { _Conn as Conn, _Conn as Connection };
+}
+```
+
+```wat
+(import "db" "Conn.new" (func $db:Conn.new (result externref)))
+(import "db" "Connection.new" (func $db:Connection.new (result externref)))
+(import "db" "Conn.get" (func $db:Conn.get (param $this externref) (result externref)))
+(import "db" "Connection.get" (func $db:Connection.get (param $this externref) (result externref)))
+```
+
+### Member types
+
+| TypeScript member        | ABI function shape                           |
+| ------------------------ | -------------------------------------------- |
+| Instance method `m()`    | `(param $this externref) ...args...`         |
+| Instance getter `x`      | `(param $this externref) (result T)`         |
+| Instance setter `x=`     | `(param $this externref) (param $value T)`   |
+| Static method `M.m()`    | `...args...`                                 |
+| Static getter `M.x`      | `(result T)`                                 |
+| Static setter `M.x=`     | `(param $value T)`                           |
+| Constructor              | `...args... (result externref)`              |
+| Dictionary `new`         | `(result externref)` — creates `{}`          |
+| `declare var x: T`       | `(result T)` — reads `globalThis.x`          |
+| `declare const x: T`     | `(result T)` — reads `globalThis.x`          |
+
+`T` is the wire type of the TS type: `declare let n: number` is
+`(result f64)`.
+
+### Dictionaries
+
+Dictionaries (property-only interfaces) get a `Type.new` function
+that returns an empty JS object (`{}`). Callers then use the
+generated setters to populate fields:
+
+```wat
+(call $ResponseInit.new)
+(local.set $init)
+(call $ResponseInit.set_status (local.get $init) (f64.const 200))
+```
+
+### Global variables
+
+`declare var x: T` and `declare const x: T` generate a getter that
+reads the property from `globalThis`:
+
+```wat
+(import "./bindings.wasm" "console" (func $console (result externref)))
+```
+
+The returned object can then be used with instance methods from its
+interface type (e.g. `Console.log`).
+
+### Namespaces
+
+Namespace members use the dotted path as a prefix:
+
+```wat
+(import "./bindings.wasm" "WebAssembly.compile" (func ...))
+```
+
+Free functions (global scope) use just the function name:
+
+```wat
+(import "./bindings.wasm" "fetch" (func ...))
+```
+
+### Module-scoped declarations
+
+Declarations inside `declare module "<spec>" { ... }` keep the same
+`Type.member` names, and the template imports them from `"<spec>"`
+instead of `./bindings.wasm`. The import module and name together are
+unique, so two modules exporting the same name are two imports:
+
+```wat
+(import "node:fs" "constants.O_RDONLY" (func $node:fs:constants.O_RDONLY (result f64)))
+(import "node:os" "constants.O_RDONLY" (func $node:os:constants.O_RDONLY (result f64)))
+```
+
+Every value is reached through one of the module's exports, as
+`(<spec>, path)`: `path[0]` is the export, each further segment a
+property read, so `constants.O_RDONLY` reads `O_RDONLY` from the
+`constants` export of `"node:fs"`. A function, variable or namespace
+member is reached this way; a class's constructor and statics go
+through the class's export, and its instance members through the
+receiver as for a global class. Types (interfaces, aliases) are not
+values and import nothing. A scalar `const` or `let` that is itself an
+export takes its scalar type, as any other value does: `export const
+count: number` is `(func (result f64))`.
+
+### Provided functions in the ABI
+
+The [`--provides`](#provided-functions---provides) spec is lowered to
+handlers: one function per provided function, parameters by value,
+result the owned type. A `Promise<T>` result is `T`'s wire type, or a
+nullable `externref` for `Promise<void>`: the slot carries the promise
+itself, or the settled value where a JSPI wrapper supplies the
+promise. Only a plain `void` export has no result. The wasm export
+name is the JS path joined with `.` with a leading `default.` dropped
+unless a top-level provider has the same path: `fetch`,
+`api.math.add`, `default.add` beside `add`.
+
+The template emits a stub per provided function, annotated with its JS
+path:
+
+```wat
+;; default.fetch: fetch(request: Request, env: E, ctx: ExecutionContext): Promise<Response>
+(func (export "fetch") (param $request externref) (param $env externref) (param $ctx externref) (result externref)
+  unreachable)
+```
+
+### Limitations
+
+**Variadics** (`...rest: T[]`) become a Wasm GC array parameter
+`(ref null $anyrefs)` where `$anyrefs` is `(type $anyrefs (array (mut
+anyref)))`. The `anyref` element type lets GC languages build the
+array natively. Fixed parameters before the rest are allowed. This
+requires Wasm GC, not just reference-types.
+
+**Duplicate names.** Within one module, or among the globals, a
+declaration merged from several `.d.ts` statements contributes each
+member once. The same name in two modules, or globally and in a
+module, is two imports. `workers-types` declares `interface
+EmailMessage` globally, a dictionary, and its constructor in
+`"cloudflare:email"`, so `"./bindings.wasm" "EmailMessage.new"`
+creates `{}` and `"cloudflare:email" "EmailMessage.new"` constructs
+the class.

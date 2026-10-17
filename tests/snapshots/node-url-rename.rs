@@ -18,6 +18,8 @@ extern "C" {
     # [wasm_bindgen (static_method_of = _URL , js_class = "URL" , catch , js_name = "canParse")]
     pub fn try_can_parse(input: &str) -> Result<bool, JsValue>;
 }
+#[allow(dead_code)]
+pub type URL = _URL;
 #[wasm_bindgen(module = "node:url")]
 extern "C" {
     #[wasm_bindgen(js_name = "fileURLToPath")]
@@ -28,5 +30,3 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "fileURLToPath")]
     pub fn try_file_url_to_path(url: &str) -> Result<String, JsValue>;
 }
-#[allow(dead_code)]
-pub type URL = _URL;
