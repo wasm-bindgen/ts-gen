@@ -211,7 +211,7 @@ fn run_embed_test(fixture_name: &str) -> Result<()> {
     };
     let merged = ts_gen::abi::embed::merge(
         &wasm_merge,
-        &module_bytes,
+        &output.module,
         &options.module_specifier,
         &bindings_bytes,
         &wrapper_bytes,
@@ -583,8 +583,8 @@ fn embed_module_export_globals_take_the_declared_reference_type() {
     let provided = ts_gen::provides::resolve("ExportedHandler.fetch", &ir, &mut gctx).unwrap();
     let abi = build_abi(&ir, &gctx, &provided);
     let module = r#"(module
-        (import "./bindings.wasm" "cfg" (func (result (ref extern))))
-        (import "./bindings.wasm" "maybe" (func (result anyref)))
+        (import "m:lib" "cfg" (func (result (ref extern))))
+        (import "m:lib" "maybe" (func (result anyref)))
         (func (export "fetch") (param externref) (result externref) unreachable))"#;
     let bytes = ts_gen::abi::embed::assemble(module).unwrap();
     let options = ts_gen::abi::embed::Options {
@@ -594,13 +594,13 @@ fn embed_module_export_globals_take_the_declared_reference_type() {
     ts_gen::abi::embed::assemble(&out.bindings_wat).unwrap();
     assert!(
         out.bindings_wat
-            .contains("(result (ref extern))\n    (ref.as_non_null (global.get $m:cfg))"),
+            .contains("(result (ref extern))\n    (ref.as_non_null (global.get $m:m:lib:cfg))"),
         "{}",
         out.bindings_wat
     );
     assert!(
         out.bindings_wat
-            .contains("(result anyref)\n    (any.convert_extern (global.get $m:maybe))"),
+            .contains("(result anyref)\n    (any.convert_extern (global.get $m:m:lib:maybe))"),
         "{}",
         out.bindings_wat
     );
@@ -693,10 +693,10 @@ fn embed_binds_one_function_under_every_alias() {
     let abi = build_abi(&ir, &gctx, &provided);
     // The two `new` imports differ in result type, so they need two functions.
     let module = r#"(module
-        (import "./bindings.wasm" "Conn.get" (func (param externref) (result externref)))
-        (import "./bindings.wasm" "Connection.get" (func (param externref) (result externref)))
-        (import "./bindings.wasm" "Conn.new" (func (result externref)))
-        (import "./bindings.wasm" "Connection.new" (func (result (ref extern))))
+        (import "m:lib" "Conn.get" (func (param externref) (result externref)))
+        (import "m:lib" "Connection.get" (func (param externref) (result externref)))
+        (import "m:lib" "Conn.new" (func (result externref)))
+        (import "m:lib" "Connection.new" (func (result (ref extern))))
         (func (export "fetch") (param externref) (result externref) unreachable))"#;
     let bytes = ts_gen::abi::embed::assemble(module).unwrap();
     let options = ts_gen::abi::embed::Options {
@@ -706,19 +706,84 @@ fn embed_binds_one_function_under_every_alias() {
     ts_gen::abi::embed::assemble(&out.bindings_wat).unwrap();
     let b = &out.bindings_wat;
     assert!(
-        b.contains(r#"(func (export "Conn.get") (export "Connection.get")"#),
+        b.contains(r#"(func (export "m:lib:Conn.get") (export "m:lib:Connection.get")"#),
         "{b}"
     );
     assert!(
-        b.contains(r#"(func (export "Conn.new") (result externref)"#),
+        b.contains(r#"(func (export "m:lib:Conn.new") (result externref)"#),
         "{b}"
     );
     assert!(
-        b.contains(r#"(func (export "Connection.new") (result (ref extern))"#),
+        b.contains(r#"(func (export "m:lib:Connection.new") (result (ref extern))"#),
         "{b}"
     );
     assert_eq!(
         out.used,
-        ["Conn.get", "Connection.get", "Conn.new", "Connection.new"]
+        [
+            "m:lib:Conn.get",
+            "m:lib:Connection.get",
+            "m:lib:Conn.new",
+            "m:lib:Connection.new"
+        ]
+    );
+}
+
+#[test]
+fn embed_links_the_same_name_from_two_modules_separately() {
+    let (ir, mut gctx) = ts_gen::parse_source(
+        r#"
+        declare module "m:a" { namespace constants { const MODE: Sock; } class Sock {} }
+        declare module "m:b" { namespace constants { const MODE: Sock; } class Sock {} }
+        interface ExportedHandler { fetch?(request: string): string; }
+        "#,
+        None,
+    )
+    .unwrap();
+    let provided = ts_gen::provides::resolve("ExportedHandler.fetch", &ir, &mut gctx).unwrap();
+    let abi = build_abi(&ir, &gctx, &provided);
+    let module = r#"(module
+        (import "m:a" "constants.MODE" (func (result externref)))
+        (import "m:b" "constants.MODE" (func (result externref)))
+        (func (export "fetch") (param externref) (result externref) unreachable))"#;
+    let bytes = ts_gen::abi::embed::assemble(module).unwrap();
+    let options = ts_gen::abi::embed::Options {
+        module_specifier: "./m.wasm".into(),
+    };
+    let out = ts_gen::abi::embed::embed(&abi, &bytes, &options).unwrap();
+    ts_gen::abi::embed::assemble(&out.bindings_wat).unwrap();
+    let b = &out.bindings_wat;
+    for spec in ["m:a", "m:b"] {
+        assert!(
+            b.contains(&format!(
+                r#"(import "{spec}" "constants" (global $m:{spec}:constants externref))"#
+            )),
+            "{b}"
+        );
+        assert!(
+            b.contains(&format!(r#"(func (export "{spec}:constants.MODE")"#)),
+            "{b}"
+        );
+    }
+    let imports: Vec<_> = wasmparser::Parser::new(0)
+        .parse_all(&out.module)
+        .filter_map(|p| match p.unwrap() {
+            wasmparser::Payload::ImportSection(r) => Some(r),
+            _ => None,
+        })
+        .flat_map(|r| r.into_imports().map(|i| i.unwrap()))
+        .map(|i| (i.module.to_string(), i.name.to_string()))
+        .collect();
+    assert_eq!(
+        imports,
+        [
+            (
+                "./bindings.wasm".to_string(),
+                "m:a:constants.MODE".to_string()
+            ),
+            (
+                "./bindings.wasm".to_string(),
+                "m:b:constants.MODE".to_string()
+            ),
+        ]
     );
 }
