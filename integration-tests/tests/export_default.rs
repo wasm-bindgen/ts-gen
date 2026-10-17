@@ -26,4 +26,5 @@ fn merged_namespaces_bind_through_the_export() {
     assert_eq!(merged::make::helper(), "helped");
     assert_eq!(renamed::create(), "made");
     assert_eq!(renamed::make::helper(), "helped");
+    assert_eq!(renamed::create::helper(), "helped");
 }
