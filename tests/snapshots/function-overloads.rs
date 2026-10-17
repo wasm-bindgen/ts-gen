@@ -79,3 +79,122 @@ pub mod n {
         pub fn try_g_with_f64(x: f64) -> Result<(), JsValue>;
     }
 }
+#[wasm_bindgen]
+extern "C" {
+    pub fn sz(x: &str) -> String;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "sz")]
+    pub fn try_sz(x: &str) -> Result<String, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "sz")]
+    pub fn sz_with_f64(x: f64) -> f64;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "sz")]
+    pub fn try_sz_with_f64(x: f64) -> Result<f64, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    pub fn gen<T: ::wasm_bindgen::JsGeneric>(x: &T) -> T;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "gen")]
+    pub fn try_gen<T: ::wasm_bindgen::JsGeneric>(x: &T) -> Result<T, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "gen")]
+    pub fn gen_with_f64_and_y(x: f64, y: f64) -> f64;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "gen")]
+    pub fn try_gen_with_f64_and_y(x: f64, y: f64) -> Result<f64, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[doc = " Reads text."]
+    pub fn read(x: &str) -> String;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[doc = " Reads text."]
+    #[wasm_bindgen(catch, js_name = "read")]
+    pub fn try_read(x: &str) -> Result<String, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[doc = " Reads a byte."]
+    #[doc = ""]
+    #[doc = " ## Errors"]
+    #[doc = ""]
+    #[doc = " * `RangeError` — When out of range."]
+    #[wasm_bindgen(js_name = "read")]
+    pub fn read_with_f64(x: f64) -> f64;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[doc = " Reads a byte."]
+    #[doc = ""]
+    #[doc = " ## Errors"]
+    #[doc = ""]
+    #[doc = " * `RangeError` — When out of range."]
+    #[wasm_bindgen(catch, js_name = "read")]
+    pub fn try_read_with_f64(x: f64) -> Result<f64, RangeError>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Twin;
+    #[wasm_bindgen(method)]
+    pub fn sz(this: &Twin, x: &str) -> String;
+    #[wasm_bindgen(method, catch, js_name = "sz")]
+    pub fn try_sz(this: &Twin, x: &str) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "sz")]
+    pub fn sz_with_f64(this: &Twin, x: f64) -> f64;
+    #[wasm_bindgen(method, catch, js_name = "sz")]
+    pub fn try_sz_with_f64(this: &Twin, x: f64) -> Result<f64, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn gen<T: ::wasm_bindgen::JsGeneric>(this: &Twin, x: &T) -> T;
+    #[wasm_bindgen(method, catch, js_name = "gen")]
+    pub fn try_gen<T: ::wasm_bindgen::JsGeneric>(this: &Twin, x: &T) -> Result<T, JsValue>;
+    #[wasm_bindgen(method, js_name = "gen")]
+    pub fn gen_with_f64_and_y(this: &Twin, x: f64, y: f64) -> f64;
+    #[wasm_bindgen(method, catch, js_name = "gen")]
+    pub fn try_gen_with_f64_and_y(this: &Twin, x: f64, y: f64) -> Result<f64, JsValue>;
+    #[doc = " Reads text."]
+    #[wasm_bindgen(method)]
+    pub fn read(this: &Twin, x: &str) -> String;
+    #[doc = " Reads text."]
+    #[wasm_bindgen(method, catch, js_name = "read")]
+    pub fn try_read(this: &Twin, x: &str) -> Result<String, JsValue>;
+    #[doc = " Reads a byte."]
+    #[doc = ""]
+    #[doc = " ## Errors"]
+    #[doc = ""]
+    #[doc = " * `RangeError` — When out of range."]
+    #[wasm_bindgen(method, js_name = "read")]
+    pub fn read_with_f64(this: &Twin, x: f64) -> f64;
+    #[doc = " Reads a byte."]
+    #[doc = ""]
+    #[doc = " ## Errors"]
+    #[doc = ""]
+    #[doc = " * `RangeError` — When out of range."]
+    #[wasm_bindgen(method, catch, js_name = "read")]
+    pub fn try_read_with_f64(this: &Twin, x: f64) -> Result<f64, RangeError>;
+    # [wasm_bindgen (static_method_of = Twin)]
+    pub fn of(x: &str) -> Twin;
+    # [wasm_bindgen (static_method_of = Twin , catch , js_name = "of")]
+    pub fn try_of(x: &str) -> Result<Twin, JsValue>;
+    # [wasm_bindgen (static_method_of = Twin , js_name = "of")]
+    pub fn of_with_f64(x: f64) -> f64;
+    # [wasm_bindgen (static_method_of = Twin , catch , js_name = "of")]
+    pub fn try_of_with_f64(x: f64) -> Result<f64, JsValue>;
+}

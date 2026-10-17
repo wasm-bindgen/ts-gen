@@ -60,11 +60,15 @@ fn emit_function(
         params: &decl.params,
         return_type: &decl.return_type,
         body_scope: decl.body_scope,
+        throws: &decl.throws,
+        doc,
     })
     .chain(decl.overloads.iter().map(|o| Overload {
         params: &o.params,
         return_type: &o.return_type,
         body_scope: o.body_scope,
+        throws: &o.throws,
+        doc: &o.doc,
     }))
     .collect();
     let sigs = build_signatures(
@@ -73,8 +77,6 @@ fn emit_function(
             rust_name: Some(&rust_name),
             kind: SignatureKind::Function,
             overloads: &overloads,
-            throws: &decl.throws,
-            doc,
         },
         &mut value_names.idents,
         cgctx,
@@ -425,6 +427,8 @@ fn generate_constructs(
             params: &construct.params,
             return_type: &construct.return_type,
             body_scope: construct.body_scope,
+            throws: &construct.throws,
+            doc,
         };
         match groups.iter_mut().find(|(first, _, _)| same(first)) {
             Some((_, _, overloads)) => overloads.push(overload),
@@ -433,15 +437,13 @@ fn generate_constructs(
     }
     let mut names: HashMap<TypeId, LocalScope> = HashMap::new();
     let mut items = Vec::new();
-    for (construct, target, overloads) in &groups {
+    for (_, target, overloads) in &groups {
         let sigs = build_signatures(
             &CallableSpec {
                 js_name: js_class,
                 rust_name: None,
                 kind: SignatureKind::Constructor,
                 overloads,
-                throws: &construct.throws,
-                doc,
             },
             names.entry(*target).or_default(),
             Some(cgctx),

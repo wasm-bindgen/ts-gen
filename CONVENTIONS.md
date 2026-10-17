@@ -1274,10 +1274,11 @@ function log(...args: any[]): void;
 Conceptually all four describe the same thing: a JS callable whose
 caller has more than one valid argument shape.
 
-A free function's declarations are its overloads wherever they merge:
-within a file, within a namespace, and across input files. Each keeps
-its own return type and type parameters, as they are separate
-declarations; a method's overloads take the first's.
+A function's declarations are its overloads wherever they merge:
+within a file, within a namespace, and across input files. Each
+overload of a function or method is a separate declaration, as in
+TypeScript, so each expansion keeps its own overload's return type,
+type parameters, JSDoc and `@throws`.
 
 ```ts
 // a.d.ts
@@ -1384,10 +1385,10 @@ Phase 3 assigns suffixes:
 
 ```rust
 pub fn show();
-pub fn show_with_value(value: &str);
-pub fn show_with_value_and_opts(value: &str, opts: &ShowOpts);
-pub fn show_with_value_a(value: f64);
-pub fn show_with_value_a_and_opts(value: f64, opts: &ShowOpts);
+pub fn show_with_str(value: &str);
+pub fn show_with_f64(value: f64);
+pub fn show_with_str_and_opts(value: &str, opts: &ShowOpts);
+pub fn show_with_f64_and_opts(value: f64, opts: &ShowOpts);
 ```
 
 `compute_rust_names` in `codegen::signatures` handles the suffix

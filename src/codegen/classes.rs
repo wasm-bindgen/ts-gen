@@ -749,6 +749,8 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             params: &[setter_param],
             return_type: &void,
             body_scope: config.scope,
+            throws: &crate::ir::Throws::None,
+            doc: &None,
         }];
         let setter_name = config.setter_name(MemberKind::Property, &g.js_name);
         build_signatures(
@@ -757,8 +759,6 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 rust_name: Some(&setter_name),
                 kind: SignatureKind::Setter,
                 overloads: &setter_overloads,
-                throws: &crate::ir::Throws::None,
-                doc: &None,
             },
             &mut setter_used,
             config.cgctx,
@@ -1438,18 +1438,6 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 }
                 expanded_constructors = true;
 
-                let doc = constructor_overloads.first().and_then(|c| c.doc.clone());
-                // Use the first overload's `@throws` (if any) as the error
-                // type for the constructor — TS overloads conventionally
-                // share semantics, and the first one carries the doc.
-                // Constructors always catch per JS `new` semantics, so
-                // `Throws::Never` here is a no-op — `build_signatures` still
-                // emits `catch` with the default `JsValue` error type.
-                let empty_throws = crate::ir::Throws::None;
-                let throws = constructor_overloads
-                    .first()
-                    .map(|c| &c.throws)
-                    .unwrap_or(&empty_throws);
                 let per_mono = CodegenContext::generic_mono(config.cgctx);
                 let return_type = if per_mono && !config.type_params.is_empty() {
                     TypeRef::generic(
@@ -1472,6 +1460,8 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         params: &c.params,
                         return_type: &return_type,
                         body_scope: config.scope,
+                        throws: &c.throws,
+                        doc: &c.doc,
                     })
                     .collect();
                 let sigs = build_signatures(
@@ -1480,8 +1470,6 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         rust_name: None,
                         kind: SignatureKind::Constructor,
                         overloads: &overloads,
-                        throws,
-                        doc: &doc,
                     },
                     &mut names,
                     config.cgctx,
@@ -1497,17 +1485,14 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 expanded_methods.insert(m.js_name.clone());
 
                 let group = &method_groups[&m.js_name];
-                let doc = group.first().and_then(|m| m.doc.clone());
-                let empty_throws = crate::ir::Throws::None;
-                let throws = group.first().map(|m| &m.throws).unwrap_or(&empty_throws);
-                // Every overload takes the first's return type and body
-                // scope, which holds its `<T, ...>`.
                 let overloads: Vec<Overload> = group
                     .iter()
                     .map(|m| Overload {
                         params: &m.params,
-                        return_type: &group[0].return_type,
-                        body_scope: group[0].body_scope,
+                        return_type: &m.return_type,
+                        body_scope: m.body_scope,
+                        throws: &m.throws,
+                        doc: &m.doc,
                     })
                     .collect();
                 let base = config.member_base(MemberKind::Method, &m.js_name);
@@ -1518,8 +1503,6 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         rust_name: Some(&base),
                         kind: SignatureKind::Method,
                         overloads: &overloads,
-                        throws,
-                        doc: &doc,
                     },
                     &mut names,
                     config.cgctx,
@@ -1535,15 +1518,14 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 expanded_static_methods.insert(m.js_name.clone());
 
                 let group = &static_method_groups[&m.js_name];
-                let doc = group.first().and_then(|m| m.doc.clone());
-                let empty_throws = crate::ir::Throws::None;
-                let throws = group.first().map(|m| &m.throws).unwrap_or(&empty_throws);
                 let overloads: Vec<Overload> = group
                     .iter()
                     .map(|m| Overload {
                         params: &m.params,
-                        return_type: &group[0].return_type,
-                        body_scope: group[0].body_scope,
+                        return_type: &m.return_type,
+                        body_scope: m.body_scope,
+                        throws: &m.throws,
+                        doc: &m.doc,
                     })
                     .collect();
                 let base = config.member_base(MemberKind::StaticMethod, &m.js_name);
@@ -1554,8 +1536,6 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         rust_name: Some(&base),
                         kind: SignatureKind::StaticMethod,
                         overloads: &overloads,
-                        throws,
-                        doc: &doc,
                     },
                     &mut names,
                     config.cgctx,
@@ -2014,6 +1994,8 @@ fn generate_setter(
         params: &[param],
         return_type: &void,
         body_scope: config.scope,
+        throws: &crate::ir::Throws::None,
+        doc: &doc,
     }];
     let setter_name = config.setter_name(MemberKind::Property, &setter.js_name);
     let sigs = build_signatures(
@@ -2022,8 +2004,6 @@ fn generate_setter(
             rust_name: Some(&setter_name),
             kind: SignatureKind::Setter,
             overloads: &overloads,
-            throws: &crate::ir::Throws::None,
-            doc: &doc,
         },
         names,
         config.cgctx,
@@ -2149,6 +2129,8 @@ fn generate_static_setter(
         params: &[param],
         return_type: &void,
         body_scope: config.scope,
+        throws: &crate::ir::Throws::None,
+        doc: &doc,
     }];
     let setter_name = config.setter_name(MemberKind::StaticProperty, &setter.js_name);
     let sigs = build_signatures(
@@ -2157,8 +2139,6 @@ fn generate_static_setter(
             rust_name: Some(&setter_name),
             kind: SignatureKind::StaticSetter,
             overloads: &overloads,
-            throws: &crate::ir::Throws::None,
-            doc: &doc,
         },
         names,
         config.cgctx,

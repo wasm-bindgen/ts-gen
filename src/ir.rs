@@ -805,6 +805,8 @@ pub struct FunctionOverload {
     /// Scope inside this overload's declaration, holding its own type
     /// parameters.
     pub body_scope: crate::parse::scope::ScopeId,
+    pub throws: Throws,
+    pub doc: Option<String>,
 }
 
 // ─── Variable ────────────────────────────────────────────────────────

@@ -419,9 +419,9 @@ fn primary_expansion(sigs: &[Vec<ConcreteParam>], first_overload_len: usize) -> 
     (primary != 0).then_some(primary)
 }
 
-/// One declared signature of a callable. A free function's overloads are
-/// separate declarations, each with its own return type and type
-/// parameters.
+/// One declared signature of a callable. A function's or method's
+/// overloads are separate declarations, each with its own return type,
+/// type parameters, JSDoc and `@throws`.
 #[derive(Clone, Copy, Debug)]
 pub struct Overload<'a> {
     pub params: &'a [Param],
@@ -429,6 +429,21 @@ pub struct Overload<'a> {
     /// The scope holding its `<T, ...>` bindings, which its types lower in.
     /// For non-generic callables this is just the enclosing scope.
     pub body_scope: ScopeId,
+    /// Failure-mode info from its `@throws` JSDoc — see [`Throws`].
+    ///
+    /// Drives three orthogonal decisions:
+    /// * `Throws::None` → catching variants use the default `JsValue`
+    ///   error type. Sync callables get a `try_<name>` companion.
+    /// * `Throws::Type(T)` → catching variants use `Result<_, T>`. Sync
+    ///   callables still get the `try_<name>` companion (with the typed
+    ///   error).
+    /// * `Throws::Never` → caller declares the callable never throws.
+    ///   Sync callables get *no* `try_` companion; async callables drop
+    ///   `catch` and return `T` directly. Constructors ignore this and
+    ///   still catch (per JS `new` semantics).
+    pub throws: &'a Throws,
+    /// Its doc comment, attached to each signature it expands to.
+    pub doc: &'a Option<String>,
 }
 
 /// Per-callable input describing a JS callable that needs to be emitted as
@@ -447,21 +462,6 @@ pub struct CallableSpec<'a> {
     /// All overloads sharing this `js_name` — typically one element, but TS
     /// allows multiple overloaded declarations.
     pub overloads: &'a [Overload<'a>],
-    /// Failure-mode info from `@throws` JSDoc — see [`Throws`].
-    ///
-    /// Drives three orthogonal decisions:
-    /// * `Throws::None` → catching variants use the default `JsValue`
-    ///   error type. Sync callables get a `try_<name>` companion.
-    /// * `Throws::Type(T)` → catching variants use `Result<_, T>`. Sync
-    ///   callables still get the `try_<name>` companion (with the typed
-    ///   error).
-    /// * `Throws::Never` → caller declares the callable never throws.
-    ///   Sync callables get *no* `try_` companion; async callables drop
-    ///   `catch` and return `T` directly. Constructors ignore this and
-    ///   still catch (per JS `new` semantics).
-    pub throws: &'a Throws,
-    /// Doc comment to attach to the primary signature only.
-    pub doc: &'a Option<String>,
 }
 
 /// Resolve a [`CallableSpec`] into the full set of [`FunctionSignature`]s
@@ -493,19 +493,16 @@ pub fn build_signatures(
         .map_or_else(|| base_rust_name(spec.js_name, spec.kind), ident_chars);
     let expansions = expand_signatures(spec.overloads, cgctx);
 
-    // `Throws::Never` suppresses every fallible form — except for
-    // constructors, which always catch (`new` can always throw in JS).
-    let nothrow = spec.throws.is_never() && !spec.kind.always_catches();
-    let error_type = spec.throws.as_type();
-
-    let augmented_doc = spec.doc.clone();
-
     let per_mono = CodegenContext::generic_mono(cgctx);
     let mut out = Vec::with_capacity(expansions.len());
 
     for exp in expansions {
         let overload = spec.overloads[exp.overload];
         let scope = overload.body_scope;
+        // `Throws::Never` suppresses every fallible form — except for
+        // constructors, which always catch (`new` can always throw in JS).
+        let nothrow = overload.throws.is_never() && !spec.kind.always_catches();
+        let error_type = overload.throws.as_type();
         let (is_async, return_type) = match (
             overload.return_type.as_promise_inner(),
             spec.kind.allows_async(),
@@ -539,7 +536,7 @@ pub fn build_signatures(
             } else {
                 None
             },
-            doc: augmented_doc.clone(),
+            doc: overload.doc.clone(),
             body_scope: scope,
         };
         push_with_js_string_return(&mut out, primary, names, cgctx, scope);
@@ -555,7 +552,7 @@ pub fn build_signatures(
                 return_type: return_type.clone(),
                 js_string_return: false,
                 error_type: error_type.cloned(),
-                doc: augmented_doc.clone(),
+                doc: overload.doc.clone(),
                 body_scope: scope,
             };
             push_with_js_string_return(&mut out, try_sig, names, cgctx, scope);
@@ -1697,9 +1694,9 @@ mod tests {
                     params,
                     return_type: ret,
                     body_scope: scope,
+                    throws: &Throws::None,
+                    doc: &None,
                 }],
-                throws: &Throws::None,
-                doc: &None,
             },
             used,
             Some(&cgctx),
@@ -1872,9 +1869,9 @@ mod tests {
                     params,
                     return_type: ret,
                     body_scope: scope,
+                    throws,
+                    doc,
                 }],
-                throws,
-                doc,
             },
             used,
             Some(&cgctx),
@@ -1898,6 +1895,8 @@ mod tests {
                 params,
                 return_type: ret,
                 body_scope: scope,
+                throws: &Throws::None,
+                doc,
             })
             .collect();
         build_signatures(
@@ -1906,8 +1905,6 @@ mod tests {
                 rust_name: None,
                 kind,
                 overloads: &overloads,
-                throws: &Throws::None,
-                doc,
             },
             used,
             Some(&cgctx),
@@ -2153,15 +2150,17 @@ mod tests {
                         params: &by_string,
                         return_type: &promise,
                         body_scope: outer,
+                        throws: &Throws::None,
+                        doc: &None,
                     },
                     Overload {
                         params: &by_number,
                         return_type: &TypeRef::Number,
                         body_scope: inner,
+                        throws: &Throws::None,
+                        doc: &None,
                     },
                 ],
-                throws: &Throws::None,
-                doc: &None,
             },
             &mut no_used(),
             Some(&cgctx),

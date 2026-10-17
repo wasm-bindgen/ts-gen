@@ -74,7 +74,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
     #[wasm_bindgen(method, catch)]
-    pub async fn get(this: &Store, key: &str) -> Result<JsOption<JsString>, JsValue>;
+    pub async fn get(this: &Store, key: &str) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_conditional(
         this: &Store,
@@ -86,7 +86,7 @@ extern "C" {
         this: &Store,
         key: &str,
         options: &GetOptions,
-    ) -> Result<JsOption<JsString>, JsValue>;
+    ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn first(this: &Store) -> Result<JsOption<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "first")]

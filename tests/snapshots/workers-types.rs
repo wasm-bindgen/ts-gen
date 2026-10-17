@@ -5,8 +5,6 @@ use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
 #[allow(dead_code)]
-use JsValue as Args;
-#[allow(dead_code)]
 use JsValue as Cf;
 #[allow(dead_code)]
 use JsValue as R;
@@ -912,26 +910,26 @@ extern "C" {
         ms_delay: f64,
     ) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, variadic, js_name = "setTimeout")]
-    pub fn set_timeout_with_function_and_args(
+    pub fn set_timeout_with_function_and_args<Args: ::wasm_bindgen::JsGeneric>(
         this: &ServiceWorkerGlobalScope,
         callback: &Function<fn(Args) -> Undefined>,
         args: &[JsValue],
     ) -> f64;
     #[wasm_bindgen(method, variadic, catch, js_name = "setTimeout")]
-    pub fn try_set_timeout_with_function_and_args(
+    pub fn try_set_timeout_with_function_and_args<Args: ::wasm_bindgen::JsGeneric>(
         this: &ServiceWorkerGlobalScope,
         callback: &Function<fn(Args) -> Undefined>,
         args: &[JsValue],
     ) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, variadic, js_name = "setTimeout")]
-    pub fn set_timeout_with_function_and_ms_delay_and_args(
+    pub fn set_timeout_with_function_and_ms_delay_and_args<Args: ::wasm_bindgen::JsGeneric>(
         this: &ServiceWorkerGlobalScope,
         callback: &Function<fn(Args) -> Undefined>,
         ms_delay: f64,
         args: &[JsValue],
     ) -> f64;
     #[wasm_bindgen(method, variadic, catch, js_name = "setTimeout")]
-    pub fn try_set_timeout_with_function_and_ms_delay_and_args(
+    pub fn try_set_timeout_with_function_and_ms_delay_and_args<Args: ::wasm_bindgen::JsGeneric>(
         this: &ServiceWorkerGlobalScope,
         callback: &Function<fn(Args) -> Undefined>,
         ms_delay: f64,
@@ -967,26 +965,26 @@ extern "C" {
         ms_delay: f64,
     ) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, variadic, js_name = "setInterval")]
-    pub fn set_interval_with_function_and_args(
+    pub fn set_interval_with_function_and_args<Args: ::wasm_bindgen::JsGeneric>(
         this: &ServiceWorkerGlobalScope,
         callback: &Function<fn(Args) -> Undefined>,
         args: &[JsValue],
     ) -> f64;
     #[wasm_bindgen(method, variadic, catch, js_name = "setInterval")]
-    pub fn try_set_interval_with_function_and_args(
+    pub fn try_set_interval_with_function_and_args<Args: ::wasm_bindgen::JsGeneric>(
         this: &ServiceWorkerGlobalScope,
         callback: &Function<fn(Args) -> Undefined>,
         args: &[JsValue],
     ) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, variadic, js_name = "setInterval")]
-    pub fn set_interval_with_function_and_ms_delay_and_args(
+    pub fn set_interval_with_function_and_ms_delay_and_args<Args: ::wasm_bindgen::JsGeneric>(
         this: &ServiceWorkerGlobalScope,
         callback: &Function<fn(Args) -> Undefined>,
         ms_delay: f64,
         args: &[JsValue],
     ) -> f64;
     #[wasm_bindgen(method, variadic, catch, js_name = "setInterval")]
-    pub fn try_set_interval_with_function_and_ms_delay_and_args(
+    pub fn try_set_interval_with_function_and_ms_delay_and_args<Args: ::wasm_bindgen::JsGeneric>(
         this: &ServiceWorkerGlobalScope,
         callback: &Function<fn(Args) -> Undefined>,
         ms_delay: f64,
@@ -2734,13 +2732,13 @@ extern "C" {
     pub async fn get_with_keys<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectTransaction,
         keys: &[String],
-    ) -> Result<JsOption<T>, JsValue>;
+    ) -> Result<Map<JsString, T>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_keys_and_options<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectTransaction,
         keys: &[String],
         options: &DurableObjectGetOptions,
-    ) -> Result<JsOption<T>, JsValue>;
+    ) -> Result<Map<JsString, T>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn list<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectTransaction,
@@ -2786,13 +2784,13 @@ extern "C" {
     pub async fn delete_with_keys(
         this: &DurableObjectTransaction,
         keys: &[String],
-    ) -> Result<Boolean, JsValue>;
+    ) -> Result<Number, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
     pub async fn delete_with_keys_and_options(
         this: &DurableObjectTransaction,
         keys: &[String],
         options: &DurableObjectPutOptions,
-    ) -> Result<Boolean, JsValue>;
+    ) -> Result<Number, JsValue>;
     #[wasm_bindgen(method)]
     pub fn rollback(this: &DurableObjectTransaction);
     #[wasm_bindgen(method, catch, js_name = "rollback")]
@@ -2854,13 +2852,13 @@ extern "C" {
     pub async fn get_with_keys<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectStorage,
         keys: &[String],
-    ) -> Result<JsOption<T>, JsValue>;
+    ) -> Result<Map<JsString, T>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_keys_and_options<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectStorage,
         keys: &[String],
         options: &DurableObjectGetOptions,
-    ) -> Result<JsOption<T>, JsValue>;
+    ) -> Result<Map<JsString, T>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn list<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectStorage,
@@ -2906,13 +2904,13 @@ extern "C" {
     pub async fn delete_with_keys(
         this: &DurableObjectStorage,
         keys: &[String],
-    ) -> Result<Boolean, JsValue>;
+    ) -> Result<Number, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
     pub async fn delete_with_keys_and_options(
         this: &DurableObjectStorage,
         keys: &[String],
         options: &DurableObjectPutOptions,
-    ) -> Result<Boolean, JsValue>;
+    ) -> Result<Number, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "deleteAll")]
     pub async fn delete_all(this: &DurableObjectStorage) -> Result<Undefined, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "deleteAll")]
@@ -8354,18 +8352,18 @@ extern "C" {
         this: &KVNamespace<Key>,
         key: &[Key],
         r#type: &str,
-    ) -> Result<JsOption<JsString>, JsValue>;
+    ) -> Result<Map<JsString, JsOption<JsString>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_slice<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
         key: &[Key],
-    ) -> Result<JsOption<JsString>, JsValue>;
+    ) -> Result<Map<JsString, JsOption<JsString>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_slice_and_kv_namespace_get_options<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
         key: &[Key],
         options: &KVNamespaceGetOptions<Undefined>,
-    ) -> Result<JsOption<JsString>, JsValue>;
+    ) -> Result<Map<JsString, JsOption<JsString>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_key_slice_and_options_kv_namespace_get_options<
         Key: ::wasm_bindgen::JsGeneric,
@@ -8373,7 +8371,7 @@ extern "C" {
         this: &KVNamespace<Key>,
         key: &[Key],
         options: &KVNamespaceGetOptions<JsString>,
-    ) -> Result<JsOption<JsString>, JsValue>;
+    ) -> Result<Map<JsString, JsOption<JsString>>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn list<Key: ::wasm_bindgen::JsGeneric, Metadata: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
@@ -8481,7 +8479,7 @@ extern "C" {
         this: &KVNamespace<Key>,
         key: &[Key],
         r#type: &str,
-    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
+    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<JsString, Metadata>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     pub async fn get_with_metadata_with_slice<
         Key: ::wasm_bindgen::JsGeneric,
@@ -8489,7 +8487,7 @@ extern "C" {
     >(
         this: &KVNamespace<Key>,
         key: &[Key],
-    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
+    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<JsString, Metadata>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     pub async fn get_with_metadata_with_slice_and_kv_namespace_get_options<
         Key: ::wasm_bindgen::JsGeneric,
@@ -8498,7 +8496,7 @@ extern "C" {
         this: &KVNamespace<Key>,
         key: &[Key],
         options: &KVNamespaceGetOptions<Undefined>,
-    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
+    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<JsString, Metadata>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     pub async fn get_with_metadata_with_key_slice_and_options_kv_namespace_get_options<
         Key: ::wasm_bindgen::JsGeneric,
@@ -8507,7 +8505,7 @@ extern "C" {
         this: &KVNamespace<Key>,
         key: &[Key],
         options: &KVNamespaceGetOptions<JsString>,
-    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
+    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<JsString, Metadata>>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn delete<Key: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespace<Key>,
@@ -9104,7 +9102,7 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn head(this: &R2Bucket, key: &str) -> Result<JsOption<R2Object>, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn get(this: &R2Bucket, key: &str) -> Result<JsOption<R2Object>, JsValue>;
+    pub async fn get(this: &R2Bucket, key: &str) -> Result<JsOption<R2ObjectBody>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_r2_bucket_options(
         this: &R2Bucket,
@@ -9116,7 +9114,7 @@ extern "C" {
         this: &R2Bucket,
         key: &str,
         options: &R2GetOptions,
-    ) -> Result<JsOption<R2Object>, JsValue>;
+    ) -> Result<JsOption<R2ObjectBody>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn put(
         this: &R2Bucket,
@@ -9188,35 +9186,35 @@ extern "C" {
         key: &str,
         value: &ReadableStream,
         options: &R2PutOptions,
-    ) -> Result<JsOption<R2Object>, JsValue>;
+    ) -> Result<R2Object, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub async fn put_with_array_buffer_and_r2_put_options(
         this: &R2Bucket,
         key: &str,
         value: &ArrayBuffer,
         options: &R2PutOptions,
-    ) -> Result<JsOption<R2Object>, JsValue>;
+    ) -> Result<R2Object, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub async fn put_with_typed_array_and_r2_put_options(
         this: &R2Bucket,
         key: &str,
         value: &Object,
         options: &R2PutOptions,
-    ) -> Result<JsOption<R2Object>, JsValue>;
+    ) -> Result<R2Object, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub async fn put_with_str_and_r2_put_options(
         this: &R2Bucket,
         key: &str,
         value: &str,
         options: &R2PutOptions,
-    ) -> Result<JsOption<R2Object>, JsValue>;
+    ) -> Result<R2Object, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub async fn put_with_blob_and_r2_put_options(
         this: &R2Bucket,
         key: &str,
         value: &Blob,
         options: &R2PutOptions,
-    ) -> Result<JsOption<R2Object>, JsValue>;
+    ) -> Result<R2Object, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "createMultipartUpload")]
     pub async fn create_multipart_upload(
         this: &R2Bucket,
@@ -29054,52 +29052,30 @@ extern "C" {
     pub fn try_to_markdown<AiModelList: ::wasm_bindgen::JsGeneric>(
         this: &Ai<AiModelList>,
     ) -> Result<ToMarkdownService, JsValue>;
-    #[wasm_bindgen(method, js_name = "toMarkdown")]
-    pub fn to_markdown_with_slice<AiModelList: ::wasm_bindgen::JsGeneric>(
-        this: &Ai<AiModelList>,
-        files: &[MarkdownDocument],
-    ) -> ToMarkdownService;
     #[wasm_bindgen(method, catch, js_name = "toMarkdown")]
-    pub fn try_to_markdown_with_slice<AiModelList: ::wasm_bindgen::JsGeneric>(
+    pub async fn to_markdown_with_slice<AiModelList: ::wasm_bindgen::JsGeneric>(
         this: &Ai<AiModelList>,
         files: &[MarkdownDocument],
-    ) -> Result<ToMarkdownService, JsValue>;
-    #[wasm_bindgen(method, js_name = "toMarkdown")]
-    pub fn to_markdown_with_slice_and_options<AiModelList: ::wasm_bindgen::JsGeneric>(
+    ) -> Result<Array<ConversionResponse>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "toMarkdown")]
+    pub async fn to_markdown_with_slice_and_options<AiModelList: ::wasm_bindgen::JsGeneric>(
         this: &Ai<AiModelList>,
         files: &[MarkdownDocument],
         options: &ConversionRequestOptions,
-    ) -> ToMarkdownService;
+    ) -> Result<Array<ConversionResponse>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "toMarkdown")]
-    pub fn try_to_markdown_with_slice_and_options<AiModelList: ::wasm_bindgen::JsGeneric>(
-        this: &Ai<AiModelList>,
-        files: &[MarkdownDocument],
-        options: &ConversionRequestOptions,
-    ) -> Result<ToMarkdownService, JsValue>;
-    #[wasm_bindgen(method, js_name = "toMarkdown")]
-    pub fn to_markdown_with_markdown_document<AiModelList: ::wasm_bindgen::JsGeneric>(
+    pub async fn to_markdown_with_markdown_document<AiModelList: ::wasm_bindgen::JsGeneric>(
         this: &Ai<AiModelList>,
         files: &MarkdownDocument,
-    ) -> ToMarkdownService;
+    ) -> Result<ConversionResponse, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "toMarkdown")]
-    pub fn try_to_markdown_with_markdown_document<AiModelList: ::wasm_bindgen::JsGeneric>(
-        this: &Ai<AiModelList>,
-        files: &MarkdownDocument,
-    ) -> Result<ToMarkdownService, JsValue>;
-    #[wasm_bindgen(method, js_name = "toMarkdown")]
-    pub fn to_markdown_with_markdown_document_and_options<AiModelList: ::wasm_bindgen::JsGeneric>(
-        this: &Ai<AiModelList>,
-        files: &MarkdownDocument,
-        options: &ConversionRequestOptions,
-    ) -> ToMarkdownService;
-    #[wasm_bindgen(method, catch, js_name = "toMarkdown")]
-    pub fn try_to_markdown_with_markdown_document_and_options<
+    pub async fn to_markdown_with_markdown_document_and_options<
         AiModelList: ::wasm_bindgen::JsGeneric,
     >(
         this: &Ai<AiModelList>,
         files: &MarkdownDocument,
         options: &ConversionRequestOptions,
-    ) -> Result<ToMarkdownService, JsValue>;
+    ) -> Result<ConversionResponse, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -30319,7 +30295,7 @@ extern "C" {
     pub async fn ai_search_with_auto_rag_ai_search_request(
         this: &AutoRAG,
         params: &AutoRagAiSearchRequest,
-    ) -> Result<Response, JsValue>;
+    ) -> Result<AutoRagAiSearchResponse, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -33422,7 +33398,7 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn raw<T: ::wasm_bindgen::JsGeneric>(
         this: &D1PreparedStatement,
-    ) -> Result<ArrayTuple<(Array<JsString>, Array<T>)>, JsValue>;
+    ) -> Result<Array<T>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "raw")]
     pub async fn raw_with_d1_prepared_statement_options<T: ::wasm_bindgen::JsGeneric>(
         this: &D1PreparedStatement,
@@ -33432,7 +33408,7 @@ extern "C" {
     pub async fn raw_with_d1_prepared_statement_options2<T: ::wasm_bindgen::JsGeneric>(
         this: &D1PreparedStatement,
         options: &D1PreparedStatementOptions2,
-    ) -> Result<ArrayTuple<(Array<JsString>, Array<T>)>, JsValue>;
+    ) -> Result<Array<T>, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -37110,36 +37086,40 @@ extern "C" {
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch)]
     pub async fn upload(this: &StreamBinding, file: &File) -> Result<StreamVideo, StreamError>;
-    #[doc = " Uploads a new video from a File."]
+    #[doc = " Uploads a new video from a provided URL."]
     #[doc = ""]
-    #[doc = " * `file` - The video file to upload."]
+    #[doc = " * `url` - The URL to upload from."]
+    #[doc = " * `params` - Optional upload parameters."]
     #[doc = ""]
     #[doc = " Returns: The uploaded video details."]
     #[doc = ""]
     #[doc = " ## Errors"]
     #[doc = ""]
-    #[doc = " * `BadRequestError` — if the upload parameter is invalid"]
+    #[doc = " * `BadRequestError` — if the upload parameter is invalid or the URL is invalid"]
     #[doc = " * `QuotaReachedError` — if the account storage capacity is exceeded"]
     #[doc = " * `MaxFileSizeError` — if the file size is too large"]
     #[doc = " * `RateLimitedError` — if the server received too many requests"]
+    #[doc = " * `AlreadyUploadedError` — if a video was already uploaded to this URL"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch, js_name = "upload")]
     pub async fn upload_with_url(
         this: &StreamBinding,
         url: &str,
     ) -> Result<StreamVideo, StreamError>;
-    #[doc = " Uploads a new video from a File."]
+    #[doc = " Uploads a new video from a provided URL."]
     #[doc = ""]
-    #[doc = " * `file` - The video file to upload."]
+    #[doc = " * `url` - The URL to upload from."]
+    #[doc = " * `params` - Optional upload parameters."]
     #[doc = ""]
     #[doc = " Returns: The uploaded video details."]
     #[doc = ""]
     #[doc = " ## Errors"]
     #[doc = ""]
-    #[doc = " * `BadRequestError` — if the upload parameter is invalid"]
+    #[doc = " * `BadRequestError` — if the upload parameter is invalid or the URL is invalid"]
     #[doc = " * `QuotaReachedError` — if the account storage capacity is exceeded"]
     #[doc = " * `MaxFileSizeError` — if the file size is too large"]
     #[doc = " * `RateLimitedError` — if the server received too many requests"]
+    #[doc = " * `AlreadyUploadedError` — if a video was already uploaded to this URL"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
     #[wasm_bindgen(method, catch, js_name = "upload")]
     pub async fn upload_with_url_and_params(
@@ -38192,7 +38172,7 @@ extern "C" {
     ) -> Result<StreamWatermark, StreamError>;
     #[doc = " Generate a new watermark profile"]
     #[doc = ""]
-    #[doc = " * `file` - The image file to upload"]
+    #[doc = " * `url` - The image url to upload"]
     #[doc = " * `params` - The watermark creation parameters."]
     #[doc = ""]
     #[doc = " Returns: The created watermark profile."]
@@ -39374,13 +39354,13 @@ extern "C" {
     pub async fn transform_with_markdown_document(
         this: &ToMarkdownService,
         files: &MarkdownDocument,
-    ) -> Result<Array<ConversionResponse>, JsValue>;
+    ) -> Result<ConversionResponse, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "transform")]
     pub async fn transform_with_markdown_document_and_options(
         this: &ToMarkdownService,
         files: &MarkdownDocument,
         options: &ConversionRequestOptions,
-    ) -> Result<Array<ConversionResponse>, JsValue>;
+    ) -> Result<ConversionResponse, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn supported(this: &ToMarkdownService)
         -> Result<Array<SupportedFileFormat>, JsValue>;

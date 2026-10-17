@@ -597,6 +597,8 @@ fn merge_function_overloads(
                         params: f.params.clone(),
                         return_type: f.return_type.clone(),
                         body_scope: f.body_scope,
+                        throws: f.throws.clone(),
+                        doc: decl.doc.clone(),
                     });
                     base.overloads.extend(f.overloads.iter().cloned());
                 }
