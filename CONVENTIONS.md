@@ -120,10 +120,10 @@ classes stay unborrowed (`&[EmailAttachment]`, not
 `&[Array<JsString>]` / `Vec<Array<JsString>>`, the same as
 `string[][]`.
 
-Inside an actual generic (`Promise<Array<T>>`, `Map<K, Array<V>>`,
-…) the legacy `Array<T'>` form is preserved — `Promise<T>` /
-`Map<K,V>` etc. require their generic argument to satisfy
-`T: JsGeneric`, which Rust's `Vec<T>` doesn't.
+Inside a built-in container (`Promise<Array<T>>`, `Map<K, Array<V>>`,
+…) the element stays the `Array<T'>` handle, which type-checks against
+both the stable js-sys API and `js_sys_unstable_apis`, where container
+elements are real generics.
 
 ### Slice modes
 
@@ -156,10 +156,10 @@ pub fn generic<T>(#[wasm_bindgen(slice = "array")] values: &[T]) -> String; // p
 ```
 
 Every other slice takes no mode, as the modes only act on numeric
-elements and wasm-bindgen already hands JS a fresh `Array`: handles
-(`&[WebSocket]`, an erased `T: JsGeneric`'s `&[T]`) are read in place,
-and `&[String]` (string enums included) and `&[bool]` are decoded
-element by element. Variadic rest parameters (`&[JsValue]`) don't take
+elements and wasm-bindgen already hands JS a fresh `Array`: JS handles
+(`&[WebSocket]`, `&[JsString]`) are read in place, and Rust values
+(`&[String]`, `&[bool]`, string enums) are decoded element by element.
+Variadic rest parameters are spread into the call, so they don't take
 one either.
 
 The user-facing Rust signature is unchanged — only the JS-side wire
@@ -1659,7 +1659,8 @@ so they stay named (`Details<Mode>`, `Details<Level>`), and an awaited
 stays a type parameter. This native-leaf rule is deliberately limited to user
 declarations. Built-in JS containers, tuples, iterators, and callbacks retain
 their established wrapper elements (`Array<JsString>`,
-`Map<JsString, JsString>`, and so on).
+`Map<JsString, JsString>`, and so on), except for the string leaves of an
+argument, below.
 
 Direct string arguments use argument-position `impl JsStringLike`, allowing
 `&str`, `String`, `&JsString`, and `JsString` without caller-side conversion.
@@ -1695,24 +1696,34 @@ pub fn flag_key<T>(this: &EvaluationDetails<T>) -> String;
 pub fn flag_key_js_string<T>(this: &EvaluationDetails<T>) -> JsString;
 ```
 
-No variant is generated when the return has no string leaf outside built-in
-containers (`Promise<Array<string>>` keeps its single binding), or when a
-top-level union becomes a [dynamic-union enum](#erased-return-position-unions-become-dynamic-union-enums):
+No variant is generated when the return's only string leaves are inside
+built-in containers (`Promise<Array<string>>` keeps its single binding),
+except for a top-level string list (below), or when a top-level union becomes
+a [dynamic-union enum](#erased-return-position-unions-become-dynamic-union-enums):
 `"a" | "b"` returns its enum only.
 
-String lists follow the same split between Rust strings and JS handles, at
-the level of the list. A list argument that would be `&[String]` accepts any
-string element shape, which wasm-bindgen lowers per instantiation (`&[String]`,
-`&[&str]` or `&[JsString]`). As with `Option<impl JsStringLike>` and `None`,
-an empty list needs its type (`&[] as &[&str]`). `ArrayLike<string>` accepts
-the handle of the same elements, which under `js_sys_unstable_apis` can hold
-Rust strings (`Array<String>`) as well as `Array<JsString>`. A sync string list return gets a
+Lists and built-in containers follow the same split between Rust strings and
+JS handles. In an argument, every string leaf reached through slices and
+built-in containers (`ArrayLike`, `Set`, `Map`, `Promise`, `Iterator`,
+`AsyncIterator`) takes `impl JsStringLike`, which wasm-bindgen lowers per
+instantiation. A `string[]` accepts `&[String]`, `&[&str]` or `&[JsString]`,
+and an empty list needs its element type (`&[] as &[&str]`). Container
+handles accept `JsString` elements, and also `String` under
+`js_sys_unstable_apis`, where js-sys container elements are real generics
+(`Array<String>`, `Set<String>`). A variadic rest array, a constructor's
+included, lowers like any other list argument (`...parts: string[]` takes
+`&[impl JsStringLike]`, `...values: number[]` takes `&[f64]`), since
+wasm-bindgen spreads any sequence. A sync string list return gets a
 `_js_string` variant returning the list as one handle rather than decoding
 every element; an awaited list is already the handle:
 
 ```rust
 pub fn set_tags(tags: &[impl ::wasm_bindgen::JsStringLike]);
 pub fn set_tags_like(tags: &Array<impl ::wasm_bindgen::JsStringLike>);
+pub fn set_rows(rows: &[Array<impl ::wasm_bindgen::JsStringLike>]);
+pub fn lookup(values: &Map<impl ::wasm_bindgen::JsStringLike, Number>);
+#[wasm_bindgen(variadic)]
+pub fn join(parts: &[impl ::wasm_bindgen::JsStringLike]) -> String;
 pub fn get_tags() -> Vec<String>;
 #[wasm_bindgen(js_name = "getTags")]
 pub fn get_tags_js_string() -> Array<JsString>;

@@ -1,6 +1,6 @@
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{Array, JsString};
+use js_sys::{Array, JsString, Map, Number, Set};
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::mono_lists::*;
@@ -14,6 +14,28 @@ fn string_lists_accept_any_string_element() {
     let handle: Array<JsString> = Array::new_typed();
     handle.push(&JsString::from("h"));
     assert_eq!(tags_like(&handle), "Array(string:h)");
+    let empty: &[&str] = &[];
+    assert_eq!(tags(empty), "Array()");
+}
+
+#[wasm_bindgen_test]
+fn variadics_spread_any_list() {
+    assert_eq!(join("-", &["a", "b"]), "a-b");
+    assert_eq!(join("-", &[JsString::from("c")]), "c");
+    assert_eq!(sum(&[1.0, 2.5]), 3.5);
+}
+
+#[wasm_bindgen_test]
+fn container_string_leaves_accept_any_string_shape() {
+    let row: Array<JsString> = Array::new_typed();
+    row.push(&JsString::from("r"));
+    assert_eq!(rows(&[row]), "Array(string:r)");
+    let set: Set<JsString> = Set::new_typed();
+    set.add(&JsString::from("s"));
+    assert_eq!(unique(&set), "Array(string:s)");
+    let map: Map<JsString, Number> = Map::new_typed();
+    map.set(&JsString::from("k"), &Number::from(2.0));
+    assert_eq!(lookup(&map, "k"), 2.0);
 }
 
 #[cfg(js_sys_unstable_apis)]
@@ -21,8 +43,10 @@ fn string_lists_accept_any_string_element() {
 fn string_list_handles_hold_rust_strings() {
     let handle: Array<String> = ["h", "i"].into_iter().map(String::from).collect();
     assert_eq!(tags_like(&handle), "Array(string:h,string:i)");
-    let empty: &[&str] = &[];
-    assert_eq!(tags(empty), "Array()");
+    assert_eq!(rows(&[handle]), "Array(string:h,string:i)");
+    let set: Set<String> = Set::new_typed();
+    set.add(&"s".to_string());
+    assert_eq!(unique(&set), "Array(string:s)");
 }
 
 #[wasm_bindgen_test]
@@ -64,4 +88,9 @@ fn properties_and_builders_take_string_lists() {
         describe_options(&options),
         "Array(string:x) Array(boolean:false)"
     );
+}
+
+#[wasm_bindgen_test]
+fn variadic_constructors_spread_the_list() {
+    assert_eq!(Total::new(&[1.0, 2.5]).unwrap().value(), 3.5);
 }

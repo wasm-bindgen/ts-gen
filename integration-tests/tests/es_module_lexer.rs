@@ -112,9 +112,10 @@ async fn test_parse_multiple_imports() {
 
     assert_eq!(imports.length(), 3);
 
-    let spec0 = imports.iter().next().unwrap();
-    let spec1 = imports.iter().nth(1).unwrap();
-    let spec2 = imports.iter().nth(2).unwrap();
+    let mut specs = imports.iter();
+    let spec0 = specs.next().unwrap();
+    let spec1 = specs.next().unwrap();
+    let spec2 = specs.next().unwrap();
 
     assert_eq!(spec0.n().unwrap(), "mod-a");
     assert_eq!(spec0.t(), ImportType::Static);

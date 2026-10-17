@@ -53,6 +53,7 @@ jobs:
     name: Test (wasm-bindgen integration${{ matrix.rustflags && ', unstable js-sys' || '' }})
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         # Generated bindings compile against both js-sys APIs; real-generic
         # element types (`Array<String>`) need the unstable one.
