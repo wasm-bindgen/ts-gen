@@ -13,6 +13,10 @@ export const sum = (...values) => values.reduce((a, b) => a + b, 0);
 export const rows = (values) => values.map(describe).join(" ");
 export const unique = (values) => describe([...values]);
 export const lookup = (values, key) => values.get(key);
+export const joinTags = (...tags) => tags.join(",");
+export const awaitTag = () => "";
+export const firstTag = (tags) => tags.next().value;
+export const nextTag = () => "";
 export const getTags = () => ["a", "b"];
 export const getMaybeTags = () => undefined;
 export const getFlags = () => [true, false];
@@ -22,6 +26,9 @@ export class Labels {
   constructor() {
     this.values = [];
     this.flags = [];
+  }
+  add(...values) {
+    return describe(values.flat());
   }
 }
 export const describeOptions = (options) =>

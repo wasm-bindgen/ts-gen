@@ -2771,7 +2771,7 @@ fn is_string_array_element(elem: &TypeRef, ctx: &CodegenContext<'_>, scope: Scop
 /// `string[]` accepts `&[String]`, `&[&str]` or `&[JsString]`, and
 /// `Set<string>` accepts `&Set<JsString>` or, under `js_sys_unstable_apis`,
 /// `&Set<String>`. `None` when there is no such leaf; a scalar string is
-/// [`mono_argument_type`](super::signatures)'s.
+/// handled by `signatures::mono_argument_type`.
 pub(crate) fn mono_string_like_argument(
     ty: &TypeRef,
     ctx: &CodegenContext<'_>,
