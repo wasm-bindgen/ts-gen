@@ -76,7 +76,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "nextMode")]
     pub async fn next_mode(this: &Probe) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "maybeMode")]
-    pub async fn maybe_mode(this: &Probe) -> Result<JsOption<JsString>, JsValue>;
+    pub async fn maybe_mode(this: &Probe) -> Result<JsNullable<JsString>, JsValue>;
     #[wasm_bindgen(method, js_name = "modeMap")]
     pub fn mode_map(this: &Probe) -> Map<JsString, JsString>;
     #[wasm_bindgen(method, catch, js_name = "modeMap")]

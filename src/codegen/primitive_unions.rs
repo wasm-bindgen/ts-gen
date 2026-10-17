@@ -195,6 +195,33 @@ impl PrimitiveUnion {
 /// only the rest group: `string | number | symbol | boolean` becomes
 /// `[boolean | number | string, symbol]`.
 pub(crate) fn group_alternatives(alts: Vec<TypeRef>, keep_literals: bool) -> Vec<TypeRef> {
+    // Nullable alternatives (`string | number | null` fans out to
+    // `Nullable(string)`, `Nullable(number)`) group among themselves and
+    // come back as one `Nullable(union)`, so the bound stays `Option<impl …>`.
+    // They all carry the same bits: `simplify_union` lifts every empty arm
+    // to one outer `Nullable` before the fan-out, so the first found is the
+    // only one.
+    if let Some(n) = alts.iter().find_map(|t| match t {
+        TypeRef::Nullable(_, n) => Some(*n),
+        _ => None,
+    }) {
+        let (nullable, plain): (Vec<_>, Vec<_>) = alts
+            .into_iter()
+            .partition(|t| matches!(t, TypeRef::Nullable(..)));
+        let inner = nullable
+            .into_iter()
+            .map(|t| match t {
+                TypeRef::Nullable(inner, _) => *inner,
+                _ => unreachable!(),
+            })
+            .collect();
+        let mut out: Vec<TypeRef> = group_alternatives(inner, keep_literals)
+            .into_iter()
+            .map(|t| TypeRef::Nullable(Box::new(t), n))
+            .collect();
+        out.extend(group_alternatives(plain, keep_literals));
+        return out;
+    }
     let is_candidate =
         |ty: &TypeRef| leaf_categories(ty).is_some() && !(keep_literals && is_literal(ty));
     if let Some(grouped) = group_where(&alts, is_candidate) {

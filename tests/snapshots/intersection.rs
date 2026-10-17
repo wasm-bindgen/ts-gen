@@ -139,19 +139,19 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
     #[wasm_bindgen(method, catch)]
-    pub async fn get(this: &Store, key: &str) -> Result<JsOption<JsString>, JsValue>;
+    pub async fn get(this: &Store, key: &str) -> Result<JsNullable<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_store_options(
         this: &Store,
         key: &str,
         options: &StoreOptions,
-    ) -> Result<JsOption<JsString>, JsValue>;
+    ) -> Result<JsNullable<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_get_options(
         this: &Store,
         key: &str,
         options: &GetOptions,
-    ) -> Result<JsOption<JsString>, JsValue>;
+    ) -> Result<JsNullable<JsString>, JsValue>;
     #[wasm_bindgen(method)]
     pub fn refine(this: &Store, value: &Derived);
     #[wasm_bindgen(method, catch, js_name = "refine")]

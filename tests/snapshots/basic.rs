@@ -55,39 +55,48 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    pub fn new_with_readable_stream(body: &ReadableStream) -> Result<Response, JsValue>;
+    pub fn new_with_readable_stream(body: &JsNullable<ReadableStream>)
+        -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    pub fn new_with_str(body: &str) -> Result<Response, JsValue>;
+    pub fn new_with_str(body: &JsNullable<JsString>) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    pub fn new_with_array_buffer(body: &ArrayBuffer) -> Result<Response, JsValue>;
+    pub fn new_with_array_buffer(body: &JsNullable<ArrayBuffer>) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    pub fn new_with_blob(body: &Blob) -> Result<Response, JsValue>;
+    pub fn new_with_blob(body: &JsNullable<Blob>) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    pub fn new_with_url_search_params(body: &URLSearchParams) -> Result<Response, JsValue>;
+    pub fn new_with_url_search_params(
+        body: &JsNullable<URLSearchParams>,
+    ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    pub fn new_with_form_data(body: &FormData) -> Result<Response, JsValue>;
+    pub fn new_with_form_data(body: &JsNullable<FormData>) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_readable_stream_and_init(
-        body: &ReadableStream,
+        body: &JsNullable<ReadableStream>,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    pub fn new_with_str_and_init(body: &str, init: &ResponseInit) -> Result<Response, JsValue>;
+    pub fn new_with_str_and_init(
+        body: &JsNullable<JsString>,
+        init: &ResponseInit,
+    ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_array_buffer_and_init(
-        body: &ArrayBuffer,
+        body: &JsNullable<ArrayBuffer>,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
-    pub fn new_with_blob_and_init(body: &Blob, init: &ResponseInit) -> Result<Response, JsValue>;
+    pub fn new_with_blob_and_init(
+        body: &JsNullable<Blob>,
+        init: &ResponseInit,
+    ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_url_search_params_and_init(
-        body: &URLSearchParams,
+        body: &JsNullable<URLSearchParams>,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_form_data_and_init(
-        body: &FormData,
+        body: &JsNullable<FormData>,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     #[doc = " Returns a new Response with a network error."]
