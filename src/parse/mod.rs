@@ -957,6 +957,12 @@ fn bind_constructor_vars(gctx: &mut GlobalContext, module: &mut Module) {
                     },
                     _ => unreachable!(),
                 };
+                // The var's scope names the class too, where its phase 1
+                // placeholder for the value stood.
+                let placeholder = gctx.scopes.get(decl.scope_id).get(&v.js_name);
+                if placeholder.is_some_and(|p| p != id && is_value(&gctx.get_type(p).kind)) {
+                    gctx.scopes.insert(decl.scope_id, v.js_name.clone(), id);
+                }
                 (id, class)
             }
             None if matches!(decl.module_context, ModuleContext::Module(_)) => {

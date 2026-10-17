@@ -27,3 +27,9 @@ declare module "dflt" {
     function g(): void;
   }
 }
+
+declare module "mm" {
+  interface W {
+    w(): void;
+  }
+}

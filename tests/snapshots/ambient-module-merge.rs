@@ -238,3 +238,33 @@ pub mod dflt {
         }
     }
 }
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type W;
+    #[wasm_bindgen(method)]
+    pub fn glob(this: &W);
+    #[wasm_bindgen(method, catch, js_name = "glob")]
+    pub fn try_glob(this: &W) -> Result<(), JsValue>;
+}
+pub mod mm {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen(module = "mm")]
+    extern "C" {
+        # [wasm_bindgen (extends = Object)]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type W;
+        #[wasm_bindgen(constructor, catch)]
+        pub fn new() -> Result<W, JsValue>;
+        # [wasm_bindgen (static_method_of = W)]
+        pub fn make() -> super::W;
+        # [wasm_bindgen (static_method_of = W , catch , js_name = "make")]
+        pub fn try_make() -> Result<super::W, JsValue>;
+        #[wasm_bindgen(method)]
+        pub fn w(this: &W);
+        #[wasm_bindgen(method, catch, js_name = "w")]
+        pub fn try_w(this: &W) -> Result<(), JsValue>;
+    }
+}
