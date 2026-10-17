@@ -39,16 +39,21 @@ src/
 │   ├── signatures.rs          # parameter expansion + per-callable layer
 │   ├── subtyping.rs           # builtin parents + `lub_types` (LUB)
 │   └── typemap.rs             # TypeRef → syn tokens, `to_return_type`, externals
-├── abi/                       # Wasm ABI layer (--target wat)
+├── abi/                       # Wasm ABI layer (--target wat, embed)
 │   ├── mod.rs                 # ABI model, `build()`
-│   └── wat.rs                 # import template generator
+│   ├── wat.rs                 # import template generator
+│   └── embed.rs               # bindings.wasm / wrapper.wasm emitter
 └── util/                      # naming, diagnostics, dedup helpers
 
 tests/
 ├── fixtures/*.d.ts            # input declarations
+├── fixtures/embed/*.wat       # language modules for the embed tests
 ├── snapshots/*.rs             # expected generated output (BLESS=1 to update)
 ├── snapshots/*.wat            # --target wat output
-└── snapshot.rs                # the Rust and WAT snapshot harness
+├── snapshots/embed/           # embed artifacts per fixture
+├── snapshot.rs                # the Rust and WAT snapshot harness
+├── embed.rs                   # embed end-to-end on the fixtures/embed modules
+└── embed.mjs                  # node run of each merged embed fixture
 
 integration-tests/
 ├── tests/*.rs                 # hand-written integration tests
@@ -115,6 +120,11 @@ Three layers:
 3. **Integration tests** (`integration-tests/`) — actual wasm-bindgen
    compilation + browser/V8 execution. Used for end-to-end ABI
    correctness. Lives in its own crate that only builds for `wasm32`.
+
+The embed tests (`cargo test --test embed`) also merge each fixture
+with binaryen's `wasm-merge` (`WASM_MERGE` or `PATH`) and run the
+result in node 24+ (`NODE` or `PATH`); a missing tool skips its step
+locally and fails under `CI`.
 
 ## Pipeline
 
