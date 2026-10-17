@@ -1082,10 +1082,9 @@ fn push_callable(
         _ => member.to_string(),
     };
 
-    // Expansion dedups by Rust rendering, which is finer than the ABI's
-    // externref view, so arms that only differ in reference type survive
-    // as separately named aliases of one signature. That keeps names
-    // aligned with the Rust bindings.
+    // Without a codegen context, expansion keeps a type alias as one
+    // parameter and renders every reference outside `js_sys` as `JsValue`,
+    // so arms that differ only there are one function taking any of them.
     for sig in expand_signatures(overloads, kind, None) {
         let Overload {
             return_type,
