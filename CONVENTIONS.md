@@ -198,6 +198,30 @@ element slice (`&[u8]`), the "Rust callers hold native bytes here"
 form, with the typed array kept as a `_with_` handle overload — the
 same shape a `TypedArray | number[]` union produces.
 
+A typed array with an `ArrayBuffer` argument (`Uint8Array<ArrayBuffer>`)
+is TS 5.7+'s spelling of a WebIDL buffer without `[AllowShared]`: the
+callee rejects a view of a `SharedArrayBuffer`. An atomics build's wasm
+memory is shared, so a `view` there is emitted twice, a view for builds
+without `target_feature = "atomics"` and a fresh copy for atomics builds.
+The bare form defaults to `ArrayBufferLike`, which accepts shared memory,
+so its view stays as is.
+
+```ts
+/** @param data {@slice view} */
+digest(data: Uint8Array<ArrayBuffer>): void;
+```
+
+```rs
+#[cfg(not(target_feature = "atomics"))]
+pub fn digest(#[wasm_bindgen(slice = "view")] data: &[u8]);
+#[cfg(target_feature = "atomics")]
+pub fn digest(#[wasm_bindgen(slice = "copy")] data: &[u8]);
+pub fn digest_with_uint8_array(data: &Uint8Array);
+```
+
+The split is on the whole function because wasm-bindgen doesn't evaluate
+a `cfg_attr` on a parameter.
+
 The tag is stripped from the rendered doc comment. A hint whose
 parameter's lowering isn't slice-shaped is dropped by shape, the same
 rule wasm-bindgen applies to an inherited mode (which is what lets one

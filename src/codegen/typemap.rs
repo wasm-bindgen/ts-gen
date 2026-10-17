@@ -304,7 +304,7 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
         TypeRef::Symbol => buf.push_str("Symbol"),
         TypeRef::ArrayBufferView => buf.push_str("ArrayBufferView"),
         TypeRef::PropertyKey => buf.push_str("PropertyKey"),
-        TypeRef::TypedSlice(e) => write!(buf, "slice:{}", e.rust()).unwrap(),
+        TypeRef::TypedSlice(e, _) => write!(buf, "slice:{}", e.rust()).unwrap(),
         TypeRef::StringLiteral(s) => write!(buf, "lit:{s:?}").unwrap(),
         TypeRef::NumberLiteral(n) => write!(buf, "lit:{n}").unwrap(),
         TypeRef::BooleanLiteral(b) => write!(buf, "lit:{b}").unwrap(),
@@ -966,7 +966,7 @@ pub fn to_syn_type(
             }
         }
         TypeRef::PropertyKey => unreachable!("desugared at the top of `to_syn_type`"),
-        TypeRef::TypedSlice(elem) => {
+        TypeRef::TypedSlice(elem, _) => {
             if pos.inner {
                 let ident = make_ident(elem.typed_array());
                 quote! { #ident }
@@ -2306,6 +2306,11 @@ pub enum SliceMode {
     /// produces it, and it is emitted explicitly so the assertion is
     /// greppable in generated code.
     View,
+    /// [`Self::View`] of a typed array whose callee rejects a view of shared
+    /// memory ([`crate::ir::SharedMemory::Rejected`]). Atomics builds use
+    /// shared memory, so the function is emitted twice: a view without
+    /// `target_feature = "atomics"` and a copy with it.
+    UnsharedView,
     /// A fresh plain `Array`. A `T[]` parameter is a plain JS `Array` the
     /// callee may keep, so a slice of numbers takes this rather than
     /// arriving as a `Float64Array` view of linear memory.
@@ -2342,7 +2347,7 @@ pub fn param_slice_mode(
         {
             Some(SliceMode::Array)
         }
-        TypeRef::TypedSlice(_) => Some(SliceMode::Copy),
+        TypeRef::TypedSlice(..) => Some(SliceMode::Copy),
         _ => None,
     };
     // A `{@slice mode}` JSDoc hint overrides the inferred mode when the
@@ -2352,6 +2357,14 @@ pub fn param_slice_mode(
     // typed-array handle overload) aren't slices.
     match (p.slice_mode, inferred) {
         (Some(hint), Some(_)) => Some(match hint {
+            crate::ir::SliceModeHint::View
+                if matches!(
+                    ty,
+                    TypeRef::TypedSlice(_, crate::ir::SharedMemory::Rejected)
+                ) =>
+            {
+                SliceMode::UnsharedView
+            }
             crate::ir::SliceModeHint::View => SliceMode::View,
             crate::ir::SliceModeHint::Array => SliceMode::Array,
             crate::ir::SliceModeHint::Copy => SliceMode::Copy,
@@ -2743,7 +2756,7 @@ mod tests {
                 param_slice_mode(p, Some(ctx), scope)
             };
             let numbers = || TypeRef::Array(Box::new(TypeRef::Number));
-            let typed = || TypeRef::TypedSlice(E::U8);
+            let typed = || TypeRef::TypedSlice(E::U8, crate::ir::SharedMemory::Accepted);
             assert_eq!(
                 mode(&cp("xs", TypeRef::Nullable(Box::new(numbers())))),
                 Some(SliceMode::Array)
@@ -2773,6 +2786,23 @@ mod tests {
                 p
             };
             assert_eq!(mode(&hinted(typed(), H::View)), Some(SliceMode::View));
+            let unshared = TypeRef::TypedSlice(E::U8, crate::ir::SharedMemory::Rejected);
+            assert_eq!(
+                mode(&hinted(unshared.clone(), H::View)),
+                Some(SliceMode::UnsharedView)
+            );
+            assert_eq!(
+                mode(&hinted(
+                    TypeRef::Nullable(Box::new(unshared.clone())),
+                    H::View
+                )),
+                Some(SliceMode::UnsharedView)
+            );
+            assert_eq!(
+                mode(&hinted(unshared.clone(), H::Copy)),
+                Some(SliceMode::Copy)
+            );
+            assert_eq!(mode(&cp("xs", unshared)), Some(SliceMode::Copy));
             assert_eq!(mode(&hinted(typed(), H::Array)), Some(SliceMode::Array));
             assert_eq!(mode(&hinted(numbers(), H::View)), Some(SliceMode::View));
             // A string slice has no mode to select (its only shape is a

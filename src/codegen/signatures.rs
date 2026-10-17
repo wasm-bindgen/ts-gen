@@ -45,7 +45,7 @@ use quote::quote;
 
 use crate::codegen::primitive_unions;
 use crate::codegen::typemap::{self, CodegenContext, TypePosition};
-use crate::ir::{Param, Throws, TypeRef};
+use crate::ir::{Param, SharedMemory, Throws, TypeRef};
 use crate::parse::scope::ScopeId;
 use crate::util::naming::{to_snake_case, LocalScope, Suffix};
 
@@ -309,7 +309,7 @@ pub fn collect_type_params(
         | TypeRef::Symbol
         | TypeRef::ArrayBufferView
         | TypeRef::PropertyKey
-        | TypeRef::TypedSlice(_)
+        | TypeRef::TypedSlice(..)
         | TypeRef::StringLiteral(_)
         | TypeRef::NumberLiteral(_)
         | TypeRef::BooleanLiteral(_)
@@ -866,12 +866,14 @@ fn pair_typed_array_slice(
     scope: ScopeId,
 ) {
     let mut typed = alts.iter().filter_map(|t| match t {
-        TypeRef::Reference { segments, .. } if segments.len() == 1 => {
-            crate::ir::TypedArrayElement::of_typed_array(&segments[0])
-        }
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } if segments.len() == 1 => crate::ir::TypedArrayElement::of_typed_array(&segments[0])
+            .map(|elem| (elem, SharedMemory::of_typed_array_args(generic_args))),
         _ => None,
     });
-    let (Some(elem), None) = (typed.next(), typed.next()) else {
+    let (Some((elem, shared)), None) = (typed.next(), typed.next()) else {
         return;
     };
     let pairs = |inner: &TypeRef| {
@@ -892,7 +894,7 @@ fn pair_typed_array_slice(
         return;
     };
     alts.remove(i);
-    alts.insert(0, TypeRef::TypedSlice(elem));
+    alts.insert(0, TypeRef::TypedSlice(elem, shared));
 }
 
 /// Push every flatten-alternative for `ty` into `out`. Returns
@@ -1306,7 +1308,7 @@ fn type_snake_name(ty: &TypeRef) -> String {
             }
             to_snake_case(head)
         }
-        TypeRef::Array(_) | TypeRef::TypedSlice(_) => "slice".to_string(),
+        TypeRef::Array(_) | TypeRef::TypedSlice(..) => "slice".to_string(),
         TypeRef::Nullable(inner) => type_snake_name(inner),
         TypeRef::Function(_) => "function".to_string(),
         _ => "js_value".to_string(),
@@ -1362,6 +1364,10 @@ fn param_attr(
     // `slice = array` token-spaced verbatim.
     match typemap::param_slice_mode(p, cgctx, scope) {
         Some(typemap::SliceMode::View) => quote! { #[wasm_bindgen(slice = "view")] },
+        Some(typemap::SliceMode::UnsharedView) => {
+            let marker = super::UNSHARED_VIEW;
+            quote! { #[wasm_bindgen(slice = #marker)] }
+        }
         Some(typemap::SliceMode::Array) => quote! { #[wasm_bindgen(slice = "array")] },
         Some(typemap::SliceMode::Copy) => quote! { #[wasm_bindgen(slice = "copy")] },
         None => quote! {},
@@ -2592,7 +2598,10 @@ mod tests {
         let flat = |members: Vec<TypeRef>| flatten_no_ctx(&TypeRef::Union(members));
         assert_eq!(
             flat(vec![TypeRef::ident("Uint8Array"), array(TypeRef::Number)]),
-            vec![TypeRef::TypedSlice(E::U8), TypeRef::ident("Uint8Array")]
+            vec![
+                TypeRef::TypedSlice(E::U8, SharedMemory::Accepted),
+                TypeRef::ident("Uint8Array")
+            ]
         );
         assert_eq!(
             flat(vec![
@@ -2601,7 +2610,7 @@ mod tests {
                 TypeRef::generic("BigInt64Array", vec![TypeRef::ident("ArrayBuffer")]),
             ]),
             vec![
-                TypeRef::TypedSlice(E::I64),
+                TypeRef::TypedSlice(E::I64, SharedMemory::Rejected),
                 TypeRef::String,
                 TypeRef::generic("BigInt64Array", vec![TypeRef::ident("ArrayBuffer")]),
             ]

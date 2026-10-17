@@ -26,6 +26,15 @@ export declare function entries(values: BigInt64Array | bigint[]): string;
 /** @param bytes {@slice copy} */
 export declare function digest(bytes: Uint8Array): string;
 
+// `Uint8Array<ArrayBuffer>` rejects a view of shared memory (WebIDL without
+// `[AllowShared]`). An atomics build's wasm memory is shared, so there the
+// `view` becomes a copy. The default `ArrayBufferLike` accepts either.
+/** @param data {@slice view} */
+export declare function keepUnsharedView(data: Uint8Array<ArrayBuffer>): void;
+
+/** @param data {@slice view} */
+export declare function keepSharedView(data: Uint8Array<ArrayBufferLike> | number[]): void;
+
 export interface Target {
   /** The write destination. {@slice view} */
   buffer?: Float64Array | number[];

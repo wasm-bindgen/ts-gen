@@ -8,6 +8,12 @@ export const keepView = (data) => {
 export const keepCopy = (data) => {
   kept = data;
 };
+export const keepUnsharedView = (data) => {
+  kept = data;
+};
+export const keepSharedView = (data) => {
+  kept = data;
+};
 export const first = () => Number(kept[0]);
 export const entries = describe;
 export const digest = describe;

@@ -119,6 +119,69 @@ extern "C" {
 }
 #[wasm_bindgen(module = "slice-hints")]
 extern "C" {
+    #[cfg(not(target_feature = "atomics"))]
+    #[doc = " * `data`"]
+    #[wasm_bindgen(js_name = "keepUnsharedView")]
+    pub fn keep_unshared_view(#[wasm_bindgen(slice = "view")] data: &[u8]);
+    #[cfg(target_feature = "atomics")]
+    #[doc = " * `data`"]
+    #[wasm_bindgen(js_name = "keepUnsharedView")]
+    pub fn keep_unshared_view(#[wasm_bindgen(slice = "copy")] data: &[u8]);
+}
+#[wasm_bindgen(module = "slice-hints")]
+extern "C" {
+    #[cfg(not(target_feature = "atomics"))]
+    #[doc = " * `data`"]
+    #[wasm_bindgen(catch, js_name = "keepUnsharedView")]
+    pub fn try_keep_unshared_view(
+        #[wasm_bindgen(slice = "view")] data: &[u8],
+    ) -> Result<(), JsValue>;
+    #[cfg(target_feature = "atomics")]
+    #[doc = " * `data`"]
+    #[wasm_bindgen(catch, js_name = "keepUnsharedView")]
+    pub fn try_keep_unshared_view(
+        #[wasm_bindgen(slice = "copy")] data: &[u8],
+    ) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "slice-hints")]
+extern "C" {
+    #[doc = " * `data`"]
+    #[wasm_bindgen(js_name = "keepUnsharedView")]
+    pub fn keep_unshared_view_with_uint8_array(data: &Uint8Array);
+}
+#[wasm_bindgen(module = "slice-hints")]
+extern "C" {
+    #[doc = " * `data`"]
+    #[wasm_bindgen(catch, js_name = "keepUnsharedView")]
+    pub fn try_keep_unshared_view_with_uint8_array(data: &Uint8Array) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "slice-hints")]
+extern "C" {
+    #[doc = " * `data`"]
+    #[wasm_bindgen(js_name = "keepSharedView")]
+    pub fn keep_shared_view(#[wasm_bindgen(slice = "view")] data: &[u8]);
+}
+#[wasm_bindgen(module = "slice-hints")]
+extern "C" {
+    #[doc = " * `data`"]
+    #[wasm_bindgen(catch, js_name = "keepSharedView")]
+    pub fn try_keep_shared_view(#[wasm_bindgen(slice = "view")] data: &[u8])
+        -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "slice-hints")]
+extern "C" {
+    #[doc = " * `data`"]
+    #[wasm_bindgen(js_name = "keepSharedView")]
+    pub fn keep_shared_view_with_uint8_array(data: &Uint8Array);
+}
+#[wasm_bindgen(module = "slice-hints")]
+extern "C" {
+    #[doc = " * `data`"]
+    #[wasm_bindgen(catch, js_name = "keepSharedView")]
+    pub fn try_keep_shared_view_with_uint8_array(data: &Uint8Array) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "slice-hints")]
+extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Target;

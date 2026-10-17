@@ -91,7 +91,7 @@ pub enum TypeRef {
     /// typed array's element: `Uint8Array | number[]` is `&[u8]`, passed
     /// to JS as a `Uint8Array` view. Synthesised by codegen's overload
     /// flattening, never parsed.
-    TypedSlice(TypedArrayElement),
+    TypedSlice(TypedArrayElement, SharedMemory),
 
     // === Syntactic constructs ===
     /// `T[]` — the syntactic array shortcut. Distinct from
@@ -145,6 +145,29 @@ pub enum TypeRef {
     /// For TS constructs we can't represent (conditional types, mapped types,
     /// template literals, `keyof`, etc.) — erased to `JsValue`.
     Unresolved(String),
+}
+
+/// Whether a typed-array parameter accepts a view of shared memory. TS 5.7+
+/// spells one that doesn't, a WebIDL buffer without `[AllowShared]`, with an
+/// `ArrayBuffer` argument (`Uint8Array<ArrayBuffer>`); the bare form defaults
+/// to `ArrayBufferLike`, which includes `SharedArrayBuffer`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum SharedMemory {
+    Accepted,
+    Rejected,
+}
+
+impl SharedMemory {
+    /// Read from a typed array's generic arguments.
+    pub fn of_typed_array_args(generic_args: &[TypeRef]) -> Self {
+        match generic_args.first() {
+            Some(TypeRef::Reference {
+                segments,
+                generic_args,
+            }) if segments == &["ArrayBuffer"] && generic_args.is_empty() => Self::Rejected,
+            _ => Self::Accepted,
+        }
+    }
 }
 
 /// The element of a JS typed array with a matching Rust slice ABI.
@@ -289,8 +312,8 @@ impl TypeRef {
             TypeRef::Symbol => "symbol".into(),
             TypeRef::ArrayBufferView => "ArrayBufferView".into(),
             TypeRef::PropertyKey => "PropertyKey".into(),
-            TypeRef::TypedSlice(e) if e.is_bigint() => "bigint[]".into(),
-            TypeRef::TypedSlice(_) => "number[]".into(),
+            TypeRef::TypedSlice(e, _) if e.is_bigint() => "bigint[]".into(),
+            TypeRef::TypedSlice(..) => "number[]".into(),
             TypeRef::Array(inner) => {
                 // Wrap composite inner types in parens so e.g.
                 // `(A | B)[]` doesn't render as the wrong-precedence
