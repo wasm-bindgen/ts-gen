@@ -456,7 +456,7 @@ fn embed(args: EmbedArgs) -> Result<()> {
         .unwrap_or_else(|| PathBuf::from("wasm-merge"));
     let merged = ts_gen::abi::embed::merge(
         &wasm_merge,
-        &wasm,
+        &out.module,
         &options.module_specifier,
         &bindings,
         &wrapper,

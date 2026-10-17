@@ -39,20 +39,25 @@ pub struct Options {
 
 #[derive(Debug, Default, Clone)]
 pub struct Output {
+    /// The language module with its imports of module-scoped ABI
+    /// functions linked to the bindings: what `merge` takes.
+    pub module: Vec<u8>,
     pub bindings_wat: String,
     pub wrapper_wat: String,
     pub builtins_js: String,
     pub jspi: bool,
-    /// ABI functions the module imports, in import order.
+    /// The bindings exports the module imports, in import order.
     pub used: Vec<String>,
     /// Module exports the wrapper republishes at their JS paths (and which
     /// `postprocess` therefore strips from the merged module).
     pub handlers: Vec<String>,
 }
 
-/// An ABI function the module uses with one signature, and the names it
-/// imports it by: one bindings function exported under each.
+/// An ABI function the module uses with one signature, and the bindings
+/// exports it is imported through: one bindings function exported under
+/// each.
 struct UsedFunction {
+    module: Option<String>,
     function: String,
     names: Vec<String>,
     param_types: Vec<WasmType>,
@@ -70,6 +75,9 @@ struct HandlerInfo {
 /// What `embed` learned from the language module.
 struct ModuleInfo {
     used: Vec<UsedFunction>,
+    /// The module's imports of module-scoped ABI functions, `(specifier,
+    /// name)`, each with the bindings export it is linked to.
+    links: BTreeMap<(String, String), String>,
     jspi: bool,
     /// The module imports the `undefined` global from the builtins.
     undefined: bool,
@@ -95,6 +103,7 @@ pub fn embed(abi: &Abi, module: &[u8], options: &Options) -> Result<Output> {
     }
 
     Ok(Output {
+        module: link_imports(module, &info.links)?,
         bindings_wat,
         wrapper_wat,
         builtins_js: builtins.render(),
@@ -160,6 +169,51 @@ pub fn merge(
         );
     }
     std::fs::read(&out).context("reading wasm-merge output")
+}
+
+/// Point the module's imports of module-scoped ABI functions at the
+/// bindings exports implementing them. `wasm-merge` links by module name,
+/// and the bindings import the real specifier themselves, so these imports
+/// cannot keep it.
+fn link_imports(wasm: &[u8], links: &BTreeMap<(String, String), String>) -> Result<Vec<u8>> {
+    use wasm_encoder::reencode::{Reencode, RoundtripReencoder};
+    use wasm_encoder::RawSection;
+    use wasmparser::Payload;
+
+    if links.is_empty() {
+        return Ok(wasm.to_vec());
+    }
+    let mut out = wasm_encoder::Module::new();
+    for payload in wasmparser::Parser::new(0).parse_all(wasm) {
+        let payload = payload?;
+        match &payload {
+            Payload::ImportSection(reader) => {
+                let mut imports = wasm_encoder::ImportSection::new();
+                for import in reader.clone().into_imports() {
+                    let import = import?;
+                    let key = (import.module.to_string(), import.name.to_string());
+                    let (module, name) = match links.get(&key) {
+                        Some(export) => (BINDINGS_SPECIFIER, export.as_str()),
+                        None => (import.module, import.name),
+                    };
+                    let ty = RoundtripReencoder
+                        .entity_type(import.ty)
+                        .map_err(|e| anyhow!("re-encoding import {name:?}: {e:?}"))?;
+                    imports.import(module, name, ty);
+                }
+                out.section(&imports);
+            }
+            _ => {
+                if let Some((id, range)) = payload.as_section() {
+                    out.section(&RawSection {
+                        id,
+                        data: &wasm[range.start as usize..range.end as usize],
+                    });
+                }
+            }
+        }
+    }
+    Ok(out.finish())
 }
 
 /// Assemble WAT and validate it with the features the ABI relies on.
@@ -316,12 +370,18 @@ fn inspect(abi: &Abi, module: &[u8]) -> Result<ModuleInfo> {
     }
 
     let mut used = Vec::new();
+    let mut links = BTreeMap::new();
     let mut jspi = false;
     let mut undefined = false;
+    let modules = abi.modules();
     for (module_name, field, ty) in &imports {
-        if module_name == BINDINGS_SPECIFIER {
-            let f = abi.function(field).ok_or_else(|| {
-                anyhow!("module imports {BINDINGS_SPECIFIER:?} {field:?}, which is not in the ABI")
+        // A module-scoped ABI function is imported from its specifier, which
+        // the module may also import other things from directly.
+        let abi_import = module_name == BINDINGS_SPECIFIER
+            || (modules.contains(&module_name.as_str()) && matches!(ty, TypeRef::Func(_)));
+        if abi_import {
+            let f = abi.import(module_name, field).ok_or_else(|| {
+                anyhow!("module imports {module_name:?} {field:?}, which is not in the ABI")
             })?;
             let TypeRef::Func(idx) = ty else {
                 bail!("import {field:?} must be a function");
@@ -335,19 +395,31 @@ fn inspect(abi: &Abi, module: &[u8]) -> Result<ModuleInfo> {
                 import: true,
             };
             let sig = check_signature(&expected, actual, &types)?;
-            if used.iter().any(|u: &UsedFunction| u.names.contains(field)) {
+            let export = match &f.module {
+                Some(spec) => format!("{spec}:{field}"),
+                None => field.clone(),
+            };
+            if f.module.is_some() {
+                links.insert((module_name.clone(), field.clone()), export.clone());
+            }
+            if used
+                .iter()
+                .any(|u: &UsedFunction| u.names.contains(&export))
+            {
                 continue;
             }
             let same = used.iter_mut().find(|u| {
-                u.function == f.name
+                u.module == f.module
+                    && u.function == f.name
                     && u.param_types == sig.param_types
                     && u.result_type == sig.result_type
             });
             match same {
-                Some(u) => u.names.push(field.clone()),
+                Some(u) => u.names.push(export),
                 None => used.push(UsedFunction {
+                    module: f.module.clone(),
                     function: f.name.clone(),
-                    names: vec![field.clone()],
+                    names: vec![export],
                     param_types: sig.param_types,
                     result_type: sig.result_type,
                 }),
@@ -423,6 +495,7 @@ fn inspect(abi: &Abi, module: &[u8]) -> Result<ModuleInfo> {
 
     Ok(ModuleInfo {
         used,
+        links,
         jspi,
         undefined,
         handlers,
@@ -765,11 +838,12 @@ impl Imports {
     }
 
     /// An ES module export, which ESM integration coerces into an
-    /// immutable externref global.
+    /// immutable externref global: a snapshot of its value at
+    /// instantiation.
     fn module_export(&mut self, spec: &str, export: &str) -> String {
         self.module_exports
             .insert((spec.to_string(), export.to_string()));
-        module_export_ident(export)
+        module_export_ident(spec, export)
     }
 
     fn render(&self) -> String {
@@ -806,7 +880,7 @@ impl Imports {
             let _ = writeln!(
                 out,
                 "  (import {spec:?} {export:?} (global ${} externref))",
-                module_export_ident(export)
+                module_export_ident(spec, export)
             );
         }
         out
@@ -821,8 +895,8 @@ fn wire(ty: WasmType) -> WasmType {
     }
 }
 
-fn module_export_ident(export: &str) -> String {
-    format!("m:{}", ident(export))
+fn module_export_ident(spec: &str, export: &str) -> String {
+    format!("m:{}", ident(&format!("{spec}:{export}")))
 }
 
 fn func_ident(name: &str, params: &[WasmType], result: Option<WasmType>) -> String {
@@ -1050,7 +1124,11 @@ fn generate_bindings(abi: &Abi, used: &[UsedFunction], builtins: &mut Builtins) 
     let mut funcs = String::new();
 
     for uf in used {
-        let f = abi.function(&uf.function).expect("checked in inspect");
+        let f = abi
+            .functions
+            .iter()
+            .find(|f| f.module == uf.module && f.name == uf.function)
+            .expect("checked in inspect");
         let mut body = Body {
             imports: &mut imports,
             builtins,
