@@ -123,3 +123,12 @@ declare module "cloudflare:sockets" {
     startTls(): Socket;
   }
 }
+
+// === Scalar module exports, and a module function's `this` ===
+declare module "embed:values" {
+  const count: number;
+  const enabled: boolean;
+  const disabled: boolean;
+  const big: bigint;
+  function receiver(): string;
+}

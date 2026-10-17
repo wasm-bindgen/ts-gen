@@ -17,9 +17,9 @@
   (func (export "console") (result externref)
     (call $reflect_get (global.get $global) (global.get $s:console)))
   (func (export "Console.log") (param $this externref) (param $args (ref null $anyrefs)) (local $arr externref) (local $push externref) (local $rest (ref null $anyrefs)) (local $i i32) (local $len i32)
-    (local.set $rest (local.get $args))
     (local.set $arr (call $call_new0 (call $reflect_get (global.get $global) (global.get $s:Array))))
     (local.set $push (call $reflect_get (local.get $arr) (global.get $s:push)))
+    (local.set $rest (local.get $args))
     (if (ref.is_null (local.get $rest)) (then) (else
       (local.set $len (array.len (local.get $rest)))
       (block $break (loop $continue
@@ -29,10 +29,10 @@
         (br $continue)))))
     (call $reflect_apply_rrr_v (call $reflect_get (local.get $this) (global.get $s:log)) (local.get $this) (local.get $arr)))
   (func (export "joinAll") (param $sep externref) (param $parts (ref null $anyrefs)) (result externref) (local $arr externref) (local $push externref) (local $rest (ref null $anyrefs)) (local $i i32) (local $len i32)
-    (local.set $rest (local.get $parts))
     (local.set $arr (call $call_new0 (call $reflect_get (global.get $global) (global.get $s:Array))))
     (local.set $push (call $reflect_get (local.get $arr) (global.get $s:push)))
     (call $call1_rrr_v (local.get $push) (local.get $arr) (local.get $sep))
+    (local.set $rest (local.get $parts))
     (if (ref.is_null (local.get $rest)) (then) (else
       (local.set $len (array.len (local.get $rest)))
       (block $break (loop $continue

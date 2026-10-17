@@ -6,57 +6,31 @@ use walkdir::WalkDir;
 
 /// Generate wasm-bindgen Rust bindings from TypeScript .d.ts files.
 #[derive(Parser, Debug)]
-#[command(name = "ts-gen", version, about)]
+#[command(name = "ts-gen", version, about, subcommand_negates_reqs = true)]
 struct Cli {
+    #[command(subcommand)]
+    command: Option<Command>,
+
     /// One or more .d.ts files or directories to process.
     #[arg(short, long, required = true, num_args = 1..)]
     input: Vec<PathBuf>,
 
     /// Output file path for the generated file (e.g., `src/bindings.rs`).
-    #[arg(short, long)]
-    output: PathBuf,
+    #[arg(short, long, required = true)]
+    output: Option<PathBuf>,
 
     /// What to generate from the declarations.
     #[arg(long, value_enum, default_value_t = Target::Rust)]
     target: Target,
 
-    /// Output surface: files and/or JS module specifiers to emit. The
-    /// `--input` set defines the full type universe for resolution;
-    /// `--export` is authoritative about what gets emitted as public
-    /// Rust code.
-    ///
-    /// Two forms:
-    ///   - File path (e.g. `types/email.d.ts`) — emits the globals that
-    ///     file declares.
-    ///   - Module specifier (e.g. `cloudflare:email`) — emits that
-    ///     module's declarations in a `pub mod` named by the specifier
-    ///     (`cloudflare::email`). The `--lib-name` module is emitted at
-    ///     the top level instead.
-    ///
-    /// When omitted entirely, every `--input` file becomes an implicit
-    /// file export. NO modules are emitted by the implicit default —
-    /// modules must be explicitly listed. As soon as one `--export` is
-    /// passed, the implicit default is disabled and only what's listed
-    /// contributes to the output.
-    #[arg(short = 'E', long = "export", num_args = 1..)]
-    export: Vec<String>,
+    #[command(flatten)]
+    selection: Selection,
 
     /// JS module specifier (required when .d.ts has top-level exports).
     /// This module is the library the output binds, so it is emitted at
     /// the top level rather than in a `pub mod`.
     #[arg(long)]
     lib_name: Option<String>,
-
-    /// External type mappings for imported types.
-    ///
-    /// Format: `LHS=RHS` where:
-    ///   - `Blob=::web_sys::Blob` maps a specific type
-    ///   - `node:buffer=node_buffer_sys` maps a module
-    ///   - `node:*=node_sys::*` maps a module prefix with wildcard
-    ///
-    /// Multiple mappings can be comma-separated or specified multiple times.
-    #[arg(short = 'e', long = "external", num_args = 1..)]
-    external: Vec<String>,
 
     /// Disable the built-in web platform → `web_sys` defaults.
     ///
@@ -113,16 +87,117 @@ struct Cli {
     provides_bindings: Option<String>,
 }
 
+/// What the output covers, shared by the main command and `embed`, which
+/// binds the surface the template lists.
+#[derive(clap::Args, Debug)]
+struct Selection {
+    /// Output surface: files and/or JS module specifiers to emit. The
+    /// `--input` set defines the full type universe for resolution;
+    /// `--export` is authoritative about what gets emitted as public
+    /// Rust code.
+    ///
+    /// Two forms:
+    ///   - File path (e.g. `types/email.d.ts`) — emits the globals that
+    ///     file declares.
+    ///   - Module specifier (e.g. `cloudflare:email`) — emits that
+    ///     module's declarations in a `pub mod` named by the specifier
+    ///     (`cloudflare::email`). The `--lib-name` module is emitted at
+    ///     the top level instead.
+    ///
+    /// When omitted entirely, every `--input` file becomes an implicit
+    /// file export. NO modules are emitted by the implicit default —
+    /// modules must be explicitly listed. As soon as one `--export` is
+    /// passed, the implicit default is disabled and only what's listed
+    /// contributes to the output.
+    #[arg(short = 'E', long = "export", num_args = 1..)]
+    export: Vec<String>,
+
+    /// External type mappings for imported types.
+    ///
+    /// Format: `LHS=RHS` where:
+    ///   - `Blob=::web_sys::Blob` maps a specific type
+    ///   - `node:buffer=node_buffer_sys` maps a module
+    ///   - `node:*=node_sys::*` maps a module prefix with wildcard
+    ///
+    /// Multiple mappings can be comma-separated or specified multiple times.
+    #[arg(short = 'e', long = "external", num_args = 1..)]
+    external: Vec<String>,
+}
+
+impl Selection {
+    /// Register the `--external` mappings and resolve the `--export`s.
+    fn apply(
+        &self,
+        gctx: &mut ts_gen::context::GlobalContext,
+        input_files: &[PathBuf],
+    ) -> Result<std::collections::HashSet<ts_gen::codegen::ExportSpec>> {
+        for mapping in &self.external {
+            gctx.external_map.add_mappings(mapping);
+        }
+        resolve_exports(&self.export, input_files)
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, clap::ValueEnum)]
 enum Target {
     /// wasm-bindgen extern declarations.
     Rust,
-    /// Import template for the externref Wasm ABI.
+    /// Import template for the externref Wasm ABI; see `embed`.
     Wat,
+}
+
+#[derive(clap::Subcommand, Debug)]
+enum Command {
+    /// Implement the Wasm ABI for a module written against the `--target wat`
+    /// template: emits `bindings.wasm`, `wrapper.wasm` and `builtins.js`.
+    Embed(EmbedArgs),
+}
+
+#[derive(clap::Args, Debug)]
+struct EmbedArgs {
+    /// The .d.ts files the module was written against.
+    #[arg(short, long, required = true, num_args = 1..)]
+    input: Vec<PathBuf>,
+
+    /// The language's compiled Wasm module.
+    #[arg(short, long)]
+    module: PathBuf,
+
+    /// Directory to write the artifacts to.
+    #[arg(short, long)]
+    out_dir: PathBuf,
+
+    /// Specifier `wrapper.wasm` imports the module under. Defaults to
+    /// `./<module file name>`.
+    #[arg(long)]
+    module_specifier: Option<String>,
+
+    /// Also write the `.wat` text of the intermediate bindings and wrapper modules.
+    #[arg(long)]
+    text: bool,
+
+    /// Path to binaryen's `wasm-merge`. Defaults to `$WASM_MERGE`, then `PATH`.
+    #[arg(long)]
+    wasm_merge: Option<PathBuf>,
+
+    /// JS module specifier (required when .d.ts has top-level exports).
+    #[arg(long)]
+    lib_name: Option<String>,
+
+    /// What the module provides; see the main command's `--provides`.
+    #[arg(long)]
+    provides: Option<String>,
+
+    #[command(flatten)]
+    selection: Selection,
 }
 
 fn main() -> Result<()> {
     let cli = Cli::parse();
+    if let Some(Command::Embed(args)) = cli.command {
+        return embed(args);
+    }
+    let output = cli.output.clone().expect("required without a subcommand");
 
     // Resolve input files
     let input_files = resolve_input_files(&cli.input)?;
@@ -139,10 +214,7 @@ fn main() -> Result<()> {
         gctx.external_map.clear_defaults();
     }
 
-    // Apply external type mappings
-    for mapping in &cli.external {
-        gctx.external_map.add_mappings(mapping);
-    }
+    let exports = cli.selection.apply(&mut gctx, &input_files)?;
 
     let provided = match &cli.provides {
         Some(spec) => ts_gen::provides::resolve(spec, &module, &mut gctx)?,
@@ -158,33 +230,6 @@ fn main() -> Result<()> {
         }
     }
 
-    // Resolve `--export` into a flat set of `ExportSpec`s. A spec is
-    // treated as a file path when it exists on disk (same logic as
-    // `--input`, which also accepts files or directories); otherwise
-    // it's a JS module specifier.
-    let mut exports: std::collections::HashSet<ts_gen::codegen::ExportSpec> =
-        std::collections::HashSet::new();
-    for spec in &cli.export {
-        let as_path = PathBuf::from(spec);
-        if as_path.exists() {
-            for resolved in resolve_input_files(&[as_path])? {
-                let canonical = resolved.canonicalize().unwrap_or(resolved);
-                exports.insert(ts_gen::codegen::ExportSpec::File(canonical));
-            }
-        } else {
-            exports.insert(ts_gen::codegen::ExportSpec::Module(spec.clone()));
-        }
-    }
-    // Implicit default: every `--input` file becomes an implicit
-    // file export. Modules are never auto-added — emitting a module
-    // requires an explicit `--export <spec>`.
-    if cli.export.is_empty() {
-        for path in &input_files {
-            let canonical = path.canonicalize().unwrap_or_else(|_| path.clone());
-            exports.insert(ts_gen::codegen::ExportSpec::File(canonical));
-        }
-    }
-
     let options = ts_gen::codegen::GenerateOptions::new()
         .errors_as_error(cli.errors_as_error)
         .experimental_generic_mono(cli.experimental_generic_mono)
@@ -196,13 +241,13 @@ fn main() -> Result<()> {
         }
     };
 
-    write_file(&cli.output, &source)?;
+    write_file(&output, &source)?;
 
     if cli.target == Target::Rust && !provided.is_empty() {
         let bindings = cli
             .provides_bindings
             .clone()
-            .unwrap_or_else(|| default_bindings_path(&cli.output));
+            .unwrap_or_else(|| default_bindings_path(&output));
         let app: syn::Path = syn::parse_str(&cli.provides_app)
             .with_context(|| format!("--provides-app {:?} is not a path", cli.provides_app))?;
         let app_file_stem = app
@@ -217,11 +262,7 @@ fn main() -> Result<()> {
         };
         let (wrapper, scaffold) =
             ts_gen::codegen::generate_provides(&module, &gctx, &options, &provided, &paths)?;
-        let dir = cli
-            .output
-            .parent()
-            .map(Path::to_path_buf)
-            .unwrap_or_default();
+        let dir = output.parent().map(Path::to_path_buf).unwrap_or_default();
         write_file(&dir.join("provides.rs"), &wrapper)?;
         let app_file = dir.join(format!("{app_file_stem}.rs"));
         if app_file.exists() {
@@ -261,6 +302,111 @@ fn default_bindings_path(output: &Path) -> String {
     } else {
         format!("super::{ident}")
     }
+}
+
+/// The `ExportSpec`s `--export` selects, for both the main command and
+/// `embed`, which binds the same surface the template lists.
+fn resolve_exports(
+    export: &[String],
+    input_files: &[PathBuf],
+) -> Result<std::collections::HashSet<ts_gen::codegen::ExportSpec>> {
+    // Resolve `--export` into a flat set of `ExportSpec`s. A spec is
+    // treated as a file path when it exists on disk (same logic as
+    // `--input`, which also accepts files or directories); otherwise
+    // it's a JS module specifier.
+    let mut exports: std::collections::HashSet<ts_gen::codegen::ExportSpec> =
+        std::collections::HashSet::new();
+    for spec in export {
+        let as_path = PathBuf::from(spec);
+        if as_path.exists() {
+            for resolved in resolve_input_files(&[as_path])? {
+                let canonical = resolved.canonicalize().unwrap_or(resolved);
+                exports.insert(ts_gen::codegen::ExportSpec::File(canonical));
+            }
+        } else {
+            exports.insert(ts_gen::codegen::ExportSpec::Module(spec.clone()));
+        }
+    }
+    // Implicit default: every `--input` file becomes an implicit
+    // file export. Modules are never auto-added — emitting a module
+    // requires an explicit `--export <spec>`.
+    if export.is_empty() {
+        for path in input_files {
+            let canonical = path.canonicalize().unwrap_or_else(|_| path.clone());
+            exports.insert(ts_gen::codegen::ExportSpec::File(canonical));
+        }
+    }
+
+    Ok(exports)
+}
+
+fn embed(args: EmbedArgs) -> Result<()> {
+    let input_files = resolve_input_files(&args.input)?;
+    if input_files.is_empty() {
+        bail!("No .d.ts files found in the specified input paths");
+    }
+    let (module, mut gctx) =
+        ts_gen::parse::parse_dts_files(&input_files, args.lib_name.as_deref())?;
+    let exports = args.selection.apply(&mut gctx, &input_files)?;
+    let provided = match &args.provides {
+        Some(spec) => ts_gen::provides::resolve(spec, &module, &mut gctx)?,
+        None => Vec::new(),
+    };
+    gctx.diagnostics.emit();
+    let options = ts_gen::codegen::GenerateOptions::new().exports(exports);
+    let abi = ts_gen::abi::build(&module, &gctx, &options, &provided);
+
+    let wasm = std::fs::read(&args.module)
+        .with_context(|| format!("Failed to read {}", args.module.display()))?;
+    let module_specifier = args.module_specifier.clone().unwrap_or_else(|| {
+        format!(
+            "./{}",
+            args.module
+                .file_name()
+                .map(|n| n.to_string_lossy().into_owned())
+                .unwrap_or_default()
+        )
+    });
+    let options = ts_gen::abi::embed::Options { module_specifier };
+    let out = ts_gen::abi::embed::embed(&abi, &wasm, &options)?;
+
+    eprintln!(
+        "[ts-gen] {} ABI function(s) used, handlers: {}{}",
+        out.used.len(),
+        out.handlers.join(", "),
+        if out.jspi { " (JSPI mode)" } else { "" }
+    );
+
+    let dir = &args.out_dir;
+    std::fs::create_dir_all(dir)
+        .with_context(|| format!("Failed to create directory: {}", dir.display()))?;
+    let bindings = ts_gen::abi::embed::assemble(&out.bindings_wat).context("bindings.wasm")?;
+    let wrapper = ts_gen::abi::embed::assemble(&out.wrapper_wat).context("wrapper.wasm")?;
+    if args.text {
+        write_file(&dir.join("bindings.wat"), &out.bindings_wat)?;
+        write_file(&dir.join("wrapper.wat"), &out.wrapper_wat)?;
+    }
+    let wasm_merge = args
+        .wasm_merge
+        .or_else(|| std::env::var_os("WASM_MERGE").map(PathBuf::from))
+        .unwrap_or_else(|| PathBuf::from("wasm-merge"));
+    let merged = ts_gen::abi::embed::merge(
+        &wasm_merge,
+        &out.module,
+        &options.module_specifier,
+        &bindings,
+        &wrapper,
+    )?;
+    let merged = ts_gen::abi::embed::postprocess(&merged, &out.used, &out.handlers)?;
+    let file_name = args
+        .module
+        .file_name()
+        .map(|n| n.to_os_string())
+        .unwrap_or_else(|| "output.wasm".into());
+    write_file(&dir.join(file_name), &merged)?;
+    write_file(&dir.join("builtins.js"), &out.builtins_js)?;
+    eprintln!("[ts-gen] Done");
+    Ok(())
 }
 
 fn write_file(path: &std::path::Path, contents: impl AsRef<[u8]>) -> Result<()> {
