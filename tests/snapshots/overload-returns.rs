@@ -20,15 +20,15 @@ extern "C" {
         key: &str,
     ) -> Promise<JsOption<T>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_keys<T: ::wasm_bindgen::JsGeneric>(
+    pub async fn get_with_keys(
         this: &Storage,
         keys: &[String],
-    ) -> Result<Map<JsString, T>, JsValue>;
+    ) -> Result<Map<JsString, JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_keys_promise<T: ::wasm_bindgen::JsGeneric>(
+    pub fn get_with_keys_promise(
         this: &Storage,
         keys: &[String],
-    ) -> Promise<Map<JsString, T>>;
+    ) -> Promise<Map<JsString, JsValue>>;
     #[wasm_bindgen(method, catch)]
     pub async fn fetch<T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi>(
         this: &Storage,
@@ -37,14 +37,16 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "fetch")]
     pub fn fetch_promise<T: ::wasm_bindgen::JsGeneric>(this: &Storage, key: &str) -> Promise<T>;
     #[wasm_bindgen(method, catch, js_name = "fetch")]
-    pub async fn fetch_with_keys<U: ::wasm_bindgen::JsGeneric>(
+    pub async fn fetch_with_keys_and_fallback<U: ::wasm_bindgen::JsGeneric>(
         this: &Storage,
         keys: &[String],
+        fallback: &U,
     ) -> Result<Map<JsString, U>, JsValue>;
     #[wasm_bindgen(method, js_name = "fetch")]
-    pub fn fetch_with_keys_promise<U: ::wasm_bindgen::JsGeneric>(
+    pub fn fetch_with_keys_and_fallback_promise<U: ::wasm_bindgen::JsGeneric>(
         this: &Storage,
         keys: &[String],
+        fallback: &U,
     ) -> Promise<Map<JsString, U>>;
     #[wasm_bindgen(method)]
     pub fn first(this: &Storage) -> String;

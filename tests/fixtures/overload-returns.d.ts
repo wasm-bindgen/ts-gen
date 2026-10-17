@@ -6,9 +6,10 @@
 interface Storage {
   get<T = unknown>(key: string): Promise<T | undefined>;
   get<T = unknown>(keys: string[]): Promise<Map<string, T>>;
-  // Each overload's own type parameters are declared on its expansions.
+  // Each overload's own type parameters are declared on its expansions
+  // (`U` is inferred from `fallback`; `get(keys)`'s nested `T` erases).
   fetch<T = unknown>(key: string): Promise<T>;
-  fetch<U = unknown>(keys: string[]): Promise<Map<string, U>>;
+  fetch<U = unknown>(keys: string[], fallback: U): Promise<Map<string, U>>;
   first(): string;
   first(column: string): Promise<string | null>;
 }

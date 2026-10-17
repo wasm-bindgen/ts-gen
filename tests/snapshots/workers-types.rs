@@ -916,26 +916,26 @@ extern "C" {
         ms_delay: f64,
     ) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, variadic, js_name = "setTimeout")]
-    pub fn set_timeout_with_function_and_args<Args: ::wasm_bindgen::JsGeneric>(
+    pub fn set_timeout_with_function_and_args(
         this: &ServiceWorkerGlobalScope,
         callback: &Function,
         args: &[JsValue],
     ) -> f64;
     #[wasm_bindgen(method, variadic, catch, js_name = "setTimeout")]
-    pub fn try_set_timeout_with_function_and_args<Args: ::wasm_bindgen::JsGeneric>(
+    pub fn try_set_timeout_with_function_and_args(
         this: &ServiceWorkerGlobalScope,
         callback: &Function,
         args: &[JsValue],
     ) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, variadic, js_name = "setTimeout")]
-    pub fn set_timeout_with_function_and_ms_delay_and_args<Args: ::wasm_bindgen::JsGeneric>(
+    pub fn set_timeout_with_function_and_ms_delay_and_args(
         this: &ServiceWorkerGlobalScope,
         callback: &Function,
         ms_delay: f64,
         args: &[JsValue],
     ) -> f64;
     #[wasm_bindgen(method, variadic, catch, js_name = "setTimeout")]
-    pub fn try_set_timeout_with_function_and_ms_delay_and_args<Args: ::wasm_bindgen::JsGeneric>(
+    pub fn try_set_timeout_with_function_and_ms_delay_and_args(
         this: &ServiceWorkerGlobalScope,
         callback: &Function,
         ms_delay: f64,
@@ -968,26 +968,26 @@ extern "C" {
         ms_delay: f64,
     ) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, variadic, js_name = "setInterval")]
-    pub fn set_interval_with_function_and_args<Args: ::wasm_bindgen::JsGeneric>(
+    pub fn set_interval_with_function_and_args(
         this: &ServiceWorkerGlobalScope,
         callback: &Function,
         args: &[JsValue],
     ) -> f64;
     #[wasm_bindgen(method, variadic, catch, js_name = "setInterval")]
-    pub fn try_set_interval_with_function_and_args<Args: ::wasm_bindgen::JsGeneric>(
+    pub fn try_set_interval_with_function_and_args(
         this: &ServiceWorkerGlobalScope,
         callback: &Function,
         args: &[JsValue],
     ) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, variadic, js_name = "setInterval")]
-    pub fn set_interval_with_function_and_ms_delay_and_args<Args: ::wasm_bindgen::JsGeneric>(
+    pub fn set_interval_with_function_and_ms_delay_and_args(
         this: &ServiceWorkerGlobalScope,
         callback: &Function,
         ms_delay: f64,
         args: &[JsValue],
     ) -> f64;
     #[wasm_bindgen(method, variadic, catch, js_name = "setInterval")]
-    pub fn try_set_interval_with_function_and_ms_delay_and_args<Args: ::wasm_bindgen::JsGeneric>(
+    pub fn try_set_interval_with_function_and_ms_delay_and_args(
         this: &ServiceWorkerGlobalScope,
         callback: &Function,
         ms_delay: f64,
@@ -1600,32 +1600,22 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(variadic, js_name = "setTimeout")]
-    pub fn set_timeout<Args: ::wasm_bindgen::JsGeneric>(
-        callback: &Function,
-        args: &[JsValue],
-    ) -> f64;
+    pub fn set_timeout(callback: &Function, args: &[JsValue]) -> f64;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(variadic, catch, js_name = "setTimeout")]
-    pub fn try_set_timeout<Args: ::wasm_bindgen::JsGeneric>(
-        callback: &Function,
-        args: &[JsValue],
-    ) -> Result<f64, JsValue>;
+    pub fn try_set_timeout(callback: &Function, args: &[JsValue]) -> Result<f64, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(variadic, js_name = "setTimeout")]
-    pub fn set_timeout_with_ms_delay<Args: ::wasm_bindgen::JsGeneric>(
-        callback: &Function,
-        ms_delay: f64,
-        args: &[JsValue],
-    ) -> f64;
+    pub fn set_timeout_with_ms_delay(callback: &Function, ms_delay: f64, args: &[JsValue]) -> f64;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(variadic, catch, js_name = "setTimeout")]
-    pub fn try_set_timeout_with_ms_delay<Args: ::wasm_bindgen::JsGeneric>(
+    pub fn try_set_timeout_with_ms_delay(
         callback: &Function,
         ms_delay: f64,
         args: &[JsValue],
@@ -1644,32 +1634,22 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(variadic, js_name = "setInterval")]
-    pub fn set_interval<Args: ::wasm_bindgen::JsGeneric>(
-        callback: &Function,
-        args: &[JsValue],
-    ) -> f64;
+    pub fn set_interval(callback: &Function, args: &[JsValue]) -> f64;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(variadic, catch, js_name = "setInterval")]
-    pub fn try_set_interval<Args: ::wasm_bindgen::JsGeneric>(
-        callback: &Function,
-        args: &[JsValue],
-    ) -> Result<f64, JsValue>;
+    pub fn try_set_interval(callback: &Function, args: &[JsValue]) -> Result<f64, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(variadic, js_name = "setInterval")]
-    pub fn set_interval_with_ms_delay<Args: ::wasm_bindgen::JsGeneric>(
-        callback: &Function,
-        ms_delay: f64,
-        args: &[JsValue],
-    ) -> f64;
+    pub fn set_interval_with_ms_delay(callback: &Function, ms_delay: f64, args: &[JsValue]) -> f64;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(variadic, catch, js_name = "setInterval")]
-    pub fn try_set_interval_with_ms_delay<Args: ::wasm_bindgen::JsGeneric>(
+    pub fn try_set_interval_with_ms_delay(
         callback: &Function,
         ms_delay: f64,
         args: &[JsValue],
@@ -2974,45 +2954,41 @@ extern "C" {
         options: &DurableObjectGetOptions,
     ) -> Promise<JsOption<T>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_keys<T: ::wasm_bindgen::JsGeneric>(
+    pub async fn get_with_keys(
         this: &DurableObjectTransaction,
         keys: &[String],
-    ) -> Result<Map<JsString, T>, JsValue>;
+    ) -> Result<Map<JsString, JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_keys_promise<T: ::wasm_bindgen::JsGeneric>(
+    pub fn get_with_keys_promise(
         this: &DurableObjectTransaction,
         keys: &[String],
-    ) -> Promise<Map<JsString, T>>;
+    ) -> Promise<Map<JsString, JsValue>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_keys_and_options<T: ::wasm_bindgen::JsGeneric>(
+    pub async fn get_with_keys_and_options(
         this: &DurableObjectTransaction,
         keys: &[String],
         options: &DurableObjectGetOptions,
-    ) -> Result<Map<JsString, T>, JsValue>;
+    ) -> Result<Map<JsString, JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_keys_and_options_promise<T: ::wasm_bindgen::JsGeneric>(
+    pub fn get_with_keys_and_options_promise(
         this: &DurableObjectTransaction,
         keys: &[String],
         options: &DurableObjectGetOptions,
-    ) -> Promise<Map<JsString, T>>;
+    ) -> Promise<Map<JsString, JsValue>>;
     #[wasm_bindgen(method, catch)]
-    pub async fn list<T: ::wasm_bindgen::JsGeneric>(
-        this: &DurableObjectTransaction,
-    ) -> Result<Map<JsString, T>, JsValue>;
+    pub async fn list(this: &DurableObjectTransaction) -> Result<Map<JsString, JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "list")]
-    pub fn list_promise<T: ::wasm_bindgen::JsGeneric>(
-        this: &DurableObjectTransaction,
-    ) -> Promise<Map<JsString, T>>;
+    pub fn list_promise(this: &DurableObjectTransaction) -> Promise<Map<JsString, JsValue>>;
     #[wasm_bindgen(method, catch, js_name = "list")]
-    pub async fn list_with_options<T: ::wasm_bindgen::JsGeneric>(
+    pub async fn list_with_options(
         this: &DurableObjectTransaction,
         options: &DurableObjectListOptions,
-    ) -> Result<Map<JsString, T>, JsValue>;
+    ) -> Result<Map<JsString, JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "list")]
-    pub fn list_with_options_promise<T: ::wasm_bindgen::JsGeneric>(
+    pub fn list_with_options_promise(
         this: &DurableObjectTransaction,
         options: &DurableObjectListOptions,
-    ) -> Promise<Map<JsString, T>>;
+    ) -> Promise<Map<JsString, JsValue>>;
     #[wasm_bindgen(method, catch)]
     pub async fn put<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectTransaction,
@@ -3204,45 +3180,41 @@ extern "C" {
         options: &DurableObjectGetOptions,
     ) -> Promise<JsOption<T>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_keys<T: ::wasm_bindgen::JsGeneric>(
+    pub async fn get_with_keys(
         this: &DurableObjectStorage,
         keys: &[String],
-    ) -> Result<Map<JsString, T>, JsValue>;
+    ) -> Result<Map<JsString, JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_keys_promise<T: ::wasm_bindgen::JsGeneric>(
+    pub fn get_with_keys_promise(
         this: &DurableObjectStorage,
         keys: &[String],
-    ) -> Promise<Map<JsString, T>>;
+    ) -> Promise<Map<JsString, JsValue>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_keys_and_options<T: ::wasm_bindgen::JsGeneric>(
+    pub async fn get_with_keys_and_options(
         this: &DurableObjectStorage,
         keys: &[String],
         options: &DurableObjectGetOptions,
-    ) -> Result<Map<JsString, T>, JsValue>;
+    ) -> Result<Map<JsString, JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_keys_and_options_promise<T: ::wasm_bindgen::JsGeneric>(
+    pub fn get_with_keys_and_options_promise(
         this: &DurableObjectStorage,
         keys: &[String],
         options: &DurableObjectGetOptions,
-    ) -> Promise<Map<JsString, T>>;
+    ) -> Promise<Map<JsString, JsValue>>;
     #[wasm_bindgen(method, catch)]
-    pub async fn list<T: ::wasm_bindgen::JsGeneric>(
-        this: &DurableObjectStorage,
-    ) -> Result<Map<JsString, T>, JsValue>;
+    pub async fn list(this: &DurableObjectStorage) -> Result<Map<JsString, JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "list")]
-    pub fn list_promise<T: ::wasm_bindgen::JsGeneric>(
-        this: &DurableObjectStorage,
-    ) -> Promise<Map<JsString, T>>;
+    pub fn list_promise(this: &DurableObjectStorage) -> Promise<Map<JsString, JsValue>>;
     #[wasm_bindgen(method, catch, js_name = "list")]
-    pub async fn list_with_options<T: ::wasm_bindgen::JsGeneric>(
+    pub async fn list_with_options(
         this: &DurableObjectStorage,
         options: &DurableObjectListOptions,
-    ) -> Result<Map<JsString, T>, JsValue>;
+    ) -> Result<Map<JsString, JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "list")]
-    pub fn list_with_options_promise<T: ::wasm_bindgen::JsGeneric>(
+    pub fn list_with_options_promise(
         this: &DurableObjectStorage,
         options: &DurableObjectListOptions,
-    ) -> Promise<Map<JsString, T>>;
+    ) -> Promise<Map<JsString, JsValue>>;
     #[wasm_bindgen(method, catch)]
     pub async fn put<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectStorage,
@@ -9790,23 +9762,19 @@ extern "C" {
         options: &KVNamespaceGetOptions<JsString>,
     ) -> Promise<Map<JsString, JsNullable<JsString>>>;
     #[wasm_bindgen(method, catch)]
-    pub async fn list<Metadata: ::wasm_bindgen::JsGeneric>(
-        this: &KVNamespace,
-    ) -> Result<KVNamespaceListResult<Metadata>, JsValue>;
+    pub async fn list(this: &KVNamespace) -> Result<KVNamespaceListResult<JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "list")]
-    pub fn list_promise<Metadata: ::wasm_bindgen::JsGeneric>(
-        this: &KVNamespace,
-    ) -> Promise<KVNamespaceListResult<Metadata>>;
+    pub fn list_promise(this: &KVNamespace) -> Promise<KVNamespaceListResult<JsValue>>;
     #[wasm_bindgen(method, catch, js_name = "list")]
-    pub async fn list_with_options<Metadata: ::wasm_bindgen::JsGeneric>(
+    pub async fn list_with_options(
         this: &KVNamespace,
         options: &KVNamespaceListOptions,
-    ) -> Result<KVNamespaceListResult<Metadata>, JsValue>;
+    ) -> Result<KVNamespaceListResult<JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "list")]
-    pub fn list_with_options_promise<Metadata: ::wasm_bindgen::JsGeneric>(
+    pub fn list_with_options_promise(
         this: &KVNamespace,
         options: &KVNamespaceListOptions,
-    ) -> Promise<KVNamespaceListResult<Metadata>>;
+    ) -> Promise<KVNamespaceListResult<JsValue>>;
     #[wasm_bindgen(method, catch)]
     pub async fn put(this: &KVNamespace, key: &str, value: &str) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
@@ -9904,113 +9872,97 @@ extern "C" {
         options: &KVNamespacePutOptions,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata<Metadata: ::wasm_bindgen::JsGeneric>(
+    pub async fn get_with_metadata(
         this: &KVNamespace,
         key: &str,
-    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
+    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_promise<Metadata: ::wasm_bindgen::JsGeneric>(
+    pub fn get_with_metadata_promise(
         this: &KVNamespace,
         key: &str,
-    ) -> Promise<KVNamespaceGetWithMetadataResult<JsString, Metadata>>;
+    ) -> Promise<KVNamespaceGetWithMetadataResult<JsString, JsValue>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_str_and_kv_namespace_get_options<
-        Metadata: ::wasm_bindgen::JsGeneric,
-    >(
+    pub async fn get_with_metadata_with_str_and_kv_namespace_get_options(
         this: &KVNamespace,
         key: &str,
         options: &KVNamespaceGetOptions<Undefined>,
-    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
+    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_with_str_and_kv_namespace_get_options_promise<
-        Metadata: ::wasm_bindgen::JsGeneric,
-    >(
+    pub fn get_with_metadata_with_str_and_kv_namespace_get_options_promise(
         this: &KVNamespace,
         key: &str,
         options: &KVNamespaceGetOptions<Undefined>,
-    ) -> Promise<KVNamespaceGetWithMetadataResult<JsString, Metadata>>;
+    ) -> Promise<KVNamespaceGetWithMetadataResult<JsString, JsValue>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_str_and_type<Metadata: ::wasm_bindgen::JsGeneric>(
+    pub async fn get_with_metadata_with_str_and_type(
         this: &KVNamespace,
         key: &str,
         r#type: &str,
-    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
+    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_with_str_and_type_promise<Metadata: ::wasm_bindgen::JsGeneric>(
+    pub fn get_with_metadata_with_str_and_type_promise(
         this: &KVNamespace,
         key: &str,
         r#type: &str,
-    ) -> Promise<KVNamespaceGetWithMetadataResult<JsString, Metadata>>;
+    ) -> Promise<KVNamespaceGetWithMetadataResult<JsString, JsValue>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_key_str_and_options_kv_namespace_get_options<
-        Metadata: ::wasm_bindgen::JsGeneric,
-    >(
+    pub async fn get_with_metadata_with_key_str_and_options_kv_namespace_get_options(
         this: &KVNamespace,
         key: &str,
         options: &KVNamespaceGetOptions<JsString>,
-    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>;
+    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_with_key_str_and_options_kv_namespace_get_options_promise<
-        Metadata: ::wasm_bindgen::JsGeneric,
-    >(
+    pub fn get_with_metadata_with_key_str_and_options_kv_namespace_get_options_promise(
         this: &KVNamespace,
         key: &str,
         options: &KVNamespaceGetOptions<JsString>,
-    ) -> Promise<KVNamespaceGetWithMetadataResult<JsString, Metadata>>;
+    ) -> Promise<KVNamespaceGetWithMetadataResult<JsString, JsValue>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_slice_and_type<Metadata: ::wasm_bindgen::JsGeneric>(
+    pub async fn get_with_metadata_with_slice_and_type(
         this: &KVNamespace,
         key: &[String],
         r#type: &str,
-    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<JsString, Metadata>>, JsValue>;
+    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<JsString, JsValue>>, JsValue>;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_with_slice_and_type_promise<Metadata: ::wasm_bindgen::JsGeneric>(
+    pub fn get_with_metadata_with_slice_and_type_promise(
         this: &KVNamespace,
         key: &[String],
         r#type: &str,
-    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<JsString, Metadata>>>;
+    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<JsString, JsValue>>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_slice<Metadata: ::wasm_bindgen::JsGeneric>(
+    pub async fn get_with_metadata_with_slice(
         this: &KVNamespace,
         key: &[String],
-    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<JsString, Metadata>>, JsValue>;
+    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<JsString, JsValue>>, JsValue>;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_with_slice_promise<Metadata: ::wasm_bindgen::JsGeneric>(
+    pub fn get_with_metadata_with_slice_promise(
         this: &KVNamespace,
         key: &[String],
-    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<JsString, Metadata>>>;
+    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<JsString, JsValue>>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_slice_and_kv_namespace_get_options<
-        Metadata: ::wasm_bindgen::JsGeneric,
-    >(
+    pub async fn get_with_metadata_with_slice_and_kv_namespace_get_options(
         this: &KVNamespace,
         key: &[String],
         options: &KVNamespaceGetOptions<Undefined>,
-    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<JsString, Metadata>>, JsValue>;
+    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<JsString, JsValue>>, JsValue>;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_with_slice_and_kv_namespace_get_options_promise<
-        Metadata: ::wasm_bindgen::JsGeneric,
-    >(
+    pub fn get_with_metadata_with_slice_and_kv_namespace_get_options_promise(
         this: &KVNamespace,
         key: &[String],
         options: &KVNamespaceGetOptions<Undefined>,
-    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<JsString, Metadata>>>;
+    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<JsString, JsValue>>>;
     #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
-    pub async fn get_with_metadata_with_key_slice_and_options_kv_namespace_get_options<
-        Metadata: ::wasm_bindgen::JsGeneric,
-    >(
+    pub async fn get_with_metadata_with_key_slice_and_options_kv_namespace_get_options(
         this: &KVNamespace,
         key: &[String],
         options: &KVNamespaceGetOptions<JsString>,
-    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<JsString, Metadata>>, JsValue>;
+    ) -> Result<Map<JsString, KVNamespaceGetWithMetadataResult<JsString, JsValue>>, JsValue>;
     #[wasm_bindgen(method, js_name = "getWithMetadata")]
-    pub fn get_with_metadata_with_key_slice_and_options_kv_namespace_get_options_promise<
-        Metadata: ::wasm_bindgen::JsGeneric,
-    >(
+    pub fn get_with_metadata_with_key_slice_and_options_kv_namespace_get_options_promise(
         this: &KVNamespace,
         key: &[String],
         options: &KVNamespaceGetOptions<JsString>,
-    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<JsString, Metadata>>>;
+    ) -> Promise<Map<JsString, KVNamespaceGetWithMetadataResult<JsString, JsValue>>>;
     #[wasm_bindgen(method, catch)]
     pub async fn delete(this: &KVNamespace, key: &str) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
@@ -15325,17 +15277,13 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SqlStorage;
     #[wasm_bindgen(method, variadic)]
-    pub fn exec<T: ::wasm_bindgen::JsGeneric>(
-        this: &SqlStorage,
-        query: &str,
-        bindings: &[JsValue],
-    ) -> SqlStorageCursor<T>;
+    pub fn exec(this: &SqlStorage, query: &str, bindings: &[JsValue]) -> SqlStorageCursor<JsValue>;
     #[wasm_bindgen(method, variadic, catch, js_name = "exec")]
-    pub fn try_exec<T: ::wasm_bindgen::JsGeneric>(
+    pub fn try_exec(
         this: &SqlStorage,
         query: &str,
         bindings: &[JsValue],
-    ) -> Result<SqlStorageCursor<T>, JsValue>;
+    ) -> Result<SqlStorageCursor<JsValue>, JsValue>;
     #[wasm_bindgen(method, getter, js_name = "databaseSize")]
     pub fn database_size(this: &SqlStorage) -> f64;
     #[wasm_bindgen(method, getter, js_name = "Cursor")]
@@ -15379,13 +15327,11 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "one")]
     pub fn try_one<T: ::wasm_bindgen::JsGeneric>(this: &SqlStorageCursor<T>) -> Result<T, JsValue>;
     #[wasm_bindgen(method)]
-    pub fn raw<T: ::wasm_bindgen::JsGeneric, U: ::wasm_bindgen::JsGeneric>(
-        this: &SqlStorageCursor<T>,
-    ) -> Iterator<U>;
+    pub fn raw<T: ::wasm_bindgen::JsGeneric>(this: &SqlStorageCursor<T>) -> Iterator;
     #[wasm_bindgen(method, catch, js_name = "raw")]
-    pub fn try_raw<T: ::wasm_bindgen::JsGeneric, U: ::wasm_bindgen::JsGeneric>(
+    pub fn try_raw<T: ::wasm_bindgen::JsGeneric>(
         this: &SqlStorageCursor<T>,
-    ) -> Result<Iterator<U>, JsValue>;
+    ) -> Result<Iterator, JsValue>;
     #[wasm_bindgen(method, getter, js_name = "columnNames")]
     pub fn column_names<T: ::wasm_bindgen::JsGeneric>(this: &SqlStorageCursor<T>) -> Vec<String>;
     #[wasm_bindgen(method, setter, js_name = "columnNames")]
@@ -16016,21 +15962,19 @@ extern "C" {
         key: &str,
     ) -> Result<Option<T>, JsValue>;
     #[wasm_bindgen(method)]
-    pub fn list<T: ::wasm_bindgen::JsGeneric>(this: &SyncKvStorage) -> SyncKvStorageList<T>;
+    pub fn list(this: &SyncKvStorage) -> SyncKvStorageList<JsValue>;
     #[wasm_bindgen(method, catch, js_name = "list")]
-    pub fn try_list<T: ::wasm_bindgen::JsGeneric>(
-        this: &SyncKvStorage,
-    ) -> Result<SyncKvStorageList<T>, JsValue>;
+    pub fn try_list(this: &SyncKvStorage) -> Result<SyncKvStorageList<JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "list")]
-    pub fn list_with_options<T: ::wasm_bindgen::JsGeneric>(
+    pub fn list_with_options(
         this: &SyncKvStorage,
         options: &SyncKvListOptions,
-    ) -> SyncKvStorageList<T>;
+    ) -> SyncKvStorageList<JsValue>;
     #[wasm_bindgen(method, catch, js_name = "list")]
-    pub fn try_list_with_options<T: ::wasm_bindgen::JsGeneric>(
+    pub fn try_list_with_options(
         this: &SyncKvStorage,
         options: &SyncKvListOptions,
-    ) -> Result<SyncKvStorageList<T>, JsValue>;
+    ) -> Result<SyncKvStorageList<JsValue>, JsValue>;
     #[wasm_bindgen(method)]
     pub fn put<T: ::wasm_bindgen::JsGeneric>(this: &SyncKvStorage, key: &str, value: &T);
     #[wasm_bindgen(method, catch, js_name = "put")]
@@ -16138,33 +16082,28 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WorkerStub;
     #[wasm_bindgen(method, js_name = "getEntrypoint")]
-    pub fn get_entrypoint<T: ::wasm_bindgen::JsGeneric>(this: &WorkerStub) -> Fetcher<T>;
+    pub fn get_entrypoint(this: &WorkerStub) -> Fetcher<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "getEntrypoint")]
-    pub fn try_get_entrypoint<T: ::wasm_bindgen::JsGeneric>(
-        this: &WorkerStub,
-    ) -> Result<Fetcher<T>, JsValue>;
+    pub fn try_get_entrypoint(this: &WorkerStub) -> Result<Fetcher<Undefined>, JsValue>;
     #[wasm_bindgen(method, js_name = "getEntrypoint")]
-    pub fn get_entrypoint_with_name<T: ::wasm_bindgen::JsGeneric>(
+    pub fn get_entrypoint_with_name(this: &WorkerStub, name: &str) -> Fetcher<Undefined>;
+    #[wasm_bindgen(method, catch, js_name = "getEntrypoint")]
+    pub fn try_get_entrypoint_with_name(
         this: &WorkerStub,
         name: &str,
-    ) -> Fetcher<T>;
-    #[wasm_bindgen(method, catch, js_name = "getEntrypoint")]
-    pub fn try_get_entrypoint_with_name<T: ::wasm_bindgen::JsGeneric>(
-        this: &WorkerStub,
-        name: &str,
-    ) -> Result<Fetcher<T>, JsValue>;
+    ) -> Result<Fetcher<Undefined>, JsValue>;
     #[wasm_bindgen(method, js_name = "getEntrypoint")]
-    pub fn get_entrypoint_with_name_and_options<T: ::wasm_bindgen::JsGeneric>(
+    pub fn get_entrypoint_with_name_and_options(
         this: &WorkerStub,
         name: &str,
         options: &WorkerStubEntrypointOptions,
-    ) -> Fetcher<T>;
+    ) -> Fetcher<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "getEntrypoint")]
-    pub fn try_get_entrypoint_with_name_and_options<T: ::wasm_bindgen::JsGeneric>(
+    pub fn try_get_entrypoint_with_name_and_options(
         this: &WorkerStub,
         name: &str,
         options: &WorkerStubEntrypointOptions,
-    ) -> Result<Fetcher<T>, JsValue>;
+    ) -> Result<Fetcher<Undefined>, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -37793,15 +37732,15 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "prepare")]
     pub fn try_prepare(this: &D1Database, query: &str) -> Result<D1PreparedStatement, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn batch<T: ::wasm_bindgen::JsGeneric>(
+    pub async fn batch(
         this: &D1Database,
         statements: &[D1PreparedStatement],
-    ) -> Result<Array<D1Result<T>>, JsValue>;
+    ) -> Result<Vec<D1Result<JsValue>>, JsValue>;
     #[wasm_bindgen(method, js_name = "batch")]
-    pub fn batch_promise<T: ::wasm_bindgen::JsGeneric>(
+    pub fn batch_promise(
         this: &D1Database,
         statements: &[D1PreparedStatement],
-    ) -> Promise<Array<D1Result<T>>>;
+    ) -> Promise<Array<D1Result<JsValue>>>;
     #[wasm_bindgen(method, catch)]
     pub async fn exec(this: &D1Database, query: &str) -> Result<D1ExecResult, JsValue>;
     #[wasm_bindgen(method, js_name = "exec")]
@@ -37880,15 +37819,15 @@ extern "C" {
         query: &str,
     ) -> Result<D1PreparedStatement, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn batch<T: ::wasm_bindgen::JsGeneric>(
+    pub async fn batch(
         this: &D1DatabaseSession,
         statements: &[D1PreparedStatement],
-    ) -> Result<Array<D1Result<T>>, JsValue>;
+    ) -> Result<Vec<D1Result<JsValue>>, JsValue>;
     #[wasm_bindgen(method, js_name = "batch")]
-    pub fn batch_promise<T: ::wasm_bindgen::JsGeneric>(
+    pub fn batch_promise(
         this: &D1DatabaseSession,
         statements: &[D1PreparedStatement],
-    ) -> Promise<Array<D1Result<T>>>;
+    ) -> Promise<Array<D1Result<JsValue>>>;
     #[doc = "          If no query has been executed yet, `null` is returned."]
     #[doc = ""]
     #[doc = " Returns: The latest session bookmark across all executed queries on the session."]
@@ -37931,49 +37870,37 @@ extern "C" {
         col_name: &str,
     ) -> Promise<JsNullable<T>>;
     #[wasm_bindgen(method, catch)]
-    pub async fn run<T: ::wasm_bindgen::JsGeneric>(
-        this: &D1PreparedStatement,
-    ) -> Result<D1Result<T>, JsValue>;
+    pub async fn run(this: &D1PreparedStatement) -> Result<D1Result<JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "run")]
-    pub fn run_promise<T: ::wasm_bindgen::JsGeneric>(
-        this: &D1PreparedStatement,
-    ) -> Promise<D1Result<T>>;
+    pub fn run_promise(this: &D1PreparedStatement) -> Promise<D1Result<JsValue>>;
     #[wasm_bindgen(method, catch)]
-    pub async fn all<T: ::wasm_bindgen::JsGeneric>(
-        this: &D1PreparedStatement,
-    ) -> Result<D1Result<T>, JsValue>;
+    pub async fn all(this: &D1PreparedStatement) -> Result<D1Result<JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "all")]
-    pub fn all_promise<T: ::wasm_bindgen::JsGeneric>(
-        this: &D1PreparedStatement,
-    ) -> Promise<D1Result<T>>;
+    pub fn all_promise(this: &D1PreparedStatement) -> Promise<D1Result<JsValue>>;
     #[wasm_bindgen(method, catch)]
-    pub async fn raw<T: ::wasm_bindgen::JsGeneric>(
-        this: &D1PreparedStatement,
-    ) -> Result<Array<T>, JsValue>;
+    pub async fn raw(this: &D1PreparedStatement) -> Result<Vec<Array>, JsValue>;
     #[wasm_bindgen(method, js_name = "raw")]
-    pub fn raw_promise<T: ::wasm_bindgen::JsGeneric>(
-        this: &D1PreparedStatement,
-    ) -> Promise<Array<T>>;
+    pub fn raw_promise(this: &D1PreparedStatement) -> Promise<Array<Array>>;
     #[wasm_bindgen(method, catch, js_name = "raw")]
-    pub async fn raw_with_d1_prepared_statement_options<T: ::wasm_bindgen::JsGeneric>(
+    pub async fn raw_with_d1_prepared_statement_options(
         this: &D1PreparedStatement,
         options: &D1PreparedStatementOptions,
-    ) -> Result<ArrayTuple<(Array<JsString>, Array<T>)>, JsValue>;
+    ) -> Result<ArrayTuple<(Array<JsString>, Array<Array>)>, JsValue>;
     #[wasm_bindgen(method, js_name = "raw")]
-    pub fn raw_with_d1_prepared_statement_options_promise<T: ::wasm_bindgen::JsGeneric>(
+    pub fn raw_with_d1_prepared_statement_options_promise(
         this: &D1PreparedStatement,
         options: &D1PreparedStatementOptions,
-    ) -> Promise<ArrayTuple<(Array<JsString>, Array<T>)>>;
+    ) -> Promise<ArrayTuple<(Array<JsString>, Array<Array>)>>;
     #[wasm_bindgen(method, catch, js_name = "raw")]
-    pub async fn raw_with_d1_prepared_statement_options2<T: ::wasm_bindgen::JsGeneric>(
+    pub async fn raw_with_d1_prepared_statement_options2(
         this: &D1PreparedStatement,
         options: &D1PreparedStatementOptions2,
-    ) -> Result<Array<T>, JsValue>;
+    ) -> Result<Vec<Array>, JsValue>;
     #[wasm_bindgen(method, js_name = "raw")]
-    pub fn raw_with_d1_prepared_statement_options2_promise<T: ::wasm_bindgen::JsGeneric>(
+    pub fn raw_with_d1_prepared_statement_options2_promise(
         this: &D1PreparedStatement,
         options: &D1PreparedStatementOptions2,
-    ) -> Promise<Array<T>>;
+    ) -> Promise<Array<Array>>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -39253,17 +39180,17 @@ pub mod cloudflare {
                 val: &Function<fn(JsString, JsValue) -> Promise<Undefined>>,
             );
             #[wasm_bindgen(method, catch, js_name = "waitForEvent")]
-            pub async fn wait_for_event<T: ::wasm_bindgen::JsGeneric>(
+            pub async fn wait_for_event(
                 this: &WorkflowStep,
                 name: &str,
                 options: &WorkflowStepOptions,
-            ) -> Result<WorkflowStepEvent<T>, JsValue>;
+            ) -> Result<WorkflowStepEvent<JsValue>, JsValue>;
             #[wasm_bindgen(method, js_name = "waitForEvent")]
-            pub fn wait_for_event_promise<T: ::wasm_bindgen::JsGeneric>(
+            pub fn wait_for_event_promise(
                 this: &WorkflowStep,
                 name: &str,
                 options: &WorkflowStepOptions,
-            ) -> Promise<WorkflowStepEvent<T>>;
+            ) -> Promise<WorkflowStepEvent<JsValue>>;
         }
         #[wasm_bindgen(module = "cloudflare:workers")]
         extern "C" {

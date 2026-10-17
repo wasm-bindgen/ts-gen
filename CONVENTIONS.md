@@ -554,8 +554,11 @@ pub mod web_assembly {
 Consumers always write `web_assembly::Global`. The `_` suffix is an
 internal detail.
 
-The bindings also spell the prelude's `Option`, `Result`, `String` and
-`Vec` bare, so a declaration with one of those names is suffixed the same
+The bindings also spell the Rust prelude bare (`Result<T, JsValue>` on
+every fallible binding, `String`, `Option<T>`, `From`/`Default`/`Clone`
+in impls), so a declaration named like anything the 2021 prelude exports
+(`Result`, `Option`, `Box`, `Default`, `From`, …; the full list is
+`RUST_PRELUDE_RESERVED` in `codegen/typemap.rs`) is suffixed the same
 way. It is not re-exported, since `pub use Result_ as Result;` would
 shadow the prelude `Result` again, so consumers write `Result_`.
 
@@ -1486,8 +1489,8 @@ focused parameter-axis result. The per-callable layer
 async-ness, `try_` companions, doc, error type) **per expansion**,
 using the return type of the overload each expansion came from, and
 resolving it in that overload's own scope so its `<T>` is the one
-declared on the binding (`get<T>(key)` next to `get<U>(keys)` declares
-`U` on `get_with_keys`):
+declared on the binding (`fetch<T>(key)` next to `fetch<U>(keys,
+fallback: U)` declares `U` on `fetch_with_keys_and_fallback`):
 
 ```ts
 get<T>(key: string): Promise<T | undefined>;
@@ -1498,7 +1501,7 @@ first(column: string): Promise<string | null>;
 
 ```rust
 pub async fn get<T>(this: &Storage, key: &str) -> Result<JsOption<T>, JsValue>;
-pub async fn get_with_keys<T>(this: &Storage, keys: &[String]) -> Result<Map<JsString, T>, JsValue>;
+pub async fn get_with_keys(this: &Storage, keys: &[String]) -> Result<Map<JsString, JsValue>, JsValue>;
 pub fn first(this: &Storage) -> String;                 // + try_first
 pub async fn first_with_column(this: &Storage, column: &str) -> Result<JsOption<JsString>, JsValue>;
 ```
@@ -1795,7 +1798,7 @@ pub fn iterator<T: ::wasm_bindgen::JsGeneric>(
 ) -> Iterator<ArrayTuple<(JsString, T)>>;
 
 #[wasm_bindgen(method)]
-pub fn list<T: ::wasm_bindgen::JsGeneric>(this: &SyncKvStorage) -> SyncKvStorageList<T>;
+pub fn list(this: &SyncKvStorage) -> SyncKvStorageList<JsValue>;
 ```
 
 The wrapper's name follows the existing `<Parent><Member>`
@@ -1809,7 +1812,10 @@ parameter-synthesis limitation.
 
 Type parameters mentioned by the iteration item bubble up onto the
 synthesized wrapper, so `Iterable<[string, T]>` produces
-`<Parent>List<T>` rather than erasing `T`.
+`<Parent>List<T>` rather than erasing `T`. The method returning it
+still has no argument to infer `T` from, so it hands back the wrapper
+at its default (see [uninferrable type
+parameters](#uninferrable-method-type-parameters)).
 
 ## In-scope generic type parameters
 
@@ -1829,6 +1835,49 @@ becomes:
 ```rust
 pub fn put<T: ::wasm_bindgen::JsGeneric>(this: &KeyValueStore, key: &str, value: &T);
 pub fn get<T: ::wasm_bindgen::JsGeneric>(this: &KeyValueStore, key: &str) -> Option<T>;
+```
+
+### Uninferrable method type parameters
+
+A callable-level parameter that no argument mentions once lowered has
+to be named at every call. That is worth it only where the turbofish
+is itself the cast — the (awaited) return is exactly `T`, `T |
+undefined` or `T | null` — so the rule, per parameter:
+
+1. Mentioned by an argument: kept, inferred at the call. A callback
+   counts only as it lowers: a variadic callback is the untyped
+   `Function` and a `Promise<T>` callback return erases, so neither
+   mentions `T`.
+2. Not mentioned, return exactly `T` / `T | undefined` / `T | null`
+   (awaited): kept — `storage.get::<JsString>(key)`, `body.json::<Row>()`.
+3. Otherwise erased and removed from the signature. The substitute is
+   the default declared by the generic type `T` instantiates in the
+   return (`Row<T = Record<string, unknown>>` → `Object`), else the
+   method's own default (`list<T = unknown>` → `JsValue`), else `any`.
+   A parameter the return never mentions is simply dropped.
+
+Callers wanting a typed container `unchecked_into` it
+(`D1Result<JsValue>` → `D1Result<Row>`). `_promise` and `try_`
+companions follow the same signature.
+
+```ts
+interface Store {
+  put<T>(key: string, value: T): Promise<void>;
+  get<T = unknown>(key: string): Promise<T | undefined>;
+  transaction<T>(closure: (tx: Store) => Promise<T>): Promise<T>;
+  run<T = unknown>(): Promise<Row<T>>;
+  list<T = unknown>(): Promise<Map<string, T>>;
+  schedule<Args extends unknown[]>(callback: (...args: Args) => void, ...args: Args): number;
+}
+```
+
+```rust
+pub async fn put<T: JsGeneric>(this: &Store, key: &str, value: &T) -> Result<(), JsValue>;
+pub async fn get<T: JsGeneric>(this: &Store, key: &str) -> Result<JsOption<T>, JsValue>;
+pub async fn transaction<T: JsGeneric + FromWasmAbi>(this: &Store, closure: &Function<fn(Store) -> Promise>) -> Result<T, JsValue>;
+pub async fn run(this: &Store) -> Result<Row<Object>, JsValue>;
+pub async fn list(this: &Store) -> Result<Map<JsString, JsValue>, JsValue>;
+pub fn schedule(this: &Store, callback: &Function, args: &[JsValue]) -> f64;
 ```
 
 Passing `--experimental-generic-mono` selects wasm-bindgen's experimental

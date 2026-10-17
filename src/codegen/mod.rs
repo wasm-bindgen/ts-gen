@@ -13,6 +13,7 @@ pub mod provides;
 pub mod signatures;
 pub mod subtyping;
 pub mod surface;
+mod type_params;
 pub mod typemap;
 
 use std::collections::{HashMap, HashSet};
