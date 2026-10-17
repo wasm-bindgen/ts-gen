@@ -139,10 +139,13 @@ pub fn generate_with_options(
 ) -> anyhow::Result<String> {
     let tokens = generate_tokens(module, gctx, options);
     // Validate that the tokens are valid Rust syntax.
-    syn::parse2::<syn::File>(tokens.clone()).map_err(|e| {
+    let mut file = syn::parse2::<syn::File>(tokens.clone()).map_err(|e| {
         anyhow::anyhow!("generated tokens are not valid syn:\n{e}\n\nTokens:\n{tokens}")
     })?;
-    let formatted = rustfmt(&tokens.to_string())?;
+    if options.experimental_generic_mono {
+        signatures::state_abi_bounds(&mut file.items);
+    }
+    let formatted = rustfmt(&quote::ToTokens::to_token_stream(&file).to_string())?;
     // Prepend a header comment. Line comments don't survive `quote!`
     // token generation, so they have to be emitted as plain text
     // after formatting.
