@@ -426,6 +426,9 @@ pub struct AbiFunction {
     /// Export name in `bindings.wasm` and import field in the language
     /// module: `Type.member` with wasm-bindgen's variant suffixes.
     pub name: String,
+    /// Further names `bindings.wasm` exports the same function under: a
+    /// type exported under several names has each member under each.
+    pub aliases: Vec<String>,
     pub op: AbiOp,
     /// Includes the receiver as the first parameter for instance ops.
     pub params: Vec<AbiParam>,
@@ -500,6 +503,7 @@ pub const UNDEFINED_GLOBAL: &str = "undefined";
 fn sys_functions() -> Vec<AbiFunction> {
     let sys = |name: &str, op: AbiOp, param: WasmType, result: WasmType, ts: &str| AbiFunction {
         name: name.into(),
+        aliases: Vec::new(),
         op,
         params: vec![AbiParam {
             name: "x".into(),
@@ -560,31 +564,29 @@ pub fn build(
     for e in provided {
         abi.handlers.push(build_handler(e, &lower, &top_level));
     }
-    for (id, decl) in module
-        .types
-        .iter()
-        .flat_map(|&id| lower.surface.get(id).iter().map(move |d| (id, d)))
-    {
-        let start = abi.functions.len();
-        build_declaration(id, decl, &[], &lower, &mut abi);
-        // The specifier is a property of the declaration, so it is stamped
-        // on everything the declaration produced rather than threaded
-        // through every builder.
-        if let ModuleContext::Module(spec) = &decl.module_context {
-            for f in &mut abi.functions[start..] {
-                f.module = Some(spec.to_string());
-                // A module export is reached as an externref global, so a
-                // scalar-typed `const`/`let` has no wire representation.
-                if let AbiOp::StaticGet { path, .. } = &f.op {
-                    if path.is_empty()
-                        && f.result
-                            .is_some_and(|r| !matches!(r, WasmType::ExternRef { .. }))
-                    {
-                        bail!(
+    for &id in &module.types {
+        for decl in lower.surface.get(id) {
+            let start = abi.functions.len();
+            build_declaration(id, decl, &[], &lower, &mut abi);
+            // The specifier is a property of the declaration, so it is stamped
+            // on everything the declaration produced rather than threaded
+            // through every builder.
+            if let ModuleContext::Module(spec) = &decl.module_context {
+                for f in &mut abi.functions[start..] {
+                    f.module = Some(spec.to_string());
+                    // A module export is reached as an externref global, so a
+                    // scalar-typed `const`/`let` has no wire representation.
+                    if let AbiOp::StaticGet { path, .. } = &f.op {
+                        if path.is_empty()
+                            && f.result
+                                .is_some_and(|r| !matches!(r, WasmType::ExternRef { .. }))
+                        {
+                            bail!(
                             "{}: a scalar `{}` exported from module {spec:?} cannot be read; a module export is a reference",
                             f.name,
                             f.ts
                         );
+                        }
                     }
                 }
             }
@@ -599,8 +601,14 @@ pub fn build(
     let mut by_name: std::collections::HashMap<String, usize> = Default::default();
     let mut kept: Vec<AbiFunction> = Vec::with_capacity(abi.functions.len());
     for f in std::mem::take(&mut abi.functions) {
-        let Some(&i) = by_name.get(&f.name) else {
-            by_name.insert(f.name.clone(), kept.len());
+        let names: Vec<String> = std::iter::once(&f.name)
+            .chain(&f.aliases)
+            .cloned()
+            .collect();
+        let Some(i) = names.iter().find_map(|n| by_name.get(n).copied()) else {
+            for n in names {
+                by_name.insert(n, kept.len());
+            }
             kept.push(f);
             continue;
         };
@@ -609,7 +617,12 @@ pub fn build(
             continue;
         }
         match (&prev.op, &f.op) {
-            (AbiOp::NewObject, _) => kept[i] = f,
+            (AbiOp::NewObject, _) => {
+                for n in names {
+                    by_name.insert(n, i);
+                }
+                kept[i] = f;
+            }
             (_, AbiOp::NewObject) => {}
             _ => bail!(
                 "ABI name {:?} is declared both {} and {}",
@@ -637,9 +650,16 @@ fn build_declaration(
     lower: &Lower,
     abi: &mut Abi,
 ) {
-    match &decl.kind {
-        TypeKind::Class(class) => build_class(class, path, lower, abi),
-        TypeKind::Interface(iface) => build_interface(iface, path, lower, abi),
+    let start = abi.functions.len();
+    let owner = match &decl.kind {
+        TypeKind::Class(class) => {
+            build_class(class, path, lower, abi);
+            class.js_name.as_str()
+        }
+        TypeKind::Interface(iface) => {
+            build_interface(iface, path, lower, abi);
+            iface.js_name.as_str()
+        }
         TypeKind::Function(func) => {
             let overloads: Vec<Overload> = std::iter::once(Overload {
                 params: &func.params,
@@ -674,20 +694,24 @@ fn build_declaration(
                 &mut used,
                 lower,
             );
+            return;
         }
         TypeKind::Namespace(ns) => {
+            let js_name = lower.surface.js_name(id, &ns.name);
             let mut child = path.to_vec();
-            child.push(lower.surface.js_name(id, &ns.name).to_string());
+            child.push(js_name.to_string());
             for &inner in &ns.declarations {
                 for d in lower.surface.get(inner) {
                     build_declaration(inner, d, &child, lower, abi);
                 }
             }
+            js_name
         }
         TypeKind::Variable(var) => {
             // A global variable is a getter: `globalThis[name]` or `namespace[name]`.
             abi.functions.push(AbiFunction {
                 name: join_name(path, &var.js_name),
+                aliases: Vec::new(),
                 op: AbiOp::StaticGet {
                     path: path.to_vec(),
                     name: var.js_name.clone(),
@@ -704,12 +728,35 @@ fn build_declaration(
                 variadic: false,
                 module: None,
             });
+            return;
         }
         TypeKind::TypeAlias(_)
         | TypeKind::DiscriminatedUnion(_)
         | TypeKind::StringEnum(_)
         | TypeKind::NumericEnum(_)
-        | TypeKind::TsEnum(_) => {}
+        | TypeKind::TsEnum(_) => return,
+    };
+    // Members are named `Owner.member`; each other public name of the
+    // owner binds the same function, under every name the member has
+    // within the owner.
+    let prefix = join_name(path, owner);
+    let others: Vec<String> = lower
+        .surface
+        .names(id)
+        .iter()
+        .filter(|&n| n != owner)
+        .map(|n| join_name(path, n))
+        .collect();
+    for f in &mut abi.functions[start..] {
+        let names: Vec<String> = std::iter::once(&f.name)
+            .chain(&f.aliases)
+            .cloned()
+            .collect();
+        for other in &others {
+            for name in &names {
+                f.aliases.push(format!("{other}{}", &name[prefix.len()..]));
+            }
+        }
     }
 }
 
@@ -808,6 +855,7 @@ fn build_members(
     if dictionary {
         abi.functions.push(AbiFunction {
             name: format!("{type_name}.new"),
+            aliases: Vec::new(),
             op: AbiOp::NewObject,
             params: vec![],
             result: Some(WasmType::JS_NON_NULL),
@@ -880,6 +928,7 @@ fn build_members(
                 };
                 abi.functions.push(AbiFunction {
                     name: format!("{type_name}.{name}"),
+                    aliases: Vec::new(),
                     op: AbiOp::Get {
                         name: g.js_name.clone(),
                     },
@@ -971,6 +1020,7 @@ fn build_members(
                 );
                 abi.functions.push(AbiFunction {
                     name: format!("{type_name}.{name}"),
+                    aliases: Vec::new(),
                     op: AbiOp::StaticGet {
                         path: js_path.to_vec(),
                         name: g.js_name.clone(),
@@ -1113,6 +1163,7 @@ fn push_callable(
         };
         abi.functions.push(AbiFunction {
             name,
+            aliases: Vec::new(),
             op: op.clone(),
             params,
             result: match kind {
@@ -1355,6 +1406,34 @@ mod tests {
         // An un-instantiated alias parameter is a type parameter: BOTH, no head.
         assert_eq!(f("Uses.partial").result, Some(WasmType::JS));
         assert_eq!(f("Uses.partial").result_head, None);
+    }
+
+    #[test]
+    fn members_bind_under_every_export_name() {
+        let class = abi(r#"
+            declare module "m:a" {
+                class _Foo { constructor(); get(): string; }
+                export { _Foo as Foo, _Foo as Bar };
+            }
+        "#)
+        .unwrap();
+        for (name, alias) in [("Foo.new", "Bar.new"), ("Foo.get", "Bar.get")] {
+            assert_eq!(class.function(name).unwrap().aliases, [alias]);
+        }
+
+        let ns = abi(r#"
+            declare module "m:a" {
+                namespace _N {
+                    function nf(): void;
+                    class C { constructor(); }
+                }
+                export { _N as N1, _N as N2 };
+            }
+        "#)
+        .unwrap();
+        for (name, alias) in [("N1.nf", "N2.nf"), ("N1.C.new", "N2.C.new")] {
+            assert_eq!(ns.function(name).unwrap().aliases, [alias]);
+        }
     }
 
     #[test]

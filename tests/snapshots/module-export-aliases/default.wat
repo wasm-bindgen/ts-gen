@@ -27,11 +27,24 @@
   ;; _Foo
   ;; bar(): void
   (import "./bindings.wasm" "_Foo.bar" (func $_Foo.bar (param $this externref)))
+  (import "./bindings.wasm" "Foo.bar" (func $Foo.bar (param $this externref)))
+  (import "./bindings.wasm" "Bar.bar" (func $Bar.bar (param $this externref)))
 
   ;; a(): void
   (import "./bindings.wasm" "a" (func $a))
   ;; b(): void
   (import "./bindings.wasm" "b" (func $b))
+
+  ;; Conn
+  ;; constructor()
+  (import "./bindings.wasm" "Conn.new" (func $Conn.new (result externref)))
+  (import "./bindings.wasm" "Connection.new" (func $Connection.new (result externref)))
+  ;; get(): string
+  (import "./bindings.wasm" "Conn.get" (func $Conn.get (param $this externref) (result externref)))
+  (import "./bindings.wasm" "Connection.get" (func $Connection.get (param $this externref) (result externref)))
+  ;; open(): _Conn
+  (import "./bindings.wasm" "Conn.open" (func $Conn.open (result externref)))
+  (import "./bindings.wasm" "Connection.open" (func $Connection.open (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
