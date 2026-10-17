@@ -799,6 +799,9 @@ pub struct FunctionDecl {
 pub struct FunctionOverload {
     pub params: Vec<Param>,
     pub return_type: TypeRef,
+    /// Scope inside this overload's declaration, holding its own type
+    /// parameters.
+    pub body_scope: crate::parse::scope::ScopeId,
 }
 
 // ─── Variable ────────────────────────────────────────────────────────

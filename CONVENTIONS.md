@@ -1231,6 +1231,27 @@ function log(...args: any[]): void;
 Conceptually all four describe the same thing: a JS callable whose
 caller has more than one valid argument shape.
 
+A free function's declarations are its overloads wherever they merge:
+within a file, within a namespace, and across input files. Each keeps
+its own return type and type parameters, as they are separate
+declarations; a method's overloads take the first's.
+
+```ts
+// a.d.ts
+declare function parse(input: string): object;
+declare function parse(input: ArrayBuffer): object;
+// b.d.ts
+declare function parse(input: string, reviver: Function): object;
+```
+
+```rust
+pub fn parse(input: &str) -> Object;
+#[wasm_bindgen(js_name = "parse")]
+pub fn parse_with_array_buffer(input: &ArrayBuffer) -> Object;
+#[wasm_bindgen(js_name = "parse")]
+pub fn parse_with_str_and_reviver(input: &str, reviver: &Function) -> Object;
+```
+
 ### The pipeline
 
 For every JS callable, `ts-gen`:

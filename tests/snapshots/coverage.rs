@@ -291,21 +291,71 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
-    pub fn parse(input: &str, reviver: &Function) -> Object;
+    pub fn parse(input: &str) -> Object;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "parse")]
-    pub fn try_parse(input: &str, reviver: &Function) -> Result<Object, JsValue>;
+    pub fn try_parse(input: &str) -> Result<Object, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
-    pub fn stringify(value: &JsValue, replacer: &Function, space: f64) -> String;
+    #[wasm_bindgen(js_name = "parse")]
+    pub fn parse_with_array_buffer(input: &ArrayBuffer) -> Object;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "parse")]
+    pub fn try_parse_with_array_buffer(input: &ArrayBuffer) -> Result<Object, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "parse")]
+    pub fn parse_with_str_and_reviver(input: &str, reviver: &Function) -> Object;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "parse")]
+    pub fn try_parse_with_str_and_reviver(
+        input: &str,
+        reviver: &Function,
+    ) -> Result<Object, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    pub fn stringify(value: &JsValue) -> String;
 }
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "stringify")]
-    pub fn try_stringify(
+    pub fn try_stringify(value: &JsValue) -> Result<String, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "stringify")]
+    pub fn stringify_with_replacer(value: &JsValue, replacer: &Function) -> String;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "stringify")]
+    pub fn try_stringify_with_replacer(
+        value: &JsValue,
+        replacer: &Function,
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "stringify")]
+    pub fn stringify_with_replacer_and_space(
+        value: &JsValue,
+        replacer: &Function,
+        space: f64,
+    ) -> String;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "stringify")]
+    pub fn try_stringify_with_replacer_and_space(
         value: &JsValue,
         replacer: &Function,
         space: f64,

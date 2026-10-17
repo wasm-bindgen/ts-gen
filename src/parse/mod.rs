@@ -276,7 +276,7 @@ fn parse_single_file(
     // Post-processing: merge, dedup, then insert into the global type arena
     let merged = merge_class_pairs(declarations);
     let merged = merge_namespaces(merged);
-    let merged = dedup_function_overloads(merged);
+    let merged = merge_function_overloads(merged);
 
     let mut cx = InsertCtx {
         gctx,
@@ -364,7 +364,7 @@ impl InsertCtx<'_> {
                     .remove(&ns.child_scope)
                     .unwrap_or_default();
                 let mut ids = Vec::new();
-                for member in merge_namespaces(member_decls) {
+                for member in merge_function_overloads(merge_namespaces(member_decls)) {
                     let id = self.insert(member, false);
                     if !ids.contains(&id) {
                         ids.push(id);
@@ -631,7 +631,7 @@ impl InsertCtx<'_> {
             },
             _ => vec![base, incoming],
         };
-        let merged = dedup_function_overloads(merge_class_pairs(pair));
+        let merged = merge_function_overloads(merge_class_pairs(pair));
         match <[_; 1]>::try_from(merged) {
             Ok([merged]) => {
                 *self.gctx.get_type_mut(existing) = merged;
@@ -690,46 +690,34 @@ fn bind_import(
     type_id.is_some() || members.is_some()
 }
 
-/// Deduplicate function overloads: when multiple `FunctionDecl` share the same
-/// JS name and module context, keep only the one with the most parameters (the
-/// most general signature). TypeScript overloads are a single JS function at
-/// runtime.
-fn dedup_function_overloads(
+/// Merge each function's declarations into its first, whose overloads the
+/// later ones become: TypeScript overloads are one JS function at runtime.
+fn merge_function_overloads(
     declarations: Vec<crate::ir::TypeDeclaration>,
 ) -> Vec<crate::ir::TypeDeclaration> {
-    use crate::ir::{ModuleContext, TypeDeclaration, TypeKind};
+    use crate::ir::{FunctionOverload, ModuleContext, TypeKind};
 
-    let mut best: std::collections::HashMap<(String, ModuleContext), usize> =
+    let mut first: std::collections::HashMap<(String, ModuleContext), usize> =
         std::collections::HashMap::new();
-    let mut result: Vec<TypeDeclaration> = Vec::new();
-    let mut skip: std::collections::HashSet<usize> = std::collections::HashSet::new();
-
-    // First pass: find the best (most params) overload for each name
-    for (i, decl) in declarations.iter().enumerate() {
-        if let TypeKind::Function(ref f) = decl.kind {
+    let mut result: Vec<crate::ir::TypeDeclaration> = Vec::new();
+    for decl in declarations {
+        if let TypeKind::Function(f) = &decl.kind {
             let key = (f.js_name.clone(), decl.module_context.clone());
-            if let Some(&existing_idx) = best.get(&key) {
-                // Compare param counts — keep the one with more params
-                if let TypeKind::Function(ref existing_f) = declarations[existing_idx].kind {
-                    if f.params.len() > existing_f.params.len() {
-                        skip.insert(existing_idx);
-                        best.insert(key, i);
-                    } else {
-                        skip.insert(i);
-                    }
+            if let Some(&i) = first.get(&key) {
+                if let TypeKind::Function(base) = &mut result[i].kind {
+                    base.overloads.push(FunctionOverload {
+                        params: f.params.clone(),
+                        return_type: f.return_type.clone(),
+                        body_scope: f.body_scope,
+                    });
+                    base.overloads.extend(f.overloads.iter().cloned());
                 }
-            } else {
-                best.insert(key, i);
+                continue;
             }
+            first.insert(key, result.len());
         }
+        result.push(decl);
     }
-
-    for (i, decl) in declarations.into_iter().enumerate() {
-        if !skip.contains(&i) {
-            result.push(decl);
-        }
-    }
-
     result
 }
 
@@ -1461,6 +1449,49 @@ mod tests {
             let exports: Vec<_> = gctx.exports.entries(root.exports).collect();
             assert_eq!(exports, [("Win", "Win"), ("N", "N")]);
         }
+    }
+
+    #[test]
+    fn function_declarations_are_overloads_of_one_function() {
+        let dir = std::env::temp_dir().join(format!("ts-gen-overloads-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let a = dir.join("a.d.ts");
+        let b = dir.join("b.d.ts");
+        std::fs::write(
+            &a,
+            "declare function f(x: string): void;
+             declare function f(x: ArrayBuffer): void;
+             declare namespace N { function g(x: string): void; function g(x: number): void; }",
+        )
+        .unwrap();
+        std::fs::write(&b, "declare function f(x: number): void;").unwrap();
+        let result = parse_dts_files(&[&a, &b], None);
+        std::fs::remove_dir_all(&dir).unwrap();
+        let (module, gctx) = result.unwrap();
+
+        let param_types = |path: &str| {
+            let ids = gctx.declarations(module.global_scope, path);
+            let id = match ids {
+                [id] => *id,
+                _ => gctx.resolve_path(module.global_scope, path).expect(path),
+            };
+            let TypeKind::Function(f) = &gctx.get_type(id).kind else {
+                panic!("{path} is a function");
+            };
+            std::iter::once(&f.params)
+                .chain(f.overloads.iter().map(|o| &o.params))
+                .map(|params| params[0].type_ref.clone())
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(
+            param_types("f"),
+            [
+                TypeRef::String,
+                TypeRef::ident("ArrayBuffer"),
+                TypeRef::Number
+            ]
+        );
+        assert_eq!(param_types("N.g"), [TypeRef::String, TypeRef::Number]);
     }
 
     #[test]

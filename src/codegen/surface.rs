@@ -420,9 +420,9 @@ fn function(f: &crate::ir::FunctionDecl, walk: &mut impl FnMut(&TypeRef, ScopeId
     walk(&f.return_type, f.body_scope);
     for o in &f.overloads {
         for p in &o.params {
-            walk(&p.type_ref, f.body_scope);
+            walk(&p.type_ref, o.body_scope);
         }
-        walk(&o.return_type, f.body_scope);
+        walk(&o.return_type, o.body_scope);
     }
     if let Some(ty) = f.throws.as_type() {
         walk(ty, f.body_scope);

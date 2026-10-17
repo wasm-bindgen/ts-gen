@@ -1475,8 +1475,34 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
+    #[wasm_bindgen(js_name = "setTimeout")]
+    pub fn set_timeout(callback: &Function<fn(Array) -> Undefined>) -> f64;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "setTimeout")]
+    pub fn try_set_timeout(callback: &Function<fn(Array) -> Undefined>) -> Result<f64, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "setTimeout")]
+    pub fn set_timeout_with_function_and_ms_delay(
+        callback: &Function<fn(Array) -> Undefined>,
+        ms_delay: f64,
+    ) -> f64;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "setTimeout")]
+    pub fn try_set_timeout_with_function_and_ms_delay(
+        callback: &Function<fn(Array) -> Undefined>,
+        ms_delay: f64,
+    ) -> Result<f64, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
     #[wasm_bindgen(variadic, js_name = "setTimeout")]
-    pub fn set_timeout<Args: ::wasm_bindgen::JsGeneric>(
+    pub fn set_timeout_with_function_and_args<Args: ::wasm_bindgen::JsGeneric>(
         callback: &Function<fn(Args) -> Undefined>,
         args: &[JsValue],
     ) -> f64;
@@ -1484,7 +1510,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(variadic, catch, js_name = "setTimeout")]
-    pub fn try_set_timeout<Args: ::wasm_bindgen::JsGeneric>(
+    pub fn try_set_timeout_with_function_and_args<Args: ::wasm_bindgen::JsGeneric>(
         callback: &Function<fn(Args) -> Undefined>,
         args: &[JsValue],
     ) -> Result<f64, JsValue>;
@@ -1492,7 +1518,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(variadic, js_name = "setTimeout")]
-    pub fn set_timeout_with_ms_delay<Args: ::wasm_bindgen::JsGeneric>(
+    pub fn set_timeout_with_function_and_ms_delay_and_args<Args: ::wasm_bindgen::JsGeneric>(
         callback: &Function<fn(Args) -> Undefined>,
         ms_delay: f64,
         args: &[JsValue],
@@ -1501,7 +1527,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(variadic, catch, js_name = "setTimeout")]
-    pub fn try_set_timeout_with_ms_delay<Args: ::wasm_bindgen::JsGeneric>(
+    pub fn try_set_timeout_with_function_and_ms_delay_and_args<Args: ::wasm_bindgen::JsGeneric>(
         callback: &Function<fn(Args) -> Undefined>,
         ms_delay: f64,
         args: &[JsValue],
@@ -1519,8 +1545,34 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
+    #[wasm_bindgen(js_name = "setInterval")]
+    pub fn set_interval(callback: &Function<fn(Array) -> Undefined>) -> f64;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "setInterval")]
+    pub fn try_set_interval(callback: &Function<fn(Array) -> Undefined>) -> Result<f64, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = "setInterval")]
+    pub fn set_interval_with_function_and_ms_delay(
+        callback: &Function<fn(Array) -> Undefined>,
+        ms_delay: f64,
+    ) -> f64;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "setInterval")]
+    pub fn try_set_interval_with_function_and_ms_delay(
+        callback: &Function<fn(Array) -> Undefined>,
+        ms_delay: f64,
+    ) -> Result<f64, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
     #[wasm_bindgen(variadic, js_name = "setInterval")]
-    pub fn set_interval<Args: ::wasm_bindgen::JsGeneric>(
+    pub fn set_interval_with_function_and_args<Args: ::wasm_bindgen::JsGeneric>(
         callback: &Function<fn(Args) -> Undefined>,
         args: &[JsValue],
     ) -> f64;
@@ -1528,7 +1580,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(variadic, catch, js_name = "setInterval")]
-    pub fn try_set_interval<Args: ::wasm_bindgen::JsGeneric>(
+    pub fn try_set_interval_with_function_and_args<Args: ::wasm_bindgen::JsGeneric>(
         callback: &Function<fn(Args) -> Undefined>,
         args: &[JsValue],
     ) -> Result<f64, JsValue>;
@@ -1536,7 +1588,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(variadic, js_name = "setInterval")]
-    pub fn set_interval_with_ms_delay<Args: ::wasm_bindgen::JsGeneric>(
+    pub fn set_interval_with_function_and_ms_delay_and_args<Args: ::wasm_bindgen::JsGeneric>(
         callback: &Function<fn(Args) -> Undefined>,
         ms_delay: f64,
         args: &[JsValue],
@@ -1545,7 +1597,7 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(variadic, catch, js_name = "setInterval")]
-    pub fn try_set_interval_with_ms_delay<Args: ::wasm_bindgen::JsGeneric>(
+    pub fn try_set_interval_with_function_and_ms_delay_and_args<Args: ::wasm_bindgen::JsGeneric>(
         callback: &Function<fn(Args) -> Undefined>,
         ms_delay: f64,
         args: &[JsValue],
@@ -33971,6 +34023,34 @@ pub mod cloudflare {
             #[wasm_bindgen(catch, js_name = "httpServerHandler")]
             pub fn try_http_server_handler(
                 port: f64,
+            ) -> Result<super::super::ExportedHandler, JsValue>;
+        }
+        #[wasm_bindgen(module = "cloudflare:node")]
+        extern "C" {
+            #[wasm_bindgen(js_name = "httpServerHandler")]
+            pub fn http_server_handler_with_options(
+                options: &Object,
+            ) -> super::super::ExportedHandler;
+        }
+        #[wasm_bindgen(module = "cloudflare:node")]
+        extern "C" {
+            #[wasm_bindgen(catch, js_name = "httpServerHandler")]
+            pub fn try_http_server_handler_with_options(
+                options: &Object,
+            ) -> Result<super::super::ExportedHandler, JsValue>;
+        }
+        #[wasm_bindgen(module = "cloudflare:node")]
+        extern "C" {
+            #[wasm_bindgen(js_name = "httpServerHandler")]
+            pub fn http_server_handler_with_server(
+                server: &NodeStyleServer,
+            ) -> super::super::ExportedHandler;
+        }
+        #[wasm_bindgen(module = "cloudflare:node")]
+        extern "C" {
+            #[wasm_bindgen(catch, js_name = "httpServerHandler")]
+            pub fn try_http_server_handler_with_server(
+                server: &NodeStyleServer,
             ) -> Result<super::super::ExportedHandler, JsValue>;
         }
     }

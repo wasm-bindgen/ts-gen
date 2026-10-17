@@ -56,11 +56,17 @@ fn emit_function(
         &binding_key(ctx, js_namespace, &decl.js_name),
         public_rust_name(&ident_chars(&decl.name)),
     );
-    let overloads = [Overload {
+    let overloads: Vec<Overload> = std::iter::once(Overload {
         params: &decl.params,
         return_type: &decl.return_type,
         body_scope: decl.body_scope,
-    }];
+    })
+    .chain(decl.overloads.iter().map(|o| Overload {
+        params: &o.params,
+        return_type: &o.return_type,
+        body_scope: o.body_scope,
+    }))
+    .collect();
     let sigs = build_signatures(
         &CallableSpec {
             js_name: &decl.js_name,
