@@ -28,7 +28,13 @@ const modules = {
     connect: (address) => { connected.push(address); return new Socket(); },
     Socket,
   },
-  'embed:values': { count: 42, enabled: true, disabled: false, big: 7n },
+  'embed:values': {
+    count: 42,
+    enabled: true,
+    disabled: false,
+    big: 7n,
+    receiver() { return this === undefined ? 'undefined' : typeof this; },
+  },
 };
 
 const builtins = await import(pathToFileURL(builtinsPath));
@@ -94,6 +100,7 @@ switch (fixture) {
     assert.equal(published.enabled(), 1);
     assert.equal(published.disabled(), 0);
     assert.equal(published.big(), 7n);
+    assert.equal(published.receiver(), 'undefined');
     break;
   }
   case 'sys': {
