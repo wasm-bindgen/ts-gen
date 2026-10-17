@@ -31,10 +31,6 @@ struct CollectCtx<'a> {
     /// Arena length before this file: a lower id is an earlier file's
     /// declaration.
     file_start: usize,
-    /// `(scope, local, public)` for each source-less export specifier.
-    /// Resolved once the whole file is collected, since a specifier may
-    /// precede the declaration it names.
-    export_specifiers: Vec<(ScopeId, String, String)>,
     /// `(module scope, specifier, name)` for each `export = name` that
     /// doesn't name a namespace of the module's own. Resolved through the
     /// scope chain once the whole file is collected, since the namespace
@@ -75,7 +71,6 @@ pub fn collect_type_names(
         is_script: is_global,
         globals: is_global.then_some(root_scope),
         file_start,
-        export_specifiers: Vec::new(),
         outer_assignments: Vec::new(),
         default_identifiers: Vec::new(),
         constructor_shaped: Default::default(),
@@ -127,23 +122,20 @@ pub fn collect_type_names(
             });
         if bound {
             ccx.export_default(scope, &name);
-        }
-    }
-
-    for (scope, local, public) in std::mem::take(&mut ccx.export_specifiers) {
-        // Only a binding declared directly in the exporting scope takes the
-        // public name; an outer one is re-exported through an alias stub.
-        if let Some(type_id) = ccx.gctx.scopes.get(scope).get(&local) {
-            ccx.registry
-                .export_names
-                .entry(type_id)
-                .or_default()
-                .push(public);
+        } else {
+            skip_default_identifier(ccx.diag, &name);
         }
     }
 
     registry.globals = ccx.globals;
     registry
+}
+
+fn skip_default_identifier(diag: &mut DiagnosticCollector, name: &str) {
+    diag.info(format!(
+        "Skipping `export default {name}` (only a class, function or variable declared in \
+         the same module is supported)"
+    ));
 }
 
 impl<'a> CollectCtx<'a> {
@@ -225,9 +217,6 @@ impl<'a> CollectCtx<'a> {
                     let exported_name = spec.exported.name().to_string();
                     let local = spec.local.name().to_string();
                     self.gctx.exports.insert(scope, &exported_name, &local);
-                    if exported_name != local {
-                        self.export_specifiers.push((scope, local, exported_name));
-                    }
                 }
             }
             // `export default class Def` exports `default` only; `Def` is a
@@ -261,6 +250,8 @@ impl<'a> CollectCtx<'a> {
                     if matches!(ctx, ir::ModuleContext::Module(_)) {
                         self.default_identifiers
                             .push((scope, ident.name.to_string()));
+                    } else {
+                        skip_default_identifier(self.diag, &ident.name);
                     }
                 }
                 other => {
@@ -720,8 +711,6 @@ impl<'a> CollectCtx<'a> {
     /// Record `local` as `scope`'s default export, binding by `default`.
     fn export_default(&mut self, scope: ScopeId, local: &str) {
         self.gctx.exports.insert(scope, "default", local);
-        self.export_specifiers
-            .push((scope, local.to_string(), "default".to_string()));
     }
 
     fn collect_namespace_names(

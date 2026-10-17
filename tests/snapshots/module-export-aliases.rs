@@ -14,6 +14,10 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "bar")]
     pub fn try_bar(this: &_Foo) -> Result<(), JsValue>;
 }
+#[allow(dead_code)]
+pub type Foo = _Foo;
+#[allow(dead_code)]
+pub type Bar = _Foo;
 #[wasm_bindgen(module = "module-export-aliases")]
 extern "C" {
     pub fn a();
@@ -32,7 +36,3 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "b")]
     pub fn try_b() -> Result<(), JsValue>;
 }
-#[allow(dead_code)]
-pub type Foo = _Foo;
-#[allow(dead_code)]
-pub type Bar = _Foo;

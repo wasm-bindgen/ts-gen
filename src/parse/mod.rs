@@ -242,7 +242,12 @@ fn parse_single_file(
     let mut scopes = std::mem::take(&mut gctx.scopes);
     let mut diag = std::mem::take(&mut gctx.diagnostics);
     let type_arena_snapshot = gctx.type_arena().to_vec();
-    let (declarations, mut namespace_members, mut static_sides) = first_pass::populate_declarations(
+    let first_pass::Populated {
+        declarations,
+        mut namespace_members,
+        mut static_sides,
+        constructor_classes,
+    } = first_pass::populate_declarations(
         program,
         &registry,
         lib_name,
@@ -266,6 +271,8 @@ fn parse_single_file(
         static_sides: &mut static_sides,
         module_scopes: &registry.module_scopes,
         assigned_namespaces: &registry.assigned_namespaces,
+        constructor_classes: &constructor_classes,
+        constructor_class_ids: std::collections::HashSet::new(),
         file_scope,
         file_start,
     };
@@ -273,6 +280,7 @@ fn parse_single_file(
         .into_iter()
         .map(|decl| cx.insert(decl, true))
         .collect();
+    let constructor_class_ids = cx.constructor_class_ids;
 
     // A global namespace a module assigns with `export =` exports the
     // module's names, also those a later file reopening it declares.
@@ -291,6 +299,7 @@ fn parse_single_file(
     if let crate::ir::ModuleContext::Module(lib) = first_pass::file_context(program, lib_name) {
         modules.insert(0, (lib.to_string(), file_scope));
     }
+    name_constructor_classes(gctx, &modules, &constructor_class_ids);
     Ok(ParsedFile {
         types,
         globals: registry.globals,
@@ -304,6 +313,9 @@ struct InsertCtx<'a> {
     static_sides: &'a mut first_pass::StaticSides,
     module_scopes: &'a std::collections::HashMap<String, ScopeId>,
     assigned_namespaces: &'a std::collections::HashMap<ScopeId, String>,
+    constructor_classes: &'a [(ScopeId, String)],
+    /// The inserted ids of `constructor_classes`.
+    constructor_class_ids: std::collections::HashSet<crate::context::TypeId>,
     file_scope: ScopeId,
     /// Arena length before this file: a lower id is an earlier file's
     /// declaration.
@@ -371,7 +383,12 @@ impl InsertCtx<'_> {
             _ => None,
         };
         let placeholder = binding_name(&decl.kind);
+        let constructor_class = matches!(&decl.kind, crate::ir::TypeKind::Class(c)
+            if self.constructor_classes.contains(&(decl_scope, c.name.clone())));
         let mut type_id = self.gctx.insert_type(decl);
+        if constructor_class {
+            self.constructor_class_ids.insert(type_id);
+        }
         if let Some(class) = static_side {
             self.gctx.static_sides.insert(type_id, class);
         }
@@ -807,6 +824,47 @@ pub(crate) fn binding_name(kind: &crate::ir::TypeKind) -> Option<String> {
         crate::ir::TypeKind::Function(f) => Some(f.js_name.clone()),
         crate::ir::TypeKind::Variable(v) => Some(v.js_name.clone()),
         kind => declaration_name(kind),
+    }
+}
+
+/// Name each constructor `var`'s class by its module's export map: the first
+/// name it is exported under, unless it is exported under its own. A default
+/// export has no name of its own, so it keeps the local one. Within the
+/// module the class's name refers to it, as it would had it been declared
+/// under that name.
+fn name_constructor_classes(
+    gctx: &mut GlobalContext,
+    modules: &[(String, ScopeId)],
+    classes: &std::collections::HashSet<crate::context::TypeId>,
+) {
+    let mut named = std::collections::HashSet::new();
+    for &(_, scope) in modules {
+        let mut entries: Vec<(String, String)> = gctx
+            .exports
+            .entries(scope)
+            .map(|(public, local)| (public.to_string(), local.to_string()))
+            .collect();
+        entries.sort_by_key(|(public, _)| public == "default");
+        for (public, local) in entries {
+            if gctx.exports.local_name(scope, &local) == Some(local.as_str()) {
+                continue;
+            }
+            for id in gctx.declarations(scope, &local).to_vec() {
+                if !classes.contains(&id) || !named.insert(id) {
+                    continue;
+                }
+                let name = first_pass::rust_name(&local, &public).to_string();
+                let decl = gctx.get_type_mut(id);
+                let decl_scope = decl.scope_id;
+                if let crate::ir::TypeKind::Class(c) = &mut decl.kind {
+                    c.name = name.clone();
+                    c.js_name = public.clone();
+                }
+                if gctx.scopes.get(decl_scope).get(&name).is_none() {
+                    gctx.scopes.insert(decl_scope, name, id);
+                }
+            }
+        }
     }
 }
 

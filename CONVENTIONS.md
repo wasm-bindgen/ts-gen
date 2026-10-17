@@ -2580,32 +2580,35 @@ A namespace exported under its own name as well keeps it.
   pub type Fetcher<T = Undefined> = Pair<T, T>;
   pub fn defaults(a: &WithDefault<Number>, b: &Chained<Number>, c: &Pair<Undefined, Undefined>);
   ```
-* `export { Local as Public };` (sourceless) → names the binding `Local`
-  declares in the exporting scope, recorded against its `TypeId` in
-  `TypeRegistry::export_names`. Each `declare module "x"` body is its own
-  scope, so the same local name in another module or at global scope is a
-  different binding and keeps its own name. The public names are what the
-  module exports, so value bindings import by them:
+* `export { Local as Public };` (sourceless) → exports what the binding
+  `Local` declares in the exporting block under the public name, as an
+  entry in its [export map](#the-export-map). A declaration of the block
+  named `Public` is a different binding and is not that export. The
+  public names are what the module exports, so value bindings import by
+  them. The first public name is the declaration's JS name, unless it is
+  also exported under its own name; `default` comes last:
   * Functions and variables are emitted once per public name, with no
-    alias stub: `function _connect(...); export { _connect as connect };`
+    alias: `function _connect(...); export { _connect as connect };`
     emits `pub fn connect(...)` bound to the JS export `connect`.
   * A constructor variable on its own is a value nothing refers to by its
-    local name, so its class takes the first public name; any further
-    names alias it.
+    local name, so its class takes the JS name as its Rust name; any
+    further names alias it.
   * A class keeps its local name as the Rust type, since the module refers
-    to it by that name, but binds `js_name` to the first public name, and
-    its constructors and static members carry `js_class` with the same
-    name. Each public name gets an alias stub (`pub type Server = _Server;`).
+    to it by that name, but binds `js_name` to the JS name, and its
+    constructors and static members carry `js_class` with the same name.
+    Each other public name gets an alias (`pub type Server = _Server;`).
     A constructor variable with an instance interface of the same name
     (`interface _Foo {…}; var _Foo: { new(): _Foo }`, or `var _Foo:
     _FooConstructor`) is a class in this sense: the interface's members
     refer to `_Foo`, so the merged class is `_Foo` with `js_name = "Foo"`
     and `pub type Foo = _Foo;`.
   * Types without a runtime binding (interfaces, type aliases, enums) get
-    an alias stub only.
+    an alias only.
+  * A namespace keeps its local name as the Rust module and binds its
+    members with `js_namespace` set to the JS name. It gets no alias.
 
-  A `Local` declared outside the exporting scope is left alone and only
-  aliased.
+  A `Local` declared outside the exporting block (an import) is left alone
+  and only aliased.
 * `export { X as Y } from "...";` (with source) → registered as an import
   from the named module.
 * `export default class C`, `export default function f` and `export

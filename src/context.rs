@@ -131,18 +131,6 @@ impl ModuleExports {
         self.by_scope.get(&scope)?.get(public).map(String::as_str)
     }
 
-    /// The name `scope` exports its binding `local` as: `local` itself
-    /// when exported under its own name, else its first public name.
-    pub fn public_name<'a>(&'a self, scope: ScopeId, local: &'a str) -> Option<&'a str> {
-        let m = self.by_scope.get(&scope)?;
-        if m.get(local).is_some_and(|l| l == local) {
-            return Some(local);
-        }
-        m.iter()
-            .find(|(_, l)| *l == local)
-            .map(|(public, _)| public.as_str())
-    }
-
     /// Every export of `scope` as `(public, local)`, in declaration order.
     pub fn entries(&self, scope: ScopeId) -> impl Iterator<Item = (&str, &str)> {
         self.by_scope

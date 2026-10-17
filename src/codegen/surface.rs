@@ -20,6 +20,7 @@ use super::{ExportSpec, GenerateOptions};
 /// function or variable once per public name, anything else once.
 pub struct Surface<'d> {
     items: HashMap<TypeId, Vec<Cow<'d, TypeDeclaration>>>,
+    names: HashMap<TypeId, Vec<String>>,
 }
 
 impl<'d> Surface<'d> {
@@ -34,6 +35,7 @@ impl<'d> Surface<'d> {
             universe: HashSet::new(),
             parents: HashMap::new(),
             items: HashMap::new(),
+            names: HashMap::new(),
             queue: Vec::new(),
         };
         builder.index(&module.types, None);
@@ -55,12 +57,30 @@ impl<'d> Surface<'d> {
         builder.close();
         Surface {
             items: builder.items,
+            names: builder.names,
         }
     }
 
     /// The forms `id` is emitted in, empty if it is not emitted.
     pub fn get(&self, id: TypeId) -> &[Cow<'d, TypeDeclaration>] {
         self.items.get(&id).map_or(&[], Vec::as_slice)
+    }
+
+    /// The public names a type is exported under, in export order; empty
+    /// for a value, which has a form per name instead, and for a type only
+    /// a signature reaches.
+    pub fn names(&self, id: TypeId) -> &[String] {
+        self.names.get(&id).map_or(&[], Vec::as_slice)
+    }
+
+    /// The name the type `id`, whose own name is `own`, binds by in JS: its
+    /// own when exported under it or not exported, else the first it is
+    /// exported under (`export { make as create }` makes `create.helper`).
+    pub fn js_name<'n>(&'n self, id: TypeId, own: &'n str) -> &'n str {
+        match self.names(id) {
+            [first, ..] if !self.names(id).iter().any(|n| n == own) => first,
+            _ => own,
+        }
     }
 
     /// The JS module specifiers with an emitted declaration.
@@ -84,6 +104,7 @@ struct Builder<'a, 'd> {
     /// Each namespace member's namespace.
     parents: HashMap<TypeId, TypeId>,
     items: HashMap<TypeId, Vec<Cow<'d, TypeDeclaration>>>,
+    names: HashMap<TypeId, Vec<String>>,
     /// Emitted declarations whose signatures are still to be followed.
     queue: Vec<TypeId>,
 }
@@ -112,10 +133,9 @@ impl<'d> Builder<'_, 'd> {
     }
 
     /// Emit every export of `root` under its public name. The declarations
-    /// an export refers to are those binding its local name. An `export {
-    /// L as P }` also reaches the alias it is emitted as, which binds `P`
-    /// (as does a constructor variable's class, which takes `P` as its
-    /// name).
+    /// an export refers to are those binding its local name; a binding from
+    /// outside the block, such as an import, is re-exported through the
+    /// alias the export declares.
     fn root(&mut self, root: Root) {
         let gctx = self.gctx;
         let mut entries: Vec<_> = gctx.exports.entries(root.exports).collect();
@@ -123,27 +143,46 @@ impl<'d> Builder<'_, 'd> {
         // export of the same declaration does.
         entries.sort_by_key(|&(public, _)| public == "default");
         for (public, local) in entries {
-            for &id in gctx.declarations(root.bindings, local) {
-                self.export(id, public);
-            }
-            if public != local {
+            let ids = gctx.declarations(root.bindings, local);
+            if ids.is_empty() {
+                let target = TypeRef::ident(local.to_string());
                 for &id in gctx.declarations(root.bindings, public) {
-                    if !matches!(
-                        gctx.get_type(id).kind,
-                        TypeKind::Function(_) | TypeKind::Variable(_)
-                    ) {
-                        self.export(id, public);
+                    if matches!(&gctx.get_type(id).kind, TypeKind::TypeAlias(a) if a.target == target)
+                    {
+                        self.export(id, public, public);
                     }
                 }
+            }
+            for &id in ids {
+                self.export(id, public, local);
             }
         }
     }
 
-    fn export(&mut self, id: TypeId, public: &str) {
+    /// Emit `id`, the declaration binding `local`, as the export `public`.
+    fn export(&mut self, id: TypeId, public: &str, local: &str) {
         if !self.emittable(id) {
             return;
         }
         let decl = self.gctx.get_type(id);
+        let first = !self.items.contains_key(&id);
+        match &decl.kind {
+            TypeKind::Function(_) | TypeKind::Variable(_) => self.export_value(id, decl, public),
+            _ => self.export_type(id, decl, public, local),
+        }
+        if first {
+            self.queue.push(id);
+            if let TypeKind::Namespace(ns) = &decl.kind {
+                self.root(Root {
+                    exports: ns.child_scope,
+                    bindings: ns.child_scope,
+                });
+            }
+        }
+    }
+
+    /// A function or variable has a form per public name, bound by it.
+    fn export_value(&mut self, id: TypeId, decl: &'d TypeDeclaration, public: &str) {
         let forms = self.items.entry(id).or_default();
         let rust_name = |local: &str| {
             let name = public_rust_name(local, public);
@@ -182,23 +221,51 @@ impl<'d> Builder<'_, 'd> {
             TypeKind::Variable(v) => Some(v.js_name.clone()),
             _ => None,
         };
-        let first = forms.is_empty();
-        match js_name(&form) {
-            Some(name) if forms.iter().all(|f| js_name(f).as_ref() != Some(&name)) => {
-                forms.push(form)
-            }
-            None if first => forms.push(form),
-            _ => {}
+        if forms.iter().all(|f| js_name(f) != js_name(&form)) {
+            forms.push(form);
         }
-        if first {
-            self.queue.push(id);
-            if let TypeKind::Namespace(ns) = &decl.kind {
-                self.root(Root {
-                    exports: ns.child_scope,
-                    bindings: ns.child_scope,
-                });
+    }
+
+    /// A type is emitted once, under its own Rust name. A class binds by
+    /// its own name when exported under it, else by its first public name;
+    /// a namespace likewise (see [`Surface::js_name`]). Each other public
+    /// name but `default`, which has no name of its own, aliases it.
+    fn export_type(&mut self, id: TypeId, decl: &'d TypeDeclaration, public: &str, local: &str) {
+        let names = self.names.entry(id).or_default();
+        if names.iter().any(|n| n == public) {
+            return;
+        }
+        names.push(public.to_string());
+        let first_name = names.len() == 1;
+        let forms = self.items.entry(id).or_default();
+        if forms.is_empty() {
+            forms.push(Cow::Borrowed(decl));
+        }
+        if let TypeKind::Class(c) = &decl.kind {
+            let bound = matches!(&forms[0].kind, TypeKind::Class(f) if f.js_name == public);
+            if (first_name || public == c.name) && !bound {
+                if let TypeKind::Class(f) = &mut forms[0].to_mut().kind {
+                    f.js_name = public.to_string();
+                }
             }
         }
+        let own = super::typemap::type_decl_name(&decl.kind);
+        if matches!(decl.kind, TypeKind::Namespace(_)) || public == "default" || own == Some(public)
+        {
+            return;
+        }
+        forms.push(Cow::Owned(TypeDeclaration {
+            kind: TypeKind::TypeAlias(crate::ir::TypeAliasDecl {
+                name: public.to_string(),
+                type_params: vec![],
+                target: TypeRef::ident(local.to_string()),
+                from_module: None,
+                body_scope: decl.scope_id,
+            }),
+            module_context: decl.module_context.clone(),
+            doc: None,
+            scope_id: decl.scope_id,
+        }));
     }
 
     /// Emit `id`, reached through a signature, as a type: a class without
@@ -499,6 +566,40 @@ mod tests {
             panic!("K is a class");
         };
         assert!(k.members.iter().all(|m| matches!(m, Member::Method(_))));
+    }
+
+    #[test]
+    fn types_bind_by_their_export() {
+        let src = r#"
+            interface Foo { internal: number }
+            interface _Bar { b: number }
+            declare namespace _N { function f(): void; }
+            declare class _C {}
+            declare class _D {}
+            export { _Bar as Foo, _N as N1, _N as N2, _C as C1, _C, _C as C2, _D as D };
+        "#;
+        let (module, gctx) = crate::parse_source(src, Some("m")).unwrap();
+        let surface = surface_of(&module, &gctx, "m");
+        let id = |name| find(&module, &gctx, name);
+        // A local declaration sharing a public name is not that export.
+        assert!(surface.get(id("Foo")).is_empty());
+        assert_eq!(surface.names(id("_Bar")), ["Foo"]);
+        assert_eq!(surface.js_name(id("_N"), "_N"), "N1");
+        // A class binds by its own name when exported under it, and each
+        // other public name aliases it.
+        let class_and_aliases = |name| -> Vec<String> {
+            surface
+                .get(id(name))
+                .iter()
+                .map(|d| match &d.kind {
+                    TypeKind::Class(c) => c.js_name.clone(),
+                    TypeKind::TypeAlias(a) => format!("type {}", a.name),
+                    _ => panic!("a class or alias"),
+                })
+                .collect()
+        };
+        assert_eq!(class_and_aliases("_C"), ["_C", "type C1", "type C2"]);
+        assert_eq!(class_and_aliases("_D"), ["D", "type D"]);
     }
 
     #[test]
