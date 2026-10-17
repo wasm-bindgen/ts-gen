@@ -95,6 +95,10 @@ pub struct GlobalContext {
     /// declarations merge in, over every file collected so far: what a
     /// later declaration of the name may merge with.
     pub(crate) declared: std::collections::HashMap<(ScopeId, String), crate::ir::DeclFlags>,
+    /// The class of each constructor-shaped `var` nothing else describes
+    /// the instance of, whose construct signature's return type
+    /// `bind_constructor_vars` may find to be a global instance interface.
+    pub(crate) constructor_classes: Vec<TypeId>,
     types: Vec<TypeDeclaration>,
     modules: Vec<ParsedModule>,
     /// Map from module specifier to ModuleId for fast lookup.
@@ -201,6 +205,7 @@ impl GlobalContext {
             static_sides: std::collections::HashMap::new(),
             ctor_vars: Vec::new(),
             declared: std::collections::HashMap::new(),
+            constructor_classes: Vec::new(),
             types: Vec::new(),
             modules: Vec::new(),
             module_index: std::collections::HashMap::new(),

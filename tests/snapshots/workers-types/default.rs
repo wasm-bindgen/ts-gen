@@ -39501,28 +39501,7 @@ impl EmailSendResult {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type EmailMessage;
-    #[doc = " Envelope From attribute of the email message."]
-    #[wasm_bindgen(method, getter)]
-    pub fn from(this: &EmailMessage) -> String;
-    #[doc = " Envelope To attribute of the email message."]
-    #[wasm_bindgen(method, getter)]
-    pub fn to(this: &EmailMessage) -> String;
-}
-impl EmailMessage {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> EmailMessage {
-        #[allow(unused_unsafe)]
-        unsafe {
-            JsValue::from(js_sys::Object::new()).unchecked_into()
-        }
-    }
-}
-#[wasm_bindgen]
-extern "C" {
-    # [wasm_bindgen (extends = EmailMessage , extends = Object)]
+    # [wasm_bindgen (extends = cloudflare :: email :: EmailMessage , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ForwardableEmailMessage;
     #[doc = " Stream of the email message content."]
@@ -39602,7 +39581,7 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn reply(
         this: &ForwardableEmailMessage,
-        message: &EmailMessage,
+        message: &cloudflare::email::EmailMessage,
     ) -> Result<EmailSendResult, JsValue>;
     #[doc = " Reply to the sender of this email message with a new EmailMessage object."]
     #[doc = ""]
@@ -39612,7 +39591,7 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "reply")]
     pub fn reply_promise(
         this: &ForwardableEmailMessage,
-        message: &EmailMessage,
+        message: &cloudflare::email::EmailMessage,
     ) -> Promise<EmailSendResult>;
 }
 #[wasm_bindgen]
@@ -39809,10 +39788,15 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SendEmail;
     #[wasm_bindgen(method, catch)]
-    pub async fn send(this: &SendEmail, message: &EmailMessage)
-        -> Result<EmailSendResult, JsValue>;
+    pub async fn send(
+        this: &SendEmail,
+        message: &cloudflare::email::EmailMessage,
+    ) -> Result<EmailSendResult, JsValue>;
     #[wasm_bindgen(method, js_name = "send")]
-    pub fn send_promise(this: &SendEmail, message: &EmailMessage) -> Promise<EmailSendResult>;
+    pub fn send_promise(
+        this: &SendEmail,
+        message: &cloudflare::email::EmailMessage,
+    ) -> Promise<EmailSendResult>;
     #[wasm_bindgen(method, catch, js_name = "send")]
     pub async fn send_with_builder(
         this: &SendEmail,
@@ -40010,7 +39994,7 @@ pub mod cloudflare {
         use super::*;
         #[wasm_bindgen(module = "cloudflare:email")]
         extern "C" {
-            # [wasm_bindgen (extends = EmailMessage , extends = Object)]
+            # [wasm_bindgen (extends = Object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type EmailMessage;
             #[wasm_bindgen(constructor, catch)]
@@ -40021,6 +40005,12 @@ pub mod cloudflare {
             ) -> Result<EmailMessage, JsValue>;
             #[wasm_bindgen(constructor, catch, js_name = "EmailMessage")]
             pub fn new_with_str(from: &str, to: &str, raw: &str) -> Result<EmailMessage, JsValue>;
+            #[doc = " Envelope From attribute of the email message."]
+            #[wasm_bindgen(method, getter)]
+            pub fn from(this: &EmailMessage) -> String;
+            #[doc = " Envelope To attribute of the email message."]
+            #[wasm_bindgen(method, getter)]
+            pub fn to(this: &EmailMessage) -> String;
         }
     }
     pub mod node {
