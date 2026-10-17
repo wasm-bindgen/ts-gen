@@ -55,3 +55,12 @@ export type Ext = Foreign & { extra: string };
 export interface Message {
   role: "user" | "assistant" | (string & {});
 }
+// Parents are checked through alias chains and intersection aliases, and a
+// generic alias over its own type parameter is refused like a primitive.
+export type Str2 = Str;
+export type ViaStr2 = Str2 & { extra: string };
+export type ViaStr = Str & { extra: string };
+export type ViaViaStr = ViaStr & { z: string };
+export type ViaBranded = Branded<Base> & { y: string };
+export type BaseAlias = Base;
+export type ViaBaseAlias = BaseAlias & { w: string };

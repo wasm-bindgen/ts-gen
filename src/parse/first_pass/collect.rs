@@ -347,23 +347,62 @@ impl<'a> CollectCtx<'a> {
         // Phase 2 reads a parent's placeholder when deciding whether an
         // intersection may `extends` it, so the placeholder says what can
         // be known syntactically: an alias over an inline shape becomes an
-        // interface and registers as one; an alias to a non-object type
-        // (`type Id = string`) records that in its target, since the
-        // default `any` means "not yet known".
+        // interface and registers as one, with an intersection's named
+        // parents as its `extends` so they are checked in turn. One over its
+        // own type parameter (`T & { … }`) can never hoist, so stays an
+        // alias of that intersection. An alias records its type parameters,
+        // and its target when that is a non-object type (`type Id = string`)
+        // or another name, since the default `any` means "not yet known".
+        let own_params: Vec<&str> = alias
+            .type_parameters
+            .iter()
+            .flat_map(|tp| tp.params.iter().map(|p| p.name.name.as_str()))
+            .collect();
+        let shape = crate::parse::members::inline_shape(&alias.type_annotation);
+        let parents: Vec<&str> = match &shape {
+            Some(crate::parse::members::InlineShape::Intersection { parents, .. }) => {
+                parents.iter().filter_map(|p| bare_reference(p)).collect()
+            }
+            _ => Vec::new(),
+        };
+        let over_own_param = parents.iter().any(|p| own_params.contains(p));
         let kind = if is_string_literal_union(&alias.type_annotation) {
             ir::RegisteredKind::StringEnum
-        } else if crate::parse::members::inline_shape(&alias.type_annotation).is_some() {
+        } else if shape.is_some() && !over_own_param {
             ir::RegisteredKind::Interface
         } else {
             ir::RegisteredKind::TypeAlias
         };
         self.register_type(&name, kind, ctx, scope, exported);
-        if let Some(target) = non_object_target(&alias.type_annotation) {
-            if let Some(id) = self.gctx.scopes.get(scope).get(&name) {
-                if let ir::TypeKind::TypeAlias(a) = &mut self.gctx.get_type_mut(id).kind {
+        let Some(id) = self.gctx.scopes.get(scope).get(&name) else {
+            return;
+        };
+        let target = if over_own_param {
+            Some(ir::TypeRef::Intersection(
+                parents.iter().copied().map(ir::TypeRef::ident).collect(),
+            ))
+        } else {
+            non_object_target(&alias.type_annotation)
+                .or_else(|| bare_reference(&alias.type_annotation).map(ir::TypeRef::ident))
+        };
+        match &mut self.gctx.get_type_mut(id).kind {
+            ir::TypeKind::TypeAlias(a) => {
+                if let Some(target) = target {
                     a.target = target;
                 }
+                a.type_params = own_params
+                    .iter()
+                    .map(|name| ir::TypeParam {
+                        name: name.to_string(),
+                        constraint: None,
+                        default: None,
+                    })
+                    .collect();
             }
+            ir::TypeKind::Interface(i) => {
+                i.extends = parents.into_iter().map(ir::TypeRef::ident).collect();
+            }
+            _ => {}
         }
     }
 
@@ -558,6 +597,18 @@ impl<'a> CollectCtx<'a> {
             },
         );
         ns_scope
+    }
+}
+
+/// The name of a single-identifier type reference, with or without type
+/// arguments.
+fn bare_reference<'a>(ts_type: &'a ast::TSType<'_>) -> Option<&'a str> {
+    match ts_type.without_parenthesized() {
+        ast::TSType::TSTypeReference(r) => match &r.type_name {
+            ast::TSTypeName::IdentifierReference(id) => Some(id.name.as_str()),
+            _ => None,
+        },
+        _ => None,
     }
 }
 

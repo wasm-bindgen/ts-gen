@@ -367,6 +367,35 @@ impl Message {
         inner
     }
 }
+#[allow(dead_code)]
+pub type Str2 = JsString;
+#[allow(dead_code)]
+pub type ViaStr2 = JsString;
+#[allow(dead_code)]
+pub type ViaStr = JsString;
+#[allow(dead_code)]
+pub type ViaViaStr = JsString;
+#[allow(dead_code)]
+pub type ViaBranded = Branded<Base>;
+#[allow(dead_code)]
+pub type BaseAlias = Base;
+#[wasm_bindgen(module = "intersection")]
+extern "C" {
+    # [wasm_bindgen (extends = Base , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ViaBaseAlias;
+    #[wasm_bindgen(method, getter)]
+    pub fn w(this: &ViaBaseAlias) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_w(this: &ViaBaseAlias, val: &str);
+}
+impl ViaBaseAlias {
+    pub fn new(w: &str) -> ViaBaseAlias {
+        let inner: ViaBaseAlias = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_w(w);
+        inner
+    }
+}
 #[wasm_bindgen(private)]
 pub enum RoleKind {
     User = "user",
