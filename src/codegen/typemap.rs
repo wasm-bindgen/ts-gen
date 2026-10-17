@@ -215,7 +215,7 @@ pub struct CodegenContext<'a> {
     /// external map. References to their types resolve through
     /// `external_map.resolve` (yielding e.g. `::other::foo::Bar`)
     /// rather than emitting a `foo::` local-mod qualifier. The
-    /// corresponding `mod` block is suppressed by `should_emit`.
+    /// surface leaves out the corresponding `mod` block.
     pub externalised_modules: HashSet<String>,
     /// Already-reported `(type_name, module_spec)` pairs for the
     /// unresolved-module-ref error. Emitting one diagnostic per

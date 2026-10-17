@@ -2257,7 +2257,9 @@ a class without its constructor and statics, and a namespace only as
 the `pub mod` path to what is emitted. A function or variable is
 emitted only as an export. With `--export b.d.ts`, a function in
 `b.d.ts` taking `OnlyA` from `a.d.ts` emits `OnlyA` but not `a.d.ts`'s
-functions.
+functions. A type that no selected export provides and no emitted
+signature reaches is not emitted, so an interface a module with `export
+{ … }` doesn't export and none of its exports use is left out.
 
 ### Output surface: `--export` and `--input`
 
