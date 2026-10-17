@@ -49,6 +49,7 @@
   ;; Plain
   ;; constructor()
   (import "./bindings.wasm" "Plain.new" (func $Plain.new (result externref)))
+  (import "./bindings.wasm" "AlsoPlain.new" (func $AlsoPlain.new (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
