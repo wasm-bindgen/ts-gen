@@ -2556,12 +2556,15 @@ signature reaches is not emitted, so an interface a module with `export
 
 `--input` defines the *type universe* — every file gets parsed so
 resolution sees the full set. `--export` defines the *output surface* —
-what actually gets emitted as public Rust code. Two forms:
+what actually gets emitted as public Rust code. Three forms:
 
 * **File path** (e.g. `--export types/email.d.ts`) — emit the globals
   that file declares.
 * **Module specifier** (e.g. `--export cloudflare:email`) — emit that
   module's declarations in its `pub mod`, attribute-attached.
+* **Declaration name** (e.g. `--export Request`, `--export
+  TailStream.TailEvent`) — emit that export of any file or module, and
+  the types its bindings reach. See [Root selection](#root-selection).
 
 When `--export` is omitted entirely, every `--input` file becomes an
 implicit file export. **No modules are emitted by the implicit
@@ -2583,6 +2586,35 @@ ts-gen --input types/email.d.ts \
 ```
 
 No wildcards in v1 — list specific specifiers and file paths.
+
+### Root selection
+
+A large upstream declaration file (`@cloudflare/workers-types`,
+`lib.dom.d.ts`) is a single file, so file-level `--export` is
+all-or-nothing. Naming declarations keeps the whole file as the type
+universe while emitting only what a chosen surface needs:
+
+```sh
+ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
+       --export Request --export Response --export KVNamespace
+```
+
+`--export Request` selects the export `Request` of every root, each
+file's globals and each module not externalised, as if that root were
+selected with only that export in it. A dotted name goes through a
+namespace's exports: `--export TailStream.TailEvent` emits `TailEvent`,
+with `tail_stream` only the `pub mod` path to it. Functions and
+variables are named by their export, the source spelling (`--export
+setTimeout`).
+
+What the selected exports reach is emitted as a type only, as for any
+selection (see [Global scope](#global-scope)); a module-context
+declaration is emitted in its module's `pub mod` with its
+`#[wasm_bindgen(module = "...")]` attribute. Files and modules listed
+alongside are selected whole. The Wasm ABI covers the same surface.
+
+A bare dotted identifier is read as a declaration name unless it names
+a `declare module`; a name no root exports is a codegen error.
 
 ### `--external <spec>=<path>` — redirect to a separate crate
 

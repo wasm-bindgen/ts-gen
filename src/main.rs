@@ -123,13 +123,17 @@ struct Selection {
     /// `--export` is authoritative about what gets emitted as public
     /// Rust code.
     ///
-    /// Two forms:
+    /// Three forms:
     ///   - File path (e.g. `types/email.d.ts`) — emits the globals that
     ///     file declares.
     ///   - Module specifier (e.g. `cloudflare:email`) — emits that
     ///     module's declarations in a `pub mod` named by the specifier
     ///     (`cloudflare::email`). The `--lib-name` module is emitted at
     ///     the top level instead.
+    ///   - Declaration name (e.g. `Request`, `TailStream.TailEvent`) —
+    ///     emits that export of any file or module and, transitively,
+    ///     the types its bindings reference. A bare identifier is read
+    ///     as a declaration name unless it names a `declare module`.
     ///
     /// When omitted entirely, every `--input` file becomes an implicit
     /// file export. NO modules are emitted by the implicit default —
@@ -157,11 +161,12 @@ impl Selection {
         &self,
         gctx: &mut ts_gen::context::GlobalContext,
         input_files: &[PathBuf],
+        lib_name: Option<&str>,
     ) -> Result<std::collections::HashSet<ts_gen::codegen::ExportSpec>> {
         for mapping in &self.external {
             gctx.external_map.add_mappings(mapping);
         }
-        resolve_exports(&self.export, input_files)
+        resolve_exports(&self.export, input_files, gctx, lib_name)
     }
 }
 
@@ -241,7 +246,9 @@ fn main() -> Result<()> {
         gctx.external_map.clear_defaults();
     }
 
-    let exports = cli.selection.apply(&mut gctx, &input_files)?;
+    let exports = cli
+        .selection
+        .apply(&mut gctx, &input_files, cli.lib_name.as_deref())?;
 
     let provided = match &cli.provides {
         Some(spec) => ts_gen::provides::resolve(spec, &module, &mut gctx)?,
@@ -343,11 +350,14 @@ fn default_bindings_path(output: &Path) -> String {
 fn resolve_exports(
     export: &[String],
     input_files: &[PathBuf],
+    gctx: &ts_gen::context::GlobalContext,
+    lib_name: Option<&str>,
 ) -> Result<std::collections::HashSet<ts_gen::codegen::ExportSpec>> {
     // Resolve `--export` into a flat set of `ExportSpec`s. A spec is
     // treated as a file path when it exists on disk (same logic as
     // `--input`, which also accepts files or directories); otherwise
-    // it's a JS module specifier.
+    // it's a declaration name when it is spelled like one and names no
+    // module, else a JS module specifier.
     let mut exports: std::collections::HashSet<ts_gen::codegen::ExportSpec> =
         std::collections::HashSet::new();
     for spec in export {
@@ -357,6 +367,12 @@ fn resolve_exports(
                 let canonical = resolved.canonicalize().unwrap_or(resolved);
                 exports.insert(ts_gen::codegen::ExportSpec::File(canonical));
             }
+        } else if gctx.find_module(spec).is_none()
+            && !gctx.ambient_module_scopes.contains_key(spec)
+            && lib_name != Some(spec.as_str())
+            && is_declaration_name(spec)
+        {
+            exports.insert(ts_gen::codegen::ExportSpec::Decl(spec.clone()));
         } else {
             exports.insert(ts_gen::codegen::ExportSpec::Module(spec.clone()));
         }
@@ -381,7 +397,9 @@ fn embed(args: EmbedArgs) -> Result<()> {
     }
     let (module, mut gctx) =
         ts_gen::parse::parse_dts_files(&input_files, args.lib_name.as_deref())?;
-    let exports = args.selection.apply(&mut gctx, &input_files)?;
+    let exports = args
+        .selection
+        .apply(&mut gctx, &input_files, args.lib_name.as_deref())?;
     let provided = match &args.provides {
         Some(spec) => ts_gen::provides::resolve(spec, &module, &mut gctx)?,
         None => Vec::new(),
@@ -630,6 +648,16 @@ fn print_member(member: &ts_gen::ir::Member, indent: usize) {
             );
         }
     }
+}
+
+/// A dotted identifier path (`Request`, `TailStream.TailEvent`) as opposed
+/// to a module specifier, which carries `:` / `/` / `*` or a leading `@`.
+fn is_declaration_name(spec: &str) -> bool {
+    spec.split('.').all(|seg| {
+        let mut chars = seg.chars();
+        matches!(chars.next(), Some(c) if c.is_alphabetic() || c == '_' || c == '$')
+            && chars.all(|c| c.is_alphanumeric() || c == '_' || c == '$')
+    })
 }
 
 #[cfg(test)]
