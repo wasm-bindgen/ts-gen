@@ -25,8 +25,8 @@ async fn test_parse_static_import() {
     assert_eq!(imports.length(), 1);
     assert_eq!(exports.length(), 0);
 
-    // Access the first import specifier — get() returns ImportSpecifier
-    let spec = imports.get(0);
+    // Access the first import specifier
+    let spec = imports.iter().next().unwrap();
 
     // Module name should be "bar" — JsString implements PartialEq<str>
     // Getters have no catch, so n() returns Option<JsString> directly
@@ -51,7 +51,7 @@ async fn test_parse_dynamic_import() {
 
     assert_eq!(imports.length(), 1);
 
-    let spec = imports.get(0);
+    let spec = imports.iter().next().unwrap();
     let module_name = spec.n().unwrap();
     assert_eq!(module_name, "foo");
 
@@ -72,7 +72,7 @@ async fn test_parse_exports() {
 
     assert_eq!(exports.length(), 1);
 
-    let spec = exports.get(0);
+    let spec = exports.iter().next().unwrap();
     let name = spec.n();
     assert_eq!(name, "answer");
 }
@@ -90,10 +90,10 @@ async fn test_parse_reexport() {
     assert_eq!(imports.length(), 1);
     assert_eq!(exports.length(), 1);
 
-    let imp = imports.get(0);
+    let imp = imports.iter().next().unwrap();
     assert_eq!(imp.n().unwrap(), "baz");
 
-    let exp = exports.get(0);
+    let exp = exports.iter().next().unwrap();
     assert_eq!(exp.n(), "bar");
 }
 
@@ -112,9 +112,9 @@ async fn test_parse_multiple_imports() {
 
     assert_eq!(imports.length(), 3);
 
-    let spec0 = imports.get(0);
-    let spec1 = imports.get(1);
-    let spec2 = imports.get(2);
+    let spec0 = imports.iter().next().unwrap();
+    let spec1 = imports.iter().nth(1).unwrap();
+    let spec2 = imports.iter().nth(2).unwrap();
 
     assert_eq!(spec0.n().unwrap(), "mod-a");
     assert_eq!(spec0.t(), ImportType::Static);
@@ -134,7 +134,7 @@ async fn test_import_specifier_offsets() {
     let result = parse(source);
     let imports = result.get0();
 
-    let spec = imports.get(0);
+    let spec = imports.iter().next().unwrap();
 
     // s and e are the start/end of the module specifier string
     let s = spec.s() as usize;

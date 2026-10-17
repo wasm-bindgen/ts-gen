@@ -16,6 +16,15 @@ fn string_lists_accept_any_string_element() {
     assert_eq!(tags_like(&handle), "Array(string:h)");
 }
 
+#[cfg(js_sys_unstable_apis)]
+#[wasm_bindgen_test]
+fn string_list_handles_hold_rust_strings() {
+    let handle: Array<String> = ["h", "i"].into_iter().map(String::from).collect();
+    assert_eq!(tags_like(&handle), "Array(string:h,string:i)");
+    let empty: &[&str] = &[];
+    assert_eq!(tags(empty), "Array()");
+}
+
 #[wasm_bindgen_test]
 fn string_list_returns_have_a_handle_variant() {
     assert_eq!(get_tags(), ["a", "b"]);
