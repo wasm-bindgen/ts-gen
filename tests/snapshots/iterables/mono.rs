@@ -10,20 +10,21 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KeyValueStore;
     #[wasm_bindgen(method, catch)]
-    pub fn list<T>(this: &KeyValueStore) -> Result<KeyValueStoreList<T>, JsValue>;
+    pub fn list(this: &KeyValueStore) -> Result<KeyValueStoreList, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "listAsync")]
-    pub fn list_async<T>(this: &KeyValueStore) -> Result<KeyValueStoreListAsync<T>, JsValue>;
+    pub fn list_async(this: &KeyValueStore) -> Result<KeyValueStoreListAsync, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn entries<T>(this: &KeyValueStore)
-        -> Result<Iterator<ArrayTuple<(JsString, T)>>, JsValue>;
+    pub fn entries(
+        this: &KeyValueStore,
+    ) -> Result<Iterator<ArrayTuple<(JsString, JsValue)>>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn keys(this: &KeyValueStore) -> Result<Iterator<JsString>, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn pages<T>(this: &KeyValueStore) -> Result<AsyncIterator<T>, JsValue>;
+    pub fn pages(this: &KeyValueStore) -> Result<AsyncIterator, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "asyncEntries")]
-    pub fn async_entries<T>(
+    pub fn async_entries(
         this: &KeyValueStore,
-    ) -> Result<AsyncIterator<ArrayTuple<(JsString, T)>>, JsValue>;
+    ) -> Result<AsyncIterator<ArrayTuple<(JsString, JsValue)>>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn put<T>(
         this: &KeyValueStore,
@@ -68,7 +69,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Cursor;
     #[wasm_bindgen(method, catch)]
-    pub fn walk<T>(this: &Cursor) -> Result<CursorWalk<T>, JsValue>;
+    pub fn walk(this: &Cursor) -> Result<CursorWalk, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

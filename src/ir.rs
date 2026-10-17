@@ -1204,6 +1204,7 @@ pub struct FunctionDecl {
 #[derive(Clone, Debug)]
 
 pub struct FunctionOverload {
+    pub type_params: Vec<TypeParam>,
     pub params: Vec<Param>,
     pub return_type: TypeRef,
     /// Scope inside this overload's declaration, holding its own type

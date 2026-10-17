@@ -2456,7 +2456,7 @@ pub fn iterator<T: ::wasm_bindgen::JsGeneric>(
 ) -> Iterator<ArrayTuple<(JsString, T)>>;
 
 #[wasm_bindgen(method)]
-pub fn list<T: ::wasm_bindgen::JsGeneric>(this: &SyncKvStorage) -> SyncKvStorageList<T>;
+pub fn list(this: &SyncKvStorage) -> SyncKvStorageList<JsValue>;
 ```
 
 The wrapper's name follows the existing `<Parent><Member>`
@@ -2470,7 +2470,10 @@ parameter-synthesis limitation.
 
 Type parameters mentioned by the iteration item bubble up onto the
 synthesized wrapper, so `Iterable<[string, T]>` produces
-`<Parent>List<T>` rather than erasing `T`.
+`<Parent>List<T>` rather than erasing `T`. The method returning it
+still has no argument to infer `T` from, so it hands back the wrapper
+at its default (see [uninferrable type
+parameters](#uninferrable-method-type-parameters)).
 
 ## In-scope generic type parameters
 
@@ -2490,6 +2493,52 @@ becomes:
 ```rust
 pub fn put<T: ::wasm_bindgen::JsGeneric>(this: &KeyValueStore, key: &str, value: &T);
 pub fn get<T: ::wasm_bindgen::JsGeneric>(this: &KeyValueStore, key: &str) -> Option<T>;
+```
+
+### Uninferrable method type parameters
+
+A callable-level parameter that no argument mentions once lowered has
+to be named at every call. That is worth it only where the turbofish
+is itself the cast — the (awaited) return is exactly `T`, `T |
+undefined` or `T | null` — so the rule, per parameter:
+
+1. Mentioned by an argument: kept, inferred at the call. A callback
+   counts only as it lowers: a variadic callback is the untyped
+   `Function` and a `Promise<T>` callback return erases, so neither
+   mentions `T`.
+2. Not mentioned, return exactly `T` / `T | undefined` / `T | null`
+   (awaited): kept — `storage.get::<JsString>(key)`, `body.json::<Row>()`.
+3. Otherwise erased and removed from the signature. The substitute is
+   the default declared by the generic type `T` instantiates in the
+   return (`Row<T = Record<string, unknown>>` → `Object`), else the
+   method's own default (`list<T = unknown>` → `JsValue`), else `any`.
+   A parameter the return never mentions is simply dropped.
+
+Callers wanting a typed container `unchecked_into` it
+(`D1Result<JsValue>` → `D1Result<Row>`). `try_` companions follow the
+same signature. Each overload of a method or
+free function applies the rule to its own type parameters.
+
+```ts
+interface Store {
+  put<T>(key: string, value: T): Promise<void>;
+  get<T = unknown>(key: string): Promise<T | undefined>;
+  transaction<T>(closure: (tx: Store) => Promise<T>): Promise<T>;
+  run<T = unknown>(): Promise<Row<T>>;
+  list<T = unknown>(): Promise<Map<string, T>>;
+  schedule<Args extends unknown[]>(callback: (...args: Args) => void, ...args: Args): number;
+}
+```
+
+```rust
+pub async fn put<T: JsGeneric>(this: &Store, key: &str, value: &T) -> Result<Undefined, JsValue>;
+pub async fn get<T: JsGeneric>(this: &Store, key: &str) -> Result<Option<T>, JsValue>
+where
+    T: OptionFromWasmAbi;
+pub async fn transaction<T: JsGeneric>(this: &Store, closure: &Function<fn(Store) -> Promise<T>>) -> Result<T, JsValue>;
+pub async fn run(this: &Store) -> Result<Row<Object>, JsValue>;
+pub async fn list(this: &Store) -> Result<Map<JsString, JsValue>, JsValue>;
+pub fn schedule(this: &Store, callback: &Function<fn(JsValue) -> Undefined>, args: &[JsValue]) -> f64;
 ```
 
 Passing `--experimental-generic-mono` selects wasm-bindgen's experimental

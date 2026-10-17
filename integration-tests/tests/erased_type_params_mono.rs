@@ -2,7 +2,7 @@
 
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{Array, JsString, Nullable, Object};
+use js_sys::{Array, JsString, Nullable};
 use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::erased_type_params_mono::{
@@ -13,15 +13,16 @@ use ts_gen_integration_tests::erased_type_params_mono::{
 // given for an erased parameter (`ListResult<Metadata, Key>`) is dropped
 // before per-monomorphization lowering looks for string leaves, so `list`
 // returns the one-parameter `ListResult` and has no `_js_string` variant.
+// No argument infers `list`'s own `Metadata`, so it erases to `unknown`.
 #[allow(dead_code)]
 async fn erased_type_params_mono_compile(store: &Store) -> Result<(), JsValue> {
     let _: Nullable<String> = store.get("k").await?;
     let _: Nullable<JsString> = store.get_js_string("k").await?;
-    let result: ListResult<Object> = store.list::<Object>().await?;
-    let keys: Vec<ListKey<Object>> = result.keys();
+    let result: ListResult = store.list().await?;
+    let keys: Vec<ListKey> = result.keys();
     for key in &keys {
         let _: String = key.name();
-        let _: Option<Object> = key.metadata();
+        let _: Option<JsValue> = key.metadata();
     }
     let _: String = result.cursor();
     store.tag("info", 1.0);
