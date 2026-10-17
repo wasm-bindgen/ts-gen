@@ -396,6 +396,14 @@ impl ViaBaseAlias {
         inner
     }
 }
+#[allow(dead_code)]
+pub type Same<T> = T;
+#[allow(dead_code)]
+pub type ViaSame = Same<Base>;
+#[allow(dead_code)]
+pub type ProviderOf<T> = Provider<Array<T>>;
+#[allow(dead_code)]
+pub type ViaProviderOf = ProviderOf<JsString>;
 #[wasm_bindgen(private)]
 pub enum RoleKind {
     User = "user",

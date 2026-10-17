@@ -382,8 +382,10 @@ impl<'a> CollectCtx<'a> {
                 parents.iter().copied().map(ir::TypeRef::ident).collect(),
             ))
         } else {
-            non_object_target(&alias.type_annotation)
-                .or_else(|| bare_reference(&alias.type_annotation).map(ir::TypeRef::ident))
+            non_object_target(&alias.type_annotation).or_else(|| {
+                bare_reference(&alias.type_annotation)?;
+                Some(placeholder_reference(&alias.type_annotation))
+            })
         };
         match &mut self.gctx.get_type_mut(id).kind {
             ir::TypeKind::TypeAlias(a) => {
@@ -609,6 +611,29 @@ fn bare_reference<'a>(ts_type: &'a ast::TSType<'_>) -> Option<&'a str> {
             _ => None,
         },
         _ => None,
+    }
+}
+
+/// A single-identifier reference with its type arguments, which keep only
+/// the names they mention (`Map<string, T[]>` → `Map<any, T[]>`): enough for
+/// phase 2 to see whether a generic alias's target mentions its parameters.
+fn placeholder_reference(ts_type: &ast::TSType<'_>) -> ir::TypeRef {
+    match ts_type.without_parenthesized() {
+        ast::TSType::TSTypeReference(r) => match &r.type_name {
+            ast::TSTypeName::IdentifierReference(id) => ir::TypeRef::Reference {
+                segments: vec![id.name.to_string()],
+                generic_args: r
+                    .type_arguments
+                    .iter()
+                    .flat_map(|args| args.params.iter().map(placeholder_reference))
+                    .collect(),
+            },
+            _ => ir::TypeRef::Any,
+        },
+        ast::TSType::TSArrayType(arr) => {
+            ir::TypeRef::Array(Box::new(placeholder_reference(&arr.element_type)))
+        }
+        _ => ir::TypeRef::Any,
     }
 }
 

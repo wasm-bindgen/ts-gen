@@ -472,7 +472,8 @@ pub(crate) fn synthesize_inline(
 
 /// Whether a single-segment name may appear in an interface's `extends`.
 /// A type parameter cannot; nor can an alias phase 1 already knows is not
-/// an object type or a generic alias over its own type parameter. A name
+/// an object type or a generic alias whose target mentions its own type
+/// parameters. A name
 /// with no local binding (an import, an `--external` mapping, or a typo)
 /// is allowed through, as is an alias whose target is still unknown:
 /// codegen resolves them, and drops a parent that erases, keeping the
@@ -509,15 +510,11 @@ fn is_extendable_in(
     let extendable = match &decl.kind {
         TypeKind::Class(_) => true,
         TypeKind::Interface(i) => i.extends.iter().all(|parent| follows(parent, visited)),
+        // Lowering the target doesn't substitute the alias's arguments, so
+        // `Id<Local>` for `type Id<T> = T` would lower to a bare `T`.
+        TypeKind::TypeAlias(a) if mentions_param(&a.target, &a.type_params) => false,
         TypeKind::TypeAlias(a) => match &a.target {
             TypeRef::Any => true,
-            // Lowering the target doesn't substitute the alias's arguments,
-            // so `Id<Local>` for `type Id<T> = T` would lower to a bare `T`.
-            TypeRef::Reference { segments, .. }
-                if segments.len() == 1 && a.type_params.iter().any(|p| p.name == segments[0]) =>
-            {
-                false
-            }
             target @ TypeRef::Reference { .. } => follows(target, visited),
             _ => false,
         },
@@ -525,6 +522,21 @@ fn is_extendable_in(
     };
     visited.remove(&id);
     extendable
+}
+
+fn mentions_param(ty: &TypeRef, params: &[TypeParam]) -> bool {
+    match ty {
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } => {
+            (segments.len() == 1 && params.iter().any(|p| p.name == segments[0]))
+                || generic_args.iter().any(|arg| mentions_param(arg, params))
+        }
+        TypeRef::Array(elem) => mentions_param(elem, params),
+        TypeRef::Intersection(parts) => parts.iter().any(|part| mentions_param(part, params)),
+        _ => false,
+    }
 }
 
 /// Try to synthesize an anonymous-interface hoist for a parameter type
