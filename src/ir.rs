@@ -672,6 +672,10 @@ pub struct StringEnumVariant {
 pub struct TsEnumDecl {
     pub name: String,
     pub members: Vec<TsEnumMember>,
+    /// Declared in the global scope, at a script file's top level or in a
+    /// `declare global` block, so it merges with the global declarations of
+    /// other files.
+    pub global: bool,
 }
 
 #[derive(Clone, Debug)]

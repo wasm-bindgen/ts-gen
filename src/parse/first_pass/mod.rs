@@ -255,6 +255,7 @@ fn register_type(
         ir::RegisteredKind::TsEnum => ir::TypeKind::TsEnum(ir::TsEnumDecl {
             name: name_str.clone(),
             members: vec![],
+            global: false,
         }),
         ir::RegisteredKind::TypeAlias => ir::TypeKind::TypeAlias(ir::TypeAliasDecl {
             name: name_str.clone(),

@@ -2520,14 +2520,16 @@ concatenation, references to earlier members of the same enum, bare or
 qualified, and references to another enum's members through its path
 (`Base.Default`, `Ns.Inner.Value`, `Base["Other"]`), including one in
 another file. A member without an initialiser continues from the previous
-member's evaluated value, or is 0 as the first member of its declaration. An enum is numeric when any member
-evaluates to a number, so `Read = 1 << 0` alone is enough, and a string
-enum otherwise.
+member's evaluated value, or is 0 as the first member of its declaration.
+An enum is numeric when any member evaluates to a number, so
+`Read = 1 << 0` alone is enough, and a string enum otherwise.
 
-The declarations of a merged enum, those of one name in the same module
-and namespace path, are evaluated in order as one enum, whose members can
-reference each other's, and emitted once at the first. They can be in
-different files or `declare module` blocks:
+The declarations of a merged enum, those of one name in the same namespace
+path of one scope, are evaluated in order as one enum, whose members can
+reference each other's, and emitted once at the first. The scope is the
+global scope of every file (script files and `declare global` blocks), the
+`declare module` blocks of one module, or a module file's top level, so a
+same-named enum in an imported module file stays a separate enum:
 
 ```ts
 declare enum Base { Default = 2 }

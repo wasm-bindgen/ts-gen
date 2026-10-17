@@ -235,6 +235,7 @@ pub fn convert_ts_enum(
     ir::TsEnumDecl {
         name: enum_decl.id.name.to_string(),
         members,
+        global: false,
     }
 }
 
