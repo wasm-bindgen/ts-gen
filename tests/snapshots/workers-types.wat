@@ -11161,14 +11161,6 @@
   ;; set messageId(value: string)
   (import "./bindings.wasm" "EmailSendResult.set_message_id" (func $EmailSendResult.set_message_id (param $this externref) (param $value externref)))
 
-  ;; EmailMessage
-  ;; {} as EmailMessage
-  (import "./bindings.wasm" "EmailMessage.new" (func $EmailMessage.new (result externref)))
-  ;; from: string
-  (import "./bindings.wasm" "EmailMessage.from" (func $EmailMessage.from (param $this externref) (result externref)))
-  ;; to: string
-  (import "./bindings.wasm" "EmailMessage.to" (func $EmailMessage.to (param $this externref) (result externref)))
-
   ;; ForwardableEmailMessage
   ;; raw: ReadableStream<Uint8Array>
   (import "./bindings.wasm" "ForwardableEmailMessage.raw" (func $ForwardableEmailMessage.raw (param $this externref) (result externref)))
@@ -11266,6 +11258,10 @@
   (import "cloudflare:email" "EmailMessage.new" (func $cloudflare:email:EmailMessage.new (param $from externref) (param $to externref) (param $raw externref) (result externref)))
   ;; constructor(from: string, to: string, raw: string)
   (import "cloudflare:email" "EmailMessage.new_with_str" (func $cloudflare:email:EmailMessage.new_with_str (param $from externref) (param $to externref) (param $raw externref) (result externref)))
+  ;; from: string
+  (import "cloudflare:email" "EmailMessage.from" (func $cloudflare:email:EmailMessage.from (param $this externref) (result externref)))
+  ;; to: string
+  (import "cloudflare:email" "EmailMessage.to" (func $cloudflare:email:EmailMessage.to (param $this externref) (result externref)))
 
   ;; HelloWorldBinding
   ;; get(): Promise<object>

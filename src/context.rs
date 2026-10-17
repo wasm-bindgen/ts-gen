@@ -85,6 +85,10 @@ pub struct GlobalContext {
     /// constructor and statics from. Every file's declarations of that
     /// interface are statics of the class.
     pub(crate) global_ctor_interfaces: std::collections::HashMap<String, TypeId>,
+    /// Each module-scoped constructor class by the global interface
+    /// describing its instance. Every file's declarations of that interface
+    /// are instance members of the class.
+    pub(crate) global_instance_interfaces: std::collections::HashMap<String, TypeId>,
     types: Vec<TypeDeclaration>,
     modules: Vec<ParsedModule>,
     /// Map from module specifier to ModuleId for fast lookup.
@@ -163,6 +167,7 @@ impl GlobalContext {
             static_sides: std::collections::HashMap::new(),
             ctor_interface_of: std::collections::HashMap::new(),
             global_ctor_interfaces: std::collections::HashMap::new(),
+            global_instance_interfaces: std::collections::HashMap::new(),
             types: Vec::new(),
             modules: Vec::new(),
             module_index: std::collections::HashMap::new(),

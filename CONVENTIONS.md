@@ -1244,6 +1244,21 @@ nesting](#module-declarations-and-namespace-nesting) for the
 The `export { _EmailMessage as EmailMessage }` rename gives the class its
 public name; see [Type aliases and `export { X as Y }`](#type-aliases-and-export--x-as-y-).
 
+Upstream pairs this with a **global** `interface EmailMessage { … }`
+holding the instance shape (the constructor's return type names it).
+The two collapse into the one module-scoped class: the interface's
+members (and `extends`) move onto the class, the interface is dropped,
+and every reference to `EmailMessage` — `ForwardableEmailMessage
+extends EmailMessage`, `reply(message: EmailMessage)` — resolves to the
+class. A global reference is therefore a reference into
+`cloudflare:email` (`cloudflare::email::EmailMessage`), like any other
+[module-context declaration](#module-declarations-and-namespace-nesting).
+The interface is the one the construct signature's return type resolves
+to from the module, so another module's own `EmailMessage` is untouched.
+An interface first declared in a later file than the class is not
+collapsed, and neither is the interface of a class exported under its
+own name (`export let Email: { new (): Email }`).
+
 ### Constructor variables named by a type alias
 
 ```ts
