@@ -3333,10 +3333,14 @@ values).
 ### The three artifacts
 
 `ts-gen embed` reads a language module written against the template
-(given the same `--export`s, so it binds the same surface) and produces:
+(given the same `--export`s and `--external`s, so it binds the same
+surface) and produces:
 
 1. **`bindings.wasm`** — implements each `Type.member` import using
-   the JS primitives in `builtins.js`.
+   the JS primitives in `builtins.js`. Imports of one function under
+   several of its names with the same signature share one bindings
+   function, exported under each (`(func (export "Conn.get") (export
+   "Connection.get") ...)`).
 2. **`wrapper.wasm`** — imports the language module's provided
    functions and publishes the module namespace: one exported
    externref global per first path segment (`default`, `version`,
