@@ -28,14 +28,18 @@
   ;; _Bar
   ;; {} as _Bar
   (import "./bindings.wasm" "_Bar.new" (func $_Bar.new (result externref)))
+  (import "./bindings.wasm" "Foo.new" (func $Foo.new (result externref)))
   ;; b: number
   (import "./bindings.wasm" "_Bar.b" (func $_Bar.b (param $this externref) (result f64)))
+  (import "./bindings.wasm" "Foo.b" (func $Foo.b (param $this externref) (result f64)))
   ;; set b(value: number)
   (import "./bindings.wasm" "_Bar.set_b" (func $_Bar.set_b (param $this externref) (param $value f64)))
+  (import "./bindings.wasm" "Foo.set_b" (func $Foo.set_b (param $this externref) (param $value f64)))
 
   ;; N1
   ;; f(): void
   (import "./bindings.wasm" "N1.f" (func $N1.f))
+  (import "./bindings.wasm" "N2.f" (func $N2.f))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
