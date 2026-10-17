@@ -41,6 +41,16 @@ fn main() {
             "pub mod {0} {{ include!(concat!(env!(\"OUT_DIR\"), \"/{0}.rs\")); }}\n\n",
             entry.mod_name
         ));
+        // `--provides`: the wrapper delegates to a hand-written
+        // `src/<mod>_app.rs` (the scaffold ts-gen would write, filled in).
+        if entry.provides.is_some() {
+            lib_code.push_str(&format!(
+                "pub mod {0}_provides {{ include!(concat!(env!(\"OUT_DIR\"), \"/{0}_provides.rs\")); }}\n\
+                 #[path = \"{1}/src/{0}_app.rs\"]\npub mod {0}_app;\n\n",
+                entry.mod_name,
+                crate_dir.display()
+            ));
+        }
     }
 
     let lib_file = out_dir.join("_lib.rs");
@@ -74,6 +84,8 @@ struct Entry {
     export_specs: Vec<String>,
     /// Further `--input` files, resolved against the workspace.
     inputs: Vec<PathBuf>,
+    /// `--provides <spec>`, if the fixture provides functions.
+    provides: Option<String>,
 }
 
 /// Pair every `integration-tests/tests/<name>.rs` with the fixture
@@ -126,6 +138,7 @@ fn discover_entries(tests_dir: &Path, fixtures_dir: &Path) -> Vec<Entry> {
                 .iter()
                 .map(|input| workspace_dir.join(input))
                 .collect(),
+            provides: directive.provides,
         });
     }
 
@@ -144,6 +157,8 @@ struct Directive {
     export_specs: Vec<String>,
     /// All `--input <path>` (or `-i <path>`) values.
     inputs: Vec<String>,
+    /// Value of `--provides <spec>` if specified.
+    provides: Option<String>,
 }
 
 /// Parse the `//! @ts-gen ...` directive lines at the top of the fixture
@@ -155,6 +170,7 @@ fn parse_directive(dts_path: &Path) -> Directive {
     let mut experimental_generic_mono = false;
     let mut export_specs = Vec::new();
     let mut inputs = Vec::new();
+    let mut provides = None;
 
     for line in content.lines() {
         let trimmed = line.trim();
@@ -183,6 +199,10 @@ fn parse_directive(dts_path: &Path) -> Directive {
                         inputs.push(args[i + 1].clone());
                         i += 2;
                     }
+                    "--provides" if i + 1 < args.len() => {
+                        provides = Some(args[i + 1].clone());
+                        i += 2;
+                    }
                     _ => i += 1,
                 }
             }
@@ -197,6 +217,7 @@ fn parse_directive(dts_path: &Path) -> Directive {
         experimental_generic_mono,
         export_specs,
         inputs,
+        provides,
     }
 }
 
@@ -287,6 +308,28 @@ fn generate_bindings(entry: &Entry, out_dir: &Path) {
         .exports(exports);
     let rust_code = ts_gen::codegen::generate_with_options(&module, &gctx, &options)
         .unwrap_or_else(|e| panic!("codegen failed for {}: {e}", entry.mod_name));
+
+    if let Some(spec) = &entry.provides {
+        // A file spec in the directive is workspace-relative, as for the CLI.
+        let as_path = workspace_dir.join(spec);
+        let spec = if as_path.is_file() {
+            as_path.to_string_lossy().into_owned()
+        } else {
+            spec.clone()
+        };
+        let fns = ts_gen::provides::resolve(&spec, &module, &mut gctx)
+            .unwrap_or_else(|e| panic!("--provides failed for {}: {e}", entry.mod_name));
+        let paths = ts_gen::codegen::provides::ProvidesPaths {
+            bindings: syn::parse_str(&format!("crate::{}", entry.mod_name)).unwrap(),
+            app: syn::parse_str(&format!("crate::{}_app", entry.mod_name)).unwrap(),
+        };
+        let (wrapper, _app) =
+            ts_gen::codegen::generate_provides(&module, &gctx, &options, &fns, &paths)
+                .unwrap_or_else(|e| panic!("provides codegen failed for {}: {e}", entry.mod_name));
+        let out_file = out_dir.join(format!("{}_provides.rs", entry.mod_name));
+        std::fs::write(&out_file, &wrapper)
+            .unwrap_or_else(|e| panic!("Failed to write {}: {e}", out_file.display()));
+    }
 
     // Generated code uses inner attributes (`#![...]`, `//!`) which are only
     // valid at the crate root. Since we `include!` the file into a module,
