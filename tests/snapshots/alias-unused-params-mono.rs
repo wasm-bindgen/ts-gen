@@ -265,7 +265,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "take")]
     pub fn try_take<T>(this: &Holder<T>, value: &Pair<T, String>) -> Result<(), JsValue>;
     #[wasm_bindgen(method)]
-    pub fn entry<T, U>(this: &Holder<T>) -> JsValue;
+    pub fn entry<T>(this: &Holder<T>) -> JsValue;
     #[wasm_bindgen(method, catch, js_name = "entry")]
-    pub fn try_entry<T, U>(this: &Holder<T>) -> Result<JsValue, JsValue>;
+    pub fn try_entry<T>(this: &Holder<T>) -> Result<JsValue, JsValue>;
 }

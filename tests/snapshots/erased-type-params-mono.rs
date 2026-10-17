@@ -110,9 +110,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
     #[wasm_bindgen(method, catch)]
-    pub async fn list<M>(this: &Store) -> Result<ListResult<M>, JsValue>;
+    pub async fn list(this: &Store) -> Result<ListResult<JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "list")]
-    pub fn list_promise<M>(this: &Store) -> Promise<ListResult<M>>;
+    pub fn list_promise(this: &Store) -> Promise<ListResult<JsValue>>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
