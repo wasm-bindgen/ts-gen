@@ -5094,14 +5094,29 @@ for a class inside a namespace):
 (import "./bindings.wasm" "Response.clone" (func ...))
 ```
 
-Overloads of one member expand together, so variant suffixes are the
-Rust bindings' `_with_<x>` names:
+Overloads of one member expand together through the Rust bindings'
+signature flattening (optional truncation, union arms, `_with_<x>`
+suffixes), run without the Rust type context. A union behind a type
+alias is not resolved there and stays one parameter. Expansions whose
+parameters render alike merge into one ABI function, and without the
+context every reference outside `js_sys` renders as `JsValue`. Such a
+function takes one `externref` and makes the same JS call whichever arm
+the caller passes. Suffixes are computed from the expansions that
+remain, so ABI names match the Rust bindings only where both keep the
+same variants. `new(body?: BodyInit | null, init?: ResponseInit)` is:
 
 ```wat
 (import "./bindings.wasm" "Response.new" (func ...))
 (import "./bindings.wasm" "Response.new_with_body" (func ...))
 (import "./bindings.wasm" "Response.new_with_body_and_init" (func ...))
 ```
+
+named from the parameter, where the Rust bindings have one constructor
+per `BodyInit` arm (`new_with_str`, `new_with_array_buffer`,
+`new_with_blob`, …). Inline arms that still render differently stay
+apart in both: `(x: string | number)` is `m` and `m_with_f64`, while
+`(x: Blob | FormData)` is one ABI `n` against Rust's `n` and
+`n_with_form_data`.
 
 A type or namespace exported under several names has each member under
 each name, as one function `bindings.wasm` exports under all of them.
