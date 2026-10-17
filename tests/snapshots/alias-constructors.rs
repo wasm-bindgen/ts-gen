@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Stub<T: ::wasm_bindgen::JsGeneric>;
+    pub type Stub<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method)]
     pub fn get<T: ::wasm_bindgen::JsGeneric>(this: &Stub<T>) -> T;
     #[wasm_bindgen(method, catch, js_name = "get")]
@@ -131,7 +131,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Wrapped<T: ::wasm_bindgen::JsGeneric>;
+    pub type Wrapped<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method)]
     pub fn get<T: ::wasm_bindgen::JsGeneric>(this: &Wrapped<T>) -> T;
     #[wasm_bindgen(method, catch, js_name = "get")]
