@@ -1224,6 +1224,14 @@ type of a constructor *value*, not a constructor of that type. It is
 dropped with a warning rather than emitted as
 `#[wasm_bindgen(constructor)]` on the wrong class.
 
+A construct signature may declare its own parameters —
+`new <T>(initial: T): MyClass<T>` — which bind the class parameter of
+the same name, so the constructor lowers as
+`new<T: JsGeneric>(initial: &T) -> Result<MyClass<T>, JsValue>` (see
+[Type-level generics](#type-level-generics-propagate-to-every-binding-site)
+for the mentioned-only rule). The interface's type parameters and body
+scope carry over to the merged class.
+
 ## Module-scoped constructor variables
 
 ```ts

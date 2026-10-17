@@ -915,7 +915,7 @@ fn bind_constructor_vars(gctx: &mut GlobalContext, module: &mut Module) {
                         is_abstract: false,
                         members: i.members.clone(),
                         type_module_context: gctx.get_type(id).module_context.clone(),
-                        body_scope: decl.scope_id,
+                        body_scope: i.body_scope,
                     },
                     _ => unreachable!(),
                 };
@@ -1219,6 +1219,7 @@ fn merge_class_pairs(
                         }
                         if new_class.type_params.is_empty() {
                             new_class.type_params = iface.type_params.clone();
+                            new_class.body_scope = iface.body_scope;
                         }
                     }
                     result[iface_idx] = TypeDeclaration {
@@ -1252,6 +1253,7 @@ fn merge_class_pairs(
                         }
                         if class.type_params.is_empty() {
                             class.type_params = iface_decl.type_params.clone();
+                            class.body_scope = iface_decl.body_scope;
                         }
                     }
                     continue;

@@ -1019,8 +1019,12 @@ pub struct MethodMember {
 pub struct ConstructorMember {
     /// The scope its types resolve in: the body scope of the declaration it
     /// is written in, which a merged declaration's other members needn't
-    /// share.
+    /// share, or a construct signature's own scope holding `type_params`.
     pub scope: crate::parse::scope::ScopeId,
+    /// Own type parameters of a construct signature (`new <T>(…)`),
+    /// as in the `declare var Foo: { new <T>(…): Foo<T> }` pattern.
+    /// Class `constructor(…)` members have none.
+    pub type_params: Vec<TypeParam>,
     pub params: Vec<Param>,
     pub doc: Option<String>,
     /// Failure-mode info from `@throws` — see [`Throws`].

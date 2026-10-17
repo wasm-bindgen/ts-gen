@@ -5,10 +5,6 @@ use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
 #[allow(dead_code)]
-use JsValue as Cf;
-#[allow(dead_code)]
-use JsValue as R;
-#[allow(dead_code)]
 use JsValue as Readonly;
 #[wasm_bindgen]
 extern "C" {
@@ -9232,14 +9228,20 @@ extern "C" {
     #[wasm_bindgen(constructor, catch, js_name = "Request")]
     pub fn new_with_url(input: &URL) -> Result<Request, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Request")]
-    pub fn new_with_request_and_init(
+    pub fn new_with_request_and_init<Cf: ::wasm_bindgen::JsGeneric>(
         input: &Request<JsValue, JsValue>,
         init: &RequestInit<Cf>,
-    ) -> Result<Request, JsValue>;
+    ) -> Result<Request<JsValue, Cf>, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Request")]
-    pub fn new_with_str_and_init(input: &str, init: &RequestInit<Cf>) -> Result<Request, JsValue>;
+    pub fn new_with_str_and_init<Cf: ::wasm_bindgen::JsGeneric>(
+        input: &str,
+        init: &RequestInit<Cf>,
+    ) -> Result<Request<JsValue, Cf>, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Request")]
-    pub fn new_with_url_and_init(input: &URL, init: &RequestInit<Cf>) -> Result<Request, JsValue>;
+    pub fn new_with_url_and_init<Cf: ::wasm_bindgen::JsGeneric>(
+        input: &URL,
+        init: &RequestInit<Cf>,
+    ) -> Result<Request<JsValue, Cf>, JsValue>;
     #[doc = " The **`clone()`** method of the Request interface creates a copy of the current `Request` object."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/clone)"]
@@ -12563,14 +12565,14 @@ extern "C" {
         strategy: &QueuingStrategy<Uint8Array>,
     ) -> Result<ReadableStream, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "ReadableStream")]
-    pub fn new_with_underlying_source(
+    pub fn new_with_underlying_source<R: ::wasm_bindgen::JsGeneric>(
         underlying_source: &UnderlyingSource<R>,
-    ) -> Result<ReadableStream, JsValue>;
+    ) -> Result<ReadableStream<R>, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "ReadableStream")]
-    pub fn new_with_underlying_source_and_queuing_strategy(
+    pub fn new_with_underlying_source_and_queuing_strategy<R: ::wasm_bindgen::JsGeneric>(
         underlying_source: &UnderlyingSource<R>,
         strategy: &QueuingStrategy<R>,
-    ) -> Result<ReadableStream, JsValue>;
+    ) -> Result<ReadableStream<R>, JsValue>;
     #[doc = " The **`locked`** read-only property of the ReadableStream interface returns whether or not the readable stream is locked to a reader."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/locked)"]
