@@ -828,7 +828,8 @@ fn push_with_js_string_return(
 ) {
     let has_js_return = cgctx.is_some_and(|ctx| {
         ctx.experimental_generic_mono
-            && typemap::has_mono_js_string_return(&sig.return_type, ctx, scope)
+            && (typemap::has_mono_js_string_return(&sig.return_type, ctx, scope)
+                || typemap::is_mono_string_list_return(&sig.return_type, ctx, scope))
     });
     out.push(sig.clone());
     if has_js_return {
@@ -1748,7 +1749,10 @@ pub(crate) fn render_param_type(
     }
     cgctx
         .filter(|ctx| ctx.experimental_generic_mono)
-        .and_then(|_| mono_argument_type(&param.type_ref))
+        .and_then(|ctx| {
+            mono_argument_type(&param.type_ref)
+                .or_else(|| typemap::mono_string_list_argument(&param.type_ref, ctx, scope))
+        })
         .unwrap_or_else(|| {
             typemap::to_syn_type(
                 &param.type_ref,

@@ -1,0 +1,6 @@
+{
+  "name": "mono-lists",
+  "private": true,
+  "type": "module",
+  "main": "index.js"
+}

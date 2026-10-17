@@ -121,13 +121,35 @@ extern "C" {
         #[wasm_bindgen(slice = "array")] ls: &[f64],
     ) -> Result<Vec<f64>, JsValue>;
     #[wasm_bindgen(method)]
-    pub fn modes(this: &Probe, ms: &[String]) -> Vec<String>;
+    pub fn modes(
+        this: &Probe,
+        ms: &[impl ::wasm_bindgen::JsStringLike + ::wasm_bindgen::convert::VectorRefIntoWasmAbi],
+    ) -> Vec<String>;
+    #[wasm_bindgen(method, js_name = "modes")]
+    pub fn modes_js_string(
+        this: &Probe,
+        ms: &[impl ::wasm_bindgen::JsStringLike + ::wasm_bindgen::convert::VectorRefIntoWasmAbi],
+    ) -> Array<JsString>;
     #[wasm_bindgen(method, catch, js_name = "modes")]
-    pub fn try_modes(this: &Probe, ms: &[String]) -> Result<Vec<String>, JsValue>;
+    pub fn try_modes(
+        this: &Probe,
+        ms: &[impl ::wasm_bindgen::JsStringLike + ::wasm_bindgen::convert::VectorRefIntoWasmAbi],
+    ) -> Result<Vec<String>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "modes")]
+    pub fn try_modes_js_string(
+        this: &Probe,
+        ms: &[impl ::wasm_bindgen::JsStringLike + ::wasm_bindgen::convert::VectorRefIntoWasmAbi],
+    ) -> Result<Array<JsString>, JsValue>;
     #[wasm_bindgen(method, js_name = "modeArray")]
-    pub fn mode_array(this: &Probe, ms: &Array<JsString>) -> Array<JsString>;
+    pub fn mode_array(
+        this: &Probe,
+        ms: &Array<impl ::wasm_bindgen::JsStringLike>,
+    ) -> Array<JsString>;
     #[wasm_bindgen(method, catch, js_name = "modeArray")]
-    pub fn try_mode_array(this: &Probe, ms: &Array<JsString>) -> Result<Array<JsString>, JsValue>;
+    pub fn try_mode_array(
+        this: &Probe,
+        ms: &Array<impl ::wasm_bindgen::JsStringLike>,
+    ) -> Result<Array<JsString>, JsValue>;
     #[wasm_bindgen(method, js_name = "onMode")]
     pub fn on_mode(this: &Probe, cb: &Function<fn(JsString) -> Number>);
     #[wasm_bindgen(method, catch, js_name = "onMode")]

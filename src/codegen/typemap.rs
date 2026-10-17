@@ -2667,6 +2667,9 @@ fn to_mono_js_string_return_type_impl(
     let peeled = peel_mono(ty, ctx, scope, visited);
     match peeled.as_ref() {
         TypeRef::String | TypeRef::StringLiteral(_) => quote! { JsString },
+        TypeRef::Array(elem) if is_string_array_element(elem, ctx, scope) => {
+            quote! { Array<JsString> }
+        }
         TypeRef::Nullable(inner, _) => {
             let inner = to_mono_js_string_return_type_impl(inner, ctx, scope, from_module, visited);
             quote! { Option<#inner> }
@@ -3105,8 +3108,77 @@ fn is_native_array_element(
             | TypeRef::StringLiteral(_)
             | TypeRef::Number
             | TypeRef::NumberLiteral(_)
+            | TypeRef::Boolean
+            | TypeRef::BooleanLiteral(_)
             | TypeRef::RustScalar(_)
             | TypeRef::WideScalar(_)
+    )
+}
+
+/// Whether a top-level `T[]` element lowers to `String`.
+fn is_string_array_element(elem: &TypeRef, ctx: &CodegenContext<'_>, scope: ScopeId) -> bool {
+    matches!(
+        native_array_leaf(elem, Some(ctx), scope).as_ref(),
+        TypeRef::String | TypeRef::StringLiteral(_)
+    )
+}
+
+/// Per-monomorphization string lists. A `string[]` argument that would be
+/// `&[String]` takes `&[impl JsStringLike]`, which wasm-bindgen lowers per
+/// element shape (`&[String]`, `&[&str]`, `&[JsString]`), and
+/// `ArrayLike<string>` takes `&Array<impl JsStringLike>`. Not every string
+/// shape has a slice ABI (`&[&String]` doesn't), so the element states
+/// `VectorRefIntoWasmAbi` for Rust-side callers such as builders.
+pub(crate) fn mono_string_list_argument(
+    ty: &TypeRef,
+    ctx: &CodegenContext<'_>,
+    scope: ScopeId,
+) -> Option<TokenStream> {
+    let (list, nullable) = match ty {
+        // As in `mono_argument_type`, `Option` crosses `None` as `undefined`,
+        // so a `null` arm keeps the regular `JsNullable` lowering.
+        TypeRef::Nullable(inner, n) if !n.null => (inner.as_ref(), true),
+        TypeRef::Nullable(..) => return None,
+        other => (other, false),
+    };
+    let tokens = match peel_mono(list, ctx, scope, &mut HashSet::new()).as_ref() {
+        TypeRef::Array(elem) if is_string_array_element(elem, ctx, scope) => quote! {
+            &[impl ::wasm_bindgen::JsStringLike + ::wasm_bindgen::convert::VectorRefIntoWasmAbi]
+        },
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } if segments.len() == 1
+            && segments[0] == "ArrayLike"
+            && generic_args.len() == 1
+            && is_string_array_element(&generic_args[0], ctx, scope) =>
+        {
+            quote! { &Array<impl ::wasm_bindgen::JsStringLike> }
+        }
+        _ => return None,
+    };
+    Some(if nullable {
+        quote! { Option<#tokens> }
+    } else {
+        tokens
+    })
+}
+
+/// Whether a return is a string list, which has both a list-of-elements
+/// form (`Vec<String>`) and a list-as-handle form (`Array<JsString>`), so it
+/// gets a `_js_string` variant like a string return.
+pub(crate) fn is_mono_string_list_return(
+    ty: &TypeRef,
+    ctx: &CodegenContext<'_>,
+    scope: ScopeId,
+) -> bool {
+    let list = match ty {
+        TypeRef::Nullable(inner, _) => inner.as_ref(),
+        other => other,
+    };
+    matches!(
+        peel_mono(list, ctx, scope, &mut HashSet::new()).as_ref(),
+        TypeRef::Array(elem) if is_string_array_element(elem, ctx, scope)
     )
 }
 
@@ -4070,7 +4142,66 @@ mod tests {
     }
 
     #[test]
-    fn array_elements_are_native_only_for_strings_and_numbers() {
+    fn mono_string_lists_accept_any_string_element() {
+        with_mono_ctx(MONO_SRC, |ctx, scope| {
+            let arg =
+                |ty: TypeRef| mono_string_list_argument(&ty, ctx, scope).map(|t| t.to_string());
+            let list = |elem: TypeRef| TypeRef::Array(Box::new(elem));
+            let slice = "& [impl :: wasm_bindgen :: JsStringLike + :: wasm_bindgen :: convert :: VectorRefIntoWasmAbi]";
+            assert_eq!(arg(list(TypeRef::String)).as_deref(), Some(slice));
+            assert_eq!(arg(list(TypeRef::ident("IdChain"))).as_deref(), Some(slice));
+            assert_eq!(
+                arg(list(TypeRef::ident("ModeAlias"))).as_deref(),
+                Some(slice)
+            );
+            assert_eq!(
+                arg(TypeRef::Nullable(
+                    Box::new(list(TypeRef::String)),
+                    Nullability::UNDEFINED
+                )),
+                Some(format!("Option < {slice} >"))
+            );
+            assert_eq!(
+                arg(TypeRef::generic("ArrayLike", vec![TypeRef::String])).as_deref(),
+                Some("& Array < impl :: wasm_bindgen :: JsStringLike >")
+            );
+            assert_eq!(
+                arg(TypeRef::Nullable(
+                    Box::new(list(TypeRef::String)),
+                    Nullability::NULL
+                )),
+                None
+            );
+            assert_eq!(arg(list(TypeRef::Number)), None);
+            assert_eq!(arg(list(TypeRef::ident("MaybeId"))), None);
+            assert_eq!(arg(list(list(TypeRef::String))), None);
+            assert_eq!(arg(TypeRef::String), None);
+
+            assert!(is_mono_string_list_return(
+                &list(TypeRef::ident("Id")),
+                ctx,
+                scope
+            ));
+            assert!(is_mono_string_list_return(
+                &TypeRef::Nullable(Box::new(list(TypeRef::String)), Nullability::UNDEFINED),
+                ctx,
+                scope
+            ));
+            assert!(!is_mono_string_list_return(
+                &list(TypeRef::Boolean),
+                ctx,
+                scope
+            ));
+            assert!(!is_mono_string_list_return(
+                &holder(list(TypeRef::String)),
+                ctx,
+                scope
+            ));
+        });
+    }
+
+    #[test]
+    fn array_elements_are_native_only_for_primitives() {
         with_mono_ctx(MONO_SRC, |ctx, scope| {
             let ret = |elem: TypeRef| {
                 to_syn_type(
@@ -4085,7 +4216,7 @@ mod tests {
             assert_eq!(ret(TypeRef::ident("IdChain")), "Vec < String >");
             assert_eq!(ret(lits(&["a", "b"])), "Vec < String >");
             assert_eq!(ret(TypeRef::Number), "Vec < f64 >");
-            assert_eq!(ret(TypeRef::Boolean), "Vec < Boolean >");
+            assert_eq!(ret(TypeRef::Boolean), "Vec < bool >");
             assert_eq!(
                 ret(TypeRef::ident("MaybeId")),
                 "Vec < JsNullable < JsString > >"
