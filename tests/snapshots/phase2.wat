@@ -23,6 +23,7 @@
   ;; Writable
   ;; write(data: string): boolean
   (import "./bindings.wasm" "Writable.write" (func $Writable.write (param $this externref) (param $data externref) (result i32)))
+  (import "./bindings.wasm" "WritableStream.write" (func $WritableStream.write (param $this externref) (param $data externref) (result i32)))
 
   ;; send(body: BodyInit): void
   (import "./bindings.wasm" "send" (func $send (param $body externref)))
