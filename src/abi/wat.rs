@@ -51,14 +51,16 @@ pub fn generate(abi: &Abi) -> String {
             }
         }
         let _ = writeln!(out, "  ;; {}", f.ts);
-        let _ = writeln!(
-            out,
-            "  (import {BINDINGS_SPECIFIER:?} {:?} (func ${}{}{}))",
-            f.name,
-            ident(&f.name),
-            params_variadic(&f.params, f.variadic),
-            result(f.result)
-        );
+        for name in std::iter::once(&f.name).chain(&f.aliases) {
+            let _ = writeln!(
+                out,
+                "  (import {BINDINGS_SPECIFIER:?} {:?} (func ${}{}{}))",
+                name,
+                ident(name),
+                params_variadic(&f.params, f.variadic),
+                result(f.result)
+            );
+        }
     }
 
     out.push_str("\n  ;; `undefined`, for passing where TS says `T | undefined`.\n");

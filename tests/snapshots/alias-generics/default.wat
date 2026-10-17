@@ -47,8 +47,12 @@
   ;; _Shape
   ;; {} as _Shape
   (import "./bindings.wasm" "_Shape.new" (func $_Shape.new (result externref)))
+  (import "./bindings.wasm" "Shape.new" (func $Shape.new (result externref)))
+  (import "./bindings.wasm" "Polygon.new" (func $Polygon.new (result externref)))
   ;; sides: number
   (import "./bindings.wasm" "_Shape.sides" (func $_Shape.sides (param $this externref) (result f64)))
+  (import "./bindings.wasm" "Shape.sides" (func $Shape.sides (param $this externref) (result f64)))
+  (import "./bindings.wasm" "Polygon.sides" (func $Polygon.sides (param $this externref) (result f64)))
 
   ;; Hidden
   ;; {} as Hidden

@@ -5103,6 +5103,25 @@ Rust bindings' `_with_<x>` names:
 (import "./bindings.wasm" "Response.new_with_body_and_init" (func ...))
 ```
 
+A type or namespace exported under several names has each member under
+each name, as one function `bindings.wasm` exports under all of them.
+`Type` is first the name it binds by, the class's `js_name`, the
+interface's local name or the namespace's `js_namespace`, then each
+other public name (`export { _N as N1, _N as N2 }` gives `N1.f` and
+`N2.f`):
+
+```ts
+declare class _Conn { constructor(); get(): string; }
+export { _Conn as Conn, _Conn as Connection };
+```
+
+```wat
+(import "./bindings.wasm" "Conn.new" (func $Conn.new (result externref)))
+(import "./bindings.wasm" "Connection.new" (func $Connection.new (result externref)))
+(import "./bindings.wasm" "Conn.get" (func $Conn.get (param $this externref) (result externref)))
+(import "./bindings.wasm" "Connection.get" (func $Connection.get (param $this externref) (result externref)))
+```
+
 ### Member types
 
 | TypeScript member        | ABI function shape                           |
