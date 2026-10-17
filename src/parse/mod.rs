@@ -1444,6 +1444,59 @@ mod tests {
     }
 
     #[test]
+    fn class_merges_are_per_scope() {
+        let dir = std::env::temp_dir().join(format!("ts-gen-merge-scope-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let decls = dir.join("decls.d.ts");
+        std::fs::write(
+            &decls,
+            r#"
+                interface A { a(): void; }
+                declare var A: { prototype: A; new(): A };
+                interface B { b(): void; }
+                interface BCtor { new(): B; readonly prototype: B; }
+                declare var B: BCtor;
+                declare module "z" {
+                    interface A { x: string }
+                    interface BCtor { y: string }
+                    interface B { z: string }
+                    const B: number;
+                }
+            "#,
+        )
+        .unwrap();
+        let result = parse_dts_files(&[&decls], None);
+        std::fs::remove_dir_all(&dir).unwrap();
+        let (module, gctx) = result.unwrap();
+
+        let globals: Vec<_> = module
+            .types
+            .iter()
+            .map(|&id| gctx.get_type(id))
+            .filter(|d| d.module_context == ModuleContext::Global)
+            .collect();
+        for name in ["A", "B"] {
+            let class = globals.iter().find_map(|d| match &d.kind {
+                TypeKind::Class(c) if c.name == name => Some(c),
+                _ => None,
+            });
+            let class = class.unwrap_or_else(|| panic!("{name} is not a class"));
+            assert!(
+                class
+                    .members
+                    .iter()
+                    .any(|m| matches!(m, crate::ir::Member::Constructor(_))),
+                "{name} has no constructor"
+            );
+        }
+        // The vars are the classes' constructors, not values of their own,
+        // and `BCtor` is the class's static side rather than an interface.
+        assert!(!globals
+            .iter()
+            .any(|d| matches!(&d.kind, TypeKind::Variable(_) | TypeKind::Interface(_))));
+    }
+
+    #[test]
     fn test_import_namespaces_between_ambient_modules() {
         let dir = std::env::temp_dir().join(format!("ts-gen-ambient-ns-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();

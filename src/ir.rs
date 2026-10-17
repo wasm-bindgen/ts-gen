@@ -907,7 +907,10 @@ pub struct StaticMethodMember {
 #[derive(Clone, Debug, Default)]
 
 pub struct TypeRegistry {
-    pub types: HashMap<String, TypeInfo>,
+    /// Each declared name by the scope declaring it. Names in different
+    /// scopes are different declarations, so a module's `interface C`
+    /// doesn't change a global `interface C` + `var C` class merge.
+    pub types: HashMap<(crate::parse::scope::ScopeId, String), TypeInfo>,
     /// Body scope of each `declare module "x"` in the file. Repeated blocks
     /// for one specifier share a scope, as TypeScript merges them.
     pub module_scopes: HashMap<String, crate::parse::scope::ScopeId>,
@@ -921,10 +924,41 @@ pub struct TypeRegistry {
     /// exporting scope. A same-named declaration in any other scope is a
     /// different binding and keeps its own name.
     pub export_names: HashMap<crate::context::TypeId, Vec<String>>,
-    /// `declare var X: XConstructor` pairs, var name → interface name.
-    /// The interface supplies the class constructor and statics and is
-    /// not emitted as a type of its own.
-    pub ctor_interfaces: HashMap<String, String>,
+    /// `declare var X: XConstructor` pairs, `(scope, X)` → the scope
+    /// declaring `XConstructor` and its name. The interface supplies the
+    /// class constructor and statics and is not emitted as a type of its own.
+    /// In source order, so that of two vars sharing an interface the first
+    /// consistently takes its statics.
+    pub ctor_interfaces: indexmap::IndexMap<
+        (crate::parse::scope::ScopeId, String),
+        (crate::parse::scope::ScopeId, String),
+    >,
+}
+
+impl TypeRegistry {
+    /// The kind registered for `name` declared directly in `scope`.
+    pub fn kind(&self, scope: crate::parse::scope::ScopeId, name: &str) -> Option<&RegisteredKind> {
+        self.types
+            .get(&(scope, name.to_string()))
+            .map(|info| &info.kind)
+    }
+
+    pub fn kind_mut(
+        &mut self,
+        scope: crate::parse::scope::ScopeId,
+        name: &str,
+    ) -> Option<&mut RegisteredKind> {
+        self.types
+            .get_mut(&(scope, name.to_string()))
+            .map(|info| &mut info.kind)
+    }
+
+    /// Whether `name` in `scope` is a `var` whose class constructor comes
+    /// from a `*Constructor` interface.
+    pub fn has_ctor_interface(&self, scope: crate::parse::scope::ScopeId, name: &str) -> bool {
+        self.ctor_interfaces
+            .contains_key(&(scope, name.to_string()))
+    }
 }
 
 #[derive(Clone, Debug)]

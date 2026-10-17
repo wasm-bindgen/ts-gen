@@ -37,7 +37,7 @@ struct CollectCtx<'a> {
     /// once the whole file is collected as the declaration may follow.
     default_identifiers: Vec<(ScopeId, String)>,
     /// Interfaces with a construct signature or `prototype` member.
-    constructor_shaped: std::collections::HashSet<String>,
+    constructor_shaped: std::collections::HashSet<(ScopeId, String)>,
     /// `declare var X: Y` declarators, held back until the file is
     /// collected so `Y` can be checked against `constructor_shaped`
     /// regardless of declaration order.
@@ -88,24 +88,23 @@ pub fn collect_type_names(
     for (scope, name) in std::mem::take(&mut ccx.default_identifiers) {
         let s = ccx.gctx.scopes.get(scope);
         let has_namespace = s.namespace(&name).is_some();
-        let bound =
-            s.get(&name)
-                .is_some_and(|id| match ccx.gctx.get_type(id).kind {
-                    ir::TypeKind::Namespace(_) => false,
-                    // An interface merged with a constructor-shaped `var` is a
-                    // class, whose binding is still the interface placeholder.
-                    ir::TypeKind::Interface(_) => {
-                        !has_namespace
-                            || ccx.registry.types.get(&name).is_some_and(|info| {
-                                info.kind == ir::RegisteredKind::MergedClassLike
-                            })
-                    }
-                    // A TS `enum` binds no JS value of its own in Rust.
-                    ir::TypeKind::TypeAlias(_)
-                    | ir::TypeKind::StringEnum(_)
-                    | ir::TypeKind::NumericEnum(_) => !has_namespace,
-                    _ => true,
-                });
+        let bound = s
+            .get(&name)
+            .is_some_and(|id| match ccx.gctx.get_type(id).kind {
+                ir::TypeKind::Namespace(_) => false,
+                // An interface merged with a constructor-shaped `var` is a
+                // class, whose binding is still the interface placeholder.
+                ir::TypeKind::Interface(_) => {
+                    !has_namespace
+                        || ccx.registry.kind(scope, &name)
+                            == Some(&ir::RegisteredKind::MergedClassLike)
+                }
+                // A TS `enum` binds no JS value of its own in Rust.
+                ir::TypeKind::TypeAlias(_)
+                | ir::TypeKind::StringEnum(_)
+                | ir::TypeKind::NumericEnum(_) => !has_namespace,
+                _ => true,
+            });
         if bound {
             ccx.export_default(scope, &name);
         }
@@ -377,11 +376,11 @@ impl<'a> CollectCtx<'a> {
     ) {
         let name = iface.id.name.as_str();
         if has_constructor_shape(&iface.body.body) {
-            self.constructor_shaped.insert(name.to_string());
+            self.constructor_shaped.insert((scope, name.to_string()));
         }
-        if let Some(info) = self.registry.types.get_mut(name) {
-            if info.kind == ir::RegisteredKind::Variable {
-                info.kind = ir::RegisteredKind::MergedClassLike;
+        if let Some(kind) = self.registry.kind_mut(scope, name) {
+            if *kind == ir::RegisteredKind::Variable {
+                *kind = ir::RegisteredKind::MergedClassLike;
                 return;
             }
         }
@@ -470,9 +469,9 @@ impl<'a> CollectCtx<'a> {
         for declarator in &var_decl.declarations {
             if let Some(name) = var_declarator_name(declarator) {
                 if is_class_constructor_var(declarator) {
-                    if let Some(info) = self.registry.types.get_mut(&name) {
-                        if info.kind == ir::RegisteredKind::Interface {
-                            info.kind = ir::RegisteredKind::MergedClassLike;
+                    if let Some(kind) = self.registry.kind_mut(scope, &name) {
+                        if *kind == ir::RegisteredKind::Interface {
+                            *kind = ir::RegisteredKind::MergedClassLike;
                             continue;
                         }
                     }
@@ -502,28 +501,34 @@ impl<'a> CollectCtx<'a> {
         scope: ScopeId,
         exported: bool,
     ) {
-        let instance = self
-            .registry
-            .types
-            .get_mut(name)
-            .filter(|info| info.kind == ir::RegisteredKind::Interface);
-        if self.constructor_shaped.contains(iface) && iface != name {
-            if let Some(info) = instance {
-                info.kind = ir::RegisteredKind::MergedClassLike;
+        // `XConstructor` resolves from the var like any type reference.
+        let ctor_scope = self
+            .gctx
+            .scopes
+            .declaring_scope(scope, iface)
+            .filter(|&s| self.constructor_shaped.contains(&(s, iface.to_string())));
+        if let Some(ctor_scope) = ctor_scope.filter(|_| iface != name) {
+            let ctor = (ctor_scope, iface.to_string());
+            if let Some(kind) = self
+                .registry
+                .kind_mut(scope, name)
+                .filter(|kind| **kind == ir::RegisteredKind::Interface)
+            {
+                *kind = ir::RegisteredKind::MergedClassLike;
                 self.registry
                     .ctor_interfaces
-                    .insert(name.to_string(), iface.to_string());
+                    .insert((scope, name.to_string()), ctor);
                 return;
             }
             if matches!(ctx, ir::ModuleContext::Module(_)) {
                 self.registry
                     .ctor_interfaces
-                    .insert(name.to_string(), iface.to_string());
+                    .insert((scope, name.to_string()), ctor);
                 self.register_type(name, ir::RegisteredKind::Variable, ctx, scope, exported);
                 return;
             }
         }
-        if !self.registry.types.contains_key(name) {
+        if self.registry.kind(scope, name).is_none() {
             self.register_type(name, ir::RegisteredKind::Variable, ctx, scope, exported);
         }
     }
@@ -603,11 +608,8 @@ impl<'a> CollectCtx<'a> {
             if let Some(ns) = s.namespace(name) {
                 // An interface merged with a constructor-shaped `var` is a
                 // class, whose binding is still the interface placeholder.
-                let class_like = self
-                    .registry
-                    .types
-                    .get(name)
-                    .is_some_and(|info| info.kind == ir::RegisteredKind::MergedClassLike);
+                let class_like =
+                    self.registry.kind(id, name) == Some(&ir::RegisteredKind::MergedClassLike);
                 let type_only = binding.is_none_or(|t| match self.gctx.get_type(t).kind {
                     ir::TypeKind::Namespace(_) | ir::TypeKind::TypeAlias(_) => true,
                     ir::TypeKind::Interface(_) => !class_like,
@@ -760,7 +762,7 @@ impl<'a> CollectCtx<'a> {
         });
         self.gctx.scopes.insert(scope, name.to_string(), ns_type_id);
         self.registry.types.insert(
-            name.to_string(),
+            (scope, name.to_string()),
             ir::TypeInfo {
                 kind: ir::RegisteredKind::Namespace,
                 primary_context: ctx.clone(),

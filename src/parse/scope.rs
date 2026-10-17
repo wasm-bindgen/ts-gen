@@ -172,6 +172,15 @@ impl ScopeArena {
         self.get_mut(scope).namespaces.insert(name, members);
     }
 
+    /// The nearest scope up the chain from `scope` that binds `name`.
+    pub fn declaring_scope(&self, scope: ScopeId, name: &str) -> Option<ScopeId> {
+        let s = self.get(scope);
+        if s.get(name).is_some() {
+            return Some(scope);
+        }
+        s.parent.and_then(|p| self.declaring_scope(p, name))
+    }
+
     /// Resolve a namespace name to its member scope by walking up the
     /// scope chain.
     pub fn resolve_namespace(&self, scope: ScopeId, name: &str) -> Option<ScopeId> {

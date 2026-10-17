@@ -1095,6 +1095,12 @@ is not emitted as a type of its own. Declaration order does not matter.
 If something else refers to `URIErrorConstructor` by name it falls back
 to `JsValue` with an unresolved-type diagnostic, like any unmapped type.
 
+As in TypeScript, only declarations in the same scope merge, and
+`URIErrorConstructor` resolves from the variable like any type
+reference. An `interface URIError` or `URIErrorConstructor` inside a
+`declare module` is a different declaration and leaves the global
+class alone.
+
 A construct signature on any other object type (`interface Factory {
 new (): Widget }`, or an inline `{ new (): T }` parameter type) is the
 type of a constructor *value*, not a constructor of that type. It is

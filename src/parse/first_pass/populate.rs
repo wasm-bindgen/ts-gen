@@ -117,7 +117,8 @@ pub fn populate_declarations<'a, 'docs>(
     scope: ScopeId,
 ) -> (Vec<ir::TypeDeclaration>, NamespaceMembers) {
     let mut declarations = Vec::new();
-    let used_type_names = LocalScope::with_claimed(registry.types.keys().cloned());
+    let used_type_names =
+        LocalScope::with_claimed(registry.types.keys().map(|(_, name)| name.clone()));
     let mut pcx = PopulateCtx {
         registry,
         lib_name,
@@ -291,12 +292,10 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                     // registry kind, not the phase-1 placeholder, reflects a var
                     // later merged with its instance interface.
                     if self.export_names(scope, &local).contains(&exported_name)
-                        && self.registry.types.get(&local).is_some_and(|info| {
-                            matches!(
-                                info.kind,
-                                ir::RegisteredKind::Function | ir::RegisteredKind::Variable
-                            )
-                        })
+                        && matches!(
+                            self.registry.kind(scope, &local),
+                            Some(ir::RegisteredKind::Function | ir::RegisteredKind::Variable)
+                        )
                     {
                         continue;
                     }
@@ -520,8 +519,8 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
             .registry
             .ctor_interfaces
             .iter()
-            .find(|(_, ctor)| *ctor == iface_name)
-            .map(|(var, _)| var.clone());
+            .find(|(_, (ctor_scope, ctor))| *ctor_scope == scope && ctor == iface_name)
+            .map(|((_, var), _)| var.clone());
         if let Some(var) = static_side_of {
             self.push_static_side_class(&var, &iface.body.body, dcx, doc, declarations);
             declarations.extend(self.drain_synth(&module_context, scope));
@@ -541,13 +540,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         let name = alias.id.name.to_string();
         let doc = self.lookup_doc(dcx.export_span_start, alias.span.start);
 
-        if self
-            .registry
-            .types
-            .get(&name)
-            .map(|info| info.kind == ir::RegisteredKind::StringEnum)
-            .unwrap_or(false)
-        {
+        if self.registry.kind(dcx.scope, &name) == Some(&ir::RegisteredKind::StringEnum) {
             if let Some(enum_decl) = convert_string_enum(&name, &alias.type_annotation) {
                 declarations.push(dcx.decl(ir::TypeKind::StringEnum(enum_decl), doc));
                 return;
@@ -686,12 +679,9 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         // var alone is a value nothing refers to by its local name, so the
         // class takes its first public name and further ones alias it.
         let public_names = self.export_names(dcx.scope, name);
-        let has_instance_interface = self
-            .registry
-            .types
-            .get(name)
-            .is_some_and(|info| info.kind == ir::RegisteredKind::MergedClassLike)
-            || self.registry.ctor_interfaces.contains_key(name);
+        let has_instance_interface = self.registry.kind(dcx.scope, name)
+            == Some(&ir::RegisteredKind::MergedClassLike)
+            || self.registry.has_ctor_interface(dcx.scope, name);
         let (class_name, js_name, aliases) = match public_names.split_first() {
             Some((public, _)) if has_instance_interface => {
                 (name.to_string(), public.clone(), &[][..])
@@ -740,16 +730,12 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         let doc = self.lookup_doc(dcx.export_span_start, var_decl.span.start);
         for declarator in &var_decl.declarations {
             if let Some(name) = var_declarator_name(declarator) {
-                if self.registry.ctor_interfaces.contains_key(&name) {
+                if self.registry.has_ctor_interface(dcx.scope, &name) {
                     // Emitted as a class from the `*Constructor` interface.
                     continue;
                 }
-                let merged_with_iface = self
-                    .registry
-                    .types
-                    .get(&name)
-                    .map(|info| info.kind == ir::RegisteredKind::MergedClassLike)
-                    .unwrap_or(false);
+                let merged_with_iface = self.registry.kind(dcx.scope, &name)
+                    == Some(&ir::RegisteredKind::MergedClassLike);
 
                 // Promote `let X: { new(...): T }` to a class when either:
                 //   (a) it merged with an interface (script `var + interface` pattern), or
@@ -942,12 +928,8 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         let name = enum_decl.id.name.to_string();
         let doc = self.docs.for_span(enum_decl.span.start);
 
-        let is_numeric = self
-            .registry
-            .types
-            .get(&name)
-            .map(|info| info.kind == ir::RegisteredKind::NumericEnum)
-            .unwrap_or(false);
+        let is_numeric =
+            self.registry.kind(dcx.scope, &name) == Some(&ir::RegisteredKind::NumericEnum);
 
         if is_numeric {
             let decl = convert_numeric_enum(enum_decl, self.docs, self.diag);

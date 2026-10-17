@@ -212,7 +212,7 @@ fn register_type(
     exported: bool,
 ) {
     registry.types.insert(
-        name.to_string(),
+        (scope, name.to_string()),
         ir::TypeInfo {
             kind: kind.clone(),
             primary_context: ctx.clone(),
