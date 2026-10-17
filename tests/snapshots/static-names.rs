@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 extern "C" {
     #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2, js_name = "$")]
-    pub static __unknown__: JsValue;
+    pub static dollar: JsValue;
 }
 #[wasm_bindgen]
 extern "C" {

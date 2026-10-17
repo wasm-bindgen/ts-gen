@@ -336,6 +336,10 @@ the setter is named `set_<snake_case>`.
   `Self`, `super`, and `crate`, which cannot be raw and become `self_` etc.
 * Names that are not valid Rust identifiers are sanitised (`0` → `_0`,
   `$public` → `public`, `@cf/openai/whisper` → `cfopenaiwhisper`).
+  Names with no alphanumeric characters would sanitise to nothing, so
+  their symbols are spelled out instead: `$` → `dollar`, `$$` →
+  `dollar_dollar`, `_` → `underscore`, and `DollarUnderscore` for a type
+  or enum variant named `$_`.
 * `js_name = "..."` is emitted whenever the final Rust ident (after all of
   the above) no longer spells the JS name, so `wasm-bindgen` binds to the
   correct runtime name. This applies to types, methods, free functions,

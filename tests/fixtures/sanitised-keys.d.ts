@@ -25,3 +25,17 @@ export declare class $Store {
 }
 export declare function $(selector: string): Pair;
 export declare const $version: string;
+// Names with nothing left after sanitising spell out their symbols.
+export declare function $$(selector: string): Pair[];
+export declare const _: number;
+export declare function each(_: number, $: string): void;
+export type Op = "+" | "-" | "" | "<=";
+export declare function compare(op: Op): void;
+export declare class $_ {
+  constructor();
+  _: string;
+}
+export declare enum Sigil {
+  "$" = 1,
+  "_" = 2,
+}

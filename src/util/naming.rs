@@ -57,6 +57,9 @@ pub fn module_path(specifier: &str) -> Vec<String> {
 }
 
 pub fn to_snake_case(name: &str) -> String {
+    if let Some(words) = symbol_words(name) {
+        return words.join("_");
+    }
     // First pass through `convert_case::Case::Snake` to do the
     // standard splits (camelCase boundaries, runs of caps, etc.).
     let standard = name.to_case(Case::Snake);
@@ -95,14 +98,53 @@ pub fn to_snake_case(name: &str) -> String {
 
 /// Convert a JS identifier to a Rust PascalCase name (for types, enums).
 pub fn to_pascal_case(name: &str) -> String {
-    name.to_case(Case::Pascal)
+    match symbol_words(name) {
+        Some(words) => words.join("_").to_case(Case::Pascal),
+        None => name.to_case(Case::Pascal),
+    }
+}
+
+/// Spell out the symbols of a name with no alphanumeric characters, which
+/// would otherwise sanitise to nothing: `$$` → `["dollar", "dollar"]`, so
+/// `$` and `$$` get usable, distinct names.
+pub(crate) fn symbol_words(name: &str) -> Option<Vec<&'static str>> {
+    if name.chars().any(char::is_alphanumeric) {
+        return None;
+    }
+    let words: Vec<_> = name.chars().filter_map(symbol_word).collect();
+    (!words.is_empty()).then_some(words)
+}
+
+fn symbol_word(c: char) -> Option<&'static str> {
+    Some(match c {
+        '$' => "dollar",
+        '_' => "underscore",
+        '@' => "at",
+        '#' => "hash",
+        '%' => "percent",
+        '&' => "amp",
+        '*' => "star",
+        '+' => "plus",
+        '-' => "minus",
+        '.' => "dot",
+        '/' => "slash",
+        ':' => "colon",
+        '<' => "lt",
+        '=' => "eq",
+        '>' => "gt",
+        '?' => "question",
+        '!' => "bang",
+        '^' => "caret",
+        '|' => "pipe",
+        '~' => "tilde",
+        _ => return None,
+    })
 }
 
 /// Convert a string literal to a PascalCase enum variant name.
 /// Handles things like `"v8"` → `"V8"`, `"text"` → `"Text"`.
 pub fn to_enum_variant(s: &str) -> String {
-    // Special-case: if the string is all lowercase/digits, just PascalCase it
-    let pascal = s.to_case(Case::Pascal);
+    let pascal = to_pascal_case(s);
     if pascal.is_empty() {
         "Empty".to_string()
     } else {
@@ -249,6 +291,19 @@ mod tests {
         let mut names: Vec<String> = ["A", "A", "A_2"].map(String::from).into();
         dedup_names(&mut names);
         assert_eq!(names, ["A", "A_2", "A_2_2"]);
+    }
+
+    #[test]
+    fn symbol_only_names_are_spelled_out() {
+        assert_eq!(to_snake_case("$"), "dollar");
+        assert_eq!(to_snake_case("$$"), "dollar_dollar");
+        assert_eq!(to_snake_case("_"), "underscore");
+        assert_eq!(to_snake_case("$foo"), "$foo");
+        assert_eq!(to_pascal_case("$_"), "DollarUnderscore");
+        assert_eq!(to_enum_variant("$"), "Dollar");
+        assert_eq!(to_enum_variant("_"), "Underscore");
+        assert_eq!(to_enum_variant(""), "Empty");
+        assert_eq!(to_snake_case("☃"), "☃");
     }
 
     #[test]

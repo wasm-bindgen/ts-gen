@@ -1663,8 +1663,13 @@ pub(crate) fn make_ident(name: &str) -> syn::Ident {
         .chars()
         .filter(|c| c.is_alphanumeric() || *c == '_')
         .collect();
-    let sanitized = if sanitized.is_empty() {
-        "__unknown__".to_string()
+    // Value names arrive snake-cased, already spelled out by `to_snake_case`,
+    // so a name with nothing left here is a type declaration or reference.
+    let sanitized = if !sanitized.chars().any(char::is_alphanumeric) {
+        match crate::util::naming::symbol_words(name) {
+            Some(_) => crate::util::naming::to_pascal_case(name),
+            None => "__unknown__".to_string(),
+        }
     } else if sanitized.starts_with(|c: char| c.is_ascii_digit()) {
         format!("_{sanitized}")
     } else {
@@ -2477,6 +2482,13 @@ mod tests {
             &ModuleContext::Global,
         )
         .to_string()
+    }
+
+    #[test]
+    fn make_ident_spells_out_symbol_only_type_names() {
+        assert_eq!(make_ident("$$").to_string(), "DollarDollar");
+        assert_eq!(make_ident("_").to_string(), "Underscore");
+        assert_eq!(make_ident("☃").to_string(), "__unknown__");
     }
 
     #[test]

@@ -73,16 +73,77 @@ extern "C" {
 #[wasm_bindgen(module = "sanitised-keys")]
 extern "C" {
     #[wasm_bindgen(js_name = "$")]
-    pub fn __unknown__(selector: &str) -> Pair;
+    pub fn dollar(selector: &str) -> Pair;
 }
 #[wasm_bindgen(module = "sanitised-keys")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "$")]
-    pub fn try_(selector: &str) -> Result<Pair, JsValue>;
+    pub fn try_dollar(selector: &str) -> Result<Pair, JsValue>;
 }
 #[wasm_bindgen(module = "sanitised-keys")]
 extern "C" {
     #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2, js_name = "$version")]
     pub static version: String;
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    #[wasm_bindgen(js_name = "$$")]
+    pub fn dollar_dollar(selector: &str) -> Vec<Pair>;
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "$$")]
+    pub fn try_dollar_dollar(selector: &str) -> Result<Vec<Pair>, JsValue>;
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    #[allow(non_upper_case_globals)]
+    #[wasm_bindgen(thread_local_v2, js_name = "_")]
+    pub static underscore: f64;
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    pub fn each(underscore: f64, dollar: &str);
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "each")]
+    pub fn try_each(underscore: f64, dollar: &str) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Op {
+    Plus = "+",
+    Minus = "-",
+    Empty = "",
+    LtEq = "<=",
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    pub fn compare(op: Op);
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "compare")]
+    pub fn try_compare(op: Op) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , js_name = "$_")]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type DollarUnderscore;
+    #[wasm_bindgen(constructor, js_class = "$_", catch)]
+    pub fn new() -> Result<DollarUnderscore, JsValue>;
+    #[wasm_bindgen(method, getter, js_name = "_")]
+    pub fn underscore(this: &DollarUnderscore) -> String;
+    #[wasm_bindgen(method, setter, js_name = "_")]
+    pub fn set_underscore(this: &DollarUnderscore, val: &str);
+}
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u32)]
+pub enum Sigil {
+    Dollar = 1u32,
+    Underscore = 2u32,
 }
