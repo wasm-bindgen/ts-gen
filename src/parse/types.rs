@@ -14,7 +14,7 @@
 
 use oxc_ast::ast::*;
 
-use crate::ir::TypeRef;
+use crate::ir::{Nullability, TypeRef};
 use crate::parse::ctx::ParseCtx;
 use crate::parse::scope::{ScopeArena, ScopeId};
 use crate::util::diagnostics::DiagnosticCollector;
@@ -192,7 +192,7 @@ fn convert_ts_type_with_arena(
         // JSDoc types
         TSType::JSDocNullableType(nullable) => {
             let inner = convert_ts_type_with_arena(&nullable.type_annotation, scope, scopes, diag);
-            TypeRef::Nullable(Box::new(inner))
+            TypeRef::Nullable(Box::new(inner), Nullability::UNDEFINED)
         }
         TSType::JSDocNonNullableType(non_nullable) => {
             convert_ts_type_with_arena(&non_nullable.type_annotation, scope, scopes, diag)
@@ -327,7 +327,7 @@ fn convert_tuple_element(
         }
         TSTupleElement::TSOptionalType(opt) => {
             let inner = convert_ts_type_with_arena(&opt.type_annotation, scope, scopes, diag);
-            TypeRef::Nullable(Box::new(inner))
+            TypeRef::Nullable(Box::new(inner), Nullability::UNDEFINED)
         }
         // All remaining variants are TSType variants flattened by inherit_variants!
         other => match other.as_ts_type() {
@@ -478,28 +478,42 @@ fn convert_literal_type(lit: &TSLiteralType<'_>, _diag: &mut DiagnosticCollector
 /// `string | null | undefined` all become `Nullable<String>`.
 pub(crate) fn simplify_union(types: Vec<TypeRef>) -> TypeRef {
     let mut non_null_types = Vec::new();
-    let mut has_null = false;
-    let mut has_undefined = false;
+    let mut n = Nullability {
+        null: false,
+        undefined: false,
+    };
 
-    for ty in types {
+    fn sort(ty: TypeRef, n: &mut Nullability, rest: &mut Vec<TypeRef>) {
         match ty {
-            TypeRef::Null => has_null = true,
-            TypeRef::Undefined => has_undefined = true,
-            TypeRef::Void => has_undefined = true,
-            other => non_null_types.push(other),
+            TypeRef::Null => n.null = true,
+            TypeRef::Undefined | TypeRef::Void => n.undefined = true,
+            // `(T | null) | undefined` flattens into one layer; the inner
+            // may itself be an empty type (`undefined | undefined`).
+            TypeRef::Nullable(inner, m) => {
+                *n = n.union(m);
+                sort(*inner, n, rest);
+            }
+            other => rest.push(other),
         }
+    }
+    for ty in types {
+        sort(ty, &mut n, &mut non_null_types);
     }
 
     let core_type = if non_null_types.len() == 1 {
         non_null_types.pop().unwrap()
     } else if non_null_types.is_empty() {
-        return TypeRef::Null;
+        return if n.null {
+            TypeRef::Null
+        } else {
+            TypeRef::Undefined
+        };
     } else {
         TypeRef::Union(non_null_types)
     };
 
-    if has_null || has_undefined {
-        TypeRef::Nullable(Box::new(core_type))
+    if n.null || n.undefined {
+        TypeRef::Nullable(Box::new(core_type), n)
     } else {
         core_type
     }

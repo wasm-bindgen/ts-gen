@@ -283,7 +283,7 @@ pub fn collect_type_params(
                 collect_type_params(a, cgctx, scope, out);
             }
         }
-        TypeRef::Array(inner) | TypeRef::Nullable(inner) => {
+        TypeRef::Array(inner) | TypeRef::Nullable(inner, _) => {
             collect_type_params(inner, cgctx, scope, out);
         }
         TypeRef::Union(members) | TypeRef::Intersection(members) | TypeRef::Tuple(members) => {
@@ -867,15 +867,25 @@ fn flatten_type_with(
 /// alternative. With more than one typed array the element is ambiguous
 /// and nothing pairs, except for a `Uint8Array` beside a
 /// `Uint8ClampedArray`: both hold `u8`, so the slice is a `Uint8Array`.
+/// A slice has no `null` carrier, so a nullable view keeps only the
+/// `undefined` arm (`Option<&[u8]>`); `null` stays reachable through the
+/// typed array's handle overload. `Clamped` has no `Option` form, so a
+/// clamped view keeps neither.
 fn pair_typed_array_slice(
     alts: &mut Vec<TypeRef>,
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) {
     use crate::ir::TypedArrayElement as E;
+    fn peel_nullable(t: &TypeRef) -> (&TypeRef, Option<crate::ir::Nullability>) {
+        match t {
+            TypeRef::Nullable(inner, n) => (inner, Some(*n)),
+            t => (t, None),
+        }
+    }
     let typed: Vec<_> = alts
         .iter()
-        .filter_map(|t| match t {
+        .filter_map(|t| match peel_nullable(t).0 {
             TypeRef::Reference {
                 segments,
                 generic_args,
@@ -903,12 +913,18 @@ fn pair_typed_array_slice(
     };
     let Some(i) = alts
         .iter()
-        .position(|t| matches!(t, TypeRef::Array(inner) if pairs(inner)))
+        .position(|t| matches!(peel_nullable(t).0, TypeRef::Array(inner) if pairs(inner)))
     else {
         return;
     };
-    alts.remove(i);
-    alts.insert(0, TypeRef::TypedSlice(elem, shared));
+    let view = match peel_nullable(&alts.remove(i)).1 {
+        Some(n) if n.undefined && !elem.is_clamped() => TypeRef::Nullable(
+            Box::new(TypeRef::TypedSlice(elem, shared)),
+            crate::ir::Nullability::UNDEFINED,
+        ),
+        _ => TypeRef::TypedSlice(elem, shared),
+    };
+    alts.insert(0, view);
 }
 
 /// Push every flatten-alternative for `ty` into `out`. Returns
@@ -955,12 +971,20 @@ fn flatten_into(
             true
         }
 
-        // Nullable: flatten the inner, dropping the `Null` arm.
-        // Argument-position `Nullable<T>` carries no useful overload
-        // information — a `_with_null(val: &Null)` variant is API
-        // noise. Return-position handling (`Option<T>` /
-        // `JsOption<T>`) is independent and lives in `to_syn_type`.
-        TypeRef::Nullable(inner) => flatten_into(inner, cgctx, scope, out),
+        // Nullable: fan out the inner and keep each alternative
+        // nullable, so `T | U | null` becomes `Option<&T>` / `Option<&U>`
+        // overloads rather than a `_with_null(val: &Null)` variant.
+        TypeRef::Nullable(inner, n) => {
+            let mut alts = Vec::new();
+            if !flatten_into(inner, cgctx, scope, &mut alts) {
+                return false;
+            }
+            out.extend(
+                alts.into_iter()
+                    .map(|alt| TypeRef::Nullable(Box::new(alt), *n)),
+            );
+            true
+        }
 
         // `PropertyKey` stays whole for per-mono grouping so it keeps
         // the `js_sys::PropertyKey` spelling; otherwise it fans out like
@@ -992,8 +1016,8 @@ fn flatten_into(
 ///
 /// Returns [`crate::codegen::subtyping::lub_union`] for unions
 /// (and aliases that chase through to one); otherwise returns the
-/// input unchanged. The `Null`-arm-drop applied by `Nullable`
-/// flattening carries through for argument-position consistency.
+/// input unchanged. A `Nullable` stays nullable around the collapsed
+/// inner.
 fn flatten_collapse_to_lub(
     ty: &TypeRef,
     cgctx: Option<&CodegenContext<'_>>,
@@ -1003,7 +1027,9 @@ fn flatten_collapse_to_lub(
         TypeRef::Union(members) => {
             crate::codegen::subtyping::lub_union(members, cgctx, scope).unwrap_or(TypeRef::Any)
         }
-        TypeRef::Nullable(inner) => flatten_collapse_to_lub(inner, cgctx, scope),
+        TypeRef::Nullable(inner, n) => {
+            TypeRef::Nullable(Box::new(flatten_collapse_to_lub(inner, cgctx, scope)), *n)
+        }
         TypeRef::PropertyKey => TypeRef::Any,
         TypeRef::Reference { .. } if ty.as_ident().is_some() => {
             if let Some(c) = cgctx {
@@ -1322,7 +1348,7 @@ fn type_snake_name(ty: &TypeRef) -> String {
             to_snake_case(head)
         }
         TypeRef::Array(_) | TypeRef::TypedSlice(..) => "slice".to_string(),
-        TypeRef::Nullable(inner) => type_snake_name(inner),
+        TypeRef::Nullable(inner, _) => type_snake_name(inner),
         TypeRef::Function(_) => "function".to_string(),
         _ => "js_value".to_string(),
     }
@@ -1475,7 +1501,11 @@ fn mono_argument_type(ty: &TypeRef) -> Option<TokenStream> {
         _ => primitive_unions::PrimitiveUnion::classify(ty).map(|u| u.trait_path()),
     };
     match ty {
-        TypeRef::Nullable(inner) => bound(inner).map(|b| quote! { Option<impl #b> }),
+        // `Option<impl Bound>` crosses `None` as `undefined`, so it is only
+        // the right shape when `undefined` is the sole empty; a `null`
+        // arm goes through the regular `JsNullable` lowering.
+        TypeRef::Nullable(inner, n) if !n.null => bound(inner).map(|b| quote! { Option<impl #b> }),
+        TypeRef::Nullable(..) => None,
         _ => bound(ty).map(|b| quote! { impl #b }),
     }
 }
@@ -1623,7 +1653,7 @@ mod tests {
     use super::*;
     use crate::codegen::typemap::CodegenContext;
     use crate::context::GlobalContext;
-    use crate::ir::TypeRef;
+    use crate::ir::{Nullability, TypeRef};
 
     fn no_used() -> LocalScope {
         LocalScope::default()
@@ -1636,11 +1666,20 @@ mod tests {
             "impl :: wasm_bindgen :: JsStringLike"
         );
         assert_eq!(
-            mono_argument_type(&TypeRef::Nullable(Box::new(TypeRef::String)))
-                .unwrap()
-                .to_string(),
+            mono_argument_type(&TypeRef::Nullable(
+                Box::new(TypeRef::String),
+                Nullability::UNDEFINED
+            ))
+            .unwrap()
+            .to_string(),
             "Option < impl :: wasm_bindgen :: JsStringLike >"
         );
+        // A `null` arm has no `impl Trait` carrier; the JsNullable lowering applies.
+        assert!(mono_argument_type(&TypeRef::Nullable(
+            Box::new(TypeRef::String),
+            Nullability::NULL
+        ))
+        .is_none());
         assert!(mono_argument_type(&TypeRef::Number).is_none());
     }
 
@@ -1652,7 +1691,7 @@ mod tests {
             "impl :: js_sys :: JsNumberOrStringLike"
         );
         assert_eq!(
-            mono_argument_type(&TypeRef::Nullable(Box::new(union)))
+            mono_argument_type(&TypeRef::Nullable(Box::new(union), Nullability::UNDEFINED))
                 .unwrap()
                 .to_string(),
             "Option < impl :: js_sys :: JsNumberOrStringLike >"
@@ -2762,6 +2801,40 @@ mod tests {
                 TypeRef::TypedSlice(E::U8, SharedMemory::Rejected),
                 TypeRef::ident("Uint8ClampedArray"),
                 TypeRef::generic("Uint8Array", vec![TypeRef::ident("ArrayBuffer")]),
+            ]
+        );
+        let bytes = TypeRef::Union(vec![TypeRef::ident("Uint8Array"), array(TypeRef::Number)]);
+        let nullable = |n| flatten_no_ctx(&TypeRef::Nullable(Box::new(bytes.clone()), n));
+        let view = TypeRef::TypedSlice(E::U8, SharedMemory::Accepted);
+        let handle = |n| TypeRef::Nullable(Box::new(TypeRef::ident("Uint8Array")), n);
+        assert_eq!(
+            nullable(Nullability::NULL),
+            vec![view.clone(), handle(Nullability::NULL)]
+        );
+        for n in [Nullability::UNDEFINED, Nullability::BOTH] {
+            assert_eq!(
+                nullable(n),
+                vec![
+                    TypeRef::Nullable(Box::new(view.clone()), Nullability::UNDEFINED),
+                    handle(n)
+                ]
+            );
+        }
+        let clamped = TypeRef::Union(vec![
+            TypeRef::ident("Uint8ClampedArray"),
+            array(TypeRef::Number),
+        ]);
+        assert_eq!(
+            flatten_no_ctx(&TypeRef::Nullable(
+                Box::new(clamped),
+                Nullability::UNDEFINED
+            )),
+            vec![
+                TypeRef::TypedSlice(E::U8Clamped, SharedMemory::Accepted),
+                TypeRef::Nullable(
+                    Box::new(TypeRef::ident("Uint8ClampedArray")),
+                    Nullability::UNDEFINED
+                ),
             ]
         );
         for unpaired in [

@@ -732,7 +732,8 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         })
     };
     // Factories call the setter the extern block emits, so they take its
-    // type. A discriminated-union branch narrows its getter
+    // type, not the getter's: an optional property reads `T | undefined`,
+    // and a discriminated-union branch narrows its getter
     // (`disposition: "inline"`), while the setter keeps the merged type
     // (`"inline" | "attachment"`) and with it the enum a literal is passed as.
     let assigned_type = |g: &crate::ir::GetterMember| -> crate::ir::TypeRef {
@@ -850,15 +851,22 @@ pub(crate) fn generate_dictionary_factory_with_passes(
 
             // Setter expansion dedups by rendered Rust type, keeping only the
             // first member of each (`"x" | "y"` leaves one setter typed
-            // `"x"`), so match on the rendered type rather than the IR. Per-mono
-            // primitive-union grouping gives setters and factory options
-            // different groupings of the same members (the factory keeps
-            // literals apart), so fall back to the grouped setter whose
-            // marker trait accepts the option's type.
-            let pick_setter = |target: &crate::ir::TypeRef| -> Option<syn::Ident> {
-                fn param_type<'s>(sig: &&'s FunctionSignature) -> Option<&'s crate::ir::TypeRef> {
-                    sig.params.first().map(|p| &p.type_ref)
-                }
+            // `"x"`), so match on the rendered type rather than the IR. A
+            // merged optional field (`contentId?: undefined` in another
+            // branch) has a `Nullable` setter param; the member matches
+            // through it and the factory takes the setter's own type so the
+            // call type-checks. Per-mono primitive-union grouping gives
+            // setters and factory options different groupings of the same
+            // members (the factory keeps literals apart), so fall back to the
+            // grouped setter whose marker trait accepts the option's type.
+            fn param_type(sig: &FunctionSignature) -> Option<&crate::ir::TypeRef> {
+                sig.params.first().map(|p| &p.type_ref)
+            }
+            let find_setter = |target: &crate::ir::TypeRef| -> Option<&FunctionSignature> {
+                let strip = |t: &crate::ir::TypeRef| match t {
+                    crate::ir::TypeRef::Nullable(inner, _) => (**inner).clone(),
+                    other => other.clone(),
+                };
                 let render = |param: &ConcreteParam| {
                     super::signatures::render_param_type(
                         param,
@@ -882,13 +890,22 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                             .is_some_and(|p| render(p) == target_rendered)
                     })
                     .or_else(|| {
+                        setters
+                            .iter()
+                            .find(|sig| param_type(sig).map(strip).as_ref() == Some(target))
+                    })
+                    .or_else(|| {
                         setters.iter().find(|sig| {
                             param_type(sig)
+                                .map(strip)
+                                .as_ref()
                                 .and_then(super::primitive_unions::PrimitiveUnion::classify)
                                 .is_some_and(|u| u.accepts(target))
                         })
                     })
-                    .map(|sig| super::typemap::make_ident(&sig.rust_name))
+            };
+            let pick_setter = |target: &crate::ir::TypeRef| -> Option<syn::Ident> {
+                find_setter(target).map(|sig| super::typemap::make_ident(&sig.rust_name))
             };
             // Fallback for fields without per-member setter granularity:
             // the first setter handles everything (typical when the IR
@@ -962,10 +979,16 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 members.iter().collect()
             };
             for m in value_targets {
-                let setter_ident = pick_setter(m).unwrap_or_else(|| default_setter.clone());
+                let setter = find_setter(m);
+                let setter_ident = setter
+                    .map(|sig| super::typemap::make_ident(&sig.rust_name))
+                    .unwrap_or_else(|| default_setter.clone());
                 let param = ConcreteParam {
                     name: param_name.clone(),
-                    type_ref: m.clone(),
+                    type_ref: setter
+                        .and_then(param_type)
+                        .cloned()
+                        .unwrap_or_else(|| m.clone()),
                     variadic: false,
                     slice_mode: None,
                 };
@@ -1899,23 +1922,8 @@ fn generate_getter(
     let rust_name = names.declare(&candidate, Suffix::Snake);
     let rust_ident = super::typemap::make_ident(&rust_name);
 
-    // Optional `?:` properties widen to `T | undefined` at the IR
-    // level. Modeling that as `Nullable<T>` lets the regular
-    // `to_syn_type` lowering handle every collapse rule uniformly —
-    // notably the `Option<JsValue>` → `JsValue` shortcut and the
-    // inner-position `JsOption` switch — without the getter site
-    // open-coding its own `Option<#inner>` wrap.
-    let lowered_ty = if getter.optional {
-        // Avoid `Option<Option<T>>` if the source already had a
-        // Nullable: a `T?` property whose type is `T | null` is just
-        // a single layer of optionality.
-        match &getter.type_ref {
-            TypeRef::Nullable(_) => getter.type_ref.clone(),
-            other => TypeRef::Nullable(Box::new(other.clone())),
-        }
-    } else {
-        getter.type_ref.clone()
-    };
+    // Optional `?:` properties already read as `T | undefined` in the IR.
+    let lowered_ty = getter.type_ref.clone();
     // Top-level erasing-union return synthesises a dynamic-union
     // enum (see [`ReturnAnchor`]). For getters the anchor is the
     // property name itself — no `Return` infix.

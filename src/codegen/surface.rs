@@ -685,7 +685,7 @@ fn type_refs(ty: &TypeRef, scope: ScopeId, out: &mut Vec<(String, ScopeId)>) {
                 type_refs(arg, scope, out);
             }
         }
-        TypeRef::Array(inner) | TypeRef::Nullable(inner) => type_refs(inner, scope, out),
+        TypeRef::Array(inner) | TypeRef::Nullable(inner, _) => type_refs(inner, scope, out),
         TypeRef::Union(members) | TypeRef::Intersection(members) | TypeRef::Tuple(members) => {
             for m in members {
                 type_refs(m, scope, out);

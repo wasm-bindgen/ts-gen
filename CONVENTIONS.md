@@ -69,20 +69,59 @@ per-monomorphization mode.
 
 ## Optional and nullable types
 
-* `T | null` → `Option<T>` in return position. In argument position the
-  `null` arm is dropped — the parameter takes `T` directly. A
-  `_with_null(val: &Null)` overload would force callers to construct a
-  `Null` value with no real upside, and the omission case for
-  truly-optional params is already covered by the optional-truncation
-  rule below.
-* `T | undefined` and `T | null | undefined` follow the same rules as
-  `T | null` — coalesced at parse time; the rendered union has no
-  separate `null`/`undefined` arm.
-* In inner type positions, `T | null` → `JsOption<T>` unless `T` already
-  erases to `JsValue`; `JsOption<JsValue>` simplifies to `JsValue`.
-* `T?` on a property → getter returns `Option<T>`; setter takes `T`.
+The IR keeps `null` and `undefined` apart: `T | undefined` and `x?: T`
+are *optional*, `T | null` is *nullable*, and `T | null | undefined`
+is both. Returns do not care which; arguments do, because the two
+directions of wasm-bindgen's `Option<T>` are not symmetric:
+`FromWasmAbi` reads both JS empties as `None`, but `IntoWasmAbi` only
+ever emits `undefined`. A Node-style `fn(x: T | null)` that checks
+`x === null`, or a default-parameter initializer that fires on
+`undefined`, would see the wrong value if `None` stood for `null`.
+No coercion is assumed anywhere.
+
+* **Return position**: `Option<T>` for all three. `Option<JsValue>`
+  collapses to `JsValue`, which carries both in-band.
+* **Argument position**, by which empties the type admits:
+
+  | TS                          | Rust                      | to pass a value / the empty            |
+  | --------------------------- | ------------------------- | -------------------------------------- |
+  | `T \| undefined`            | `Option<&T>`              | `Some(&v)` / `None` (→ `undefined`)    |
+  | `T \| null`                 | `&JsNullable<I>`          | `&JsNullable::wrap(v)` / `&JsNullable::new()` (→ `null`) |
+  | `T \| null \| undefined`    | `Option<&JsNullable<I>>`  | `Some(&JsNullable::wrap(v))` / `Some(&JsNullable::new())` / `None` |
+  | setter for `x?: T`          | `&T`                      | the property may only be assigned `T`  |
+  | setter for `x?: T \| undefined` | `Option<&T>`          | `Some(&v)` / `None`                    |
+  | setter for `x?: T \| null`  | `&JsNullable<I>`          | as `T \| null`                         |
+
+  `I` is `T` in its JS spelling (`JsString`, `Number`, `Boolean`, a
+  bound class), since `JsNullable<T>` requires `T: JsGeneric`. The
+  three-way spelling is deliberate: two distinct absent values exist.
+  When `T` is a type parameter the carrier is taken by value
+  (`Option<T>`, `JsNullable<T>`, `Option<JsNullable<T>>`): the macro
+  cannot borrow a generic. A `JsValue` inner collapses to `&JsValue`
+  (`JsValue::NULL` is the empty) for the nullable forms. Union inners
+  fan out as usual with each alternative keeping its nullability
+  (`&JsNullable<JsString>` / `&JsNullable<Blob>` overloads, suffixed
+  as the carried type: `_with_str`, `_with_slice`); in
+  per-mono mode a `null`-admitting primitive union has no marker-trait
+  carrier and is `&JsValue`.
+* **Inner positions** (`Promise<T | null>`, `Array<T | undefined>`):
+  `JsNullable<T>` when `null` is admitted (`T | null | undefined` too;
+  `is_empty` covers both), `JsOption<T>` for `T | undefined` only —
+  wasm-bindgen's `JsOption` is undefined-only. `JsValue` inner stays
+  bare.
+* `x?: T` on a property reads as `T | undefined` (the IR records it, so
+  every consumer sees it): the getter returns `Option<T>`, while the
+  setter takes what may be assigned, per the setter rows above. The
+  `x?: T` vs `x?: T | undefined` difference is TypeScript's
+  `exactOptionalPropertyTypes`.
 * `f(x?: T)` (optional parameter) → produces an overload pair, *not* an
-  `Option<T>` parameter. See [Signature flattening](#signature-flattening).
+  `Option<T>` parameter; see [Signature flattening](#signature-flattening).
+  So `Response(body?: BodyInit | null)` gives `new()` and
+  `new_with_body(body: &JsNullable<…>)`: omission is the shorter
+  overload, `null` is passed explicitly.
+* A discriminated-union branch whose property is required in one
+  branch and `?: undefined` in another has a merged setter of the
+  optional shape; the branch factory takes that setter's type.
 
 ## Array and slice types
 
@@ -109,7 +148,7 @@ takes its inner-position handle form:
 | `Foo` (named JS / Rust type) | `Foo`                  |
 | `any` / `unknown`            | `JsValue`              |
 | `boolean`                    | `Boolean`              |
-| `T \| null`                  | `JsOption<U>`          |
+| `T \| null`                  | `JsNullable<U>`        |
 | `T[]`                        | `Array<U>`             |
 
 `boolean` takes its handle because `bool` has a slice ABI but no `Vec`
@@ -144,7 +183,8 @@ the copy shape instead:
 * A `T[]` parameter is a plain JS `Array` the callee may keep, so a
   slice of numbers (`&[f64]` or `Option<&[f64]>`) gets
   `slice = "array"`, after resolving aliases, literal unions and numeric
-  enums.
+  enums. A slice has no `null` carrier, so a `null`-admitting `T[]` is
+  the `&JsNullable<Array<Number>>` handle and takes no mode.
 * Under [per-monomorphization](#in-scope-generic-type-parameters), a
   `T[]` whose element is a type parameter gets `slice = "array"` too:
   wasm-bindgen resolves the mode per instantiation, so `T = f64` reaches
@@ -263,8 +303,14 @@ pub fn fill(#[wasm_bindgen(slice = "copy")] data: ::wasm_bindgen::Clamped<&[u8]>
 pub fn fill_with_uint8_clamped_array(data: &Uint8ClampedArray);
 ```
 
-The pairing applies after aliases, `null` and optional parameters are
+The pairing applies after aliases and optional parameters are
 flattened, and to a generic member such as `Uint8Array<ArrayBuffer>`.
+A slice has no `null` carrier, so under an admitted empty the view
+keeps only `undefined` (`Option<&[u8]>`) and `null` is passed through
+the typed array's handle overload (`&JsNullable<Uint8Array>`).
+`Clamped` has no `Option` form, so a `Uint8ClampedArray` view keeps
+neither empty and both go through the handle
+(`Option<&Uint8ClampedArray>`).
 It needs exactly one typed array whose element matches the array's
 (`bigint` for the 64-bit arrays, `number` for the rest), except that
 `Uint8Array | Uint8ClampedArray | number[]` pairs as the `Uint8Array`
@@ -1481,7 +1527,7 @@ sync returns or arguments:
 | `Promise<number>`              | `Result<Number, JsValue>`     |
 | `Promise<string>`              | `Result<JsString, JsValue>`   |
 | `Promise<void>`                | `Result<Undefined, JsValue>`  |
-| `Promise<T \| null>`           | `Result<JsOption<T>, JsValue>`|
+| `Promise<T \| null>`           | `Result<JsNullable<T>, JsValue>`|
 | `Promise<Foo>` (named JS type) | `Result<Foo, JsValue>`        |
 
 `wasm-bindgen`'s typed `Promise<T>` / `JsFuture<T>` require
