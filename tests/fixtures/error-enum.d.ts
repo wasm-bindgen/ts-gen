@@ -15,6 +15,12 @@ declare class QuotaError extends DOMException {
   readonly quota: number;
 }
 
+declare namespace Lock {
+  class HeldError extends Error {
+    readonly holder: string;
+  }
+}
+
 declare class Store {
   /**
    * A union keeps both classes instead of collapsing to `Error`.
@@ -35,6 +41,13 @@ declare class Store {
    * @throws {Error} otherwise
    */
   grow(bytes: number): Promise<void>;
+
+  /**
+   * A qualified name resolves through its namespace; the variant is named
+   * by its Rust path.
+   * @throws {Lock.HeldError} when another writer holds the lock
+   */
+  lock(): void;
 
   /** Untyped — `crate::Error`, not the enum. */
   size(): number;

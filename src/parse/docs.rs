@@ -72,9 +72,17 @@ impl JsDocInfo {
         match self.throws.len() {
             0 if self.nothrow => Throws::Never,
             0 => Throws::None,
-            1 => Throws::Type(TypeRef::ident(self.throws[0].clone())),
-            _ => Throws::Type(TypeRef::union(self.throws.iter().map(TypeRef::ident))),
+            1 => Throws::Type(throws_ref(&self.throws[0])),
+            _ => Throws::Type(TypeRef::union(self.throws.iter().map(|n| throws_ref(n)))),
         }
+    }
+}
+
+/// `Ns.Fault` is a qualified reference, like the same name in a type position.
+fn throws_ref(name: &str) -> crate::ir::TypeRef {
+    crate::ir::TypeRef::Reference {
+        segments: name.split('.').map(String::from).collect(),
+        generic_args: Vec::new(),
     }
 }
 

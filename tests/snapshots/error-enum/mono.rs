@@ -22,6 +22,20 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn quota(this: &QuotaError) -> f64;
 }
+pub mod lock {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen(experimental_generic_mono)]
+    extern "C" {
+        # [wasm_bindgen (extends = Error , extends = Object , js_namespace = "Lock")]
+        #[derive(Debug, Clone, PartialEq, Eq)]
+        pub type HeldError;
+        #[wasm_bindgen(method, getter)]
+        pub fn holder(this: &HeldError) -> String;
+        #[wasm_bindgen(method, getter, js_name = "holder")]
+        pub fn holder_js_string(this: &HeldError) -> JsString;
+    }
+}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -67,6 +81,14 @@ extern "C" {
     #[doc = " * `Error` — otherwise"]
     #[wasm_bindgen(method, catch)]
     pub async fn grow(this: &Store, bytes: f64) -> Result<Undefined, JsException>;
+    #[doc = " A qualified name resolves through its namespace; the variant is named"]
+    #[doc = " by its Rust path."]
+    #[doc = ""]
+    #[doc = " ## Errors"]
+    #[doc = ""]
+    #[doc = " * `Lock.HeldError` — when another writer holds the lock"]
+    #[wasm_bindgen(method, catch)]
+    pub fn lock(this: &Store) -> Result<(), JsException>;
     #[doc = " Untyped — `crate::Error`, not the enum."]
     #[wasm_bindgen(method, catch)]
     pub fn size(this: &Store) -> Result<f64, crate::Error>;
@@ -100,6 +122,7 @@ pub enum JsException {
     TypeError(TypeError),
     RangeError(RangeError),
     DOMException(DOMException),
+    LockHeldError(lock::HeldError),
     Error(Error),
     Other(JsValue),
 }
@@ -125,6 +148,10 @@ impl From<JsValue> for JsException {
             Ok(error) => return Self::DOMException(error),
             Err(value) => value,
         };
+        let value = match value.dyn_into::<lock::HeldError>() {
+            Ok(error) => return Self::LockHeldError(error),
+            Err(value) => value,
+        };
         let value = match value.dyn_into::<Error>() {
             Ok(error) => return Self::Error(error),
             Err(value) => value,
@@ -140,6 +167,7 @@ impl From<JsException> for JsValue {
             JsException::TypeError(error) => error.into(),
             JsException::RangeError(error) => error.into(),
             JsException::DOMException(error) => error.into(),
+            JsException::LockHeldError(error) => error.into(),
             JsException::Error(error) => error.into(),
             JsException::Other(value) => value,
         }
@@ -153,6 +181,7 @@ impl AsRef<JsValue> for JsException {
             Self::TypeError(error) => error.as_ref(),
             Self::RangeError(error) => error.as_ref(),
             Self::DOMException(error) => error.as_ref(),
+            Self::LockHeldError(error) => error.as_ref(),
             Self::Error(error) => error.as_ref(),
             Self::Other(value) => value,
         }
