@@ -934,7 +934,6 @@ fn flatten_into(
             let head = ty.as_ident().unwrap();
             if let Some(c) = cgctx {
                 if let Some(target) = c.resolve_alias(head, scope) {
-                    let target = target.clone();
                     return flatten_into(&target, cgctx, scope, out);
                 }
             }
@@ -995,7 +994,7 @@ fn flatten_collapse_to_lub(
         TypeRef::Reference { .. } if ty.as_ident().is_some() => {
             if let Some(c) = cgctx {
                 if let Some(target) = c.resolve_alias(ty.as_ident().unwrap(), scope) {
-                    return flatten_collapse_to_lub(&target.clone(), cgctx, scope);
+                    return flatten_collapse_to_lub(&target, cgctx, scope);
                 }
             }
             ty.clone()

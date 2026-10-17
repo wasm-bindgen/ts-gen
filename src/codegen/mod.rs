@@ -728,22 +728,7 @@ fn generate_type_alias(
         }
     }
 
-    // Resolve the target inside the alias's body scope so its own
-    // type parameters bind locally (the alias is a scope-introducing
-    // construct in TS). An enum target has no inner form, so it is
-    // named directly.
-    let pos = if cgctx.enum_kind(&alias.target, alias.body_scope).is_some() {
-        typemap::TypePosition::RETURN
-    } else {
-        typemap::TypePosition::ARGUMENT.to_inner()
-    };
-    let target = typemap::to_syn_type(
-        &alias.target,
-        pos,
-        Some(cgctx),
-        alias.body_scope,
-        from_module,
-    );
+    let target = cgctx.alias_target(alias, from_module);
     let renamed = cgctx.renamed_locals.get(&alias.name);
     let name = typemap::make_ident(renamed.map_or(alias.name.as_str(), String::as_str));
 
@@ -763,16 +748,41 @@ fn generate_type_alias(
     // survive codegen: `pub type Handler<Env, Props> = …;` rather
     // than the bare `Handler = …` that would leave `Props`
     // undeclared. Type aliases use plain `<T, U>` (no `JsGeneric`
-    // bound) — they're erased at use-site monomorphisation.
-    let generics = if alias.type_params.is_empty() {
+    // bound) — they're erased at use-site monomorphisation. Parameters
+    // the target doesn't mention are dropped, matching every use site.
+    // Use sites fill in TS's defaults themselves, so the Rust defaults are
+    // for hand-written instantiations: the trailing run of kept parameters
+    // whose defaults name no dropped parameter keeps them.
+    let kept = typemap::alias_params_mentioned(alias, &target);
+    let mut defaults = cgctx.alias_param_defaults(alias, from_module);
+    let mut trailing = true;
+    for i in (0..defaults.len()).rev().filter(|&i| kept[i]) {
+        trailing &= defaults[i].as_ref().is_some_and(|default| {
+            let mentioned = typemap::alias_params_mentioned(alias, default);
+            mentioned.iter().zip(&kept).all(|(&m, &k)| !m || k)
+        });
+        if !trailing {
+            defaults[i] = None;
+        }
+    }
+    let params = alias
+        .type_params
+        .iter()
+        .zip(defaults)
+        .zip(kept)
+        .filter(|(_, kept)| *kept)
+        .map(|((tp, default), _)| {
+            let ident = typemap::make_ident(&tp.name);
+            match default {
+                Some(default) => quote! { #ident = #default },
+                None => quote! { #ident },
+            }
+        })
+        .collect::<Vec<_>>();
+    let generics = if params.is_empty() {
         quote! {}
     } else {
-        let idents = alias
-            .type_params
-            .iter()
-            .map(|tp| typemap::make_ident(&tp.name))
-            .collect::<Vec<_>>();
-        quote! { <#(#idents),*> }
+        quote! { <#(#params),*> }
     };
 
     let _ = scope;
