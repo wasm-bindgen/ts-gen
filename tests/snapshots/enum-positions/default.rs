@@ -33,7 +33,7 @@ pub mod codes {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Holder<T: ::wasm_bindgen::JsGeneric>;
+    pub type Holder<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new<T: ::wasm_bindgen::JsGeneric>(value: &T) -> Result<Holder<T>, JsValue>;
     #[wasm_bindgen(method)]
@@ -52,7 +52,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Details<T: ::wasm_bindgen::JsGeneric>;
+    pub type Details<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &Details<T>) -> T;
     #[wasm_bindgen(method, setter)]

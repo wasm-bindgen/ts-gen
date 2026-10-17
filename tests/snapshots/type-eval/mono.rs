@@ -234,7 +234,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Rounding<U>;
+    pub type Rounding<U = JsValue>;
     #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
     pub fn smallest_unit<U>(this: &Rounding<U>) -> Option<Plural>;
     #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
@@ -279,7 +279,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Box<T>;
+    pub type Box<T = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn value<T>(this: &Box<T>) -> T
     where
@@ -315,7 +315,7 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Box<T> {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Holder<T>;
+    pub type Holder<T = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn partial<T>(this: &Holder<T>) -> PartialBox<T>;
     #[wasm_bindgen(method, setter)]
@@ -683,7 +683,7 @@ pub enum PluralHourOrMinute {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type PartialBox<T>;
+    pub type PartialBox<T = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn value<T>(this: &PartialBox<T>) -> Option<T>
     where

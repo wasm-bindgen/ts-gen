@@ -371,7 +371,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Provider<T>;
+    pub type Provider<T = JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn call<T>(this: &Provider<T>) -> Result<T, JsValue>
     where
@@ -381,7 +381,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Provider , extends = Fetcher , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type GenericStub<T>;
+    pub type GenericStub<T = JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn fetch<T>(
         this: &GenericStub<T>,

@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Holder<T: ::wasm_bindgen::JsGeneric>;
+    pub type Holder<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new<T: ::wasm_bindgen::JsGeneric>(value: &T) -> Result<Holder<T>, JsValue>;
     #[wasm_bindgen(method)]
@@ -36,9 +36,11 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Store<T: ::wasm_bindgen::JsGeneric>;
+    pub type Store<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn load<T: ::wasm_bindgen::JsGeneric>(this: &Store<T>) -> Result<T, JsValue>;
+    pub async fn load<T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi>(
+        this: &Store<T>,
+    ) -> Result<T, JsValue>;
     #[wasm_bindgen(method, js_name = "load")]
     pub fn load_promise<T: ::wasm_bindgen::JsGeneric>(this: &Store<T>) -> Promise<T>;
     #[wasm_bindgen(method, catch, js_name = "loadHolder")]
@@ -60,7 +62,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type EvaluationDetails<T: ::wasm_bindgen::JsGeneric>;
+    pub type EvaluationDetails<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter, js_name = "flagKey")]
     pub fn flag_key<T: ::wasm_bindgen::JsGeneric>(this: &EvaluationDetails<T>) -> String;
     #[wasm_bindgen(method, setter, js_name = "flagKey")]
@@ -101,7 +103,7 @@ impl<T: ::wasm_bindgen::JsGeneric> EvaluationDetailsBuilder<T> {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Pair<A: ::wasm_bindgen::JsGeneric, B: ::wasm_bindgen::JsGeneric>;
+    pub type Pair<A: ::wasm_bindgen::JsGeneric = JsValue, B: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn first<A: ::wasm_bindgen::JsGeneric, B: ::wasm_bindgen::JsGeneric>(
         this: &Pair<A, B>,

@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Pair<A: ::wasm_bindgen::JsGeneric, B: ::wasm_bindgen::JsGeneric>;
+    pub type Pair<A: ::wasm_bindgen::JsGeneric = JsValue, B: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn a<A: ::wasm_bindgen::JsGeneric, B: ::wasm_bindgen::JsGeneric>(this: &Pair<A, B>) -> A;
     #[wasm_bindgen(method, setter)]
@@ -201,7 +201,7 @@ pub type TopMode = Mode;
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Holder<T: ::wasm_bindgen::JsGeneric>;
+    pub type Holder<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new<T: ::wasm_bindgen::JsGeneric>(value: &T) -> Result<Holder<T>, JsValue>;
     #[wasm_bindgen(method)]

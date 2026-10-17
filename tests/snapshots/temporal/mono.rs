@@ -706,7 +706,7 @@ pub mod temporal {
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type RoundingOptions<Units>;
+        pub type RoundingOptions<Units = JsValue>;
         #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
         pub fn smallest_unit<Units>(this: &RoundingOptions<Units>) -> Option<PluralizeUnit>;
         #[wasm_bindgen(method, setter, js_name = "smallestUnit")]
@@ -754,7 +754,7 @@ pub mod temporal {
     extern "C" {
         # [wasm_bindgen (extends = RoundingOptions , extends = Object , js_namespace = "Temporal")]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type RoundingOptionsWithLargestUnit<Units>;
+        pub type RoundingOptionsWithLargestUnit<Units = JsValue>;
         #[wasm_bindgen(method, getter, js_name = "largestUnit")]
         pub fn largest_unit<Units>(
             this: &RoundingOptionsWithLargestUnit<Units>,
@@ -803,7 +803,7 @@ pub mod temporal {
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type ToStringRoundingOptions<Units>;
+        pub type ToStringRoundingOptions<Units = JsValue>;
         #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
         pub fn smallest_unit<Units>(this: &ToStringRoundingOptions<Units>)
             -> Option<PluralizeUnit>;
@@ -849,7 +849,7 @@ pub mod temporal {
     extern "C" {
         # [wasm_bindgen (extends = ToStringRoundingOptions , extends = Object , js_namespace = "Temporal")]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type ToStringRoundingOptionsWithFractionalSeconds<Units>;
+        pub type ToStringRoundingOptionsWithFractionalSeconds<Units = JsValue>;
         #[wasm_bindgen(method, getter, js_name = "fractionalSecondDigits")]
         pub fn fractional_second_digits<Units>(
             this: &ToStringRoundingOptionsWithFractionalSeconds<Units>,

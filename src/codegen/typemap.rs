@@ -1409,7 +1409,25 @@ pub fn to_syn_type(
                 .take(8)
                 .map(|p| to_syn_type(&p.type_ref, inner_pos, ctx, scope, from_module))
                 .collect();
-            let ret = to_syn_type(&sig.return_type, inner_pos, ctx, scope, from_module);
+            // `Function<fn() -> Promise<T>>` with a type parameter `T`
+            // does not satisfy wasm-bindgen's `JsFunction` (the nested
+            // `ErasableGeneric::Repr` projection fails to normalise), so
+            // the promised value erases inside callback signatures.
+            let promised_param = sig.return_type.as_promise_inner().is_some_and(|inner| {
+                inner.as_ident().is_some_and(|name| {
+                    ctx.is_some_and(|c| {
+                        matches!(
+                            c.gctx.scopes.resolve_binding(scope, name),
+                            Some(crate::parse::scope::Binding::TypeParam)
+                        )
+                    })
+                })
+            });
+            let ret = if promised_param {
+                quote! { Promise }
+            } else {
+                to_syn_type(&sig.return_type, inner_pos, ctx, scope, from_module)
+            };
             // A `fn` pointer type has fixed arity, so a rest parameter
             // cannot be spelled; the untyped `Function` accepts any
             // closure, which is what `(...args: any[]) => void` means.

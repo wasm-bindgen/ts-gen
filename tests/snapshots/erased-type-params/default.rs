@@ -164,7 +164,7 @@ impl Point {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Slot<V: ::wasm_bindgen::JsGeneric>;
+    pub type Slot<V: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn value<V: ::wasm_bindgen::JsGeneric>(this: &Slot<V>) -> V;
     #[wasm_bindgen(method, setter)]

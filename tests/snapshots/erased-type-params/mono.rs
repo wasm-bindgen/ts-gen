@@ -175,7 +175,7 @@ impl Point {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Slot<V>;
+    pub type Slot<V = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn value<V>(this: &Slot<V>) -> V
     where

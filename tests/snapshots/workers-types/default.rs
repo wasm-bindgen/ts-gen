@@ -7,8 +7,6 @@ use wasm_bindgen::prelude::*;
 #[allow(dead_code)]
 use JsValue as Cf;
 #[allow(dead_code)]
-use JsValue as CfHostMetadata;
-#[allow(dead_code)]
 use JsValue as R;
 #[wasm_bindgen]
 extern "C" {
@@ -2751,10 +2749,10 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "blockConcurrencyWhile")]
     pub async fn block_concurrency_while<
         Props: ::wasm_bindgen::JsGeneric,
-        T: ::wasm_bindgen::JsGeneric,
+        T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi,
     >(
         this: &DurableObjectState<Props>,
-        callback: &Function<fn() -> Promise<T>>,
+        callback: &Function<fn() -> Promise>,
     ) -> Result<T, JsValue>;
     #[wasm_bindgen(method, js_name = "blockConcurrencyWhile")]
     pub fn block_concurrency_while_promise<
@@ -2762,7 +2760,7 @@ extern "C" {
         T: ::wasm_bindgen::JsGeneric,
     >(
         this: &DurableObjectState<Props>,
-        callback: &Function<fn() -> Promise<T>>,
+        callback: &Function<fn() -> Promise>,
     ) -> Promise<T>;
     #[wasm_bindgen(method, js_name = "acceptWebSocket")]
     pub fn accept_web_socket<Props: ::wasm_bindgen::JsGeneric>(
@@ -3303,14 +3301,14 @@ extern "C" {
         options: &DurableObjectPutOptions,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch)]
-    pub async fn transaction<T: ::wasm_bindgen::JsGeneric>(
+    pub async fn transaction<T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi>(
         this: &DurableObjectStorage,
-        closure: &Function<fn(DurableObjectTransaction) -> Promise<T>>,
+        closure: &Function<fn(DurableObjectTransaction) -> Promise>,
     ) -> Result<T, JsValue>;
     #[wasm_bindgen(method, js_name = "transaction")]
     pub fn transaction_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &DurableObjectStorage,
-        closure: &Function<fn(DurableObjectTransaction) -> Promise<T>>,
+        closure: &Function<fn(DurableObjectTransaction) -> Promise>,
     ) -> Promise<T>;
     #[wasm_bindgen(method, catch, js_name = "getAlarm")]
     pub async fn get_alarm(this: &DurableObjectStorage) -> Result<Nullable<f64>, JsValue>;
@@ -3976,7 +3974,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EventTarget<EventMap: ::wasm_bindgen::JsGeneric = Object<Event>>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<EventMap: ::wasm_bindgen::JsGeneric>() -> Result<EventTarget<EventMap>, JsValue>;
+    pub fn new() -> Result<EventTarget, JsValue>;
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
@@ -4402,12 +4400,12 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type CustomEvent<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<T: ::wasm_bindgen::JsGeneric>(r#type: &str) -> Result<CustomEvent<T>, JsValue>;
+    pub fn new(r#type: &str) -> Result<CustomEvent, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "CustomEvent")]
-    pub fn new_with_init<T: ::wasm_bindgen::JsGeneric>(
+    pub fn new_with_init(
         r#type: &str,
         init: &CustomEventCustomEventInit,
-    ) -> Result<CustomEvent<T>, JsValue>;
+    ) -> Result<CustomEvent, JsValue>;
     #[doc = " The read-only **`detail`** property of the CustomEvent interface returns any data passed when initializing the event."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/CustomEvent/detail)"]
@@ -8721,7 +8719,9 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "text")]
     pub fn text_promise(this: &Body) -> Promise<JsString>;
     #[wasm_bindgen(method, catch)]
-    pub async fn json<T: ::wasm_bindgen::JsGeneric>(this: &Body) -> Result<T, JsValue>;
+    pub async fn json<T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi>(
+        this: &Body,
+    ) -> Result<T, JsValue>;
     #[wasm_bindgen(method, js_name = "json")]
     pub fn json_promise<T: ::wasm_bindgen::JsGeneric>(this: &Body) -> Promise<T>;
     #[wasm_bindgen(method, catch, js_name = "formData")]
@@ -9015,29 +9015,16 @@ extern "C" {
         Cf: ::wasm_bindgen::JsGeneric = CfProperties,
     >;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
-        input: &RequestInfo,
-    ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
+    pub fn new(input: &RequestInfo) -> Result<Request, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Request")]
-    pub fn new_with_url<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
-        input: &URL,
-    ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
+    pub fn new_with_url(input: &URL) -> Result<Request, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Request")]
-    pub fn new_with_request_info_and_init<
-        CfHostMetadata: ::wasm_bindgen::JsGeneric,
-        Cf: ::wasm_bindgen::JsGeneric,
-    >(
+    pub fn new_with_request_info_and_init(
         input: &RequestInfo,
         init: &RequestInit<Cf>,
-    ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
+    ) -> Result<Request, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Request")]
-    pub fn new_with_url_and_init<
-        CfHostMetadata: ::wasm_bindgen::JsGeneric,
-        Cf: ::wasm_bindgen::JsGeneric,
-    >(
-        input: &URL,
-        init: &RequestInit<Cf>,
-    ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
+    pub fn new_with_url_and_init(input: &URL, init: &RequestInit<Cf>) -> Result<Request, JsValue>;
     #[doc = " The **`clone()`** method of the Request interface creates a copy of the current `Request` object."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/clone)"]
@@ -9417,7 +9404,7 @@ pub type Fetcher = JsValue;
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type KVNamespaceListKey<Metadata: ::wasm_bindgen::JsGeneric>;
+    pub type KVNamespaceListKey<Metadata: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn name<Metadata: ::wasm_bindgen::JsGeneric>(this: &KVNamespaceListKey<Metadata>)
         -> String;
@@ -9475,7 +9462,7 @@ impl<Metadata: ::wasm_bindgen::JsGeneric> KVNamespaceListKeyBuilder<Metadata> {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type KVNamespaceListResult<Metadata: ::wasm_bindgen::JsGeneric>;
+    pub type KVNamespaceListResult<Metadata: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn list_complete<Metadata: ::wasm_bindgen::JsGeneric>(
         this: &KVNamespaceListResult<Metadata>,
@@ -9998,7 +9985,7 @@ impl KVNamespaceListOptionsBuilder {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type KVNamespaceGetOptions<Type: ::wasm_bindgen::JsGeneric>;
+    pub type KVNamespaceGetOptions<Type: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_<Type: ::wasm_bindgen::JsGeneric>(this: &KVNamespaceGetOptions<Type>) -> Type;
     #[wasm_bindgen(method, setter)]
@@ -10091,8 +10078,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KVNamespaceGetWithMetadataResult<
-        Value: ::wasm_bindgen::JsGeneric,
-        Metadata: ::wasm_bindgen::JsGeneric,
+        Value: ::wasm_bindgen::JsGeneric = JsValue,
+        Metadata: ::wasm_bindgen::JsGeneric = JsValue,
     >;
     #[wasm_bindgen(method, getter)]
     pub fn value<Value: ::wasm_bindgen::JsGeneric, Metadata: ::wasm_bindgen::JsGeneric>(
@@ -11445,7 +11432,9 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "text")]
     pub fn text_promise(this: &R2ObjectBody) -> Promise<JsString>;
     #[wasm_bindgen(method, catch)]
-    pub async fn json<T: ::wasm_bindgen::JsGeneric>(this: &R2ObjectBody) -> Result<T, JsValue>;
+    pub async fn json<T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi>(
+        this: &R2ObjectBody,
+    ) -> Result<T, JsValue>;
     #[wasm_bindgen(method, js_name = "json")]
     pub fn json_promise<T: ::wasm_bindgen::JsGeneric>(this: &R2ObjectBody) -> Promise<T>;
     #[wasm_bindgen(method, catch)]
@@ -12689,25 +12678,25 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ReadableStream<R: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<R: ::wasm_bindgen::JsGeneric>() -> Result<ReadableStream<R>, JsValue>;
+    pub fn new() -> Result<ReadableStream, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "ReadableStream")]
-    pub fn new_with_underlying_byte_source<R: ::wasm_bindgen::JsGeneric>(
+    pub fn new_with_underlying_byte_source(
         underlying_source: &UnderlyingByteSource,
-    ) -> Result<ReadableStream<R>, JsValue>;
+    ) -> Result<ReadableStream, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "ReadableStream")]
-    pub fn new_with_underlying_byte_source_and_queuing_strategy<R: ::wasm_bindgen::JsGeneric>(
+    pub fn new_with_underlying_byte_source_and_queuing_strategy(
         underlying_source: &UnderlyingByteSource,
         strategy: &QueuingStrategy<Uint8Array>,
-    ) -> Result<ReadableStream<R>, JsValue>;
+    ) -> Result<ReadableStream, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "ReadableStream")]
-    pub fn new_with_underlying_source<R: ::wasm_bindgen::JsGeneric>(
+    pub fn new_with_underlying_source(
         underlying_source: &UnderlyingSource<R>,
-    ) -> Result<ReadableStream<R>, JsValue>;
+    ) -> Result<ReadableStream, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "ReadableStream")]
-    pub fn new_with_underlying_source_and_queuing_strategy<R: ::wasm_bindgen::JsGeneric>(
+    pub fn new_with_underlying_source_and_queuing_strategy(
         underlying_source: &UnderlyingSource<R>,
         strategy: &QueuingStrategy<R>,
-    ) -> Result<ReadableStream<R>, JsValue>;
+    ) -> Result<ReadableStream, JsValue>;
     #[doc = " The **`locked`** read-only property of the ReadableStream interface returns whether or not the readable stream is locked to a reader."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/locked)"]
@@ -12881,9 +12870,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ReadableStreamDefaultReader<R: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<R: ::wasm_bindgen::JsGeneric>(
-        stream: &ReadableStream,
-    ) -> Result<ReadableStreamDefaultReader<R>, JsValue>;
+    pub fn new(stream: &ReadableStream) -> Result<ReadableStreamDefaultReader, JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn closed<R: ::wasm_bindgen::JsGeneric>(
         this: &ReadableStreamDefaultReader<R>,
@@ -13387,16 +13374,16 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WritableStream<W: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<W: ::wasm_bindgen::JsGeneric>() -> Result<WritableStream<W>, JsValue>;
+    pub fn new() -> Result<WritableStream, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "WritableStream")]
-    pub fn new_with_underlying_sink<W: ::wasm_bindgen::JsGeneric>(
+    pub fn new_with_underlying_sink(
         underlying_sink: &UnderlyingSink,
-    ) -> Result<WritableStream<W>, JsValue>;
+    ) -> Result<WritableStream, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "WritableStream")]
-    pub fn new_with_underlying_sink_and_queuing_strategy<W: ::wasm_bindgen::JsGeneric>(
+    pub fn new_with_underlying_sink_and_queuing_strategy(
         underlying_sink: &UnderlyingSink,
         queuing_strategy: &QueuingStrategy,
-    ) -> Result<WritableStream<W>, JsValue>;
+    ) -> Result<WritableStream, JsValue>;
     #[doc = " The **`locked`** read-only property of the WritableStream interface returns a boolean indicating whether the `WritableStream` is locked to a writer."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/locked)"]
@@ -13467,9 +13454,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WritableStreamDefaultWriter<W: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<W: ::wasm_bindgen::JsGeneric>(
-        stream: &WritableStream,
-    ) -> Result<WritableStreamDefaultWriter<W>, JsValue>;
+    pub fn new(stream: &WritableStream) -> Result<WritableStreamDefaultWriter, JsValue>;
     #[doc = " The **`closed`** read-only property of the the stream errors or the writer's lock is released."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/closed)"]
@@ -13587,8 +13572,7 @@ extern "C" {
         O: ::wasm_bindgen::JsGeneric = JsValue,
     >;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
-    ) -> Result<TransformStream<I, O>, JsValue>;
+    pub fn new() -> Result<TransformStream, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "TransformStream")]
     pub fn new_with_transformer<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric>(
         transformer: &Transformer<I, O>,
@@ -15433,7 +15417,7 @@ pub type SqlStorageValue = JsValue;
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type SqlStorageCursor<T: ::wasm_bindgen::JsGeneric>;
+    pub type SqlStorageCursor<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method)]
     pub fn next<T: ::wasm_bindgen::JsGeneric>(
         this: &SqlStorageCursor<T>,
@@ -15476,7 +15460,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type SqlStorageCursorNextReturn<T: ::wasm_bindgen::JsGeneric>;
+    pub type SqlStorageCursorNextReturn<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn done<T: ::wasm_bindgen::JsGeneric>(this: &SqlStorageCursorNextReturn<T>)
         -> Option<bool>;
@@ -16111,7 +16095,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type SyncKvStorageList<T: ::wasm_bindgen::JsGeneric>;
+    pub type SyncKvStorageList<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[doc = " Conformance to the JS iteration protocol — returns the underlying iterator."]
     #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
     pub fn iterator<T: ::wasm_bindgen::JsGeneric>(
@@ -37174,7 +37158,7 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<
-        HostMetadata: ::wasm_bindgen::JsGeneric,
+        HostMetadata: ::wasm_bindgen::JsGeneric = JsValue,
     >;
     #[doc = " Custom metadata set per-host in [Cloudflare for SaaS](https://developers.cloudflare.com/cloudflare-for-platforms/cloudflare-for-saas/)."]
     #[doc = ""]
@@ -39933,7 +39917,7 @@ pub mod cloudflare {
         extern "C" {
             # [wasm_bindgen (extends = Object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
-            pub type WorkflowEvent<T: ::wasm_bindgen::JsGeneric>;
+            pub type WorkflowEvent<T: ::wasm_bindgen::JsGeneric = JsValue>;
             #[wasm_bindgen(method, getter)]
             pub fn payload<T: ::wasm_bindgen::JsGeneric>(this: &WorkflowEvent<T>) -> T;
             #[wasm_bindgen(method, setter)]
@@ -39963,7 +39947,7 @@ pub mod cloudflare {
         extern "C" {
             # [wasm_bindgen (extends = Object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
-            pub type WorkflowStepEvent<T: ::wasm_bindgen::JsGeneric>;
+            pub type WorkflowStepEvent<T: ::wasm_bindgen::JsGeneric = JsValue>;
             #[wasm_bindgen(method, getter)]
             pub fn payload<T: ::wasm_bindgen::JsGeneric>(this: &WorkflowStepEvent<T>) -> T;
             #[wasm_bindgen(method, setter)]
@@ -40012,30 +39996,32 @@ pub mod cloudflare {
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type WorkflowStep;
             #[wasm_bindgen(method, catch, js_name = "do")]
-            pub async fn do_<T: ::wasm_bindgen::JsGeneric>(
+            pub async fn do_<T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi>(
                 this: &WorkflowStep,
                 name: &str,
-                callback: &Function<fn(WorkflowStepContext) -> Promise<T>>,
+                callback: &Function<fn(WorkflowStepContext) -> Promise>,
             ) -> Result<T, JsValue>;
             #[wasm_bindgen(method, js_name = "do")]
             pub fn do__promise<T: ::wasm_bindgen::JsGeneric>(
                 this: &WorkflowStep,
                 name: &str,
-                callback: &Function<fn(WorkflowStepContext) -> Promise<T>>,
+                callback: &Function<fn(WorkflowStepContext) -> Promise>,
             ) -> Promise<T>;
             #[wasm_bindgen(method, catch, js_name = "do")]
-            pub async fn do_with_config<T: ::wasm_bindgen::JsGeneric>(
+            pub async fn do_with_config<
+                T: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi,
+            >(
                 this: &WorkflowStep,
                 name: &str,
                 config: &WorkflowStepConfig,
-                callback: &Function<fn(WorkflowStepContext) -> Promise<T>>,
+                callback: &Function<fn(WorkflowStepContext) -> Promise>,
             ) -> Result<T, JsValue>;
             #[wasm_bindgen(method, js_name = "do")]
             pub fn do_with_config_promise<T: ::wasm_bindgen::JsGeneric>(
                 this: &WorkflowStep,
                 name: &str,
                 config: &WorkflowStepConfig,
-                callback: &Function<fn(WorkflowStepContext) -> Promise<T>>,
+                callback: &Function<fn(WorkflowStepContext) -> Promise>,
             ) -> Promise<T>;
             #[wasm_bindgen(method, getter)]
             pub fn sleep(
@@ -42065,7 +42051,10 @@ pub type Params = Object;
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type EventContext<Env: ::wasm_bindgen::JsGeneric, Data: ::wasm_bindgen::JsGeneric>;
+    pub type EventContext<
+        Env: ::wasm_bindgen::JsGeneric = JsValue,
+        Data: ::wasm_bindgen::JsGeneric = JsValue,
+    >;
     #[wasm_bindgen(method, getter)]
     pub fn request<Env: ::wasm_bindgen::JsGeneric, Data: ::wasm_bindgen::JsGeneric>(
         this: &EventContext<Env, Data>,
@@ -42176,9 +42165,9 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EventPluginContext<
-        Env: ::wasm_bindgen::JsGeneric,
-        Data: ::wasm_bindgen::JsGeneric,
-        PluginArgs: ::wasm_bindgen::JsGeneric,
+        Env: ::wasm_bindgen::JsGeneric = JsValue,
+        Data: ::wasm_bindgen::JsGeneric = JsValue,
+        PluginArgs: ::wasm_bindgen::JsGeneric = JsValue,
     >;
     #[wasm_bindgen(method, getter)]
     pub fn request<
@@ -42567,7 +42556,7 @@ pub mod rpc {
     extern "C" {
         # [wasm_bindgen (extends = super :: Disposable , extends = Object , js_namespace = "Rpc")]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type StubBase<T: ::wasm_bindgen::JsGeneric>;
+        pub type StubBase<T: ::wasm_bindgen::JsGeneric = JsValue>;
         #[wasm_bindgen(method)]
         pub fn dup<T: ::wasm_bindgen::JsGeneric>(this: &StubBase<T>) -> JsValue;
         #[wasm_bindgen(method, catch, js_name = "dup")]
@@ -42579,7 +42568,7 @@ pub mod rpc {
     extern "C" {
         # [wasm_bindgen (extends = Provider , extends = StubBase , extends = Object , js_namespace = "Rpc")]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type Stub<T: ::wasm_bindgen::JsGeneric>;
+        pub type Stub<T: ::wasm_bindgen::JsGeneric = JsValue>;
         #[wasm_bindgen(method)]
         pub fn dup<T: ::wasm_bindgen::JsGeneric>(this: &Stub<T>) -> JsValue;
         #[wasm_bindgen(method, catch, js_name = "dup")]
@@ -42607,7 +42596,7 @@ pub mod rpc {
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "Rpc")]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type Provider<T: ::wasm_bindgen::JsGeneric>;
+        pub type Provider<T: ::wasm_bindgen::JsGeneric = JsValue>;
     }
 }
 #[wasm_bindgen]
@@ -46339,7 +46328,7 @@ pub mod tail_stream {
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "TailStream")]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type TailEvent<Event: ::wasm_bindgen::JsGeneric>;
+        pub type TailEvent<Event: ::wasm_bindgen::JsGeneric = JsValue>;
         #[wasm_bindgen(method, getter, js_name = "invocationId")]
         pub fn invocation_id<Event: ::wasm_bindgen::JsGeneric>(this: &TailEvent<Event>) -> String;
         #[wasm_bindgen(method, getter, js_name = "spanContext")]

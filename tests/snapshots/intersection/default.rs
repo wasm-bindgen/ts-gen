@@ -328,7 +328,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Provider<T: ::wasm_bindgen::JsGeneric>;
+    pub type Provider<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method)]
     pub fn call<T: ::wasm_bindgen::JsGeneric>(this: &Provider<T>) -> T;
     #[wasm_bindgen(method, catch, js_name = "call")]
@@ -338,7 +338,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Provider , extends = Fetcher , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type GenericStub<T: ::wasm_bindgen::JsGeneric>;
+    pub type GenericStub<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn fetch<T: ::wasm_bindgen::JsGeneric>(
         this: &GenericStub<T>,

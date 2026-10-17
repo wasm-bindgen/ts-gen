@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Pair<A, B>;
+    pub type Pair<A = JsValue, B = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn a<A, B>(this: &Pair<A, B>) -> A
     where
@@ -164,7 +164,7 @@ pub type TopMode = Mode;
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Holder<T>;
+    pub type Holder<T = JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new<T>(value: T) -> Result<Holder<T>, JsValue>
     where

@@ -285,7 +285,7 @@ impl Registry {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Holder<T>;
+    pub type Holder<T = JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn get<T>(this: &Holder<T>) -> Result<T, JsValue>
     where

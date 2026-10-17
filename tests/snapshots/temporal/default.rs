@@ -683,7 +683,7 @@ pub mod temporal {
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type RoundingOptions<Units: ::wasm_bindgen::JsGeneric>;
+        pub type RoundingOptions<Units: ::wasm_bindgen::JsGeneric = JsValue>;
         #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
         pub fn smallest_unit<Units: ::wasm_bindgen::JsGeneric>(
             this: &RoundingOptions<Units>,
@@ -746,7 +746,7 @@ pub mod temporal {
     extern "C" {
         # [wasm_bindgen (extends = RoundingOptions , extends = Object , js_namespace = "Temporal")]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type RoundingOptionsWithLargestUnit<Units: ::wasm_bindgen::JsGeneric>;
+        pub type RoundingOptionsWithLargestUnit<Units: ::wasm_bindgen::JsGeneric = JsValue>;
         #[wasm_bindgen(method, getter, js_name = "largestUnit")]
         pub fn largest_unit<Units: ::wasm_bindgen::JsGeneric>(
             this: &RoundingOptionsWithLargestUnit<Units>,
@@ -795,7 +795,7 @@ pub mod temporal {
     extern "C" {
         # [wasm_bindgen (extends = Object , js_namespace = "Temporal")]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type ToStringRoundingOptions<Units: ::wasm_bindgen::JsGeneric>;
+        pub type ToStringRoundingOptions<Units: ::wasm_bindgen::JsGeneric = JsValue>;
         #[wasm_bindgen(method, getter, js_name = "smallestUnit")]
         pub fn smallest_unit<Units: ::wasm_bindgen::JsGeneric>(
             this: &ToStringRoundingOptions<Units>,
@@ -845,7 +845,9 @@ pub mod temporal {
     extern "C" {
         # [wasm_bindgen (extends = ToStringRoundingOptions , extends = Object , js_namespace = "Temporal")]
         #[derive(Debug, Clone, PartialEq, Eq)]
-        pub type ToStringRoundingOptionsWithFractionalSeconds<Units: ::wasm_bindgen::JsGeneric>;
+        pub type ToStringRoundingOptionsWithFractionalSeconds<
+            Units: ::wasm_bindgen::JsGeneric = JsValue,
+        >;
         #[wasm_bindgen(method, getter, js_name = "fractionalSecondDigits")]
         pub fn fractional_second_digits<Units: ::wasm_bindgen::JsGeneric>(
             this: &ToStringRoundingOptionsWithFractionalSeconds<Units>,

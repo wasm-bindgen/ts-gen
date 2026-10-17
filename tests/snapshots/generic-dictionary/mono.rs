@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type EvaluationDetails<T>;
+    pub type EvaluationDetails<T = JsValue>;
     #[wasm_bindgen(method, getter, js_name = "flagKey")]
     pub fn flag_key<T>(this: &EvaluationDetails<T>) -> String;
     #[wasm_bindgen(method, getter, js_name = "flagKey")]

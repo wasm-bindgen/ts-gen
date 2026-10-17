@@ -60,7 +60,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Holder<T>;
+    pub type Holder<T = JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new<T>(value: T) -> Result<Holder<T>, JsValue>
     where

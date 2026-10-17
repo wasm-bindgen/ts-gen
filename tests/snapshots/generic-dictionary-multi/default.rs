@@ -8,7 +8,10 @@ use wasm_bindgen::prelude::*;
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type ResultBox<T: ::wasm_bindgen::JsGeneric, E: ::wasm_bindgen::JsGeneric>;
+    pub type ResultBox<
+        T: ::wasm_bindgen::JsGeneric = JsValue,
+        E: ::wasm_bindgen::JsGeneric = JsValue,
+    >;
     #[wasm_bindgen(method, getter)]
     pub fn value<T: ::wasm_bindgen::JsGeneric, E: ::wasm_bindgen::JsGeneric>(
         this: &ResultBox<T, E>,

@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Holder<T>;
+    pub type Holder<T = JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new<T>(value: T) -> Result<Holder<T>, JsValue>
     where
@@ -33,7 +33,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Store<T>;
+    pub type Store<T = JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn load<T>(this: &Store<T>) -> Result<T, JsValue>
     where
@@ -58,7 +58,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type EvaluationDetails<T>;
+    pub type EvaluationDetails<T = JsValue>;
     #[wasm_bindgen(method, getter, js_name = "flagKey")]
     pub fn flag_key<T>(this: &EvaluationDetails<T>) -> String;
     #[wasm_bindgen(method, getter, js_name = "flagKey")]
@@ -110,7 +110,7 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> EvaluationDetailsBuilder<T> {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Pair<A, B>;
+    pub type Pair<A = JsValue, B = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn first<A, B>(this: &Pair<A, B>) -> A
     where

@@ -24,8 +24,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Holder<T: ::wasm_bindgen::JsGeneric = JsValue, U: ::wasm_bindgen::JsGeneric = Box<T>>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<T: ::wasm_bindgen::JsGeneric, U: ::wasm_bindgen::JsGeneric>(
-    ) -> Result<Holder<T, U>, JsValue>;
+    pub fn new() -> Result<Holder, JsValue>;
     #[wasm_bindgen(method)]
     pub fn get<T: ::wasm_bindgen::JsGeneric, U: ::wasm_bindgen::JsGeneric>(
         this: &Holder<T, U>,
