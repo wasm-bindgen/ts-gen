@@ -7,6 +7,7 @@
     "./create": "./create.js",
     "./version": "./version.js",
     "./merged": "./merged.js",
-    "./renamed": "./renamed.js"
+    "./renamed": "./renamed.js",
+    "./namespace": "./namespace.js"
   }
 }

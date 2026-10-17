@@ -198,6 +198,8 @@ pub struct ConcreteParam {
 /// against the surrounding extern block's used-name set.
 #[derive(Clone, Debug)]
 pub struct ExpandedSignature {
+    /// Index of the overload it expands.
+    pub overload: usize,
     /// `_with_X` / `_with_X_and_Y` suffix — empty for the primary
     /// (most-truncated) variant when only one signature survives, or when
     /// the variant is the shortest in its cohort.
@@ -327,26 +329,25 @@ pub fn collect_type_params(
 /// The caller is responsible for choosing a base name, applying the suffix,
 /// and deduping the final names against the surrounding extern block.
 pub fn expand_signatures(
-    overloads: &[&[Param]],
+    overloads: &[Overload<'_>],
     cgctx: Option<&CodegenContext<'_>>,
-    scope: ScopeId,
 ) -> Vec<ExpandedSignature> {
     // Phase 1: Per-overload expansion — optional truncation + union cartesian product.
-    let mut all_sigs: Vec<Vec<ConcreteParam>> = Vec::new();
+    let mut all_sigs: Vec<(usize, Vec<ConcreteParam>)> = Vec::new();
     let mut first_overload_sigs = 0;
-    for (index, params) in overloads.iter().enumerate() {
-        let sigs = expand_single_overload(params, cgctx, scope);
+    for (index, overload) in overloads.iter().enumerate() {
+        let sigs = expand_single_overload(overload.params, cgctx, overload.body_scope);
         if index == 0 {
             first_overload_sigs = sigs.len();
         }
-        all_sigs.extend(sigs);
+        all_sigs.extend(sigs.into_iter().map(|sig| (index, sig)));
     }
 
     // Phase 2: Cross-overload dedup — remove signatures that are identical
     // structurally OR after lowering to Rust type tokens (so `"inline"` and
     // `"attachment"` literal arms both collapse to a single `&str` overload).
     let from_module = crate::ir::ModuleContext::Global;
-    let render = |sig: &[ConcreteParam]| -> Vec<String> {
+    let render = |sig: &[ConcreteParam], scope: ScopeId| -> Vec<String> {
         sig.iter()
             .map(|p| {
                 let ty = render_param_type(p, cgctx, scope, &from_module);
@@ -358,20 +359,22 @@ pub fn expand_signatures(
     let mut seen_concrete: Vec<&Vec<ConcreteParam>> = Vec::new();
     let mut seen_rendered: Vec<Vec<String>> = Vec::new();
     let mut deduped: Vec<Vec<ConcreteParam>> = Vec::new();
+    let mut origins: Vec<usize> = Vec::new();
     // The first overload's expansions are never dropped as duplicates of a
     // later overload's, so its survivors are a contiguous prefix of `deduped`.
     let mut first_overload_len = 0;
-    for (i, sig) in all_sigs.iter().enumerate() {
+    for (i, (overload, sig)) in all_sigs.iter().enumerate() {
         if seen_concrete.iter().any(|s| concrete_params_eq(s, sig)) {
             continue;
         }
-        let rendered = render(sig);
+        let rendered = render(sig, overloads[*overload].body_scope);
         if seen_rendered.contains(&rendered) {
             continue;
         }
         seen_concrete.push(sig);
         seen_rendered.push(rendered);
         deduped.push(sig.clone());
+        origins.push(*overload);
         if i < first_overload_sigs {
             first_overload_len += 1;
         }
@@ -386,11 +389,14 @@ pub fn expand_signatures(
     // `put(key, value)`) does not displace the first overload.
     if let Some(primary) = primary_expansion(&deduped, first_overload_len) {
         deduped[..=primary].rotate_right(1);
+        origins[..=primary].rotate_right(1);
     }
     compute_suffixes(&deduped)
         .into_iter()
         .zip(deduped)
-        .map(|(name_suffix, params)| ExpandedSignature {
+        .zip(origins)
+        .map(|((name_suffix, params), overload)| ExpandedSignature {
+            overload,
             name_suffix,
             params,
         })
@@ -413,6 +419,33 @@ fn primary_expansion(sigs: &[Vec<ConcreteParam>], first_overload_len: usize) -> 
     (primary != 0).then_some(primary)
 }
 
+/// One declared signature of a callable. A function's or method's
+/// overloads are separate declarations, each with its own return type,
+/// type parameters, JSDoc and `@throws`.
+#[derive(Clone, Copy, Debug)]
+pub struct Overload<'a> {
+    pub params: &'a [Param],
+    pub return_type: &'a TypeRef,
+    /// The scope holding its `<T, ...>` bindings, which its types lower in.
+    /// For non-generic callables this is just the enclosing scope.
+    pub body_scope: ScopeId,
+    /// Failure-mode info from its `@throws` JSDoc — see [`Throws`].
+    ///
+    /// Drives three orthogonal decisions:
+    /// * `Throws::None` → catching variants use the default `JsValue`
+    ///   error type. Sync callables get a `try_<name>` companion.
+    /// * `Throws::Type(T)` → catching variants use `Result<_, T>`. Sync
+    ///   callables still get the `try_<name>` companion (with the typed
+    ///   error).
+    /// * `Throws::Never` → caller declares the callable never throws.
+    ///   Sync callables get *no* `try_` companion; async callables drop
+    ///   `catch` and return `T` directly. Constructors ignore this and
+    ///   still catch (per JS `new` semantics).
+    pub throws: &'a Throws,
+    /// Its doc comment, attached to each signature it expands to.
+    pub doc: &'a Option<String>,
+}
+
 /// Per-callable input describing a JS callable that needs to be emitted as
 /// one or more wasm-bindgen extern signatures. Pairs with [`build_signatures`].
 ///
@@ -428,29 +461,7 @@ pub struct CallableSpec<'a> {
     pub kind: SignatureKind,
     /// All overloads sharing this `js_name` — typically one element, but TS
     /// allows multiple overloaded declarations.
-    pub overloads: &'a [&'a [Param]],
-    pub return_type: &'a TypeRef,
-    /// Failure-mode info from `@throws` JSDoc — see [`Throws`].
-    ///
-    /// Drives three orthogonal decisions:
-    /// * `Throws::None` → catching variants use the default `JsValue`
-    ///   error type. Sync callables get a `try_<name>` companion.
-    /// * `Throws::Type(T)` → catching variants use `Result<_, T>`. Sync
-    ///   callables still get the `try_<name>` companion (with the typed
-    ///   error).
-    /// * `Throws::Never` → caller declares the callable never throws.
-    ///   Sync callables get *no* `try_` companion; async callables drop
-    ///   `catch` and return `T` directly. Constructors ignore this and
-    ///   still catch (per JS `new` semantics).
-    pub throws: &'a Throws,
-    /// Doc comment to attach to the primary signature only.
-    pub doc: &'a Option<String>,
-    /// Source-side body scope of the underlying method/function — the
-    /// scope chain that holds its `<T, ...>` type-parameter bindings.
-    /// Threaded onto each emitted [`FunctionSignature`] so codegen can
-    /// resolve type-parameter references during emit. For non-generic
-    /// callables this is just the enclosing scope.
-    pub body_scope: ScopeId,
+    pub overloads: &'a [Overload<'a>],
 }
 
 /// Resolve a [`CallableSpec`] into the full set of [`FunctionSignature`]s
@@ -476,40 +487,35 @@ pub fn build_signatures(
     spec: &CallableSpec<'_>,
     names: &mut LocalScope,
     cgctx: Option<&CodegenContext<'_>>,
-    scope: ScopeId,
 ) -> Vec<FunctionSignature> {
     let base = spec
         .rust_name
         .map_or_else(|| base_rust_name(spec.js_name, spec.kind), ident_chars);
-    let expansions = expand_signatures(spec.overloads, cgctx, scope);
+    let expansions = expand_signatures(spec.overloads, cgctx);
 
-    // Promise unwrap is per-callable, not per-overload — every expansion of a
-    // given JS callable shares the same return type.
-    let (is_async, return_type) = match (
-        spec.return_type.as_promise_inner(),
-        spec.kind.allows_async(),
-    ) {
-        (Some(inner), true) => (true, inner.clone()),
-        _ => (false, spec.return_type.clone()),
-    };
-
-    // `Throws::Never` suppresses every fallible form — except for
-    // constructors, which always catch (`new` can always throw in JS).
-    let nothrow = spec.throws.is_never() && !spec.kind.always_catches();
-    let error_type = spec.throws.as_type();
-
-    let augmented_doc = spec.doc.clone();
-
-    let allow_try = !is_async && !nothrow && spec.kind.allows_try_variant();
     let per_mono = CodegenContext::generic_mono(cgctx);
-    let variants_per_expansion = match (allow_try, per_mono) {
-        (true, true) => 4,
-        (true, false) | (false, true) => 2,
-        (false, false) => 1,
-    };
-    let mut out = Vec::with_capacity(expansions.len() * variants_per_expansion);
+    let mut out = Vec::with_capacity(expansions.len());
 
     for exp in expansions {
+        let overload = spec.overloads[exp.overload];
+        let scope = overload.body_scope;
+        // `Throws::Never` suppresses every fallible form — except for
+        // constructors, which always catch (`new` can always throw in JS).
+        let nothrow = overload.throws.is_never() && !spec.kind.always_catches();
+        let error_type = overload.throws.as_type();
+        let (is_async, return_type) = match (
+            overload.return_type.as_promise_inner(),
+            spec.kind.allows_async(),
+        ) {
+            (Some(inner), true) => (true, inner.clone()),
+            _ => (false, overload.return_type.clone()),
+        };
+        let allow_try = !is_async && !nothrow && spec.kind.allows_try_variant();
+        out.reserve(match (allow_try, per_mono) {
+            (true, true) => 4,
+            (true, false) | (false, true) => 2,
+            (false, false) => 1,
+        });
         let primary_candidate = public_rust_name(&format!("{base}{}", exp.name_suffix));
         let primary_name = names.declare(&primary_candidate, Suffix::Snake);
 
@@ -530,8 +536,8 @@ pub fn build_signatures(
             } else {
                 None
             },
-            doc: augmented_doc.clone(),
-            body_scope: spec.body_scope,
+            doc: overload.doc.clone(),
+            body_scope: scope,
         };
         push_with_js_string_return(&mut out, primary, names, cgctx, scope);
 
@@ -546,8 +552,8 @@ pub fn build_signatures(
                 return_type: return_type.clone(),
                 js_string_return: false,
                 error_type: error_type.cloned(),
-                doc: augmented_doc.clone(),
-                body_scope: spec.body_scope,
+                doc: overload.doc.clone(),
+                body_scope: scope,
             };
             push_with_js_string_return(&mut out, try_sig, names, cgctx, scope);
         }
@@ -1684,15 +1690,16 @@ mod tests {
                 js_name: js,
                 rust_name: None,
                 kind: SignatureKind::Function,
-                overloads: &[params],
-                return_type: ret,
-                throws: &Throws::None,
-                doc: &None,
-                body_scope: scope,
+                overloads: &[Overload {
+                    params,
+                    return_type: ret,
+                    body_scope: scope,
+                    throws: &Throws::None,
+                    doc: &None,
+                }],
             },
             used,
             Some(&cgctx),
-            scope,
         )
     }
 
@@ -1858,15 +1865,16 @@ mod tests {
                 js_name: js,
                 rust_name: None,
                 kind,
-                overloads: &[params],
-                return_type: ret,
-                throws,
-                doc,
-                body_scope: scope,
+                overloads: &[Overload {
+                    params,
+                    return_type: ret,
+                    body_scope: scope,
+                    throws,
+                    doc,
+                }],
             },
             used,
             Some(&cgctx),
-            scope,
         )
     }
 
@@ -1881,20 +1889,25 @@ mod tests {
     ) -> Vec<FunctionSignature> {
         let (gctx, scope) = test_ctx();
         let cgctx = CodegenContext::empty(&gctx, scope);
+        let overloads: Vec<Overload> = overloads
+            .iter()
+            .map(|&params| Overload {
+                params,
+                return_type: ret,
+                body_scope: scope,
+                throws: &Throws::None,
+                doc,
+            })
+            .collect();
         build_signatures(
             &CallableSpec {
                 js_name: js,
                 rust_name: None,
                 kind,
-                overloads,
-                return_type: ret,
-                throws: &Throws::None,
-                doc,
-                body_scope: scope,
+                overloads: &overloads,
             },
             used,
             Some(&cgctx),
-            scope,
         )
     }
 
@@ -2117,6 +2130,60 @@ mod tests {
         // Names should disambiguate via the standard `_with_<param>` suffix.
         assert_eq!(sigs[0].rust_name, "send");
         assert_eq!(sigs[1].rust_name, "send_with_builder");
+    }
+
+    #[test]
+    fn overloads_keep_their_own_return_type_and_scope() {
+        let (mut gctx, outer) = test_ctx();
+        let inner = gctx.create_child_scope(outer);
+        let cgctx = CodegenContext::empty(&gctx, outer);
+        let promise = TypeRef::generic("Promise", vec![TypeRef::String]);
+        let by_string = [typed_param("x", TypeRef::String)];
+        let by_number = [typed_param("x", TypeRef::Number)];
+        let sigs = build_signatures(
+            &CallableSpec {
+                js_name: "f",
+                rust_name: None,
+                kind: SignatureKind::Function,
+                overloads: &[
+                    Overload {
+                        params: &by_string,
+                        return_type: &promise,
+                        body_scope: outer,
+                        throws: &Throws::None,
+                        doc: &None,
+                    },
+                    Overload {
+                        params: &by_number,
+                        return_type: &TypeRef::Number,
+                        body_scope: inner,
+                        throws: &Throws::None,
+                        doc: &None,
+                    },
+                ],
+            },
+            &mut no_used(),
+            Some(&cgctx),
+        );
+        let summary: Vec<_> = sigs
+            .iter()
+            .map(|s| {
+                (
+                    s.rust_name.as_str(),
+                    s.is_async,
+                    &s.return_type,
+                    s.body_scope,
+                )
+            })
+            .collect();
+        assert_eq!(
+            summary,
+            [
+                ("f", true, &TypeRef::String, outer),
+                ("f_with_f64", false, &TypeRef::Number, inner),
+                ("try_f_with_f64", false, &TypeRef::Number, inner),
+            ]
+        );
     }
 
     #[test]

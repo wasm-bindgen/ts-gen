@@ -1093,9 +1093,33 @@ declare var MyClass: {
 };
 ```
 
-is recognised at parse time. The variable contributes the constructor,
-the interface contributes the methods, and the merged result emits as a
-single class. See `merge.rs` for the heuristic.
+is bound as TypeScript binds it: the interface and the variable are two
+declarations of one symbol in their container, which may be a file's
+top level, a namespace, a `declare module` body or the global scope
+across files. The interface contributes the instance members and the
+variable's type the constructor and statics, and the symbol emits as a
+single class in that container, whichever is declared first.
+
+```ts
+declare namespace R {
+  interface Q { q(): void; }
+  var Q: { prototype: Q; new (): Q };
+}
+```
+
+```rust
+pub mod r {
+    #[wasm_bindgen]
+    extern "C" {
+        #[wasm_bindgen(extends = Object, js_namespace = "R")]
+        pub type Q;
+        #[wasm_bindgen(constructor, js_namespace = "R", catch)]
+        pub fn new() -> Result<Q, JsValue>;
+        #[wasm_bindgen(method)]
+        pub fn q(this: &Q);
+    }
+}
+```
 
 The TS lib spelling, where the static side is a named interface rather
 than an inline literal, merges the same way:
@@ -1115,11 +1139,30 @@ is not emitted as a type of its own. Declaration order does not matter.
 If something else refers to `URIErrorConstructor` by name it falls back
 to `JsValue` with an unresolved-type diagnostic, like any unmapped type.
 
-As in TypeScript, only declarations in the same scope merge, and
-`URIErrorConstructor` resolves from the variable like any type
-reference. An `interface URIError` or `URIErrorConstructor` inside a
-`declare module` is a different declaration and leaves the global
-class alone.
+As TypeScript's checker types a declaration, the variable's type is
+resolved once every file is bound, from the variable's own location:
+`URIErrorConstructor` resolves from the variable's scope with every
+file's declarations of it merged, wherever it is declared. Only
+declarations in the same container merge into the class, so an
+`interface URIError` inside a `declare module` is a different
+declaration and leaves the global class alone, and a constructor
+interface declared outside a namespace still gives the namespace's
+class its constructor and statics:
+
+```ts
+interface FooCtor { new (): N.Foo; readonly prototype: N.Foo; create(): N.Foo; }
+declare namespace N {
+  interface Foo { go(): void; }
+  var Foo: FooCtor;
+}
+```
+
+emits `n::Foo` with `new`, `create` and `go`, binding through
+`js_namespace = "N"`. A module's constructor variable with no interface
+of its own is a class of its own (see below), taking its constructor
+and statics the same way. A global or namespace variable with no
+interface of its name is a value of the constructor interface's type,
+which stays an interface.
 
 A construct signature on any other object type (`interface Factory {
 new (): Widget }`, or an inline `{ new (): T }` parameter type) is the
@@ -1231,6 +1274,28 @@ function log(...args: any[]): void;
 Conceptually all four describe the same thing: a JS callable whose
 caller has more than one valid argument shape.
 
+A function's declarations are its overloads wherever they merge:
+within a file, within a namespace, and across input files. Each
+overload of a function or method is a separate declaration, as in
+TypeScript, so each expansion keeps its own overload's return type,
+type parameters, JSDoc and `@throws`.
+
+```ts
+// a.d.ts
+declare function parse(input: string): object;
+declare function parse(input: ArrayBuffer): object;
+// b.d.ts
+declare function parse(input: string, reviver: Function): object;
+```
+
+```rust
+pub fn parse(input: &str) -> Object;
+#[wasm_bindgen(js_name = "parse")]
+pub fn parse_with_array_buffer(input: &ArrayBuffer) -> Object;
+#[wasm_bindgen(js_name = "parse")]
+pub fn parse_with_str_and_reviver(input: &str, reviver: &Function) -> Object;
+```
+
 ### The pipeline
 
 For every JS callable, `ts-gen`:
@@ -1320,10 +1385,10 @@ Phase 3 assigns suffixes:
 
 ```rust
 pub fn show();
-pub fn show_with_value(value: &str);
-pub fn show_with_value_and_opts(value: &str, opts: &ShowOpts);
-pub fn show_with_value_a(value: f64);
-pub fn show_with_value_a_and_opts(value: f64, opts: &ShowOpts);
+pub fn show_with_str(value: &str);
+pub fn show_with_f64(value: f64);
+pub fn show_with_str_and_opts(value: &str, opts: &ShowOpts);
+pub fn show_with_f64_and_opts(value: f64, opts: &ShowOpts);
 ```
 
 `compute_rust_names` in `codegen::signatures` handles the suffix
@@ -2083,6 +2148,15 @@ declarations whose `module_context` is `Module("<spec>")`. They are
 whether they are **emitted** is governed by `--export` and
 `--external`.
 
+As in TypeScript, an ambient module is one symbol: the blocks of one
+specifier, in one file or across input files, share one scope, and
+their declarations merge as globals do. An interface declared in two
+files' `declare module "x"` blocks is one type with the members of
+both, a function's declarations are its overloads, and a namespace's
+members are one module. A block with an export declaration
+(`export { … }`, `export =`) has locals: its other declarations are its
+own and merge with no other block's.
+
 An input describes an environment: its globals and the host modules
 it can import. The output mirrors it, with the globals at the top
 level and each emitted module in its own `pub mod`, one segment per
@@ -2118,9 +2192,11 @@ A module-context declaration has exactly three possible states:
    plus a bare-ident use site).
 
 3. **Resolution-only** — `<spec>` is in the type universe but listed
-   in neither `--export` nor `--external`. The declaration is not
-   emitted. Any cross-reference from an emitted decl produces a
-   codegen **error**:
+   in neither `--export` nor `--external`. Its exports are not emitted,
+   but a type an emitted signature reaches through an import is, as a
+   type only (see [Global scope](#global-scope)). A reference to a
+   module's declaration that is not in scope at the use site, which
+   codegen finds by name, produces a codegen **error**:
 
    ```text
    error: type `Bar` from module "x:foo" is referenced by exported
@@ -2138,7 +2214,7 @@ externalised, not emitted.
 
 For `Global` declarations (top-level `declare class`, `declare
 function`, `declare const`, etc. in a script file) the rule is simpler:
-emit when the decl's source file is in `--export`, otherwise skip.
+a file's globals are emitted when the file is in `--export`.
 
 A file with any top-level `import` or `export` is a module, and with
 `--lib-name` every top-level declaration in it is `Module("<lib>")`,
@@ -2166,8 +2242,15 @@ Imports look up public names and bind the local: `export { _Foo as
 Foo }` makes `import { Foo }`, `D.Foo` and `extends Foo` all reach
 `_Foo`, and the Rust reference is `_Foo`.
 
-Unexported functions, variables and namespaces are not emitted; an
-unexported class keeps only its instance members. Types are unaffected.
+The output is built from export maps: each export of a selected file or
+module is emitted under its public name, a function or variable once
+per name and a type under its local name with an alias per public name
+(see [Type aliases and `export { X as Y }`](#type-aliases-and-export--x-as-y-)).
+A default export takes its local's Rust name, or `default` when a named
+export of the same declaration has it: `export { f, f as default }`
+binds `f()` and `default()`. An `export default` declaration's local
+name is not exported, also in a block without `export { … }`, so
+`export default function f()` binds only `default`, as `f()`.
 
 Qualification keys off the *resolved* declaration's `module_context`,
 not the textual name, so a global `interface Foo` and a module-scoped
@@ -2179,14 +2262,59 @@ are not visible to the file or to other modules, and repeated
 file or module reaches them with `import { Foo } from "<spec>"`, which
 resolves against the module's scopes before looking for a file.
 
+### Global scope
+
+As in TypeScript, there is one global scope. A script file's top-level
+declarations and every `declare global` block declare into it, after the
+built-in types, so declarations of a name in different files merge into
+one, as they do within a file:
+
+```ts
+// a.d.ts
+interface Win { a(): void; }
+// b.d.ts
+interface Win { b(): void; }
+```
+
+```rust
+pub type Win;
+pub fn a(this: &Win);
+pub fn b(this: &Win);
+```
+
+That includes the split TypeScript's own libs use, an interface in one
+file and its constructor `var` in another (`declare var X: { new(): X;
+… }` or `declare var X: XConstructor`): in either order they are one
+class, as within a file. Every file's `interface XConstructor` blocks
+are the static side of that class and are not emitted as a type, so
+`from` and `of`, which lib.es2015.core adds to `ArrayConstructor`, are
+statics of `Array`. Of the construct signatures, the last file's wins,
+as a later block's does within a file. A value never takes a type's
+name, so `interface F` and `declare function F(): F` in different files
+keep `F` the interface.
+
+A file without `--lib-name` is read as a script, its globals are its
+exports, and selecting it emits each of them whole, members from other
+files included. Without `--export`, every input file is selected.
+
+What a selected export's signatures reach and no selected export
+provides is emitted as a type only: an interface, alias or enum as is,
+a class without its constructor and statics, and a namespace only as
+the `pub mod` path to what is emitted. A function or variable is
+emitted only as an export. With `--export b.d.ts`, a function in
+`b.d.ts` taking `OnlyA` from `a.d.ts` emits `OnlyA` but not `a.d.ts`'s
+functions. A type that no selected export provides and no emitted
+signature reaches is not emitted, so an interface a module with `export
+{ … }` doesn't export and none of its exports use is left out.
+
 ### Output surface: `--export` and `--input`
 
 `--input` defines the *type universe* — every file gets parsed so
 resolution sees the full set. `--export` defines the *output surface* —
 what actually gets emitted as public Rust code. Two forms:
 
-* **File path** (e.g. `--export types/email.d.ts`) — emit that file's
-  **global-scope** declarations.
+* **File path** (e.g. `--export types/email.d.ts`) — emit the globals
+  that file declares.
 * **Module specifier** (e.g. `--export cloudflare:email`) — emit that
   module's declarations in its `pub mod`, attribute-attached.
 
@@ -2410,8 +2538,9 @@ that declaration as the type `Foo`, while `Foo.Options` resolves
 through the namespace, in either declaration order.
 
 In a module, the namespace's members bind through the name the module
-exports it under. That differs from the local name for a value merged
-with the namespace and exported renamed or as the default:
+exports it under, which also names its Rust module. That differs from the
+local name for a value merged with the namespace and exported renamed or
+as the default:
 
 ```ts
 declare module "m" {
@@ -2425,7 +2554,7 @@ declare module "m" {
 pub mod m {
     // …
     pub fn create();
-    pub mod make {
+    pub mod create {
         #[wasm_bindgen(module = "m")]
         extern "C" {
             #[wasm_bindgen(js_namespace = "create")]
@@ -2435,8 +2564,9 @@ pub mod m {
 }
 ```
 
-With `export default make`, the members take `js_namespace = "default"`.
-A namespace exported under its own name as well keeps it.
+With `export default make`, the members take `js_namespace = "default"`
+and the module keeps the local name, as `default` is no name of its own. A
+namespace exported under its own name as well keeps it.
 
 ## Type aliases and `export { X as Y }`
 
@@ -2500,32 +2630,48 @@ A namespace exported under its own name as well keeps it.
   pub type Fetcher<T = Undefined> = Pair<T, T>;
   pub fn defaults(a: &WithDefault<Number>, b: &Chained<Number>, c: &Pair<Undefined, Undefined>);
   ```
-* `export { Local as Public };` (sourceless) → names the binding `Local`
-  declares in the exporting scope, recorded against its `TypeId` in
-  `TypeRegistry::export_names`. Each `declare module "x"` body is its own
-  scope, so the same local name in another module or at global scope is a
-  different binding and keeps its own name. The public names are what the
-  module exports, so value bindings import by them:
+* `export { Local as Public };` (sourceless) → exports what the binding
+  `Local` declares in the exporting block under the public name, as an
+  entry in its [export map](#the-export-map). A declaration of the block
+  named `Public` is a different binding and is not that export. The
+  public names are what the module exports, so value bindings import by
+  them. The first public name is the declaration's JS name, unless it is
+  also exported under its own name; `default` comes last:
   * Functions and variables are emitted once per public name, with no
-    alias stub: `function _connect(...); export { _connect as connect };`
+    alias: `function _connect(...); export { _connect as connect };`
     emits `pub fn connect(...)` bound to the JS export `connect`.
   * A constructor variable on its own is a value nothing refers to by its
-    local name, so its class takes the first public name; any further
-    names alias it.
+    local name, so its class takes the JS name as its Rust name; any
+    further names alias it.
   * A class keeps its local name as the Rust type, since the module refers
-    to it by that name, but binds `js_name` to the first public name, and
-    its constructors and static members carry `js_class` with the same
-    name. Each public name gets an alias stub (`pub type Server = _Server;`).
+    to it by that name, but binds `js_name` to the JS name, and its
+    constructors and static members carry `js_class` with the same name.
+    Each other public name gets an alias (`pub type Server = _Server;`).
     A constructor variable with an instance interface of the same name
     (`interface _Foo {…}; var _Foo: { new(): _Foo }`, or `var _Foo:
     _FooConstructor`) is a class in this sense: the interface's members
     refer to `_Foo`, so the merged class is `_Foo` with `js_name = "Foo"`
     and `pub type Foo = _Foo;`.
   * Types without a runtime binding (interfaces, type aliases, enums) get
-    an alias stub only.
+    an alias only.
+  * A namespace's Rust module is named by its JS name, so a local name
+    the module does not export does not appear: `namespace N {…}; export
+    { N as M }` emits `pub mod m`, and `function make(); namespace make
+    {…}; export { make as create }` emits `create()` and `pub mod create`.
+    Its members bind with `js_namespace` set to the JS name. Each other
+    public name is a module re-exporting it (`pub mod m2 { pub use
+    super::m::*; }`), since `pub use m as m2;` would also import a
+    function `m` as `m2`. The names come from the namespace's own
+    container, so a module that is only reached, not exported, names it
+    the same way. TypeScript keeps a module's exports and locals apart
+    but Rust has one namespace, so a namespace the module doesn't export
+    by name (a local, or the default export) takes a suffix where an
+    exported one has its name: with a local `namespace M` beside
+    `export { N as M }`, `N` is `pub mod m` and the local `M` is
+    `pub mod m_2`.
 
-  A `Local` declared outside the exporting scope is left alone and only
-  aliased.
+  A `Local` declared outside the exporting block (an import) is left alone
+  and only aliased.
 * `export { X as Y } from "...";` (with source) → registered as an import
   from the named module.
 * `export default class C`, `export default function f` and `export
@@ -2534,9 +2680,11 @@ A namespace exported under its own name as well keeps it.
   so the Rust name stays the local one, as for the binding an `export =`
   assigns: the class gets `js_name = "default"` and its constructor and
   statics `js_class = "default"`, and the function or static gets
-  `js_name = "default"`. `export default x` of a namespace without a merged
-  class, function or variable, or of a name the module doesn't declare,
-  is skipped with a diagnostic. Outside a module there is no export to
+  `js_name = "default"`. As in TypeScript, `export default x` exports every
+  meaning of `x`, so a namespace alone is the default too and its members
+  bind through `js_namespace = "default"` in a `pub mod` of its local name.
+  `export default x` of a name the module doesn't declare is skipped with
+  a diagnostic. Outside a module there is no export to
   bind: `export default class C` and `function f` are emitted as plain
   globals, and `export default x` is skipped.
 

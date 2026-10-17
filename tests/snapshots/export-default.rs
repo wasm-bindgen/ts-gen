@@ -85,7 +85,7 @@ pub mod export_default {
             #[wasm_bindgen(catch, js_name = "create")]
             pub fn try_create() -> Result<String, JsValue>;
         }
-        pub mod make {
+        pub mod create {
             #[allow(unused_imports)]
             use super::*;
             #[wasm_bindgen(module = "export-default/renamed")]
@@ -97,6 +97,24 @@ pub mod export_default {
             extern "C" {
                 #[wasm_bindgen(catch, js_name = "helper", js_namespace = "create")]
                 pub fn try_helper() -> Result<String, JsValue>;
+            }
+        }
+    }
+    pub mod namespace {
+        #[allow(unused_imports)]
+        use super::*;
+        pub mod n {
+            #[allow(unused_imports)]
+            use super::*;
+            #[wasm_bindgen(module = "export-default/namespace")]
+            extern "C" {
+                #[wasm_bindgen(js_namespace = "default")]
+                pub fn f() -> String;
+            }
+            #[wasm_bindgen(module = "export-default/namespace")]
+            extern "C" {
+                #[wasm_bindgen(catch, js_name = "f", js_namespace = "default")]
+                pub fn try_f() -> Result<String, JsValue>;
             }
         }
     }

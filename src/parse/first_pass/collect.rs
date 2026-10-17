@@ -21,13 +21,16 @@ struct CollectCtx<'a> {
     gctx: &'a mut crate::context::GlobalContext,
     diag: &'a mut DiagnosticCollector,
     file_scope: ScopeId,
-    /// Whether the file is a script, whose top-level declarations are
-    /// globals visible to later files.
+    /// Whether the file is read as a script, whose top-level declarations
+    /// are globals visible to later files.
     is_script: bool,
-    /// `(scope, local, public)` for each source-less export specifier.
-    /// Resolved once the whole file is collected, since a specifier may
-    /// precede the declaration it names.
-    export_specifiers: Vec<(ScopeId, String, String)>,
+    /// Key of the export map listing the globals this file declares: the
+    /// file scope for a file read as a script, else a scope of its own,
+    /// created at the first `declare global`.
+    globals: Option<ScopeId>,
+    /// Arena length before this file: a lower id is an earlier file's
+    /// declaration.
+    file_start: usize,
     /// `(module scope, specifier, name)` for each `export = name` that
     /// doesn't name a namespace of the module's own. Resolved through the
     /// scope chain once the whole file is collected, since the namespace
@@ -45,6 +48,10 @@ struct CollectCtx<'a> {
     /// collected so `Y` can be checked against `constructor_shaped`
     /// regardless of declaration order.
     named_ctor_vars: Vec<(String, String, ir::ModuleContext, ScopeId, bool)>,
+    /// Specifiers of the `declare module` blocks with an export declaration
+    /// (`export { … }`, `export =`, …), whose other declarations are locals
+    /// of the block rather than exports of the module.
+    local_modules: std::collections::HashSet<String>,
 }
 
 /// Walk the AST and collect all type names into the registry and scope arena.
@@ -56,26 +63,48 @@ pub fn collect_type_names(
     root_scope: ScopeId,
 ) -> ir::TypeRegistry {
     let mut registry = ir::TypeRegistry::default();
+    let file_ctx = super::file_context(program, lib_name);
+    let is_global = !matches!(file_ctx, ir::ModuleContext::Module(_));
+    let file_start = gctx.type_arena().len();
     let mut ccx = CollectCtx {
         lib_name,
         registry: &mut registry,
         gctx,
         diag,
         file_scope: root_scope,
-        is_script: !super::is_module(program),
-        export_specifiers: Vec::new(),
+        is_script: is_global,
+        globals: is_global.then_some(root_scope),
+        file_start,
         outer_assignments: Vec::new(),
         default_identifiers: Vec::new(),
         constructor_shaped: Default::default(),
         ctor_vars: Default::default(),
         named_ctor_vars: Vec::new(),
+        local_modules: program
+            .body
+            .iter()
+            .filter_map(|stmt| match stmt {
+                ast::Statement::TSExternalModuleDeclaration(module) => Some(module),
+                _ => None,
+            })
+            .filter(|module| {
+                module
+                    .body
+                    .as_ref()
+                    .is_some_and(|block| super::block_exports_explicitly(&block.body))
+            })
+            .map(|module| module.id.value.to_string())
+            .collect(),
     };
 
-    let file_ctx = super::file_context(program, lib_name);
     ccx.collect_block(&program.body, &file_ctx, root_scope, false);
-    if !matches!(file_ctx, ir::ModuleContext::Module(_)) {
-        // A script file's globals are not a module's exports.
-        ccx.gctx.exports.clear(root_scope);
+    if is_global {
+        // A file read as a script exports every global it declares, and
+        // a global has no default export.
+        for name in super::block_declared_names(&program.body) {
+            ccx.gctx.exports.insert(root_scope, &name, &name);
+        }
+        ccx.gctx.exports.remove(root_scope, "default");
     }
 
     for (name, iface, ctx, scope, exported) in std::mem::take(&mut ccx.named_ctor_vars) {
@@ -86,48 +115,27 @@ pub fn collect_type_names(
         ccx.assign_namespace(scope, &specifier, &name);
     }
 
-    // A namespace's members would bind through a named export the module
-    // doesn't have, so a name with a namespace is the default only when a
-    // merged class, function or variable carries the value.
+    // As in TypeScript, `export default x` exports every meaning of `x`, so
+    // a namespace alone is the default too, its members bound through it.
     for (scope, name) in std::mem::take(&mut ccx.default_identifiers) {
         let s = ccx.gctx.scopes.get(scope);
-        let has_namespace = s.namespace(&name).is_some();
-        let bound = s
-            .get(&name)
-            .is_some_and(|id| match ccx.gctx.get_type(id).kind {
-                ir::TypeKind::Namespace(_) => false,
-                // An interface merged with a constructor-shaped `var` is a
-                // class, whose binding is still the interface placeholder.
-                ir::TypeKind::Interface(_) => {
-                    !has_namespace
-                        || ccx.registry.kind(scope, &name)
-                            == Some(&ir::RegisteredKind::MergedClassLike)
-                }
-                // A TS `enum` binds no JS value of its own in Rust.
-                ir::TypeKind::TypeAlias(_)
-                | ir::TypeKind::StringEnum(_)
-                | ir::TypeKind::NumericEnum(_)
-                | ir::TypeKind::TsEnum(_) => !has_namespace,
-                _ => true,
-            });
+        let bound = s.namespace(&name).is_some() || s.get(&name).is_some();
         if bound {
             ccx.export_default(scope, &name);
+        } else {
+            skip_default_identifier(ccx.diag, &name);
         }
     }
 
-    for (scope, local, public) in std::mem::take(&mut ccx.export_specifiers) {
-        // Only a binding declared directly in the exporting scope takes the
-        // public name; an outer one is re-exported through an alias stub.
-        if let Some(type_id) = ccx.gctx.scopes.get(scope).get(&local) {
-            ccx.registry
-                .export_names
-                .entry(type_id)
-                .or_default()
-                .push(public);
-        }
-    }
-
+    registry.globals = ccx.globals;
     registry
+}
+
+fn skip_default_identifier(diag: &mut DiagnosticCollector, name: &str) {
+    diag.info(format!(
+        "Skipping `export default {name}` (only a name declared in the same module is \
+         supported)"
+    ));
 }
 
 impl<'a> CollectCtx<'a> {
@@ -177,9 +185,7 @@ impl<'a> CollectCtx<'a> {
                 self.register_type(&name, ir::RegisteredKind::TsEnum, ctx, scope, exported);
             }
             ast::Statement::TSGlobalDeclaration(global) => {
-                for s in &global.body.body {
-                    self.collect_statement(s, &ir::ModuleContext::Global, self.file_scope, true);
-                }
+                self.collect_global(&global.body.body);
             }
 
             // ModuleDeclaration variants
@@ -211,9 +217,6 @@ impl<'a> CollectCtx<'a> {
                     let exported_name = spec.exported.name().to_string();
                     let local = spec.local.name().to_string();
                     self.gctx.exports.insert(scope, &exported_name, &local);
-                    if exported_name != local {
-                        self.export_specifiers.push((scope, local, exported_name));
-                    }
                 }
             }
             // `export default class Def` exports `default` only; `Def` is a
@@ -247,6 +250,8 @@ impl<'a> CollectCtx<'a> {
                     if matches!(ctx, ir::ModuleContext::Module(_)) {
                         self.default_identifiers
                             .push((scope, ident.name.to_string()));
+                    } else {
+                        skip_default_identifier(self.diag, &ident.name);
                     }
                 }
                 other => {
@@ -360,11 +365,25 @@ impl<'a> CollectCtx<'a> {
                 self.register_type(&name, ir::RegisteredKind::TsEnum, ctx, scope, exported);
             }
             ast::Declaration::TSGlobalDeclaration(global) => {
-                for s in &global.body.body {
-                    self.collect_statement(s, &ir::ModuleContext::Global, self.file_scope, true);
-                }
+                self.collect_global(&global.body.body);
             }
             ast::Declaration::TSImportEqualsDeclaration(_) => {}
+        }
+    }
+
+    /// A `declare global` block binds into the file scope, from which
+    /// population hoists it to the global scope, and adds its names to the
+    /// file's globals.
+    fn collect_global(&mut self, stmts: &[ast::Statement<'_>]) {
+        for s in stmts {
+            self.collect_statement(s, &ir::ModuleContext::Global, self.file_scope, false);
+        }
+        let file_scope = self.file_scope;
+        let globals = *self
+            .globals
+            .get_or_insert_with(|| self.gctx.scopes.create_child(file_scope));
+        for name in super::block_declared_names(stmts) {
+            self.gctx.exports.insert(globals, &name, &name);
         }
     }
 
@@ -503,13 +522,14 @@ impl<'a> CollectCtx<'a> {
         }
     }
 
-    /// `declare var X: XConstructor` merges like the inline literal form
-    /// when `XConstructor` has constructor shape and there is an instance
-    /// interface `X` to carry the members (or the var is module-scoped,
-    /// where the class may be constructor-only). Otherwise it is a plain
-    /// variable of that type; a same-named namespace or interface
-    /// collected meanwhile keeps the name, as it would have by
-    /// overwriting the var in source order.
+    /// `declare var X: XConstructor` next to an interface `X` registers `X`
+    /// as a class when this file's `XConstructor` has constructor shape.
+    /// That is only the name's phase 1 kind: the var is bound as a value,
+    /// and the static side its type gives is resolved once every file is
+    /// inserted (see `bind_constructor_vars`). Otherwise it is a plain
+    /// variable; a same-named namespace or interface collected meanwhile
+    /// keeps the name, as it would have by overwriting the var in source
+    /// order.
     fn resolve_named_ctor_var(
         &mut self,
         name: &str,
@@ -520,28 +540,15 @@ impl<'a> CollectCtx<'a> {
     ) {
         // `XConstructor` resolves from the var like any type reference.
         let ctor_scope = self
-            .gctx
-            .scopes
             .declaring_scope(scope, iface)
             .filter(|&s| self.constructor_shaped.contains(&(s, iface.to_string())));
-        if let Some(ctor_scope) = ctor_scope.filter(|_| iface != name) {
-            let ctor = (ctor_scope, iface.to_string());
+        if ctor_scope.is_some() && iface != name {
             if let Some(kind) = self
                 .registry
                 .kind_mut(scope, name)
                 .filter(|kind| **kind == ir::RegisteredKind::Interface)
             {
                 *kind = ir::RegisteredKind::MergedClassLike;
-                self.registry
-                    .ctor_interfaces
-                    .insert((scope, name.to_string()), ctor);
-                return;
-            }
-            if matches!(ctx, ir::ModuleContext::Module(_)) {
-                self.registry
-                    .ctor_interfaces
-                    .insert((scope, name.to_string()), ctor);
-                self.register_type(name, ir::RegisteredKind::Variable, ctx, scope, exported);
                 return;
             }
         }
@@ -557,11 +564,31 @@ impl<'a> CollectCtx<'a> {
     ) {
         let specifier = module.id.value.as_str();
         let module_ctx = ir::ModuleContext::Module(specifier.into());
-        let module_scope = *self
-            .registry
-            .module_scopes
-            .entry(specifier.to_string())
-            .or_insert_with(|| self.gctx.scopes.create_child(scope));
+        // As in TypeScript, an ambient module's exports merge across files,
+        // so a script's blocks whose declarations are all exports share one
+        // scope, under the globals they resolve against. A block with locals
+        // and a module augmentation, which sees its file's imports, keep
+        // their own.
+        let shared = (self.is_script && !self.local_modules.contains(specifier))
+            .then(|| self.gctx.scopes.get(scope).parent)
+            .flatten();
+        let module_scope = match self.registry.module_scopes.get(specifier) {
+            Some(&module_scope) => module_scope,
+            None => {
+                let module_scope = match shared {
+                    Some(global) => *self
+                        .gctx
+                        .ambient_modules
+                        .entry(specifier.to_string())
+                        .or_insert_with(|| self.gctx.scopes.create_child(global)),
+                    None => self.gctx.scopes.create_child(scope),
+                };
+                self.registry
+                    .module_scopes
+                    .insert(specifier.to_string(), module_scope);
+                module_scope
+            }
+        };
         if let Some(block) = &module.body {
             self.collect_block(&block.body, &module_ctx, module_scope, false);
         }
@@ -581,7 +608,7 @@ impl<'a> CollectCtx<'a> {
             self.collect_statement(stmt, ctx, scope, exported);
         }
         if !super::block_exports_explicitly(stmts) {
-            for name in super::block_declared_names(stmts) {
+            for name in super::block_implicit_exports(stmts) {
                 self.gctx.exports.insert(scope, &name, &name);
             }
         }
@@ -616,6 +643,28 @@ impl<'a> CollectCtx<'a> {
     /// Phase 2 populates one file at a time, so only a namespace this file
     /// declares first can be: an earlier file's is already populated as a
     /// global.
+    /// The scope enclosing `scope` in this file. A `declare module` block is
+    /// in its file, though a script's shares its scope with other files'.
+    fn lexical_parent(&self, scope: ScopeId) -> Option<ScopeId> {
+        if self.registry.module_scopes.values().any(|&s| s == scope) {
+            Some(self.file_scope)
+        } else {
+            self.gctx.scopes.get(scope).parent
+        }
+    }
+
+    /// The scope `name` is declared in, seen from `scope` in this file.
+    fn declaring_scope(&self, scope: ScopeId, name: &str) -> Option<ScopeId> {
+        let mut at = Some(scope);
+        while let Some(id) = at {
+            if self.gctx.scopes.get(id).get(name).is_some() {
+                return Some(id);
+            }
+            at = self.lexical_parent(id);
+        }
+        None
+    }
+
     fn assign_namespace(&mut self, scope: ScopeId, specifier: &str, name: &str) {
         let mut at = Some(scope);
         let (found_in, ns_scope) = loop {
@@ -640,7 +689,7 @@ impl<'a> CollectCtx<'a> {
             if binding.is_some() {
                 return;
             }
-            at = s.parent;
+            at = self.lexical_parent(id);
         };
         if let Some(other) = self.gctx.assigned_namespaces.get(&ns_scope) {
             self.diag.warn(format!(
@@ -689,8 +738,6 @@ impl<'a> CollectCtx<'a> {
     /// Record `local` as `scope`'s default export, binding by `default`.
     fn export_default(&mut self, scope: ScopeId, local: &str) {
         self.gctx.exports.insert(scope, "default", local);
-        self.export_specifiers
-            .push((scope, local.to_string(), "default".to_string()));
     }
 
     fn collect_namespace_names(
@@ -702,21 +749,25 @@ impl<'a> CollectCtx<'a> {
     ) {
         let name = ns.id.name.to_string();
         // A namespace inside a module is emitted flat into the module,
-        // but still gets its own scope so `NS.Member` resolves.
+        // but still gets its own scope so `NS.Member` resolves. A global
+        // namespace another file declared already takes this file's
+        // members into its scope, as the two merge.
+        let global = (scope == self.file_scope && *parent_ctx == ir::ModuleContext::Global)
+            .then(|| self.gctx.scopes.get(scope).parent)
+            .flatten()
+            .and_then(|global| self.gctx.scopes.get(global).namespace(&name));
         let ns_scope = match self.gctx.scopes.get(scope).namespace(&name) {
             Some(ns_scope) => ns_scope,
             None => {
-                let ns_scope = self.create_namespace_scope(&name, parent_ctx, scope, exported);
+                let ns_scope =
+                    self.create_namespace_scope(&name, parent_ctx, scope, exported, global);
                 // Reopening a global namespace an earlier file assigned to
                 // a module, whose declarations are the module's too.
-                if scope == self.file_scope && matches!(parent_ctx, ir::ModuleContext::Global) {
-                    let assigned = self
-                        .earlier_global_namespace(&name)
-                        .and_then(|earlier| self.gctx.assigned_namespaces.get(&earlier))
-                        .cloned();
-                    if let Some(specifier) = assigned {
-                        self.assign_global_namespace(&name, ns_scope, specifier);
-                    }
+                let assigned = global
+                    .and_then(|earlier| self.gctx.assigned_namespaces.get(&earlier))
+                    .cloned();
+                if let Some(specifier) = assigned {
+                    self.assign_global_namespace(&name, ns_scope, specifier);
                 }
                 ns_scope
             }
@@ -734,7 +785,24 @@ impl<'a> CollectCtx<'a> {
         scope: ScopeId,
         exported: bool,
     ) {
-        super::register_type(name, kind, ctx, self.registry, self.gctx, scope, exported);
+        // An earlier file's declaration in a shared namespace scope stays
+        // bound, so this file's declaration of the name merges into it.
+        let earlier = self
+            .gctx
+            .scopes
+            .get(scope)
+            .get(name)
+            .is_some_and(|id| id.index() < self.file_start);
+        super::register_type(
+            name,
+            kind,
+            ctx,
+            self.registry,
+            self.gctx,
+            scope,
+            exported,
+            !earlier,
+        );
     }
 
     fn register_import(
@@ -747,15 +815,17 @@ impl<'a> CollectCtx<'a> {
         super::register_import(local_name, original_name, from_module, self.gctx, scope);
     }
 
-    /// Create a new namespace child scope and register it.
+    /// Register a namespace in `scope`, with a new member scope unless it
+    /// merges into the existing `members`.
     fn create_namespace_scope(
         &mut self,
         name: &str,
         ctx: &ir::ModuleContext,
         scope: ScopeId,
         exported: bool,
+        members: Option<ScopeId>,
     ) -> ScopeId {
-        let ns_scope = self.gctx.scopes.create_child(scope);
+        let ns_scope = members.unwrap_or_else(|| self.gctx.scopes.create_child(scope));
         self.gctx
             .scopes
             .insert_namespace(scope, name.to_string(), ns_scope);
@@ -775,7 +845,6 @@ impl<'a> CollectCtx<'a> {
             module_context: ctx.clone(),
             doc: None,
             scope_id: scope,
-            exported,
         });
         self.gctx.scopes.insert(scope, name.to_string(), ns_type_id);
         self.registry.types.insert(
