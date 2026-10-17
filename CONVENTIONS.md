@@ -3223,9 +3223,9 @@ property read, so `constants.O_RDONLY` reads `O_RDONLY` from the
 member is reached this way; a class's constructor and statics go
 through the class's export, and its instance members through the
 receiver as for a global class. Types (interfaces, aliases) are not
-values and import nothing. An export is a reference, so a scalar-typed
-`const` or `let` that is itself an export is an error; one inside an
-exported namespace is a property read and is fine.
+values and import nothing. A scalar `const` or `let` that is itself an
+export takes its scalar type, as any other value does: `export const
+count: number` is `(func (result f64))`.
 
 ### Provided functions in the ABI
 
