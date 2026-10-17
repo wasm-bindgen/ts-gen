@@ -1093,9 +1093,33 @@ declare var MyClass: {
 };
 ```
 
-is recognised at parse time. The variable contributes the constructor,
-the interface contributes the methods, and the merged result emits as a
-single class. See `merge.rs` for the heuristic.
+is bound as TypeScript binds it: the interface and the variable are two
+declarations of one symbol in their container, which may be a file's
+top level, a namespace, a `declare module` body or the global scope
+across files. The interface contributes the instance members and the
+variable's type the constructor and statics, and the symbol emits as a
+single class in that container, whichever is declared first.
+
+```ts
+declare namespace R {
+  interface Q { q(): void; }
+  var Q: { prototype: Q; new (): Q };
+}
+```
+
+```rust
+pub mod r {
+    #[wasm_bindgen]
+    extern "C" {
+        #[wasm_bindgen(extends = Object, js_namespace = "R")]
+        pub type Q;
+        #[wasm_bindgen(constructor, js_namespace = "R", catch)]
+        pub fn new() -> Result<Q, JsValue>;
+        #[wasm_bindgen(method)]
+        pub fn q(this: &Q);
+    }
+}
+```
 
 The TS lib spelling, where the static side is a named interface rather
 than an inline literal, merges the same way:
@@ -1115,11 +1139,30 @@ is not emitted as a type of its own. Declaration order does not matter.
 If something else refers to `URIErrorConstructor` by name it falls back
 to `JsValue` with an unresolved-type diagnostic, like any unmapped type.
 
-As in TypeScript, only declarations in the same scope merge, and
-`URIErrorConstructor` resolves from the variable like any type
-reference. An `interface URIError` or `URIErrorConstructor` inside a
-`declare module` is a different declaration and leaves the global
-class alone.
+As TypeScript's checker types a declaration, the variable's type is
+resolved once every file is bound, from the variable's own location:
+`URIErrorConstructor` resolves from the variable's scope with every
+file's declarations of it merged, wherever it is declared. Only
+declarations in the same container merge into the class, so an
+`interface URIError` inside a `declare module` is a different
+declaration and leaves the global class alone, and a constructor
+interface declared outside a namespace still gives the namespace's
+class its constructor and statics:
+
+```ts
+interface FooCtor { new (): N.Foo; readonly prototype: N.Foo; create(): N.Foo; }
+declare namespace N {
+  interface Foo { go(): void; }
+  var Foo: FooCtor;
+}
+```
+
+emits `n::Foo` with `new`, `create` and `go`, binding through
+`js_namespace = "N"`. A module's constructor variable with no interface
+of its own is a class of its own (see below), taking its constructor
+and statics the same way. A global or namespace variable with no
+interface of its name is a value of the constructor interface's type,
+which stays an interface.
 
 A construct signature on any other object type (`interface Factory {
 new (): Widget }`, or an inline `{ new (): T }` parameter type) is the

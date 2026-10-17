@@ -57,17 +57,12 @@ struct PopulateCtx<'a, 'docs> {
     /// The classes of constructor-shaped `var`s with no instance interface,
     /// by scope and name.
     constructor_classes: Vec<(ScopeId, String)>,
-    ctor_interfaces: CtorInterfaces,
 }
 
 /// The static side of each global constructor-shaped `var` with no
 /// instance interface in its file, as a class, by the var's scope and name.
 /// Another file may declare the interface, which then merges with it.
 pub type StaticSides = std::collections::HashMap<(ScopeId, String), ir::TypeDeclaration>;
-
-/// The interface each static side of a `var X: XConstructor` comes from, by
-/// the var's scope and name.
-pub type CtorInterfaces = std::collections::HashMap<(ScopeId, String), String>;
 
 /// Populated members of each global namespace, keyed by its member scope.
 /// They are inserted into the type arena after population, when the
@@ -140,7 +135,6 @@ pub fn populate_declarations<'a, 'docs>(
         global_scope: !matches!(file_ctx, ir::ModuleContext::Module(_)),
         static_sides: StaticSides::new(),
         constructor_classes: Vec::new(),
-        ctor_interfaces: CtorInterfaces::new(),
     };
 
     if let ir::ModuleContext::Module(_) = file_ctx {
@@ -155,7 +149,6 @@ pub fn populate_declarations<'a, 'docs>(
         namespace_members: pcx.namespace_members,
         static_sides: pcx.static_sides,
         constructor_classes: pcx.constructor_classes,
-        ctor_interfaces: pcx.ctor_interfaces,
     }
 }
 
@@ -168,7 +161,6 @@ pub struct Populated {
     /// by scope and name: a value nothing refers to by its local name, so
     /// such a class takes the name its module exports it under.
     pub constructor_classes: Vec<(ScopeId, String)>,
-    pub ctor_interfaces: CtorInterfaces,
 }
 
 /// The binding a module body's `export = <name>` assigns.
@@ -478,51 +470,9 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         let doc = self.lookup_doc(dcx.export_span_start, iface.span.start);
         let module_context = dcx.module_context.clone();
         let scope = dcx.scope;
-        let iface_name = iface.id.name.as_str();
-        let static_side_of = self
-            .registry
-            .ctor_interfaces
-            .iter()
-            .find(|(_, (ctor_scope, ctor))| *ctor_scope == scope && ctor == iface_name)
-            .map(|(var, _)| var.clone());
-        if let Some((var_scope, var)) = static_side_of {
-            self.push_static_side_class(&var, &iface.body.body, dcx, doc, declarations);
-            self.ctor_interfaces
-                .insert((var_scope, var), iface_name.to_string());
-            declarations.extend(self.drain_synth(&module_context, scope));
-            return;
-        }
-        let global = scope == self.file_scope
-            && self.global_scope
-            && matches!(module_context, ir::ModuleContext::Global);
-        if let Some(class) = self
-            .registry
-            .global_ctor_classes
-            .get(iface_name)
-            .filter(|_| global)
-        {
-            let class = class.clone();
-            declarations.push(self.static_side_class(&class, &iface.body.body, dcx, doc));
-            declarations.extend(self.drain_synth(&module_context, scope));
-            return;
-        }
         let iface_decl = convert_interface_decl(iface, scope, &mut self.parse_ctx());
-        declarations.push(dcx.decl(ir::TypeKind::Interface(iface_decl), doc.clone()));
+        declarations.push(dcx.decl(ir::TypeKind::Interface(iface_decl), doc));
         declarations.extend(self.drain_synth(&module_context, scope));
-        let unpaired: Vec<(ScopeId, String)> = self
-            .registry
-            .unpaired_ctor_vars
-            .iter()
-            .filter(|(_, (ctor_scope, ctor))| *ctor_scope == scope && ctor == iface_name)
-            .map(|(var, _)| var.clone())
-            .collect();
-        for (var_scope, var) in unpaired {
-            let side = self.static_side_class(&var, &iface.body.body, dcx, doc.clone());
-            declarations.extend(self.drain_synth(&module_context, scope));
-            self.ctor_interfaces
-                .insert((var_scope, var.clone()), iface_name.to_string());
-            self.static_sides.insert((var_scope, var), side);
-        }
     }
 
     fn populate_type_alias(
@@ -653,9 +603,8 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         // With an instance interface, the interface's members refer to the
         // local name and `merge_class_pairs` pairs the two by it. A var
         // alone is a value nothing refers to by its local name.
-        let has_instance_interface = self.registry.kind(dcx.scope, name)
-            == Some(&ir::RegisteredKind::MergedClassLike)
-            || self.registry.has_ctor_interface(dcx.scope, name);
+        let has_instance_interface =
+            self.registry.kind(dcx.scope, name) == Some(&ir::RegisteredKind::MergedClassLike);
         if !has_instance_interface {
             self.constructor_classes.push((dcx.scope, name.to_string()));
         }
@@ -704,10 +653,6 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         let doc = self.lookup_doc(dcx.export_span_start, var_decl.span.start);
         for declarator in &var_decl.declarations {
             if let Some(name) = var_declarator_name(declarator) {
-                if self.registry.has_ctor_interface(dcx.scope, &name) {
-                    // Emitted as a class from the `*Constructor` interface.
-                    continue;
-                }
                 let merged_with_iface = self.registry.kind(dcx.scope, &name)
                     == Some(&ir::RegisteredKind::MergedClassLike);
                 let alias_ctor = self

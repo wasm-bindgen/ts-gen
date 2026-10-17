@@ -63,6 +63,25 @@ pub fn var_declarator_name(declarator: &VariableDeclarator<'_>) -> Option<String
 /// Extract constructor, static methods, and static properties from the
 /// static-side object type of a class: an inline `{ new(...): T; ... }`
 /// literal or a `*Constructor` interface body.
+/// A construct signature (`new (…): T`) as the constructor of the class it
+/// constructs.
+pub fn convert_construct_signature(
+    ctor: &oxc_ast::ast::TSConstructSignatureDeclaration<'_>,
+    parent_scope: ScopeId,
+    ctx: &mut ParseCtx<'_, '_>,
+) -> ConstructorMember {
+    let params = convert_formal_params_scoped(&ctor.params, parent_scope, ctx);
+    let (doc, info) = match ctx.docs.info_for_span(ctor.span.start) {
+        Some((d, i)) => (Some(d), i),
+        None => (None, crate::parse::docs::JsDocInfo::default()),
+    };
+    ConstructorMember {
+        params,
+        doc,
+        throws: info.throws(),
+    }
+}
+
 pub fn extract_var_members(
     members: &[TSSignature<'_>],
     parent_scope: ScopeId,
@@ -74,16 +93,7 @@ pub fn extract_var_members(
     for member in members {
         match member {
             TSSignature::TSConstructSignatureDeclaration(ctor) => {
-                let params = convert_formal_params_scoped(&ctor.params, parent_scope, ctx);
-                let (doc, info) = match ctx.docs.info_for_span(ctor.span.start) {
-                    Some((d, i)) => (Some(d), i),
-                    None => (None, crate::parse::docs::JsDocInfo::default()),
-                };
-                constructor = Some(ConstructorMember {
-                    params,
-                    doc,
-                    throws: info.throws(),
-                });
+                constructor = Some(convert_construct_signature(ctor, parent_scope, ctx));
             }
             TSSignature::TSPropertySignature(prop) => {
                 let js_name = match property_key_name(&prop.key) {

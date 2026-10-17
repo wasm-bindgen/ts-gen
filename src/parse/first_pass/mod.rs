@@ -15,9 +15,7 @@ mod populate;
 
 // Re-export public entry points.
 pub use collect::collect_type_names;
-pub use populate::{
-    populate_declarations, CtorInterfaces, NamespaceMembers, Populated, StaticSides,
-};
+pub use populate::{populate_declarations, NamespaceMembers, Populated, StaticSides};
 
 // ─── Script vs Module Detection ─────────────────────────────────────
 
@@ -265,6 +263,7 @@ fn register_type(
             })
         }
         ir::RegisteredKind::Interface => ir::TypeKind::Interface(ir::InterfaceDecl {
+            construct: None,
             name: name_str.clone(),
             js_name: name_str.clone(),
             type_params: vec![],

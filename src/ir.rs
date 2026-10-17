@@ -579,6 +579,9 @@ pub struct InterfaceDecl {
     pub type_params: Vec<TypeParam>,
     pub extends: Vec<TypeRef>,
     pub members: Vec<Member>,
+    /// Its construct signature (`new (…): T`). Only a constructor `var` the
+    /// interface types binds it, as its class's constructor.
+    pub construct: Option<ConstructorMember>,
     /// Classification determined during assembly.
     pub classification: InterfaceClassification,
     /// Scope inside this interface's body — see
@@ -979,29 +982,9 @@ pub struct TypeRegistry {
     /// the module, so it is populated into the module rather than as a
     /// global.
     pub assigned_namespaces: HashMap<crate::parse::scope::ScopeId, String>,
-    /// `declare var X: XConstructor` pairs, `(scope, X)` → the scope
-    /// declaring `XConstructor` and its name. The interface supplies the
-    /// class constructor and statics and is not emitted as a type of its own.
-    /// In source order, so that of two vars sharing an interface the first
-    /// consistently takes its statics.
-    pub ctor_interfaces: indexmap::IndexMap<
-        (crate::parse::scope::ScopeId, String),
-        (crate::parse::scope::ScopeId, String),
-    >,
     /// Constructor-shaped variables whose name a type alias in the same
     /// scope takes as the type. The alias keeps the binding.
     pub alias_constructors: std::collections::HashSet<(crate::parse::scope::ScopeId, String)>,
-    /// Global `declare var X: XConstructor` pairs with no instance interface
-    /// `X` in the file, keyed as `ctor_interfaces`. Another file may declare
-    /// it, so population keeps the static side for that merge.
-    pub unpaired_ctor_vars: indexmap::IndexMap<
-        (crate::parse::scope::ScopeId, String),
-        (crate::parse::scope::ScopeId, String),
-    >,
-    /// The global classes of earlier files by the constructor interface
-    /// they take their statics from, → the class name. This file's global
-    /// declarations of that interface are its static side.
-    pub global_ctor_classes: std::collections::HashMap<String, String>,
     /// Key of the export map listing the globals the file declares, if it
     /// declares any (see [`Module::file_roots`]).
     pub globals: Option<crate::parse::scope::ScopeId>,
@@ -1023,13 +1006,6 @@ impl TypeRegistry {
         self.types
             .get_mut(&(scope, name.to_string()))
             .map(|info| &mut info.kind)
-    }
-
-    /// Whether `name` in `scope` is a `var` whose class constructor comes
-    /// from a `*Constructor` interface.
-    pub fn has_ctor_interface(&self, scope: crate::parse::scope::ScopeId, name: &str) -> bool {
-        self.ctor_interfaces
-            .contains_key(&(scope, name.to_string()))
     }
 }
 

@@ -522,13 +522,14 @@ impl<'a> CollectCtx<'a> {
         }
     }
 
-    /// `declare var X: XConstructor` merges like the inline literal form
-    /// when `XConstructor` has constructor shape and there is an instance
-    /// interface `X` to carry the members (or the var is module-scoped,
-    /// where the class may be constructor-only). Otherwise it is a plain
-    /// variable of that type; a same-named namespace or interface
-    /// collected meanwhile keeps the name, as it would have by
-    /// overwriting the var in source order.
+    /// `declare var X: XConstructor` next to an interface `X` registers `X`
+    /// as a class when this file's `XConstructor` has constructor shape.
+    /// That is only the name's phase 1 kind: the var is bound as a value,
+    /// and the static side its type gives is resolved once every file is
+    /// inserted (see `bind_constructor_vars`). Otherwise it is a plain
+    /// variable; a same-named namespace or interface collected meanwhile
+    /// keeps the name, as it would have by overwriting the var in source
+    /// order.
     fn resolve_named_ctor_var(
         &mut self,
         name: &str,
@@ -543,29 +544,15 @@ impl<'a> CollectCtx<'a> {
             .scopes
             .declaring_scope(scope, iface)
             .filter(|&s| self.constructor_shaped.contains(&(s, iface.to_string())));
-        if let Some(ctor_scope) = ctor_scope.filter(|_| iface != name) {
-            let ctor = (ctor_scope, iface.to_string());
+        if ctor_scope.is_some() && iface != name {
             if let Some(kind) = self
                 .registry
                 .kind_mut(scope, name)
                 .filter(|kind| **kind == ir::RegisteredKind::Interface)
             {
                 *kind = ir::RegisteredKind::MergedClassLike;
-                self.registry
-                    .ctor_interfaces
-                    .insert((scope, name.to_string()), ctor);
                 return;
             }
-            if matches!(ctx, ir::ModuleContext::Module(_)) {
-                self.registry
-                    .ctor_interfaces
-                    .insert((scope, name.to_string()), ctor);
-                self.register_type(name, ir::RegisteredKind::Variable, ctx, scope, exported);
-                return;
-            }
-            self.registry
-                .unpaired_ctor_vars
-                .insert((scope, name.to_string()), ctor);
         }
         if self.registry.kind(scope, name).is_none() {
             self.register_type(name, ir::RegisteredKind::Variable, ctx, scope, exported);

@@ -66,6 +66,7 @@ pub fn parse_dts_files(
         &mut parsed_files,
         lib_name,
     )?;
+    bind_constructor_vars(&mut gctx, &mut module);
     enums::evaluate_ts_enums(&mut gctx, &mut module.types);
 
     Ok((module, gctx))
@@ -82,6 +83,7 @@ pub fn parse_single_source(
     let path = Path::new("<input>");
     let parsed = parse_single_file(source, path, lib_name, &mut gctx, file_scope)?;
     module.add_file(path.to_path_buf(), file_scope, parsed);
+    bind_constructor_vars(&mut gctx, &mut module);
     enums::evaluate_ts_enums(&mut gctx, &mut module.types);
     Ok((module, gctx))
 }
@@ -191,17 +193,8 @@ fn parse_single_file(
     // Swap out diagnostics temporarily to avoid double-borrowing gctx.
     let file_start = gctx.type_arena().len();
     let mut diag = std::mem::take(&mut gctx.diagnostics);
-    let mut registry =
-        first_pass::collect_type_names(program, lib_name, &mut diag, gctx, file_scope);
+    let registry = first_pass::collect_type_names(program, lib_name, &mut diag, gctx, file_scope);
     gctx.diagnostics = diag;
-    registry.global_ctor_classes = gctx
-        .global_ctor_interfaces
-        .iter()
-        .filter_map(|(iface, &id)| match &gctx.get_type(id).kind {
-            crate::ir::TypeKind::Class(c) => Some((iface.clone(), c.name.clone())),
-            _ => None,
-        })
-        .collect();
     for (specifier, &scope) in &registry.module_scopes {
         gctx.ambient_module_scopes
             .entry(specifier.clone())
@@ -259,7 +252,6 @@ fn parse_single_file(
         mut namespace_members,
         mut static_sides,
         constructor_classes,
-        ctor_interfaces,
     } = first_pass::populate_declarations(
         program,
         &registry,
@@ -273,10 +265,7 @@ fn parse_single_file(
     gctx.scopes = scopes;
     gctx.diagnostics = diag;
 
-    // Post-processing: merge, dedup, then insert into the global type arena
-    let merged = merge_class_pairs(declarations);
-    let merged = merge_namespaces(merged);
-    let merged = merge_function_overloads(merged);
+    let merged = merge_declarations(declarations);
 
     let mut cx = InsertCtx {
         gctx,
@@ -286,7 +275,6 @@ fn parse_single_file(
         assigned_namespaces: &registry.assigned_namespaces,
         constructor_classes: &constructor_classes,
         constructor_class_ids: std::collections::HashSet::new(),
-        ctor_interfaces: &ctor_interfaces,
         dropped: std::collections::HashSet::new(),
         file_scope,
         file_start,
@@ -334,7 +322,6 @@ struct InsertCtx<'a> {
     constructor_classes: &'a [(ScopeId, String)],
     /// The inserted ids of `constructor_classes`.
     constructor_class_ids: std::collections::HashSet<crate::context::TypeId>,
-    ctor_interfaces: &'a first_pass::CtorInterfaces,
     /// Earlier declarations that merged into a later one and are no longer
     /// declarations of their own.
     dropped: std::collections::HashSet<crate::context::TypeId>,
@@ -364,7 +351,7 @@ impl InsertCtx<'_> {
                     .remove(&ns.child_scope)
                     .unwrap_or_default();
                 let mut ids = Vec::new();
-                for member in merge_function_overloads(merge_namespaces(member_decls)) {
+                for member in merge_declarations(member_decls) {
                     let id = self.insert(member, false);
                     if !ids.contains(&id) {
                         ids.push(id);
@@ -398,25 +385,9 @@ impl InsertCtx<'_> {
             }
             _ => decl_scope,
         };
-        if let (Some(_), crate::ir::TypeKind::Interface(iface)) = (global, &decl.kind) {
-            if let Some(&class) = self.gctx.global_ctor_interfaces.get(&iface.name) {
-                self.add_statics(class, &iface.members);
-                return class;
-            }
-        }
         let static_side = match &decl.kind {
             crate::ir::TypeKind::Variable(v) => {
                 self.static_sides.remove(&(decl_scope, v.js_name.clone()))
-            }
-            _ => None,
-        };
-        let ctor_interface = match &decl.kind {
-            crate::ir::TypeKind::Class(_) | crate::ir::TypeKind::Variable(_)
-                if global.is_some() =>
-            {
-                binding_name(&decl.kind)
-                    .and_then(|name| self.ctor_interfaces.get(&(decl_scope, name)))
-                    .cloned()
             }
             _ => None,
         };
@@ -430,9 +401,6 @@ impl InsertCtx<'_> {
         if let Some(class) = static_side {
             self.gctx.static_sides.insert(type_id, class);
         }
-        if let Some(iface) = ctor_interface {
-            self.gctx.ctor_interface_of.insert(type_id, iface);
-        }
         let earlier: Vec<_> = placeholder
             .as_ref()
             .map(|local| self.gctx.declarations(block, local))
@@ -443,23 +411,16 @@ impl InsertCtx<'_> {
             .collect();
         for existing in earlier {
             if self.merge_into(existing, type_id) {
-                if let Some(iface) = self.gctx.ctor_interface_of.remove(&type_id) {
-                    self.gctx.ctor_interface_of.entry(existing).or_insert(iface);
-                }
                 type_id = existing;
                 break;
             }
         }
-        if let Some(global) = global {
-            let class = matches!(
-                self.gctx.get_type(type_id).kind,
-                crate::ir::TypeKind::Class(_)
-            );
-            if let Some(iface) = self.gctx.ctor_interface_of.get(&type_id).filter(|_| class) {
-                self.adopt_ctor_interface(global, &iface.clone(), type_id);
+        let gctx = &mut *self.gctx;
+        if let crate::ir::TypeKind::Variable(v) = &gctx.get_type(type_id).kind {
+            if v.type_ref.as_ident().is_some() && !gctx.ctor_vars.contains(&(type_id, block)) {
+                gctx.ctor_vars.push((type_id, block));
             }
         }
-        let gctx = &mut *self.gctx;
         let merged = &gctx.get_type(type_id).kind;
         let name = declaration_name(merged);
         let local = binding_name(merged);
@@ -505,89 +466,6 @@ impl InsertCtx<'_> {
         type_id
     }
 
-    /// `class` takes its constructor and statics from the interface `iface`,
-    /// so every file's declarations of `iface` are statics of `class`, as
-    /// within one file, rather than an interface: those inserted so far
-    /// merge now, and later ones as they are inserted.
-    fn adopt_ctor_interface(
-        &mut self,
-        global: ScopeId,
-        iface: &str,
-        class: crate::context::TypeId,
-    ) {
-        if self
-            .gctx
-            .global_ctor_interfaces
-            .insert(iface.to_string(), class)
-            == Some(class)
-        {
-            return;
-        }
-        let ifaces: Vec<_> = self
-            .gctx
-            .declarations(global, iface)
-            .iter()
-            .copied()
-            .filter(|&id| {
-                matches!(
-                    self.gctx.get_type(id).kind,
-                    crate::ir::TypeKind::Interface(_)
-                )
-            })
-            .collect();
-        if ifaces.is_empty() {
-            return;
-        }
-        for &id in &ifaces {
-            if let crate::ir::TypeKind::Interface(i) = &self.gctx.get_type(id).kind {
-                let members = i.members.clone();
-                self.add_statics(class, &members);
-            }
-        }
-        let ifaces: std::collections::HashSet<_> = ifaces.into_iter().collect();
-        self.gctx.drop_types(&ifaces);
-        self.dropped.extend(ifaces);
-    }
-
-    /// Merge an interface's members into `class` as its statics. A construct
-    /// signature never reaches an interface's members.
-    fn add_statics(&mut self, class: crate::context::TypeId, members: &[crate::ir::Member]) {
-        use crate::ir::Member;
-        let statics = members
-            .iter()
-            .filter_map(|m| match m {
-                Member::Getter(g) if g.js_name != "prototype" => {
-                    Some(Member::StaticGetter(crate::ir::StaticGetterMember {
-                        js_name: g.js_name.clone(),
-                        type_ref: g.type_ref.clone(),
-                        doc: g.doc.clone(),
-                    }))
-                }
-                Member::Setter(s) if s.js_name != "prototype" => {
-                    Some(Member::StaticSetter(crate::ir::StaticSetterMember {
-                        js_name: s.js_name.clone(),
-                        type_ref: s.type_ref.clone(),
-                        doc: s.doc.clone(),
-                    }))
-                }
-                Member::Method(m) => Some(Member::StaticMethod(crate::ir::StaticMethodMember {
-                    name: m.name.clone(),
-                    js_name: m.js_name.clone(),
-                    type_params: m.type_params.clone(),
-                    params: m.params.clone(),
-                    return_type: m.return_type.clone(),
-                    doc: m.doc.clone(),
-                    throws: m.throws.clone(),
-                    body_scope: m.body_scope,
-                })),
-                _ => None,
-            })
-            .collect();
-        if let crate::ir::TypeKind::Class(c) = &mut self.gctx.get_type_mut(class).kind {
-            merge_members(&mut c.members, statics);
-        }
-    }
-
     /// Merge the declaration `new` into `existing` where the two would merge
     /// within one file. Returns whether they merged.
     fn merge_into(
@@ -631,7 +509,7 @@ impl InsertCtx<'_> {
             },
             _ => vec![base, incoming],
         };
-        let merged = merge_function_overloads(merge_class_pairs(pair));
+        let merged = merge_declarations(pair);
         match <[_; 1]>::try_from(merged) {
             Ok([merged]) => {
                 *self.gctx.get_type_mut(existing) = merged;
@@ -688,6 +566,16 @@ fn bind_import(
             .insert_namespace(import.scope, import.local_name.clone(), members);
     }
     type_id.is_some() || members.is_some()
+}
+
+/// Merge the declarations of one container (a file's top level, a module
+/// body, a namespace body, or two files' declarations of one global) by
+/// name, as TypeScript merges the declarations of a symbol: an interface
+/// with a class, namespaces, and a function's overloads.
+fn merge_declarations(
+    declarations: Vec<crate::ir::TypeDeclaration>,
+) -> Vec<crate::ir::TypeDeclaration> {
+    merge_function_overloads(merge_namespaces(merge_class_pairs(declarations)))
 }
 
 /// Merge each function's declarations into its first, whose overloads the
@@ -880,6 +768,7 @@ fn populate_builtin_scope(gctx: &mut GlobalContext, scope: ScopeId) {
     for &name in crate::codegen::typemap::JS_SYS_RESERVED {
         let type_id = gctx.insert_type(crate::ir::TypeDeclaration {
             kind: crate::ir::TypeKind::Interface(crate::ir::InterfaceDecl {
+                construct: None,
                 name: name.to_string(),
                 js_name: name.to_string(),
                 type_params: vec![],
@@ -906,6 +795,7 @@ fn populate_builtin_scope(gctx: &mut GlobalContext, scope: ScopeId) {
     for (name, _) in defaults {
         let type_id = gctx.insert_type(crate::ir::TypeDeclaration {
             kind: crate::ir::TypeKind::Interface(crate::ir::InterfaceDecl {
+                construct: None,
                 name: name.to_string(),
                 js_name: name.to_string(),
                 type_params: vec![],
@@ -949,6 +839,172 @@ pub(crate) fn binding_name(kind: &crate::ir::TypeKind) -> Option<String> {
         crate::ir::TypeKind::Variable(v) => Some(v.js_name.clone()),
         kind => declaration_name(kind),
     }
+}
+
+/// Give each `var X: XConstructor` the static side its type describes, as
+/// TypeScript's checker types a declaration: once every file is bound, from
+/// the declaration's own location. `XConstructor` resolves from the var's
+/// scope, with the declarations of every file merged, and when it has
+/// constructor shape its construct signature and members are the
+/// constructor and statics of the var's class. That class is the instance
+/// type `X` declared in the var's container, which becomes a class, or for
+/// a module's var alone, the var itself. The constructor interface is the
+/// class's static side rather than a type of its own; a var of one with no
+/// class stays a value of that type.
+fn bind_constructor_vars(gctx: &mut GlobalContext, module: &mut Module) {
+    use crate::ir::{ClassDecl, Member, ModuleContext, TypeKind};
+    let mut dropped = std::collections::HashSet::new();
+    let mut consumed = std::collections::HashSet::new();
+    let mut constructor_classes = std::collections::HashSet::new();
+    for (var, block) in std::mem::take(&mut gctx.ctor_vars) {
+        let decl = gctx.get_type(var).clone();
+        let TypeKind::Variable(v) = &decl.kind else {
+            continue;
+        };
+        let Some(ctor) = v
+            .type_ref
+            .as_ident()
+            .and_then(|name| gctx.scopes.resolve(decl.scope_id, name))
+        else {
+            continue;
+        };
+        let TypeKind::Interface(side) = &gctx.get_type(ctor).kind else {
+            continue;
+        };
+        let prototype = side
+            .members
+            .iter()
+            .any(|m| matches!(m, Member::Getter(g) if g.js_name == "prototype"));
+        if side.construct.is_none() && !prototype {
+            continue;
+        }
+        let mut members: Vec<Member> = side
+            .construct
+            .clone()
+            .map(Member::Constructor)
+            .into_iter()
+            .collect();
+        members.extend(static_members(&side.members));
+        let instance = gctx
+            .declarations(block, &v.js_name)
+            .iter()
+            .copied()
+            .find(|&id| {
+                id != ctor
+                    && matches!(
+                        gctx.get_type(id).kind,
+                        TypeKind::Interface(_) | TypeKind::Class(_)
+                    )
+            });
+        let (class_id, mut class) = match instance {
+            Some(id) => {
+                dropped.insert(var);
+                let class = match &gctx.get_type(id).kind {
+                    TypeKind::Class(c) => c.clone(),
+                    TypeKind::Interface(i) => ClassDecl {
+                        name: i.name.clone(),
+                        js_name: i.name.clone(),
+                        type_params: i.type_params.clone(),
+                        extends: i.extends.first().cloned(),
+                        implements: vec![],
+                        is_abstract: false,
+                        members: i.members.clone(),
+                        type_module_context: gctx.get_type(id).module_context.clone(),
+                        body_scope: decl.scope_id,
+                    },
+                    _ => unreachable!(),
+                };
+                (id, class)
+            }
+            None if matches!(decl.module_context, ModuleContext::Module(_)) => {
+                constructor_classes.insert(var);
+                // The class is a type, which the var's phase 1 placeholder
+                // stood in for.
+                for scope in [decl.scope_id, block] {
+                    gctx.scopes.insert(scope, v.js_name.clone(), var);
+                }
+                let class = ClassDecl {
+                    name: v.js_name.clone(),
+                    js_name: v.js_name.clone(),
+                    type_params: vec![],
+                    extends: None,
+                    implements: vec![],
+                    is_abstract: false,
+                    members: vec![],
+                    type_module_context: decl.module_context.clone(),
+                    body_scope: decl.scope_id,
+                };
+                (var, class)
+            }
+            None => continue,
+        };
+        merge_members(&mut members, std::mem::take(&mut class.members));
+        class.members = members;
+        let target = gctx.get_type_mut(class_id);
+        target.kind = TypeKind::Class(class);
+        if target.doc.is_none() {
+            target.doc = decl.doc.clone();
+        }
+        consumed.insert(ctor);
+    }
+    let mut stack = module.types.clone();
+    while let Some(id) = stack.pop() {
+        match &gctx.get_type(id).kind {
+            TypeKind::Interface(i) if i.construct.is_some() && !consumed.contains(&id) => {
+                let name = i.name.clone();
+                gctx.diagnostics.warn(format!(
+                    "Construct signature on `{name}` is not a class constructor, skipping"
+                ));
+            }
+            TypeKind::Namespace(ns) => stack.extend(&ns.declarations),
+            _ => {}
+        }
+    }
+    dropped.extend(consumed);
+    gctx.drop_types(&dropped);
+    module.types.retain(|id| !dropped.contains(id));
+    let modules: Vec<(String, ScopeId)> = module
+        .module_roots
+        .iter()
+        .map(|(specifier, root)| (specifier.clone(), root.exports))
+        .collect();
+    name_constructor_classes(gctx, &modules, &constructor_classes);
+}
+
+/// An interface's members as statics, where an interface describes a
+/// constructor. Its `prototype` is the instance type, not a static.
+fn static_members(members: &[crate::ir::Member]) -> Vec<crate::ir::Member> {
+    use crate::ir::Member;
+    members
+        .iter()
+        .filter_map(|m| match m {
+            Member::Getter(g) if g.js_name != "prototype" => {
+                Some(Member::StaticGetter(crate::ir::StaticGetterMember {
+                    js_name: g.js_name.clone(),
+                    type_ref: g.type_ref.clone(),
+                    doc: g.doc.clone(),
+                }))
+            }
+            Member::Setter(s) if s.js_name != "prototype" => {
+                Some(Member::StaticSetter(crate::ir::StaticSetterMember {
+                    js_name: s.js_name.clone(),
+                    type_ref: s.type_ref.clone(),
+                    doc: s.doc.clone(),
+                }))
+            }
+            Member::Method(m) => Some(Member::StaticMethod(crate::ir::StaticMethodMember {
+                name: m.name.clone(),
+                js_name: m.js_name.clone(),
+                type_params: m.type_params.clone(),
+                params: m.params.clone(),
+                return_type: m.return_type.clone(),
+                doc: m.doc.clone(),
+                throws: m.throws.clone(),
+                body_scope: m.body_scope,
+            })),
+            _ => None,
+        })
+        .collect()
 }
 
 /// Name each constructor `var`'s class by its module's export map: the first
@@ -1176,6 +1232,9 @@ fn merge_class_pairs(
                 if let Some(&existing_idx) = iface_map.get(&key) {
                     if let TypeKind::Interface(ref mut existing) = result[existing_idx].kind {
                         merge_members(&mut existing.members, iface_decl.members.clone());
+                        if iface_decl.construct.is_some() {
+                            existing.construct = iface_decl.construct.clone();
+                        }
                         // Merge extends
                         for ext in &iface_decl.extends {
                             if !existing.extends.contains(ext) {
@@ -1246,6 +1305,7 @@ mod tests {
 
     fn iface(name: &str, members: Vec<Member>) -> InterfaceDecl {
         InterfaceDecl {
+            construct: None,
             name: name.to_string(),
             js_name: name.to_string(),
             type_params: vec![],
@@ -1550,6 +1610,87 @@ mod tests {
                 matches!(&gctx.get_type(id).kind, TypeKind::Interface(i) if i.name == "ArrConstructor")
             });
             assert_eq!(ctor_interfaces.count(), 0, "{i}");
+        }
+    }
+
+    #[test]
+    fn constructor_vars_bind_from_their_own_scope() {
+        let types =
+            "interface FooCtor { new (): N.Foo; readonly prototype: N.Foo; create(): N.Foo; }
+            declare namespace N { interface Foo { go(): void; } }
+            declare namespace R { interface Q { q(): void; } }
+            interface G { g(): void; }
+            interface GCtor { new (): G; readonly prototype: G; }
+            interface WCtor { new (): W; readonly prototype: W; make(): W; }
+            interface W { w(): void; }
+            declare module \"m\" { const W: WCtor; }";
+        let vars = "export {};
+            declare global {
+              namespace N { var Foo: FooCtor; }
+              namespace R { var Q: { prototype: Q; new (): Q }; }
+              var G: GCtor;
+            }";
+        for (i, sources) in [[types, vars], [vars, types]].iter().enumerate() {
+            let dir =
+                std::env::temp_dir().join(format!("ts-gen-ctor-vars-{}-{i}", std::process::id()));
+            std::fs::create_dir_all(&dir).unwrap();
+            let paths: Vec<_> = sources
+                .iter()
+                .enumerate()
+                .map(|(n, src)| {
+                    let path = dir.join(format!("{n}.d.ts"));
+                    std::fs::write(&path, src).unwrap();
+                    path
+                })
+                .collect();
+            let result = parse_dts_files(&paths, None);
+            std::fs::remove_dir_all(&dir).unwrap();
+            let (module, gctx) = result.unwrap();
+
+            let members = |id| -> Vec<String> {
+                let TypeKind::Class(c) = &gctx.get_type(id).kind else {
+                    panic!("{i}: {:?} is a class", gctx.get_type(id).kind);
+                };
+                c.members
+                    .iter()
+                    .map(|m| match m {
+                        Member::Constructor(_) => "new".into(),
+                        Member::StaticMethod(m) => format!("static {}", m.js_name),
+                        Member::Method(m) => m.js_name.clone(),
+                        other => panic!("{i}: {other:?}"),
+                    })
+                    .collect()
+            };
+            let class = |path| members(gctx.resolve_path(module.global_scope, path).expect(path));
+            assert_eq!(class("N.Foo"), ["new", "static create", "go"], "{i}");
+            assert_eq!(class("R.Q"), ["new", "q"], "{i}");
+            assert_eq!(class("G"), ["new", "g"], "{i}");
+            let m = gctx.ambient_module_scopes["m"][0];
+            let w = gctx.declarations(m, "W");
+            assert_eq!(w.len(), 1, "{i}");
+            assert_eq!(members(w[0]), ["new", "static make"], "{i}");
+            // The global `W` has no var of its own, so it stays an interface.
+            let global_w = gctx.resolve_path(module.global_scope, "W").unwrap();
+            assert!(
+                matches!(gctx.get_type(global_w).kind, TypeKind::Interface(_)),
+                "{i}"
+            );
+
+            let mut stack = module.types.clone();
+            while let Some(id) = stack.pop() {
+                match &gctx.get_type(id).kind {
+                    TypeKind::Interface(iface) => {
+                        assert!(
+                            !iface.name.ends_with("Ctor"),
+                            "{i}: {} is emitted",
+                            iface.name
+                        )
+                    }
+                    TypeKind::Variable(v) => panic!("{i}: var {} is emitted", v.js_name),
+                    TypeKind::Namespace(ns) => stack.extend(&ns.declarations),
+                    _ => {}
+                }
+            }
         }
     }
 
