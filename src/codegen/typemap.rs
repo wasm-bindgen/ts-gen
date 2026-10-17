@@ -2353,10 +2353,11 @@ pub fn param_slice_mode(
 }
 
 /// The fn-level `slice = "array"` a binding with these parameters needs:
-/// any `T[]` whose element per-monomorphization keeps as a bare `T`. wasm-bindgen resolves the mode per instantiation, so it
-/// turns `T = f64`'s view into an `Array` — but a non-numeric `T` can't
-/// take a mode at all, and only an *inherited* mode drops by shape there;
-/// a per-argument one is a hard error. So the mono case is the one mode
+/// any `T[]` whose element per-monomorphization keeps as a bare `T`.
+/// wasm-bindgen resolves the mode per instantiation, so it turns
+/// `T = f64`'s view into an `Array` — but a non-numeric `T` can't take a
+/// mode at all, and only an *inherited* mode drops by shape there; a
+/// per-argument one is a hard error. So the mono case is the one mode
 /// ts-gen emits at the function level. Erased `T: JsGeneric` is always a
 /// handle and needs no mode.
 pub fn fn_mono_array_mode(
