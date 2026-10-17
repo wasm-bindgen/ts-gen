@@ -83,6 +83,19 @@ impl<'d> Surface<'d> {
         }
     }
 
+    /// The `pub mod` name of the namespace `id`, whose own name is `own`:
+    /// its own when exported under it or not exported by name, else the
+    /// first name it is exported under (`export { N as M }` makes `m`).
+    /// Each other public name aliases it.
+    pub fn mod_name(&self, id: TypeId, own: &str) -> String {
+        let names = self.names(id);
+        let name = match names.iter().find(|&n| n != "default") {
+            Some(first) if !names.iter().any(|n| n == own) => first,
+            _ => own,
+        };
+        crate::util::naming::to_snake_case(name)
+    }
+
     /// The JS module specifiers with an emitted declaration.
     pub fn modules(&self) -> HashSet<String> {
         self.items
@@ -585,6 +598,7 @@ mod tests {
         assert!(surface.get(id("Foo")).is_empty());
         assert_eq!(surface.names(id("_Bar")), ["Foo"]);
         assert_eq!(surface.js_name(id("_N"), "_N"), "N1");
+        assert_eq!(surface.mod_name(id("_N"), "_N"), "n1");
         // A class binds by its own name when exported under it, and each
         // other public name aliases it.
         let class_and_aliases = |name| -> Vec<String> {
@@ -600,6 +614,40 @@ mod tests {
         };
         assert_eq!(class_and_aliases("_C"), ["_C", "type C1", "type C2"]);
         assert_eq!(class_and_aliases("_D"), ["D", "type D"]);
+    }
+
+    #[test]
+    fn namespaces_take_their_module_name_from_the_export() {
+        let src = r#"
+            declare function make(): void;
+            declare namespace make { function helper(): void; }
+            declare function own(): void;
+            declare namespace own { function helper(): void; }
+            declare namespace D { function f(): void; }
+            declare namespace Hidden { interface T {} }
+            export declare function f(t: Hidden.T): void;
+            export { make as create, own, own as other, D as default };
+        "#;
+        let (module, gctx) = crate::parse_source(src, Some("m")).unwrap();
+        let surface = surface_of(&module, &gctx, "m");
+        let id = |name| {
+            let mut stack = module.types.clone();
+            while let Some(id) = stack.pop() {
+                if let TypeKind::Namespace(ns) = &gctx.get_type(id).kind {
+                    if ns.name == name {
+                        return id;
+                    }
+                    stack.extend(&ns.declarations);
+                }
+            }
+            panic!("no namespace {name}");
+        };
+        assert_eq!(surface.mod_name(id("make"), "make"), "create");
+        assert_eq!(surface.mod_name(id("own"), "own"), "own");
+        // `default` is no name of its own, and a namespace only a signature
+        // reaches has no public name.
+        assert_eq!(surface.mod_name(id("D"), "D"), "d");
+        assert_eq!(surface.mod_name(id("Hidden"), "Hidden"), "hidden");
     }
 
     #[test]

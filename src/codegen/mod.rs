@@ -275,7 +275,7 @@ fn generate_tokens(
         gctx,
         options.errors_as_error,
         options.experimental_generic_mono,
-        surface.modules(),
+        Some(&surface),
     );
 
     let preamble = quote! {
@@ -742,7 +742,7 @@ impl<'d> ModTree<'d> {
     ) {
         match &decl.kind {
             TypeKind::Namespace(ns) => {
-                let name = crate::util::naming::to_snake_case(&ns.name);
+                let name = surface.mod_name(id, &ns.name);
                 let aliases = self.aliases.entry(name.clone()).or_default();
                 for public in surface.names(id).iter().filter(|&p| p != "default") {
                     let alias = crate::util::naming::to_snake_case(public);

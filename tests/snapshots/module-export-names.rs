@@ -30,7 +30,7 @@ pub mod pc {
 pub mod ns {
     #[allow(unused_imports)]
     use super::*;
-    pub mod n {
+    pub mod n1 {
         #[allow(unused_imports)]
         use super::*;
         #[wasm_bindgen(module = "ns")]
@@ -43,12 +43,24 @@ pub mod ns {
             #[wasm_bindgen(catch, js_name = "f", js_namespace = "N1")]
             pub fn try_f() -> Result<(), JsValue>;
         }
-    }
-    pub mod n1 {
-        pub use super::n::*;
+        #[wasm_bindgen(module = "ns")]
+        extern "C" {
+            # [wasm_bindgen (extends = Object , js_namespace = "N1")]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type T;
+        }
     }
     pub mod n2 {
-        pub use super::n::*;
+        pub use super::n1::*;
+    }
+    #[wasm_bindgen(module = "ns")]
+    extern "C" {
+        pub fn g(t: &n1::T);
+    }
+    #[wasm_bindgen(module = "ns")]
+    extern "C" {
+        #[wasm_bindgen(catch, js_name = "g")]
+        pub fn try_g(t: &n1::T) -> Result<(), JsValue>;
     }
 }
 pub mod plain {
@@ -71,5 +83,62 @@ pub mod plain {
     extern "C" {
         #[wasm_bindgen(catch, js_name = "create")]
         pub fn try_create() -> Result<(), JsValue>;
+    }
+}
+pub mod pure {
+    #[allow(unused_imports)]
+    use super::*;
+    pub mod m {
+        #[allow(unused_imports)]
+        use super::*;
+        #[wasm_bindgen(module = "pure")]
+        extern "C" {
+            #[wasm_bindgen(js_namespace = "M")]
+            pub fn f();
+        }
+        #[wasm_bindgen(module = "pure")]
+        extern "C" {
+            #[wasm_bindgen(catch, js_name = "f", js_namespace = "M")]
+            pub fn try_f() -> Result<(), JsValue>;
+        }
+    }
+}
+pub mod own {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen(module = "own")]
+    extern "C" {
+        pub fn make();
+    }
+    #[wasm_bindgen(module = "own")]
+    extern "C" {
+        #[wasm_bindgen(catch, js_name = "make")]
+        pub fn try_make() -> Result<(), JsValue>;
+    }
+    #[wasm_bindgen(module = "own")]
+    extern "C" {
+        pub fn create();
+    }
+    #[wasm_bindgen(module = "own")]
+    extern "C" {
+        #[wasm_bindgen(catch, js_name = "create")]
+        pub fn try_create() -> Result<(), JsValue>;
+    }
+    pub mod make {
+        #[allow(unused_imports)]
+        use super::*;
+        #[wasm_bindgen(module = "own")]
+        extern "C" {
+            #[wasm_bindgen(js_namespace = "make")]
+            pub fn helper();
+        }
+        #[wasm_bindgen(module = "own")]
+        extern "C" {
+            #[wasm_bindgen(catch, js_name = "helper", js_namespace = "make")]
+            pub fn try_helper() -> Result<(), JsValue>;
+        }
+    }
+    pub mod create {
+        pub use super::make::*;
     }
 }

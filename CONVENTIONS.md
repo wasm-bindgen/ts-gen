@@ -2464,8 +2464,9 @@ that declaration as the type `Foo`, while `Foo.Options` resolves
 through the namespace, in either declaration order.
 
 In a module, the namespace's members bind through the name the module
-exports it under. That differs from the local name for a value merged
-with the namespace and exported renamed or as the default:
+exports it under, which also names its Rust module. That differs from the
+local name for a value merged with the namespace and exported renamed or
+as the default:
 
 ```ts
 declare module "m" {
@@ -2479,7 +2480,7 @@ declare module "m" {
 pub mod m {
     // …
     pub fn create();
-    pub mod make {
+    pub mod create {
         #[wasm_bindgen(module = "m")]
         extern "C" {
             #[wasm_bindgen(js_namespace = "create")]
@@ -2489,8 +2490,9 @@ pub mod m {
 }
 ```
 
-With `export default make`, the members take `js_namespace = "default"`.
-A namespace exported under its own name as well keeps it.
+With `export default make`, the members take `js_namespace = "default"`
+and the module keeps the local name, as `default` is no name of its own. A
+namespace exported under its own name as well keeps it.
 
 ## Type aliases and `export { X as Y }`
 
@@ -2578,10 +2580,14 @@ A namespace exported under its own name as well keeps it.
     and `pub type Foo = _Foo;`.
   * Types without a runtime binding (interfaces, type aliases, enums) get
     an alias only.
-  * A namespace keeps its local name as the Rust module and binds its
-    members with `js_namespace` set to the JS name. Each other public name
-    is a module re-exporting it (`pub mod n2 { pub use super::n::*; }`),
-    since `pub use n as n2;` would also import a function `n` as `n2`.
+  * A namespace's Rust module is named by its JS name, so a local name
+    the module does not export does not appear: `namespace N {…}; export
+    { N as M }` emits `pub mod m`, and `function make(); namespace make
+    {…}; export { make as create }` emits `create()` and `pub mod create`.
+    Its members bind with `js_namespace` set to the JS name. Each other
+    public name is a module re-exporting it (`pub mod m2 { pub use
+    super::m::*; }`), since `pub use m as m2;` would also import a
+    function `m` as `m2`.
 
   A `Local` declared outside the exporting block (an import) is left alone
   and only aliased.

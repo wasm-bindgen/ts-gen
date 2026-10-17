@@ -85,7 +85,7 @@ pub mod export_default {
             #[wasm_bindgen(catch, js_name = "create")]
             pub fn try_create() -> Result<String, JsValue>;
         }
-        pub mod make {
+        pub mod create {
             #[allow(unused_imports)]
             use super::*;
             #[wasm_bindgen(module = "export-default/renamed")]
@@ -98,9 +98,6 @@ pub mod export_default {
                 #[wasm_bindgen(catch, js_name = "helper", js_namespace = "create")]
                 pub fn try_helper() -> Result<String, JsValue>;
             }
-        }
-        pub mod create {
-            pub use super::make::*;
         }
     }
 }

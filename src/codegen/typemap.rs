@@ -655,19 +655,21 @@ impl<'a> CodegenContext<'a> {
     /// Build a `CodegenContext` from a parsed IR module + global context.
     /// Used by tests and library callers that don't customise codegen.
     pub fn from_module(module: &ir::Module, gctx: &'a GlobalContext) -> Self {
-        Self::from_module_full(module, gctx, false, false, HashSet::new())
+        Self::from_module_full(module, gctx, false, false, None)
     }
 
     /// Build a `CodegenContext` with the full set of per-codegen options
-    /// including the set of emitted JS module specifiers.
+    /// and the surface being emitted, which names the emitted modules and
+    /// namespaces.
     pub fn from_module_full(
         module: &ir::Module,
         gctx: &'a GlobalContext,
         errors_as_error: bool,
         experimental_generic_mono: bool,
-        exported_modules: HashSet<String>,
+        surface: Option<&crate::codegen::surface::Surface<'_>>,
     ) -> Self {
         let externalised_modules = externalised_modules(module, gctx);
+        let exported_modules = surface.map(|s| s.modules()).unwrap_or_default();
 
         let mut ctx = CodegenContext {
             gctx,
@@ -702,7 +704,7 @@ impl<'a> CodegenContext<'a> {
         }
         for &type_id in &module.types {
             let path = ctx.module_path(&gctx.get_type(type_id).module_context);
-            ctx.collect_declaration(type_id, &path);
+            ctx.collect_declaration(type_id, &path, surface);
         }
         ctx.resolve_collisions();
         ctx
@@ -969,7 +971,12 @@ impl<'a> CodegenContext<'a> {
 
     /// Record a declaration this unit emits. `mod_path` is the `pub mod`
     /// it is emitted in.
-    fn collect_declaration(&mut self, type_id: TypeId, mod_path: &[String]) {
+    fn collect_declaration(
+        &mut self,
+        type_id: TypeId,
+        mod_path: &[String],
+        surface: Option<&crate::codegen::surface::Surface<'_>>,
+    ) {
         let gctx = self.gctx;
         let decl = gctx.get_type(type_id);
         let mctx = &decl.module_context;
@@ -985,9 +992,12 @@ impl<'a> CodegenContext<'a> {
             ir::TypeKind::TypeAlias(a) => (&a.name, Some(a.type_params.len())),
             ir::TypeKind::Namespace(ns) => {
                 let mut path = mod_path.to_vec();
-                path.push(crate::util::naming::to_snake_case(&ns.name));
+                path.push(match surface {
+                    Some(surface) => surface.mod_name(type_id, &ns.name),
+                    None => crate::util::naming::to_snake_case(&ns.name),
+                });
                 for &member in &ns.declarations {
-                    self.collect_declaration(member, &path);
+                    self.collect_declaration(member, &path, surface);
                 }
                 self.namespace_paths.insert(ns.child_scope, path);
                 return;
@@ -3077,7 +3087,7 @@ mod tests {
         };
         let ts = TypeRef::Array(Box::new(TypeRef::ident("T")));
         let modes = |mono: bool| {
-            let ctx = CodegenContext::from_module_full(&module, &gctx, false, mono, HashSet::new());
+            let ctx = CodegenContext::from_module_full(&module, &gctx, false, mono, None);
             [
                 param_slice_mode(&cp("xs", ts.clone()), Some(&ctx), holder.body_scope),
                 param_slice_mode(
@@ -3535,7 +3545,7 @@ mod tests {
     /// to the source file, so aliases and local generics resolve.
     fn with_mono_ctx(src: &str, f: impl FnOnce(&CodegenContext<'_>, ScopeId)) {
         let (module, gctx) = crate::parse_source(src, None).unwrap();
-        let ctx = CodegenContext::from_module_full(&module, &gctx, false, true, HashSet::new());
+        let ctx = CodegenContext::from_module_full(&module, &gctx, false, true, None);
         let scope = *module.file_scopes.first().expect("file scope");
         f(&ctx, scope);
     }
@@ -3847,7 +3857,7 @@ mod tests {
             declare namespace Codes { type Region = "eu" | "us"; }
         "#;
         let (module, gctx) = crate::parse_source(src, None).unwrap();
-        let ctx = CodegenContext::from_module_full(&module, &gctx, false, false, HashSet::new());
+        let ctx = CodegenContext::from_module_full(&module, &gctx, false, false, None);
         let scope = *module.file_scopes.first().expect("file scope");
         let lower = |ty: &TypeRef, pos: TypePosition| {
             to_syn_type(ty, pos, Some(&ctx), scope, &ModuleContext::Global).to_string()
@@ -3905,7 +3915,7 @@ mod tests {
             }
         "#;
         let (module, gctx) = crate::parse_source(src, Some("m")).unwrap();
-        let ctx = CodegenContext::from_module_full(&module, &gctx, false, false, HashSet::new());
+        let ctx = CodegenContext::from_module_full(&module, &gctx, false, false, None);
         let scope = *module.file_scopes.first().expect("file scope");
         let outer = match &gctx
             .get_type(gctx.resolve_path(scope, "Outer").unwrap())
@@ -3940,7 +3950,7 @@ mod tests {
             }
         "#;
         let (module, gctx) = crate::parse_source(src, None).unwrap();
-        let ctx = CodegenContext::from_module_full(&module, &gctx, false, false, HashSet::new());
+        let ctx = CodegenContext::from_module_full(&module, &gctx, false, false, None);
         let file = module.file_scopes[0];
         let events = gctx.scopes.get(file).namespace("Events").unwrap();
         let inner = gctx.scopes.get(events).namespace("Inner").unwrap();

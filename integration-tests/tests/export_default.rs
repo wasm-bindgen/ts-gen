@@ -19,12 +19,11 @@ fn default_exports_bind_as_default() {
 }
 
 // Neither module exports `make`, so the namespace members only bind through
-// the name the merged function is exported as.
+// the name the merged function is exported as, which names their module.
 #[wasm_bindgen_test]
 fn merged_namespaces_bind_through_the_export() {
     assert_eq!(merged::make(), "made");
     assert_eq!(merged::make::helper(), "helped");
     assert_eq!(renamed::create(), "made");
-    assert_eq!(renamed::make::helper(), "helped");
     assert_eq!(renamed::create::helper(), "helped");
 }
