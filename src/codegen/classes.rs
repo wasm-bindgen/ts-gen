@@ -30,7 +30,7 @@ use std::collections::HashMap;
 use crate::codegen::signatures::{
     build_signatures, generate_concrete_params_with_mono_bounds, generate_dictionary_params,
     is_void_return, public_rust_name, render_generic_bounds, CallableSpec, ConcreteParam,
-    DictionaryParams, FunctionSignature, SignatureKind,
+    DictionaryParams, FunctionSignature, Overload, SignatureKind,
 };
 use crate::codegen::typemap::{to_return_type, CodegenContext, TypePosition};
 use crate::ir::{
@@ -744,8 +744,12 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         let setter_param =
             config.setter_param(&g.js_name, &assigned_type(g), slice_mode_of(&g.js_name));
         let mut setter_used = LocalScope::default();
-        let setter_overloads = [&[setter_param][..]];
         let void = crate::ir::TypeRef::Void;
+        let setter_overloads = [Overload {
+            params: &[setter_param],
+            return_type: &void,
+            body_scope: config.scope,
+        }];
         let setter_name = config.setter_name(MemberKind::Property, &g.js_name);
         build_signatures(
             &CallableSpec {
@@ -753,14 +757,11 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 rust_name: Some(&setter_name),
                 kind: SignatureKind::Setter,
                 overloads: &setter_overloads,
-                return_type: &void,
                 throws: &crate::ir::Throws::None,
                 doc: &None,
-                body_scope: config.scope,
             },
             &mut setter_used,
             config.cgctx,
-            config.scope,
         )
     };
 
@@ -1387,7 +1388,7 @@ fn unreserve_base(names: &mut LocalScope, base: &str) {
 /// Each name — including `try_` variants — is declared in that scope, which
 /// guarantees uniqueness by appending numeric suffixes on collision.
 pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
-    use crate::ir::{ConstructorMember, MethodMember, Param, StaticMethodMember};
+    use crate::ir::{ConstructorMember, MethodMember, StaticMethodMember};
     use std::collections::HashMap;
 
     let mut items = Vec::new();
@@ -1437,10 +1438,6 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 }
                 expanded_constructors = true;
 
-                let overloads: Vec<&[Param]> = constructor_overloads
-                    .iter()
-                    .map(|c| c.params.as_slice())
-                    .collect();
                 let doc = constructor_overloads.first().and_then(|c| c.doc.clone());
                 // Use the first overload's `@throws` (if any) as the error
                 // type for the constructor — TS overloads conventionally
@@ -1466,23 +1463,28 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 } else {
                     TypeRef::ident(config.rust_name.clone())
                 };
+                // Constructors don't have their own type parameter scope —
+                // they instantiate the class's. `config.scope` is the class
+                // body.
+                let overloads: Vec<Overload> = constructor_overloads
+                    .iter()
+                    .map(|c| Overload {
+                        params: &c.params,
+                        return_type: &return_type,
+                        body_scope: config.scope,
+                    })
+                    .collect();
                 let sigs = build_signatures(
                     &CallableSpec {
                         js_name: &config.js_name,
                         rust_name: None,
                         kind: SignatureKind::Constructor,
                         overloads: &overloads,
-                        return_type: &return_type,
                         throws,
                         doc: &doc,
-                        // Constructors don't have their own type
-                        // parameter scope — they instantiate the
-                        // class's. `config.scope` is the class body.
-                        body_scope: config.scope,
                     },
                     &mut names,
                     config.cgctx,
-                    config.scope,
                 );
                 for sig in &sigs {
                     items.push(generate_expanded_constructor(config, sig));
@@ -1495,13 +1497,19 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 expanded_methods.insert(m.js_name.clone());
 
                 let group = &method_groups[&m.js_name];
-                let overloads: Vec<&[Param]> = group.iter().map(|m| m.params.as_slice()).collect();
                 let doc = group.first().and_then(|m| m.doc.clone());
-                let return_type = &group[0].return_type;
                 let empty_throws = crate::ir::Throws::None;
                 let throws = group.first().map(|m| &m.throws).unwrap_or(&empty_throws);
-                // The method's own body scope holds its `<T, ...>`.
-                let method_scope = group[0].body_scope;
+                // Every overload takes the first's return type and body
+                // scope, which holds its `<T, ...>`.
+                let overloads: Vec<Overload> = group
+                    .iter()
+                    .map(|m| Overload {
+                        params: &m.params,
+                        return_type: &group[0].return_type,
+                        body_scope: group[0].body_scope,
+                    })
+                    .collect();
                 let base = config.member_base(MemberKind::Method, &m.js_name);
                 unreserve_base(&mut names, &base);
                 let sigs = build_signatures(
@@ -1510,14 +1518,11 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         rust_name: Some(&base),
                         kind: SignatureKind::Method,
                         overloads: &overloads,
-                        return_type,
                         throws,
                         doc: &doc,
-                        body_scope: method_scope,
                     },
                     &mut names,
                     config.cgctx,
-                    method_scope,
                 );
                 for sig in &sigs {
                     items.push(generate_expanded_method(config, sig));
@@ -1530,12 +1535,17 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 expanded_static_methods.insert(m.js_name.clone());
 
                 let group = &static_method_groups[&m.js_name];
-                let overloads: Vec<&[Param]> = group.iter().map(|m| m.params.as_slice()).collect();
                 let doc = group.first().and_then(|m| m.doc.clone());
-                let return_type = &group[0].return_type;
                 let empty_throws = crate::ir::Throws::None;
                 let throws = group.first().map(|m| &m.throws).unwrap_or(&empty_throws);
-                let method_scope = group[0].body_scope;
+                let overloads: Vec<Overload> = group
+                    .iter()
+                    .map(|m| Overload {
+                        params: &m.params,
+                        return_type: &group[0].return_type,
+                        body_scope: group[0].body_scope,
+                    })
+                    .collect();
                 let base = config.member_base(MemberKind::StaticMethod, &m.js_name);
                 unreserve_base(&mut names, &base);
                 let sigs = build_signatures(
@@ -1544,14 +1554,11 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         rust_name: Some(&base),
                         kind: SignatureKind::StaticMethod,
                         overloads: &overloads,
-                        return_type,
                         throws,
                         doc: &doc,
-                        body_scope: method_scope,
                     },
                     &mut names,
                     config.cgctx,
-                    method_scope,
                 );
                 for sig in &sigs {
                     items.push(generate_expanded_static_method(config, sig));
@@ -2002,8 +2009,12 @@ fn generate_setter(
     // Treat the setter as a single-param method and expand through signatures
     let param = config.setter_param(&setter.js_name, &setter.type_ref, setter.slice_mode);
 
-    let overloads = [&[param][..]];
     let void = crate::ir::TypeRef::Void;
+    let overloads = [Overload {
+        params: &[param],
+        return_type: &void,
+        body_scope: config.scope,
+    }];
     let setter_name = config.setter_name(MemberKind::Property, &setter.js_name);
     let sigs = build_signatures(
         &CallableSpec {
@@ -2011,14 +2022,11 @@ fn generate_setter(
             rust_name: Some(&setter_name),
             kind: SignatureKind::Setter,
             overloads: &overloads,
-            return_type: &void,
             throws: &crate::ir::Throws::None,
             doc: &doc,
-            body_scope: config.scope,
         },
         names,
         config.cgctx,
-        config.scope,
     );
 
     let this_generics = config.type_generics_args();
@@ -2136,8 +2144,12 @@ fn generate_static_setter(
 
     let param = config.setter_param(&setter.js_name, &setter.type_ref, None);
 
-    let overloads = [&[param][..]];
     let void = crate::ir::TypeRef::Void;
+    let overloads = [Overload {
+        params: &[param],
+        return_type: &void,
+        body_scope: config.scope,
+    }];
     let setter_name = config.setter_name(MemberKind::StaticProperty, &setter.js_name);
     let sigs = build_signatures(
         &CallableSpec {
@@ -2145,14 +2157,11 @@ fn generate_static_setter(
             rust_name: Some(&setter_name),
             kind: SignatureKind::StaticSetter,
             overloads: &overloads,
-            return_type: &void,
             throws: &crate::ir::Throws::None,
             doc: &doc,
-            body_scope: config.scope,
         },
         names,
         config.cgctx,
-        config.scope,
     );
 
     sigs.iter()

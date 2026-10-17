@@ -5,7 +5,7 @@ use quote::quote;
 
 use crate::codegen::signatures::{
     build_signatures, generate_concrete_params_with_mono_bounds, is_void_return, public_rust_name,
-    render_generic_bounds, CallableSpec, FunctionSignature, SignatureKind,
+    render_generic_bounds, CallableSpec, FunctionSignature, Overload, SignatureKind,
 };
 use crate::codegen::typemap::{to_return_type, to_syn_type, CodegenContext, TypePosition};
 use crate::parse::scope::ScopeId;
@@ -56,21 +56,22 @@ fn emit_function(
         &binding_key(ctx, js_namespace, &decl.js_name),
         public_rust_name(&ident_chars(&decl.name)),
     );
-    let overloads = [decl.params.as_slice()];
+    let overloads = [Overload {
+        params: &decl.params,
+        return_type: &decl.return_type,
+        body_scope: decl.body_scope,
+    }];
     let sigs = build_signatures(
         &CallableSpec {
             js_name: &decl.js_name,
             rust_name: Some(&rust_name),
             kind: SignatureKind::Function,
-            overloads: &[overloads[0]],
-            return_type: &decl.return_type,
+            overloads: &overloads,
             throws: &decl.throws,
             doc,
-            body_scope: decl.body_scope,
         },
         &mut value_names.idents,
         cgctx,
-        decl.body_scope,
     );
 
     let items: Vec<TokenStream> = sigs
@@ -404,7 +405,7 @@ fn generate_constructs(
     // Overloads constructing the same type are named together, as
     // `new_with_*`, like a class's constructors, and names are taken per
     // type, whose impl they go on.
-    let mut groups: Vec<(&FunctionDecl, TypeId, Vec<&[crate::ir::Param]>)> = Vec::new();
+    let mut groups: Vec<(&FunctionDecl, TypeId, Vec<Overload>)> = Vec::new();
     for (construct, &target) in decl.constructs.iter().zip(targets) {
         let same = |first: &FunctionDecl| {
             first.return_type == construct.return_type
@@ -414,9 +415,14 @@ fn generate_constructs(
                     .map(|tp| &tp.name)
                     .eq(construct.type_params.iter().map(|tp| &tp.name))
         };
+        let overload = Overload {
+            params: &construct.params,
+            return_type: &construct.return_type,
+            body_scope: construct.body_scope,
+        };
         match groups.iter_mut().find(|(first, _, _)| same(first)) {
-            Some((_, _, overloads)) => overloads.push(&construct.params),
-            None => groups.push((construct, target, vec![&construct.params])),
+            Some((_, _, overloads)) => overloads.push(overload),
+            None => groups.push((construct, target, vec![overload])),
         }
     }
     let mut names: HashMap<TypeId, LocalScope> = HashMap::new();
@@ -428,14 +434,11 @@ fn generate_constructs(
                 rust_name: None,
                 kind: SignatureKind::Constructor,
                 overloads,
-                return_type: &construct.return_type,
                 throws: &construct.throws,
                 doc,
-                body_scope: construct.body_scope,
             },
             names.entry(*target).or_default(),
             Some(cgctx),
-            construct.body_scope,
         );
         for sig in &sigs {
             let scope = sig.body_scope;
