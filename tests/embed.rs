@@ -307,6 +307,13 @@ fn embed_module_imports() {
 }
 
 #[test]
+fn embed_module_values() {
+    if let Err(e) = run_embed_test("module_values") {
+        panic!("module_values failed: {e:#}");
+    }
+}
+
+#[test]
 fn embed_sys() {
     if let Err(e) = run_embed_test("sys") {
         panic!("sys failed: {e:#}");

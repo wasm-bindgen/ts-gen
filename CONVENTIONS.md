@@ -5292,8 +5292,9 @@ count: number` is `(func (result f64))`.
 bindings functions, exported as `<spec>:<name>`, before the merge:
 `wasm-merge` links by module name, and the bindings themselves import
 the real `"<spec>"`. They reach each value through the merged module's
-own ESM imports, one immutable `externref` global per export (ESM
-integration coerces a non-`WebAssembly.Global` export into one), with
+own ESM imports, one immutable global per export, an `externref`
+unless the export is a scalar (ESM integration coerces a
+non-`WebAssembly.Global` export into a global of the import's type), with
 each further path segment a `reflect_get` keyed by a
 `wasm:js/string-constants` import:
 
@@ -5308,7 +5309,17 @@ seen. A module's free function is called with `globalThis` as `this`;
 a class export is constructed with `call_new`, and its statics and
 nested namespaces are read with `reflect_get` as for globals. A
 `const`/`let` export is the global's value, under the per-position
-reference rule above (`anyref` converts, `(ref extern)` narrows).
+reference rule above (`anyref` converts, `(ref extern)` narrows). A
+scalar one is a global of its type, `(global f64)` for a `number` and
+`(global i64)` for a `bigint`. The JS API rejects a boolean for an
+`i32` global, so a `boolean` stays an `externref` global, read as `i32`
+through a call to `Boolean` whose import returns `i32`:
+
+```wat
+(import "embed:values" "count" (global $m:embed:values:count_f f64))
+(import "embed:values" "enabled" (global $m:embed:values:enabled externref))
+```
+
 Assigning a module export is rejected by `embed`. A language module
 may still import other exports of `"<spec>"` directly, as anything but
 a function; those are left for the host to resolve.
