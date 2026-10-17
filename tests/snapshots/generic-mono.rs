@@ -162,6 +162,11 @@ extern "C" {
         this: &Flags,
         default_value: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, js_name = "getStringValue")]
+    pub fn get_string_value_promise(
+        this: &Flags,
+        default_value: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<JsString>;
     #[wasm_bindgen(method, catch, js_name = "getStringDetails")]
     pub async fn get_string_details(
         this: &Flags,
@@ -172,16 +177,31 @@ extern "C" {
         this: &Flags,
         default_value: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<EvaluationDetails<JsString>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getStringDetails")]
+    pub fn get_string_details_promise(
+        this: &Flags,
+        default_value: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<EvaluationDetails<String>>;
     #[wasm_bindgen(method, catch, js_name = "getBooleanDetails")]
     pub async fn get_boolean_details(
         this: &Flags,
         default_value: bool,
     ) -> Result<EvaluationDetails<bool>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getBooleanDetails")]
+    pub fn get_boolean_details_promise(
+        this: &Flags,
+        default_value: bool,
+    ) -> Promise<EvaluationDetails<bool>>;
     #[wasm_bindgen(method, catch, js_name = "getNumberDetails")]
     pub async fn get_number_details(
         this: &Flags,
         default_value: f64,
     ) -> Result<EvaluationDetails<f64>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getNumberDetails")]
+    pub fn get_number_details_promise(
+        this: &Flags,
+        default_value: f64,
+    ) -> Promise<EvaluationDetails<f64>>;
     #[wasm_bindgen(method, catch, js_name = "getNullableString")]
     pub async fn get_nullable_string(
         this: &Flags,
@@ -192,6 +212,11 @@ extern "C" {
         this: &Flags,
         default_value: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Option<JsString>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getNullableString")]
+    pub fn get_nullable_string_promise(
+        this: &Flags,
+        default_value: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<JsOption<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "getStringPair")]
     pub async fn get_string_pair(
         this: &Flags,
@@ -202,18 +227,32 @@ extern "C" {
         this: &Flags,
         default_value: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Pair<JsString, JsString>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getStringPair")]
+    pub fn get_string_pair_promise(
+        this: &Flags,
+        default_value: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<Pair<String, String>>;
     #[wasm_bindgen(method, catch, js_name = "getStringArray")]
     pub async fn get_string_array(this: &Flags) -> Result<Array<JsString>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getStringArray")]
+    pub fn get_string_array_promise(this: &Flags) -> Promise<Array<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "getStringMap")]
     pub async fn get_string_map(this: &Flags) -> Result<Map<JsString, JsString>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getStringMap")]
+    pub fn get_string_map_promise(this: &Flags) -> Promise<Map<JsString, JsString>>;
     #[wasm_bindgen(method, catch, js_name = "getStringTuple")]
     pub async fn get_string_tuple(
         this: &Flags,
     ) -> Result<ArrayTuple<(JsString, JsString)>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getStringTuple")]
+    pub fn get_string_tuple_promise(this: &Flags) -> Promise<ArrayTuple<(JsString, JsString)>>;
     #[wasm_bindgen(method, catch, js_name = "getStringCallback")]
     pub async fn get_string_callback(
         this: &Flags,
     ) -> Result<Function<fn(JsString) -> JsString>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getStringCallback")]
+    pub fn get_string_callback_promise(this: &Flags)
+        -> Promise<Function<fn(JsString) -> JsString>>;
     #[wasm_bindgen(method, js_name = "compareStrings")]
     pub fn compare_strings(
         this: &Flags,

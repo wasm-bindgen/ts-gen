@@ -78,6 +78,8 @@ extern "C" {
         cron: &str,
         env: &Env,
     ) -> Result<Undefined, JsValue>;
+    #[wasm_bindgen(method, js_name = "scheduled")]
+    pub fn scheduled_promise(this: &ExportedHandler, cron: &str, env: &Env) -> Promise<Undefined>;
     #[doc = " Always provided: a plain method with an optional parameter."]
     #[wasm_bindgen(method)]
     pub fn health(this: &ExportedHandler) -> String;

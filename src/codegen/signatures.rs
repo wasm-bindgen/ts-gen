@@ -473,6 +473,7 @@ pub struct CallableSpec<'a> {
 ///   type is `Promise<T>`, collapse to a single `async fn` with `catch: true`,
 ///   carrying the unwrapped `T` as `return_type`. No `try_` companion is
 ///   emitted in this case (`async + catch` is already the fallible form).
+///   A sync `<name>_promise` sibling returns the `Promise<T>` itself.
 /// * **`try_` companion**: for sync, non-setter, non-constructor callables,
 ///   each primary `name` gets a fallible `try_name` sibling.
 /// * **Constructor catches always**: per JS semantics; the primary signature
@@ -545,6 +546,33 @@ pub fn build_signatures(
             body_scope: scope,
         };
         push_with_js_string_return(&mut out, primary, names, cgctx, scope);
+
+        // An `async fn` import only calls JS when first polled, so a
+        // caller that needs the call started now (handing the promise
+        // to `waitUntil`, gating a constructor on it, racing it) gets
+        // the un-awaited form too. Rejection travels inside the
+        // returned promise; `catch` here covers only a synchronous
+        // throw, which the sync-callable policy decides.
+        if is_async {
+            let promise_name = names.declare(&format!("{primary_name}_promise"), Suffix::Snake);
+            let promise_catches = !nothrow && fallible && spec.kind.allows_try_variant();
+            out.push(FunctionSignature {
+                rust_name: promise_name,
+                js_name: spec.js_name.to_string(),
+                params: exp.params.clone(),
+                catch: promise_catches,
+                is_async: false,
+                return_type: overload.return_type.clone(),
+                js_string_return: false,
+                error_type: if promise_catches {
+                    error_type.cloned()
+                } else {
+                    None
+                },
+                doc: overload.doc.clone(),
+                body_scope: scope,
+            });
+        }
 
         if allow_try {
             let try_name = names.declare(&format!("try_{primary_name}"), Suffix::Snake);
@@ -1849,6 +1877,24 @@ mod tests {
     }
 
     #[test]
+    fn fallible_policy_promise_form_catches_sync_throws() {
+        let promise = TypeRef::generic("Promise", vec![TypeRef::String]);
+        let sigs = fallible_sigs(SignatureKind::Method, &Throws::None, &promise);
+        assert_eq!(sigs.len(), 2);
+        assert_eq!(sigs[1].rust_name, "op_promise");
+        assert!(!sigs[1].is_async && sigs[1].catch);
+        assert_eq!(sigs[1].return_type, promise);
+        let typed = fallible_sigs(
+            SignatureKind::Method,
+            &Throws::Type(TypeRef::ident("TypeError")),
+            &promise,
+        );
+        assert_eq!(typed[1].error_type, Some(TypeRef::ident("TypeError")));
+        let never = fallible_sigs(SignatureKind::Method, &Throws::Never, &promise);
+        assert!(!never[1].catch && never[1].error_type.is_none());
+    }
+
+    #[test]
     fn js_string_variants_need_mono_and_a_string_return() {
         let default = expand_mode(false, "value", &[], &TypeRef::String, &mut no_used());
         assert!(default.iter().all(|s| !s.js_string_return));
@@ -2153,13 +2199,22 @@ mod tests {
             &None,
             &mut used,
         );
-        assert_eq!(sigs.len(), 1, "promise method should not get a try_ pair");
+        assert_eq!(sigs.len(), 2, "async primary plus its `_promise` form");
         assert_eq!(sigs[0].rust_name, "foo");
         assert!(sigs[0].is_async, "promise method must be async");
         assert!(sigs[0].catch, "async promise method must catch");
         // Return type is unwrapped from Promise<T> — wasm-bindgen rewraps as a
         // Promise on the JS side automatically when `async fn` is used.
         assert_eq!(sigs[0].return_type, TypeRef::String);
+        // The sync form hands back the promise itself, un-unwrapped, and
+        // does not catch under the default policy.
+        assert_eq!(sigs[1].rust_name, "foo_promise");
+        assert!(!sigs[1].is_async);
+        assert!(!sigs[1].catch);
+        assert_eq!(
+            sigs[1].return_type,
+            TypeRef::generic("Promise", vec![TypeRef::String])
+        );
     }
 
     #[test]
@@ -2173,11 +2228,12 @@ mod tests {
             &None,
             &mut used,
         );
-        assert_eq!(sigs.len(), 1);
+        assert_eq!(sigs.len(), 2);
         assert_eq!(sigs[0].rust_name, "fetch");
         assert!(sigs[0].is_async);
         assert!(sigs[0].catch);
         assert_eq!(sigs[0].return_type, TypeRef::ident("Response"));
+        assert_eq!(sigs[1].rust_name, "fetch_promise");
     }
 
     #[test]
@@ -2191,7 +2247,7 @@ mod tests {
             &None,
             &mut used,
         );
-        assert_eq!(sigs.len(), 1);
+        assert_eq!(sigs.len(), 2);
         assert!(sigs[0].is_async);
         assert!(sigs[0].catch);
     }
@@ -2236,19 +2292,27 @@ mod tests {
             &None,
             &mut used,
         );
-        assert_eq!(sigs.len(), 2, "two overloads → two sigs, no try_ variants");
+        assert_eq!(
+            sigs.len(),
+            4,
+            "two overloads → two async sigs + two `_promise`"
+        );
         for sig in &sigs {
-            assert!(sig.is_async, "{} should be async", sig.rust_name);
-            assert!(sig.catch, "{} should catch", sig.rust_name);
             assert!(
                 !sig.rust_name.starts_with("try_"),
                 "no try_ variant expected for promise overloads, got {}",
                 sig.rust_name,
             );
         }
-        // Names should disambiguate via the standard `_with_<param>` suffix.
+        for sig in sigs.iter().filter(|s| s.is_async) {
+            assert!(sig.catch, "{} should catch", sig.rust_name);
+        }
+        // Names should disambiguate via the standard `_with_<param>` suffix;
+        // the promise form appends to the disambiguated name.
         assert_eq!(sigs[0].rust_name, "send");
-        assert_eq!(sigs[1].rust_name, "send_with_builder");
+        assert_eq!(sigs[1].rust_name, "send_promise");
+        assert_eq!(sigs[2].rust_name, "send_with_builder");
+        assert_eq!(sigs[3].rust_name, "send_with_builder_promise");
     }
 
     #[test]
@@ -2299,6 +2363,7 @@ mod tests {
             summary,
             [
                 ("f", true, &TypeRef::String, outer),
+                ("f_promise", false, &promise, outer),
                 ("f_with_f64", false, &TypeRef::Number, inner),
                 ("try_f_with_f64", false, &TypeRef::Number, inner),
             ]
@@ -2572,7 +2637,7 @@ mod tests {
             &None,
             &mut used,
         );
-        assert_eq!(sigs.len(), 1);
+        assert_eq!(sigs.len(), 2);
         assert_eq!(sigs[0].rust_name, "loaded");
         assert!(sigs[0].is_async);
         assert!(
@@ -2581,6 +2646,8 @@ mod tests {
         );
         assert!(sigs[0].error_type.is_none());
         assert_eq!(sigs[0].return_type, TypeRef::String);
+        assert_eq!(sigs[1].rust_name, "loaded_promise");
+        assert!(!sigs[1].catch);
     }
 
     #[test]
@@ -2662,10 +2729,15 @@ mod tests {
             &None,
             &mut used,
         );
-        assert_eq!(sigs.len(), 1);
+        assert_eq!(sigs.len(), 2);
         assert!(sigs[0].is_async);
         assert!(sigs[0].catch);
         assert_eq!(sigs[0].error_type.as_ref(), Some(&err));
+        // Default policy: the sync promise form does not catch, so the
+        // typed error does not apply to it.
+        assert_eq!(sigs[1].rust_name, "upload_promise");
+        assert!(!sigs[1].catch);
+        assert!(sigs[1].error_type.is_none());
     }
 
     #[test]

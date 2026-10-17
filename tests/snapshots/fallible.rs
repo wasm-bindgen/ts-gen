@@ -29,6 +29,9 @@ extern "C" {
     #[doc = " Async — unchanged: already a single `Result` form."]
     #[wasm_bindgen(method, catch)]
     pub async fn text(this: &Headers) -> Result<JsString, crate::Error>;
+    #[doc = " Async — unchanged: already a single `Result` form."]
+    #[wasm_bindgen(method, catch, js_name = "text")]
+    pub fn text_promise(this: &Headers) -> Result<Promise<JsString>, crate::Error>;
     #[doc = " Getter — infallible by default."]
     #[wasm_bindgen(method, getter)]
     pub fn size(this: &Headers) -> f64;

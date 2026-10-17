@@ -98,10 +98,16 @@ extern "C" {
     pub fn try_maybe_holder(this: &Probe) -> Result<Holder<Option<Mode>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "nextMode")]
     pub async fn next_mode(this: &Probe) -> Result<Mode, JsValue>;
+    #[wasm_bindgen(method, js_name = "nextMode")]
+    pub fn next_mode_promise(this: &Probe) -> Promise<JsString>;
     #[wasm_bindgen(method, catch, js_name = "nextLevel")]
     pub async fn next_level(this: &Probe) -> Result<Option<Level>, JsValue>;
+    #[wasm_bindgen(method, js_name = "nextLevel")]
+    pub fn next_level_promise(this: &Probe) -> Promise<JsOption<Number>>;
     #[wasm_bindgen(method, catch, js_name = "nextDetails")]
     pub async fn next_details(this: &Probe) -> Result<Details<Mode>, JsValue>;
+    #[wasm_bindgen(method, js_name = "nextDetails")]
+    pub fn next_details_promise(this: &Probe) -> Promise<Details<Mode>>;
     #[wasm_bindgen(method)]
     pub fn levels(this: &Probe, #[wasm_bindgen(slice = "array")] ls: &[f64]) -> Vec<f64>;
     #[wasm_bindgen(method, catch, js_name = "levels")]

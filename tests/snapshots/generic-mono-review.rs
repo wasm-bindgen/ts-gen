@@ -58,6 +58,11 @@ extern "C" {
 }
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {
+    #[wasm_bindgen(js_name = "asyncByAlias")]
+    pub fn async_by_alias_promise(id: impl ::wasm_bindgen::JsStringLike) -> Promise<JsString>;
+}
+#[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
+extern "C" {
     #[wasm_bindgen(js_name = "withS")]
     pub fn with_s(s: &S, s2: &S2, name: impl ::wasm_bindgen::JsStringLike);
 }
