@@ -815,6 +815,7 @@ struct Imports {
     funcs: IndexSet<(String, Vec<WasmType>, Option<WasmType>)>,
     strings: IndexSet<String>,
     global: bool,
+    undefined: bool,
     anyrefs_type: bool,
     /// `globalThis.Boolean`, fetched once at start for boolean writes.
     boolean: bool,
@@ -855,6 +856,12 @@ impl Imports {
             let _ = writeln!(
                 out,
                 "  (import {BUILTINS_SPECIFIER:?} \"global\" (global $global externref))"
+            );
+        }
+        if self.undefined {
+            let _ = writeln!(
+                out,
+                "  (import {BUILTINS_SPECIFIER:?} {UNDEFINED_GLOBAL:?} (global $undefined externref))"
             );
         }
         for (name, params, result) in &self.funcs {
@@ -987,6 +994,12 @@ impl Body<'_> {
         self.imports.global = true;
         self.builtins.global = true;
         "(global.get $global)".into()
+    }
+
+    fn undefined(&mut self) -> String {
+        self.imports.undefined = true;
+        self.builtins.undefined = true;
+        "(global.get $undefined)".into()
     }
 
     /// `receiver[name]`; the key is a string constant, hence externref.
@@ -1292,10 +1305,10 @@ fn function_body_inner(
             body.set((&recv, R), name, value()?)
         }
         AbiOp::StaticCall { path, name } => {
-            // A module's own export is called with globalThis as `this`,
-            // as an ESM free function would be.
+            // A module's own export is called with `this` undefined, as
+            // `import { f } from "m"; f()` calls it.
             let recv = match (module, path.is_empty()) {
-                (Some(_), true) => body.global(),
+                (Some(_), true) => body.undefined(),
                 _ => body.path(module, path),
             };
             let func = body.static_ref(module, path, name);

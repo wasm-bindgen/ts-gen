@@ -6,3 +6,5 @@ export const call0 = (f, t) => f.call(t);
 export const call1 = (f, t, a0) => f.call(t, a0);
 export const call_new0 = (C) => new C();
 export const call_new1 = (C, a0) => new C(a0);
+const undefined_ = undefined;
+export { undefined_ as undefined };
