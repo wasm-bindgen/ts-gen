@@ -168,10 +168,9 @@ element by element. Variadic rest parameters (`&[JsValue]`) don't take
 one either.
 
 The user-facing Rust signature is unchanged — only the JS-side wire
-format changes. The mode goes on the argument rather than the
-function: a fn-level mode is inherited by every slice parameter of
-the binding, which would also turn a typed-array union's typed copy
-(see below) into an `Array` when the two share a signature.
+format changes. Modes go on the argument, except for the mono case
+above. A per-argument mode overrides the fn-level one, so a typed copy
+sharing a signature with a mono `T[]` stays a copy.
 
 ### `{@slice}` JSDoc hints
 

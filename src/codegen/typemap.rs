@@ -2352,9 +2352,8 @@ pub fn param_slice_mode(
     }
 }
 
-/// Whether a binding with these parameters needs a fn-level
-/// `slice = "array"`: any `T[]` whose element per-monomorphization keeps
-/// as a bare `T`. wasm-bindgen resolves the mode per instantiation, so it
+/// The fn-level `slice = "array"` a binding with these parameters needs:
+/// any `T[]` whose element per-monomorphization keeps as a bare `T`. wasm-bindgen resolves the mode per instantiation, so it
 /// turns `T = f64`'s view into an `Array` — but a non-numeric `T` can't
 /// take a mode at all, and only an *inherited* mode drops by shape there;
 /// a per-argument one is a hard error. So the mono case is the one mode
@@ -2364,17 +2363,20 @@ pub fn fn_mono_array_mode(
     params: &[crate::codegen::signatures::ConcreteParam],
     ctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
-) -> bool {
-    params.iter().any(|p| {
-        if p.variadic {
-            return false;
-        }
-        let ty = match &p.type_ref {
-            TypeRef::Nullable(inner) => inner.as_ref(),
-            other => other,
-        };
-        matches!(ty, TypeRef::Array(elem) if is_mono_type_param(elem, ctx, scope))
-    })
+) -> Option<TokenStream> {
+    params
+        .iter()
+        .any(|p| {
+            if p.variadic {
+                return false;
+            }
+            let ty = match &p.type_ref {
+                TypeRef::Nullable(inner) => inner.as_ref(),
+                other => other,
+            };
+            matches!(ty, TypeRef::Array(elem) if is_mono_type_param(elem, ctx, scope))
+        })
+        .then(|| quote! { slice = "array" })
 }
 
 fn is_mono_type_param(ty: &TypeRef, ctx: Option<&CodegenContext<'_>>, scope: ScopeId) -> bool {
@@ -2727,14 +2729,16 @@ mod tests {
         let modes = |mono: bool| {
             let ctx = CodegenContext::from_module_full(&module, &gctx, false, mono, HashSet::new());
             [
-                fn_mono_array_mode(&[cp("xs", ts.clone())], Some(&ctx), holder.body_scope),
+                fn_mono_array_mode(&[cp("xs", ts.clone())], Some(&ctx), holder.body_scope)
+                    .is_some(),
                 fn_mono_array_mode(
                     &[cp("xs", TypeRef::Nullable(Box::new(ts.clone())))],
                     Some(&ctx),
                     holder.body_scope,
-                ),
+                )
+                .is_some(),
                 // Outside its declaring scope `T` is no type parameter.
-                fn_mono_array_mode(&[cp("xs", ts.clone())], Some(&ctx), scope),
+                fn_mono_array_mode(&[cp("xs", ts.clone())], Some(&ctx), scope).is_some(),
             ]
         };
         assert_eq!(modes(true), [true, true, false]);

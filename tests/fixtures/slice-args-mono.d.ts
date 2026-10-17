@@ -10,3 +10,4 @@ export declare class Bag<T> {
   constructor();
   take(values: T[]): string;
 }
+export declare function mixed<T>(values: T[], weights: number[], data: Float64Array | number[]): string;

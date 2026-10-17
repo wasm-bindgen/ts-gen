@@ -18,3 +18,11 @@ fn class_generic_slices_arrive_as_arrays() {
     let bag = Bag::<f64>::new().unwrap();
     assert_eq!(bag.take(&[1.5]), "Array(1.5)");
 }
+
+#[wasm_bindgen_test]
+fn per_argument_modes_override_the_mono_fn_mode() {
+    assert_eq!(
+        mixed::<String>(&["a".to_string()], &[1.0], &[2.0]),
+        "Array(a) Array(1) Float64Array(2)"
+    );
+}

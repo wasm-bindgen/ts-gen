@@ -7,3 +7,5 @@ export class Bag {
     return describe(values);
   }
 }
+export const mixed = (values, weights, data) =>
+  [describe(values), describe(weights), describe(data)].join(" ");
