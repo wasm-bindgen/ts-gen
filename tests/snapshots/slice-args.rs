@@ -261,12 +261,63 @@ extern "C" {
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
     #[wasm_bindgen(js_name = "floats")]
-    pub fn floats_with_float64_array(values: &Float64Array) -> String;
+    pub fn floats_with_float64_array(values: &JsNullable<Float64Array>) -> String;
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "floats")]
-    pub fn try_floats_with_float64_array(values: &Float64Array) -> Result<String, JsValue>;
+    pub fn try_floats_with_float64_array(
+        values: &JsNullable<Float64Array>,
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "maybeBytes")]
+    pub fn maybe_bytes(#[wasm_bindgen(slice = "copy")] values: Option<&[u8]>) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "maybeBytes")]
+    pub fn try_maybe_bytes(
+        #[wasm_bindgen(slice = "copy")] values: Option<&[u8]>,
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "maybeBytes")]
+    pub fn maybe_bytes_with_uint8_array(values: Option<&Uint8Array>) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "maybeBytes")]
+    pub fn try_maybe_bytes_with_uint8_array(values: Option<&Uint8Array>)
+        -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "maybeClamped")]
+    pub fn maybe_clamped(
+        #[wasm_bindgen(slice = "copy")] values: ::wasm_bindgen::Clamped<&[u8]>,
+    ) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "maybeClamped")]
+    pub fn try_maybe_clamped(
+        #[wasm_bindgen(slice = "copy")] values: ::wasm_bindgen::Clamped<&[u8]>,
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(js_name = "maybeClamped")]
+    pub fn maybe_clamped_with_uint8_clamped_array(values: Option<&Uint8ClampedArray>) -> String;
+}
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "maybeClamped")]
+    pub fn try_maybe_clamped_with_uint8_clamped_array(
+        values: Option<&Uint8ClampedArray>,
+    ) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "slice-args")]
 extern "C" {

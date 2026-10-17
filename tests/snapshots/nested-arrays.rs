@@ -80,13 +80,13 @@ extern "C" {
 #[wasm_bindgen(module = "nested-arrays")]
 extern "C" {
     #[wasm_bindgen(js_name = "maybeRows")]
-    pub fn maybe_rows(rows: &[Array<JsString>]) -> Option<Vec<Array<JsString>>>;
+    pub fn maybe_rows(rows: &JsNullable<Array<Array<JsString>>>) -> Option<Vec<Array<JsString>>>;
 }
 #[wasm_bindgen(module = "nested-arrays")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "maybeRows")]
     pub fn try_maybe_rows(
-        rows: &[Array<JsString>],
+        rows: &JsNullable<Array<Array<JsString>>>,
     ) -> Result<Option<Vec<Array<JsString>>>, JsValue>;
 }
 #[wasm_bindgen(module = "nested-arrays")]
@@ -104,26 +104,26 @@ extern "C" {
 #[wasm_bindgen(module = "nested-arrays")]
 extern "C" {
     #[wasm_bindgen(js_name = "nullableStrings")]
-    pub fn nullable_strings(values: &[JsOption<JsString>]) -> Vec<JsOption<JsString>>;
+    pub fn nullable_strings(values: &[JsNullable<JsString>]) -> Vec<JsNullable<JsString>>;
 }
 #[wasm_bindgen(module = "nested-arrays")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "nullableStrings")]
     pub fn try_nullable_strings(
-        values: &[JsOption<JsString>],
-    ) -> Result<Vec<JsOption<JsString>>, JsValue>;
+        values: &[JsNullable<JsString>],
+    ) -> Result<Vec<JsNullable<JsString>>, JsValue>;
 }
 #[wasm_bindgen(module = "nested-arrays")]
 extern "C" {
     #[wasm_bindgen(js_name = "nullableRows")]
-    pub fn nullable_rows(rows: &[JsOption<Array<JsString>>]) -> Vec<JsOption<Array<JsString>>>;
+    pub fn nullable_rows(rows: &[JsNullable<Array<JsString>>]) -> Vec<JsNullable<Array<JsString>>>;
 }
 #[wasm_bindgen(module = "nested-arrays")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "nullableRows")]
     pub fn try_nullable_rows(
-        rows: &[JsOption<Array<JsString>>],
-    ) -> Result<Vec<JsOption<Array<JsString>>>, JsValue>;
+        rows: &[JsNullable<Array<JsString>>],
+    ) -> Result<Vec<JsNullable<Array<JsString>>>, JsValue>;
 }
 #[wasm_bindgen(module = "nested-arrays")]
 extern "C" {
