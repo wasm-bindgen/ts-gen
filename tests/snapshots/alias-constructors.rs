@@ -24,12 +24,12 @@ extern "C" {
 #[wasm_bindgen(module = "alias-constructors")]
 extern "C" {
     #[wasm_bindgen(js_name = "unwrapText")]
-    pub fn unwrap_text(stub: &Wrap<JsString>) -> String;
+    pub fn unwrap_text(stub: &Stub<JsString>) -> String;
 }
 #[wasm_bindgen(module = "alias-constructors")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "unwrapText")]
-    pub fn try_unwrap_text(stub: &Wrap<JsString>) -> Result<String, JsValue>;
+    pub fn try_unwrap_text(stub: &Stub<JsString>) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "alias-constructors")]
 extern "C" {
