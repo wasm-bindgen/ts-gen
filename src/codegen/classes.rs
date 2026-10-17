@@ -401,6 +401,81 @@ impl<'a> ClassConfig<'a> {
         render_generic_bounds(&self.type_param_bounds())
     }
 
+    /// The `pub type` form of the generic declaration: every parameter
+    /// carries a default so the bare name (`Request`, `ReadableStream`)
+    /// stays usable at every site that does not care about the
+    /// parameter. The default is the TS default when one is declared,
+    /// otherwise `JsValue`.
+    fn type_generics_decl_with_defaults(&self) -> TokenStream {
+        if self.type_params.is_empty() {
+            return quote! {};
+        }
+        let params: Vec<TokenStream> = self
+            .type_params
+            .iter()
+            .map(|tp| {
+                let decl = CodegenContext::type_param_decl(self.cgctx, &tp.name);
+                let default = self.type_param_default_tokens(tp);
+                quote! { #decl = #default }
+            })
+            .collect();
+        quote! { <#(#params),*> }
+    }
+
+    /// Lowering of a type parameter's default in generic-argument
+    /// position; `JsValue` when the TS declaration has none. When the
+    /// default's target itself erases to `JsValue` (an alias of a union,
+    /// an unresolved name) its type arguments go with it:
+    /// `CfProperties<CfHostMetadata>` is just `JsValue`.
+    fn type_param_default_tokens(&self, tp: &crate::ir::TypeParam) -> TokenStream {
+        let Some(default) = &tp.default else {
+            return quote! { JsValue };
+        };
+        let tokens = super::typemap::to_syn_type(
+            default,
+            TypePosition::ARGUMENT.to_inner(),
+            self.cgctx,
+            self.scope,
+            &self.from_module(),
+        );
+        if let (TypeRef::Reference { segments, .. }, Some(ctx)) = (default, self.cgctx) {
+            let uses = ctx.external_uses.borrow();
+            if uses.get(&segments[0]).is_some_and(|v| v == "JsValue") {
+                return quote! { JsValue };
+            }
+        }
+        tokens
+    }
+
+    /// The TS default of a type parameter as a `TypeRef`, `any` when
+    /// none is declared.
+    fn type_param_default_ref(&self, tp: &crate::ir::TypeParam) -> TypeRef {
+        tp.default.clone().unwrap_or(TypeRef::Any)
+    }
+
+    /// Type-level parameters mentioned by `tys`, in declaration order.
+    fn mentioned_type_params(&self, scope: ScopeId, tys: &[&TypeRef]) -> Vec<String> {
+        let names = self.mentioned_type_param_names(scope, tys);
+        self.type_params
+            .iter()
+            .filter(|tp| names.contains(&tp.name))
+            .map(|tp| tp.name.clone())
+            .collect()
+    }
+
+    /// Every name in `tys` that resolves to a type parameter in `scope`
+    /// (type-level or callable-level), in appearance order.
+    fn mentioned_type_param_names(&self, scope: ScopeId, tys: &[&TypeRef]) -> Vec<String> {
+        let Some(cgctx) = self.cgctx else {
+            return Vec::new();
+        };
+        let mut names: Vec<String> = Vec::new();
+        for ty in tys {
+            super::signatures::collect_type_params(ty, cgctx, scope, &mut names);
+        }
+        names
+    }
+
     /// Generic declaration for Rust helper impls and builder structs. The
     /// erased path keeps the extern declaration's `JsGeneric` bound. The
     /// per-monomorphization path instead needs `IntoWasmAbi` because helper
@@ -1486,6 +1561,14 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 } else {
                     TypeRef::ident(config.rust_name.clone())
                 };
+                // A construct signature may declare its own `<T>`
+                // (`new <T>(…): Foo<T>`); its body scope then shadows
+                // the class body scope for the whole overload group.
+                let ctor_scope = constructor_overloads
+                    .iter()
+                    .find(|c| !c.type_params.is_empty())
+                    .map(|c| c.body_scope)
+                    .unwrap_or(config.scope);
                 let sigs = build_signatures(
                     &CallableSpec {
                         js_name: &config.js_name,
@@ -1495,14 +1578,11 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         return_type: &return_type,
                         throws,
                         doc: &doc,
-                        // Constructors don't have their own type
-                        // parameter scope — they instantiate the
-                        // class's. `config.scope` is the class body.
-                        body_scope: config.scope,
+                        body_scope: ctor_scope,
                     },
                     &mut names,
                     config.cgctx,
-                    config.scope,
+                    ctor_scope,
                 );
                 for sig in &sigs {
                     items.push(generate_expanded_constructor(config, sig));
@@ -1692,7 +1772,7 @@ fn generate_type_decl(config: &ClassConfig) -> TokenStream {
         quote! { #[wasm_bindgen(#(#wb_parts),*)] }
     };
 
-    let generics_decl = config.type_generics_decl();
+    let generics_decl = config.type_generics_decl_with_defaults();
 
     quote! {
         #wb_attr
@@ -1722,7 +1802,44 @@ fn generic_bounds_for_method(config: &ClassConfig, sig: &FunctionSignature) -> V
         .chain(std::iter::once(&sig.return_type))
         .collect();
     bounds.extend(config.local_generic_bounds(sig.body_scope, &sig_tys));
+    widen_async_return_param(bounds, config, sig)
+}
+
+/// An `async fn` resolving to a bare type parameter is converted from
+/// the settled `JsValue` by wasm-bindgen's `JsFuture<T>`, which needs
+/// `T: FromWasmAbi` on top of `JsGeneric`.
+fn widen_async_return_param(
+    bounds: Vec<TokenStream>,
+    config: &ClassConfig,
+    sig: &FunctionSignature,
+) -> Vec<TokenStream> {
+    if !sig.is_async || CodegenContext::generic_mono(config.cgctx) {
+        return bounds;
+    }
+    let Some(cgctx) = config.cgctx else {
+        return bounds;
+    };
+    let Some(name) = sig.return_type.as_ident() else {
+        return bounds;
+    };
+    if !matches!(
+        cgctx.gctx.scopes.resolve_binding(sig.body_scope, name),
+        Some(crate::parse::scope::Binding::TypeParam)
+    ) {
+        return bounds;
+    }
+    let plain = CodegenContext::type_param_decl(config.cgctx, name).to_string();
+    let ident = super::typemap::make_ident(name);
     bounds
+        .into_iter()
+        .map(|b| {
+            if b.to_string() == plain {
+                quote! { #ident: ::wasm_bindgen::JsGeneric + ::wasm_bindgen::convert::FromWasmAbi }
+            } else {
+                b
+            }
+        })
+        .collect()
 }
 
 /// Generate a constructor binding from a resolved signature.
@@ -1739,8 +1856,35 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
 
     // Constructors always return the constructed type, wrapped in Result
     // when `catch` (which is always-true here per `SignatureKind::Constructor`).
+    // Type parameters the arguments mention — the class's own or the
+    // construct signature's. A constructor-level `<T>` of the same
+    // name as a class-level one (the `declare var` pattern) binds the
+    // class parameter positionally by name.
+    let param_tys: Vec<&TypeRef> = sig.params.iter().map(|p| &p.type_ref).collect();
+    let mentioned = config.mentioned_type_param_names(scope, &param_tys);
+    let return_type = if CodegenContext::generic_mono(config.cgctx)
+        || config.type_params.is_empty()
+        || mentioned.is_empty()
+    {
+        sig.return_type.clone()
+    } else {
+        TypeRef::generic(
+            config.rust_name.clone(),
+            config
+                .type_params
+                .iter()
+                .map(|tp| {
+                    if mentioned.contains(&tp.name) {
+                        TypeRef::ident(tp.name.clone())
+                    } else {
+                        config.type_param_default_ref(tp)
+                    }
+                })
+                .collect(),
+        )
+    };
     let ret = to_return_type(
-        &sig.return_type,
+        &return_type,
         sig.catch,
         sig.is_async,
         sig.js_string_return,
@@ -1770,7 +1914,14 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
     let generics = if CodegenContext::generic_mono(config.cgctx) {
         render_generic_bounds(&generic_bounds_for_method(config, sig))
     } else {
-        quote! {}
+        // A constructor only binds the type parameters its own
+        // arguments mention; the rest are instantiated at their
+        // defaults in the return type so `Foo::new()` needs no turbofish.
+        let bounds: Vec<TokenStream> = mentioned
+            .iter()
+            .map(|n| CodegenContext::type_param_decl(config.cgctx, n))
+            .collect();
+        render_generic_bounds(&bounds)
     };
 
     quote! {
@@ -1900,7 +2051,21 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
         quote! {}
     };
 
-    let generics = render_generic_bounds(&generic_bounds_for_method(config, sig));
+    // Static methods have no `this`, so type-level parameters are only
+    // declared when the signature mentions them.
+    let sig_tys: Vec<&TypeRef> = sig
+        .params
+        .iter()
+        .map(|p| &p.type_ref)
+        .chain(std::iter::once(&sig.return_type))
+        .collect();
+    let mut bounds: Vec<TokenStream> = config
+        .mentioned_type_params(scope, &sig_tys)
+        .iter()
+        .map(|n| CodegenContext::type_param_decl(config.cgctx, n))
+        .collect();
+    bounds.extend(config.local_generic_bounds(scope, &sig_tys));
+    let generics = render_generic_bounds(&bounds);
 
     quote! {
         #doc

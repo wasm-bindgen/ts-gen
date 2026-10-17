@@ -334,6 +334,44 @@ impl TypeRef {
         args.first()
     }
 
+    /// `self` with each bare single-segment reference to a name in `map`
+    /// (type parameter names) replaced by its substitute, recursively.
+    pub fn substitute<K>(&self, map: &HashMap<K, TypeRef>) -> TypeRef
+    where
+        K: std::borrow::Borrow<str> + Eq + std::hash::Hash,
+    {
+        let sub = |t: &TypeRef| t.substitute(map);
+        match self {
+            TypeRef::Reference {
+                segments,
+                generic_args,
+            } => match (segments.as_slice(), map.get(segments[0].as_str())) {
+                ([_], Some(arg)) if generic_args.is_empty() => arg.clone(),
+                _ => TypeRef::Reference {
+                    segments: segments.clone(),
+                    generic_args: generic_args.iter().map(sub).collect(),
+                },
+            },
+            TypeRef::Array(t) => TypeRef::Array(Box::new(sub(t))),
+            TypeRef::Nullable(t, n) => TypeRef::Nullable(Box::new(sub(t)), *n),
+            TypeRef::Union(ts) => TypeRef::Union(ts.iter().map(sub).collect()),
+            TypeRef::Intersection(ts) => TypeRef::Intersection(ts.iter().map(sub).collect()),
+            TypeRef::Tuple(ts) => TypeRef::Tuple(ts.iter().map(sub).collect()),
+            TypeRef::Function(sig) => TypeRef::Function(FunctionSig {
+                params: sig
+                    .params
+                    .iter()
+                    .map(|p| Param {
+                        type_ref: sub(&p.type_ref),
+                        ..p.clone()
+                    })
+                    .collect(),
+                return_type: Box::new(sub(&sig.return_type)),
+            }),
+            other => other.clone(),
+        }
+    }
+
     /// Members of the `string | number | symbol` union that
     /// [`TypeRef::PropertyKey`] abbreviates, in `lib.es5.d.ts` order.
     pub fn property_key_members() -> Vec<TypeRef> {
@@ -953,6 +991,10 @@ pub struct MethodMember {
 #[derive(Clone, Debug)]
 
 pub struct ConstructorMember {
+    /// Own type parameters of a construct signature (`new <T>(…)`),
+    /// as in the `declare var Foo: { new <T>(…): Foo<T> }` pattern.
+    /// Class `constructor(…)` members have none.
+    pub type_params: Vec<TypeParam>,
     pub params: Vec<Param>,
     pub doc: Option<String>,
     /// Failure-mode info from `@throws` — see [`Throws`].
@@ -961,6 +1003,9 @@ pub struct ConstructorMember {
     /// `Throws::Never` here is effectively a no-op for codegen — only
     /// `Throws::Type` (custom error type) changes behavior.
     pub throws: Throws,
+    /// Scope holding `type_params`; the parent's body scope when the
+    /// constructor declares none.
+    pub body_scope: crate::parse::scope::ScopeId,
 }
 
 #[derive(Clone, Debug)]

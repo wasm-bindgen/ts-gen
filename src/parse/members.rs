@@ -857,9 +857,11 @@ fn convert_class_method(
     match method.kind {
         MethodDefinitionKind::Constructor => {
             vec![Member::Constructor(ConstructorMember {
+                type_params,
                 params,
                 doc,
                 throws: info.throws(),
+                body_scope,
             })]
         }
         MethodDefinitionKind::Get => {

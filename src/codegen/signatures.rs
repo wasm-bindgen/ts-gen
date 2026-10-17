@@ -984,13 +984,11 @@ fn flatten_into(
             true
         }
 
-        // Bare references: resolve through aliases, then re-flatten.
-        // Generic instantiations and qualified paths don't follow
-        // aliases (they're already concrete at this level).
-        TypeRef::Reference { .. } if ty.as_ident().is_some() => {
-            let head = ty.as_ident().unwrap();
+        // References resolve through aliases (generic instantiations
+        // substitute their arguments), then re-flatten.
+        TypeRef::Reference { .. } => {
             if let Some(c) = cgctx {
-                if let Some(target) = c.resolve_alias(head, scope) {
+                if let Some(target) = c.resolve_alias_instance(ty, scope) {
                     return flatten_into(&target, cgctx, scope, out);
                 }
             }
@@ -1058,9 +1056,9 @@ fn flatten_collapse_to_lub(
             TypeRef::Nullable(Box::new(flatten_collapse_to_lub(inner, cgctx, scope)), *n)
         }
         TypeRef::PropertyKey => TypeRef::Any,
-        TypeRef::Reference { .. } if ty.as_ident().is_some() => {
+        TypeRef::Reference { .. } => {
             if let Some(c) = cgctx {
-                if let Some(target) = c.resolve_alias(ty.as_ident().unwrap(), scope) {
+                if let Some(target) = c.resolve_alias_instance(ty, scope) {
                     return flatten_collapse_to_lub(&target, cgctx, scope);
                 }
             }

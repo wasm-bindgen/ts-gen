@@ -26,6 +26,33 @@
   (import "namespace-type-aliases" "emit" (func $namespace-type-aliases:emit (param $name externref) (param $options externref) (result externref)))
   ;; onEvent(listener: Events.Listener<string>): void
   (import "namespace-type-aliases" "onEvent" (func $namespace-type-aliases:onEvent (param $listener externref)))
+  ;; outerPair(r: Events.Result<number>): void
+  (import "namespace-type-aliases" "outerPair" (func $namespace-type-aliases:outerPair (param $r externref)))
+  ;; loose(x: Events.Loose<string>): void
+  (import "namespace-type-aliases" "loose" (func $namespace-type-aliases:loose (param $x externref)))
+
+  ;; Holder
+  ;; on(listener: Events.Listener<T>): void
+  (import "namespace-type-aliases" "Holder.on" (func $namespace-type-aliases:Holder.on (param $this externref) (param $listener externref)))
+
+  ;; tagged(t: Events.Inner.Tagged<number>): void
+  (import "namespace-type-aliases" "tagged" (func $namespace-type-aliases:tagged (param $t externref)))
+
+  ;; Shadowed
+  ;; {} as Shadowed
+  (import "./bindings.wasm" "Shadowed.new" (func $Shadowed.new (result externref)))
+  ;; globalSide: string
+  (import "./bindings.wasm" "Shadowed.global_side" (func $Shadowed.global_side (param $this externref) (result externref)))
+  ;; set globalSide(value: string)
+  (import "./bindings.wasm" "Shadowed.set_global_side" (func $Shadowed.set_global_side (param $this externref) (param $value externref)))
+
+  ;; Events.Shadowed
+  ;; {} as Events.Shadowed
+  (import "./bindings.wasm" "Events.Shadowed.new" (func $Events.Shadowed.new (result externref)))
+  ;; eventsSide: number
+  (import "./bindings.wasm" "Events.Shadowed.events_side" (func $Events.Shadowed.events_side (param $this externref) (result f64)))
+  ;; set eventsSide(value: number)
+  (import "./bindings.wasm" "Events.Shadowed.set_events_side" (func $Events.Shadowed.set_events_side (param $this externref) (param $value f64)))
 
   ;; Events.Options
   ;; {} as Events.Options

@@ -293,7 +293,7 @@ impl Stub {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Provider<T: ::wasm_bindgen::JsGeneric>;
+    pub type Provider<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method)]
     pub fn call<T: ::wasm_bindgen::JsGeneric>(this: &Provider<T>) -> T;
     #[wasm_bindgen(method, catch, js_name = "call")]
@@ -303,7 +303,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Provider , extends = Fetcher , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type GenericStub<T: ::wasm_bindgen::JsGeneric>;
+    pub type GenericStub<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn id<T: ::wasm_bindgen::JsGeneric>(this: &GenericStub<T>) -> String;
 }
@@ -392,7 +392,7 @@ pub type ViaStr = JsString;
 #[allow(dead_code)]
 pub type ViaViaStr = JsString;
 #[allow(dead_code)]
-pub type ViaBranded = Branded<Base>;
+pub type ViaBranded = Base;
 #[allow(dead_code)]
 pub type BaseAlias = Base;
 #[wasm_bindgen(module = "intersection")]
@@ -415,11 +415,11 @@ impl ViaBaseAlias {
 #[allow(dead_code)]
 pub type Same<T> = T;
 #[allow(dead_code)]
-pub type ViaSame = Same<Base>;
+pub type ViaSame = Base;
 #[allow(dead_code)]
 pub type ProviderOf<T> = Provider<Array<T>>;
 #[allow(dead_code)]
-pub type ViaProviderOf = ProviderOf<JsString>;
+pub type ViaProviderOf = Provider<Array<JsString>>;
 #[wasm_bindgen(private)]
 pub enum RoleKind {
     User = "user",

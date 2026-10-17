@@ -2,7 +2,9 @@
 
 // A Rust alias can't declare a type parameter its target doesn't use
 // (E0091). Parameters the lowered target doesn't mention are dropped from
-// the alias and from every instantiation.
+// the alias declaration, and from the arguments where a reference still
+// names the alias (the `_js_string` variant); other references chase to
+// the target.
 
 interface Local {
   l: string;
@@ -22,9 +24,9 @@ declare function brand(value: Branded<Local, "id">): void;
 declare function erase(value: Erased<string>): Partly<string, number>;
 declare function skip(value: Skip<string, number, boolean>): void;
 
-// An omitted argument is left to the Rust alias's default, which resolves
-// where the alias is declared (`Ns.Inner`). `Chained`'s default names the
-// dropped `T`, so the use site fills it in. A bare alias means its defaults.
+// An omitted argument takes its default, read where the alias is declared
+// (`Ns.Inner`). `Chained`'s default names the dropped `T`. A bare alias
+// means its defaults.
 type WithDefault<T, U = string> = Pair<T, U>;
 type Chained<T, U = T> = Pair<U, U>;
 type Fetcher<T = undefined, Reserved = never> = Pair<T, T>;

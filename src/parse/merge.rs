@@ -74,15 +74,23 @@ pub fn extract_var_members(
     for member in members {
         match member {
             TSSignature::TSConstructSignatureDeclaration(ctor) => {
-                let params = convert_formal_params_scoped(&ctor.params, parent_scope, ctx);
+                let type_params = crate::parse::types::convert_type_params(
+                    ctor.type_parameters.as_ref(),
+                    ctx.diag,
+                );
+                let body_scope =
+                    crate::parse::members::create_body_scope(&type_params, parent_scope, ctx);
+                let params = convert_formal_params_scoped(&ctor.params, body_scope, ctx);
                 let (doc, info) = match ctx.docs.info_for_span(ctor.span.start) {
                     Some((d, i)) => (Some(d), i),
                     None => (None, crate::parse::docs::JsDocInfo::default()),
                 };
                 constructor = Some(ConstructorMember {
+                    type_params,
                     params,
                     doc,
                     throws: info.throws(),
+                    body_scope,
                 });
             }
             TSSignature::TSPropertySignature(prop) => {

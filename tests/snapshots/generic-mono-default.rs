@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type DefaultDetails<T: ::wasm_bindgen::JsGeneric>;
+    pub type DefaultDetails<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &DefaultDetails<T>) -> T;
     #[wasm_bindgen(method, setter)]

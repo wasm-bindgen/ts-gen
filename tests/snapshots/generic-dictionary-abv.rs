@@ -25,7 +25,7 @@ impl U {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type GenAbv<T: ::wasm_bindgen::JsGeneric>;
+    pub type GenAbv<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &GenAbv<T>) -> Option<T>;
     #[wasm_bindgen(method, setter)]
@@ -68,7 +68,7 @@ impl<T: ::wasm_bindgen::JsGeneric> GenAbvBuilder<T> {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type ReqAbv<T: ::wasm_bindgen::JsGeneric>;
+    pub type ReqAbv<T: ::wasm_bindgen::JsGeneric = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn value<T: ::wasm_bindgen::JsGeneric>(this: &ReqAbv<T>) -> T;
     #[wasm_bindgen(method, setter)]
