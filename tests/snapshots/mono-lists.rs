@@ -193,6 +193,102 @@ extern "C" {
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
+    #[wasm_bindgen(variadic, js_name = "joinTags")]
+    pub fn join_tags(tags: &[impl ::wasm_bindgen::JsStringLike]) -> String;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(variadic, js_name = "joinTags")]
+    pub fn join_tags_js_string(tags: &[impl ::wasm_bindgen::JsStringLike]) -> JsString;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(variadic, catch, js_name = "joinTags")]
+    pub fn try_join_tags(tags: &[impl ::wasm_bindgen::JsStringLike]) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(variadic, catch, js_name = "joinTags")]
+    pub fn try_join_tags_js_string(
+        tags: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "awaitTag")]
+    pub fn await_tag(tag: &Promise<impl ::wasm_bindgen::JsStringLike>) -> String;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "awaitTag")]
+    pub fn await_tag_js_string(tag: &Promise<impl ::wasm_bindgen::JsStringLike>) -> JsString;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "awaitTag")]
+    pub fn try_await_tag(
+        tag: &Promise<impl ::wasm_bindgen::JsStringLike>,
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "awaitTag")]
+    pub fn try_await_tag_js_string(
+        tag: &Promise<impl ::wasm_bindgen::JsStringLike>,
+    ) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "firstTag")]
+    pub fn first_tag(tags: &Iterator<impl ::wasm_bindgen::JsStringLike>) -> String;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "firstTag")]
+    pub fn first_tag_js_string(tags: &Iterator<impl ::wasm_bindgen::JsStringLike>) -> JsString;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "firstTag")]
+    pub fn try_first_tag(
+        tags: &Iterator<impl ::wasm_bindgen::JsStringLike>,
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "firstTag")]
+    pub fn try_first_tag_js_string(
+        tags: &Iterator<impl ::wasm_bindgen::JsStringLike>,
+    ) -> Result<JsString, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "nextTag")]
+    pub fn next_tag(tags: &AsyncIterator<impl ::wasm_bindgen::JsStringLike>) -> String;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(js_name = "nextTag")]
+    pub fn next_tag_js_string(tags: &AsyncIterator<impl ::wasm_bindgen::JsStringLike>) -> JsString;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "nextTag")]
+    pub fn try_next_tag(
+        tags: &AsyncIterator<impl ::wasm_bindgen::JsStringLike>,
+    ) -> Result<String, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "nextTag")]
+    pub fn try_next_tag_js_string(
+        tags: &AsyncIterator<impl ::wasm_bindgen::JsStringLike>,
+    ) -> Result<JsString, JsValue>;
+}
+#[allow(dead_code)]
+pub type Tags = Array<JsString>;
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
     #[wasm_bindgen(js_name = "getTags")]
     pub fn get_tags() -> Vec<String>;
 }
@@ -253,6 +349,35 @@ extern "C" {
     pub type Labels;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Labels, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn add(this: &Labels, values: &[impl ::wasm_bindgen::JsStringLike]) -> String;
+    #[wasm_bindgen(method, js_name = "add")]
+    pub fn add_js_string(this: &Labels, values: &[impl ::wasm_bindgen::JsStringLike]) -> JsString;
+    #[wasm_bindgen(method, catch, js_name = "add")]
+    pub fn try_add(
+        this: &Labels,
+        values: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "add")]
+    pub fn try_add_js_string(
+        this: &Labels,
+        values: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, variadic, js_name = "add")]
+    pub fn add_2(this: &Labels, values: &[impl ::wasm_bindgen::JsStringLike]) -> String;
+    #[wasm_bindgen(method, variadic, js_name = "add")]
+    pub fn add_2_js_string(this: &Labels, values: &[impl ::wasm_bindgen::JsStringLike])
+        -> JsString;
+    #[wasm_bindgen(method, variadic, catch, js_name = "add")]
+    pub fn try_add_2(
+        this: &Labels,
+        values: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, variadic, catch, js_name = "add")]
+    pub fn try_add_2_js_string(
+        this: &Labels,
+        values: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn values(this: &Labels) -> Vec<String>;
     #[wasm_bindgen(method, getter, js_name = "values")]

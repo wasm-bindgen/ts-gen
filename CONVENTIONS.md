@@ -158,8 +158,9 @@ Every other slice takes no mode, as the modes only act on numeric
 elements and wasm-bindgen already hands JS a fresh `Array`: JS handles
 (`&[WebSocket]`, `&[JsString]`) are read in place, and Rust values
 (`&[String]`, `&[bool]`, string enums) are decoded element by element.
-Variadic rest parameters are spread into the call, so they don't take
-one either.
+Variadic rest parameters don't take one either: JS spreads the elements
+into the call, copying them out of a numeric view before the callee runs,
+so nothing can retain the view or re-enter wasm while it is live.
 
 The user-facing Rust signature is unchanged — only the JS-side wire
 format changes. The mode goes on the argument rather than the
