@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "export-assignment-file"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -25,9 +23,9 @@
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
   ;; default(value: unknown): void
-  (import "./bindings.wasm" "default" (func $default (param $value externref)))
+  (import "export-assignment-file" "default" (func $export-assignment-file:default (param $value externref)))
   ;; strictEqual(actual: unknown, expected: unknown): boolean
-  (import "./bindings.wasm" "strictEqual" (func $strictEqual (param $actual externref) (param $expected externref) (result i32)))
+  (import "export-assignment-file" "strictEqual" (func $export-assignment-file:strictEqual (param $actual externref) (param $expected externref) (result i32)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

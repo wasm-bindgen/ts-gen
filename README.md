@@ -78,7 +78,8 @@ Generate a WAT import template for languages that compile directly to Wasm:
 ts-gen --input types.d.ts --output template.wat --target wat
 ```
 
-The template lists every ABI function as an import from `./bindings.wasm`
+The template lists every ABI function as an import, from `./bindings.wasm`
+for a global and from its specifier for a `declare module` declaration,
 and, with `--provides`, a stub export per provided function.
 
 ### Provided functions (`--provides`)

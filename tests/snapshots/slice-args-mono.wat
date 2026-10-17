@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "slice-args-mono"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -25,18 +23,18 @@
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
   ;; generic(values: T[]): string
-  (import "./bindings.wasm" "generic" (func $generic (param $values externref) (result externref)))
+  (import "slice-args-mono" "generic" (func $slice-args-mono:generic (param $values externref) (result externref)))
 
   ;; Bag
   ;; constructor()
-  (import "./bindings.wasm" "Bag.new" (func $Bag.new (result externref)))
+  (import "slice-args-mono" "Bag.new" (func $slice-args-mono:Bag.new (result externref)))
   ;; take(values: T[]): string
-  (import "./bindings.wasm" "Bag.take" (func $Bag.take (param $this externref) (param $values externref) (result externref)))
+  (import "slice-args-mono" "Bag.take" (func $slice-args-mono:Bag.take (param $this externref) (param $values externref) (result externref)))
 
   ;; mixed(values: T[], weights: number[], data: number[]): string
-  (import "./bindings.wasm" "mixed" (func $mixed (param $values externref) (param $weights externref) (param $data externref) (result externref)))
+  (import "slice-args-mono" "mixed" (func $slice-args-mono:mixed (param $values externref) (param $weights externref) (param $data externref) (result externref)))
   ;; mixed(values: T[], weights: number[], data: Float64Array): string
-  (import "./bindings.wasm" "mixed_with_float64_array" (func $mixed_with_float64_array (param $values externref) (param $weights externref) (param $data externref) (result externref)))
+  (import "slice-args-mono" "mixed_with_float64_array" (func $slice-args-mono:mixed_with_float64_array (param $values externref) (param $weights externref) (param $data externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

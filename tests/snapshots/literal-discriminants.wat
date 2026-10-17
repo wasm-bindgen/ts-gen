@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "literal-discriminants"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -26,47 +24,47 @@
 
   ;; Options
   ;; {} as Options
-  (import "./bindings.wasm" "Options.new" (func $Options.new (result externref)))
+  (import "literal-discriminants" "Options.new" (func $literal-discriminants:Options.new (result externref)))
   ;; keepAlive: KeepAlive
-  (import "./bindings.wasm" "Options.keep_alive" (func $Options.keep_alive (param $this externref) (result externref)))
+  (import "literal-discriminants" "Options.keep_alive" (func $literal-discriminants:Options.keep_alive (param $this externref) (result externref)))
   ;; set keepAlive(value: KeepAlive)
-  (import "./bindings.wasm" "Options.set_keep_alive" (func $Options.set_keep_alive (param $this externref) (param $value externref)))
+  (import "literal-discriminants" "Options.set_keep_alive" (func $literal-discriminants:Options.set_keep_alive (param $this externref) (param $value externref)))
   ;; label?: string
-  (import "./bindings.wasm" "Options.label" (func $Options.label (param $this externref) (result externref)))
+  (import "literal-discriminants" "Options.label" (func $literal-discriminants:Options.label (param $this externref) (result externref)))
   ;; set label(value: string)
-  (import "./bindings.wasm" "Options.set_label" (func $Options.set_label (param $this externref) (param $value externref)))
+  (import "literal-discriminants" "Options.set_label" (func $literal-discriminants:Options.set_label (param $this externref) (param $value externref)))
 
   ;; Scaled
   ;; {} as Scaled
-  (import "./bindings.wasm" "Scaled.new" (func $Scaled.new (result externref)))
+  (import "literal-discriminants" "Scaled.new" (func $literal-discriminants:Scaled.new (result externref)))
   ;; scale: -1 | 0.5
-  (import "./bindings.wasm" "Scaled.scale" (func $Scaled.scale (param $this externref) (result externref)))
+  (import "literal-discriminants" "Scaled.scale" (func $literal-discriminants:Scaled.scale (param $this externref) (result externref)))
   ;; set scale(value: -1)
-  (import "./bindings.wasm" "Scaled.set_scale" (func $Scaled.set_scale (param $this externref) (param $value f64)))
+  (import "literal-discriminants" "Scaled.set_scale" (func $literal-discriminants:Scaled.set_scale (param $this externref) (param $value f64)))
 
   ;; level(): 0 | 1 | 2
-  (import "./bindings.wasm" "level" (func $level (result externref)))
+  (import "literal-discriminants" "level" (func $literal-discriminants:level (result externref)))
   ;; direction(): -1 | 0 | 1
-  (import "./bindings.wasm" "direction" (func $direction (result externref)))
+  (import "literal-discriminants" "direction" (func $literal-discriminants:direction (result externref)))
 
   ;; Feedback
   ;; {} as Feedback
-  (import "./bindings.wasm" "Feedback.new" (func $Feedback.new (result externref)))
+  (import "literal-discriminants" "Feedback.new" (func $literal-discriminants:Feedback.new (result externref)))
   ;; value: -1 | 1 | null
-  (import "./bindings.wasm" "Feedback.value" (func $Feedback.value (param $this externref) (result externref)))
+  (import "literal-discriminants" "Feedback.value" (func $literal-discriminants:Feedback.value (param $this externref) (result externref)))
 
   ;; ratio(): 0.5 | 1
-  (import "./bindings.wasm" "ratio" (func $ratio (result externref)))
+  (import "literal-discriminants" "ratio" (func $literal-discriminants:ratio (result externref)))
   ;; count(): number | 0
-  (import "./bindings.wasm" "count" (func $count (result externref)))
+  (import "literal-discriminants" "count" (func $literal-discriminants:count (result externref)))
   ;; wide(): 0 | 4294967296
-  (import "./bindings.wasm" "wide" (func $wide (result externref)))
+  (import "literal-discriminants" "wide" (func $literal-discriminants:wide (result externref)))
   ;; size(): "auto" | 0
-  (import "./bindings.wasm" "size" (func $size (result externref)))
+  (import "literal-discriminants" "size" (func $literal-discriminants:size (result externref)))
   ;; repeat(): true | "x" | "y"
-  (import "./bindings.wasm" "repeat" (func $repeat (result externref)))
+  (import "literal-discriminants" "repeat" (func $literal-discriminants:repeat (result externref)))
   ;; flag(): false | ArrayBuffer
-  (import "./bindings.wasm" "flag" (func $flag (result externref)))
+  (import "literal-discriminants" "flag" (func $literal-discriminants:flag (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

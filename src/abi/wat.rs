@@ -4,9 +4,7 @@
 
 use std::fmt::Write;
 
-use super::{
-    Abi, AbiFunction, AbiParam, WasmType, BINDINGS_SPECIFIER, BUILTINS_SPECIFIER, UNDEFINED_GLOBAL,
-};
+use super::{Abi, AbiFunction, AbiParam, WasmType, BUILTINS_SPECIFIER, UNDEFINED_GLOBAL};
 
 fn has_variadic(abi: &Abi) -> bool {
     abi.functions.iter().any(|f| f.variadic)
@@ -22,13 +20,10 @@ pub fn generate(abi: &Abi) -> String {
     out.push_str(";; Import names: Type.member with _with_x suffixes for overloads.\n");
     out.push_str(";; Dictionary constructors: Type.new creates {} (empty object).\n");
     out.push_str(";; Variables: declare var x -> x getter reading it from its scope.\n;;\n");
-    let modules = abi.modules();
-    if !modules.is_empty() {
-        out.push_str(";; Declarations from `declare module` are reached through the module's\n");
-        out.push_str(";; own ESM imports of:\n");
-        for spec in &modules {
-            let _ = writeln!(out, ";;   {spec:?}");
-        }
+    if !abi.modules().is_empty() {
+        out.push_str(
+            ";; Declarations from `declare module \"spec\"` are imported from \"spec\".\n",
+        );
         out.push_str(";;\n");
     }
     out.push_str(";; Import only what you use; unused entries need not be deleted.\n");
@@ -51,12 +46,15 @@ pub fn generate(abi: &Abi) -> String {
             }
         }
         let _ = writeln!(out, "  ;; {}", f.ts);
+        let module = f.import_module();
         for name in std::iter::once(&f.name).chain(&f.aliases) {
+            let id = match &f.module {
+                Some(spec) => ident(&format!("{spec}:{name}")),
+                None => ident(name),
+            };
             let _ = writeln!(
                 out,
-                "  (import {BINDINGS_SPECIFIER:?} {:?} (func ${}{}{}))",
-                name,
-                ident(name),
+                "  (import {module:?} {name:?} (func ${id}{}{}))",
                 params_variadic(&f.params, f.variadic),
                 result(f.result)
             );
@@ -94,10 +92,19 @@ pub fn generate(abi: &Abi) -> String {
     out
 }
 
-/// `Type.member` as a WAT identifier: `$Type.member` is legal since `.`
-/// is an id character.
+/// `Type.member` as a WAT identifier: `$Type.member` and
+/// `$node:fs:readFileSync` are legal since `.`, `:` and `/` are id
+/// characters; anything else becomes `_`.
 pub fn ident(name: &str) -> String {
-    name.replace(['[', ']'], "_")
+    name.chars()
+        .map(|c| {
+            if c.is_ascii_alphanumeric() || "!#$%&'*+-./:<=>?@\\^_`|~".contains(c) {
+                c
+            } else {
+                '_'
+            }
+        })
+        .collect()
 }
 
 pub fn params(params: &[AbiParam]) -> String {

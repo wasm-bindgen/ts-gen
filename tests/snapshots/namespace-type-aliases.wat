@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "namespace-type-aliases"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -25,9 +23,9 @@
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
   ;; emit(name: Events.Name, options: Events.Opts): Events.Label
-  (import "./bindings.wasm" "emit" (func $emit (param $name externref) (param $options externref) (result externref)))
+  (import "namespace-type-aliases" "emit" (func $namespace-type-aliases:emit (param $name externref) (param $options externref) (result externref)))
   ;; onEvent(listener: Events.Listener<string>): void
-  (import "./bindings.wasm" "onEvent" (func $onEvent (param $listener externref)))
+  (import "namespace-type-aliases" "onEvent" (func $namespace-type-aliases:onEvent (param $listener externref)))
 
   ;; Events.Options
   ;; {} as Events.Options

@@ -9,9 +9,7 @@
 ;; Dictionary constructors: Type.new creates {} (empty object).
 ;; Variables: declare var x -> x getter reading it from its scope.
 ;;
-;; Declarations from `declare module` are reached through the module's
-;; own ESM imports of:
-;;   "enum-initializers"
+;; Declarations from `declare module "spec"` are imported from "spec".
 ;;
 ;; Import only what you use; unused entries need not be deleted.
 (module
@@ -25,7 +23,7 @@
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
   ;; useAll(mode: Mode, label: Label, merged: Merged, restart: Restart, cycle: Cycle, loop: Loop): void
-  (import "./bindings.wasm" "useAll" (func $useAll (param $mode externref) (param $label externref) (param $merged externref) (param $restart externref) (param $cycle externref) (param $loop externref)))
+  (import "enum-initializers" "useAll" (func $enum-initializers:useAll (param $mode externref) (param $label externref) (param $merged externref) (param $restart externref) (param $cycle externref) (param $loop externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
