@@ -415,6 +415,86 @@ fn write_type_ref_key(buf: &mut String, ty: &TypeRef) {
     }
 }
 
+/// What a name binds in a scope.
+#[derive(Clone, Copy, PartialEq)]
+enum Bound {
+    Type(crate::context::TypeId),
+    Namespace(ScopeId),
+}
+
+/// How a reference's first segment, written in an alias target, reads
+/// from the scope referencing the alias.
+enum Qualify {
+    /// It binds the same there.
+    Keep,
+    /// It needs this qualified path instead.
+    As(Vec<String>),
+    /// No path from there reaches it.
+    Unreachable,
+}
+
+/// `ty` with the first segment of each reference replaced as `qualify`
+/// says, given the segment and whether it heads a path.
+fn qualify_references(
+    ty: &ir::TypeRef,
+    qualify: &dyn Fn(&str, bool) -> Qualify,
+) -> Option<ir::TypeRef> {
+    let q = |t: &ir::TypeRef| qualify_references(t, qualify);
+    let all = |items: &[ir::TypeRef]| items.iter().map(q).collect::<Option<Vec<_>>>();
+    Some(match ty {
+        ir::TypeRef::Reference {
+            segments,
+            generic_args,
+        } => ir::TypeRef::Reference {
+            segments: match qualify(&segments[0], segments.len() > 1) {
+                Qualify::Keep => segments.clone(),
+                Qualify::As(path) => path
+                    .into_iter()
+                    .chain(segments[1..].iter().cloned())
+                    .collect(),
+                Qualify::Unreachable => return None,
+            },
+            generic_args: all(generic_args)?,
+        },
+        ir::TypeRef::Array(inner) => ir::TypeRef::Array(Box::new(q(inner)?)),
+        ir::TypeRef::Nullable(inner, n) => ir::TypeRef::Nullable(Box::new(q(inner)?), *n),
+        ir::TypeRef::Union(items) => ir::TypeRef::Union(all(items)?),
+        ir::TypeRef::Intersection(items) => ir::TypeRef::Intersection(all(items)?),
+        ir::TypeRef::Tuple(items) => ir::TypeRef::Tuple(all(items)?),
+        ir::TypeRef::Function(sig) => ir::TypeRef::Function(ir::FunctionSig {
+            params: sig
+                .params
+                .iter()
+                .map(|p| {
+                    Some(ir::Param {
+                        type_ref: q(&p.type_ref)?,
+                        ..p.clone()
+                    })
+                })
+                .collect::<Option<_>>()?,
+            return_type: Box::new(q(&sig.return_type)?),
+        }),
+        other => other.clone(),
+    })
+}
+
+/// `alias`'s target with `generic_args` substituted for its parameters;
+/// a missing argument takes the parameter's default, else `any`.
+fn alias_instance(alias: &ir::TypeAliasDecl, generic_args: &[ir::TypeRef]) -> ir::TypeRef {
+    // A default may name an earlier parameter (`<A, B = A>`), so each
+    // one is substituted with the map built so far.
+    let mut map: HashMap<&str, ir::TypeRef> = HashMap::new();
+    for (i, tp) in alias.type_params.iter().enumerate() {
+        let arg = generic_args
+            .get(i)
+            .cloned()
+            .or_else(|| tp.default.as_ref().map(|d| d.substitute(&map)))
+            .unwrap_or(ir::TypeRef::Any);
+        map.insert(&tp.name, arg);
+    }
+    alias.target.substitute(&map)
+}
+
 /// The `Module(spec)` groups fully covered by the external map (Rule 3).
 /// References to types from these modules go through
 /// `external_map.resolve` in `emit_type_name` instead of producing a local
@@ -627,7 +707,7 @@ impl<'a> CodegenContext<'a> {
             let arg = match (args.get(i), &tp.default) {
                 (Some(arg), _) => arg.clone(),
                 _ if params.defaulted[i] => break,
-                (None, Some(default)) => substitute_type_params(default, &given),
+                (None, Some(default)) => default.substitute(&given),
                 (None, None) => TypeRef::Any,
             };
             if params.kept[i] {
@@ -962,6 +1042,142 @@ impl<'a> CodegenContext<'a> {
             }
         }
         Some(target)
+    }
+
+    /// Chase a generic alias instantiation: `Foo<A, B>` where `Foo` is
+    /// `type Foo<T, U> = …` yields the target with `T`/`U` substituted.
+    /// Missing arguments take the parameter default, else `any`. Bare
+    /// references go through [`Self::resolve_alias`], qualified ones
+    /// through [`Self::resolve_qualified_alias_instance`]; non-alias heads
+    /// yield `None`.
+    pub fn resolve_alias_instance(&self, ty: &ir::TypeRef, scope: ScopeId) -> Option<ir::TypeRef> {
+        let ir::TypeRef::Reference {
+            segments,
+            generic_args,
+        } = ty
+        else {
+            return None;
+        };
+        if segments.len() != 1 {
+            return self.resolve_qualified_alias_instance(segments, generic_args, scope);
+        }
+        let type_id = self.gctx.scopes.resolve(scope, &segments[0])?;
+        let TypeKind::TypeAlias(alias) = &self.gctx.get_type(type_id).kind else {
+            return None;
+        };
+        if alias.type_params.is_empty() {
+            return self
+                .resolve_alias(&segments[0], scope)
+                .map(std::borrow::Cow::into_owned);
+        }
+        Some(alias_instance(alias, generic_args))
+    }
+
+    /// [`Self::resolve_alias_instance`] for `Ns.Alias<A, B>`. The result
+    /// lowers in the referencing scope, where the arguments were written,
+    /// so each name in the target that the referencing scope would bind
+    /// differently is first qualified through the namespaces of the path
+    /// (`Ns.X` for a sibling, the shorter `Outer.X` for a name from an
+    /// enclosing namespace). A target naming something no such path
+    /// reaches, such as an unexported member, is not chased. An alias
+    /// without parameters is not either: with no arguments to keep,
+    /// `to_syn_type` lowers its target where it was declared.
+    fn resolve_qualified_alias_instance(
+        &self,
+        segments: &[String],
+        generic_args: &[ir::TypeRef],
+        scope: ScopeId,
+    ) -> Option<ir::TypeRef> {
+        let type_id = self.gctx.resolve_path(scope, &segments.join("."))?;
+        let decl = self.gctx.get_type(type_id);
+        let TypeKind::TypeAlias(alias) = &decl.kind else {
+            return None;
+        };
+        if alias.type_params.is_empty() {
+            return None;
+        }
+        let scopes = &self.gctx.scopes;
+        // The namespace each proper prefix of the path reaches.
+        let mut chain = vec![scopes.resolve_namespace(scope, &segments[0])?];
+        for name in &segments[1..segments.len() - 1] {
+            let ns = *chain.last()?;
+            let (local, bound) = self.gctx.exports.binding(ns, name)?;
+            chain.push(scopes.get(bound).namespace(local)?);
+        }
+        // A name heading a path binds a namespace, otherwise a type.
+        let resolve = |s: ScopeId, name: &str, path: bool| {
+            if path {
+                scopes.resolve_namespace(s, name).map(Bound::Namespace)
+            } else {
+                scopes.resolve(s, name).map(Bound::Type)
+            }
+        };
+        let member = |ns: ScopeId, name: &str, path: bool| {
+            let members = scopes.get(ns);
+            if path {
+                members.namespace(name).map(Bound::Namespace)
+            } else {
+                members.get(name).map(Bound::Type)
+            }
+        };
+        let qualify = |name: &str, path: bool| {
+            if !path && alias.type_params.iter().any(|tp| tp.name == name) {
+                return Qualify::Keep;
+            }
+            let meant = resolve(decl.scope_id, name, path);
+            if resolve(scope, name, path) == meant {
+                return Qualify::Keep;
+            }
+            if meant.is_none() {
+                return Qualify::Unreachable;
+            }
+            // Each namespace's export map, read forward: any public name
+            // whose local binding is the one meant reaches it, the name's
+            // own first, so a declaration exported under several names is
+            // found by each.
+            for (depth, &ns) in chain.iter().enumerate().rev() {
+                let public = self
+                    .gctx
+                    .exports
+                    .bindings(ns)
+                    .filter(|&(_, local, bound)| member(bound, local, path) == meant)
+                    .min_by_key(|&(public, _, _)| public != name)
+                    .map(|(public, _, _)| public);
+                if let Some(public) = public {
+                    return Qualify::As(
+                        segments[..=depth]
+                            .iter()
+                            .cloned()
+                            .chain(std::iter::once(public.to_string()))
+                            .collect(),
+                    );
+                }
+            }
+            Qualify::Unreachable
+        };
+        // A default stands in for an omitted argument, so it is read where
+        // it is written, like the target.
+        let type_params = alias
+            .type_params
+            .iter()
+            .enumerate()
+            .map(|(i, tp)| {
+                let default = match &tp.default {
+                    Some(d) if i >= generic_args.len() => Some(qualify_references(d, &qualify)?),
+                    _ => None,
+                };
+                Some(ir::TypeParam {
+                    default,
+                    ..tp.clone()
+                })
+            })
+            .collect::<Option<Vec<_>>>()?;
+        let alias = ir::TypeAliasDecl {
+            type_params,
+            target: qualify_references(&alias.target, &qualify)?,
+            ..alias.clone()
+        };
+        Some(alias_instance(&alias, generic_args))
     }
 
     /// Emit an error diagnostic during code generation.
@@ -1525,6 +1741,9 @@ pub fn to_syn_type(
                     }
                 }
             }
+            if let Some(target) = ctx.and_then(|c| c.resolve_alias_instance(ty, scope)) {
+                return to_syn_type(&target, pos, ctx, scope, from_module);
+            }
             if let Some(repr) = ctx.and_then(|c| c.enum_repr(ty, scope)) {
                 if pos.inner {
                     return to_syn_type(&repr, pos, ctx, scope, from_module);
@@ -2023,49 +2242,7 @@ fn alias_target_with_defaults(alias: &ir::TypeAliasDecl) -> std::borrow::Cow<'_,
     if alias.type_params.is_empty() {
         return std::borrow::Cow::Borrowed(&alias.target);
     }
-    let mut defaults: HashMap<&str, TypeRef> = HashMap::new();
-    for tp in &alias.type_params {
-        let default = tp
-            .default
-            .as_ref()
-            .map_or(TypeRef::Any, |d| substitute_type_params(d, &defaults));
-        defaults.insert(&tp.name, default);
-    }
-    std::borrow::Cow::Owned(substitute_type_params(&alias.target, &defaults))
-}
-
-/// `ty` with each bare reference to a name in `params` replaced.
-pub(crate) fn substitute_type_params(ty: &TypeRef, params: &HashMap<&str, TypeRef>) -> TypeRef {
-    let sub = |t: &TypeRef| substitute_type_params(t, params);
-    match ty {
-        TypeRef::Reference {
-            segments,
-            generic_args,
-        } => match (segments.as_slice(), generic_args.is_empty()) {
-            ([name], true) if params.contains_key(name.as_str()) => params[name.as_str()].clone(),
-            _ => TypeRef::Reference {
-                segments: segments.clone(),
-                generic_args: generic_args.iter().map(sub).collect(),
-            },
-        },
-        TypeRef::Array(t) => TypeRef::Array(Box::new(sub(t))),
-        TypeRef::Nullable(t, n) => TypeRef::Nullable(Box::new(sub(t)), *n),
-        TypeRef::Union(ts) => TypeRef::Union(ts.iter().map(sub).collect()),
-        TypeRef::Intersection(ts) => TypeRef::Intersection(ts.iter().map(sub).collect()),
-        TypeRef::Tuple(ts) => TypeRef::Tuple(ts.iter().map(sub).collect()),
-        TypeRef::Function(sig) => TypeRef::Function(ir::FunctionSig {
-            params: sig
-                .params
-                .iter()
-                .map(|p| ir::Param {
-                    type_ref: sub(&p.type_ref),
-                    ..p.clone()
-                })
-                .collect(),
-            return_type: Box::new(sub(&sig.return_type)),
-        }),
-        other => other.clone(),
-    }
+    std::borrow::Cow::Owned(alias_instance(alias, &[]))
 }
 
 /// Create a `syn::Ident`, sanitizing invalid characters and escaping keywords.

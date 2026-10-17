@@ -14,7 +14,6 @@ use oxc_ast::ast;
 use oxc_parser::Parser;
 use oxc_span::SourceType;
 
-use crate::codegen::typemap::substitute_type_params;
 use crate::context::GlobalContext;
 use crate::ir::{InterfaceDecl, Member, Module, Param, TypeKind, TypeRef};
 use crate::parse::docs::DocComments;
@@ -308,14 +307,14 @@ impl Members<'_> {
             let params = params
                 .iter()
                 .map(|p| Param {
-                    type_ref: substitute_type_params(&p.type_ref, &subst),
+                    type_ref: p.type_ref.substitute(&subst),
                     ..p.clone()
                 })
                 .collect();
             out.push(ProvidedFn {
                 path: child,
                 params,
-                return_type: normalise_result(substitute_type_params(&ret, &subst)),
+                return_type: normalise_result(ret.substitute(&subst)),
                 doc: doc.clone(),
                 scope,
                 rust_name: String::new(),
@@ -350,7 +349,7 @@ impl Members<'_> {
                         (p.name.as_str(), ty)
                     })
                     .collect();
-                let target = substitute_type_params(&alias.target, &subst);
+                let target = alias.target.substitute(&subst);
                 self.function_type(&target, alias.body_scope)
             }
             _ => None,
