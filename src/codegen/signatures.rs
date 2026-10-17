@@ -1451,9 +1451,10 @@ fn compute_trim(signatures: &[Vec<ConcreteParam>]) -> (usize, usize) {
 /// | `T[]`           | `&[T]`          | `slice`         |
 /// | `Uint8Array`    | `&Uint8Array`   | `uint8_array`   |
 /// | `MyType`        | `&MyType`       | `my_type`       |
+/// | `A.X`           | `&a::X`         | `a_x`           |
 ///
-/// Named references (built-ins and user types) snake-case the head
-/// segment — type args don't participate in the suffix. The named
+/// Named references (built-ins and user types) snake-case their path,
+/// `A.X` → `a_x` — type args don't participate in the suffix. The named
 /// JS types (`Uint8Array`, `Headers`, …) double as Rust types in
 /// the generated bindings, so the snake-cased JS name *is* the
 /// Rust spelling.
@@ -1475,17 +1476,22 @@ fn type_snake_name(ty: &TypeRef) -> String {
         TypeRef::ArrayBufferView => "typed_array".to_string(),
         TypeRef::Union(_) if let Some((core, _)) = ty.split_empties() => type_snake_name(&core),
         TypeRef::Union(_) | TypeRef::PropertyKey => "js_value".to_string(),
-        // Snake-case the leftmost (head) segment of any named
-        // reference. Type args don't participate in `_with_` suffixes.
-        // A synthesised `Array<T>` / `ReadonlyArray<T>` reference
-        // lowers to the slice form like the parse-normalised
+        // Snake-case every segment of a named reference, so `A.X` is
+        // `a_x` like its Rust path `a::X`. Type args don't participate in
+        // `_with_` suffixes. A synthesised `Array<T>` / `ReadonlyArray<T>`
+        // reference lowers to the slice form like the parse-normalised
         // `TypeRef::Array`, so it shares the `slice` suffix.
         TypeRef::Reference { segments, .. } => {
-            let head = segments.first().map_or("", |s| s.as_str());
-            if head == "Array" || head == "ReadonlyArray" {
-                return "slice".to_string();
+            if let [head] = segments.as_slice() {
+                if head == "Array" || head == "ReadonlyArray" {
+                    return "slice".to_string();
+                }
             }
-            to_snake_case(head)
+            segments
+                .iter()
+                .map(|s| to_snake_case(s))
+                .collect::<Vec<_>>()
+                .join("_")
         }
         TypeRef::Array(_) | TypeRef::TypedSlice(..) => "slice".to_string(),
         TypeRef::Function(_) => "function".to_string(),
@@ -2640,6 +2646,20 @@ mod tests {
             variadic: true,
             slice_mode: None,
         }
+    }
+
+    #[test]
+    fn qualified_reference_suffix_uses_the_full_path() {
+        let qualified = |path: &str| TypeRef::Reference {
+            segments: path.split('.').map(String::from).collect(),
+            generic_args: vec![],
+        };
+        assert_eq!(type_snake_name(&qualified("A.X")), "a_x");
+        assert_eq!(
+            type_snake_name(&qualified("NodeJS.TypedArray")),
+            "node_js_typed_array"
+        );
+        assert_eq!(type_snake_name(&qualified("Array")), "slice");
     }
 
     #[test]

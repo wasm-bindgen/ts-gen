@@ -1685,14 +1685,17 @@ up with what callers see in the function signature:
 | `Array<T>` / `T[]` | `&[T]`        | `_with_slice`   |
 | `Uint8Array`    | `&Uint8Array`    | `_with_uint8_array` |
 | `Foo` (named)   | `&Foo`           | `_with_foo`     |
+| `A.X` (qualified) | `&a::X`        | `_with_a_x`     |
 | `null`          | (dropped — see [Optional and nullable types](#optional-and-nullable-types)) | – |
 | `undefined`     | (dropped, same)  | – |
 | `any` / `unknown` | `&JsValue`     | `_with_js_value`|
 
-For named JS types the snake-cased head doubles as the Rust
+For named JS types the snake-cased name doubles as the Rust
 identifier (`Uint8Array` → `uint8_array`, also `&Uint8Array` in
 the rendered type), so there's no separate translation table —
-the same convention works in both directions.
+the same convention works in both directions. A qualified name
+snake-cases its full path, like its Rust path (`A.X` → `a::X` →
+`a_x`), so `A.X` and `B.X` don't collide.
 
 ### Why a single pipeline
 
