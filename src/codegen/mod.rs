@@ -11,6 +11,7 @@ pub(crate) mod primitive_unions;
 pub mod provides;
 pub mod signatures;
 pub mod subtyping;
+pub mod surface;
 pub mod typemap;
 
 use std::collections::{HashMap, HashSet};
@@ -79,7 +80,8 @@ pub struct GenerateOptions {
     /// * Empty → implicit default: emit every input file's global
     ///   declarations. No module-context declarations are emitted.
     /// * Non-empty → authoritative: emit exactly the listed files'
-    ///   globals plus the listed modules' declarations. Each module is
+    ///   globals plus the listed modules' exports, and the types their
+    ///   signatures reach. Each module is
     ///   emitted in a `pub mod` named by its specifier (`node:fs` →
     ///   `node::fs`), except the `--lib-name` module, which is emitted
     ///   at the top level.
@@ -117,8 +119,7 @@ impl GenerateOptions {
 /// A single entry in [`GenerateOptions::exports`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ExportSpec {
-    /// Canonical path of an input file whose global-scope
-    /// declarations should be emitted.
+    /// Canonical path of an input file whose globals are emitted.
     File(PathBuf),
     /// JS module specifier whose declarations are emitted in its
     /// `pub mod`.
@@ -235,20 +236,13 @@ pub fn generate_provides(
     fns: &[crate::provides::ProvidedFn],
     paths: &provides::ProvidesPaths,
 ) -> anyhow::Result<(String, String)> {
-    let exported_modules: HashSet<String> = options
-        .exports
-        .iter()
-        .filter_map(|e| match e {
-            ExportSpec::Module(m) => Some(m.clone()),
-            ExportSpec::File(_) => None,
-        })
-        .collect();
+    let surface = surface::Surface::build(module, gctx, options);
     let cgctx = CodegenContext::from_module_full(
         module,
         gctx,
         options.errors_as_error,
         options.experimental_generic_mono,
-        exported_modules,
+        surface.modules(),
     );
     let wrapper = provides::generate_wrapper(fns, &cgctx, paths)?;
     let app = provides::generate_app(fns, &cgctx, paths)?;
@@ -308,20 +302,13 @@ fn generate_tokens(
     gctx: &crate::context::GlobalContext,
     options: &GenerateOptions,
 ) -> TokenStream {
-    let exported_modules: HashSet<String> = options
-        .exports
-        .iter()
-        .filter_map(|e| match e {
-            ExportSpec::Module(m) => Some(m.clone()),
-            ExportSpec::File(_) => None,
-        })
-        .collect();
+    let surface = surface::Surface::build(module, gctx, options);
     let cgctx = CodegenContext::from_module_full(
         module,
         gctx,
         options.errors_as_error,
         options.experimental_generic_mono,
-        exported_modules,
+        surface.modules(),
     );
 
     let preamble = quote! {
@@ -366,77 +353,14 @@ fn generate_tokens(
         }
     }
 
-    // Decide whether a declaration is in the output surface. The type
-    // universe is the full `module.types` (so resolution sees
-    // everything); this only filters emission.
-    //
-    // * `Global` decls: when `exports` is empty, every input file's
-    //   globals are emitted (implicit default). Otherwise the
-    //   decl's owning file must be listed as `ExportSpec::File`.
-    // * `Module(m)` decls: only emitted when `m` is explicitly listed
-    //   as `ExportSpec::Module`. A module that's externalised wins
-    //   regardless — emission is suppressed and references route
-    //   through the external map.
-    let exports_empty = options.exports.is_empty();
-    let should_emit = |decl: &crate::ir::TypeDeclaration| -> bool {
-        match &decl.module_context {
-            crate::ir::ModuleContext::Global => {
-                if exports_empty {
-                    return true;
-                }
-                if let Some(path) = module.file_scope_paths.get(&decl.scope_id) {
-                    options.exports.contains(&ExportSpec::File(path.clone()))
-                } else {
-                    // Decls without a tracked file (synthetic, builtin)
-                    // are emitted alongside any explicit selection.
-                    true
-                }
-            }
-            crate::ir::ModuleContext::Module(m) => {
-                let m_str: &str = m.as_ref();
-                if cgctx.externalised_modules.contains(m_str) {
-                    return false;
-                }
-                options
-                    .exports
-                    .contains(&ExportSpec::Module(m_str.to_string()))
-            }
-        }
-    };
-
-    // What reaches the output, by id, including namespace members. The
-    // filtered declarations outlive the tree, which borrows them.
-    let mut surfaces: HashMap<crate::context::TypeId, std::borrow::Cow<'_, TypeDeclaration>> =
-        HashMap::new();
-    fn collect_surfaces<'d>(
-        type_id: crate::context::TypeId,
-        gctx: &'d crate::context::GlobalContext,
-        surfaces: &mut HashMap<crate::context::TypeId, std::borrow::Cow<'d, TypeDeclaration>>,
-    ) {
-        let decl = gctx.get_type(type_id);
-        let Some(surface) = module_surface(decl, gctx) else {
-            return;
-        };
-        if let TypeKind::Namespace(ns) = &decl.kind {
-            for &member in &ns.declarations {
-                collect_surfaces(member, gctx, surfaces);
-            }
-        }
-        surfaces.insert(type_id, surface);
-    }
-    for &type_id in &module.types {
-        if should_emit(gctx.get_type(type_id)) {
-            collect_surfaces(type_id, gctx, &mut surfaces);
-        }
-    }
     let mut root = ModTree::default();
     for &type_id in &module.types {
-        if let Some(decl) = surfaces.get(&type_id) {
+        for decl in surface.get(type_id) {
             root.at(&cgctx.module_path(&decl.module_context)).insert(
+                type_id,
                 decl,
                 Vec::new(),
-                &surfaces,
-                gctx,
+                &surface,
             );
         }
     }
@@ -456,46 +380,6 @@ fn generate_tokens(
         #external_uses
         #(#global_items)*
         #dynamic_unions
-    }
-}
-
-/// The part of a module declaration that reaches JS. A value its block
-/// does not export has no import to bind to: `import { helper } from "m"`
-/// fails at link time when `m` has no such export, so an unexported
-/// function, variable or namespace is dropped, and an unexported class
-/// keeps only its instance members, which bind through a value rather
-/// than by importing the class. Types are unaffected, as nothing imports
-/// them.
-fn module_surface<'d>(
-    decl: &'d TypeDeclaration,
-    gctx: &crate::context::GlobalContext,
-) -> Option<std::borrow::Cow<'d, TypeDeclaration>> {
-    use std::borrow::Cow;
-    if !matches!(decl.module_context, crate::ir::ModuleContext::Module(_)) {
-        return Some(Cow::Borrowed(decl));
-    }
-    let exported = |name: &str| gctx.exports.is_exported(decl.scope_id, name);
-    match &decl.kind {
-        TypeKind::Function(f) if !exported(&f.js_name) => None,
-        TypeKind::Variable(v) if !exported(&v.js_name) => None,
-        TypeKind::Namespace(ns) if !exported(&ns.name) => None,
-        TypeKind::Class(c) if !exported(&c.name) && !exported(&c.js_name) => {
-            let mut c = c.clone();
-            c.members.retain(|m| {
-                !matches!(
-                    m,
-                    crate::ir::Member::Constructor(_)
-                        | crate::ir::Member::StaticGetter(_)
-                        | crate::ir::Member::StaticSetter(_)
-                        | crate::ir::Member::StaticMethod(_)
-                )
-            });
-            Some(Cow::Owned(TypeDeclaration {
-                kind: TypeKind::Class(c),
-                ..decl.clone()
-            }))
-        }
-        _ => Some(Cow::Borrowed(decl)),
     }
 }
 
@@ -762,7 +646,13 @@ fn generate_type_alias(
                 .resolve_binding(alias.body_scope, target_name),
             Some(crate::parse::scope::Binding::TypeParam)
         );
+        let resolves_local = cgctx
+            .gctx
+            .scopes
+            .resolve(alias.body_scope, target_name)
+            .is_some_and(|id| cgctx.local_type_ids.contains(&id));
         if !is_type_param
+            && !resolves_local
             && !cgctx.local_types.contains_key(target_name)
             && !crate::codegen::typemap::JS_SYS_RESERVED.contains(&target_name)
         {
@@ -850,6 +740,8 @@ pub(crate) fn js_namespace_attr(js_namespace: &[String]) -> Option<TokenStream> 
 struct ModTree<'d> {
     entries: Vec<ModEntry<'d>>,
     children: HashMap<String, ModTree<'d>>,
+    /// The other public names of each child's namespace, which alias it.
+    aliases: HashMap<String, Vec<String>>,
 }
 
 enum ModEntry<'d> {
@@ -873,31 +765,30 @@ impl<'d> ModTree<'d> {
 
     /// Add `decl`, whose enclosing namespaces have the JS path
     /// `js_namespace`. A namespace becomes a child holding those of its
-    /// members that are in `surfaces`.
-    ///
-    /// A module's namespace is reached through the module's export of it,
-    /// which a renamed or default export of a merged value names
-    /// differently (`export { make as create }` makes `create.helper`).
+    /// members that are in the surface, under the name it binds by in JS.
     fn insert(
         &mut self,
+        id: crate::context::TypeId,
         decl: &'d TypeDeclaration,
         mut js_namespace: Vec<String>,
-        surfaces: &'d HashMap<crate::context::TypeId, std::borrow::Cow<'d, TypeDeclaration>>,
-        gctx: &crate::context::GlobalContext,
+        surface: &'d surface::Surface<'d>,
     ) {
         match &decl.kind {
             TypeKind::Namespace(ns) => {
-                let child = self.child(&crate::util::naming::to_snake_case(&ns.name));
-                let js_name = match decl.module_context {
-                    crate::ir::ModuleContext::Module(_) if js_namespace.is_empty() => gctx
-                        .exports
-                        .public_name(decl.scope_id, &ns.name)
-                        .unwrap_or(&ns.name),
-                    _ => &ns.name,
-                };
-                js_namespace.push(js_name.to_string());
-                for member in ns.declarations.iter().filter_map(|id| surfaces.get(id)) {
-                    child.insert(member, js_namespace.clone(), surfaces, gctx);
+                let name = crate::util::naming::to_snake_case(&ns.name);
+                let aliases = self.aliases.entry(name.clone()).or_default();
+                for public in surface.names(id).iter().filter(|&p| p != "default") {
+                    let alias = crate::util::naming::to_snake_case(public);
+                    if alias != name && !aliases.contains(&alias) {
+                        aliases.push(alias);
+                    }
+                }
+                let child = self.child(&name);
+                js_namespace.push(surface.js_name(id, &ns.name).to_string());
+                for &member in &ns.declarations {
+                    for decl in surface.get(member) {
+                        child.insert(member, decl, js_namespace.clone(), surface);
+                    }
                 }
             }
             _ => self.entries.push(ModEntry::Item(decl, js_namespace)),
@@ -943,6 +834,17 @@ impl<'d> ModTree<'d> {
                             #(#members)*
                         }
                     });
+                    // A module alias rather than `pub use`, which would also
+                    // import a same-named function under the alias.
+                    let aliases = self.aliases.get(name).into_iter().flatten();
+                    for alias in aliases.filter(|a| !self.children.contains_key(*a)) {
+                        let alias = typemap::make_ident(alias);
+                        items.push(quote! {
+                            pub mod #alias {
+                                pub use super::#ident::*;
+                            }
+                        });
+                    }
                 }
             }
         }

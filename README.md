@@ -63,6 +63,25 @@ codegen:
 ts-gen --input types.d.ts --output src/bindings.rs --experimental-generic-mono
 ```
 
+### Targets (`--target`)
+
+| Value  | Output |
+|--------|--------|
+| `rust` | wasm-bindgen extern blocks (the default) |
+| `wat`  | The Wasm ABI as a WAT import template |
+
+### Wasm ABI template (`--target wat`)
+
+Generate a WAT import template for languages that compile directly to Wasm:
+
+```sh
+ts-gen --input types.d.ts --output template.wat --target wat
+```
+
+The template lists every ABI function as an import, from `./bindings.wasm`
+for a global and from its specifier for a `declare module` declaration,
+and, with `--provides`, a stub export per provided function.
+
 ### Provided functions (`--provides`)
 
 The reverse direction: what the module provides to JS, as a `.d.ts` export

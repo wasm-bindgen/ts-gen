@@ -53,7 +53,21 @@ struct PopulateCtx<'a, 'docs> {
     /// Whether declarations in the global module context are in the global
     /// scope: in a script file, or in a `declare global` block.
     global_scope: bool,
+    static_sides: StaticSides,
+    /// The classes of constructor-shaped `var`s with no instance interface,
+    /// by scope and name.
+    constructor_classes: Vec<(ScopeId, String)>,
+    ctor_interfaces: CtorInterfaces,
 }
+
+/// The static side of each global constructor-shaped `var` with no
+/// instance interface in its file, as a class, by the var's scope and name.
+/// Another file may declare the interface, which then merges with it.
+pub type StaticSides = std::collections::HashMap<(ScopeId, String), ir::TypeDeclaration>;
+
+/// The interface each static side of a `var X: XConstructor` comes from, by
+/// the var's scope and name.
+pub type CtorInterfaces = std::collections::HashMap<(ScopeId, String), String>;
 
 /// Populated members of each global namespace, keyed by its member scope.
 /// They are inserted into the type arena after population, when the
@@ -62,17 +76,6 @@ struct PopulateCtx<'a, 'docs> {
 pub type NamespaceMembers = std::collections::HashMap<ScopeId, Vec<ir::TypeDeclaration>>;
 
 impl<'a, 'docs> PopulateCtx<'a, 'docs> {
-    /// Public names an `export { local as public }` in `scope` gives the
-    /// binding `local` declares there; empty when it is not renamed.
-    fn export_names(&self, scope: ScopeId, local: &str) -> &'a [String] {
-        let registry = self.registry;
-        self.scopes
-            .get(scope)
-            .get(local)
-            .and_then(|type_id| registry.export_names.get(&type_id))
-            .map_or(&[], Vec::as_slice)
-    }
-
     /// Build a fresh `ParseCtx` reborrowing this struct's mutable
     /// fields. Use within a method to thread through to converters.
     fn parse_ctx<'b>(&'b mut self) -> ParseCtx<'b, 'docs> {
@@ -101,7 +104,6 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                 module_context: module_context.clone(),
                 doc: None,
                 scope_id: scope,
-                exported: true,
             })
             .collect()
     }
@@ -118,8 +120,9 @@ pub fn populate_declarations<'a, 'docs>(
     scopes: &'a mut ScopeArena,
     type_arena: &'a [ir::TypeDeclaration],
     scope: ScopeId,
-) -> (Vec<ir::TypeDeclaration>, NamespaceMembers) {
+) -> Populated {
     let mut declarations = Vec::new();
+    let file_ctx = super::file_context(program, lib_name);
     let used_type_names =
         LocalScope::with_claimed(registry.types.keys().map(|(_, name)| name.clone()));
     let mut pcx = PopulateCtx {
@@ -134,18 +137,38 @@ pub fn populate_declarations<'a, 'docs>(
         file_scope: scope,
         namespace_members: NamespaceMembers::new(),
         export_assignment: None,
-        global_scope: !super::is_module(program),
+        global_scope: !matches!(file_ctx, ir::ModuleContext::Module(_)),
+        static_sides: StaticSides::new(),
+        constructor_classes: Vec::new(),
+        ctor_interfaces: CtorInterfaces::new(),
     };
 
-    let file_ctx = super::file_context(program, lib_name);
     if let ir::ModuleContext::Module(_) = file_ctx {
         pcx.export_assignment = assigned_name(&program.body).map(|name| (scope, name));
     }
     for stmt in &program.body {
-        pcx.populate_statement(stmt, &file_ctx, &mut declarations, scope, false);
+        pcx.populate_statement(stmt, &file_ctx, &mut declarations, scope);
     }
 
-    (declarations, pcx.namespace_members)
+    Populated {
+        declarations,
+        namespace_members: pcx.namespace_members,
+        static_sides: pcx.static_sides,
+        constructor_classes: pcx.constructor_classes,
+        ctor_interfaces: pcx.ctor_interfaces,
+    }
+}
+
+/// What population yields for a file.
+pub struct Populated {
+    pub declarations: Vec<ir::TypeDeclaration>,
+    pub namespace_members: NamespaceMembers,
+    pub static_sides: StaticSides,
+    /// The classes of constructor-shaped `var`s with no instance interface,
+    /// by scope and name: a value nothing refers to by its local name, so
+    /// such a class takes the name its module exports it under.
+    pub constructor_classes: Vec<(ScopeId, String)>,
+    pub ctor_interfaces: CtorInterfaces,
 }
 
 /// The binding a module body's `export = <name>` assigns.
@@ -159,45 +182,21 @@ fn assigned_name(body: &[ast::Statement<'_>]) -> Option<String> {
     })
 }
 
-/// `(rust_name, js_name)` for each name a value binding is imported by: its
-/// own name, or else every public name its module exports it under.
-fn value_bindings(local: &str, public_names: &[String]) -> Vec<(String, String)> {
-    if public_names.is_empty() {
-        return vec![(to_snake_case(local), local.to_string())];
-    }
-    public_names
-        .iter()
-        .map(|public| (to_snake_case(rust_name(local, public)), public.clone()))
-        .collect()
-}
-
-/// The Rust name of the binding `local` exported as `public`. A default
-/// export has no name of its own, so it keeps the local one.
-fn rust_name<'n>(local: &'n str, public: &'n str) -> &'n str {
-    if public == "default" {
-        local
-    } else {
-        public
-    }
-}
-
 /// Per-declaration context passed to `populate_declaration`.
 struct DeclCtx<'a> {
     module_context: &'a ir::ModuleContext,
     export_span_start: Option<u32>,
     scope: ScopeId,
-    exported: bool,
 }
 
 impl<'a> DeclCtx<'a> {
-    /// Build a `TypeDeclaration` with this context's module/scope/exported fields.
+    /// Build a `TypeDeclaration` with this context's module and scope.
     fn decl(&self, kind: ir::TypeKind, doc: Option<String>) -> ir::TypeDeclaration {
         ir::TypeDeclaration {
             kind,
             module_context: self.module_context.clone(),
             doc,
             scope_id: self.scope,
-            exported: self.exported,
         }
     }
 }
@@ -210,13 +209,11 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         ctx: &ir::ModuleContext,
         declarations: &mut Vec<ir::TypeDeclaration>,
         scope: ScopeId,
-        exported: bool,
     ) {
         let dcx = DeclCtx {
             module_context: ctx,
             export_span_start: None,
             scope,
-            exported,
         };
 
         match stmt {
@@ -240,7 +237,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                 self.populate_external_module(module, declarations);
             }
             ast::Statement::TSNamespaceDeclaration(ns) => {
-                self.populate_namespace(ns, ctx, declarations, scope, exported);
+                self.populate_namespace(ns, ctx, declarations, scope);
             }
             ast::Statement::TSEnumDeclaration(enum_decl) => {
                 self.populate_ts_enum(enum_decl, &dcx, declarations);
@@ -253,7 +250,6 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                         &ir::ModuleContext::Global,
                         declarations,
                         self.file_scope,
-                        true,
                     );
                 }
                 self.global_scope = global_scope;
@@ -290,19 +286,10 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                 for spec in &export.specifiers {
                     let exported_name = spec.exported.name().to_string();
                     let local = spec.local.name().to_string();
-                    if exported_name == local {
-                        continue;
-                    }
-                    // Functions and variables are emitted under each public name
-                    // directly, so an alias stub would only shadow them. The
-                    // registry kind, not the phase-1 placeholder, reflects a var
-                    // later merged with its instance interface.
-                    if self.export_names(scope, &local).contains(&exported_name)
-                        && matches!(
-                            self.registry.kind(scope, &local),
-                            Some(ir::RegisteredKind::Function | ir::RegisteredKind::Variable)
-                        )
-                    {
+                    // The output emits a binding the block declares under each
+                    // public name; one from outside it, such as an import, is
+                    // re-exported through an alias.
+                    if exported_name == local || self.scopes.get(scope).get(&local).is_some() {
                         continue;
                     }
                     self.push_export_alias(spec, None, ctx, declarations, scope);
@@ -315,16 +302,12 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                         .for_span(export.span.start)
                         .or_else(|| self.docs.for_span(class.span.start));
                     let class_decl = convert_class_decl(class, ctx, scope, &mut self.parse_ctx());
-                    if let Some(mut decl) = class_decl {
-                        if let Some(public) = self.export_names(scope, &decl.name).first() {
-                            decl.js_name = public.clone();
-                        }
+                    if let Some(decl) = class_decl {
                         declarations.push(ir::TypeDeclaration {
                             kind: ir::TypeKind::Class(decl),
                             module_context: ctx.clone(),
                             doc,
                             scope_id: scope,
-                            exported: true,
                         });
                         declarations.extend(self.drain_synth(ctx, scope));
                     }
@@ -349,37 +332,17 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                             &decl.js_name,
                             self.diag,
                         );
-                        let names = self.export_names(scope, &decl.js_name);
-                        for (name, js_name) in value_bindings(&decl.js_name, names) {
-                            declarations.push(ir::TypeDeclaration {
-                                kind: ir::TypeKind::Function(ir::FunctionDecl {
-                                    name,
-                                    js_name,
-                                    ..decl.clone()
-                                }),
-                                module_context: ctx.clone(),
-                                doc: doc.clone(),
-                                scope_id: scope,
-                                exported: true,
-                            });
-                        }
+                        declarations.push(ir::TypeDeclaration {
+                            kind: ir::TypeKind::Function(decl),
+                            module_context: ctx.clone(),
+                            doc,
+                            scope_id: scope,
+                        });
                     }
                 }
                 // Bound by its declaration, which takes `default` from the
                 // export map.
-                ast::ExportDefaultDeclarationKind::Identifier(ident) => {
-                    if !self
-                        .export_names(scope, &ident.name)
-                        .iter()
-                        .any(|name| name == "default")
-                    {
-                        self.diag.info(format!(
-                            "Skipping `export default {}` (only a class, function or variable \
-                             declared in the same module is supported)",
-                            ident.name
-                        ));
-                    }
-                }
+                ast::ExportDefaultDeclarationKind::Identifier(_) => {}
                 other => {
                     self.diag.warn(format!(
                         "Unsupported export default declaration kind: {}",
@@ -445,7 +408,6 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
             module_context: ctx,
             export_span_start,
             scope,
-            exported: true,
         };
 
         match decl {
@@ -468,7 +430,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                 self.populate_external_module(module, declarations);
             }
             ast::Declaration::TSNamespaceDeclaration(ns) => {
-                self.populate_namespace(ns, ctx, declarations, scope, true);
+                self.populate_namespace(ns, ctx, declarations, scope);
             }
             ast::Declaration::TSEnumDeclaration(enum_decl) => {
                 self.populate_ts_enum(enum_decl, &dcx, declarations);
@@ -481,7 +443,6 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                         &ir::ModuleContext::Global,
                         declarations,
                         self.file_scope,
-                        true,
                     );
                 }
                 self.global_scope = global_scope;
@@ -502,12 +463,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         let module_context = dcx.module_context.clone();
         let scope = dcx.scope;
         let class_decl = convert_class_decl(class, &module_context, scope, &mut self.parse_ctx());
-        if let Some(mut d) = class_decl {
-            // The local name stays the Rust type name since the module refers
-            // to the class by it; the public names reach Rust as alias stubs.
-            if let Some(public) = self.export_names(scope, &d.name).first() {
-                d.js_name = public.clone();
-            }
+        if let Some(d) = class_decl {
             declarations.push(dcx.decl(ir::TypeKind::Class(d), doc));
             declarations.extend(self.drain_synth(&module_context, scope));
         }
@@ -528,15 +484,45 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
             .ctor_interfaces
             .iter()
             .find(|(_, (ctor_scope, ctor))| *ctor_scope == scope && ctor == iface_name)
-            .map(|((_, var), _)| var.clone());
-        if let Some(var) = static_side_of {
+            .map(|(var, _)| var.clone());
+        if let Some((var_scope, var)) = static_side_of {
             self.push_static_side_class(&var, &iface.body.body, dcx, doc, declarations);
+            self.ctor_interfaces
+                .insert((var_scope, var), iface_name.to_string());
+            declarations.extend(self.drain_synth(&module_context, scope));
+            return;
+        }
+        let global = scope == self.file_scope
+            && self.global_scope
+            && matches!(module_context, ir::ModuleContext::Global);
+        if let Some(class) = self
+            .registry
+            .global_ctor_classes
+            .get(iface_name)
+            .filter(|_| global)
+        {
+            let class = class.clone();
+            declarations.push(self.static_side_class(&class, &iface.body.body, dcx, doc));
             declarations.extend(self.drain_synth(&module_context, scope));
             return;
         }
         let iface_decl = convert_interface_decl(iface, scope, &mut self.parse_ctx());
-        declarations.push(dcx.decl(ir::TypeKind::Interface(iface_decl), doc));
+        declarations.push(dcx.decl(ir::TypeKind::Interface(iface_decl), doc.clone()));
         declarations.extend(self.drain_synth(&module_context, scope));
+        let unpaired: Vec<(ScopeId, String)> = self
+            .registry
+            .unpaired_ctor_vars
+            .iter()
+            .filter(|(_, (ctor_scope, ctor))| *ctor_scope == scope && ctor == iface_name)
+            .map(|(var, _)| var.clone())
+            .collect();
+        for (var_scope, var) in unpaired {
+            let side = self.static_side_class(&var, &iface.body.body, dcx, doc.clone());
+            declarations.extend(self.drain_synth(&module_context, scope));
+            self.ctor_interfaces
+                .insert((var_scope, var.clone()), iface_name.to_string());
+            self.static_sides.insert((var_scope, var), side);
+        }
     }
 
     fn populate_type_alias(
@@ -648,16 +634,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
             convert_function_decl(func, info.throws(), dcx.scope, &mut self.parse_ctx())
         {
             crate::parse::members::apply_slice_hints(&mut d.params, &info, &d.js_name, self.diag);
-            let d = d;
-            let names = self.export_names(dcx.scope, &d.js_name);
-            for (name, js_name) in value_bindings(&d.js_name, names) {
-                let d = ir::FunctionDecl {
-                    name,
-                    js_name,
-                    ..d.clone()
-                };
-                declarations.push(dcx.decl(ir::TypeKind::Function(d), doc.clone()));
-            }
+            declarations.push(dcx.decl(ir::TypeKind::Function(d), doc));
         }
     }
 
@@ -672,6 +649,26 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         doc: Option<String>,
         declarations: &mut Vec<ir::TypeDeclaration>,
     ) {
+        declarations.push(self.static_side_class(name, members, dcx, doc));
+        // With an instance interface, the interface's members refer to the
+        // local name and `merge_class_pairs` pairs the two by it. A var
+        // alone is a value nothing refers to by its local name.
+        let has_instance_interface = self.registry.kind(dcx.scope, name)
+            == Some(&ir::RegisteredKind::MergedClassLike)
+            || self.registry.has_ctor_interface(dcx.scope, name);
+        if !has_instance_interface {
+            self.constructor_classes.push((dcx.scope, name.to_string()));
+        }
+    }
+
+    /// The class a static side describes.
+    fn static_side_class(
+        &mut self,
+        name: &str,
+        members: &[ast::TSSignature<'_>],
+        dcx: &DeclCtx<'_>,
+        doc: Option<String>,
+    ) -> ir::TypeDeclaration {
         let (ctor, static_members) = extract_var_members(members, dcx.scope, &mut self.parse_ctx());
 
         let mut members = Vec::new();
@@ -680,53 +677,22 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         }
         members.extend(static_members);
 
-        // With an instance interface, the local name is the Rust type: the
-        // interface's members refer to it and `merge_class_pairs` pairs the
-        // two by it. The class binds to its first public name, and the
-        // `export { _X as X }` stubs alias it, as for a renamed class. A
-        // var alone is a value nothing refers to by its local name, so the
-        // class takes its first public name and further ones alias it.
-        let public_names = self.export_names(dcx.scope, name);
-        let has_instance_interface = self.registry.kind(dcx.scope, name)
-            == Some(&ir::RegisteredKind::MergedClassLike)
-            || self.registry.has_ctor_interface(dcx.scope, name);
-        let (class_name, js_name, aliases) = match public_names.split_first() {
-            Some((public, _)) if has_instance_interface => {
-                (name.to_string(), public.clone(), &[][..])
-            }
-            Some((public, rest)) => (rust_name(name, public).to_string(), public.clone(), rest),
-            None => (name.to_string(), name.to_string(), &[][..]),
-        };
-
         // Var-promoted classes have no surface
         // type parameters; body scope = enclosing.
-        let body_scope = dcx.scope;
-        declarations.push(dcx.decl(
+        dcx.decl(
             ir::TypeKind::Class(ir::ClassDecl {
-                name: class_name.clone(),
-                js_name,
+                name: name.to_string(),
+                js_name: name.to_string(),
                 type_params: vec![],
                 extends: None,
                 implements: vec![],
                 is_abstract: false,
                 members,
                 type_module_context: dcx.module_context.clone(),
-                body_scope,
+                body_scope: dcx.scope,
             }),
             doc,
-        ));
-        for alias in aliases {
-            declarations.push(dcx.decl(
-                ir::TypeKind::TypeAlias(ir::TypeAliasDecl {
-                    name: alias.clone(),
-                    type_params: vec![],
-                    target: ir::TypeRef::ident(class_name.clone()),
-                    from_module: None,
-                    body_scope,
-                }),
-                None,
-            ));
-        }
+        )
     }
 
     fn populate_variable_decl(
@@ -776,6 +742,18 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                         }
                     }
                 }
+                let global =
+                    self.global_scope && matches!(dcx.module_context, ir::ModuleContext::Global);
+                if global && !alias_ctor && is_class_constructor_var(declarator) {
+                    if let Some(type_ann) = &declarator.type_annotation {
+                        if let ast::TSType::TSTypeLiteral(lit) = &type_ann.type_annotation {
+                            let side =
+                                self.static_side_class(&name, &lit.members, dcx, doc.clone());
+                            declarations.extend(self.drain_synth(dcx.module_context, dcx.scope));
+                            self.static_sides.insert((dcx.scope, name.clone()), side);
+                        }
+                    }
+                }
 
                 let type_ref = declarator
                     .type_annotation
@@ -789,41 +767,37 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                     })
                     .unwrap_or(ir::TypeRef::Any);
 
-                let bindings = value_bindings(&name, self.export_names(dcx.scope, &name));
+                let rust_name = to_snake_case(&name);
                 if let ir::TypeRef::Function(sig) = type_ref {
-                    for (name, js_name) in bindings {
-                        declarations.push(dcx.decl(
-                            ir::TypeKind::Function(ir::FunctionDecl {
-                                name,
-                                js_name,
-                                type_params: vec![],
-                                params: sig.params.clone(),
-                                return_type: (*sig.return_type).clone(),
-                                overloads: vec![],
-                                // Variable-as-function form (`var foo: () => T`) doesn't
-                                // typically carry @throws JSDoc; leave empty.
-                                throws: ir::Throws::None,
-                                // Var-as-function bindings have no surface type
-                                // parameters; their body scope is the enclosing.
-                                body_scope: dcx.scope,
-                            }),
-                            doc.clone(),
-                        ));
-                    }
+                    declarations.push(dcx.decl(
+                        ir::TypeKind::Function(ir::FunctionDecl {
+                            name: rust_name,
+                            js_name: name,
+                            type_params: vec![],
+                            params: sig.params,
+                            return_type: *sig.return_type,
+                            overloads: vec![],
+                            // Variable-as-function form (`var foo: () => T`) doesn't
+                            // typically carry @throws JSDoc; leave empty.
+                            throws: ir::Throws::None,
+                            // Var-as-function bindings have no surface type
+                            // parameters; their body scope is the enclosing.
+                            body_scope: dcx.scope,
+                        }),
+                        doc.clone(),
+                    ));
                 } else {
                     let is_const = matches!(var_decl.kind, ast::VariableDeclarationKind::Const);
-                    for (name, js_name) in bindings {
-                        declarations.push(dcx.decl(
-                            ir::TypeKind::Variable(ir::VariableDecl {
-                                name,
-                                js_name,
-                                type_ref: type_ref.clone(),
-                                is_const,
-                                constructs: constructs.clone(),
-                            }),
-                            doc.clone(),
-                        ));
-                    }
+                    declarations.push(dcx.decl(
+                        ir::TypeKind::Variable(ir::VariableDecl {
+                            name: rust_name,
+                            js_name: name,
+                            type_ref,
+                            is_const,
+                            constructs,
+                        }),
+                        doc.clone(),
+                    ));
                 }
             }
         }
@@ -907,7 +881,6 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
             module_context: ctx.clone(),
             doc: None,
             scope_id: scope,
-            exported: true,
         });
     }
 
@@ -929,7 +902,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                 assigned_name(&block.body).map(|name| (module_scope, name)),
             );
             for stmt in &block.body {
-                self.populate_statement(stmt, &module_ctx, declarations, module_scope, false);
+                self.populate_statement(stmt, &module_ctx, declarations, module_scope);
             }
             self.export_assignment = outer;
         }
@@ -941,7 +914,6 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         parent_ctx: &ir::ModuleContext,
         declarations: &mut Vec<ir::TypeDeclaration>,
         scope: ScopeId,
-        exported: bool,
     ) {
         let doc = self.docs.for_span(ns.span.start);
         let ns_name = ns.id.name.to_string();
@@ -958,14 +930,14 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
             .is_some_and(|(module_scope, name)| *module_scope == scope && *name == ns_name)
         {
             for stmt in stmts {
-                self.populate_statement(stmt, parent_ctx, declarations, ns_scope, exported);
+                self.populate_statement(stmt, parent_ctx, declarations, ns_scope);
             }
             return;
         }
         if let Some(specifier) = self.registry.assigned_namespaces.get(&ns_scope) {
             let module_ctx = ir::ModuleContext::Module(specifier.as_str().into());
             for stmt in stmts {
-                self.populate_statement(stmt, &module_ctx, declarations, ns_scope, exported);
+                self.populate_statement(stmt, &module_ctx, declarations, ns_scope);
             }
             return;
         }
@@ -974,7 +946,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         // `module = "…"` as well as the namespace path.
         let mut ns_decls = Vec::new();
         for stmt in stmts {
-            self.populate_statement(stmt, parent_ctx, &mut ns_decls, ns_scope, exported);
+            self.populate_statement(stmt, parent_ctx, &mut ns_decls, ns_scope);
         }
         self.namespace_members
             .entry(ns_scope)
@@ -989,7 +961,6 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
             module_context: parent_ctx.clone(),
             doc,
             scope_id: scope,
-            exported,
         });
     }
 

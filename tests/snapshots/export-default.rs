@@ -99,5 +99,8 @@ pub mod export_default {
                 pub fn try_helper() -> Result<String, JsValue>;
             }
         }
+        pub mod create {
+            pub use super::make::*;
+        }
     }
 }

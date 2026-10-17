@@ -14,6 +14,7 @@
 //!   → Code Generation: IR → syn::File → prettyplease → .rs files
 //! ```
 
+pub mod abi;
 pub mod codegen;
 pub mod context;
 pub mod external_map;

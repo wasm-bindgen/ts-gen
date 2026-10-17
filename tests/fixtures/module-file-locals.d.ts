@@ -25,8 +25,8 @@ export { _Server as Server };
 interface Options {
   depth: number;
 }
-export declare function configure(o: Options): Foo;
-export type Alias = Foo;
+export declare function configure(o: Options): _Foo;
+export type Alias = _Foo;
 
 declare function helper(): void;
 declare const secret: number;
