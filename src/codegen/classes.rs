@@ -103,8 +103,9 @@ struct MemberNames {
 /// A property's getter, `set_` setter, and a dictionary's factory parameter
 /// and builder method are named in separate passes, so names that convert
 /// alike (`data` / `$data`, `fooBar` / `foo_bar`) are made distinct here,
-/// once. Declared names claim first, in [`naming_priority`] order after the
-/// constructor's `new`, then the setters' derived names: `set_` plus the
+/// once. Declared names claim first, instance members before statics and
+/// each in [`naming_priority`] order after the constructor's `new`, then
+/// the setters' derived names: `set_` plus the
 /// property's base (`$data` → `data_2` / `set_data_2`), numbered on its own
 /// when a declared name already has it (`setFoo()` keeps `set_foo` and
 /// property `foo`'s setter becomes `set_foo_2`).
@@ -113,6 +114,10 @@ struct MemberNames {
 /// only clash with that one name, so it takes a trailing underscore instead
 /// (`new_`, still `set_new`). A method's names (`try_new`, `new_with_x`) can
 /// clash more than once, so it's numbered.
+///
+/// A static named like an instance member takes `_static`, MDN's spelling
+/// for the clash (`Response.json` → `json_static`, `response.json()` →
+/// `json`).
 fn member_names(members: &[Member], generated: &[&str]) -> MemberNames {
     let mut keyed: Vec<(MemberKind, &str)> = members
         .iter()
@@ -133,19 +138,32 @@ fn member_names(members: &[Member], generated: &[&str]) -> MemberNames {
         })
         .map(|(kind, js_name)| (kind, js_name.as_str()))
         .collect();
-    keyed.sort_by_key(|(_, js_name)| naming_priority(js_name, &member_snake(js_name)));
+    let is_static =
+        |kind: &MemberKind| matches!(kind, MemberKind::StaticProperty | MemberKind::StaticMethod);
+    keyed.sort_by_key(|(kind, js_name)| {
+        (
+            is_static(kind),
+            naming_priority(js_name, &member_snake(js_name)),
+        )
+    });
 
     let mut scope = LocalScope::default();
     for name in generated {
         scope.claim(*name);
     }
     let mut names = MemberNames::default();
+    let mut instance = HashSet::new();
     for (kind, js_name) in &keyed {
         let key = (*kind, js_name.to_string());
         if names.bases.contains_key(&key) {
             continue;
         }
-        let snake = member_snake(js_name);
+        let mut snake = member_snake(js_name);
+        if !is_static(kind) {
+            instance.insert(snake.clone());
+        } else if instance.contains(&snake) {
+            snake.push_str("_static");
+        }
         let is_property = matches!(kind, MemberKind::Property | MemberKind::StaticProperty);
         let base = if is_property && generated.contains(&public_rust_name(&snake).as_str()) {
             names.stems.insert(key.clone(), snake.clone());
