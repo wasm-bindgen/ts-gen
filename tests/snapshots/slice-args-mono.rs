@@ -6,25 +6,23 @@ use js_sys::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
-    pub fn generic<T>(#[wasm_bindgen(slice = "array")] values: &[T]) -> String;
+    #[wasm_bindgen(slice = "array")]
+    pub fn generic<T>(values: &[T]) -> String;
 }
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "generic")]
-    pub fn generic_js_string<T>(#[wasm_bindgen(slice = "array")] values: &[T]) -> JsString;
+    #[wasm_bindgen(slice = "array", js_name = "generic")]
+    pub fn generic_js_string<T>(values: &[T]) -> JsString;
 }
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "generic")]
-    pub fn try_generic<T>(#[wasm_bindgen(slice = "array")] values: &[T])
-        -> Result<String, JsValue>;
+    #[wasm_bindgen(slice = "array", catch, js_name = "generic")]
+    pub fn try_generic<T>(values: &[T]) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "generic")]
-    pub fn try_generic_js_string<T>(
-        #[wasm_bindgen(slice = "array")] values: &[T],
-    ) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(slice = "array", catch, js_name = "generic")]
+    pub fn try_generic_js_string<T>(values: &[T]) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
@@ -33,21 +31,12 @@ extern "C" {
     pub type Bag<T>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new<T>() -> Result<Bag<T>, JsValue>;
-    #[wasm_bindgen(method)]
-    pub fn take<T>(this: &Bag<T>, #[wasm_bindgen(slice = "array")] values: &[T]) -> String;
-    #[wasm_bindgen(method, js_name = "take")]
-    pub fn take_js_string<T>(
-        this: &Bag<T>,
-        #[wasm_bindgen(slice = "array")] values: &[T],
-    ) -> JsString;
-    #[wasm_bindgen(method, catch, js_name = "take")]
-    pub fn try_take<T>(
-        this: &Bag<T>,
-        #[wasm_bindgen(slice = "array")] values: &[T],
-    ) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "take")]
-    pub fn try_take_js_string<T>(
-        this: &Bag<T>,
-        #[wasm_bindgen(slice = "array")] values: &[T],
-    ) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, slice = "array")]
+    pub fn take<T>(this: &Bag<T>, values: &[T]) -> String;
+    #[wasm_bindgen(method, slice = "array", js_name = "take")]
+    pub fn take_js_string<T>(this: &Bag<T>, values: &[T]) -> JsString;
+    #[wasm_bindgen(method, slice = "array", catch, js_name = "take")]
+    pub fn try_take<T>(this: &Bag<T>, values: &[T]) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, slice = "array", catch, js_name = "take")]
+    pub fn try_take_js_string<T>(this: &Bag<T>, values: &[T]) -> Result<JsString, JsValue>;
 }

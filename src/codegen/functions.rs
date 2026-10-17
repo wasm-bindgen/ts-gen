@@ -109,6 +109,9 @@ fn generate_expanded_free_function(
     if has_variadic {
         wb_parts.push(quote! { variadic });
     }
+    if super::typemap::fn_mono_array_mode(&sig.params, cgctx, scope) {
+        wb_parts.push(quote! { slice = "array" });
+    }
     if sig.catch {
         wb_parts.push(quote! { catch });
     }

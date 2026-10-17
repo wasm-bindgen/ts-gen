@@ -1502,6 +1502,9 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
 
     let mut wb_parts = vec![quote! { constructor }];
     wb_parts.extend(config.js_class_parts());
+    if super::typemap::fn_mono_array_mode(&sig.params, config.cgctx, scope) {
+        wb_parts.push(quote! { slice = "array" });
+    }
     if sig.catch {
         wb_parts.push(quote! { catch });
     }
@@ -1545,6 +1548,9 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
     let mut wb_parts: Vec<TokenStream> = vec![quote! { method }];
     if has_variadic {
         wb_parts.push(quote! { variadic });
+    }
+    if super::typemap::fn_mono_array_mode(&sig.params, config.cgctx, method_scope) {
+        wb_parts.push(quote! { slice = "array" });
     }
     if sig.catch {
         wb_parts.push(quote! { catch });
@@ -1609,6 +1615,9 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
     wb_parts.extend(config.js_class_parts());
     if has_variadic {
         wb_parts.push(quote! { variadic });
+    }
+    if super::typemap::fn_mono_array_mode(&sig.params, config.cgctx, scope) {
+        wb_parts.push(quote! { slice = "array" });
     }
     if sig.catch {
         wb_parts.push(quote! { catch });
@@ -1812,6 +1821,9 @@ fn generate_setter(
             let fn_generics = render_generic_bounds(&bounds);
 
             let mut wb_parts: Vec<TokenStream> = vec![quote! { method }, quote! { setter }];
+            if super::typemap::fn_mono_array_mode(&sig.params, config.cgctx, config.scope) {
+                wb_parts.push(quote! { slice = "array" });
+            }
             if super::typemap::needs_js_name(&rust_ident, &format!("set_{}", setter.js_name)) {
                 let js_name = &setter.js_name;
                 wb_parts.push(quote! { js_name = #js_name });
@@ -1945,6 +1957,9 @@ fn generate_static_setter(
             let mut wb_parts: Vec<TokenStream> = vec![quote! { static_method_of = #class_ident }];
             wb_parts.extend(config.js_class_parts());
             wb_parts.push(quote! { setter });
+            if super::typemap::fn_mono_array_mode(&sig.params, config.cgctx, config.scope) {
+                wb_parts.push(quote! { slice = "array" });
+            }
             if super::typemap::needs_js_name(&rust_ident, &format!("set_{}", setter.js_name)) {
                 let js_name = &setter.js_name;
                 wb_parts.push(quote! { js_name = #js_name });
