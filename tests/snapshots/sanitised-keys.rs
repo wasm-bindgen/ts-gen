@@ -225,6 +225,48 @@ extern "C" {
     pub fn data_2(this: &MethodCollide) -> String;
     #[wasm_bindgen(method, setter, js_name = "$data")]
     pub fn set_data_2(this: &MethodCollide, val: &str);
+    #[wasm_bindgen(method, js_name = "setFoo")]
+    pub fn set_foo(this: &MethodCollide);
+    #[wasm_bindgen(method, catch, js_name = "setFoo")]
+    pub fn try_set_foo(this: &MethodCollide) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, getter, js_name = "foo")]
+    pub fn foo_2(this: &MethodCollide) -> String;
+    #[wasm_bindgen(method, setter, js_name = "foo")]
+    pub fn set_foo_2(this: &MethodCollide, val: &str);
+    #[wasm_bindgen(method)]
+    pub fn call(this: &MethodCollide);
+    #[wasm_bindgen(method, catch, js_name = "call")]
+    pub fn try_call(this: &MethodCollide) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "call")]
+    pub fn call_with_a(this: &MethodCollide, a: &str);
+    #[wasm_bindgen(method, catch, js_name = "call")]
+    pub fn try_call_with_a(this: &MethodCollide, a: &str) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "call")]
+    pub fn call_with_a_2(this: &MethodCollide, a: f64);
+    #[wasm_bindgen(method, catch, js_name = "call")]
+    pub fn try_call_with_a_2(this: &MethodCollide, a: f64) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type SetterCollide;
+    #[wasm_bindgen(method, getter, js_name = "setFoo")]
+    pub fn set_foo(this: &SetterCollide) -> String;
+    #[wasm_bindgen(method, setter, js_name = "setFoo")]
+    pub fn set_set_foo(this: &SetterCollide, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "foo")]
+    pub fn foo_2(this: &SetterCollide) -> String;
+    #[wasm_bindgen(method, setter, js_name = "foo")]
+    pub fn set_foo_2(this: &SetterCollide, val: &str);
+}
+impl SetterCollide {
+    pub fn new(set_foo: &str, foo_2: &str) -> SetterCollide {
+        let inner: SetterCollide = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_set_foo(set_foo);
+        inner.set_foo_2(foo_2);
+        inner
+    }
 }
 #[wasm_bindgen(module = "sanitised-keys")]
 extern "C" {
@@ -244,6 +286,16 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch, js_name = "$ajax")]
     pub fn try_ajax_2(url: &str) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    #[wasm_bindgen(js_name = "dollar")]
+    pub fn dollar_2();
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "dollar")]
+    pub fn try_dollar_2() -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "sanitised-keys")]
 extern "C" {

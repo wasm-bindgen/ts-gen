@@ -1,8 +1,9 @@
 #![cfg(target_arch = "wasm32")]
 
 use ts_gen_integration_tests::sanitised_keys::{
-    ajax, ajax_2, collide_args, compare, dollar, dollar_dollar, each, underscore_underscore,
-    version, Collide, CollideInit, DollarUnderscore, MethodCollide, Op, Pair, Sigil, Store,
+    ajax, ajax_2, collide_args, compare, dollar, dollar_2, dollar_dollar, each,
+    underscore_underscore, version, Collide, CollideInit, DollarUnderscore, MethodCollide, Op,
+    Pair, SetterCollide, Sigil, Store,
 };
 
 // Compile-only coverage that wasm-bindgen accepts the `js_name` / `js_class`
@@ -52,8 +53,21 @@ fn colliding_names_compile(collide: &Collide, methods: &MethodCollide) {
     methods.data();
     let _: String = methods.data_2();
     methods.set_data_2("x");
+    methods.set_foo();
+    let _: String = methods.foo_2();
+    methods.set_foo_2("x");
+    methods.call();
+    methods.call_with_a("x");
+    methods.call_with_a_2(1.0);
+
+    let setters = SetterCollide::new("a", "b");
+    let _: String = setters.set_foo();
+    setters.set_set_foo("x");
+    let _: String = setters.foo_2();
+    setters.set_foo_2("x");
 
     ajax("/a");
     ajax_2("/b");
     collide_args("a", 1.0, "b", 2.0);
+    dollar_2();
 }

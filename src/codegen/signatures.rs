@@ -1098,7 +1098,7 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
                 continue;
             }
 
-            let param_snake = to_snake_case(&param.name);
+            let param_snake = snake_ident(&param.name);
             let (text, from_type) = if any_same_name_different_type {
                 (type_snake_name(&param.type_ref), true)
             } else {

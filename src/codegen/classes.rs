@@ -34,8 +34,9 @@ use crate::codegen::signatures::{
 };
 use crate::codegen::typemap::{to_return_type, CodegenContext, TypePosition};
 use crate::ir::{
-    ClassDecl, GetterMember, InterfaceClassification, InterfaceDecl, Member, ModuleContext,
-    SetterMember, StaticGetterMember, StaticSetterMember, TypeRef,
+    ClassDecl, GetterMember, InterfaceClassification, InterfaceDecl, Member, MethodMember,
+    ModuleContext, SetterMember, StaticGetterMember, StaticMethodMember, StaticSetterMember,
+    TypeRef,
 };
 use crate::parse::scope::ScopeId;
 use crate::util::naming::{to_snake_case, LocalScope, Suffix};
@@ -76,8 +77,9 @@ pub(crate) struct ClassConfig<'a> {
 /// The getter, the `set_` setter and a dictionary's factory parameters and
 /// builder methods are all named from it, but in separate passes, so names
 /// that convert alike (`data` / `$data`, `fooBar` / `foo_bar`) are made
-/// distinct here, once, in declaration order. Methods claim their names
-/// too, so a property numbered around one numbers its setter with it.
+/// distinct here, once, in declaration order. A base is only taken when its
+/// `set_` name is free too, and methods claim their names, so a property's
+/// getter and setter are always numbered together.
 fn property_bases(members: &[Member]) -> HashMap<(bool, String), String> {
     let mut scope = LocalScope::default();
     let mut bases = HashMap::new();
@@ -87,15 +89,22 @@ fn property_bases(members: &[Member]) -> HashMap<(bool, String), String> {
             | Member::Setter(SetterMember { js_name, .. }) => (false, js_name.clone()),
             Member::StaticGetter(StaticGetterMember { js_name, .. })
             | Member::StaticSetter(StaticSetterMember { js_name, .. }) => (true, js_name.clone()),
-            Member::Method(crate::ir::MethodMember { js_name, .. })
-            | Member::StaticMethod(crate::ir::StaticMethodMember { js_name, .. }) => {
+            Member::Method(MethodMember { js_name, .. })
+            | Member::StaticMethod(StaticMethodMember { js_name, .. }) => {
                 scope.claim(property_snake(js_name));
                 continue;
             }
             _ => continue,
         };
         bases.entry(key).or_insert_with_key(|(_, js_name)| {
-            scope.declare(&property_snake(js_name), Suffix::Snake)
+            let candidate = property_snake(js_name);
+            let base = std::iter::once(candidate.clone())
+                .chain((2..).map(|n| format!("{candidate}_{n}")))
+                .find(|base| !scope.contains(base) && !scope.contains(&format!("set_{base}")))
+                .expect("unbounded");
+            scope.claim(format!("set_{base}"));
+            scope.claim(base.clone());
+            base
         });
     }
     bases

@@ -55,7 +55,17 @@ export interface CollideInit {
 export interface MethodCollide {
   data(): void;
   $data: string;
+  setFoo(): void;
+  foo: string;
+  call(): void;
+  call(a: string): void;
+  call($a: number): void;
+}
+export interface SetterCollide {
+  setFoo: string;
+  foo: string;
 }
 export declare function ajax(url: string): void;
 export declare function $ajax(url: string): void;
+export declare function dollar(): void;
 export declare function collideArgs(a: string, $a: number, fooBar: string, foo_bar: number): void;
