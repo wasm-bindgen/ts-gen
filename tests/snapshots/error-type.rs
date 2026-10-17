@@ -17,7 +17,10 @@ extern "C" {
     pub fn try_bar(this: &Foo, x: f64) -> Result<String, crate::Error>;
     #[doc = " Async method — `Result<T, crate::Error>`."]
     #[wasm_bindgen(method, catch)]
-    pub async fn baz(this: &Foo) -> Result<Number, crate::Error>;
+    pub async fn baz(this: &Foo) -> Result<f64, crate::Error>;
+    #[doc = " Async method — `Result<T, crate::Error>`."]
+    #[wasm_bindgen(method, js_name = "baz")]
+    pub fn baz_promise(this: &Foo) -> Promise<Number>;
     #[doc = " Explicit `@throws` still wins over the configured default."]
     #[doc = ""]
     #[doc = " ## Errors"]
@@ -46,5 +49,11 @@ extern "C" {
 extern "C" {
     #[doc = " Free function — same default-error rule."]
     #[wasm_bindgen(catch, js_name = "fetchData")]
-    pub async fn fetch_data(url: &str) -> Result<JsString, crate::Error>;
+    pub async fn fetch_data(url: &str) -> Result<String, crate::Error>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[doc = " Free function — same default-error rule."]
+    #[wasm_bindgen(js_name = "fetchData")]
+    pub fn fetch_data_promise(url: &str) -> Promise<JsString>;
 }
