@@ -69,8 +69,8 @@ proc-macro2 = "1"
 quote = "1"
 syn = { version = "2", features = ["full", "extra-traits", "printing"] }
 walkdir = { version = "2", optional = true }
-wasm-encoder = "0.262"
-wasmparser = "0.259"
+wasm-encoder = { version = "0.262", features = ["wasmparser"] }
+wasmparser = "0.262"
 wat = "1.259"
 tempfile = "3"
 

@@ -3264,23 +3264,30 @@ values and import nothing. A scalar `const` or `let` that is itself an
 export takes its scalar type, as any other value does: `export const
 count: number` is `(func (result f64))`.
 
-`embed` reaches them through the merged module's own
-ESM imports, one immutable `externref` global per export (ESM
-integration coerces a non-`WebAssembly.Global` export into one):
+`embed` links the language module's imports from `"<spec>"` to
+bindings functions, exported as `<spec>:<name>`, before the merge:
+`wasm-merge` links by module name, and the bindings themselves import
+the real `"<spec>"`. They reach each value through the merged module's
+own ESM imports, one immutable `externref` global per export (ESM
+integration coerces a non-`WebAssembly.Global` export into one), with
+each further path segment a `reflect_get` keyed by a
+`wasm:js/string-constants` import:
 
 ```wat
-(import "cloudflare:sockets" "connect" (global $m:connect externref))
-(import "cloudflare:sockets" "Socket" (global $m:Socket externref))
+(import "cloudflare:sockets" "connect" (global $m:cloudflare:sockets:connect externref))
+(import "cloudflare:sockets" "Socket" (global $m:cloudflare:sockets:Socket externref))
 ```
 
-A module's free function is called with `globalThis` as `this`; a
-class export is constructed with `call_new`, and its statics and
+A static import is a snapshot of the export at instantiation, not a
+live binding: a module that reassigns an exported `let` later is not
+seen. A module's free function is called with `globalThis` as `this`;
+a class export is constructed with `call_new`, and its statics and
 nested namespaces are read with `reflect_get` as for globals. A
 `const`/`let` export is the global's value, under the per-position
 reference rule above (`anyref` converts, `(ref extern)` narrows).
-Module exports are references and immutable, so a scalar-typed one is
-an error in the model, and assigning a module export is rejected by
-`embed`.
+Assigning a module export is rejected by `embed`. A language module
+may still import other exports of `"<spec>"` directly, as anything but
+a function; those are left for the host to resolve.
 
 ### Provided functions in the ABI
 
