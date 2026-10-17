@@ -3,7 +3,7 @@
 use wasm_bindgen_test::*;
 
 use ts_gen_integration_tests::export_default::{
-    export_default::{create::create, merged, renamed, version::version},
+    export_default::{create::create, merged, namespace, renamed, version::version},
     Processor,
 };
 
@@ -26,4 +26,10 @@ fn merged_namespaces_bind_through_the_export() {
     assert_eq!(merged::make::helper(), "helped");
     assert_eq!(renamed::create(), "made");
     assert_eq!(renamed::create::helper(), "helped");
+}
+
+// A namespace alone exported as the default binds through `default`.
+#[wasm_bindgen_test]
+fn default_namespaces_bind_as_default() {
+    assert_eq!(namespace::n::f(), "f");
 }

@@ -100,4 +100,22 @@ pub mod export_default {
             }
         }
     }
+    pub mod namespace {
+        #[allow(unused_imports)]
+        use super::*;
+        pub mod n {
+            #[allow(unused_imports)]
+            use super::*;
+            #[wasm_bindgen(module = "export-default/namespace")]
+            extern "C" {
+                #[wasm_bindgen(js_namespace = "default")]
+                pub fn f() -> String;
+            }
+            #[wasm_bindgen(module = "export-default/namespace")]
+            extern "C" {
+                #[wasm_bindgen(catch, js_name = "f", js_namespace = "default")]
+                pub fn try_f() -> Result<String, JsValue>;
+            }
+        }
+    }
 }

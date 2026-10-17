@@ -2077,6 +2077,7 @@ mod tests {
                     namespace P { function z(): void; }
                     export default P;
                 }
+                declare module "u" { export default missing; }
             "#,
         )
         .unwrap();
@@ -2084,7 +2085,18 @@ mod tests {
         std::fs::remove_dir_all(&dir).unwrap();
         let (_, gctx) = result.unwrap();
 
-        for (m, local) in [("a", "C"), ("b", "f"), ("c", "v"), ("d", "later")] {
+        // As in TypeScript, `export default x` exports every meaning of `x`,
+        // so a namespace is the default with or without a value merged in.
+        for (m, local) in [
+            ("a", "C"),
+            ("b", "f"),
+            ("c", "v"),
+            ("d", "later"),
+            ("e", "N"),
+            ("g", "I"),
+            ("k", "E"),
+            ("h", "P"),
+        ] {
             let scope = gctx.ambient_module_scopes[m][0];
             assert_eq!(
                 gctx.exports.local_name(scope, "default"),
@@ -2092,17 +2104,8 @@ mod tests {
                 "{m}"
             );
         }
-        // A namespace has no value to bind as `default`, so stays unexported.
-        let e = gctx.ambient_module_scopes["e"][0];
-        assert_eq!(gctx.exports.entries(e).count(), 0);
-        // Nor does an interface merged with one, unless a `var` makes it a
-        // class.
-        let g = gctx.ambient_module_scopes["g"][0];
-        assert_eq!(gctx.exports.local_name(g, "default"), None);
-        let k = gctx.ambient_module_scopes["k"][0];
-        assert_eq!(gctx.exports.local_name(k, "default"), None);
-        let h = gctx.ambient_module_scopes["h"][0];
-        assert_eq!(gctx.exports.local_name(h, "default"), Some("P"));
+        let u = gctx.ambient_module_scopes["u"][0];
+        assert_eq!(gctx.exports.entries(u).count(), 0);
     }
 
     #[test]

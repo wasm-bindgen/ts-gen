@@ -96,30 +96,11 @@ pub fn collect_type_names(
         ccx.assign_namespace(scope, &specifier, &name);
     }
 
-    // A namespace's members would bind through a named export the module
-    // doesn't have, so a name with a namespace is the default only when a
-    // merged class, function or variable carries the value.
+    // As in TypeScript, `export default x` exports every meaning of `x`, so
+    // a namespace alone is the default too, its members bound through it.
     for (scope, name) in std::mem::take(&mut ccx.default_identifiers) {
         let s = ccx.gctx.scopes.get(scope);
-        let has_namespace = s.namespace(&name).is_some();
-        let bound = s
-            .get(&name)
-            .is_some_and(|id| match ccx.gctx.get_type(id).kind {
-                ir::TypeKind::Namespace(_) => false,
-                // An interface merged with a constructor-shaped `var` is a
-                // class, whose binding is still the interface placeholder.
-                ir::TypeKind::Interface(_) => {
-                    !has_namespace
-                        || ccx.registry.kind(scope, &name)
-                            == Some(&ir::RegisteredKind::MergedClassLike)
-                }
-                // A TS `enum` binds no JS value of its own in Rust.
-                ir::TypeKind::TypeAlias(_)
-                | ir::TypeKind::StringEnum(_)
-                | ir::TypeKind::NumericEnum(_)
-                | ir::TypeKind::TsEnum(_) => !has_namespace,
-                _ => true,
-            });
+        let bound = s.namespace(&name).is_some() || s.get(&name).is_some();
         if bound {
             ccx.export_default(scope, &name);
         } else {
@@ -133,8 +114,8 @@ pub fn collect_type_names(
 
 fn skip_default_identifier(diag: &mut DiagnosticCollector, name: &str) {
     diag.info(format!(
-        "Skipping `export default {name}` (only a class, function or variable declared in \
-         the same module is supported)"
+        "Skipping `export default {name}` (only a name declared in the same module is \
+         supported)"
     ));
 }
 

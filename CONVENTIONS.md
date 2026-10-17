@@ -2663,9 +2663,11 @@ namespace exported under its own name as well keeps it.
   so the Rust name stays the local one, as for the binding an `export =`
   assigns: the class gets `js_name = "default"` and its constructor and
   statics `js_class = "default"`, and the function or static gets
-  `js_name = "default"`. `export default x` of a namespace without a merged
-  class, function or variable, or of a name the module doesn't declare,
-  is skipped with a diagnostic. Outside a module there is no export to
+  `js_name = "default"`. As in TypeScript, `export default x` exports every
+  meaning of `x`, so a namespace alone is the default too and its members
+  bind through `js_namespace = "default"` in a `pub mod` of its local name.
+  `export default x` of a name the module doesn't declare is skipped with
+  a diagnostic. Outside a module there is no export to
   bind: `export default class C` and `function f` are emitted as plain
   globals, and `export default x` is skipped.
 

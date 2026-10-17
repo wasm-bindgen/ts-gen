@@ -1,4 +1,4 @@
-//! @ts-gen --lib-name export-default --export export-default --export export-default/create --export export-default/version --export export-default/merged --export export-default/renamed
+//! @ts-gen --lib-name export-default --export export-default --export export-default/create --export export-default/version --export export-default/merged --export export-default/renamed --export export-default/namespace
 
 // A default export has no name of its own: the declaration keeps its local
 // Rust name and binds `default`, as for `export =`. That covers a default
@@ -38,4 +38,13 @@ declare module "export-default/renamed" {
     function helper(): string;
   }
   export { make as create };
+}
+
+// `export default` exports every meaning of a name, so a namespace alone is
+// the default too.
+declare module "export-default/namespace" {
+  namespace N {
+    function f(): string;
+  }
+  export default N;
 }
