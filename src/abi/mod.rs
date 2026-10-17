@@ -174,6 +174,8 @@ impl Lower<'_> {
             }
             return match self.gctx.scopes.resolve_binding(scope, head)? {
                 Binding::TypeParam => Some(Resolved::TypeParam),
+                // A parameter erased to a primitive reads as that primitive.
+                Binding::Erased(erasure) => Some(Resolved::Alias(erasure.type_ref(), scope)),
                 Binding::Declared(id) => Some(self.declared(id, segments, args, scope)),
             };
         }

@@ -39,6 +39,7 @@ src/
 │   ├── provides.rs            # provides.rs wrapper + app scaffold for --provides
 │   ├── signatures.rs          # parameter expansion + per-callable layer
 │   ├── subtyping.rs           # builtin parents + `lub_types` (LUB)
+│   ├── surface.rs             # output surface: export roots, `--export <Name>`, closure
 │   └── typemap.rs             # TypeRef → syn tokens, `to_return_type`, externals
 ├── abi/                       # Wasm ABI layer (--target wat, embed)
 │   ├── mod.rs                 # ABI model, `build()`

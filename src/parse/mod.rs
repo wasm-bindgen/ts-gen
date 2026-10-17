@@ -1156,33 +1156,50 @@ fn declaration_name(kind: &crate::ir::TypeKind) -> Option<String> {
 
 /// Merge two member lists, deduplicating by (kind, name).
 /// Members from `incoming` override same-named members in `base`.
+///
+/// Overloads share a key, so an incoming member group replaces the
+/// base group as a whole (in the first base slot) rather than entry
+/// by entry; `getReader()` / `getReader(options)` both survive a
+/// var + interface merge.
 pub(crate) fn merge_members(base: &mut Vec<crate::ir::Member>, incoming: Vec<crate::ir::Member>) {
-    use std::collections::HashMap;
+    use std::collections::{HashMap, HashSet};
 
-    // Build a map of existing members by key
-    let mut by_key: HashMap<MemberKey, usize> = HashMap::new();
-    for (i, m) in base.iter().enumerate() {
-        by_key.insert(member_key(m), i);
-    }
-
+    let incoming_keys: HashSet<MemberKey> = incoming.iter().map(member_key).collect();
+    let mut groups: HashMap<MemberKey, Vec<crate::ir::Member>> = HashMap::new();
+    let mut order: Vec<MemberKey> = Vec::new();
     for m in incoming {
         let key = member_key(&m);
-        if let Some(&idx) = by_key.get(&key) {
-            // Override existing
-            base[idx] = m;
+        if !groups.contains_key(&key) {
+            order.push(key.clone());
+        }
+        groups.entry(key).or_default().push(m);
+    }
+
+    let mut merged = Vec::with_capacity(base.len());
+    for m in base.drain(..) {
+        let key = member_key(&m);
+        if incoming_keys.contains(&key) {
+            if let Some(group) = groups.remove(&key) {
+                merged.extend(group);
+            }
         } else {
-            by_key.insert(key, base.len());
-            base.push(m);
+            merged.push(m);
         }
     }
+    for key in order {
+        if let Some(group) = groups.remove(&key) {
+            merged.extend(group);
+        }
+    }
+    *base = merged;
 }
 
 /// A lightweight key for member deduplication.
 ///
 /// Getters and setters for the same JS property name get distinct keys,
 /// since they are independent bindings that should not overwrite each other.
-#[derive(Debug, PartialEq, Eq, Hash)]
-enum MemberKey {
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub(crate) enum MemberKey {
     Constructor,
     StaticMethod(String),
     StaticGetter(String),
@@ -1192,7 +1209,7 @@ enum MemberKey {
     ProtoSetter(String),
 }
 
-fn member_key(member: &crate::ir::Member) -> MemberKey {
+pub(crate) fn member_key(member: &crate::ir::Member) -> MemberKey {
     match member {
         crate::ir::Member::Constructor(_) => MemberKey::Constructor,
         crate::ir::Member::StaticMethod(m) => MemberKey::StaticMethod(m.name.clone()),

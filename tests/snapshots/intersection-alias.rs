@@ -60,6 +60,10 @@ extern "C" {
     # [wasm_bindgen (extends = Base , extends = Geo , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Properties<HostMetadata: ::wasm_bindgen::JsGeneric = JsValue>;
+    #[wasm_bindgen(method, getter)]
+    pub fn country<HostMetadata: ::wasm_bindgen::JsGeneric>(
+        this: &Properties<HostMetadata>,
+    ) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "hostMetadata")]
     pub fn host_metadata<HostMetadata: ::wasm_bindgen::JsGeneric>(
         this: &Properties<HostMetadata>,
@@ -71,10 +75,12 @@ extern "C" {
     );
 }
 impl<HostMetadata: ::wasm_bindgen::JsGeneric> Properties<HostMetadata> {
-    pub fn new(host_metadata: &HostMetadata) -> Properties<HostMetadata> {
-        let inner: Properties<HostMetadata> = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_host_metadata(host_metadata);
-        inner
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Properties<HostMetadata> {
+        #[allow(unused_unsafe)]
+        unsafe {
+            JsValue::from(js_sys::Object::new()).unchecked_into()
+        }
     }
 }
 #[wasm_bindgen]
@@ -88,10 +94,12 @@ extern "C" {
     pub fn set_results<T: ::wasm_bindgen::JsGeneric>(this: &QueryResult<T>, val: &[T]);
 }
 impl<T: ::wasm_bindgen::JsGeneric> QueryResult<T> {
-    pub fn new(results: &[T]) -> QueryResult<T> {
-        let inner: QueryResult<T> = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_results(results);
-        inner
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> QueryResult<T> {
+        #[allow(unused_unsafe)]
+        unsafe {
+            JsValue::from(js_sys::Object::new()).unchecked_into()
+        }
     }
 }
 #[wasm_bindgen]
@@ -99,6 +107,15 @@ extern "C" {
     # [wasm_bindgen (extends = Response , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Stub<T: ::wasm_bindgen::JsGeneric = JsValue>;
+}
+impl<T: ::wasm_bindgen::JsGeneric> Stub<T> {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Stub<T> {
+        #[allow(unused_unsafe)]
+        unsafe {
+            JsValue::from(js_sys::Object::new()).unchecked_into()
+        }
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -127,10 +144,12 @@ extern "C" {
     pub fn set_extra(this: &Plain, val: &str);
 }
 impl Plain {
-    pub fn new(extra: &str) -> Plain {
-        let inner: Plain = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_extra(extra);
-        inner
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Plain {
+        #[allow(unused_unsafe)]
+        unsafe {
+            JsValue::from(js_sys::Object::new()).unchecked_into()
+        }
     }
 }
 #[wasm_bindgen]
@@ -294,8 +313,10 @@ extern "C" {
     pub fn set_score(this: &Match, val: f64);
 }
 impl Match {
-    pub fn new(score: f64) -> Match {
+    pub fn new(id: &str, values: &[f64], score: f64) -> Match {
         let inner: Match = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_id(id);
+        inner.set_values(values);
         inner.set_score(score);
         inner
     }

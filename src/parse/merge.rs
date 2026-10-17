@@ -74,12 +74,12 @@ pub fn extract_var_members(
     for member in members {
         match member {
             TSSignature::TSConstructSignatureDeclaration(ctor) => {
-                let type_params = crate::parse::types::convert_type_params(
+                let mut type_params = crate::parse::types::convert_type_params(
                     ctor.type_parameters.as_ref(),
                     ctx.diag,
                 );
                 let body_scope =
-                    crate::parse::members::create_body_scope(&type_params, parent_scope, ctx);
+                    crate::parse::members::create_body_scope(&mut type_params, parent_scope, ctx);
                 let params = convert_formal_params_scoped(&ctor.params, body_scope, ctx);
                 let (doc, info) = match ctx.docs.info_for_span(ctor.span.start) {
                     Some((d, i)) => (Some(d), i),
@@ -134,8 +134,9 @@ pub fn extract_var_members(
                     None => (None, crate::parse::docs::JsDocInfo::default()),
                 };
                 let name = to_snake_case(&js_name);
-                let type_params = convert_type_params(method.type_parameters.as_ref(), ctx.diag);
-                let body_scope = create_body_scope(&type_params, parent_scope, ctx);
+                let mut type_params =
+                    convert_type_params(method.type_parameters.as_ref(), ctx.diag);
+                let body_scope = create_body_scope(&mut type_params, parent_scope, ctx);
                 let params = convert_formal_params_scoped(&method.params, body_scope, ctx);
                 let return_type = method
                     .return_type

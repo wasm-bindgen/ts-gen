@@ -18,6 +18,7 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 * [Primitive types](#primitive-types)
 * [Optional and nullable types](#optional-and-nullable-types)
 * [Array and slice types](#array-and-slice-types)
+* [Function types](#function-types)
 * [Outer-type ABI fan-out](#outer-type-abi-fan-out)
 * [Property accessors](#property-accessors)
 * [Naming conversion](#naming-conversion)
@@ -57,12 +58,17 @@ in sync with the snapshot fixtures (`tests/fixtures/*.d.ts` paired with
 | `undefined`                     | `Undefined`                |
 | `null`                          | `()`                       |
 | `any` / `unknown`               | `JsValue`                  |
-| `never`                         | `JsValue`                  |
+| `never`                         | `Undefined`                |
 | `object`                        | `Object`                   |
 
 `String` vs `&str` (or `Object` vs `&Object` etc.) is chosen by argument
 position vs return position. Argument-position container types are
 borrowed by reference; return-position container types are owned.
+
+`never` lowers to `Undefined` rather than `JsValue` because the only
+value a `never`-typed slot can ever read back is `undefined`; in a union
+it then coalesces like `undefined` does, so a merged `value: T` /
+`value?: never` property is `Option<T>`.
 
 TypeScript's built-in `PropertyKey` is recognised without a declaration
 and lowers exactly like `string | number | symbol`, except for
@@ -336,6 +342,33 @@ generic over their buffer (`Uint8Array<ArrayBuffer>`,
 argument is dropped in every position without a warning, and
 `Uint8Array<ArrayBuffer>` lowers exactly like `Uint8Array`.
 
+## Function types
+
+A function type lowers to wasm-bindgen's typed `Function<fn(P…) -> R>`,
+with parameters and return in their inside-generic forms (`Number`,
+`JsString`, `Boolean`, `Undefined` for `void`), borrowed in argument
+position:
+
+```ts
+onTick(callback: (tick: number, label: string) => boolean): void;
+```
+
+```rust
+pub fn on_tick(this: &Timer, callback: &Function<fn(Number, JsString) -> Boolean>);
+```
+
+Two shapes lower to the untyped `Function` instead, which any
+`js_sys::Function` (a `Promise` executor's `resolve`, a `Closure`'s
+`as_ref()`) satisfies without a cast:
+
+* A signature whose parameters and return are all `any` / `unknown`
+  carries no type information.
+* A signature with a rest parameter (`(...args: any[]) => void`,
+  `(first: string, ...rest: number[]) => void`): a `fn` pointer type
+  has fixed arity, so there is no typed spelling of it.
+
+Parameters beyond the eighth are dropped from the typed form.
+
 ## Outer-type ABI fan-out
 
 Some Rust-idiomatic outer-type lowerings imply a copy across the
@@ -447,6 +480,13 @@ the setter is named `set_<snake_case>`.
     instead: `new_` / `set_new`, with `new_` as its factory parameter and
     builder method. A method's derived names (`try_new`, `new_with_x`)
     can clash more than once, so a method `new()` is numbered `new_2`.
+  * Instance and static members share one extern block, and an instance
+    member keeps its name whatever the declaration order: a static named
+    like one takes `_static`, MDN's spelling for the same clash.
+    `Response.json(data)` → `json_static(data)` /
+    `json_static_with_init(data, init)` beside `response.json()` →
+    `json(this)`, and a `static readonly ok` beside an instance `ok` →
+    `ok_static()`.
   * A parameter can't shadow a static (E0530), so one named like a static
     in scope, including one a namespace's module imports from its parent,
     takes a trailing underscore (`url_`). So does a dictionary helper's
@@ -545,7 +585,43 @@ Interfaces are classified by shape (see `parse/classify.rs`):
   bindings, the builder just calls them. See [Dictionary builders](#dictionary-builders).
 
 Multiple interface declarations with the same name + module context merge:
-their members union, their `extends` lists merge.
+their members union, their `extends` lists merge. A member the incoming
+declaration redeclares replaces the base's as a whole overload group, so
+`text()` beside `text(encoding)` on the interface keeps both when it merges
+into its constructor variable.
+
+### Inherited members
+
+Every `extends` parent becomes a wasm-bindgen `extends =`, but
+wasm-bindgen derefs to the *first* one only; the others are reachable
+through `AsRef` alone. So the members of every parent beyond the first
+(and of their ancestors) are declared on the child itself, with the
+parent's type parameters substituted by the arguments the `extends`
+clause passes. A member the child redeclares wins; between siblings
+that declare the same member, the earliest parent in `extends` order
+provides it.
+
+```ts
+interface Base { a: string; }
+interface Geo { country?: string; }
+interface Child extends Base, Geo { c: number; }
+interface Named extends Tagged, Box<string> {}
+```
+
+```rust
+#[wasm_bindgen(extends = Base, extends = Geo, extends = Object)]
+pub type Child;
+pub fn country(this: &Child) -> Option<String>;   // from Geo
+pub fn c(this: &Child) -> f64;
+pub fn value(this: &Named) -> String;             // Box<T>.value with T = string
+```
+
+`Child.a()` is reached through the deref to `Base`. A dictionary's
+factory sets the fields of all its parents, first chain included:
+`Child::new(a, c)`, `Child::builder(a, c).country(..)`. Classification
+also looks through the parents: an interface with no members of its own
+that extends dictionaries is a dictionary, one that extends a class-like
+parent is class-like.
 
 ## Dictionary builders
 
@@ -847,7 +923,7 @@ pub fn set_level(this: &Options, val: LevelKind);
 An inline `{ … }` type — or a union or intersection built from `{ … }`
 types and named references — that appears in a position where a named
 interface would do is promoted to a real `InterfaceDecl` so consumers
-get a typed builder rather than an opaque `Object`. Two positions
+get a typed builder rather than an opaque `Object`. Three positions
 trigger synthesis:
 
 ### Parameter position
@@ -879,6 +955,22 @@ interface SendEmail {
 }
 ```
 
+### Method return position
+
+```ts
+declare class Cursor<T> {
+  next(): { done?: false; value: T } | { done: true; value?: never };
+}
+```
+
+is treated as if the user had written `interface CursorNextReturn<T>
+{ done?: boolean; value?: T }` and `next(): CursorNextReturn<T>`. The
+name takes the `Return` segment used by synthesized return enums.
+Enclosing type parameters that the literal mentions become the hoisted
+interface's own parameters, instantiated at the reference, so its
+getters and builder bind them. Free functions have no parent name and
+keep the `Object` erasure, as their parameters do.
+
 ### Type-alias position
 
 ```ts
@@ -900,7 +992,7 @@ anything else (named types, primitives, function types, generics,
 
 When every branch of a union is itself an inline literal, the branches
 are **structurally merged** into a single member set. The merge
-covers both positions above:
+covers all three positions above:
 
 ```ts
 type EmailAttachment =
@@ -947,7 +1039,11 @@ named reference in the intersection is an `extends` parent and every
 inline literal contributes own members. The result then flows through
 the regular interface pipeline, including `extends = A, extends = B`
 on the wasm-bindgen side and the dictionary builder for the own
-members. This is what makes the common required-field refinement
+members. Through [inherited members](#inherited-members) every part's
+members are reachable on the result: `cf.country()` resolves on
+`IncomingRequestCfProperties`, and `EmailMessageBuilder =
+EmailReplyMessageBuilder & EmailDestinations` gets a factory over both
+parts' fields. This is what makes the common required-field refinement
 produce a usable type:
 
 ```ts
@@ -1037,6 +1133,10 @@ Only **directly-inline** type literals (or unions of such) are
 synthesized. Anonymous types nested inside a generic, an array,
 `Record<…>`, or a property of another object literal are not hoisted
 — they follow the regular type-mapping rules and erase to `Object`.
+Union members that erase to the same type are one member, so a
+property typed `{ … } | { … }` is `Option<Object>`, and `{ … } | { … }
+| string` is a two-variant `Object` / `String` dynamic union rather
+than carrying an unreachable duplicate variant.
 Inline literals inside the *body* of a hoisted interface are themselves
 hoisted recursively, using the synthesized parent's name.
 
@@ -1378,10 +1478,31 @@ For every JS callable, `ts-gen`:
    pub async fn put_with_entries(this: &Store, entries: &Object<JsString>) -> …;
    ```
 
-The output is a `Vec<{ name_suffix, params }>` — a focused
-parameter-axis result. The per-callable layer (`build_signatures`)
-then handles the orthogonal decisions (base name, async-ness, `try_`
-companions, doc, error type).
+The output is a `Vec<{ name_suffix, params, overload_index }>` — a
+focused parameter-axis result. The per-callable layer
+(`build_signatures`) then handles the orthogonal decisions (base name,
+async-ness, `try_` companions, doc, error type) **per expansion**,
+using the return type of the overload each expansion came from, and
+resolving it in that overload's own scope so its `<T>` is the one
+declared on the binding (`get<T>(key)` next to `get<U>(keys)` declares
+`U` on `get_with_keys`):
+
+```ts
+get<T>(key: string): Promise<T | undefined>;
+get<T>(keys: string[]): Promise<Map<string, T>>;
+first(): string;
+first(column: string): Promise<string | null>;
+```
+
+```rust
+pub async fn get<T>(this: &Storage, key: &str) -> Result<JsOption<T>, JsValue>;
+pub async fn get_with_keys<T>(this: &Storage, keys: &[String]) -> Result<Map<JsString, T>, JsValue>;
+pub fn first(this: &Storage) -> String;                 // + try_first
+pub async fn first_with_column(this: &Storage, column: &str) -> Result<JsOption<JsString>, JsValue>;
+```
+
+When two overloads dedup to the same parameter list, the first
+declared overload's return type wins.
 
 ### Examples
 
@@ -1449,14 +1570,17 @@ up with what callers see in the function signature:
 | `Array<T>` / `T[]` | `&[T]`        | `_with_slice`   |
 | `Uint8Array`    | `&Uint8Array`    | `_with_uint8_array` |
 | `Foo` (named)   | `&Foo`           | `_with_foo`     |
+| `A.X` (qualified) | `&a::X`        | `_with_a_x`     |
 | `null`          | (dropped — see [Optional and nullable types](#optional-and-nullable-types)) | – |
 | `undefined`     | (dropped, same)  | – |
 | `any` / `unknown` | `&JsValue`     | `_with_js_value`|
 
-For named JS types the snake-cased head doubles as the Rust
+For named JS types the snake-cased name doubles as the Rust
 identifier (`Uint8Array` → `uint8_array`, also `&Uint8Array` in
 the rendered type), so there's no separate translation table —
-the same convention works in both directions.
+the same convention works in both directions. A qualified name
+snake-cases its full path, like its Rust path (`A.X` → `a::X` →
+`a_x`), so `A.X` and `B.X` don't collide.
 
 ### Why a single pipeline
 
@@ -1940,6 +2064,37 @@ impl<T: ::wasm_bindgen::JsGeneric> EvaluationDetailsBuilder<T> {
 }
 ```
 
+### Primitive-constrained parameters erase
+
+A type parameter whose constraint is a primitive — `string`, `number`,
+`boolean`, `bigint`, a union of literals of one of those, or `keyof X`
+(a union of property names, read as `string`) — can only be
+instantiated with subtypes that share the primitive's ABI, so a Rust
+generic would only ever be `JsString` under another name. The
+parameter is dropped from the declaration and reads as the primitive;
+references that pass an argument for it drop that argument so the
+remaining ones line up:
+
+```ts
+interface KVNamespace<Key extends string = string> {
+  get(key: Key): Promise<string | null>;
+  list<Metadata = unknown>(): Promise<KVNamespaceListResult<Metadata, Key>>;
+}
+interface Env { TYPED: KVNamespace<"a" | "b">; }
+```
+
+```rust
+pub type KVNamespace;
+pub async fn get(this: &KVNamespace, key: &str) -> Result<JsOption<JsString>, JsValue>;
+pub async fn list<Metadata: ::wasm_bindgen::JsGeneric>(
+    this: &KVNamespace,
+) -> Result<KVNamespaceListResult<Metadata>, JsValue>;
+pub fn typed(this: &Env) -> KVNamespace;
+```
+
+Method-level parameters follow the same rule
+(`tag<Level extends "info" | "warn">(level: Level)` → `level: &str`).
+
 ### Primitive union arguments
 
 In per-monomorphization mode, primitive union arguments use `js_sys`'s
@@ -2249,8 +2404,10 @@ Derived & Unrelated                  -> JsValue     (no member subtypes the othe
 ```
 
 In argument position the bound accepts slightly more than TypeScript
-does; in return position the literal's extra fields are not reachable.
-Neither is unsound at the ABI.
+does; in a return position that does not hoist (a free function, a
+property; a method's `A & { … }` return is hoisted, see
+[Method return position](#method-return-position)) the literal's extra
+fields are not reachable. Neither is unsound at the ABI.
 
 ### Erased return-position unions become dynamic-union enums
 
@@ -2556,12 +2713,15 @@ signature reaches is not emitted, so an interface a module with `export
 
 `--input` defines the *type universe* — every file gets parsed so
 resolution sees the full set. `--export` defines the *output surface* —
-what actually gets emitted as public Rust code. Two forms:
+what actually gets emitted as public Rust code. Three forms:
 
 * **File path** (e.g. `--export types/email.d.ts`) — emit the globals
   that file declares.
 * **Module specifier** (e.g. `--export cloudflare:email`) — emit that
   module's declarations in its `pub mod`, attribute-attached.
+* **Declaration name** (e.g. `--export Request`, `--export
+  TailStream.TailEvent`) — emit that export of any file or module, and
+  the types its bindings reach. See [Root selection](#root-selection).
 
 When `--export` is omitted entirely, every `--input` file becomes an
 implicit file export. **No modules are emitted by the implicit
@@ -2583,6 +2743,35 @@ ts-gen --input types/email.d.ts \
 ```
 
 No wildcards in v1 — list specific specifiers and file paths.
+
+### Root selection
+
+A large upstream declaration file (`@cloudflare/workers-types`,
+`lib.dom.d.ts`) is a single file, so file-level `--export` is
+all-or-nothing. Naming declarations keeps the whole file as the type
+universe while emitting only what a chosen surface needs:
+
+```sh
+ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
+       --export Request --export Response --export KVNamespace
+```
+
+`--export Request` selects the export `Request` of every root, each
+file's globals and each module not externalised, as if that root were
+selected with only that export in it. A dotted name goes through a
+namespace's exports: `--export TailStream.TailEvent` emits `TailEvent`,
+with `tail_stream` only the `pub mod` path to it. Functions and
+variables are named by their export, the source spelling (`--export
+setTimeout`).
+
+What the selected exports reach is emitted as a type only, as for any
+selection (see [Global scope](#global-scope)); a module-context
+declaration is emitted in its module's `pub mod` with its
+`#[wasm_bindgen(module = "...")]` attribute. Files and modules listed
+alongside are selected whole. The Wasm ABI covers the same surface.
+
+A bare dotted identifier is read as a declaration name unless it names
+a `declare module`; a name no root exports is a codegen error.
 
 ### `--external <spec>=<path>` — redirect to a separate crate
 

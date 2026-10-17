@@ -6,6 +6,9 @@
 //! binding → declaration) is emitted under its public name. A declaration
 //! a signature reaches but no root exports is emitted as a type only, so
 //! every reference in the output has a declaration to name.
+//!
+//! A declaration root (`--export Request`) selects one export of every
+//! root, so a consumer can take part of a single large file.
 
 use std::borrow::Cow;
 use std::collections::{HashMap, HashSet};
@@ -21,6 +24,8 @@ use super::{ExportSpec, GenerateOptions};
 pub struct Surface<'d> {
     items: HashMap<TypeId, Vec<Cow<'d, TypeDeclaration>>>,
     names: HashMap<TypeId, Vec<String>>,
+    /// Declaration roots no root exports.
+    pub missing: Vec<String>,
 }
 
 impl<'d> Surface<'d> {
@@ -54,10 +59,19 @@ impl<'d> Surface<'d> {
                 builder.root(*root);
             }
         }
+        let mut missing = Vec::new();
+        for spec in &options.exports {
+            if let ExportSpec::Decl(path) = spec {
+                if !builder.select(path) {
+                    missing.push(path.clone());
+                }
+            }
+        }
         builder.close();
         Surface {
             items: builder.items,
             names: builder.names,
+            missing,
         }
     }
 
@@ -143,19 +157,94 @@ impl<'d> Builder<'_, 'd> {
         // export of the same declaration does.
         entries.sort_by_key(|&(public, _)| public == "default");
         for (public, local) in entries {
-            let ids = gctx.declarations(root.bindings, local);
-            if ids.is_empty() {
-                let target = TypeRef::ident(local.to_string());
-                for &id in gctx.declarations(root.bindings, public) {
-                    if matches!(&gctx.get_type(id).kind, TypeKind::TypeAlias(a) if a.target == target)
-                    {
-                        self.export(id, public, public);
-                    }
+            self.entry(root, public, local);
+        }
+    }
+
+    /// Emit the export `public` of `root`, bound to `local`.
+    fn entry(&mut self, root: Root, public: &str, local: &str) {
+        let gctx = self.gctx;
+        let ids = gctx.declarations(root.bindings, local);
+        if ids.is_empty() {
+            let target = TypeRef::ident(local.to_string());
+            for &id in gctx.declarations(root.bindings, public) {
+                if matches!(&gctx.get_type(id).kind, TypeKind::TypeAlias(a) if a.target == target) {
+                    self.export(id, public, public);
                 }
             }
-            for &id in ids {
-                self.export(id, public, local);
+        }
+        for &id in ids {
+            self.export(id, public, local);
+        }
+    }
+
+    /// Emit the export `path` of every root that is not externalised,
+    /// selected or not, as if its root were selected with only that export
+    /// in it. A dotted path goes through a namespace's exports, and the
+    /// namespaces come along as the `pub mod` path to it. Returns whether
+    /// any root exports it.
+    fn select(&mut self, path: &str) -> bool {
+        let roots: Vec<Root> = self
+            .module
+            .file_roots
+            .iter()
+            .map(|(_, root)| *root)
+            .chain(
+                self.module
+                    .module_roots
+                    .iter()
+                    .filter(|(specifier, _)| !self.externalised.contains(specifier))
+                    .map(|(_, root)| *root),
+            )
+            .collect();
+        let mut found = false;
+        for root in roots {
+            found |= self.select_in(root, path);
+        }
+        found
+    }
+
+    fn select_in(&mut self, root: Root, path: &str) -> bool {
+        let gctx = self.gctx;
+        let (public, rest) = match path.split_once('.') {
+            Some((head, rest)) => (head, Some(rest)),
+            None => (path, None),
+        };
+        let Some(local) = gctx.exports.local_name(root.exports, public) else {
+            return false;
+        };
+        let Some(rest) = rest else {
+            self.entry(root, public, local);
+            for &id in gctx.declarations(root.bindings, local) {
+                self.contain(id);
             }
+            return true;
+        };
+        let mut found = false;
+        for &id in gctx.declarations(root.bindings, local) {
+            if let TypeKind::Namespace(ns) = &gctx.get_type(id).kind {
+                let members = Root {
+                    exports: ns.child_scope,
+                    bindings: ns.child_scope,
+                };
+                found |= self.select_in(members, rest);
+            }
+        }
+        found
+    }
+
+    /// Emit the namespaces enclosing the emitted `id` as the `pub mod` path
+    /// to it.
+    fn contain(&mut self, id: TypeId) {
+        if !self.items.contains_key(&id) {
+            return;
+        }
+        let mut parent = self.parents.get(&id).copied();
+        while let Some(ns) = parent {
+            self.items
+                .entry(ns)
+                .or_insert_with(|| vec![Cow::Borrowed(self.gctx.get_type(ns))]);
+            parent = self.parents.get(&ns).copied();
         }
     }
 
@@ -304,13 +393,7 @@ impl<'d> Builder<'_, 'd> {
         };
         self.items.insert(id, vec![form]);
         self.queue.push(id);
-        let mut parent = self.parents.get(&id).copied();
-        while let Some(ns) = parent {
-            self.items
-                .entry(ns)
-                .or_insert_with(|| vec![Cow::Borrowed(self.gctx.get_type(ns))]);
-            parent = self.parents.get(&ns).copied();
-        }
+        self.contain(id);
     }
 
     /// Follow the signatures of everything emitted to the declarations
@@ -566,6 +649,35 @@ mod tests {
             panic!("K is a class");
         };
         assert!(k.members.iter().all(|m| matches!(m, Member::Method(_))));
+    }
+
+    #[test]
+    fn declaration_roots_select_one_export_of_any_root() {
+        let src = r#"
+            interface Opts { o: string }
+            interface Unused {}
+            declare function f(o: Opts): void;
+            declare function g(): void;
+            declare namespace NS { interface Inner {} interface Other {} }
+            declare module "m" {
+                function connect(): void;
+                function other(): void;
+            }
+        "#;
+        let (module, gctx) = crate::parse_source(src, None).unwrap();
+        let exports = ["f", "NS.Inner", "connect", "Nope"]
+            .map(|name| ExportSpec::Decl(name.to_string()))
+            .into_iter()
+            .collect();
+        let surface = Surface::build(&module, &gctx, &GenerateOptions::new().exports(exports));
+        let emitted = |name| !surface.get(find(&module, &gctx, name)).is_empty();
+        for name in ["f", "Opts", "NS", "Inner", "connect"] {
+            assert!(emitted(name), "{name}");
+        }
+        for name in ["Unused", "g", "Other", "other"] {
+            assert!(!emitted(name), "{name}");
+        }
+        assert_eq!(surface.missing, ["Nope"]);
     }
 
     #[test]
