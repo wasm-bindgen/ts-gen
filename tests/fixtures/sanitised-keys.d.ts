@@ -83,3 +83,35 @@ export declare function ajax(url: string): void;
 export declare function $ajax(url: string): void;
 export declare function dollar(): void;
 export declare function collideArgs(a: string, $a: number, fooBar: string, foo_bar: number): void;
+// A property named like a dictionary's generated `new`, `builder` or `build`
+// takes a trailing underscore, as does a constructor's `new` on a class. A
+// method's derived names can clash more than once, so it's numbered. The
+// dictionary helpers' parameter for `inner` can't shadow their local.
+export interface ReservedInit {
+  new: string;
+  inner: string;
+  builder?: number;
+  build?: boolean;
+}
+export declare class ReservedClass {
+  constructor();
+  new: string;
+}
+export declare class ReservedMethod {
+  constructor();
+  new(): void;
+}
+// A parameter can't shadow a static in scope (E0530), including one a
+// namespace's module imports from its parent.
+export declare const url: string;
+export declare function fetchUrl(url: string): void;
+export declare namespace Scoped {
+  function fetchUrl(url: string): void;
+}
+// `Ns.x` and `ns.x` share a Rust module but are distinct bindings.
+export declare namespace Ns {
+  const x: number;
+}
+export declare namespace ns {
+  const x: string;
+}

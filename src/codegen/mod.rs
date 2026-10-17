@@ -845,9 +845,16 @@ impl<'d> ModTree<'d> {
     fn generate(&self, path: &mut Vec<String>, cgctx: &CodegenContext) -> Vec<TokenStream> {
         let mut value_names =
             functions::ValueNames::new(self.entries.iter().filter_map(|entry| match entry {
-                ModEntry::Item(decl, _) => Some(*decl),
+                ModEntry::Item(decl, js_namespace) => Some((*decl, js_namespace.as_slice())),
                 ModEntry::Mod(_) => None,
             }));
+        // A child module's `use super::*` brings its parent's statics into
+        // scope too.
+        let outer_statics = cgctx.statics_in_scope.borrow().clone();
+        cgctx
+            .statics_in_scope
+            .borrow_mut()
+            .extend(value_names.statics().iter().cloned());
         let mut items = Vec::new();
         for entry in &self.entries {
             match entry {
@@ -876,6 +883,7 @@ impl<'d> ModTree<'d> {
                 }
             }
         }
+        cgctx.statics_in_scope.replace(outer_statics);
         items
     }
 }

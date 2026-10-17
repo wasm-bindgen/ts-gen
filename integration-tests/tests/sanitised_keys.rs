@@ -1,9 +1,10 @@
 #![cfg(target_arch = "wasm32")]
 
 use ts_gen_integration_tests::sanitised_keys::{
-    ajax, ajax_2, collide_args, compare, dollar, dollar_2, dollar_dollar, each,
-    underscore_underscore, version, Collide, CollideInit, DollarUnderscore, MethodCollide, Op,
-    Pair, ReadonlyCollide, SetterCollide, SetterNumbers, Sigil, Store,
+    ajax, ajax_2, collide_args, compare, dollar, dollar_2, dollar_dollar, each, fetch_url, ns,
+    scoped, underscore_underscore, url, version, Collide, CollideInit, DollarUnderscore,
+    MethodCollide, Op, Pair, ReadonlyCollide, ReservedClass, ReservedInit, ReservedMethod,
+    SetterCollide, SetterNumbers, Sigil, Store,
 };
 
 // Compile-only coverage that wasm-bindgen accepts the `js_name` / `js_class`
@@ -87,4 +88,24 @@ fn colliding_names_compile(
     ajax_2("/b");
     collide_args("a", 1.0, "b", 2.0);
     dollar();
+
+    let reserved: ReservedInit = ReservedInit::builder("a", "b")
+        .builder_(1.0)
+        .build_(true)
+        .build();
+    let _: ReservedInit = ReservedInit::new("a", "b");
+    let _: String = reserved.inner();
+    let _: String = reserved.new_();
+    reserved.set_new("b");
+    let _: Option<f64> = reserved.builder_();
+    let _: Option<bool> = reserved.build_();
+    let class = ReservedClass::new().unwrap();
+    let _: String = class.new_();
+    class.set_new("x");
+    ReservedMethod::new().unwrap().new_2();
+
+    fetch_url(&url.with(|u| u.clone()));
+    scoped::fetch_url("x");
+    let _: f64 = ns::x.with(|x| *x);
+    let _: String = ns::x_2.with(|x| x.clone());
 }

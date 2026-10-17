@@ -306,22 +306,22 @@ extern "C" {
 }
 #[wasm_bindgen(module = "sanitised-keys")]
 extern "C" {
-    pub fn ajax(url: &str);
+    pub fn ajax(url_: &str);
 }
 #[wasm_bindgen(module = "sanitised-keys")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "ajax")]
-    pub fn try_ajax(url: &str) -> Result<(), JsValue>;
+    pub fn try_ajax(url_: &str) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "sanitised-keys")]
 extern "C" {
     #[wasm_bindgen(js_name = "$ajax")]
-    pub fn ajax_2(url: &str);
+    pub fn ajax_2(url_: &str);
 }
 #[wasm_bindgen(module = "sanitised-keys")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "$ajax")]
-    pub fn try_ajax_2(url: &str) -> Result<(), JsValue>;
+    pub fn try_ajax_2(url_: &str) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "sanitised-keys")]
 extern "C" {
@@ -341,4 +341,123 @@ extern "C" {
 extern "C" {
     #[wasm_bindgen(catch, js_name = "collideArgs")]
     pub fn try_collide_args(a: &str, a2: f64, foo_bar: &str, foo_bar2: f64) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ReservedInit;
+    #[wasm_bindgen(method, getter, js_name = "new")]
+    pub fn new_(this: &ReservedInit) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_new(this: &ReservedInit, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn inner(this: &ReservedInit) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_inner(this: &ReservedInit, val: &str);
+    #[wasm_bindgen(method, getter, js_name = "builder")]
+    pub fn builder_(this: &ReservedInit) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_builder(this: &ReservedInit, val: f64);
+    #[wasm_bindgen(method, getter, js_name = "build")]
+    pub fn build_(this: &ReservedInit) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_build(this: &ReservedInit, val: bool);
+}
+impl ReservedInit {
+    pub fn new(new_: &str, inner_: &str) -> ReservedInit {
+        Self::builder(new_, inner_).build()
+    }
+    pub fn builder(new_: &str, inner_: &str) -> ReservedInitBuilder {
+        let inner: ReservedInit = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_new(new_);
+        inner.set_inner(inner_);
+        ReservedInitBuilder { inner }
+    }
+}
+pub struct ReservedInitBuilder {
+    inner: ReservedInit,
+}
+impl ReservedInitBuilder {
+    pub fn builder_(self, val: f64) -> Self {
+        self.inner.set_builder(val);
+        self
+    }
+    pub fn build_(self, val: bool) -> Self {
+        self.inner.set_build(val);
+        self
+    }
+    pub fn build(self) -> ReservedInit {
+        self.inner
+    }
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ReservedClass;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<ReservedClass, JsValue>;
+    #[wasm_bindgen(method, getter, js_name = "new")]
+    pub fn new_(this: &ReservedClass) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_new(this: &ReservedClass, val: &str);
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ReservedMethod;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<ReservedMethod, JsValue>;
+    #[wasm_bindgen(method, js_name = "new")]
+    pub fn new_2(this: &ReservedMethod);
+    #[wasm_bindgen(method, catch, js_name = "new")]
+    pub fn try_new_2(this: &ReservedMethod) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    #[allow(non_upper_case_globals)]
+    #[wasm_bindgen(thread_local_v2)]
+    pub static url: String;
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    #[wasm_bindgen(js_name = "fetchUrl")]
+    pub fn fetch_url(url_: &str);
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "fetchUrl")]
+    pub fn try_fetch_url(url_: &str) -> Result<(), JsValue>;
+}
+pub mod scoped {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen(module = "sanitised-keys")]
+    extern "C" {
+        #[wasm_bindgen(js_name = "fetchUrl", js_namespace = "Scoped")]
+        pub fn fetch_url(url_: &str);
+    }
+    #[wasm_bindgen(module = "sanitised-keys")]
+    extern "C" {
+        #[wasm_bindgen(catch, js_name = "fetchUrl", js_namespace = "Scoped")]
+        pub fn try_fetch_url(url_: &str) -> Result<(), JsValue>;
+    }
+}
+pub mod ns {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen(module = "sanitised-keys")]
+    extern "C" {
+        #[allow(non_upper_case_globals)]
+        #[wasm_bindgen(thread_local_v2, js_namespace = "Ns")]
+        pub static x: f64;
+    }
+    #[wasm_bindgen(module = "sanitised-keys")]
+    extern "C" {
+        #[allow(non_upper_case_globals)]
+        #[wasm_bindgen(thread_local_v2, js_name = "x", js_namespace = "ns")]
+        pub static x_2: String;
+    }
 }

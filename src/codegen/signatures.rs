@@ -1329,7 +1329,7 @@ pub fn generate_concrete_params(
 ) -> TokenStream {
     let items: Vec<_> = params
         .iter()
-        .zip(param_idents(params))
+        .zip(param_idents(params, cgctx))
         .map(|(p, name)| {
             let attr = param_attr(p, cgctx, scope);
             let ty = if p.variadic {
@@ -1352,16 +1352,27 @@ pub fn generate_concrete_params(
 
 /// One ident per parameter, numbered where names collide once sanitised
 /// (`a` / `$a` → `a` / `a2`).
-fn param_idents(params: &[ConcreteParam]) -> Vec<syn::Ident> {
+fn param_idents(params: &[ConcreteParam], cgctx: Option<&CodegenContext<'_>>) -> Vec<syn::Ident> {
     use syn::ext::IdentExt;
     let mut names = LocalScope::default();
     params
         .iter()
         .map(|p| {
             let ident = typemap::make_ident(&p.name).unraw().to_string();
+            let ident = CodegenContext::param_name(cgctx, &ident);
             typemap::make_ident(&names.declare(&ident, Suffix::Param))
         })
         .collect()
+}
+
+/// The ident a dictionary helper's parameter binds. One named like the
+/// helpers' `inner` local takes a trailing underscore, as does one named
+/// like a static.
+pub(crate) fn dictionary_param_ident(name: &str, cgctx: Option<&CodegenContext<'_>>) -> syn::Ident {
+    if name == "inner" {
+        return typemap::make_ident("inner_");
+    }
+    typemap::make_ident(&CodegenContext::param_name(cgctx, name))
 }
 
 /// The per-argument wasm-bindgen attribute for an extern parameter, or
@@ -1403,7 +1414,7 @@ pub(crate) fn generate_concrete_params_with_mono_bounds(
 
     let items = params
         .iter()
-        .zip(param_idents(params))
+        .zip(param_idents(params, cgctx))
         .map(|(param, name)| {
             let attr = param_attr(param, cgctx, scope);
             let ty = render_param_type(param, cgctx, scope, from_module);
@@ -1504,7 +1515,7 @@ pub fn generate_dictionary_params(
     let items: Vec<_> = params
         .iter()
         .map(|p| {
-            let name = typemap::make_ident(&p.name);
+            let name = dictionary_param_ident(&p.name, cgctx);
             let ty = if !p.variadic && matches!(p.type_ref, TypeRef::ArrayBufferView) {
                 let g = syn::Ident::new(
                     &letters.next().expect("unbounded"),
@@ -1625,7 +1636,7 @@ mod tests {
     #[test]
     fn param_idents_number_sanitised_collisions_without_underscores() {
         let params = ["a", "$a", "type", "type", "a2"].map(|n| concrete(n, TypeRef::Any, false));
-        let idents: Vec<String> = param_idents(&params)
+        let idents: Vec<String> = param_idents(&params, None)
             .iter()
             .map(|i| i.to_string())
             .collect();

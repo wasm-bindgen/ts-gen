@@ -179,6 +179,9 @@ pub struct CodegenContext<'a> {
     /// they resolve from: a synthesised union resolves from its use site
     /// but is emitted at the top level.
     pub emit_path: RefCell<Vec<String>>,
+    /// The statics the module being emitted sees, which a parameter or
+    /// local can't shadow (E0530).
+    pub statics_in_scope: RefCell<HashSet<String>>,
     /// Builtin (root) scope id.
     pub root_scope: ScopeId,
     /// Per-file scopes (children of root, contain imports + local types).
@@ -592,6 +595,16 @@ impl<'a> CodegenContext<'a> {
         Some(out)
     }
 
+    /// A parameter named `name`, or `name_` when a static in scope has its
+    /// name, since a parameter can't shadow a static (E0530).
+    pub(crate) fn param_name(ctx: Option<&Self>, name: &str) -> String {
+        if ctx.is_some_and(|c| c.statics_in_scope.borrow().contains(name)) {
+            format!("{name}_")
+        } else {
+            name.to_string()
+        }
+    }
+
     /// Build the attribute for a generated extern block, including the
     /// per-monomorphization opt-in when enabled.
     pub(crate) fn extern_attr(
@@ -659,6 +672,7 @@ impl<'a> CodegenContext<'a> {
             namespace_paths: HashMap::new(),
             lib_name: module.lib_name.clone(),
             emit_path: RefCell::new(Vec::new()),
+            statics_in_scope: RefCell::new(HashSet::new()),
             root_scope: module.builtin_scope,
             file_scopes: module.file_scopes.clone(),
             external_uses: RefCell::new(HashMap::new()),
@@ -698,6 +712,7 @@ impl<'a> CodegenContext<'a> {
             namespace_paths: HashMap::new(),
             lib_name: None,
             emit_path: RefCell::new(Vec::new()),
+            statics_in_scope: RefCell::new(HashSet::new()),
             root_scope,
             file_scopes: vec![],
             external_uses: RefCell::new(HashMap::new()),

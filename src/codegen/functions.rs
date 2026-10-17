@@ -52,7 +52,7 @@ fn emit_function(
     value_names: &mut ValueNames,
 ) -> TokenStream {
     let rust_name = value_names.take(
-        &binding_key(ctx, &decl.js_name),
+        &binding_key(ctx, js_namespace, &decl.js_name),
         public_rust_name(&ident_chars(&decl.name)),
     );
     let overloads = [decl.params.as_slice()];
@@ -182,11 +182,15 @@ fn generic_bounds_for_function(
         .collect()
 }
 
-/// A value binding: its module specifier and JS name.
-type BindingKey = (Option<String>, String);
+/// A value binding: its module specifier, JS namespace and JS name.
+type BindingKey = (Option<String>, Vec<String>, String);
 
-fn binding_key(ctx: &ModuleContext, js_name: &str) -> BindingKey {
-    (ctx.specifier().map(str::to_string), js_name.to_string())
+fn binding_key(ctx: &ModuleContext, js_namespace: &[String], js_name: &str) -> BindingKey {
+    (
+        ctx.specifier().map(str::to_string),
+        js_namespace.to_vec(),
+        js_name.to_string(),
+    )
 }
 
 /// The names of the free functions and statics in one Rust module, which
@@ -202,16 +206,17 @@ pub struct ValueNames {
     idents: LocalScope,
     bindings: HashSet<BindingKey>,
     names: HashMap<BindingKey, String>,
+    statics: Vec<String>,
 }
 
 impl ValueNames {
     /// Name every function and static among `decls` up front. Each name
     /// stays reserved until its binding is emitted, so a derived `try_`
     /// name declared earlier can't take it.
-    pub fn new<'d>(decls: impl IntoIterator<Item = &'d TypeDeclaration>) -> Self {
-        let mut values: Vec<(BindingKey, String, u8)> = decls
+    pub fn new<'d>(decls: impl IntoIterator<Item = (&'d TypeDeclaration, &'d [String])>) -> Self {
+        let mut values: Vec<(BindingKey, String, u8, bool)> = decls
             .into_iter()
-            .filter_map(|decl| {
+            .filter_map(|(decl, js_namespace)| {
                 let (js_name, name, is_fn) = match &decl.kind {
                     TypeKind::Function(f) => (&f.js_name, &f.name, true),
                     TypeKind::Variable(v) => (&v.js_name, &v.name, false),
@@ -225,19 +230,24 @@ impl ValueNames {
                     ident
                 };
                 Some((
-                    binding_key(&decl.module_context, js_name),
+                    binding_key(&decl.module_context, js_namespace, js_name),
                     candidate,
                     priority,
+                    is_fn,
                 ))
             })
             .collect();
-        values.sort_by_key(|(.., priority)| *priority);
+        values.sort_by_key(|&(_, _, priority, _)| priority);
         let mut idents = LocalScope::default();
         let mut names = HashMap::new();
-        for (key, candidate, _) in values {
+        let mut statics = Vec::new();
+        for (key, candidate, _, is_fn) in values {
             names.entry(key).or_insert_with(|| {
                 let name = idents.declare(&candidate, Suffix::Snake);
                 idents.reserve(name.clone());
+                if !is_fn {
+                    statics.push(name.clone());
+                }
                 name
             });
         }
@@ -245,7 +255,13 @@ impl ValueNames {
             idents,
             bindings: HashSet::new(),
             names,
+            statics,
         }
+    }
+
+    /// The names of the module's statics.
+    pub fn statics(&self) -> &[String] {
+        &self.statics
     }
 
     /// The name chosen for `key`, freed for its binding to declare.
@@ -270,7 +286,7 @@ pub fn generate_variable(
     scope: ScopeId,
     value_names: &mut ValueNames,
 ) -> TokenStream {
-    let binding = binding_key(ctx, &decl.js_name);
+    let binding = binding_key(ctx, js_namespace, &decl.js_name);
     if !value_names.bindings.insert(binding.clone()) {
         return TokenStream::new();
     }

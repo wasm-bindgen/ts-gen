@@ -93,6 +93,9 @@ struct MemberNames {
     /// The `set_` name of each property that has a setter, which a
     /// dictionary's builder method follows.
     setters: HashMap<MemberKey, String>,
+    /// The base a property named like a generated name had before taking
+    /// its trailing underscore, which its other names derive from.
+    stems: HashMap<MemberKey, String>,
 }
 
 /// Name a type's properties and methods up front.
@@ -105,7 +108,12 @@ struct MemberNames {
 /// property's base (`$data` → `data_2` / `set_data_2`), numbered on its own
 /// when a declared name already has it (`setFoo()` keeps `set_foo` and
 /// property `foo`'s setter becomes `set_foo_2`).
-fn member_names(members: &[Member], is_abstract: bool) -> MemberNames {
+///
+/// A property named like one of the type's `generated` names (`new`) can
+/// only clash with that one name, so it takes a trailing underscore instead
+/// (`new_`, still `set_new`). A method's names (`try_new`, `new_with_x`) can
+/// clash more than once, so it's numbered.
+fn member_names(members: &[Member], generated: &[&str]) -> MemberNames {
     let mut keyed: Vec<(MemberKind, &str)> = members
         .iter()
         .filter_map(|member| {
@@ -128,20 +136,26 @@ fn member_names(members: &[Member], is_abstract: bool) -> MemberNames {
     keyed.sort_by_key(|(_, js_name)| naming_priority(js_name, &member_snake(js_name)));
 
     let mut scope = LocalScope::default();
-    if !is_abstract && members.iter().any(|m| matches!(m, Member::Constructor(_))) {
-        scope.claim("new");
+    for name in generated {
+        scope.claim(*name);
     }
     let mut names = MemberNames::default();
     for (kind, js_name) in &keyed {
-        names
-            .bases
-            .entry((*kind, js_name.to_string()))
-            .or_insert_with(|| {
-                let base = scope.declare(&member_snake(js_name), Suffix::Snake);
-                // A keyword is declared under its public spelling (`type_`).
-                scope.claim(public_rust_name(&base));
-                base
-            });
+        let key = (*kind, js_name.to_string());
+        if names.bases.contains_key(&key) {
+            continue;
+        }
+        let snake = member_snake(js_name);
+        let is_property = matches!(kind, MemberKind::Property | MemberKind::StaticProperty);
+        let base = if is_property && generated.contains(&public_rust_name(&snake).as_str()) {
+            names.stems.insert(key.clone(), snake.clone());
+            scope.declare(&format!("{snake}_"), Suffix::Snake)
+        } else {
+            scope.declare(&snake, Suffix::Snake)
+        };
+        // A keyword is declared under its public spelling (`type_`).
+        scope.claim(public_rust_name(&base));
+        names.bases.insert(key, base);
     }
     // Every setter that can keep `set_<base>` does before any is numbered,
     // so `set_data_2` can't go to `data`'s setter while `data_2` has one.
@@ -158,7 +172,7 @@ fn member_names(members: &[Member], is_abstract: bool) -> MemberNames {
         if names.setters.contains_key(&key) || numbered.contains(&key) {
             continue;
         }
-        let setter = format!("set_{}", names.bases[&key]);
+        let setter = format!("set_{}", names.stem(&key));
         if scope.claim(setter.clone()) {
             names.setters.insert(key, setter);
         } else {
@@ -166,10 +180,32 @@ fn member_names(members: &[Member], is_abstract: bool) -> MemberNames {
         }
     }
     for key in numbered {
-        let setter = scope.declare(&format!("set_{}", names.bases[&key]), Suffix::Snake);
+        let setter = scope.declare(&format!("set_{}", names.stem(&key)), Suffix::Snake);
         names.setters.insert(key, setter);
     }
     names
+}
+
+impl MemberNames {
+    /// The base `key`'s derived names follow; see [`Self::stems`].
+    fn stem(&self, key: &MemberKey) -> &str {
+        self.stems.get(key).unwrap_or(&self.bases[key])
+    }
+}
+
+/// The names a type's generated API takes; see [`member_names`].
+fn generated_names(
+    members: &[Member],
+    is_abstract: bool,
+    dictionary: bool,
+) -> &'static [&'static str] {
+    if dictionary {
+        &["new", "builder", "build"]
+    } else if !is_abstract && members.iter().any(|m| matches!(m, Member::Constructor(_))) {
+        &["new"]
+    } else {
+        &[]
+    }
 }
 
 fn member_snake(js_name: &str) -> String {
@@ -193,6 +229,15 @@ impl ClassConfig<'_> {
             .get(&(kind, js_name.to_string()))
             .cloned()
             .unwrap_or_else(|| format!("set_{}", self.member_base(kind, js_name)))
+    }
+
+    /// The base a member's derived names follow; see [`MemberNames::stems`].
+    fn member_stem(&self, kind: MemberKind, js_name: &str) -> String {
+        let key = (kind, js_name.to_string());
+        match self.member_names.stems.get(&key) {
+            Some(stem) => stem.clone(),
+            None => self.member_base(kind, js_name),
+        }
     }
 
     /// An extern block's names with every member's own names reserved, so
@@ -276,7 +321,10 @@ impl<'a> ClassConfig<'a> {
             js_namespace: Vec::new(),
             is_abstract: decl.is_abstract,
             members: decl.members.clone(),
-            member_names: member_names(&decl.members, decl.is_abstract),
+            member_names: member_names(
+                &decl.members,
+                generated_names(&decl.members, decl.is_abstract, false),
+            ),
             type_params: decl.type_params.clone(),
             cgctx,
             scope,
@@ -288,6 +336,7 @@ impl<'a> ClassConfig<'a> {
         ctx: &ModuleContext,
         cgctx: Option<&'a CodegenContext>,
         _enclosing_scope: ScopeId,
+        dictionary: bool,
     ) -> Self {
         let scope = decl.body_scope;
         let extends = extends_list(&decl.extends, cgctx, scope, ctx);
@@ -304,7 +353,10 @@ impl<'a> ClassConfig<'a> {
             js_namespace: Vec::new(),
             is_abstract: false,
             members: decl.members.clone(),
-            member_names: member_names(&decl.members, false),
+            member_names: member_names(
+                &decl.members,
+                generated_names(&decl.members, false, dictionary),
+            ),
             type_params: decl.type_params.clone(),
             cgctx,
             scope,
@@ -335,7 +387,7 @@ impl<'a> ClassConfig<'a> {
             js_namespace: Vec::new(),
             is_abstract: false,
             members: decl.members.clone(),
-            member_names: member_names(&decl.members, false),
+            member_names: member_names(&decl.members, generated_names(&decl.members, false, true)),
             type_params: decl.type_params.clone(),
             cgctx,
             scope,
@@ -488,7 +540,7 @@ pub fn generate_class_like_interface(
         "expected ClassLike or Unclassified, got {:?}",
         decl.classification
     );
-    let mut config = ClassConfig::from_interface(decl, ctx, cgctx, scope);
+    let mut config = ClassConfig::from_interface(decl, ctx, cgctx, scope, false);
     config.js_namespace = js_namespace.to_vec();
     generate_extern_block(&config)
 }
@@ -515,7 +567,7 @@ pub fn generate_dictionary_extern(
     js_namespace: &[String],
     scope: ScopeId,
 ) -> TokenStream {
-    let mut config = ClassConfig::from_interface(decl, ctx, cgctx, scope);
+    let mut config = ClassConfig::from_interface(decl, ctx, cgctx, scope, true);
     config.js_namespace = js_namespace.to_vec();
 
     let extern_block = generate_extern_block(&config);
@@ -1044,7 +1096,8 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                         param,
                         setter_ident,
                     } => {
-                        let arg_ident = super::typemap::make_ident(&param.name);
+                        let arg_ident =
+                            super::signatures::dictionary_param_ident(&param.name, config.cgctx);
                         arg_idents.push(arg_ident.clone());
                         init_calls.push(quote! { inner.#setter_ident(#arg_ident); });
                         value_params.push(param.clone());
@@ -1237,7 +1290,12 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             // The builder has no methods of its own to avoid, so it follows
             // the getter's name, with the setter's expansion suffix.
             let suffix = sig.rust_name.strip_prefix(&setter_name).unwrap_or_default();
-            let builder_method_name = public_rust_name(&format!("{base}{suffix}"));
+            let builder_method_name = if suffix.is_empty() {
+                public_rust_name(&base)
+            } else {
+                let stem = config.member_stem(MemberKind::Property, &g.js_name);
+                public_rust_name(&format!("{stem}{suffix}"))
+            };
             let method_ident = super::typemap::make_ident(&builder_method_name);
             let setter_ident = super::typemap::make_ident(&sig.rust_name);
             // Mirrors `generate_setter`: an `ArrayBufferView` param is a
@@ -1258,7 +1316,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             let param_idents: Vec<_> = sig
                 .params
                 .iter()
-                .map(|p| super::typemap::make_ident(&p.name))
+                .map(|p| super::signatures::dictionary_param_ident(&p.name, config.cgctx))
                 .collect();
             builder_methods.push(quote! {
                 pub fn #method_ident #generics (self, #params) -> Self
