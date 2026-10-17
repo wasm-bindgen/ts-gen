@@ -48,7 +48,6 @@ tests/
 ├── fixtures/*.d.ts            # input declarations
 ├── snapshots/*.rs             # expected generated output (BLESS=1 to update)
 ├── snapshots/*.wat            # --target wat output
-├── snapshots/*.wat.err        # --target wat error, for a fixture the ABI rejects
 └── snapshot.rs                # the Rust and WAT snapshot harness
 
 integration-tests/
