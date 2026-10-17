@@ -64,6 +64,11 @@ impl<T: ::wasm_bindgen::JsGeneric> GenAbvBuilder<T> {
         self.inner
     }
 }
+impl<T: ::wasm_bindgen::JsGeneric> From<GenAbv<T>> for GenAbvBuilder<T> {
+    fn from(inner: GenAbv<T>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]

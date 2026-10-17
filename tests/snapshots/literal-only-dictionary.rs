@@ -60,6 +60,11 @@ impl PlaceholderBuilder {
         self.inner
     }
 }
+impl From<Placeholder> for PlaceholderBuilder {
+    fn from(inner: Placeholder) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -157,6 +162,11 @@ impl PartBuilder {
     }
     pub fn build(self) -> Part {
         self.inner
+    }
+}
+impl From<Part> for PartBuilder {
+    fn from(inner: Part) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(private)]

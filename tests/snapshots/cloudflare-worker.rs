@@ -229,6 +229,11 @@ impl RequestInitBuilder {
         self.inner
     }
 }
+impl From<RequestInit> for RequestInitBuilder {
+    fn from(inner: RequestInit) -> Self {
+        Self { inner }
+    }
+}
 #[allow(dead_code)]
 pub type BodyInit = JsValue;
 #[wasm_bindgen]
@@ -401,6 +406,11 @@ impl ResponseInitBuilder {
     }
     pub fn build(self) -> ResponseInit {
         self.inner
+    }
+}
+impl From<ResponseInit> for ResponseInitBuilder {
+    fn from(inner: ResponseInit) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen]
@@ -576,6 +586,11 @@ impl FlagsBuilder {
     }
     pub fn build(self) -> Flags {
         self.inner
+    }
+}
+impl From<Flags> for FlagsBuilder {
+    fn from(inner: Flags) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen]
