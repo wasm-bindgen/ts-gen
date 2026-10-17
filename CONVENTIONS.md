@@ -383,13 +383,14 @@ the setter is named `set_<snake_case>`.
   * Free functions and statics share their module's value namespace: a
     function `foo_bar` and statics `fooBar` and `FOO_BAR` become
     `foo_bar`, `foo_bar_2` and `foo_bar_3`.
-  * A type's properties and methods are named together. The getter, `set_` setter, and a dictionary's
-    factory parameter and builder method all follow the property's name
-    (`data` and `$data` give `data` / `set_data` and `data_2` /
-    `set_data_2`). The setter's name is derived, so it yields to a
-    declared one and is numbered alone: a method `setTimeout()` keeps
-    `set_timeout` and a property `timeout` beside it gets `timeout` /
-    `set_timeout_2`. A read-only property has no setter to number.
+  * A type's properties and methods are named together. The getter,
+    `set_` setter, and a dictionary's factory parameter and builder method
+    all follow the property's name (`data` and `$data` give `data` /
+    `set_data` and `data_2` / `set_data_2`). The setter's name is derived,
+    so it yields to a declared one and is numbered alone: a method
+    `setTimeout()` keeps `set_timeout` and a property `timeout` beside it
+    gets `timeout` / `set_timeout_2`. A read-only property has no setter to
+    number.
   * A property named like one of the type's generated names, a
     constructor's `new` or a dictionary's `new`, `builder` and `build`,
     can only clash with that one name, so it takes a trailing underscore
@@ -399,7 +400,10 @@ the setter is named `set_<snake_case>`.
   * A parameter can't shadow a static (E0530), so one named like a static
     in scope, including one a namespace's module imports from its parent,
     takes a trailing underscore (`url_`). So does a dictionary helper's
-    parameter named like its `inner` local.
+    parameter named like its `inner` local. wasm-bindgen's expansion and
+    the dictionary helpers bind some names themselves (`val`, `inner`,
+    `value`, …), so a static with one of those takes the underscore instead
+    (`val_`, with `js_name = "val"`).
   * A parameter list numbers without the underscore (`a` and `$a` give
     `a` and `a2`), since wasm-bindgen's generated code names the ABI
     parts of a parameter `a` `a_1` to `a_4`.

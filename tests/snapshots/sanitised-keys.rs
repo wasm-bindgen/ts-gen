@@ -365,13 +365,13 @@ extern "C" {
     pub fn set_build(this: &ReservedInit, val: bool);
 }
 impl ReservedInit {
-    pub fn new(new_: &str, inner_: &str) -> ReservedInit {
-        Self::builder(new_, inner_).build()
+    pub fn new(new_: &str, inner__: &str) -> ReservedInit {
+        Self::builder(new_, inner__).build()
     }
-    pub fn builder(new_: &str, inner_: &str) -> ReservedInitBuilder {
+    pub fn builder(new_: &str, inner__: &str) -> ReservedInitBuilder {
         let inner: ReservedInit = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_new(new_);
-        inner.set_inner(inner_);
+        inner.set_inner(inner__);
         ReservedInitBuilder { inner }
     }
 }
@@ -420,6 +420,18 @@ extern "C" {
     #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2)]
     pub static url: String;
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    #[allow(non_upper_case_globals)]
+    #[wasm_bindgen(thread_local_v2, js_name = "val")]
+    pub static val_: String;
+}
+#[wasm_bindgen(module = "sanitised-keys")]
+extern "C" {
+    #[allow(non_upper_case_globals)]
+    #[wasm_bindgen(thread_local_v2, js_name = "inner")]
+    pub static inner_: f64;
 }
 #[wasm_bindgen(module = "sanitised-keys")]
 extern "C" {

@@ -1,8 +1,8 @@
 #![cfg(target_arch = "wasm32")]
 
 use ts_gen_integration_tests::sanitised_keys::{
-    ajax, ajax_2, collide_args, compare, dollar, dollar_2, dollar_dollar, each, fetch_url, ns,
-    scoped, underscore_underscore, url, version, Collide, CollideInit, DollarUnderscore,
+    ajax, ajax_2, collide_args, compare, dollar, dollar_2, dollar_dollar, each, fetch_url, inner_,
+    ns, scoped, underscore_underscore, url, val_, version, Collide, CollideInit, DollarUnderscore,
     MethodCollide, Op, Pair, ReadonlyCollide, ReservedClass, ReservedInit, ReservedMethod,
     SetterCollide, SetterNumbers, Sigil, Store,
 };
@@ -105,6 +105,8 @@ fn colliding_names_compile(
     ReservedMethod::new().unwrap().new_2();
 
     fetch_url(&url.with(|u| u.clone()));
+    let _: String = val_.with(|v| v.clone());
+    let _: f64 = inner_.with(|i| *i);
     scoped::fetch_url("x");
     let _: f64 = ns::x.with(|x| *x);
     let _: String = ns::x_2.with(|x| x.clone());

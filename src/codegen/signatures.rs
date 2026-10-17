@@ -1377,9 +1377,7 @@ fn param_idents(params: &[ConcreteParam], cgctx: Option<&CodegenContext<'_>>) ->
 /// helpers' `inner` local takes a trailing underscore, as does one named
 /// like a static.
 pub(crate) fn dictionary_param_ident(name: &str, cgctx: Option<&CodegenContext<'_>>) -> syn::Ident {
-    if name == "inner" {
-        return typemap::make_ident("inner_");
-    }
+    let name = if name == "inner" { "inner_" } else { name };
     typemap::make_ident(&CodegenContext::param_name(cgctx, name))
 }
 

@@ -182,6 +182,14 @@ fn generic_bounds_for_function(
         .collect()
 }
 
+/// The names wasm-bindgen's expansion of an import and the dictionary
+/// helpers bind as parameters and locals, which a static in scope makes an
+/// error at each (E0530). Renaming those can't help, so the static takes a
+/// trailing underscore instead.
+const BOUND_NAMES: &[&str] = &[
+    "abi", "e", "idx", "inner", "js", "obj", "other", "s", "slice", "val", "value",
+];
+
 /// A value binding: its module specifier, JS namespace and JS name.
 type BindingKey = (Option<String>, Vec<String>, String);
 
@@ -226,6 +234,8 @@ impl ValueNames {
                 let priority = naming_priority(js_name, &ident);
                 let candidate = if is_fn {
                     public_rust_name(&ident)
+                } else if BOUND_NAMES.contains(&ident.as_str()) {
+                    format!("{ident}_")
                 } else {
                     ident
                 };

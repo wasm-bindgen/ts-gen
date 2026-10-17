@@ -104,6 +104,10 @@ export declare class ReservedMethod {
 // A parameter can't shadow a static in scope (E0530), including one a
 // namespace's module imports from its parent.
 export declare const url: string;
+// wasm-bindgen's expansion and the dictionary helpers bind `val` and `inner`
+// themselves, so those statics take the underscore instead.
+export declare const val: string;
+export declare const inner: number;
 export declare function fetchUrl(url: string): void;
 export declare namespace Scoped {
   function fetchUrl(url: string): void;

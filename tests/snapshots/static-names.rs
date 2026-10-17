@@ -55,8 +55,8 @@ pub mod mod_a {
     #[wasm_bindgen(module = "mod-a")]
     extern "C" {
         #[allow(non_upper_case_globals)]
-        #[wasm_bindgen(thread_local_v2)]
-        pub static value: String;
+        #[wasm_bindgen(thread_local_v2, js_name = "value")]
+        pub static value_: String;
     }
 }
 pub mod mod_b {
@@ -65,7 +65,7 @@ pub mod mod_b {
     #[wasm_bindgen(module = "mod-b")]
     extern "C" {
         #[allow(non_upper_case_globals)]
-        #[wasm_bindgen(thread_local_v2)]
-        pub static value: String;
+        #[wasm_bindgen(thread_local_v2, js_name = "value")]
+        pub static value_: String;
     }
 }
