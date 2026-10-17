@@ -228,3 +228,22 @@ fn snapshots() {
 
     eprintln!("All {} snapshot tests passed.", fixtures.len());
 }
+
+/// Diagnostics aren't part of a snapshot, so the absence of the dropped
+/// generic argument warning is checked separately.
+#[test]
+fn typed_array_buffer_arguments_drop_without_a_warning() {
+    let fixture = crate_root().join("tests/fixtures/typed-array-buffers.d.ts");
+    let out_file = std::env::temp_dir().join("ts-gen-typed-array-buffers.rs");
+    let output = Command::new(ts_gen_bin())
+        .arg("--input")
+        .arg(&fixture)
+        .arg("--output")
+        .arg(&out_file)
+        .output()
+        .expect("Failed to execute ts-gen binary");
+    let _ = std::fs::remove_file(&out_file);
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(output.status.success(), "{stderr}");
+    assert!(!stderr.contains("warning"), "{stderr}");
+}

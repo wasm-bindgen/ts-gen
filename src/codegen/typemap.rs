@@ -1635,7 +1635,7 @@ fn with_generic_args(
     }
     let accepts_generics = ctx.is_some_and(|c| c.is_local_generic(name, scope));
     if !accepts_generics {
-        if let Some(c) = ctx {
+        if let Some(c) = ctx.filter(|_| !is_buffer_generic(name)) {
             c.warn(format!(
                 "generic type arguments on `{name}<...>` are not emitted (target is not a \
                  locally-declared generic type), using bare `{name}`"
@@ -1654,6 +1654,14 @@ fn with_generic_args(
         })
         .collect();
     quote! { #base<#(#arg_tokens),*> }
+}
+
+/// TS 5.7+ makes the typed arrays and `DataView` generic over their buffer
+/// (`Uint8Array<ArrayBuffer>`). The js-sys types aren't, and dropping the
+/// argument is the intended lowering, so it isn't warned about.
+fn is_buffer_generic(name: &str) -> bool {
+    matches!(name, "Uint8ClampedArray" | "DataView")
+        || ir::TypedArrayElement::of_typed_array(name).is_some()
 }
 
 /// Create a `syn::Ident`, sanitizing invalid characters and escaping keywords.

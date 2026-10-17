@@ -243,6 +243,14 @@ says the callee also accepts a copy. A bare `bigint[]` stays
 return would silently wrap values beyond 64 bits, and the argument
 matches it so a getter's value can be passed back to the setter.
 
+### Typed-array buffer arguments
+
+Since TS 5.7 the typed arrays, `DataView` and `ArrayBufferView` are
+generic over their buffer (`Uint8Array<ArrayBuffer>`,
+`Float64Array<ArrayBufferLike>`). The js-sys types aren't, so the
+argument is dropped in every position without a warning, and
+`Uint8Array<ArrayBuffer>` lowers exactly like `Uint8Array`.
+
 ## Outer-type ABI fan-out
 
 Some Rust-idiomatic outer-type lowerings imply a copy across the
