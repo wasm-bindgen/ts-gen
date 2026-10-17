@@ -1612,9 +1612,6 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 // Use the first overload's `@throws` (if any) as the error
                 // type for the constructor — TS overloads conventionally
                 // share semantics, and the first one carries the doc.
-                // Constructors always catch per JS `new` semantics, so
-                // `Throws::Never` here is a no-op — `build_signatures` still
-                // emits `catch` with the default `JsValue` error type.
                 let empty_throws = crate::ir::Throws::None;
                 let throws = constructor_overloads
                     .first()
@@ -1936,8 +1933,8 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
     );
     let doc = super::doc_tokens(&sig.doc);
 
-    // Constructors always return the constructed type, wrapped in Result
-    // when `catch` (which is always-true here per `SignatureKind::Constructor`).
+    // Constructors return the constructed type, wrapped in `Result` when
+    // `catch` (the default; `@throws {never}` opts out).
     // Type parameters the arguments mention — the class's own or the
     // construct signature's. A constructor-level `<T>` of the same
     // name as a class-level one (the `declare var` pattern) binds the
@@ -2006,8 +2003,10 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
         render_generic_bounds(&bounds)
     };
 
+    let literal = super::inline_wrappers::literal_attr(sig);
     quote! {
         #doc
+        #literal
         #[wasm_bindgen(#(#wb_parts),*)]
         pub fn #rust_ident #generics (#params) -> #ret;
     }
@@ -2072,8 +2071,10 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
     let method_generics = render_generic_bounds(&generic_bounds_for_method(config, sig));
     let this_generics = config.type_generics_args();
 
+    let literal = super::inline_wrappers::literal_attr(sig);
     quote! {
         #doc
+        #literal
         #[wasm_bindgen(#(#wb_parts),*)]
         pub #async_kw fn #rust_ident #method_generics (this: &#this_type #this_generics, #params) #ret;
     }
@@ -2149,8 +2150,10 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
     bounds.extend(config.local_generic_bounds(scope, &sig_tys));
     let generics = render_generic_bounds(&bounds);
 
+    let literal = super::inline_wrappers::literal_attr(sig);
     quote! {
         #doc
+        #literal
         #[wasm_bindgen(#(#wb_parts),*)]
         pub #async_kw fn #rust_ident #generics (#params) #ret;
     }

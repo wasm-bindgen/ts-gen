@@ -3,7 +3,8 @@
 // Sync callables annotated with `@throws {never}` get *no* `try_*`
 // companion. Async (Promise-returning) callables drop the `Result`
 // wrapper and `catch` attribute, becoming `async fn -> T`.
-// Constructors ignore the annotation — JS `new` always catches.
+// Constructors catch by default; annotated `@throws {never}` they
+// return the type bare.
 
 declare class NeverThrows {
   /**
@@ -32,8 +33,8 @@ declare class NeverThrows {
   typedOp(x: number): string;
 
   /**
-   * Constructor with `@throws {never}` is a no-op — JS `new` can
-   * always throw, so the constructor still catches.
+   * Constructor declared infallible — `new(name) -> NeverThrows`, no
+   * `catch`.
    * @throws {never}
    */
   constructor(name: string);
