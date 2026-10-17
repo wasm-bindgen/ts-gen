@@ -2579,7 +2579,9 @@ A namespace exported under its own name as well keeps it.
   * Types without a runtime binding (interfaces, type aliases, enums) get
     an alias only.
   * A namespace keeps its local name as the Rust module and binds its
-    members with `js_namespace` set to the JS name. It gets no alias.
+    members with `js_namespace` set to the JS name. Each other public name
+    is a module re-exporting it (`pub mod n2 { pub use super::n::*; }`),
+    since `pub use n as n2;` would also import a function `n` as `n2`.
 
   A `Local` declared outside the exporting block (an import) is left alone
   and only aliased.

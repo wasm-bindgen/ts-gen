@@ -707,6 +707,8 @@ pub(crate) fn js_namespace_attr(js_namespace: &[String]) -> Option<TokenStream> 
 struct ModTree<'d> {
     entries: Vec<ModEntry<'d>>,
     children: HashMap<String, ModTree<'d>>,
+    /// The other public names of each child's namespace, which alias it.
+    aliases: HashMap<String, Vec<String>>,
 }
 
 enum ModEntry<'d> {
@@ -740,7 +742,15 @@ impl<'d> ModTree<'d> {
     ) {
         match &decl.kind {
             TypeKind::Namespace(ns) => {
-                let child = self.child(&crate::util::naming::to_snake_case(&ns.name));
+                let name = crate::util::naming::to_snake_case(&ns.name);
+                let aliases = self.aliases.entry(name.clone()).or_default();
+                for public in surface.names(id).iter().filter(|&p| p != "default") {
+                    let alias = crate::util::naming::to_snake_case(public);
+                    if alias != name && !aliases.contains(&alias) {
+                        aliases.push(alias);
+                    }
+                }
+                let child = self.child(&name);
                 js_namespace.push(surface.js_name(id, &ns.name).to_string());
                 for &member in &ns.declarations {
                     for decl in surface.get(member) {
@@ -791,6 +801,17 @@ impl<'d> ModTree<'d> {
                             #(#members)*
                         }
                     });
+                    // A module alias rather than `pub use`, which would also
+                    // import a same-named function under the alias.
+                    let aliases = self.aliases.get(name).into_iter().flatten();
+                    for alias in aliases.filter(|a| !self.children.contains_key(*a)) {
+                        let alias = typemap::make_ident(alias);
+                        items.push(quote! {
+                            pub mod #alias {
+                                pub use super::#ident::*;
+                            }
+                        });
+                    }
                 }
             }
         }

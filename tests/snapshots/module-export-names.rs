@@ -44,4 +44,10 @@ pub mod ns {
             pub fn try_f() -> Result<(), JsValue>;
         }
     }
+    pub mod n1 {
+        pub use super::n::*;
+    }
+    pub mod n2 {
+        pub use super::n::*;
+    }
 }
