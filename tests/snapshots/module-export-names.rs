@@ -142,3 +142,107 @@ pub mod own {
         pub use super::make::*;
     }
 }
+pub mod col {
+    #[allow(unused_imports)]
+    use super::*;
+    pub mod m {
+        #[allow(unused_imports)]
+        use super::*;
+        #[wasm_bindgen(module = "col")]
+        extern "C" {
+            # [wasm_bindgen (extends = Object , js_namespace = "M")]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type T;
+            #[wasm_bindgen(method, getter)]
+            pub fn n(this: &T) -> f64;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_n(this: &T, val: f64);
+        }
+        impl T {
+            pub fn new(n: f64) -> T {
+                let inner: T = JsCast::unchecked_into(js_sys::Object::new());
+                inner.set_n(n);
+                inner
+            }
+        }
+        #[wasm_bindgen(module = "col")]
+        extern "C" {
+            #[wasm_bindgen(js_namespace = "M")]
+            pub fn f(t: &T);
+        }
+        #[wasm_bindgen(module = "col")]
+        extern "C" {
+            #[wasm_bindgen(catch, js_name = "f", js_namespace = "M")]
+            pub fn try_f(t: &T) -> Result<(), JsValue>;
+        }
+    }
+    pub mod m_2 {
+        #[allow(unused_imports)]
+        use super::*;
+        #[wasm_bindgen(module = "col")]
+        extern "C" {
+            # [wasm_bindgen (extends = Object , js_namespace = "M")]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type T;
+            #[wasm_bindgen(method, getter)]
+            pub fn m(this: &T) -> String;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_m(this: &T, val: &str);
+        }
+        impl T {
+            pub fn new(m: &str) -> T {
+                let inner: T = JsCast::unchecked_into(js_sys::Object::new());
+                inner.set_m(m);
+                inner
+            }
+        }
+    }
+    #[wasm_bindgen(module = "col")]
+    extern "C" {
+        pub fn g(t: &m_2::T);
+    }
+    #[wasm_bindgen(module = "col")]
+    extern "C" {
+        #[wasm_bindgen(catch, js_name = "g")]
+        pub fn try_g(t: &m_2::T) -> Result<(), JsValue>;
+    }
+}
+pub mod reached {
+    #[allow(unused_imports)]
+    use super::*;
+    pub mod m {
+        #[allow(unused_imports)]
+        use super::*;
+        #[wasm_bindgen(module = "reached")]
+        extern "C" {
+            # [wasm_bindgen (extends = Object , js_namespace = "M")]
+            #[derive(Debug, Clone, PartialEq, Eq)]
+            pub type T;
+            #[wasm_bindgen(method, getter)]
+            pub fn t(this: &T) -> f64;
+            #[wasm_bindgen(method, setter)]
+            pub fn set_t(this: &T, val: f64);
+        }
+        impl T {
+            pub fn new(t: f64) -> T {
+                let inner: T = JsCast::unchecked_into(js_sys::Object::new());
+                inner.set_t(t);
+                inner
+            }
+        }
+    }
+}
+pub mod user {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen(module = "user")]
+    extern "C" {
+        #[wasm_bindgen(js_name = "use")]
+        pub fn use_(x: &super::reached::m::T);
+    }
+    #[wasm_bindgen(module = "user")]
+    extern "C" {
+        #[wasm_bindgen(catch, js_name = "use")]
+        pub fn try_use_(x: &super::reached::m::T) -> Result<(), JsValue>;
+    }
+}

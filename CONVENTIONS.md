@@ -2661,7 +2661,14 @@ namespace exported under its own name as well keeps it.
     Its members bind with `js_namespace` set to the JS name. Each other
     public name is a module re-exporting it (`pub mod m2 { pub use
     super::m::*; }`), since `pub use m as m2;` would also import a
-    function `m` as `m2`.
+    function `m` as `m2`. The names come from the namespace's own
+    container, so a module that is only reached, not exported, names it
+    the same way. TypeScript keeps a module's exports and locals apart
+    but Rust has one namespace, so a namespace the module doesn't export
+    by name (a local, or the default export) takes a suffix where an
+    exported one has its name: with a local `namespace M` beside
+    `export { N as M }`, `N` is `pub mod m` and the local `M` is
+    `pub mod m_2`.
 
   A `Local` declared outside the exporting block (an import) is left alone
   and only aliased.

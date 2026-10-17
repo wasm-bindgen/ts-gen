@@ -21,6 +21,7 @@ use super::{ExportSpec, GenerateOptions};
 pub struct Surface<'d> {
     items: HashMap<TypeId, Vec<Cow<'d, TypeDeclaration>>>,
     names: HashMap<TypeId, Vec<String>>,
+    mod_names: HashMap<TypeId, String>,
 }
 
 impl<'d> Surface<'d> {
@@ -55,9 +56,11 @@ impl<'d> Surface<'d> {
             }
         }
         builder.close();
+        let mod_names = builder.name_namespaces();
         Surface {
             items: builder.items,
             names: builder.names,
+            mod_names,
         }
     }
 
@@ -68,7 +71,8 @@ impl<'d> Surface<'d> {
 
     /// The public names a type is exported under, in export order; empty
     /// for a value, which has a form per name instead, and for a type only
-    /// a signature reaches.
+    /// a signature reaches. A namespace's are those its own container
+    /// exports it under, whether or not that container is a root.
     pub fn names(&self, id: TypeId) -> &[String] {
         self.names.get(&id).map_or(&[], Vec::as_slice)
     }
@@ -86,14 +90,13 @@ impl<'d> Surface<'d> {
     /// The `pub mod` name of the namespace `id`, whose own name is `own`:
     /// its own when exported under it or not exported by name, else the
     /// first name it is exported under (`export { N as M }` makes `m`).
-    /// Each other public name aliases it.
+    /// Each other public name aliases it. A namespace its container doesn't
+    /// export by name takes a suffix where an exported one has its name.
     pub fn mod_name(&self, id: TypeId, own: &str) -> String {
-        let names = self.names(id);
-        let name = match names.iter().find(|&n| n != "default") {
-            Some(first) if !names.iter().any(|n| n == own) => first,
-            _ => own,
-        };
-        crate::util::naming::to_snake_case(name)
+        self.mod_names
+            .get(&id)
+            .cloned()
+            .unwrap_or_else(|| exported_mod_name(&[], own))
     }
 
     /// The JS module specifiers with an emitted declaration.
@@ -326,6 +329,95 @@ impl<'d> Builder<'_, 'd> {
         }
     }
 
+    /// Name each emitted namespace by the exports of its own container, a
+    /// module or namespace, whichever roots are selected, and give each its
+    /// `pub mod` name. As in TypeScript a container's exports and locals
+    /// are separate, but Rust has one namespace: the exported namespaces
+    /// and their aliases take their names, and one not exported by name (a
+    /// local or the default export) takes a suffix where its name is taken.
+    fn name_namespaces(&mut self) -> HashMap<TypeId, String> {
+        let gctx = self.gctx;
+        let mut namespaces: Vec<TypeId> = self
+            .items
+            .keys()
+            .copied()
+            .filter(|&id| matches!(gctx.get_type(id).kind, TypeKind::Namespace(_)))
+            .collect();
+        namespaces.sort_by_key(|id| id.index());
+        // A namespace's container: its namespace, or its module's top level.
+        type Container = (Option<TypeId>, ModuleContext);
+        let mut containers: Vec<(Container, Vec<TypeId>)> = Vec::new();
+        for &id in &namespaces {
+            let parent = self.parents.get(&id).copied();
+            let context = gctx.get_type(id).module_context.clone();
+            let roots: Vec<Root> = match parent.map(|p| &gctx.get_type(p).kind) {
+                Some(TypeKind::Namespace(ns)) => vec![Root {
+                    exports: ns.child_scope,
+                    bindings: ns.child_scope,
+                }],
+                Some(_) => vec![],
+                None => self
+                    .module
+                    .module_roots
+                    .iter()
+                    .filter(|(specifier, _)| context.specifier() == Some(specifier.as_str()))
+                    .map(|(_, root)| *root)
+                    .collect(),
+            };
+            if parent.is_some() || context.specifier().is_some() {
+                let mut names: Vec<String> = Vec::new();
+                for root in roots {
+                    for (public, local) in gctx.exports.entries(root.exports) {
+                        if gctx.declarations(root.bindings, local).contains(&id)
+                            && !names.iter().any(|n| n == public)
+                        {
+                            names.push(public.to_string());
+                        }
+                    }
+                }
+                names.sort_by_key(|n| n == "default");
+                self.names.insert(id, names);
+            }
+            let key = (parent, context);
+            match containers.iter_mut().find(|(k, _)| *k == key) {
+                Some((_, ids)) => ids.push(id),
+                None => containers.push((key, vec![id])),
+            }
+        }
+        let mut mod_names = HashMap::new();
+        for (_, ids) in containers {
+            let mut taken = crate::util::naming::LocalScope::default();
+            let own = |id: TypeId| match &gctx.get_type(id).kind {
+                TypeKind::Namespace(ns) => ns.name.clone(),
+                _ => unreachable!(),
+            };
+            let (exported, local): (Vec<_>, Vec<_>) = ids.into_iter().partition(|id| {
+                self.names
+                    .get(id)
+                    .is_some_and(|names| names.iter().any(|n| n != "default"))
+            });
+            // Exported namespaces whose Rust names coincide (`Ns` and `ns`)
+            // share a module, which holds their distinct bindings.
+            for id in exported {
+                let names = &self.names[&id];
+                let name = exported_mod_name(names, &own(id));
+                taken.claim(name.clone());
+                for public in names.iter().filter(|&p| p != "default") {
+                    taken.claim(crate::util::naming::to_snake_case(public));
+                }
+                mod_names.insert(id, name);
+            }
+            for id in local {
+                let name = taken.declare(
+                    &crate::util::naming::to_snake_case(&own(id)),
+                    crate::util::naming::Suffix::Snake,
+                );
+                mod_names.insert(id, name);
+            }
+        }
+        mod_names
+    }
+
     /// Follow the signatures of everything emitted to the declarations
     /// they name.
     fn close(&mut self) {
@@ -362,6 +454,16 @@ impl<'d> Builder<'_, 'd> {
             .chain(&self.module.file_scopes)
             .find_map(|&s| gctx.resolve_path(s, name))
     }
+}
+
+/// The `pub mod` name of a namespace whose own name is `own`, exported as
+/// `names`: see [`Surface::mod_name`].
+fn exported_mod_name(names: &[String], own: &str) -> String {
+    let name = match names.iter().find(|&n| n != "default") {
+        Some(first) if !names.iter().any(|n| n == own) => first,
+        _ => own,
+    };
+    crate::util::naming::to_snake_case(name)
 }
 
 /// The Rust name of a function or variable `local` exported as `public`.

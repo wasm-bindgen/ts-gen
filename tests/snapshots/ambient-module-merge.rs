@@ -105,3 +105,35 @@ pub mod loc {
         }
     }
 }
+pub mod dflt {
+    #[allow(unused_imports)]
+    use super::*;
+    pub mod n_2 {
+        #[allow(unused_imports)]
+        use super::*;
+        #[wasm_bindgen(module = "dflt")]
+        extern "C" {
+            #[wasm_bindgen(js_namespace = "default")]
+            pub fn f();
+        }
+        #[wasm_bindgen(module = "dflt")]
+        extern "C" {
+            #[wasm_bindgen(catch, js_name = "f", js_namespace = "default")]
+            pub fn try_f() -> Result<(), JsValue>;
+        }
+    }
+    pub mod n {
+        #[allow(unused_imports)]
+        use super::*;
+        #[wasm_bindgen(module = "dflt")]
+        extern "C" {
+            #[wasm_bindgen(js_namespace = "N")]
+            pub fn g();
+        }
+        #[wasm_bindgen(module = "dflt")]
+        extern "C" {
+            #[wasm_bindgen(catch, js_name = "g", js_namespace = "N")]
+            pub fn try_g() -> Result<(), JsValue>;
+        }
+    }
+}

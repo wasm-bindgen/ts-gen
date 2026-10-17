@@ -1,10 +1,10 @@
-//! @ts-gen --input tests/fixtures/ambient-module-merge/b.d.ts --export ovi --export loc
+//! @ts-gen --input tests/fixtures/ambient-module-merge/b.d.ts --export ovi --export loc --export dflt
 
 // As in TypeScript, an ambient module is one symbol whose declarations
 // merge across files: `I`'s members, `k`'s overloads and `NS`'s members
 // come from both this file and b.d.ts. A block with an export declaration
-// has locals of its own: "loc"'s `N` here is exported as `M` only, and is
-// not b.d.ts's `N`.
+// has locals of its own: "loc"'s `N` here is exported as `M` only, and
+// "dflt"'s as `default` only, and neither is b.d.ts's `N`.
 
 declare module "ovi" {
   export interface I {
@@ -21,4 +21,11 @@ declare module "loc" {
     function f(): void;
   }
   export { N as M };
+}
+
+declare module "dflt" {
+  namespace N {
+    function f(): void;
+  }
+  export default N;
 }

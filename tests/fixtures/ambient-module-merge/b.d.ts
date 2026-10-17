@@ -13,3 +13,9 @@ declare module "loc" {
     function g(): void;
   }
 }
+
+declare module "dflt" {
+  namespace N {
+    function g(): void;
+  }
+}
