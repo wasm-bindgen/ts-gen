@@ -30,6 +30,13 @@ extern "C" {
 }
 #[wasm_bindgen(module = "fallible", experimental_generic_mono)]
 extern "C" {
+    #[wasm_bindgen(catch, js_name = "parseLater")]
+    pub fn parse_later_promise(
+        s: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<Number>, JsValue>;
+}
+#[wasm_bindgen(module = "fallible", experimental_generic_mono)]
+extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Counter;

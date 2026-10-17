@@ -44,6 +44,11 @@ extern "C" {
 }
 #[wasm_bindgen(module = "fallible")]
 extern "C" {
+    #[wasm_bindgen(js_name = "parseLater")]
+    pub fn parse_later_promise(s: &str) -> Promise<Number>;
+}
+#[wasm_bindgen(module = "fallible")]
+extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Counter;

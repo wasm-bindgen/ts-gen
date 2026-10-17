@@ -105,18 +105,28 @@ extern "C" {
     pub fn clone(this: &Request) -> Result<Request, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "arrayBuffer")]
     pub async fn array_buffer(this: &Request) -> Result<ArrayBuffer, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "arrayBuffer")]
+    pub fn array_buffer_promise(this: &Request) -> Result<Promise<ArrayBuffer>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn text(this: &Request) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "text")]
     pub async fn text_js_string(this: &Request) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "text")]
+    pub fn text_promise(this: &Request) -> Result<Promise<JsString>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn json<T>(this: &Request) -> Result<T, JsValue>
     where
         T: ::wasm_bindgen::convert::FromWasmAbi + 'static;
+    #[wasm_bindgen(method, catch, js_name = "json")]
+    pub fn json_promise<T>(this: &Request) -> Result<Promise<T>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn blob(this: &Request) -> Result<Blob, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "blob")]
+    pub fn blob_promise(this: &Request) -> Result<Promise<Blob>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "formData")]
     pub async fn form_data(this: &Request) -> Result<FormData, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "formData")]
+    pub fn form_data_promise(this: &Request) -> Result<Promise<FormData>, JsValue>;
 }
 #[allow(dead_code)]
 pub type RequestInfo = JsValue;
@@ -329,18 +339,28 @@ extern "C" {
     pub fn clone(this: &Response) -> Result<Response, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "arrayBuffer")]
     pub async fn array_buffer(this: &Response) -> Result<ArrayBuffer, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "arrayBuffer")]
+    pub fn array_buffer_promise(this: &Response) -> Result<Promise<ArrayBuffer>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn text(this: &Response) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "text")]
     pub async fn text_js_string(this: &Response) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "text")]
+    pub fn text_promise(this: &Response) -> Result<Promise<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "json")]
     pub async fn json_2<T>(this: &Response) -> Result<T, JsValue>
     where
         T: ::wasm_bindgen::convert::FromWasmAbi + 'static;
+    #[wasm_bindgen(method, catch, js_name = "json")]
+    pub fn json_2_promise<T>(this: &Response) -> Result<Promise<T>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn blob(this: &Response) -> Result<Blob, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "blob")]
+    pub fn blob_promise(this: &Response) -> Result<Promise<Blob>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "formData")]
     pub async fn form_data(this: &Response) -> Result<FormData, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "formData")]
+    pub fn form_data_promise(this: &Response) -> Result<Promise<FormData>, JsValue>;
 }
 impl Response {
     pub fn new_with_null() -> Result<Response, JsValue> {
@@ -442,6 +462,15 @@ extern "C" {
     ) -> Result<Response, JsValue>
     where
         E: ::wasm_bindgen::convert::IntoWasmAbi;
+    #[wasm_bindgen(method, catch, js_name = "fetch")]
+    pub fn fetch_promise<E>(
+        this: &ExportedHandler<E>,
+        request: &Request,
+        env: E,
+        ctx: &ExecutionContext,
+    ) -> Result<Promise<Response>, JsValue>
+    where
+        E: ::wasm_bindgen::convert::IntoWasmAbi;
     #[wasm_bindgen(method, catch)]
     pub async fn scheduled<E>(
         this: &ExportedHandler<E>,
@@ -449,6 +478,15 @@ extern "C" {
         env: E,
         ctx: &ExecutionContext,
     ) -> Result<Undefined, JsValue>
+    where
+        E: ::wasm_bindgen::convert::IntoWasmAbi;
+    #[wasm_bindgen(method, catch, js_name = "scheduled")]
+    pub fn scheduled_promise<E>(
+        this: &ExportedHandler<E>,
+        controller: &ScheduledController,
+        env: E,
+        ctx: &ExecutionContext,
+    ) -> Result<Promise<Undefined>, JsValue>
     where
         E: ::wasm_bindgen::convert::IntoWasmAbi;
 }
@@ -474,9 +512,21 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetch")]
+    pub fn fetch_promise(input: &Request) -> Result<Promise<Response>, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "fetch")]
     pub async fn fetch_with_str(
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Response, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "fetch")]
+    pub fn fetch_with_str_promise(
+        input: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<Response>, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -489,8 +539,24 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "fetch")]
+    pub fn fetch_with_request_and_init_promise(
+        input: &Request,
+        init: &RequestInit,
+    ) -> Result<Promise<Response>, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "fetch")]
     pub async fn fetch_with_str_and_init(
         input: impl ::wasm_bindgen::JsStringLike,
         init: &RequestInit,
     ) -> Result<Response, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "fetch")]
+    pub fn fetch_with_str_and_init_promise(
+        input: impl ::wasm_bindgen::JsStringLike,
+        init: &RequestInit,
+    ) -> Result<Promise<Response>, JsValue>;
 }

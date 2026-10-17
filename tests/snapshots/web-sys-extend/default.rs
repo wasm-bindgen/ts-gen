@@ -69,9 +69,15 @@ extern "C" {
     #[doc = " Parse the body as JSON and return a typed result."]
     #[wasm_bindgen(method, catch, js_name = "jsonExt")]
     pub async fn json_ext<T: ::wasm_bindgen::JsGeneric>(this: &ResponseExt) -> Result<T, JsValue>;
+    #[doc = " Parse the body as JSON and return a typed result."]
+    #[wasm_bindgen(method, js_name = "jsonExt")]
+    pub fn json_ext_promise<T: ::wasm_bindgen::JsGeneric>(this: &ResponseExt) -> Promise<T>;
     #[doc = " Get the response body as a Uint8Array."]
     #[wasm_bindgen(method, catch)]
     pub async fn bytes(this: &ResponseExt) -> Result<ArrayBuffer, JsValue>;
+    #[doc = " Get the response body as a Uint8Array."]
+    #[wasm_bindgen(method, js_name = "bytes")]
+    pub fn bytes_promise(this: &ResponseExt) -> Promise<ArrayBuffer>;
     #[doc = " Whether the response was served from cache."]
     #[wasm_bindgen(method, getter)]
     pub fn cached(this: &ResponseExt) -> bool;
@@ -88,8 +94,20 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[doc = " Perform a fetch with extended options, returning an extended response."]
+    #[wasm_bindgen(js_name = "fetch")]
+    pub fn fetch_promise(input: &Request) -> Promise<ResponseExt>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[doc = " Perform a fetch with extended options, returning an extended response."]
     #[wasm_bindgen(catch, js_name = "fetch")]
     pub async fn fetch_with_str(input: &str) -> Result<ResponseExt, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[doc = " Perform a fetch with extended options, returning an extended response."]
+    #[wasm_bindgen(js_name = "fetch")]
+    pub fn fetch_with_str_promise(input: &str) -> Promise<ResponseExt>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -103,9 +121,27 @@ extern "C" {
 #[wasm_bindgen]
 extern "C" {
     #[doc = " Perform a fetch with extended options, returning an extended response."]
+    #[wasm_bindgen(js_name = "fetch")]
+    pub fn fetch_with_request_and_init_promise(
+        input: &Request,
+        init: &FetchOptions,
+    ) -> Promise<ResponseExt>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[doc = " Perform a fetch with extended options, returning an extended response."]
     #[wasm_bindgen(catch, js_name = "fetch")]
     pub async fn fetch_with_str_and_init(
         input: &str,
         init: &FetchOptions,
     ) -> Result<ResponseExt, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[doc = " Perform a fetch with extended options, returning an extended response."]
+    #[wasm_bindgen(js_name = "fetch")]
+    pub fn fetch_with_str_and_init_promise(
+        input: &str,
+        init: &FetchOptions,
+    ) -> Promise<ResponseExt>;
 }

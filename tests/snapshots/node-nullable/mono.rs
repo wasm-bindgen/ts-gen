@@ -185,10 +185,26 @@ extern "C" {
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {
+    #[doc = " `lookup`, resolved asynchronously."]
+    #[wasm_bindgen(catch, js_name = "lookupAsync")]
+    pub fn lookup_async_promise(
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<Option<Nullable<JsString>>>, JsValue>;
+}
+#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
+extern "C" {
     #[doc = " Resolves to `null` for an unknown key."]
     #[wasm_bindgen(catch)]
     pub async fn find(key: impl ::wasm_bindgen::JsStringLike)
         -> Result<Nullable<Options>, JsValue>;
+}
+#[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
+extern "C" {
+    #[doc = " Resolves to `null` for an unknown key."]
+    #[wasm_bindgen(catch, js_name = "find")]
+    pub fn find_promise(
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<Nullable<Options>>, JsValue>;
 }
 #[wasm_bindgen(module = "node-nullable", experimental_generic_mono)]
 extern "C" {

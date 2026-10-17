@@ -1652,8 +1652,10 @@ keeps a sync binding infallible (no `catch`, plain `T`) and is the only
 way to get one under the flag. Async callables, constructors (always
 catch), setters (never catch) and property getters are not affected
 (a getter annotated `@throws {X}` catches under either policy; see
-[`@throws {X}` on getters](#throws-x-on-getters)). Without the flag,
-output is identical to the default.
+[`@throws {X}` on getters](#throws-x-on-getters)); an async callable's
+sync `<name>_promise` form (below) catches under the flag like any
+other sync primary. Without the flag, output is identical to the
+default.
 
 ## `Promise<T>` returns become `async fn`
 
@@ -1671,6 +1673,39 @@ pub async fn fetch(url: &str) -> Result<Response, JsValue>;
 * The async + catch form is already fallible — no `try_fetch` companion.
 * `wasm-bindgen` rewraps the `T` as `Promise<T>` on the JS side.
 * Constructors and setters never become async.
+
+### `<name>_promise` — the un-awaited form
+
+An `async fn` import calls into JS only when the returned future is
+first polled. Some callers need the JS call to have *started* by the
+time the statement ends: a Durable Object constructor gating itself on
+`blockConcurrencyWhile`, `ctx.waitUntil(promise)`, or a `Promise.race`
+against a signal. Every `Promise`-returning callable therefore also
+emits a sync sibling returning the typed promise itself:
+
+```rust
+#[wasm_bindgen(catch)]
+pub async fn fetch(url: &str) -> Result<Response, JsValue>;
+#[wasm_bindgen(js_name = "fetch")]
+pub fn fetch_promise(url: &str) -> Promise<Response>;
+```
+
+* The suffix is appended after any `_with_X` disambiguator
+  (`fetch_with_init_promise`), as `_js_string` is.
+* Rejection travels inside the promise (`Promise<T>: IntoFuture<Output
+  = Result<T, JsValue>>`), so `catch` on the sync form only covers a
+  synchronous throw. Under the default policy the form is plain, like
+  every other sync primary; under `--fallible` it catches and returns
+  `Result<Promise<T>, E>`, typed by `@throws` like the primary, and
+  `@throws {never}` makes it plain again.
+* A `Promise`-typed *property* is already a sync getter and gets no
+  sibling.
+
+The alternative, making the primary itself return `Promise<T>` and
+relying on `IntoFuture`, was rejected: the future's error is always
+`JsValue`, discarding `--errors-as-error` and `@throws` on every
+async binding, and under `--fallible` a sync throw and a rejection would need
+`?.await?`.
 
 ### Async return primitives lower to `js_sys` wrappers
 

@@ -88,6 +88,11 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
+    pub fn get_promise(
+        this: &Store,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<JsString>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_conditional(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
@@ -100,6 +105,12 @@ extern "C" {
         options: &Conditional,
     ) -> Result<Nullable<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
+    pub fn get_with_conditional_promise(
+        this: &Store,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &Conditional,
+    ) -> Result<Promise<Nullable<JsString>>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_get_options(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
@@ -111,10 +122,18 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions,
     ) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub fn get_with_get_options_promise(
+        this: &Store,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &GetOptions,
+    ) -> Result<Promise<JsString>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn first(this: &Store) -> Result<Nullable<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "first")]
     pub async fn first_js_string(this: &Store) -> Result<Nullable<JsString>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "first")]
+    pub fn first_promise(this: &Store) -> Result<Promise<Nullable<JsString>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "first")]
     pub async fn first_with_column(
         this: &Store,
@@ -125,12 +144,23 @@ extern "C" {
         this: &Store,
         column: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<JsString>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "first")]
+    pub fn first_with_column_promise(
+        this: &Store,
+        column: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<Nullable<JsString>>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn put(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Undefined, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "put")]
+    pub fn put_promise(
+        this: &Store,
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<Undefined>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub async fn put_with_key_and_value_and_options(
         this: &Store,
@@ -139,16 +169,34 @@ extern "C" {
         options: &GetOptions,
     ) -> Result<Undefined, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]
+    pub fn put_with_key_and_value_and_options_promise(
+        this: &Store,
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: impl ::wasm_bindgen::JsStringLike,
+        options: &GetOptions,
+    ) -> Result<Promise<Undefined>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub async fn put_with_entries(
         this: &Store,
         entries: &Object<JsString>,
     ) -> Result<Undefined, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "put")]
+    pub fn put_with_entries_promise(
+        this: &Store,
+        entries: &Object<JsString>,
+    ) -> Result<Promise<Undefined>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub async fn put_with_entries_and_options(
         this: &Store,
         entries: &Object<JsString>,
         options: &GetOptions,
     ) -> Result<Undefined, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "put")]
+    pub fn put_with_entries_and_options_promise(
+        this: &Store,
+        entries: &Object<JsString>,
+        options: &GetOptions,
+    ) -> Result<Promise<Undefined>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn find(
         this: &Store,
@@ -162,7 +210,15 @@ extern "C" {
         options: &GetOptions,
     ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "find")]
+    pub fn find_promise(
+        this: &Store,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &GetOptions,
+    ) -> Result<Promise<JsString>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "find")]
     pub async fn find_with_f64(this: &Store, key: f64) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "find")]
     pub async fn find_with_f64_js_string(this: &Store, key: f64) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "find")]
+    pub fn find_with_f64_promise(this: &Store, key: f64) -> Result<Promise<JsString>, JsValue>;
 }

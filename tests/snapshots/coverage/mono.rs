@@ -142,6 +142,13 @@ pub mod my_module {
     }
     #[wasm_bindgen(module = "my-module", experimental_generic_mono)]
     extern "C" {
+        #[wasm_bindgen(catch, js_name = "doWork")]
+        pub fn do_work_promise(
+            input: impl ::wasm_bindgen::JsStringLike,
+        ) -> Result<Promise<JsString>, JsValue>;
+    }
+    #[wasm_bindgen(module = "my-module", experimental_generic_mono)]
+    extern "C" {
         # [wasm_bindgen (extends = Object)]
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type WorkResult;
@@ -220,6 +227,11 @@ extern "C" {
         this: &DefaultProcessor,
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "process")]
+    pub fn process_promise(
+        this: &DefaultProcessor,
+        input: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<JsString>, JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn name(this: &DefaultProcessor) -> String;
     #[wasm_bindgen(method, getter, js_name = "name")]
@@ -506,12 +518,23 @@ extern "C" {
         this: &Cache,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Nullable<Map<JsString, Array<JsString>>>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub fn get_promise(
+        this: &Cache,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Promise<Nullable<Map<JsString, Array<JsString>>>>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn set(
         this: &Cache,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &Map<impl ::wasm_bindgen::JsStringLike, Array<impl ::wasm_bindgen::JsStringLike>>,
     ) -> Result<Undefined, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "set")]
+    pub fn set_promise(
+        this: &Cache,
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: &Map<impl ::wasm_bindgen::JsStringLike, Array<impl ::wasm_bindgen::JsStringLike>>,
+    ) -> Result<Promise<Undefined>, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

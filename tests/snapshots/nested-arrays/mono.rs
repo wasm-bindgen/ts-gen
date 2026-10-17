@@ -15,6 +15,8 @@ extern "C" {
     pub type Grid;
     #[wasm_bindgen(method, catch)]
     pub async fn rows(this: &Grid) -> Result<Array<Array<JsString>>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "rows")]
+    pub fn rows_promise(this: &Grid) -> Result<Promise<Array<Array<JsString>>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "putRows")]
     pub fn put_rows(this: &Grid, rows: &[Array<Number>]) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]

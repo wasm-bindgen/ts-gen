@@ -31,16 +31,33 @@ extern "C" {
         this: &DefaultFlags,
         default_value: &str,
     ) -> Result<DefaultDetails<JsString>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getStringDetails")]
+    pub fn get_string_details_promise(
+        this: &DefaultFlags,
+        default_value: &str,
+    ) -> Promise<DefaultDetails<JsString>>;
     #[wasm_bindgen(method, catch, js_name = "getBooleanDetails")]
     pub async fn get_boolean_details(
         this: &DefaultFlags,
         default_value: bool,
     ) -> Result<DefaultDetails<Boolean>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getBooleanDetails")]
+    pub fn get_boolean_details_promise(
+        this: &DefaultFlags,
+        default_value: bool,
+    ) -> Promise<DefaultDetails<Boolean>>;
     #[wasm_bindgen(method, catch, js_name = "getNumberDetails")]
     pub async fn get_number_details(
         this: &DefaultFlags,
         default_value: f64,
     ) -> Result<DefaultDetails<Number>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getNumberDetails")]
+    pub fn get_number_details_promise(
+        this: &DefaultFlags,
+        default_value: f64,
+    ) -> Promise<DefaultDetails<Number>>;
     #[wasm_bindgen(method, catch, js_name = "getStringArray")]
     pub async fn get_string_array(this: &DefaultFlags) -> Result<Array<JsString>, JsValue>;
+    #[wasm_bindgen(method, js_name = "getStringArray")]
+    pub fn get_string_array_promise(this: &DefaultFlags) -> Promise<Array<JsString>>;
 }

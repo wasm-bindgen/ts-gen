@@ -190,6 +190,11 @@ extern "C" {
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
+    #[wasm_bindgen(catch, js_name = "fetchTags")]
+    pub fn fetch_tags_promise() -> Result<Promise<Array<JsString>>, JsValue>;
+}
+#[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
+extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Labels;

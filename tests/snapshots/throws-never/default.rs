@@ -15,6 +15,9 @@ extern "C" {
     #[doc = " Async, declared infallible — emits `async fn -> Loaded` (no Result)."]
     #[wasm_bindgen(method)]
     pub async fn loaded(this: &NeverThrows) -> Loaded;
+    #[doc = " Async, declared infallible — emits `async fn -> Loaded` (no Result)."]
+    #[wasm_bindgen(method, js_name = "loaded")]
+    pub fn loaded_promise(this: &NeverThrows) -> Promise<Loaded>;
     #[doc = " Sync method without `@throws {never}` — keeps the `try_normal_op`"]
     #[doc = " companion as usual."]
     #[wasm_bindgen(method, js_name = "normalOp")]
@@ -72,4 +75,10 @@ extern "C" {
     #[doc = " Async free function with `@throws {never}` — no Result wrapper."]
     #[wasm_bindgen(js_name = "infallibleFetch")]
     pub async fn infallible_fetch(url: &str) -> JsString;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[doc = " Async free function with `@throws {never}` — no Result wrapper."]
+    #[wasm_bindgen(js_name = "infallibleFetch")]
+    pub fn infallible_fetch_promise(url: &str) -> Promise<JsString>;
 }

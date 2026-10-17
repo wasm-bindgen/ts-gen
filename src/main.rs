@@ -110,8 +110,8 @@ struct Cli {
     /// and returns `Result<T, E>`; `E` follows the usual rules
     /// (`@throws {T}`, else `JsValue`, or `js_sys::Error` under
     /// `--errors-as-error`). `@throws {never}` keeps a binding
-    /// infallible. Async callables, constructors and setters are
-    /// unchanged.
+    /// infallible. Async callables (though not their sync `_promise`
+    /// forms), constructors and setters are unchanged.
     #[arg(long = "fallible")]
     fallible: bool,
 
