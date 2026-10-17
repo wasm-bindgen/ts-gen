@@ -32,6 +32,29 @@ fn ts_gen_bin() -> PathBuf {
     PathBuf::from(env!("CARGO_BIN_EXE_ts-gen"))
 }
 
+/// A fresh output directory for one CLI run. The name includes the process
+/// id, so concurrent test runs (e.g. from separate worktrees) don't share or
+/// delete each other's output. It's removed on drop, including when the test
+/// panics.
+struct TempDir(PathBuf);
+
+impl TempDir {
+    fn new(name: &str) -> Self {
+        let dir = std::env::temp_dir().join(format!("ts-gen-{name}-{}", std::process::id()));
+        // Left over from an earlier process with the same id.
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir)
+            .unwrap_or_else(|e| panic!("Failed to create {}: {e}", dir.display()));
+        TempDir(dir)
+    }
+}
+
+impl Drop for TempDir {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_dir_all(&self.0);
+    }
+}
+
 /// Collect extra CLI args from `//! @ts-gen <args>` directive lines at the top
 /// of a `.d.ts` file. The text after the prefix is split on whitespace and
 /// returned as a flat list of arguments — no interpretation, just passthrough.
@@ -131,11 +154,8 @@ fn snapshot_test(fixture_name: &str) {
     // Collect any extra CLI flags from directive comments
     let extra_args = collect_directive_args(&fixture);
 
-    // Use a temp file for the CLI output
-    let out_dir = std::env::temp_dir().join(format!("ts-gen-snapshot-{base_name}"));
-    let _ = std::fs::remove_dir_all(&out_dir);
-    std::fs::create_dir_all(&out_dir).expect("Failed to create temp output dir");
-    let out_file = out_dir.join("bindings.rs");
+    let out_dir = TempDir::new(&format!("snapshot-{base_name}"));
+    let out_file = out_dir.0.join("bindings.rs");
 
     // Invoke the CLI binary: ts-gen --input <fixture> --output <out_file> [extra_args...]
     let output = Command::new(ts_gen_bin())
@@ -167,9 +187,6 @@ fn snapshot_test(fixture_name: &str) {
     });
 
     assert_snapshot(&snap_path, &rust_code);
-
-    // Clean up
-    let _ = std::fs::remove_dir_all(&out_dir);
 }
 
 /// Discover all `.d.ts` files in `tests/fixtures/` and run a snapshot test
@@ -234,15 +251,14 @@ fn snapshots() {
 #[test]
 fn typed_array_buffer_arguments_drop_without_a_warning() {
     let fixture = crate_root().join("tests/fixtures/typed-array-buffers.d.ts");
-    let out_file = std::env::temp_dir().join("ts-gen-typed-array-buffers.rs");
+    let out_dir = TempDir::new("typed-array-buffers");
     let output = Command::new(ts_gen_bin())
         .arg("--input")
         .arg(&fixture)
         .arg("--output")
-        .arg(&out_file)
+        .arg(out_dir.0.join("bindings.rs"))
         .output()
         .expect("Failed to execute ts-gen binary");
-    let _ = std::fs::remove_file(&out_file);
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(output.status.success(), "{stderr}");
     assert!(!stderr.contains("warning"), "{stderr}");
