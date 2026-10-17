@@ -28,7 +28,7 @@ export class Labels {
     this.flags = [];
   }
   add(...values) {
-    return describe(values.flat());
+    return describe(values);
   }
 }
 export const describeOptions = (options) =>

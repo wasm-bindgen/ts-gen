@@ -25,7 +25,7 @@ fn variadics_spread_any_list() {
     assert_eq!(sum(&[1.0, 2.5]), 3.5);
     assert_eq!(join_tags(&["x", "y"]), "x,y");
     let labels = Labels::new().unwrap();
-    assert_eq!(labels.add(&["a"]), "Array(string:a)");
+    assert_eq!(labels.add(&["a"]), "Array(object:a)");
     assert_eq!(labels.add_2(&["b", "c"]), "Array(string:b,string:c)");
 }
 
