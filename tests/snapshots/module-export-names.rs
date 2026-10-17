@@ -51,3 +51,25 @@ pub mod ns {
         pub use super::n::*;
     }
 }
+pub mod plain {
+    #[allow(unused_imports)]
+    use super::*;
+    #[wasm_bindgen(module = "plain")]
+    extern "C" {
+        pub fn make();
+    }
+    #[wasm_bindgen(module = "plain")]
+    extern "C" {
+        #[wasm_bindgen(catch, js_name = "make")]
+        pub fn try_make() -> Result<(), JsValue>;
+    }
+    #[wasm_bindgen(module = "plain")]
+    extern "C" {
+        pub fn create();
+    }
+    #[wasm_bindgen(module = "plain")]
+    extern "C" {
+        #[wasm_bindgen(catch, js_name = "create")]
+        pub fn try_create() -> Result<(), JsValue>;
+    }
+}
