@@ -495,6 +495,17 @@ impl<'a> ClassConfig<'a> {
 
     /// Type-level parameters mentioned by `tys`, in declaration order.
     fn mentioned_type_params(&self, scope: ScopeId, tys: &[&TypeRef]) -> Vec<String> {
+        let names = self.mentioned_type_param_names(scope, tys);
+        self.type_params
+            .iter()
+            .filter(|tp| names.contains(&tp.name))
+            .map(|tp| tp.name.clone())
+            .collect()
+    }
+
+    /// Every name in `tys` that resolves to a type parameter in `scope`
+    /// (type-level or callable-level), in appearance order.
+    fn mentioned_type_param_names(&self, scope: ScopeId, tys: &[&TypeRef]) -> Vec<String> {
         let Some(cgctx) = self.cgctx else {
             return Vec::new();
         };
@@ -502,11 +513,7 @@ impl<'a> ClassConfig<'a> {
         for ty in tys {
             super::signatures::collect_type_params(ty, cgctx, scope, &mut names);
         }
-        self.type_params
-            .iter()
-            .filter(|tp| names.contains(&tp.name))
-            .map(|tp| tp.name.clone())
-            .collect()
+        names
     }
 
     /// Generic declaration for Rust helper impls and builder structs. The
@@ -1615,9 +1622,9 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 } else {
                     TypeRef::ident(config.rust_name.clone())
                 };
-                // Constructors don't have their own type parameter scope —
-                // they instantiate the class's, and resolve in the body of
-                // the declaration each is written in.
+                // Each constructor resolves in the body of the declaration
+                // it is written in, or in its construct signature's own
+                // scope when that declares `<T>` (`new <T>(…): Foo<T>`).
                 let overloads: Vec<Overload> = constructor_overloads
                     .iter()
                     .map(|c| Overload {
@@ -1912,30 +1919,32 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
     let doc = super::doc_tokens(&sig.doc);
     let has_variadic = sig.params.last().is_some_and(|p| p.variadic);
 
-    let return_type = if CodegenContext::generic_mono(config.cgctx) || config.type_params.is_empty()
+    // Type parameters the arguments mention — the class's own or the
+    // construct signature's. A constructor-level `<T>` of the same
+    // name as a class-level one (the `declare var` pattern) binds the
+    // class parameter positionally by name.
+    let param_tys: Vec<&TypeRef> = sig.params.iter().map(|p| &p.type_ref).collect();
+    let mentioned = config.mentioned_type_param_names(scope, &param_tys);
+    let return_type = if CodegenContext::generic_mono(config.cgctx)
+        || config.type_params.is_empty()
+        || mentioned.is_empty()
     {
         sig.return_type.clone()
     } else {
-        let param_tys: Vec<&TypeRef> = sig.params.iter().map(|p| &p.type_ref).collect();
-        let mentioned = config.mentioned_type_params(scope, &param_tys);
-        if mentioned.is_empty() {
-            sig.return_type.clone()
-        } else {
-            TypeRef::generic(
-                config.rust_name.clone(),
-                config
-                    .type_params
-                    .iter()
-                    .map(|tp| {
-                        if mentioned.contains(&tp.name) {
-                            TypeRef::ident(tp.name.clone())
-                        } else {
-                            config.type_param_default_ref(tp)
-                        }
-                    })
-                    .collect(),
-            )
-        }
+        TypeRef::generic(
+            config.rust_name.clone(),
+            config
+                .type_params
+                .iter()
+                .map(|tp| {
+                    if mentioned.contains(&tp.name) {
+                        TypeRef::ident(tp.name.clone())
+                    } else {
+                        config.type_param_default_ref(tp)
+                    }
+                })
+                .collect(),
+        )
     };
     // Constructors always return the constructed type, wrapped in Result
     // when `catch` (which is always-true here per `SignatureKind::Constructor`).
@@ -1974,20 +1983,14 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
     let generics = if CodegenContext::generic_mono(config.cgctx) {
         render_generic_bounds(&generic_bounds_for_method(config, sig))
     } else {
-        // A constructor only binds the type-level parameters its own
+        // A constructor only binds the type parameters its own
         // arguments mention; the rest are instantiated at their
         // defaults in the return type so `Foo::new()` needs no turbofish.
-        let param_tys: Vec<&TypeRef> = sig.params.iter().map(|p| &p.type_ref).collect();
-        let mentioned = config.mentioned_type_params(scope, &param_tys);
-        if mentioned.is_empty() {
-            quote! {}
-        } else {
-            let bounds: Vec<TokenStream> = mentioned
-                .iter()
-                .map(|n| CodegenContext::type_param_decl(config.cgctx, n))
-                .collect();
-            render_generic_bounds(&bounds)
-        }
+        let bounds: Vec<TokenStream> = mentioned
+            .iter()
+            .map(|n| CodegenContext::type_param_decl(config.cgctx, n))
+            .collect();
+        render_generic_bounds(&bounds)
     };
 
     quote! {

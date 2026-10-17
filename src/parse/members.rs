@@ -944,6 +944,7 @@ fn convert_class_method(
         MethodDefinitionKind::Constructor => {
             vec![Member::Constructor(ConstructorMember {
                 scope: parent_scope,
+                type_params,
                 params,
                 doc,
                 throws: info.throws(),

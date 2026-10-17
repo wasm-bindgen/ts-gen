@@ -4,12 +4,6 @@
 use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
-#[allow(dead_code)]
-use JsValue as Cf;
-#[allow(dead_code)]
-use JsValue as CfHostMetadata;
-#[allow(dead_code)]
-use JsValue as R;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[allow(non_upper_case_globals)]
