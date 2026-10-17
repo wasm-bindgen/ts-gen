@@ -168,6 +168,7 @@ Flags:
 | `--provides` | What the module provides, as for the main command |
 | `--lib-name` | JS module specifier, required when the `.d.ts` has top-level exports |
 | `-E`, `--export` | What the template covers, as for the main command; pass the same values |
+| `-e`, `--external` | External mappings, as for the main command; pass the same values |
 
 Hello-world flow:
 
