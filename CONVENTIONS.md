@@ -2208,6 +2208,14 @@ pub fn a(this: &Win);
 pub fn b(this: &Win);
 ```
 
+That includes the split TypeScript's own libs use, an interface in one
+file and its constructor `var` in another (`declare var X: { new(): X;
+… }` or `declare var X: XConstructor`): in either order they are one
+class, as within a file, though across files `XConstructor` is also
+emitted as a type. A value never takes a type's name, so `interface F`
+and `declare function F(): F` in different files keep `F` the
+interface.
+
 A file without `--lib-name` is read as a script, its globals are its
 exports, and selecting it emits each of them whole, members from other
 files included. Without `--export`, every input file is selected.

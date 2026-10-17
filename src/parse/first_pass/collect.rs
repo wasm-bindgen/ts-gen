@@ -572,6 +572,9 @@ impl<'a> CollectCtx<'a> {
                 self.register_type(name, ir::RegisteredKind::Variable, ctx, scope, exported);
                 return;
             }
+            self.registry
+                .unpaired_ctor_vars
+                .insert((scope, name.to_string()), ctor);
         }
         if self.registry.kind(scope, name).is_none() {
             self.register_type(name, ir::RegisteredKind::Variable, ctx, scope, exported);

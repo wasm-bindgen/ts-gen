@@ -993,6 +993,13 @@ pub struct TypeRegistry {
     /// Constructor-shaped variables whose name a type alias in the same
     /// scope takes as the type. The alias keeps the binding.
     pub alias_constructors: std::collections::HashSet<(crate::parse::scope::ScopeId, String)>,
+    /// Global `declare var X: XConstructor` pairs with no instance interface
+    /// `X` in the file, keyed as `ctor_interfaces`. Another file may declare
+    /// it, so population keeps the static side for that merge.
+    pub unpaired_ctor_vars: indexmap::IndexMap<
+        (crate::parse::scope::ScopeId, String),
+        (crate::parse::scope::ScopeId, String),
+    >,
     /// Key of the export map listing the globals the file declares, if it
     /// declares any (see [`Module::file_roots`]).
     pub globals: Option<crate::parse::scope::ScopeId>,

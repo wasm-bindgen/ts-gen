@@ -242,7 +242,7 @@ fn parse_single_file(
     let mut scopes = std::mem::take(&mut gctx.scopes);
     let mut diag = std::mem::take(&mut gctx.diagnostics);
     let type_arena_snapshot = gctx.type_arena().to_vec();
-    let (declarations, mut namespace_members) = first_pass::populate_declarations(
+    let (declarations, mut namespace_members, mut static_sides) = first_pass::populate_declarations(
         program,
         &registry,
         lib_name,
@@ -263,6 +263,7 @@ fn parse_single_file(
     let mut cx = InsertCtx {
         gctx,
         namespace_members: &mut namespace_members,
+        static_sides: &mut static_sides,
         module_scopes: &registry.module_scopes,
         assigned_namespaces: &registry.assigned_namespaces,
         file_scope,
@@ -300,6 +301,7 @@ fn parse_single_file(
 struct InsertCtx<'a> {
     gctx: &'a mut GlobalContext,
     namespace_members: &'a mut first_pass::NamespaceMembers,
+    static_sides: &'a mut first_pass::StaticSides,
     module_scopes: &'a std::collections::HashMap<String, ScopeId>,
     assigned_namespaces: &'a std::collections::HashMap<ScopeId, String>,
     file_scope: ScopeId,
@@ -340,8 +342,6 @@ impl InsertCtx<'_> {
             _ => None,
         };
         let file_scope = self.file_scope;
-        let name = declaration_name(&decl.kind);
-        let local = binding_name(&decl.kind);
         let decl_scope = decl.scope_id;
         let flat_scope = match &decl.module_context {
             crate::ir::ModuleContext::Module(m) => Some(
@@ -355,32 +355,59 @@ impl InsertCtx<'_> {
         let global = (flat_scope.is_none() && decl_scope == file_scope)
             .then(|| self.gctx.scopes.get(file_scope).parent)
             .flatten();
-        let mut type_id = self.gctx.insert_type(decl);
-        if let Some(existing) = name.as_ref().and_then(|n| self.earlier(decl_scope, n)) {
-            if self.merge_into(existing, type_id) {
-                type_id = existing;
+        let block = match (global, flat_scope) {
+            (Some(global), _) => global,
+            (None, Some(flat_scope))
+                if top_level && !self.assigned_namespaces.contains_key(&decl_scope) =>
+            {
+                flat_scope
             }
+            _ => decl_scope,
+        };
+        let static_side = match &decl.kind {
+            crate::ir::TypeKind::Variable(v) => {
+                self.static_sides.remove(&(decl_scope, v.js_name.clone()))
+            }
+            _ => None,
+        };
+        let placeholder = binding_name(&decl.kind);
+        let mut type_id = self.gctx.insert_type(decl);
+        if let Some(class) = static_side {
+            self.gctx.static_sides.insert(type_id, class);
         }
-        let earlier_global = global
-            .zip(name.as_ref())
-            .and_then(|(global, name)| self.earlier(global, name));
-        if let Some(existing) = earlier_global {
+        let earlier: Vec<_> = placeholder
+            .as_ref()
+            .map(|local| self.gctx.declarations(block, local))
+            .unwrap_or_default()
+            .iter()
+            .copied()
+            .filter(|id| id.index() < self.file_start)
+            .collect();
+        for existing in earlier {
             if self.merge_into(existing, type_id) {
                 type_id = existing;
+                break;
             }
         }
         let gctx = &mut *self.gctx;
+        let merged = &gctx.get_type(type_id).kind;
+        let name = declaration_name(merged);
+        let local = binding_name(merged);
+        let binds_value = is_value(merged);
         // A namespace merged with a same-named class, function or
-        // interface leaves that declaration as the name's type.
+        // interface leaves that declaration as the name's type, and a value
+        // never takes a type's binding.
         let yields = |gctx: &GlobalContext, scope: ScopeId| {
-            members.is_some()
-                && name.as_ref().is_some_and(|name| {
-                    gctx.scopes.get(scope).get(name).is_some_and(|id| {
-                        id != type_id
-                            && !gctx.builtin_type_ids.contains(&id)
-                            && !matches!(gctx.get_type(id).kind, crate::ir::TypeKind::Namespace(_))
-                    })
+            name.as_ref().is_some_and(|name| {
+                gctx.scopes.get(scope).get(name).is_some_and(|id| {
+                    id != type_id
+                        && !gctx.builtin_type_ids.contains(&id)
+                        && match &gctx.get_type(id).kind {
+                            crate::ir::TypeKind::Namespace(_) => false,
+                            kind => members.is_some() || (binds_value && !is_value(kind)),
+                        }
                 })
+            })
         };
         // Members of a namespace inside a module are flattened into the
         // module but declared in the namespace scope, which also needs the
@@ -399,28 +426,13 @@ impl InsertCtx<'_> {
                 gctx.scopes.insert(global, name.clone(), type_id);
             }
         }
-        let block = match (global, flat_scope) {
-            (Some(global), _) => global,
-            (None, Some(flat_scope))
-                if top_level && !self.assigned_namespaces.contains_key(&decl_scope) =>
-            {
-                flat_scope
-            }
-            _ => decl_scope,
-        };
         if let Some(local) = local {
             gctx.declare(block, &local, type_id);
+            if global.is_some() {
+                prefer_global_type(gctx, block, &local);
+            }
         }
         type_id
-    }
-
-    /// An earlier file's declaration `scope` binds to `name`.
-    fn earlier(&self, scope: ScopeId, name: &str) -> Option<crate::context::TypeId> {
-        self.gctx
-            .scopes
-            .get(scope)
-            .get(name)
-            .filter(|id| id.index() < self.file_start && !self.gctx.builtin_type_ids.contains(id))
     }
 
     /// Merge the declaration `new` into `existing` where the two would merge
@@ -445,17 +457,32 @@ impl InsertCtx<'_> {
             *self.gctx.get_type_mut(existing) = base;
             return true;
         }
-        // A redeclared `var` has the same type, so it is one variable.
-        if matches!(
-            (&base.kind, &incoming.kind),
-            (TypeKind::Variable(_), TypeKind::Variable(_))
-        ) {
-            return true;
-        }
-        let merged = dedup_function_overloads(merge_class_pairs(vec![base, incoming]));
+        let sides = &mut self.gctx.static_sides;
+        let pair = match (&base.kind, &incoming.kind) {
+            // A redeclared `var` has the same type, so it is one variable.
+            (TypeKind::Variable(_), TypeKind::Variable(_)) => {
+                if let Some(side) = sides.remove(&new) {
+                    sides.entry(existing).or_insert(side);
+                }
+                return true;
+            }
+            // An interface and a constructor-shaped `var` declared in
+            // different files are one class, as within a file.
+            (TypeKind::Interface(_), TypeKind::Variable(_)) => match sides.get(&new) {
+                Some(side) => vec![base, side.clone()],
+                None => return false,
+            },
+            (TypeKind::Variable(_), TypeKind::Interface(_)) => match sides.get(&existing) {
+                Some(side) => vec![side.clone(), incoming],
+                None => return false,
+            },
+            _ => vec![base, incoming],
+        };
+        let merged = dedup_function_overloads(merge_class_pairs(pair));
         match <[_; 1]>::try_from(merged) {
             Ok([merged]) => {
                 *self.gctx.get_type_mut(existing) = merged;
+                self.gctx.static_sides.remove(&existing);
                 true
             }
             Err(_) => false,
@@ -781,6 +808,41 @@ pub(crate) fn binding_name(kind: &crate::ir::TypeKind) -> Option<String> {
         crate::ir::TypeKind::Variable(v) => Some(v.js_name.clone()),
         kind => declaration_name(kind),
     }
+}
+
+/// Make the type among the global declarations of `name` what each declaring
+/// file's scope binds it to. A value's phase 1 placeholder holds the name
+/// there, and within one file the type's population replaces it, but a
+/// type another file declares would be shadowed by it.
+fn prefer_global_type(gctx: &mut GlobalContext, global: ScopeId, name: &str) {
+    use crate::ir::TypeKind;
+    let ids = gctx.declarations(global, name).to_vec();
+    let Some(&ty) = ids.iter().find(|&&id| {
+        !matches!(
+            gctx.get_type(id).kind,
+            TypeKind::Function(_) | TypeKind::Variable(_) | TypeKind::Namespace(_)
+        )
+    }) else {
+        return;
+    };
+    for id in ids {
+        let scope = gctx.get_type(id).scope_id;
+        let shadows = gctx
+            .scopes
+            .get(scope)
+            .get(name)
+            .is_some_and(|bound| is_value(&gctx.get_type(bound).kind));
+        if shadows {
+            gctx.scopes.insert(scope, name.to_string(), ty);
+        }
+    }
+}
+
+fn is_value(kind: &crate::ir::TypeKind) -> bool {
+    matches!(
+        kind,
+        crate::ir::TypeKind::Function(_) | crate::ir::TypeKind::Variable(_)
+    )
 }
 
 /// Extract the name from a declaration kind, if it has one.

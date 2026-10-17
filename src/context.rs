@@ -74,6 +74,10 @@ pub struct GlobalContext {
     /// an export map's local names refer to. The global scope holds every
     /// global, with the declarations of all files merged.
     declarations: std::collections::HashMap<ScopeId, indexmap::IndexMap<String, Vec<TypeId>>>,
+    /// The static side of a global constructor-shaped `var` (see
+    /// [`crate::parse::first_pass::StaticSides`]), by the var's id, for an
+    /// instance interface a later file declares.
+    pub(crate) static_sides: std::collections::HashMap<TypeId, TypeDeclaration>,
     types: Vec<TypeDeclaration>,
     modules: Vec<ParsedModule>,
     /// Map from module specifier to ModuleId for fast lookup.
@@ -161,6 +165,7 @@ impl GlobalContext {
             assigned_namespaces: std::collections::HashMap::new(),
             exports: ModuleExports::default(),
             declarations: std::collections::HashMap::new(),
+            static_sides: std::collections::HashMap::new(),
             types: Vec::new(),
             modules: Vec::new(),
             module_index: std::collections::HashMap::new(),
