@@ -1,6 +1,6 @@
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{Array, Function, JsString, Number};
+use js_sys::{Array, Function, JsString, Nullable, Number};
 use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::enum_positions_mono::{
@@ -26,8 +26,8 @@ async fn enum_positions_mono_compile(
     let _: Mode = holder.get();
     let levels: Holder<Level> = probe.holder(&holder);
     let _: Level = levels.get();
-    let maybe: Holder<Option<Mode>> = probe.maybe_holder();
-    let _: Option<Mode> = maybe.get();
+    let maybe: Holder<Nullable<Mode>> = probe.maybe_holder();
+    let _: Nullable<Mode> = maybe.get();
 
     let details: Details<Mode> = Details::builder(Mode::Fast).fallback(Mode::Slow).build();
     let _: Mode = details.value();

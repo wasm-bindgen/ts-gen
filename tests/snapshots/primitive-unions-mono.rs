@@ -88,6 +88,22 @@ extern "C" {
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
+    #[wasm_bindgen(js_name = "setNullable")]
+    fn set_nullable_with_null_js(value: &::wasm_bindgen::JsValue);
+}
+pub fn set_nullable_with_null() {
+    set_nullable_with_null_js(&::wasm_bindgen::JsValue::NULL)
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "setNullable")]
+    fn try_set_nullable_with_null_js(value: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+}
+pub fn try_set_nullable_with_null() -> Result<(), JsValue> {
+    try_set_nullable_with_null_js(&::wasm_bindgen::JsValue::NULL)
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
     #[wasm_bindgen(js_name = "setMaybe")]
     pub fn set_maybe();
 }

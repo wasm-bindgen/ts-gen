@@ -265,15 +265,28 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_data(this: &LinkedList, val: &JsValue);
     #[wasm_bindgen(method, getter)]
-    pub fn next(this: &LinkedList) -> Option<LinkedList>;
+    pub fn next(this: &LinkedList) -> Nullable<LinkedList>;
     #[wasm_bindgen(method, setter)]
     pub fn set_next(this: &LinkedList, val: &LinkedList);
+    #[wasm_bindgen(method, setter, js_name = "next")]
+    fn set_next_with_null_js(this: &LinkedList, val: &::wasm_bindgen::JsValue);
+}
+impl LinkedList {
+    pub fn set_next_with_null(&self) {
+        self.set_next_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    }
 }
 impl LinkedList {
     pub fn new(data: &JsValue, next: &LinkedList) -> LinkedList {
         let inner: LinkedList = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_data(data);
         inner.set_next(next);
+        inner
+    }
+    pub fn new_with_null(data: &JsValue) -> LinkedList {
+        let inner: LinkedList = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_data(data);
+        inner.set_next_with_null();
         inner
     }
 }
@@ -454,9 +467,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Storage;
     #[wasm_bindgen(method, js_name = "getItem")]
-    pub fn get_item(this: &Storage, key: &str) -> Option<String>;
+    pub fn get_item(this: &Storage, key: &str) -> Nullable<String>;
     #[wasm_bindgen(method, catch, js_name = "getItem")]
-    pub fn try_get_item(this: &Storage, key: &str) -> Result<Option<String>, JsValue>;
+    pub fn try_get_item(this: &Storage, key: &str) -> Result<Nullable<String>, JsValue>;
     #[wasm_bindgen(method, js_name = "setItem")]
     pub fn set_item(this: &Storage, key: &str, value: &str);
     #[wasm_bindgen(method, catch, js_name = "setItem")]
@@ -481,7 +494,7 @@ extern "C" {
     pub async fn get(
         this: &Cache,
         key: &str,
-    ) -> Result<JsOption<Map<JsString, Array<JsString>>>, JsValue>;
+    ) -> Result<JsNullable<Map<JsString, Array<JsString>>>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn set(
         this: &Cache,
@@ -505,11 +518,13 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_record(this: &FetchOptions, val: &Object<JsString>);
     #[wasm_bindgen(method, getter)]
-    pub fn body(this: &FetchOptions) -> Option<BodyKind>;
+    pub fn body(this: &FetchOptions) -> Option<Nullable<BodyKind>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_body(this: &FetchOptions, val: &str);
     #[wasm_bindgen(method, setter, js_name = "body")]
     pub fn set_body_with_array_buffer(this: &FetchOptions, val: &ArrayBuffer);
+    #[wasm_bindgen(method, setter, js_name = "body")]
+    fn set_body_with_null_js(this: &FetchOptions, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
     pub fn redirect(this: &FetchOptions) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -518,6 +533,11 @@ extern "C" {
     pub fn signal(this: &FetchOptions) -> Option<AbortSignal>;
     #[wasm_bindgen(method, setter)]
     pub fn set_signal(this: &FetchOptions, val: &AbortSignal);
+}
+impl FetchOptions {
+    pub fn set_body_with_null(&self) {
+        self.set_body_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    }
 }
 impl FetchOptions {
     pub fn new() -> FetchOptions {
@@ -551,6 +571,10 @@ impl FetchOptionsBuilder {
     }
     pub fn body_with_array_buffer(self, val: &ArrayBuffer) -> Self {
         self.inner.set_body_with_array_buffer(val);
+        self
+    }
+    pub fn body_with_null(self) -> Self {
+        self.inner.set_body_with_null();
         self
     }
     pub fn redirect(self, val: &str) -> Self {

@@ -19,7 +19,7 @@ use std::collections::BTreeSet;
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::ir::TypeRef;
+use crate::ir::{Nullability, TypeRef};
 
 /// One TypeScript value-primitive category. Declaration order is the
 /// alphabetical order `js-sys` uses to spell trait names.
@@ -194,7 +194,53 @@ impl PrimitiveUnion {
 /// no trait covers them, so the `symbol`-bearing leaves stay separate and
 /// only the rest group: `string | number | symbol | boolean` becomes
 /// `[boolean | number | string, symbol]`.
+///
+/// Leaves under the same carrier group the same way (`Option<string>`,
+/// `Option<number>` become `Option<number | string>`), as the marker traits
+/// carry the carriers' ABI.
 pub(crate) fn group_alternatives(alts: Vec<TypeRef>, keep_literals: bool) -> Vec<TypeRef> {
+    let mut out = group_leaves(alts, keep_literals);
+    let wrapped = |ty: &TypeRef| match ty {
+        TypeRef::Nullable(inner, n) if leaf_categories(inner).is_some() => Some(*n),
+        _ => None,
+    };
+    let mut carriers: Vec<Nullability> = Vec::new();
+    for n in out.iter().filter_map(wrapped) {
+        if !carriers.contains(&n) {
+            carriers.push(n);
+        }
+    }
+    for n in carriers {
+        let (members, rest): (Vec<TypeRef>, Vec<TypeRef>) =
+            out.iter().cloned().partition(|ty| wrapped(ty) == Some(n));
+        let inners: Vec<TypeRef> = members
+            .iter()
+            .map(|ty| match ty {
+                TypeRef::Nullable(inner, _) => (**inner).clone(),
+                _ => unreachable!(),
+            })
+            .collect();
+        let grouped = group_leaves(inners.clone(), keep_literals);
+        if grouped == inners {
+            continue;
+        }
+        let first = out.iter().position(|ty| wrapped(ty) == Some(n)).unwrap();
+        let before = out[..first]
+            .iter()
+            .filter(|ty| wrapped(ty) != Some(n))
+            .count();
+        out = rest;
+        out.splice(
+            before..before,
+            grouped
+                .into_iter()
+                .map(|ty| TypeRef::Nullable(Box::new(ty), n)),
+        );
+    }
+    out
+}
+
+fn group_leaves(alts: Vec<TypeRef>, keep_literals: bool) -> Vec<TypeRef> {
     let is_candidate =
         |ty: &TypeRef| leaf_categories(ty).is_some() && !(keep_literals && is_literal(ty));
     if let Some(grouped) = group_where(&alts, is_candidate) {
@@ -397,6 +443,21 @@ mod tests {
             group_alternatives(vec![TypeRef::PropertyKey], false),
             vec![TypeRef::PropertyKey]
         );
+    }
+
+    #[test]
+    fn grouping_merges_leaves_under_the_same_carrier() {
+        let opt = |ty: TypeRef| TypeRef::Nullable(Box::new(ty), Nullability::UNDEFINED);
+        let alts = vec![opt(TypeRef::String), opt(TypeRef::Number), TypeRef::Null];
+        assert_eq!(
+            group_alternatives(alts, false),
+            [
+                opt(union(&[TypeRef::String, TypeRef::Number])),
+                TypeRef::Null
+            ]
+        );
+        let mixed = vec![opt(TypeRef::String), TypeRef::Number];
+        assert_eq!(group_alternatives(mixed.clone(), false), mixed);
     }
 
     #[test]

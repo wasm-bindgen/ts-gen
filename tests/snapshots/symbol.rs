@@ -34,12 +34,12 @@ extern "C" {
 }
 #[wasm_bindgen(module = "symbol")]
 extern "C" {
-    pub fn find(name: &str) -> Option<Symbol>;
+    pub fn find(name: &str) -> Nullable<Symbol>;
 }
 #[wasm_bindgen(module = "symbol")]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "find")]
-    pub fn try_find(name: &str) -> Result<Option<Symbol>, JsValue>;
+    pub fn try_find(name: &str) -> Result<Nullable<Symbol>, JsValue>;
 }
 #[wasm_bindgen(module = "symbol")]
 extern "C" {

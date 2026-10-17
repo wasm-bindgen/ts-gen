@@ -14,7 +14,7 @@
 
 use oxc_ast::ast::*;
 
-use crate::ir::TypeRef;
+use crate::ir::{Nullability, TypeRef};
 use crate::parse::ctx::ParseCtx;
 use crate::parse::scope::{ScopeArena, ScopeId};
 use crate::util::diagnostics::DiagnosticCollector;
@@ -191,8 +191,9 @@ fn convert_ts_type_with_arena(
 
         // JSDoc types
         TSType::JSDocNullableType(nullable) => {
+            // JSDoc `?T` / `T?` is `T | null`.
             let inner = convert_ts_type_with_arena(&nullable.type_annotation, scope, scopes, diag);
-            TypeRef::Nullable(Box::new(inner))
+            simplify_union(vec![inner, TypeRef::Null])
         }
         TSType::JSDocNonNullableType(non_nullable) => {
             convert_ts_type_with_arena(&non_nullable.type_annotation, scope, scopes, diag)
@@ -327,7 +328,7 @@ fn convert_tuple_element(
         }
         TSTupleElement::TSOptionalType(opt) => {
             let inner = convert_ts_type_with_arena(&opt.type_annotation, scope, scopes, diag);
-            TypeRef::Nullable(Box::new(inner))
+            TypeRef::Nullable(Box::new(inner), Nullability::UNDEFINED)
         }
         // All remaining variants are TSType variants flattened by inherit_variants!
         other => match other.as_ts_type() {
@@ -478,28 +479,44 @@ fn convert_literal_type(lit: &TSLiteralType<'_>, _diag: &mut DiagnosticCollector
 /// `string | null | undefined` all become `Nullable<String>`.
 pub(crate) fn simplify_union(types: Vec<TypeRef>) -> TypeRef {
     let mut non_null_types = Vec::new();
-    let mut has_null = false;
-    let mut has_undefined = false;
+    let mut n = Nullability {
+        null: false,
+        undefined: false,
+    };
 
-    for ty in types {
+    fn sort(ty: TypeRef, n: &mut Nullability, rest: &mut Vec<TypeRef>) {
         match ty {
-            TypeRef::Null => has_null = true,
-            TypeRef::Undefined => has_undefined = true,
-            TypeRef::Void => has_undefined = true,
-            other => non_null_types.push(other),
+            TypeRef::Null => n.null = true,
+            TypeRef::Undefined | TypeRef::Void => n.undefined = true,
+            // `(T | null) | undefined` flattens into one layer; the inner
+            // may itself be an empty type (`undefined | undefined`).
+            TypeRef::Nullable(inner, m) => {
+                *n = n.union(m);
+                sort(*inner, n, rest);
+            }
+            other => rest.push(other),
         }
+    }
+    for ty in types {
+        sort(ty, &mut n, &mut non_null_types);
     }
 
     let core_type = if non_null_types.len() == 1 {
         non_null_types.pop().unwrap()
     } else if non_null_types.is_empty() {
-        return TypeRef::Null;
+        // `null | undefined` keeps both: `null` as the value, `undefined`
+        // as the empty.
+        return match (n.null, n.undefined) {
+            (true, true) => TypeRef::Nullable(Box::new(TypeRef::Null), Nullability::UNDEFINED),
+            (true, false) => TypeRef::Null,
+            _ => TypeRef::Undefined,
+        };
     } else {
         TypeRef::Union(non_null_types)
     };
 
-    if has_null || has_undefined {
-        TypeRef::Nullable(Box::new(core_type))
+    if n.null || n.undefined {
+        TypeRef::Nullable(Box::new(core_type), n)
     } else {
         core_type
     }
@@ -591,6 +608,45 @@ mod tests {
         assert_eq!(
             f.params[3].type_ref,
             TypeRef::generic("Array", vec![TypeRef::String, TypeRef::Number])
+        );
+    }
+
+    #[test]
+    fn simplify_union_keeps_each_empty() {
+        let s = || TypeRef::String;
+        assert_eq!(
+            simplify_union(vec![s(), TypeRef::Null, TypeRef::Undefined]),
+            TypeRef::Nullable(Box::new(s()), Nullability::BOTH)
+        );
+        assert_eq!(
+            simplify_union(vec![
+                TypeRef::Nullable(Box::new(s()), Nullability::NULL),
+                TypeRef::Void
+            ]),
+            TypeRef::Nullable(Box::new(s()), Nullability::BOTH)
+        );
+        // With no core type, `null` is the value and `undefined` the empty.
+        assert_eq!(
+            simplify_union(vec![TypeRef::Null, TypeRef::Undefined]),
+            TypeRef::Nullable(Box::new(TypeRef::Null), Nullability::UNDEFINED)
+        );
+        assert_eq!(simplify_union(vec![TypeRef::Null]), TypeRef::Null);
+        assert_eq!(
+            simplify_union(vec![TypeRef::Undefined, TypeRef::Void]),
+            TypeRef::Undefined
+        );
+    }
+
+    #[test]
+    fn jsdoc_nullable_admits_null() {
+        let (module, gctx) =
+            crate::parse_source("declare function f(a: ?string): void;", None).unwrap();
+        let crate::ir::TypeKind::Function(f) = &gctx.get_type(module.types[0]).kind else {
+            panic!("expected function");
+        };
+        assert_eq!(
+            f.params[0].type_ref,
+            TypeRef::Nullable(Box::new(TypeRef::String), Nullability::NULL)
         );
     }
 

@@ -1,7 +1,7 @@
 #![cfg(target_arch = "wasm32")]
 
 use js_sys::{Array, ArrayTuple, Function, JsString, Map, Uint8Array};
-use wasm_bindgen::convert::{FromWasmAbi, IntoWasmAbi, OptionFromWasmAbi};
+use wasm_bindgen::convert::{FromWasmAbi, IntoWasmAbi, MaybeFromWasmAbi};
 use wasm_bindgen::JsValue;
 
 use ts_gen_integration_tests::generic_mono::{
@@ -76,7 +76,7 @@ async fn generic_mono_signatures_compile(flags: &Flags, js_string: &JsString) {
 #[allow(dead_code)]
 async fn generic_mono_bounds_are_declared<T>(holder: &Holder<T>, store: &Store<T>, value: T)
 where
-    T: FromWasmAbi + IntoWasmAbi + OptionFromWasmAbi + 'static,
+    T: FromWasmAbi + IntoWasmAbi + MaybeFromWasmAbi + 'static,
 {
     holder.set(value);
     let _: T = holder.get();

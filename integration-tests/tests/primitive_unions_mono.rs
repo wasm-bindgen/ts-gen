@@ -5,7 +5,8 @@ use js_sys::{BigInt, JsString, Symbol};
 use ts_gen_integration_tests::primitive_unions_mono::{
     has_key, has_key_explicit, lookup, send, send_with_number_or_string, set_any,
     set_any_with_symbol, set_flag, set_keyed, set_keyed_with_symbol, set_level,
-    set_maybe_with_value, set_nullable, set_value, LevelKind, Settings, Store, Target,
+    set_maybe_with_value, set_nullable, set_nullable_with_null, set_value, LevelKind, Settings,
+    Store, Target,
 };
 
 // This fixture has no backing JavaScript module, so it provides compile-only
@@ -35,7 +36,11 @@ fn primitive_union_signatures_compile(js_string: &JsString, symbol: &Symbol, big
 
     set_level(1i32);
     set_level("auto");
-    set_nullable(3.0f32);
+    // `string | number | null`: the members group, `null` is its own arm.
+    set_nullable("s");
+    set_nullable(js_string);
+    set_nullable(3.0);
+    set_nullable_with_null();
     set_maybe_with_value("value");
     lookup(7usize);
 

@@ -36,9 +36,9 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "delete")]
     pub fn try_delete(this: &Headers, name: &str) -> Result<(), JsValue>;
     #[wasm_bindgen(method)]
-    pub fn get(this: &Headers, name: &str) -> Option<String>;
+    pub fn get(this: &Headers, name: &str) -> Nullable<String>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get(this: &Headers, name: &str) -> Result<Option<String>, JsValue>;
+    pub fn try_get(this: &Headers, name: &str) -> Result<Nullable<String>, JsValue>;
     #[wasm_bindgen(method)]
     pub fn has(this: &Headers, name: &str) -> bool;
     #[wasm_bindgen(method, catch, js_name = "has")]
@@ -87,7 +87,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn headers(this: &Request) -> Headers;
     #[wasm_bindgen(method, getter)]
-    pub fn body(this: &Request) -> Option<ReadableStream>;
+    pub fn body(this: &Request) -> Nullable<ReadableStream>;
     #[wasm_bindgen(method, getter, js_name = "bodyUsed")]
     pub fn body_used(this: &Request) -> bool;
     #[wasm_bindgen(method, getter)]
@@ -142,6 +142,8 @@ extern "C" {
     pub fn set_body_with_url_search_params(this: &RequestInit, val: &URLSearchParams);
     #[wasm_bindgen(method, setter, js_name = "body")]
     pub fn set_body_with_form_data(this: &RequestInit, val: &FormData);
+    #[wasm_bindgen(method, setter, js_name = "body")]
+    fn set_body_with_null_js(this: &RequestInit, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
     pub fn redirect(this: &RequestInit) -> Option<String>;
     #[wasm_bindgen(method, setter)]
@@ -150,6 +152,11 @@ extern "C" {
     pub fn signal(this: &RequestInit) -> Option<AbortSignal>;
     #[wasm_bindgen(method, setter)]
     pub fn set_signal(this: &RequestInit, val: &AbortSignal);
+}
+impl RequestInit {
+    pub fn set_body_with_null(&self) {
+        self.set_body_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    }
 }
 impl RequestInit {
     pub fn new() -> RequestInit {
@@ -205,6 +212,10 @@ impl RequestInitBuilder {
         self.inner.set_body_with_form_data(val);
         self
     }
+    pub fn body_with_null(self) -> Self {
+        self.inner.set_body_with_null();
+        self
+    }
     pub fn redirect(self, val: &str) -> Self {
         self.inner.set_redirect(val);
         self
@@ -239,6 +250,8 @@ extern "C" {
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_form_data(body: &FormData) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    fn new_with_null_js(body: &::wasm_bindgen::JsValue) -> Result<Response, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_readable_stream_and_init(
         body: &ReadableStream,
         init: &ResponseInit,
@@ -260,6 +273,11 @@ extern "C" {
     #[wasm_bindgen(constructor, catch, js_name = "Response")]
     pub fn new_with_form_data_and_init(
         body: &FormData,
+        init: &ResponseInit,
+    ) -> Result<Response, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Response")]
+    fn new_with_null_and_init_js(
+        body: &::wasm_bindgen::JsValue,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     # [wasm_bindgen (static_method_of = Response)]
@@ -287,7 +305,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn headers(this: &Response) -> Headers;
     #[wasm_bindgen(method, getter)]
-    pub fn body(this: &Response) -> Option<ReadableStream>;
+    pub fn body(this: &Response) -> Nullable<ReadableStream>;
     #[wasm_bindgen(method, getter, js_name = "bodyUsed")]
     pub fn body_used(this: &Response) -> bool;
     #[wasm_bindgen(method, getter)]
@@ -306,6 +324,14 @@ extern "C" {
     pub async fn blob(this: &Response) -> Result<Blob, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "formData")]
     pub async fn form_data(this: &Response) -> Result<FormData, JsValue>;
+}
+impl Response {
+    pub fn new_with_null() -> Result<Response, JsValue> {
+        Self::new_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn new_with_null_and_init(init: &ResponseInit) -> Result<Response, JsValue> {
+        Self::new_with_null_and_init_js(&::wasm_bindgen::JsValue::NULL, init)
+    }
 }
 #[wasm_bindgen]
 extern "C" {

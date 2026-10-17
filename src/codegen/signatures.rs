@@ -45,7 +45,7 @@ use quote::quote;
 
 use crate::codegen::primitive_unions;
 use crate::codegen::typemap::{self, CodegenContext, TypePosition};
-use crate::ir::{Param, SharedMemory, Throws, TypeRef};
+use crate::ir::{Nullability, Param, SharedMemory, Throws, TypeRef};
 use crate::parse::scope::ScopeId;
 use crate::util::naming::{ident_chars, snake_ident, to_snake_case, LocalScope, Suffix};
 
@@ -283,7 +283,7 @@ pub fn collect_type_params(
                 collect_type_params(a, cgctx, scope, out);
             }
         }
-        TypeRef::Array(inner) | TypeRef::Nullable(inner) => {
+        TypeRef::Array(inner) | TypeRef::Nullable(inner, _) => {
             collect_type_params(inner, cgctx, scope, out);
         }
         TypeRef::Union(members) | TypeRef::Intersection(members) | TypeRef::Tuple(members) => {
@@ -682,7 +682,8 @@ fn expand_single_overload(
 
     for (i, (param, mut type_alternatives)) in non_variadic.iter().zip(per_param_alts).enumerate() {
         if collapse_each && type_alternatives.len() > 1 {
-            type_alternatives = vec![flatten_collapse_to_lub(&param.type_ref, cgctx, scope)];
+            type_alternatives =
+                split_null_arm(vec![flatten_collapse_to_lub(&param.type_ref, cgctx, scope)]);
         }
 
         if param.optional {
@@ -842,6 +843,7 @@ fn flatten_type_with(
     let mut out: Vec<TypeRef> = Vec::new();
     if flatten_into(ty, cgctx, scope, &mut out) {
         pair_typed_array_slice(&mut out, cgctx, scope);
+        let out = split_null_arm(out);
         if cgctx.is_some_and(|ctx| ctx.experimental_generic_mono) {
             return primitive_unions::group_alternatives(out, keep_literals);
         }
@@ -856,7 +858,38 @@ fn flatten_type_with(
             FLATTEN_ALTERNATIVE_LIMIT,
         ));
     }
-    vec![flatten_collapse_to_lub(ty, cgctx, scope)]
+    split_null_arm(vec![flatten_collapse_to_lub(ty, cgctx, scope)])
+}
+
+/// A written `null` is an ordinary union arm: each alternative is taken
+/// without it (`Option<T>` where `undefined` is still admitted) and `null`
+/// has an arm of its own, whose parameter the emitters drop and pass `null`
+/// for (`f(x)` and `f_with_null()`; see [`super::null_arms`]). `any | null`
+/// is `any`, whose `&JsValue` already takes `null`, so it needs no arm.
+fn split_null_arm(alts: Vec<TypeRef>) -> Vec<TypeRef> {
+    let in_band = |inner: &TypeRef| matches!(inner, TypeRef::Any | TypeRef::Unknown);
+    let split = |t: &TypeRef| matches!(t, TypeRef::Nullable(inner, n) if n.null && !in_band(inner));
+    if !alts.iter().any(split) {
+        return alts;
+    }
+    let arm = !alts
+        .iter()
+        .any(|t| matches!(t, TypeRef::Nullable(inner, n) if n.null && in_band(inner)));
+    let mut out: Vec<TypeRef> = alts
+        .into_iter()
+        .map(|t| match t {
+            t if !split(&t) => t,
+            TypeRef::Nullable(inner, n) if n.undefined => {
+                TypeRef::Nullable(inner, Nullability::UNDEFINED)
+            }
+            TypeRef::Nullable(inner, _) => *inner,
+            t => t,
+        })
+        .collect();
+    if arm {
+        out.push(TypeRef::Null);
+    }
+    out
 }
 
 /// Pair a typed array with the `number[]` (or `bigint[]` for a 64-bit
@@ -867,15 +900,23 @@ fn flatten_type_with(
 /// alternative. With more than one typed array the element is ambiguous
 /// and nothing pairs, except for a `Uint8Array` beside a
 /// `Uint8ClampedArray`: both hold `u8`, so the slice is a `Uint8Array`.
+/// A nullable view keeps its empties (`Option<&[u8]>`, `Nullable<&[u8]>`).
+/// `Clamped` has no `Option` form, so a clamped view keeps neither.
 fn pair_typed_array_slice(
     alts: &mut Vec<TypeRef>,
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) {
     use crate::ir::TypedArrayElement as E;
+    fn peel_nullable(t: &TypeRef) -> (&TypeRef, Option<crate::ir::Nullability>) {
+        match t {
+            TypeRef::Nullable(inner, n) => (inner, Some(*n)),
+            t => (t, None),
+        }
+    }
     let typed: Vec<_> = alts
         .iter()
-        .filter_map(|t| match t {
+        .filter_map(|t| match peel_nullable(t).0 {
             TypeRef::Reference {
                 segments,
                 generic_args,
@@ -903,12 +944,17 @@ fn pair_typed_array_slice(
     };
     let Some(i) = alts
         .iter()
-        .position(|t| matches!(t, TypeRef::Array(inner) if pairs(inner)))
+        .position(|t| matches!(peel_nullable(t).0, TypeRef::Array(inner) if pairs(inner)))
     else {
         return;
     };
-    alts.remove(i);
-    alts.insert(0, TypeRef::TypedSlice(elem, shared));
+    let view = match peel_nullable(&alts.remove(i)).1 {
+        Some(n) if !elem.is_clamped() => {
+            TypeRef::Nullable(Box::new(TypeRef::TypedSlice(elem, shared)), n)
+        }
+        _ => TypeRef::TypedSlice(elem, shared),
+    };
+    alts.insert(0, view);
 }
 
 /// Push every flatten-alternative for `ty` into `out`. Returns
@@ -972,12 +1018,21 @@ fn flatten_into(
             true
         }
 
-        // Nullable: flatten the inner, dropping the `Null` arm.
-        // Argument-position `Nullable<T>` carries no useful overload
-        // information — a `_with_null(val: &Null)` variant is API
-        // noise. Return-position handling (`Option<T>` /
-        // `JsOption<T>`) is independent and lives in `to_syn_type`.
-        TypeRef::Nullable(inner) => flatten_into(inner, cgctx, scope, out),
+        // Nullable: fan out the inner and keep each alternative
+        // nullable; `split_null_arm` then lifts `null` into an arm of its
+        // own. An alternative that is itself nullable (through an alias)
+        // merges its empties into this one.
+        TypeRef::Nullable(inner, n) => {
+            let mut alts = Vec::new();
+            if !flatten_into(inner, cgctx, scope, &mut alts) {
+                return false;
+            }
+            out.extend(alts.into_iter().map(|alt| match alt {
+                TypeRef::Nullable(core, m) => TypeRef::Nullable(core, n.union(m)),
+                alt => TypeRef::Nullable(Box::new(alt), *n),
+            }));
+            true
+        }
 
         // `PropertyKey` stays whole for per-mono grouping so it keeps
         // the `js_sys::PropertyKey` spelling; otherwise it fans out like
@@ -1009,8 +1064,8 @@ fn flatten_into(
 ///
 /// Returns [`crate::codegen::subtyping::lub_union`] for unions
 /// (and aliases that chase through to one); otherwise returns the
-/// input unchanged. The `Null`-arm-drop applied by `Nullable`
-/// flattening carries through for argument-position consistency.
+/// input unchanged. A `Nullable` stays nullable around the collapsed
+/// inner.
 fn flatten_collapse_to_lub(
     ty: &TypeRef,
     cgctx: Option<&CodegenContext<'_>>,
@@ -1020,7 +1075,9 @@ fn flatten_collapse_to_lub(
         TypeRef::Union(members) => {
             crate::codegen::subtyping::lub_union(members, cgctx, scope).unwrap_or(TypeRef::Any)
         }
-        TypeRef::Nullable(inner) => flatten_collapse_to_lub(inner, cgctx, scope),
+        TypeRef::Nullable(inner, n) => {
+            TypeRef::Nullable(Box::new(flatten_collapse_to_lub(inner, cgctx, scope)), *n)
+        }
         TypeRef::PropertyKey => TypeRef::Any,
         TypeRef::Reference { .. } if ty.as_ident().is_some() => {
             if let Some(c) = cgctx {
@@ -1078,6 +1135,14 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
     // semantic disambiguation (`_with_record` + `_with_context`).
     let mut names = Vec::with_capacity(signatures.len());
     let mut used = LocalScope::default();
+    let is_null = |p: &ConcreteParam| matches!(p.type_ref, TypeRef::Null);
+    // `_with_null` names the arm when one parameter admits `null`; with more,
+    // each is named for its parameter (`_with_value_null`).
+    let null_positions: std::collections::HashSet<usize> = signatures
+        .iter()
+        .flat_map(|sig| sig.iter().enumerate().filter(|(_, p)| is_null(p)))
+        .map(|(i, _)| i)
+        .collect();
 
     for (sig_idx, sig) in signatures.iter().enumerate() {
         // The first signature gets the base name without any suffix;
@@ -1114,6 +1179,8 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
                     continue;
                 }
                 match other.get(abs_idx) {
+                    // A `null` arm names itself, not the arms beside it.
+                    Some(other_param) if is_null(other_param) && !is_null(param) => {}
                     Some(other_param) => {
                         if other_param.name == param.name && other_param.type_ref != param.type_ref
                         {
@@ -1135,7 +1202,11 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
             }
 
             let param_snake = snake_ident(&param.name);
-            let (text, from_type) = if any_same_name_different_type {
+            let (text, from_type) = if is_null(param) && null_positions.len() > 1 {
+                (format!("{param_snake}_null"), false)
+            } else if is_null(param) {
+                ("null".to_string(), false)
+            } else if any_same_name_different_type {
                 (type_snake_name(&param.type_ref), true)
             } else {
                 (param_snake.clone(), false)
@@ -1345,7 +1416,7 @@ fn type_snake_name(ty: &TypeRef) -> String {
             to_snake_case(head)
         }
         TypeRef::Array(_) | TypeRef::TypedSlice(..) => "slice".to_string(),
-        TypeRef::Nullable(inner) => type_snake_name(inner),
+        TypeRef::Nullable(inner, _) => type_snake_name(inner),
         TypeRef::Function(_) => "function".to_string(),
         _ => "js_value".to_string(),
     }
@@ -1371,6 +1442,8 @@ pub fn generate_concrete_params(
             let attr = param_attr(p, cgctx, scope);
             let ty = if p.variadic {
                 quote! { &[JsValue] }
+            } else if matches!(p.type_ref, TypeRef::Null) {
+                super::null_arms::marker()
             } else {
                 typemap::to_syn_type(
                     &p.type_ref,
@@ -1472,6 +1545,9 @@ pub(crate) fn render_param_type(
     if param.variadic {
         return quote! { &[JsValue] };
     }
+    if matches!(param.type_ref, TypeRef::Null) {
+        return super::null_arms::marker();
+    }
     cgctx
         .filter(|ctx| ctx.experimental_generic_mono)
         .and_then(|_| mono_argument_type(&param.type_ref))
@@ -1489,17 +1565,18 @@ pub(crate) fn render_param_type(
 /// Per-monomorphization argument bounds: strings become `impl
 /// JsStringLike`, and grouped primitive unions become the matching `impl
 /// js_sys::Js…Like` marker trait. Each occurrence is an independent
-/// anonymous type parameter.
+/// anonymous type parameter. The markers imply `MaybeIntoWasmAbi`, so they
+/// keep their place under a carrier (`Option<impl JsNumberOrStringLike>`).
 fn mono_argument_type(ty: &TypeRef) -> Option<TokenStream> {
-    let bound = |ty: &TypeRef| match ty {
-        TypeRef::String | TypeRef::StringLiteral(_) => {
-            Some(quote! { ::wasm_bindgen::JsStringLike })
-        }
-        _ => primitive_unions::PrimitiveUnion::classify(ty).map(|u| u.trait_path()),
-    };
+    let string = |t: &TypeRef| matches!(t, TypeRef::String | TypeRef::StringLiteral(_));
     match ty {
-        TypeRef::Nullable(inner) => bound(inner).map(|b| quote! { Option<impl #b> }),
-        _ => bound(ty).map(|b| quote! { impl #b }),
+        TypeRef::Nullable(inner, n) => {
+            mono_argument_type(inner).map(|marker| typemap::nullable_carrier(marker, *n))
+        }
+        t if string(t) => Some(quote! { impl ::wasm_bindgen::JsStringLike }),
+        _ => primitive_unions::PrimitiveUnion::classify(ty)
+            .map(|u| u.trait_path())
+            .map(|b| quote! { impl #b }),
     }
 }
 
@@ -1668,7 +1745,7 @@ fn abi_shape(ty: &syn::Type, params: &std::collections::HashSet<String>) -> AbiS
                 && matches!(p.path.segments[0].arguments, syn::PathArguments::None);
             match last.as_deref() {
                 Some(name) if bare && params.contains(name) => AbiShape::Dependent,
-                Some("Option" | "Vec" | "Box") => AbiShape::Dependent,
+                Some("Option" | "Nullable" | "Vec" | "Box") => AbiShape::Dependent,
                 _ => AbiShape::Imported,
             }
         }
@@ -1731,13 +1808,14 @@ fn state_fn_abi_bounds(f: &mut syn::ForeignItemFn) {
     };
     let into = quote! { ::wasm_bindgen::convert::IntoWasmAbi };
     let from = quote! { ::wasm_bindgen::convert::FromWasmAbi };
-    // `Option<T>` has its ABI exactly when `T: Option{Into,From}WasmAbi`,
-    // which is the form a generic caller writes.
+    // `Option<T>`, `Nullable<T>` and `Option<Nullable<T>>` have their ABI
+    // exactly when `T: Maybe{Into,From}WasmAbi`, which is the form a generic
+    // caller writes.
     let bounded = |ty: &syn::Type, abi: &TokenStream| -> (TokenStream, TokenStream) {
-        if let Some(inner) = option_param(ty, &params) {
+        if let Some(inner) = carrier_param(ty, &params) {
             let abi = match abi.to_string().contains("Into") {
-                true => quote! { ::wasm_bindgen::convert::OptionIntoWasmAbi },
-                false => quote! { ::wasm_bindgen::convert::OptionFromWasmAbi },
+                true => quote! { ::wasm_bindgen::convert::MaybeIntoWasmAbi },
+                false => quote! { ::wasm_bindgen::convert::MaybeFromWasmAbi },
             };
             return (inner.to_token_stream(), abi);
         }
@@ -1828,8 +1906,9 @@ fn is_bare_param(path: &syn::Path, params: &std::collections::HashSet<String>) -
         .is_some_and(|i| params.contains(&i.to_string()))
 }
 
-/// `T` of an `Option<T>` whose `T` is a bare type parameter.
-fn option_param<'t>(
+/// The bare type parameter `T` of an `Option<T>`, `Nullable<T>` or
+/// `Option<Nullable<T>>`.
+fn carrier_param<'t>(
     ty: &'t syn::Type,
     params: &std::collections::HashSet<String>,
 ) -> Option<&'t syn::Ident> {
@@ -1837,13 +1916,26 @@ fn option_param<'t>(
         return None;
     };
     let last = p.path.segments.last()?;
-    if last.ident != "Option" {
+    if last.ident != "Option" && last.ident != "Nullable" {
         return None;
     }
     let syn::PathArguments::AngleBracketed(args) = &last.arguments else {
         return None;
     };
-    let Some(syn::GenericArgument::Type(syn::Type::Path(inner))) = args.args.first() else {
+    let Some(syn::GenericArgument::Type(inner)) = args.args.first() else {
+        return None;
+    };
+    if let syn::Type::Path(nested) = inner {
+        if nested
+            .path
+            .segments
+            .last()
+            .is_some_and(|s| s.ident == "Nullable")
+        {
+            return carrier_param(inner, params);
+        }
+    }
+    let syn::Type::Path(inner) = inner else {
         return None;
     };
     inner
@@ -1905,7 +1997,7 @@ mod tests {
     use super::*;
     use crate::codegen::typemap::CodegenContext;
     use crate::context::GlobalContext;
-    use crate::ir::TypeRef;
+    use crate::ir::{Nullability, TypeRef};
 
     fn no_used() -> LocalScope {
         LocalScope::default()
@@ -1920,6 +2012,7 @@ mod tests {
                 pub async fn load<T, U>(this: &Store<T>, u: U, key: impl JsStringLike) -> Result<Holder<T>, JsValue>;
                 pub fn find<T>(value: &T, rest: Vec<T>) -> Option<T>;
                 pub fn plain(value: f64) -> f64;
+                pub fn nullable<T, U>(value: Nullable<T>, both: Option<Nullable<U>>) -> Option<Nullable<T>>;
             }
         };
         state_abi_bounds(&mut file.items);
@@ -1945,9 +2038,12 @@ mod tests {
             [
                 "where U : :: wasm_bindgen :: convert :: IntoWasmAbi , T : 'static",
                 "where T : :: wasm_bindgen :: convert :: RefIntoWasmAbi + \
-                 :: wasm_bindgen :: convert :: OptionFromWasmAbi , \
+                 :: wasm_bindgen :: convert :: MaybeFromWasmAbi , \
                  Vec < T > : :: wasm_bindgen :: convert :: IntoWasmAbi",
                 "",
+                "where T : :: wasm_bindgen :: convert :: MaybeIntoWasmAbi + \
+                 :: wasm_bindgen :: convert :: MaybeFromWasmAbi , \
+                 U : :: wasm_bindgen :: convert :: MaybeIntoWasmAbi",
             ]
         );
     }
@@ -1959,10 +2055,22 @@ mod tests {
             "impl :: wasm_bindgen :: JsStringLike"
         );
         assert_eq!(
-            mono_argument_type(&TypeRef::Nullable(Box::new(TypeRef::String)))
-                .unwrap()
-                .to_string(),
+            mono_argument_type(&TypeRef::Nullable(
+                Box::new(TypeRef::String),
+                Nullability::UNDEFINED
+            ))
+            .unwrap()
+            .to_string(),
             "Option < impl :: wasm_bindgen :: JsStringLike >"
+        );
+        assert_eq!(
+            mono_argument_type(&TypeRef::Nullable(
+                Box::new(TypeRef::String),
+                Nullability::NULL
+            ))
+            .unwrap()
+            .to_string(),
+            "Nullable < impl :: wasm_bindgen :: JsStringLike >"
         );
         assert!(mono_argument_type(&TypeRef::Number).is_none());
     }
@@ -1975,7 +2083,7 @@ mod tests {
             "impl :: js_sys :: JsNumberOrStringLike"
         );
         assert_eq!(
-            mono_argument_type(&TypeRef::Nullable(Box::new(union)))
+            mono_argument_type(&TypeRef::Nullable(Box::new(union), Nullability::UNDEFINED))
                 .unwrap()
                 .to_string(),
             "Option < impl :: js_sys :: JsNumberOrStringLike >"
@@ -3115,6 +3223,48 @@ mod tests {
                 TypeRef::TypedSlice(E::U8, SharedMemory::Rejected),
                 TypeRef::ident("Uint8ClampedArray"),
                 TypeRef::generic("Uint8Array", vec![TypeRef::ident("ArrayBuffer")]),
+            ]
+        );
+        let bytes = TypeRef::Union(vec![TypeRef::ident("Uint8Array"), array(TypeRef::Number)]);
+        let nullable = |n| flatten_no_ctx(&TypeRef::Nullable(Box::new(bytes.clone()), n));
+        let view = TypeRef::TypedSlice(E::U8, SharedMemory::Accepted);
+        let handle = |n| TypeRef::Nullable(Box::new(TypeRef::ident("Uint8Array")), n);
+        let undefined = Nullability::UNDEFINED;
+        assert_eq!(
+            nullable(undefined),
+            vec![
+                TypeRef::Nullable(Box::new(view.clone()), undefined),
+                handle(undefined)
+            ]
+        );
+        // A written `null` is an arm of its own beside the bare alternatives.
+        assert_eq!(
+            nullable(Nullability::NULL),
+            vec![view.clone(), TypeRef::ident("Uint8Array"), TypeRef::Null]
+        );
+        assert_eq!(
+            nullable(Nullability::BOTH),
+            vec![
+                TypeRef::Nullable(Box::new(view.clone()), undefined),
+                handle(undefined),
+                TypeRef::Null
+            ]
+        );
+        let clamped = TypeRef::Union(vec![
+            TypeRef::ident("Uint8ClampedArray"),
+            array(TypeRef::Number),
+        ]);
+        assert_eq!(
+            flatten_no_ctx(&TypeRef::Nullable(
+                Box::new(clamped),
+                Nullability::UNDEFINED
+            )),
+            vec![
+                TypeRef::TypedSlice(E::U8Clamped, SharedMemory::Accepted),
+                TypeRef::Nullable(
+                    Box::new(TypeRef::ident("Uint8ClampedArray")),
+                    Nullability::UNDEFINED
+                ),
             ]
         );
         for unpaired in [

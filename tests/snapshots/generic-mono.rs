@@ -59,14 +59,14 @@ extern "C" {
     #[wasm_bindgen(method)]
     pub fn find<T>(this: &Store<T>, key: impl ::wasm_bindgen::JsStringLike) -> Option<T>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        T: ::wasm_bindgen::convert::MaybeFromWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "find")]
     pub fn try_find<T>(
         this: &Store<T>,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        T: ::wasm_bindgen::convert::MaybeFromWasmAbi;
 }
 #[wasm_bindgen(module = "generic-mono", experimental_generic_mono)]
 extern "C" {
@@ -92,7 +92,10 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "variant")]
     pub fn variant_js_string<T>(this: &EvaluationDetails<T>) -> Option<JsString>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_variant<T>(this: &EvaluationDetails<T>, val: impl ::wasm_bindgen::JsStringLike);
+    pub fn set_variant<T>(
+        this: &EvaluationDetails<T>,
+        val: Option<impl ::wasm_bindgen::JsStringLike>,
+    );
 }
 impl<T: ::wasm_bindgen::convert::IntoWasmAbi> EvaluationDetails<T> {
     pub fn new(flag_key: impl ::wasm_bindgen::JsStringLike, value: T) -> EvaluationDetails<T> {
@@ -112,7 +115,7 @@ pub struct EvaluationDetailsBuilder<T> {
     inner: EvaluationDetails<T>,
 }
 impl<T: ::wasm_bindgen::convert::IntoWasmAbi> EvaluationDetailsBuilder<T> {
-    pub fn variant(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+    pub fn variant(self, val: Option<impl ::wasm_bindgen::JsStringLike>) -> Self {
         self.inner.set_variant(val);
         self
     }

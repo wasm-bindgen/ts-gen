@@ -61,7 +61,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn fallback<T>(this: &Details<T>) -> Option<T>
     where
-        T: ::wasm_bindgen::convert::OptionFromWasmAbi;
+        T: ::wasm_bindgen::convert::MaybeFromWasmAbi;
     #[wasm_bindgen(method, setter)]
     pub fn set_fallback<T>(this: &Details<T>, val: T)
     where
@@ -111,9 +111,9 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "details")]
     pub fn try_details(this: &Probe, d: &Details<Mode>) -> Result<Details<Level>, JsValue>;
     #[wasm_bindgen(method, js_name = "maybeHolder")]
-    pub fn maybe_holder(this: &Probe) -> Holder<Option<Mode>>;
+    pub fn maybe_holder(this: &Probe) -> Holder<Nullable<Mode>>;
     #[wasm_bindgen(method, catch, js_name = "maybeHolder")]
-    pub fn try_maybe_holder(this: &Probe) -> Result<Holder<Option<Mode>>, JsValue>;
+    pub fn try_maybe_holder(this: &Probe) -> Result<Holder<Nullable<Mode>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "nextMode")]
     pub async fn next_mode(this: &Probe) -> Result<Mode, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "nextLevel")]

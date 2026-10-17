@@ -101,7 +101,7 @@ pub mod shadow {
         pub fn wrapped(
             a: &[super::Pair<super::Inner, super::Inner>],
             b: &Promise<super::Pair<super::Inner, super::Inner>>,
-        ) -> Option<super::Pair<super::Inner, super::Inner>>;
+        ) -> Nullable<super::Pair<super::Inner, super::Inner>>;
     }
     #[wasm_bindgen]
     extern "C" {
@@ -109,7 +109,7 @@ pub mod shadow {
         pub fn try_wrapped(
             a: &[super::Pair<super::Inner, super::Inner>],
             b: &Promise<super::Pair<super::Inner, super::Inner>>,
-        ) -> Result<Option<super::Pair<super::Inner, super::Inner>>, JsValue>;
+        ) -> Result<Nullable<super::Pair<super::Inner, super::Inner>>, JsValue>;
     }
     #[wasm_bindgen]
     extern "C" {
