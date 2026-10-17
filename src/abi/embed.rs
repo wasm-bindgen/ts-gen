@@ -818,8 +818,8 @@ struct Imports {
     anyrefs_type: bool,
     /// `globalThis.Boolean`, fetched once at start for boolean writes.
     boolean: bool,
-    /// (specifier, export) pairs imported as externref globals.
-    module_exports: IndexSet<(String, String)>,
+    /// (specifier, export, type) imported as globals of that type.
+    module_exports: IndexSet<(String, String, WasmType)>,
 }
 
 impl Imports {
@@ -838,12 +838,12 @@ impl Imports {
     }
 
     /// An ES module export, which ESM integration coerces into an
-    /// immutable externref global: a snapshot of its value at
+    /// immutable global of type `ty`: a snapshot of its value at
     /// instantiation.
-    fn module_export(&mut self, spec: &str, export: &str) -> String {
+    fn module_export(&mut self, spec: &str, export: &str, ty: WasmType) -> String {
         self.module_exports
-            .insert((spec.to_string(), export.to_string()));
-        module_export_ident(spec, export)
+            .insert((spec.to_string(), export.to_string(), ty));
+        module_export_ident(spec, export, ty)
     }
 
     fn render(&self) -> String {
@@ -876,11 +876,12 @@ impl Imports {
                 string_ident(s)
             );
         }
-        for (spec, export) in &self.module_exports {
+        for (spec, export, ty) in &self.module_exports {
             let _ = writeln!(
                 out,
-                "  (import {spec:?} {export:?} (global ${} externref))",
-                module_export_ident(spec, export)
+                "  (import {spec:?} {export:?} (global ${} {}))",
+                module_export_ident(spec, export, *ty),
+                ty.wat()
             );
         }
         out
@@ -895,8 +896,12 @@ fn wire(ty: WasmType) -> WasmType {
     }
 }
 
-fn module_export_ident(spec: &str, export: &str) -> String {
-    format!("m:{}", ident(&format!("{spec}:{export}")))
+fn module_export_ident(spec: &str, export: &str, ty: WasmType) -> String {
+    let id = format!("m:{}", ident(&format!("{spec}:{export}")));
+    match ty {
+        R => id,
+        _ => format!("{id}_{}", short(ty)),
+    }
 }
 
 fn func_ident(name: &str, params: &[WasmType], result: Option<WasmType>) -> String {
@@ -1004,7 +1009,7 @@ impl Body<'_> {
     fn path(&mut self, module: Option<&str>, path: &[String]) -> String {
         let (mut expr, rest) = match (module, path) {
             (Some(spec), [first, rest @ ..]) => {
-                let g = self.imports.module_export(spec, first);
+                let g = self.imports.module_export(spec, first, R);
                 (format!("(global.get ${g})"), rest)
             }
             _ => (self.global(), path),
@@ -1019,11 +1024,35 @@ impl Body<'_> {
     /// means `name` is itself one of the module's exports.
     fn static_ref(&mut self, module: Option<&str>, path: &[String], name: &str) -> String {
         match (module, path) {
-            (Some(spec), []) => format!("(global.get ${})", self.imports.module_export(spec, name)),
+            (Some(spec), []) => self.export_value(spec, name, R),
             _ => {
                 let recv = self.path(module, path);
                 self.get((&recv, R), name, R)
             }
+        }
+    }
+
+    /// The module export `name` as `ty`. The JS API links a Number or
+    /// BigInt export as a numeric global but rejects a boolean for `i32`,
+    /// so a boolean is linked as a reference and read through `Boolean`
+    /// called with an `i32` result.
+    fn export_value(&mut self, spec: &str, name: &str, ty: WasmType) -> String {
+        let global = |body: &mut Self, ty| {
+            format!(
+                "(global.get ${})",
+                body.imports.module_export(spec, name, ty)
+            )
+        };
+        match ty {
+            WasmType::F64 | WasmType::I64 => global(self, ty),
+            WasmType::I32 => {
+                let export = global(self, R);
+                self.imports.boolean = true;
+                let g = self.global();
+                self.call("(global.get $Boolean)", (&g, R), &[(export, R)], Some(ty))
+            }
+            WasmType::AnyRef { .. } => format!("(any.convert_extern {})", global(self, R)),
+            _ => global(self, R),
         }
     }
 
@@ -1248,14 +1277,8 @@ fn function_body_inner(
             }
             body.construct(&class, args, result)
         }
-        // The export is an externref global; a module reading it as
-        // anyref converts, and `generate_bindings` narrows a `(ref any)`.
         AbiOp::StaticGet { path, name } if module.is_some() && path.is_empty() => {
-            let export = body.static_ref(module, path, name);
-            match result {
-                WasmType::AnyRef { .. } => format!("(any.convert_extern {export})"),
-                _ => export,
-            }
+            body.export_value(module.unwrap_or_default(), name, result)
         }
         AbiOp::StaticGet { path, name } => {
             let recv = body.path(module, path);
