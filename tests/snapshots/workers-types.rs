@@ -42178,7 +42178,7 @@ pub enum AttributeValueKind {
     String(String),
     VecOfString(Vec<String>),
     Bool(bool),
-    VecOfBool(Vec<Boolean>),
+    VecOfBool(Vec<bool>),
     F64(f64),
     VecOfF64(Vec<f64>),
     BigInt(BigInt),
