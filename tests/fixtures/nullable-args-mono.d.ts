@@ -25,6 +25,8 @@ interface ResponseInit {
   status?: number;
   // An optional `any` reads as `Option<JsValue>`.
   cf?: any;
+  // An optional property that can only be absent has no accessors.
+  error?: never;
 }
 declare class Reply {
   constructor(body?: BodyInit | null, init?: ResponseInit);

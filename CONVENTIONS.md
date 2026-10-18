@@ -71,7 +71,10 @@ borrowed by reference; return-position container types are owned.
 `never` lowers to `Undefined` rather than `JsValue` because the only
 value a `never`-typed slot can ever read back is `undefined`; in a union
 it then coalesces like `undefined` does, so a merged `value: T` /
-`value?: never` property is `Option<T>`.
+`value?: never` property is `Option<T>`. Under
+`--experimental-generic-mono` an optional property typed only `never` or
+`undefined` (D1's `error?: never`) has no getter, setter or builder method,
+since it can only be absent.
 
 TypeScript's built-in `PropertyKey` is recognised without a declaration
 and lowers exactly like `string | number | symbol`, except for

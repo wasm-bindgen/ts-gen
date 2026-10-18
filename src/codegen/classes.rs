@@ -78,6 +78,48 @@ pub(crate) struct ClassConfig<'a> {
     typed_twins: Vec<Member>,
 }
 
+/// Per-mono, drops an optional property typed `undefined` or `never`
+/// (D1's `error?: never`), which can only be absent: its getter would only
+/// read `None` and its setter take `&Undefined`.
+fn drop_absent_properties(members: &mut Vec<Member>, cgctx: Option<&CodegenContext<'_>>) {
+    if !CodegenContext::generic_mono(cgctx) {
+        return;
+    }
+    let absent: Vec<String> = absent_properties(members.iter())
+        .into_iter()
+        .map(str::to_string)
+        .collect();
+    let absent: Vec<&str> = absent.iter().map(String::as_str).collect();
+    members.retain(|m| !absent_accessor(m, &absent));
+}
+
+/// The JS names of the optional properties typed only `undefined` (which
+/// `never` lowers to) among `members`.
+pub(crate) fn absent_properties<'m>(members: impl Iterator<Item = &'m Member>) -> Vec<&'m str> {
+    members
+        .filter_map(|m| match m {
+            Member::Getter(g)
+                if g.optional
+                    && match &g.type_ref {
+                        TypeRef::Nullable(inner, _) => **inner == TypeRef::Undefined,
+                        ty => *ty == TypeRef::Undefined,
+                    } =>
+            {
+                Some(g.js_name.as_str())
+            }
+            _ => None,
+        })
+        .collect()
+}
+
+pub(crate) fn absent_accessor(member: &Member, absent: &[&str]) -> bool {
+    match member {
+        Member::Getter(g) => absent.contains(&g.js_name.as_str()),
+        Member::Setter(s) => absent.contains(&s.js_name.as_str()),
+        _ => false,
+    }
+}
+
 /// Splits declared well-known-symbol methods out of `members` (the parser
 /// names them `[Symbol.iterator]`, where a synthesized wrapper's method is
 /// `iterator`), returning the item type of a sync `[Symbol.iterator]()`.
@@ -371,6 +413,7 @@ impl<'a> ClassConfig<'a> {
 
         let mut members = decl.members.clone();
         let iterable = take_symbol_methods(&mut members);
+        drop_absent_properties(&mut members, cgctx);
         let typed_twins = super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
         ClassConfig {
             rust_name: decl.name.clone(),
@@ -409,6 +452,7 @@ impl<'a> ClassConfig<'a> {
         let inherited = inherited_members(&decl.extends, cgctx);
         let mut members = inherit_into(inherited.beyond_first, &decl.members);
         let iterable = take_symbol_methods(&mut members);
+        drop_absent_properties(&mut members, cgctx);
         let typed_twins = super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
 
         ClassConfig {
@@ -434,7 +478,8 @@ impl<'a> ClassConfig<'a> {
     /// has to set its fields.
     fn with_first_parent_members(&self, decl: &InterfaceDecl) -> Self {
         let inherited = inherited_members(&decl.extends, self.cgctx);
-        let members = inherit_into(inherited.first_chain, &self.members);
+        let mut members = inherit_into(inherited.first_chain, &self.members);
+        drop_absent_properties(&mut members, self.cgctx);
         ClassConfig {
             rust_name: self.rust_name.clone(),
             js_name: self.js_name.clone(),
@@ -470,6 +515,7 @@ impl<'a> ClassConfig<'a> {
         };
         let mut members = decl.members.clone();
         let iterable = take_symbol_methods(&mut members);
+        drop_absent_properties(&mut members, cgctx);
         let typed_twins = super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
         ClassConfig {
             rust_name: decl.name.clone(),
