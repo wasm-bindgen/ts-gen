@@ -1722,15 +1722,15 @@ pub(crate) fn is_buffer_source(ty: &TypeRef) -> bool {
     *ty == buffer_source_union()
 }
 
-/// Whether a setter's value is a grouped buffer source. The object keeps
-/// what it is given, so a `&[u8]` view must be copied: the setter carries an
-/// inherited `slice = "copy"`, which copies a slice instantiation and leaves
-/// handle instantiations untouched.
-pub(crate) fn stores_buffer_source(params: &[ConcreteParam]) -> bool {
-    params.iter().any(|p| match &p.type_ref {
-        TypeRef::Nullable(inner, _) => is_buffer_source(inner),
+/// Whether `p` lowers to `impl BufferSourceLike` (bare or `Option`).
+fn is_buffer_source_param(p: &ConcreteParam, cgctx: Option<&CodegenContext<'_>>) -> bool {
+    if p.variadic || !CodegenContext::generic_mono(cgctx) {
+        return false;
+    }
+    match typemap::mono_argument_empty(&p.type_ref, cgctx).as_ref() {
+        TypeRef::Nullable(inner, n) if !n.null => is_buffer_source(inner),
         t => is_buffer_source(t),
-    })
+    }
 }
 
 /// Per-mono, a `null`-admitting union that fans out into overloads takes
@@ -2445,6 +2445,14 @@ fn param_attr(
     // The string-literal spelling rather than the bare ident: rustfmt
     // only normalises `name = <literal>` attribute arms, leaving
     // `slice = array` token-spaced verbatim.
+    if is_buffer_source_param(p, cgctx) {
+        let marker = match p.slice_mode {
+            Some(crate::ir::SliceModeHint::Handle) => return quote! {},
+            Some(crate::ir::SliceModeHint::View) => super::BUFFER_SOURCE_VIEW,
+            _ => super::BUFFER_SOURCE_COPY,
+        };
+        return quote! { #[wasm_bindgen(slice = #marker)] };
+    }
     match typemap::param_slice_mode(p, cgctx, scope) {
         Some(typemap::SliceMode::View) => quote! { #[wasm_bindgen(slice = "view")] },
         Some(typemap::SliceMode::UnsharedView) => {
@@ -2502,6 +2510,15 @@ pub(crate) fn render_param_type(
     };
     if param.variadic && !mono.is_some_and(spreads_list) {
         return quote! { &[JsValue] };
+    }
+    if param.slice_mode == Some(crate::ir::SliceModeHint::Handle)
+        && is_buffer_source_param(param, cgctx)
+    {
+        let bound = quote! { ::js_sys::BufferSourceLike + AsRef<::wasm_bindgen::JsValue> };
+        return match param.type_ref {
+            TypeRef::Nullable(..) => quote! { Option<impl #bound> },
+            _ => quote! { impl #bound },
+        };
     }
     let type_ref = typemap::mono_argument_empty(&param.type_ref, cgctx);
     mono.and_then(|ctx| {

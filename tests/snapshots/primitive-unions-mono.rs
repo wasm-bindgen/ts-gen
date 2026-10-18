@@ -386,7 +386,7 @@ impl From<Settings> for SettingsBuilder {
 pub type BufferSource = JsValue;
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch)]
+    #[wasm_bindgen(catch, slice = "copy")]
     pub fn verify(
         algorithm: impl ::wasm_bindgen::JsStringLike,
         signature: impl ::js_sys::BufferSourceLike,
@@ -395,7 +395,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "verify")]
+    #[wasm_bindgen(catch, js_name = "verify", slice = "copy")]
     pub fn verify_with_algorithm(
         algorithm: &Target,
         signature: impl ::js_sys::BufferSourceLike,
@@ -413,12 +413,12 @@ extern "C" {
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "write")]
+    #[wasm_bindgen(js_name = "write", slice = "copy")]
     pub fn write_with_buffer_source(chunk: impl ::js_sys::BufferSourceLike);
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "write")]
+    #[wasm_bindgen(catch, js_name = "write", slice = "copy")]
     pub fn try_write_with_buffer_source(
         chunk: impl ::js_sys::BufferSourceLike,
     ) -> Result<(), JsValue>;
@@ -450,12 +450,12 @@ extern "C" {
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "digest")]
+    #[wasm_bindgen(js_name = "digest", slice = "copy")]
     pub fn digest_with_data(data: impl ::js_sys::BufferSourceLike);
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "digest")]
+    #[wasm_bindgen(catch, js_name = "digest", slice = "copy")]
     pub fn try_digest_with_data(data: impl ::js_sys::BufferSourceLike) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]

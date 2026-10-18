@@ -3208,20 +3208,19 @@ pub fn param_slice_mode(
     // same rule wasm-bindgen applies to an inherited mode, which is what
     // lets one hint cover a union whose other alternatives (the
     // typed-array handle overload) aren't slices.
+    use crate::ir::SliceModeHint as Hint;
     match (p.slice_mode, inferred) {
-        (Some(hint), Some(_)) => Some(match hint {
-            crate::ir::SliceModeHint::View
-                if matches!(
-                    ty,
-                    TypeRef::TypedSlice(_, crate::ir::SharedMemory::Rejected)
-                ) =>
-            {
-                SliceMode::UnsharedView
-            }
-            crate::ir::SliceModeHint::View => SliceMode::View,
-            crate::ir::SliceModeHint::Array => SliceMode::Array,
-            crate::ir::SliceModeHint::Copy => SliceMode::Copy,
-        }),
+        (Some(Hint::View), Some(_))
+            if matches!(
+                ty,
+                TypeRef::TypedSlice(_, crate::ir::SharedMemory::Rejected)
+            ) =>
+        {
+            Some(SliceMode::UnsharedView)
+        }
+        (Some(Hint::View), Some(_)) => Some(SliceMode::View),
+        (Some(Hint::Array), Some(_)) => Some(SliceMode::Array),
+        (Some(Hint::Copy), Some(_)) => Some(SliceMode::Copy),
         (_, inferred) => inferred,
     }
 }

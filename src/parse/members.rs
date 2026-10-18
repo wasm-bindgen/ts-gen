@@ -38,7 +38,7 @@ fn slice_hint(
     let hint = crate::ir::SliceModeHint::parse(mode);
     if hint.is_none() {
         diag.warn(format!(
-            "unknown slice mode `{{@slice {mode}}}` on `{site}`; expected `view`, `array` or `copy`"
+            "unknown slice mode `{{@slice {mode}}}` on `{site}`; expected `view`, `array`, `copy` or `handle`"
         ));
     }
     hint
@@ -89,7 +89,8 @@ pub(crate) fn apply_slice_hints(
         let Some(hint) = slice_hint(Some(mode), site, diag) else {
             continue;
         };
-        match params.iter_mut().find(|p| p.name == *name) {
+        let ir_name = to_snake_case(name);
+        match params.iter_mut().find(|p| p.name == ir_name) {
             Some(p) => {
                 p.slice_mode = Some(hint);
                 if let Some(widened) = hint.widen_bare_typed_array(&p.type_ref) {

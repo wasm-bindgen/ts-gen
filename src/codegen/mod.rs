@@ -200,6 +200,7 @@ pub fn generate_with_options(
     })?;
     inline_wrappers::apply(&mut file);
     split_unshared_views(&mut file.items);
+    hoist_buffer_source_modes(&mut file.items);
     let formatted = rustfmt(&quote::ToTokens::to_token_stream(&file).to_string())?;
     // Prepend a header comment. Line comments don't survive `quote!`
     // token generation, so they have to be emitted as plain text
@@ -280,6 +281,65 @@ fn with_unshared_views(
         }
     }
     f
+}
+
+/// Placeholder `slice` values on an `impl BufferSourceLike` argument, which
+/// [`hoist_buffer_source_modes`] moves onto its fn.
+pub(crate) const BUFFER_SOURCE_COPY: &str = "__ts_gen_buffer_source_copy";
+pub(crate) const BUFFER_SOURCE_VIEW: &str = "__ts_gen_buffer_source_view";
+
+/// A mode written on an argument must fit every instantiation, and `slice`
+/// doesn't fit a handle, so a buffer source's mode is the fn's instead:
+/// wasm-bindgen applies an inherited mode only where it fits, the `&[u8]`
+/// instantiation. The fn copies unless every buffer source on it asks for
+/// the view.
+fn hoist_buffer_source_modes(items: &mut [syn::Item]) {
+    for item in items {
+        match item {
+            syn::Item::Mod(syn::ItemMod {
+                content: Some((_, items)),
+                ..
+            }) => hoist_buffer_source_modes(items),
+            syn::Item::ForeignMod(foreign) => {
+                for item in &mut foreign.items {
+                    if let syn::ForeignItem::Fn(f) = item {
+                        hoist_buffer_source_mode(f);
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+}
+
+fn hoist_buffer_source_mode(f: &mut syn::ForeignItemFn) {
+    let copy: syn::Attribute = syn::parse_quote!(#[wasm_bindgen(slice = #BUFFER_SOURCE_COPY)]);
+    let view: syn::Attribute = syn::parse_quote!(#[wasm_bindgen(slice = #BUFFER_SOURCE_VIEW)]);
+    let (mut copies, mut views) = (false, false);
+    for arg in &mut f.sig.inputs {
+        if let syn::FnArg::Typed(pat) = arg {
+            pat.attrs.retain(|attr| {
+                copies |= *attr == copy;
+                views |= *attr == view;
+                *attr != copy && *attr != view
+            });
+        }
+    }
+    let mode = match (copies, views) {
+        (false, false) => return,
+        (false, true) => "view",
+        (true, _) => "copy",
+    };
+    let wasm_bindgen = f
+        .attrs
+        .iter_mut()
+        .find(|attr| attr.path().is_ident("wasm_bindgen"));
+    match wasm_bindgen.map(|attr| &mut attr.meta) {
+        Some(syn::Meta::List(list)) => list.tokens.extend(quote! { , slice = #mode }),
+        _ => f
+            .attrs
+            .push(syn::parse_quote!(#[wasm_bindgen(slice = #mode)])),
+    }
 }
 
 /// The `--provides` wrapper and app scaffold, as `(provides.rs, app.rs)`
@@ -990,8 +1050,48 @@ fn generate_ns_declaration(
 
 #[cfg(test)]
 mod tests {
-    use super::{js_namespace_attr, split_unshared_views, UNSHARED_VIEW};
+    use super::{
+        hoist_buffer_source_modes, js_namespace_attr, split_unshared_views, BUFFER_SOURCE_COPY,
+        BUFFER_SOURCE_VIEW, UNSHARED_VIEW,
+    };
     use quote::{quote, ToTokens};
+
+    #[test]
+    fn buffer_source_modes_move_to_the_fn() {
+        let (copy, view) = (BUFFER_SOURCE_COPY, BUFFER_SOURCE_VIEW);
+        let mut file: syn::File = syn::parse2(quote! {
+            extern "C" {
+                #[wasm_bindgen(method)]
+                pub fn send(this: &Socket, #[wasm_bindgen(slice = #view)] data: impl BufferSourceLike);
+                pub fn verify(
+                    #[wasm_bindgen(slice = #view)] signature: impl BufferSourceLike,
+                    #[wasm_bindgen(slice = #copy)] data: impl BufferSourceLike,
+                    #[wasm_bindgen(slice = "array")] weights: &[f64],
+                );
+                pub fn other(data: &str);
+            }
+        })
+        .unwrap();
+        hoist_buffer_source_modes(&mut file.items);
+        let expected: syn::File = syn::parse2(quote! {
+            extern "C" {
+                #[wasm_bindgen(method, slice = "view")]
+                pub fn send(this: &Socket, data: impl BufferSourceLike);
+                #[wasm_bindgen(slice = "copy")]
+                pub fn verify(
+                    signature: impl BufferSourceLike,
+                    data: impl BufferSourceLike,
+                    #[wasm_bindgen(slice = "array")] weights: &[f64],
+                );
+                pub fn other(data: &str);
+            }
+        })
+        .unwrap();
+        assert_eq!(
+            file.to_token_stream().to_string(),
+            expected.to_token_stream().to_string()
+        );
+    }
 
     #[test]
     fn unshared_views_split_on_target_feature_atomics() {
