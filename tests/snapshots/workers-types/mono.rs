@@ -42926,21 +42926,13 @@ extern "C" {
     fn __raw_with_column_names(
         this: &D1PreparedStatement,
         options: &D1PreparedStatementRawOptions,
-    ) -> Promise<ArrayTuple<(Array<String>, Array<Array>)>>;
+    ) -> Promise<Vec<JsValue>>;
     #[wasm_bindgen(method, catch, js_name = "raw")]
     pub fn raw_typed<T>(this: &D1PreparedStatement) -> Promise<Vec<T>>;
-    #[wasm_bindgen(method, catch, js_name = "raw")]
-    fn __raw_with_column_names_typed<T>(
-        this: &D1PreparedStatement,
-        options: &D1PreparedStatementRawOptions,
-    ) -> Promise<ArrayTuple<(Array<String>, Array<T>)>>;
 }
 impl D1PreparedStatement {
-    pub fn raw_with_column_names(&self) -> Promise<ArrayTuple<(Array<String>, Array<Array>)>> {
+    pub fn raw_with_column_names(&self) -> Promise<Vec<JsValue>> {
         self.__raw_with_column_names(&<D1PreparedStatementRawOptions>::new())
-    }
-    pub fn raw_with_column_names_typed<T>(&self) -> Promise<ArrayTuple<(Array<String>, Array<T>)>> {
-        self.__raw_with_column_names_typed(&<D1PreparedStatementRawOptions>::new())
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]

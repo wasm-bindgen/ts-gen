@@ -979,12 +979,12 @@ extern "C" {
     pub async fn raw_with_stream_options(
         this: &Stream,
         options: &StreamOptions,
-    ) -> Result<ArrayTuple<(Array<JsString>, Array)>, JsValue>;
+    ) -> Result<Vec<JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "raw")]
     pub fn raw_with_stream_options_promise(
         this: &Stream,
         options: &StreamOptions,
-    ) -> Promise<ArrayTuple<(Array<JsString>, Array)>>;
+    ) -> Promise<Array>;
     #[wasm_bindgen(method, catch, js_name = "raw")]
     pub async fn raw_with_stream_options2(
         this: &Stream,

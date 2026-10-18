@@ -150,7 +150,7 @@
   (import "literal-overloads" "Stream.get_reader_with_options" (func $literal-overloads:Stream.get_reader_with_options (param $this externref) (param $options externref) (result f64)))
   ;; raw(): Promise<unknown[]>
   (import "literal-overloads" "Stream.raw" (func $literal-overloads:Stream.raw (param $this externref) (result externref)))
-  ;; raw(options: StreamRawOptions): Promise<[string[], unknown[]]>
+  ;; raw(options: StreamRawOptions): Promise<any[]>
   (import "literal-overloads" "Stream.raw_with_options" (func $literal-overloads:Stream.raw_with_options (param $this externref) (param $options externref) (result externref)))
 
   ;; StreamRawOptions
