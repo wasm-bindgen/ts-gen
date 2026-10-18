@@ -933,6 +933,9 @@ pub struct GetterMember {
     /// Whether declared with `?:` syntax — wraps return in `Option`.
     pub optional: bool,
     pub doc: Option<String>,
+    /// `@throws {X}` makes the getter fallible (`Result<R, X>`); getters
+    /// are otherwise infallible under every policy. See [`Throws`].
+    pub throws: Throws,
 }
 
 /// Instance property setter binding.
@@ -1016,6 +1019,8 @@ pub struct StaticGetterMember {
     pub js_name: String,
     pub type_ref: TypeRef,
     pub doc: Option<String>,
+    /// See [`GetterMember::throws`].
+    pub throws: Throws,
 }
 
 /// Static property setter binding.

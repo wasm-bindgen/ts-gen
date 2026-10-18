@@ -55,6 +55,7 @@ mod tests {
             type_ref: TypeRef::Any,
             optional,
             doc: None,
+            throws: crate::ir::Throws::None,
         })
     }
 
@@ -64,6 +65,7 @@ mod tests {
             js_name: name.to_string(),
             type_ref: TypeRef::Any,
             doc: None,
+            throws: crate::ir::Throws::None,
         })
     }
 

@@ -1945,6 +1945,11 @@ fn generate_getter(
         let js_name = &getter.js_name;
         wb_parts.push(quote! { js_name = #js_name });
     }
+    let error_ty = getter_error_type(config, &getter.throws);
+    if error_ty.is_some() {
+        wb_parts.push(quote! { catch });
+    }
+    let getter_type = wrap_getter_result(getter_type, error_ty.as_ref());
 
     // Thread the type's generic parameters through the binding so a
     // generic dictionary's getter (e.g. `value(): T` on
@@ -1957,12 +1962,14 @@ fn generate_getter(
     let this_generics = config.type_generics_args();
 
     let source_name = &getter.js_name;
+    let catch = error_ty.is_some().then(|| quote! { , catch });
     let js_string_variant =
         getter_js_string_variant(config, &lowered_ty, getter.scope, &rust_name, names).map(
             |(js_ident, js_type)| {
+                let js_type = wrap_getter_result(js_type, error_ty.as_ref());
                 quote! {
                     #doc
-                    #[wasm_bindgen(method, getter, js_name = #source_name)]
+                    #[wasm_bindgen(method, getter, js_name = #source_name #catch)]
                     pub fn #js_ident #fn_generics (this: &#this_type #this_generics) -> #js_type;
                 }
             },
@@ -1973,6 +1980,26 @@ fn generate_getter(
         #[wasm_bindgen(#(#wb_parts),*)]
         pub fn #rust_ident #fn_generics (this: &#this_type #this_generics) -> #getter_type;
         #js_string_variant
+    }
+}
+
+/// A getter annotated `@throws {X}` is the one accessor form that
+/// catches; the `Result` error is `X` resolved like any `@throws` type.
+fn getter_error_type(config: &ClassConfig, throws: &crate::ir::Throws) -> Option<TokenStream> {
+    throws.as_type().map(|ty| {
+        super::typemap::error_type_tokens(
+            Some(ty),
+            config.cgctx,
+            config.scope,
+            &config.from_module(),
+        )
+    })
+}
+
+fn wrap_getter_result(ty: TokenStream, error_ty: Option<&TokenStream>) -> TokenStream {
+    match error_ty {
+        Some(err) => quote! { Result<#ty, #err> },
+        None => ty,
     }
 }
 
@@ -2103,6 +2130,11 @@ fn generate_static_getter(
         let js_name = &getter.js_name;
         wb_parts.push(quote! { js_name = #js_name });
     }
+    let error_ty = getter_error_type(config, &getter.throws);
+    if error_ty.is_some() {
+        wb_parts.push(quote! { catch });
+    }
+    let getter_type = wrap_getter_result(getter_type, error_ty.as_ref());
 
     // Static getters take no receiver, so no `this` generic args
     // need plumbing — but the bounds still need redeclaring on the
@@ -2113,16 +2145,22 @@ fn generate_static_getter(
 
     let source_name = &getter.js_name;
     let js_class = config.js_class_parts();
-    let js_string_variant =
-        getter_js_string_variant(config, &getter.type_ref, getter.scope, &rust_name, names).map(
-            |(js_ident, js_type)| {
-                quote! {
-                    #doc
-                    #[wasm_bindgen(static_method_of = #class_ident, #(#js_class,)* getter, js_name = #source_name)]
-                    pub fn #js_ident #fn_generics () -> #js_type;
-                }
-            },
-        );
+    let catch = error_ty.is_some().then(|| quote! { , catch });
+    let js_string_variant = getter_js_string_variant(
+        config,
+        &getter.type_ref,
+        getter.scope,
+        &rust_name,
+        names,
+    )
+    .map(|(js_ident, js_type)| {
+        let js_type = wrap_getter_result(js_type, error_ty.as_ref());
+        quote! {
+            #doc
+            #[wasm_bindgen(static_method_of = #class_ident, #(#js_class,)* getter, js_name = #source_name #catch)]
+            pub fn #js_ident #fn_generics () -> #js_type;
+        }
+    });
 
     quote! {
         #doc

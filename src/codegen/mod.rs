@@ -6,6 +6,7 @@
 pub mod classes;
 pub mod discriminated_unions;
 pub mod enums;
+pub mod error_enum;
 pub mod functions;
 pub(crate) mod primitive_unions;
 pub mod provides;
@@ -55,17 +56,41 @@ pub(crate) fn doc_tokens(doc: &Option<String>) -> TokenStream {
 /// Options for controlling code generation output.
 #[derive(Debug, Clone, Default)]
 pub struct GenerateOptions {
-    /// When `true`, the default error type for fallible bindings
-    /// (`@throws`-less callables that catch JS exceptions) is
-    /// `js_sys::Error` rather than `JsValue`. Bindings whose
-    /// `@throws` JSDoc names a specific type still use that type.
+    /// Rust path of the default error type for fallible bindings
+    /// (`@throws`-less callables that catch JS exceptions); `None`
+    /// means wasm-bindgen's `JsValue`. Bindings whose `@throws`
+    /// JSDoc names a specific type still use that type.
     ///
-    /// Useful in environments that prefer the typed `Error` API
-    /// (`message`, `name`, `cause`, …) over raw `JsValue`. The
-    /// trade-off is that JS code returning a non-Error throwable
-    /// (e.g. `throw "oops"`) now produces a runtime conversion
-    /// error rather than the silent `JsValue` pass-through.
-    errors_as_error: bool,
+    /// wasm-bindgen's `catch` lowers to `take_last_exception()?`, so
+    /// any type implementing `From<JsValue>` works here: a project's
+    /// own error enum, or `::js_sys::Error` for the typed `Error`
+    /// API (`message`, `name`, `cause`, …). The trade-off with a
+    /// `js_sys` class is that JS code throwing a non-Error value
+    /// (`throw "oops"`) is an unchecked cast at the FFI boundary.
+    error_type: Option<String>,
+
+    /// Emit sync methods, free functions and constructors as a single
+    /// `Result`-returning binding under the primary name, with no
+    /// panicking variant and no `try_` prefix. Getters and setters stay
+    /// infallible unless annotated `@throws {X}`; `@throws {never}`
+    /// makes a callable plain.
+    ///
+    /// Off by default: the panicking-primary + `try_` shape is what
+    /// existing users have. A project whose code is written as
+    /// `handler() -> Result<_, Error>` with `?` on every call turns
+    /// this on so there is exactly one binding per JS member and it
+    /// never aborts on a JS throw.
+    fallible: bool,
+
+    /// Name of a generated error enum collecting every type named in a
+    /// `@throws` across the output, with `From<JsValue>` dispatching by
+    /// `instanceof` (most derived class first) and an `Other(JsValue)`
+    /// fallback. When set, every `@throws`-typed binding returns
+    /// `Result<T, ThisEnum>` — a union keeps its members instead of
+    /// collapsing to the LUB, and a single type routes through the same
+    /// enum so callers have one `?`-able type. Untyped bindings keep the
+    /// `error_type` default. `None` keeps the LUB lowering.
+    error_enum: Option<String>,
 
     /// Opt generic imports into wasm-bindgen's experimental
     /// per-monomorphization codegen. Type parameters are emitted without
@@ -97,9 +122,31 @@ impl GenerateOptions {
         Self::default()
     }
 
-    /// Configure whether untyped caught exceptions use `js_sys::Error`.
+    /// Set the default error type for fallible bindings to a Rust path
+    /// such as `crate::Error`. The type must implement `From<JsValue>`.
+    pub fn error_type(mut self, path: impl Into<String>) -> Self {
+        self.error_type = Some(path.into());
+        self
+    }
+
+    /// Shorthand for [`error_type`](Self::error_type) with
+    /// `::js_sys::Error`; `false` restores the `JsValue` default.
     pub fn errors_as_error(mut self, enabled: bool) -> Self {
-        self.errors_as_error = enabled;
+        self.error_type = enabled.then(|| "::js_sys::Error".to_string());
+        self
+    }
+
+    /// Emit every sync callable as one `Result`-returning binding
+    /// instead of a panicking primary plus `try_` companion.
+    pub fn fallible(mut self, enabled: bool) -> Self {
+        self.fallible = enabled;
+        self
+    }
+
+    /// Generate an enum of this name over every `@throws` type and
+    /// return it from every `@throws`-typed binding.
+    pub fn error_enum(mut self, name: impl Into<String>) -> Self {
+        self.error_enum = Some(name.into());
         self
     }
 
@@ -139,7 +186,7 @@ pub fn generate_with_options(
     gctx: &crate::context::GlobalContext,
     options: &GenerateOptions,
 ) -> anyhow::Result<String> {
-    let tokens = generate_tokens(module, gctx, options);
+    let tokens = generate_tokens(module, gctx, options)?;
     // Validate that the tokens are valid Rust syntax.
     let mut file = syn::parse2::<syn::File>(tokens.clone()).map_err(|e| {
         anyhow::anyhow!("generated tokens are not valid syn:\n{e}\n\nTokens:\n{tokens}")
@@ -237,13 +284,7 @@ pub fn generate_provides(
     paths: &provides::ProvidesPaths,
 ) -> anyhow::Result<(String, String)> {
     let surface = surface::Surface::build(module, gctx, options);
-    let cgctx = CodegenContext::from_module_full(
-        module,
-        gctx,
-        options.errors_as_error,
-        options.experimental_generic_mono,
-        Some(&surface),
-    );
+    let cgctx = CodegenContext::from_module_full(module, gctx, options, Some(&surface))?;
     let wrapper = provides::generate_wrapper(fns, &cgctx, paths)?;
     let app = provides::generate_app(fns, &cgctx, paths)?;
     cgctx.diagnostics.borrow().emit();
@@ -301,15 +342,9 @@ fn generate_tokens(
     module: &Module,
     gctx: &crate::context::GlobalContext,
     options: &GenerateOptions,
-) -> TokenStream {
+) -> anyhow::Result<TokenStream> {
     let surface = surface::Surface::build(module, gctx, options);
-    let cgctx = CodegenContext::from_module_full(
-        module,
-        gctx,
-        options.errors_as_error,
-        options.experimental_generic_mono,
-        Some(&surface),
-    );
+    let cgctx = CodegenContext::from_module_full(module, gctx, options, Some(&surface))?;
 
     let preamble = quote! {
         #[allow(unused_imports)]
@@ -367,6 +402,11 @@ fn generate_tokens(
     let global_items = root.generate(&mut Vec::new(), &cgctx);
     cgctx.emit_path.replace(Vec::new());
 
+    let error_enum = options.error_enum.as_deref().map(|name| {
+        let names = error_enum::collect_throws_names(&module.types, &surface);
+        error_enum::generate_error_enum(name, &names, &cgctx)
+    });
+
     let external_uses = cgctx.external_use_tokens();
 
     // Dynamic-union enums synthesised during the per-declaration
@@ -375,12 +415,13 @@ fn generate_tokens(
 
     cgctx.take_diagnostics().emit();
 
-    quote! {
+    Ok(quote! {
         #preamble
         #external_uses
         #(#global_items)*
         #dynamic_unions
-    }
+        #error_enum
+    })
 }
 
 /// Emit the synthesised dynamic-union enums collected on `cgctx`
