@@ -3314,7 +3314,17 @@ pub fn to_return_type(
         let read = resolve_union_aliases(ty, ctx, scope);
         match maybe_synthesise_return_union(&read, ctx, scope, from_module, anchor) {
             Some(tokens) => tokens,
-            None => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
+            // Per-mono `(File | string) | null` is the enum in its empties'
+            // carrier, as an optional getter's is.
+            None => match read.split_empties() {
+                Some((inner, n)) if CodegenContext::generic_mono(ctx) => {
+                    match maybe_synthesise_return_union(&inner, ctx, scope, from_module, anchor) {
+                        Some(tokens) => read_carrier(tokens, n, ctx),
+                        None => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
+                    }
+                }
+                _ => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
+            },
         }
     };
 

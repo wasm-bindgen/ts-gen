@@ -8708,7 +8708,7 @@ extern "C" {
     pub fn get(
         this: &FormData,
         name: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Option<JsValue>, JsValue>;
+    ) -> Result<Option<GetReturnKind>, JsValue>;
     #[doc = " The **`getAll()`** method of the FormData interface returns all the values associated with a given key from within a `FormData` object."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/FormData/getAll)"]
@@ -55175,6 +55175,11 @@ pub enum BytesWrittenKind {
 #[wasm_bindgen(private)]
 pub enum DataKind {
     ArrayBuffer(ArrayBuffer),
+    String(String),
+}
+#[wasm_bindgen(private)]
+pub enum GetReturnKind {
+    File(File),
     String(String),
 }
 #[wasm_bindgen(private)]

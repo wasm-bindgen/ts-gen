@@ -4137,6 +4137,15 @@ pub enum EmailAttachmentContentKind {
 pub fn content(this: &EmailAttachment) -> EmailAttachmentContentKind;
 ```
 
+An optional getter's union is `Option` of the enum. Under
+`--experimental-generic-mono` so is a callable's `T | null` return,
+awaited or not (elsewhere it stays `Option<JsValue>`):
+
+```rust
+// get(name: string): (File | string) | null;
+pub fn get(this: &FormData, name: impl JsStringLike) -> Option<GetReturnKind>;
+```
+
 #### Shape arms go last
 
 The tuple arms dispatch in order through `dyn_into`, and a
