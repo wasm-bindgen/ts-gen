@@ -2102,6 +2102,37 @@ ones, since both use the top-level return lowering:
 | `Promise<Details<string>>` | `Result<Details<JsString>, _>` | `Result<Details<String>, _>` + `_js_string` |
 | `Promise<Array<string>>` | `Result<Vec<String>, _>` | `Result<Vec<String>, _>` + `_js_string` |
 
+The twin is named from the unescaped member name, so a keyword member
+`type` gives `type_` and `type_js_string`.
+
+A `{@string copy|ref|both}` JSDoc inline tag picks the forms one member gets,
+since most strings are small enough that the handle form is never used and
+a few are large enough that the copy should be avoided. It goes in the
+member's description or its `@returns` description and applies to the
+property type or return; a property's setter is unaffected:
+
+```ts
+interface Headers {
+  /** @returns The header value {@string copy} */
+  get(name: string): string | null;   // get -> Option<String>, no twin
+  /** {@string ref} */
+  getAll(name: string): string[];     // get_all -> Array<JsString>, no twin
+}
+/** {@string copy} */
+interface Meta {
+  readonly id: string;                // id -> String
+  /** {@string both} */
+  readonly body: string;              // body -> String, body_js_string -> JsString
+}
+```
+
+`copy` keeps only the `String` form, `ref` only the handle form under the
+base name, and `both` is the default. A tag in a class or interface doc is
+the default for every member of that declaration without its own tag. The
+tag only selects among the forms a member would get, so it has no effect
+where no twin exists (strings inside built-in containers) or without
+per-monomorphization.
+
 This can increase code size because wasm-bindgen generates a separate shim and
 descriptor for every instantiation. The option is experimental and tracks the
 upstream attribute of the same name.
@@ -2738,6 +2769,9 @@ ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
 * `@rust` applies as if written on the input member; a property's tag
   reaches its setter too. Parameters match by name.
 * `@throws` replaces the input member's failure mode.
+* `{@string mode}` replaces the input member's mode; one in a side
+  declaration's doc is the default for every input member of it that no
+  tag (input or side) sets.
 * A side member applies to every overload of the input method or
   function, and its rendered doc (the `## Errors` section of `@throws`)
   is appended to the input's doc once. Overloads may differ in return
@@ -2747,7 +2781,8 @@ ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
 * A declaration, member or parameter named in the side file that does
   not exist in the input fails the run, so a typo cannot silently miss
   a binding; so does an invalid `@rust` tag, or one whose scalar the
-  input's type cannot carry. Side members without tags are ignored.
+  input's type cannot carry. Side members without tags are ignored; a
+  `{@string}` tag alone counts as one.
 * Only classes, interfaces and functions can be annotated: a
   `declare namespace`, `declare module`, alias or variable in the side
   file fails the run rather than being skipped, as does a bare name

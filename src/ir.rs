@@ -671,6 +671,33 @@ impl SliceModeHint {
     }
 }
 
+/// Which forms of a string return a `{@string copy|ref|both}` JSDoc inline
+/// tag asks for under per-monomorphization, where a string-leaf return
+/// otherwise gets both a `String` binding and a `_js_string` twin
+/// returning the handle.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum StringModeHint {
+    /// Only the copied `String` form.
+    Copy,
+    /// Only the `JsString` handle form, under the base name.
+    Ref,
+    /// Both forms (the default); lets a member opt back in under a
+    /// declaration-level tag.
+    Both,
+}
+
+impl StringModeHint {
+    /// Parse the mode name from a `{@string <mode>}` tag.
+    pub fn parse(name: &str) -> Option<Self> {
+        match name {
+            "copy" => Some(Self::Copy),
+            "ref" => Some(Self::Ref),
+            "both" => Some(Self::Both),
+            _ => None,
+        }
+    }
+}
+
 // ─── Type Parameters (Generics) ──────────────────────────────────────
 
 #[derive(Clone, Debug, PartialEq)]
@@ -801,6 +828,11 @@ pub struct ClassDecl {
     /// `<T, ...>`. Methods chain off this scope; codegen resolves
     /// names against it.
     pub body_scope: crate::parse::scope::ScopeId,
+    /// A declaration-level `{@string mode}`, the default for members
+    /// carrying none. Parsing applies it to the declaration's own members;
+    /// it is kept so `--annotate` can apply a side declaration's default to
+    /// the input's members.
+    pub string_mode: Option<StringModeHint>,
 }
 
 // ─── Interface ───────────────────────────────────────────────────────
@@ -822,6 +854,8 @@ pub struct InterfaceDecl {
     /// Scope inside this interface's body — see
     /// [`ClassDecl::body_scope`] for the contract.
     pub body_scope: crate::parse::scope::ScopeId,
+    /// See [`ClassDecl::string_mode`].
+    pub string_mode: Option<StringModeHint>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -1030,6 +1064,8 @@ pub struct FunctionDecl {
     pub throws: Throws,
     /// Scope inside this function's body — see [`ClassDecl::body_scope`].
     pub body_scope: crate::parse::scope::ScopeId,
+    /// See [`StringModeHint`].
+    pub string_mode: Option<StringModeHint>,
 }
 
 #[derive(Clone, Debug)]
@@ -1043,6 +1079,8 @@ pub struct FunctionOverload {
     pub body_scope: crate::parse::scope::ScopeId,
     pub throws: Throws,
     pub doc: Option<String>,
+    /// See [`StringModeHint`].
+    pub string_mode: Option<StringModeHint>,
 }
 
 // ─── Variable ────────────────────────────────────────────────────────
@@ -1163,6 +1201,8 @@ pub struct GetterMember {
     /// `@throws {X}` makes the getter fallible (`Result<R, X>`); getters
     /// are otherwise infallible under every policy. See [`Throws`].
     pub throws: Throws,
+    /// See [`StringModeHint`].
+    pub string_mode: Option<StringModeHint>,
 }
 
 /// Instance property setter binding.
@@ -1201,6 +1241,8 @@ pub struct MethodMember {
     /// type's body scope, holding [`Binding::TypeParam`] entries for
     /// the method's own `<T, ...>`. See [`ClassDecl::body_scope`].
     pub body_scope: crate::parse::scope::ScopeId,
+    /// See [`StringModeHint`].
+    pub string_mode: Option<StringModeHint>,
 }
 
 #[derive(Clone, Debug)]
@@ -1252,6 +1294,8 @@ pub struct StaticGetterMember {
     pub doc: Option<String>,
     /// See [`GetterMember::throws`].
     pub throws: Throws,
+    /// See [`StringModeHint`].
+    pub string_mode: Option<StringModeHint>,
 }
 
 /// Static property setter binding.
@@ -1284,6 +1328,8 @@ pub struct StaticMethodMember {
     /// Scope inside this static method's body — see
     /// [`MethodMember::body_scope`].
     pub body_scope: crate::parse::scope::ScopeId,
+    /// See [`StringModeHint`].
+    pub string_mode: Option<StringModeHint>,
 }
 
 // ─── Type Registry (First Pass) ──────────────────────────────────────

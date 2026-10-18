@@ -363,6 +363,7 @@ mod tests {
                 members: vec![],
                 classification: crate::ir::InterfaceClassification::ClassLike,
                 body_scope: scope,
+                string_mode: None,
             }),
             module_context: crate::ir::ModuleContext::Global,
             doc: None,

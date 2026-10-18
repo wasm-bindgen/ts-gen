@@ -44,6 +44,39 @@ fn slice_hint(
     hint
 }
 
+/// Parse a `{@string <mode>}` mode name into a [`StringModeHint`],
+/// warning on an unknown mode.
+pub(crate) fn string_hint(
+    mode: Option<&str>,
+    site: &str,
+    diag: &mut crate::util::diagnostics::DiagnosticCollector,
+) -> Option<StringModeHint> {
+    let mode = mode?;
+    let hint = StringModeHint::parse(mode);
+    if hint.is_none() {
+        diag.warn(format!(
+            "unknown string mode `{{@string {mode}}}` on `{site}`; expected `copy`, `ref` or `both`"
+        ));
+    }
+    hint
+}
+
+/// A declaration-level `{@string mode}` is the default of each member
+/// that returns a value and carries no tag of its own.
+pub(crate) fn apply_string_default(members: &mut [Member], mode: Option<StringModeHint>) {
+    let Some(mode) = mode else { return };
+    for m in members {
+        let slot = match m {
+            Member::Getter(g) => &mut g.string_mode,
+            Member::StaticGetter(g) => &mut g.string_mode,
+            Member::Method(m) => &mut m.string_mode,
+            Member::StaticMethod(m) => &mut m.string_mode,
+            _ => continue,
+        };
+        slot.get_or_insert(mode);
+    }
+}
+
 /// Attach `{@slice mode}` hints from `@param` tags to the matching
 /// parameters, warning when a tag names no parameter.
 pub(crate) fn apply_slice_hints(
@@ -297,6 +330,7 @@ pub(crate) fn try_synthesize_iterable_return(
         )),
         throws: Throws::None,
         body_scope: iter_method_body,
+        string_mode: None,
     });
 
     ctx.synth.push(InterfaceDecl {
@@ -308,6 +342,7 @@ pub(crate) fn try_synthesize_iterable_return(
         members: vec![iter_method],
         classification: crate::ir::InterfaceClassification::ClassLike,
         body_scope,
+        string_mode: None,
     });
 
     // The return type references the synthesized type with the same
@@ -601,6 +636,7 @@ pub(crate) fn synthesize_inline(
             members,
             classification,
             body_scope,
+            string_mode: None,
         },
         branches,
     })
@@ -851,6 +887,7 @@ fn convert_property_signature(
         None => return vec![],
     };
     let (doc, info) = split_info(ctx.docs.info_for_span(prop.span.start));
+    let string_mode = string_hint(info.string_mode.as_deref(), &js_name, ctx.diag);
     let slice_mode = slice_hint(info.slice_mode.as_deref(), &js_name, ctx.diag);
 
     let mut type_ref = prop
@@ -867,6 +904,7 @@ fn convert_property_signature(
         optional: prop.optional,
         doc,
         throws: info.throws(),
+        string_mode,
     })];
 
     if !prop.readonly {
@@ -903,6 +941,7 @@ fn convert_method_signature(
         None => return vec![],
     };
     let (doc, info) = split_info(ctx.docs.info_for_span(method.span.start));
+    let string_mode = string_hint(info.string_mode.as_deref(), &js_name, ctx.diag);
 
     let mut type_params = convert_type_params(method.type_parameters.as_ref(), ctx.diag);
 
@@ -952,6 +991,7 @@ fn convert_method_signature(
             optional: method.optional,
             doc,
             throws: info.throws(),
+            string_mode,
         })],
         TSMethodSignatureKind::Set => {
             let type_ref = params
@@ -976,6 +1016,7 @@ fn convert_method_signature(
             optional: method.optional,
             doc,
             throws: info.throws(),
+            string_mode,
             body_scope,
         })],
     }
@@ -1016,6 +1057,7 @@ fn convert_class_method(
         None => return vec![],
     };
     let (doc, info) = split_info(ctx.docs.info_for_span(method.span.start));
+    let string_mode = string_hint(info.string_mode.as_deref(), &js_name, ctx.diag);
 
     let func = &method.value;
     let mut type_params = convert_type_params(func.type_parameters.as_ref(), ctx.diag);
@@ -1086,6 +1128,7 @@ fn convert_class_method(
                     type_ref: return_type,
                     doc,
                     throws: info.throws(),
+                    string_mode,
                 })]
             } else {
                 vec![Member::Getter(GetterMember {
@@ -1095,6 +1138,7 @@ fn convert_class_method(
                     optional: method.optional,
                     doc,
                     throws: info.throws(),
+                    string_mode,
                 })]
             }
         }
@@ -1131,6 +1175,7 @@ fn convert_class_method(
                     return_type,
                     doc,
                     throws: info.throws(),
+                    string_mode,
                     body_scope,
                 })]
             } else {
@@ -1143,6 +1188,7 @@ fn convert_class_method(
                     optional: method.optional,
                     doc,
                     throws: info.throws(),
+                    string_mode,
                     body_scope,
                 })]
             }
@@ -1160,6 +1206,7 @@ fn convert_class_property(
         None => return vec![],
     };
     let (doc, info) = split_info(ctx.docs.info_for_span(prop.span.start));
+    let string_mode = string_hint(info.string_mode.as_deref(), &js_name, ctx.diag);
     let slice_mode = slice_hint(info.slice_mode.as_deref(), &js_name, ctx.diag);
 
     let mut type_ref = prop
@@ -1176,6 +1223,7 @@ fn convert_class_property(
             type_ref: type_ref.clone(),
             doc,
             throws: info.throws(),
+            string_mode,
         })];
         if !prop.readonly {
             members.push(Member::StaticSetter(StaticSetterMember {
@@ -1194,6 +1242,7 @@ fn convert_class_property(
             optional: prop.optional,
             doc,
             throws: info.throws(),
+            string_mode,
         })];
         if !prop.readonly {
             members.push(Member::Setter(SetterMember {
@@ -1218,6 +1267,7 @@ fn convert_accessor_property(
         None => return vec![],
     };
     let (doc, info) = split_info(ctx.docs.info_for_span(acc.span.start));
+    let string_mode = string_hint(info.string_mode.as_deref(), &js_name, ctx.diag);
 
     let type_ref = acc
         .type_annotation
@@ -1233,6 +1283,7 @@ fn convert_accessor_property(
                 type_ref: type_ref.clone(),
                 doc,
                 throws: info.throws(),
+                string_mode,
             }),
             Member::StaticSetter(StaticSetterMember {
                 scope: parent_scope,
@@ -1250,6 +1301,7 @@ fn convert_accessor_property(
                 optional: false,
                 doc,
                 throws: info.throws(),
+                string_mode,
             }),
             Member::Setter(SetterMember {
                 scope: parent_scope,

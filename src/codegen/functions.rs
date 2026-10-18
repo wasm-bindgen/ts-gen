@@ -82,6 +82,7 @@ fn emit_function(
         body_scope: decl.body_scope,
         throws: &decl.throws,
         doc,
+        string_mode: decl.string_mode,
     })
     .chain(decl.overloads.iter().map(|o| Overload {
         params: &o.params,
@@ -89,6 +90,7 @@ fn emit_function(
         body_scope: o.body_scope,
         throws: &o.throws,
         doc: &o.doc,
+        string_mode: o.string_mode,
     }))
     .collect();
     let sigs = build_signatures(
@@ -451,6 +453,7 @@ fn generate_constructs(
             body_scope: construct.body_scope,
             throws: &construct.throws,
             doc,
+            string_mode: None,
         };
         match groups.iter_mut().find(|(first, _, _)| same(first)) {
             Some((_, _, overloads)) => overloads.push(overload),

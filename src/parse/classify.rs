@@ -56,6 +56,7 @@ mod tests {
             optional,
             doc: None,
             throws: crate::ir::Throws::None,
+            string_mode: None,
         })
     }
 
@@ -66,6 +67,7 @@ mod tests {
             type_ref: TypeRef::Any,
             doc: None,
             throws: crate::ir::Throws::None,
+            string_mode: None,
         })
     }
 
@@ -80,6 +82,7 @@ mod tests {
             doc: None,
             throws: crate::ir::Throws::None,
             body_scope: crate::parse::scope::ScopeId::DUMMY,
+            string_mode: None,
         })
     }
 

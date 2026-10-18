@@ -124,6 +124,7 @@ pub fn extract_var_members(
                     type_ref: type_ref.clone(),
                     doc,
                     throws: info.throws(),
+                    string_mode: info.string_mode.as_deref().and_then(StringModeHint::parse),
                 }));
                 if !prop.readonly {
                     static_members.push(Member::StaticSetter(StaticSetterMember {
@@ -162,6 +163,7 @@ pub fn extract_var_members(
                     doc,
                     throws: info.throws(),
                     body_scope,
+                    string_mode: info.string_mode.as_deref().and_then(StringModeHint::parse),
                 }));
             }
             TSSignature::TSCallSignatureDeclaration(_) => {

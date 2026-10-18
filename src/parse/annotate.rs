@@ -6,7 +6,8 @@
 
 use crate::context::{GlobalContext, TypeId};
 use crate::ir::{
-    FunctionDecl, Member, Module, Param, RustScalar, Throws, TypeKind, TypeParam, TypeRef,
+    FunctionDecl, Member, Module, Param, RustScalar, StringModeHint, Throws, TypeKind, TypeParam,
+    TypeRef,
 };
 
 /// Apply every tag found in `annotations` to the matching declarations
@@ -21,9 +22,9 @@ pub fn apply(
     let mut errors = Vec::new();
     for &aid in &annotations.types {
         let adecl = agctx.get_type(aid);
-        let (name, members, type_params) = match &adecl.kind {
-            TypeKind::Class(c) => (&c.name, &c.members, &c.type_params),
-            TypeKind::Interface(i) => (&i.name, &i.members, &i.type_params),
+        let (name, members, type_params, string_mode) = match &adecl.kind {
+            TypeKind::Class(c) => (&c.name, &c.members, &c.type_params, c.string_mode),
+            TypeKind::Interface(i) => (&i.name, &i.members, &i.type_params, i.string_mode),
             TypeKind::Function(f) => {
                 apply_function(gctx, module, adecl.doc.as_deref(), f, &mut errors);
                 continue;
@@ -47,6 +48,7 @@ pub fn apply(
         };
         apply_members(gctx, module, name, members, &mut errors);
         apply_type_param_defaults(gctx, module, name, type_params, &mut errors);
+        apply_string_default(gctx, module, name, string_mode, &mut errors);
     }
     errors
 }
@@ -64,12 +66,14 @@ fn apply_function(
         own: scalar_leaf(&f.return_type),
         params: &f.params,
         throws: &f.throws,
+        string_mode: f.string_mode,
         doc,
     })
     .chain(f.overloads.iter().map(|o| Overlay {
         own: scalar_leaf(&o.return_type),
         params: &o.params,
         throws: &o.throws,
+        string_mode: o.string_mode,
         doc: o.doc.as_deref(),
     }))
     .filter(|o| !o.is_empty())
@@ -100,13 +104,19 @@ fn apply_function(
             &mut func.params,
             &mut func.throws,
             &mut target.doc,
+            &mut func.string_mode,
         ))
-        .chain(
-            func.overloads
-                .iter_mut()
-                .map(|o| (&mut o.return_type, &mut o.params, &mut o.throws, &mut o.doc)),
-        );
-        for (ret, params, throws, doc) in targets {
+        .chain(func.overloads.iter_mut().map(|o| {
+            (
+                &mut o.return_type,
+                &mut o.params,
+                &mut o.throws,
+                &mut o.doc,
+                &mut o.string_mode,
+            )
+        }));
+        for (ret, params, throws, doc, string_mode) in targets {
+            overlay.apply_string_mode(string_mode);
             match overlay.apply_return(ret) {
                 Some(m) => return_mismatches.push(m),
                 None => returns_ok = true,
@@ -162,6 +172,35 @@ fn apply_type_param_defaults(
     }
 }
 
+/// A side declaration's `{@string mode}` is the default of every input
+/// member of it that no tag (input or side) has set.
+fn apply_string_default(
+    gctx: &mut GlobalContext,
+    module: &Module,
+    name: &str,
+    mode: Option<StringModeHint>,
+    errors: &mut Vec<String>,
+) {
+    if mode.is_none() {
+        return;
+    }
+    let id = match find_decl(gctx, module, name) {
+        Ok(id) => id,
+        Err(e) => {
+            errors.push(e);
+            return;
+        }
+    };
+    match &mut gctx.get_type_mut(id).kind {
+        TypeKind::Class(c) => crate::parse::members::apply_string_default(&mut c.members, mode),
+        TypeKind::Interface(i) => crate::parse::members::apply_string_default(&mut i.members, mode),
+        TypeKind::DiscriminatedUnion(d) => {
+            crate::parse::members::apply_string_default(&mut d.members, mode)
+        }
+        _ => errors.push(format!("`{name}` is not a class or interface")),
+    }
+}
+
 /// The input declaration a side name targets. A name declared more than
 /// once (globally and in a module) cannot be targeted by bare name.
 fn find_decl(gctx: &GlobalContext, module: &Module, name: &str) -> Result<TypeId, String> {
@@ -198,6 +237,8 @@ struct Overlay<'a> {
     /// Parameters, of which only `@rust`-tagged ones are applied.
     params: &'a [Param],
     throws: &'a Throws,
+    /// `{@string mode}` for the property type or callable return.
+    string_mode: Option<StringModeHint>,
     /// Rendered side doc (the `## Errors` section of `@throws`), appended
     /// to the target's doc.
     doc: Option<&'a str>,
@@ -211,6 +252,7 @@ impl Overlay<'_> {
                 .iter()
                 .all(|p| scalar_leaf(&p.type_ref).is_none())
             && matches!(self.throws, Throws::None)
+            && self.string_mode.is_none()
             && self.doc.is_none_or(|d| d.trim().is_empty())
     }
 
@@ -252,6 +294,12 @@ impl Overlay<'_> {
                     found.push(ap.name.clone());
                 }
             }
+        }
+    }
+
+    fn apply_string_mode(&self, mode: &mut Option<StringModeHint>) {
+        if self.string_mode.is_some() {
+            *mode = self.string_mode;
         }
     }
 
@@ -312,6 +360,7 @@ fn side_member(m: &Member) -> Option<(Key<'_>, Overlay<'_>)> {
                 own: scalar_leaf(&g.type_ref),
                 params: &[],
                 throws: &g.throws,
+                string_mode: g.string_mode,
                 doc: g.doc.as_deref(),
             },
         ),
@@ -321,6 +370,7 @@ fn side_member(m: &Member) -> Option<(Key<'_>, Overlay<'_>)> {
                 own: scalar_leaf(&g.type_ref),
                 params: &[],
                 throws: &g.throws,
+                string_mode: g.string_mode,
                 doc: g.doc.as_deref(),
             },
         ),
@@ -330,6 +380,7 @@ fn side_member(m: &Member) -> Option<(Key<'_>, Overlay<'_>)> {
                 own: scalar_leaf(&m.return_type),
                 params: &m.params,
                 throws: &m.throws,
+                string_mode: m.string_mode,
                 doc: m.doc.as_deref(),
             },
         ),
@@ -339,6 +390,7 @@ fn side_member(m: &Member) -> Option<(Key<'_>, Overlay<'_>)> {
                 own: scalar_leaf(&m.return_type),
                 params: &m.params,
                 throws: &m.throws,
+                string_mode: m.string_mode,
                 doc: m.doc.as_deref(),
             },
         ),
@@ -348,6 +400,7 @@ fn side_member(m: &Member) -> Option<(Key<'_>, Overlay<'_>)> {
                 own: None,
                 params: &c.params,
                 throws: &c.throws,
+                string_mode: None,
                 doc: c.doc.as_deref(),
             },
         ),
@@ -403,6 +456,7 @@ fn apply_members(
                 (Member::Getter(t), Key::Property(n)) if t.js_name == *n => {
                     hit = true;
                     mismatched.extend(overlay.apply_return(&mut t.type_ref));
+                    overlay.apply_string_mode(&mut t.string_mode);
                     overlay.apply_throws(&mut t.throws);
                     overlay.apply_doc(&mut t.doc);
                 }
@@ -412,6 +466,7 @@ fn apply_members(
                 (Member::StaticGetter(t), Key::StaticProperty(n)) if t.js_name == *n => {
                     hit = true;
                     mismatched.extend(overlay.apply_return(&mut t.type_ref));
+                    overlay.apply_string_mode(&mut t.string_mode);
                     overlay.apply_throws(&mut t.throws);
                     overlay.apply_doc(&mut t.doc);
                 }
@@ -421,6 +476,7 @@ fn apply_members(
                 (Member::Method(t), Key::Method(n)) if t.js_name == *n => {
                     hit = true;
                     on_return(overlay.apply_return(&mut t.return_type));
+                    overlay.apply_string_mode(&mut t.string_mode);
                     overlay.apply_params(&mut t.params, &mut found, &mut mismatched);
                     overlay.apply_throws(&mut t.throws);
                     overlay.apply_doc(&mut t.doc);
@@ -428,6 +484,7 @@ fn apply_members(
                 (Member::StaticMethod(t), Key::StaticMethod(n)) if t.js_name == *n => {
                     hit = true;
                     on_return(overlay.apply_return(&mut t.return_type));
+                    overlay.apply_string_mode(&mut t.string_mode);
                     overlay.apply_params(&mut t.params, &mut found, &mut mismatched);
                     overlay.apply_throws(&mut t.throws);
                     overlay.apply_doc(&mut t.doc);
