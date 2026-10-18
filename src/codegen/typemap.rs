@@ -2452,8 +2452,11 @@ pub fn to_return_type(
     // `js_string_return` is only set by `build_signatures` in per-mono mode,
     // which implies a context; without one, fall through to the plain lowering.
     let js_string_ctx = ctx.filter(|_| js_string_return);
-    let generic_container =
-        is_async && ctx.is_some_and(|c| is_generic_rust_container(ty, c, scope));
+    // An erased `T` has no `Option<T>` / `Vec<T>` ABI, so the awaited value
+    // keeps its handle form there; a per-mono `T` is concrete per call.
+    let generic_container = is_async
+        && !CodegenContext::generic_mono(ctx)
+        && ctx.is_some_and(|c| is_generic_rust_container(ty, c, scope));
     let inner = if let Some(ctx) = js_string_ctx {
         to_mono_js_string_return_type(ty, ctx, scope, from_module)
     } else if generic_container {
