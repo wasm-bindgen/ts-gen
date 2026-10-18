@@ -75,6 +75,8 @@ extern "C" {
     pub type Holder<T = JsValue, U = Box_<T>>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<Holder, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Holder")]
+    pub fn new_typed<T, U>() -> Result<Holder<T, U>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn get<T, U>(this: &Holder<T, U>) -> Result<T, JsValue>
     where

@@ -522,6 +522,32 @@ impl<'a> ClassConfig<'a> {
         names
     }
 
+    /// Under per-monomorphization, a construct signature's declared return
+    /// when it instantiates the class with concrete arguments only
+    /// (`new (source: UnderlyingByteSource): ReadableStream<Uint8Array>`),
+    /// which the constructor then returns as written rather than at the
+    /// class's defaults.
+    fn concrete_construct_return<'c>(
+        &self,
+        c: &'c crate::ir::ConstructorMember,
+    ) -> Option<&'c TypeRef> {
+        if !CodegenContext::generic_mono(self.cgctx) || self.type_params.is_empty() {
+            return None;
+        }
+        let ret = c.return_type.as_ref()?;
+        let TypeRef::Reference {
+            segments,
+            generic_args,
+        } = ret
+        else {
+            return None;
+        };
+        let names_class = segments.len() == 1
+            && (segments[0] == self.rust_name || segments[0] == self.js_name)
+            && generic_args.len() == self.type_params.len();
+        (names_class && self.mentioned_type_param_names(c.scope, &[ret]).is_empty()).then_some(ret)
+    }
+
     /// Generic declaration for Rust helper impls and builder structs. The
     /// erased path keeps the extern declaration's `JsGeneric` bound. The
     /// per-monomorphization path instead needs `IntoWasmAbi` because helper
@@ -1770,14 +1796,19 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 // `generate_expanded_constructor` instantiates only the
                 // parameters its arguments mention and the rest default.
                 let return_type = TypeRef::ident(config.rust_name.clone());
+                let returns: Vec<&TypeRef> = constructor_overloads
+                    .iter()
+                    .map(|c| config.concrete_construct_return(c).unwrap_or(&return_type))
+                    .collect();
                 // Each constructor resolves in the body of the declaration
                 // it is written in, or in its construct signature's own
                 // scope when that declares `<T>` (`new <T>(…): Foo<T>`).
                 let overloads: Vec<Overload> = constructor_overloads
                     .iter()
-                    .map(|c| Overload {
+                    .zip(&returns)
+                    .map(|(c, return_type)| Overload {
                         params: &c.params,
-                        return_type: &return_type,
+                        return_type,
                         body_scope: c.scope,
                         throws: &c.throws,
                         async_modifier: false,
@@ -2233,11 +2264,81 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
     let generics = render_generic_bounds(&bounds);
 
     let literal = super::inline_wrappers::literal_attr(sig);
+    let typed = typed_constructor(config, sig, &mentioned, &return_type, &params, &wb_parts);
     quote! {
         #doc
         #literal
         #[wasm_bindgen(#(#wb_parts),*)]
         pub fn #rust_ident #generics (#params) -> #ret;
+        #typed
+    }
+}
+
+/// Under per-monomorphization, a constructor that leaves class parameters
+/// at their defaults (`TransformStream::new()` is `TransformStream<JsValue,
+/// JsValue>`, so it needs no annotation) gets a `_typed` twin binding every
+/// class parameter, for a typed stream from the same JS constructor:
+/// `let t: TransformStream<Uint8Array, Uint8Array> = TransformStream::new_typed()?`.
+fn typed_constructor(
+    config: &ClassConfig,
+    sig: &FunctionSignature,
+    mentioned: &[String],
+    return_type: &TypeRef,
+    params: &TokenStream,
+    wb_parts: &[TokenStream],
+) -> TokenStream {
+    let declared_concrete = mentioned.is_empty()
+        && matches!(return_type, TypeRef::Reference { generic_args, .. } if !generic_args.is_empty());
+    if !CodegenContext::generic_mono(config.cgctx)
+        || config.type_params.is_empty()
+        || sig.literal.is_some()
+        || mentioned.len() >= config.type_params.len()
+        || declared_concrete
+    {
+        return quote! {};
+    }
+    let typed_ident = super::typemap::make_ident(&format!("{}_typed", sig.rust_name));
+    let typed_return = TypeRef::generic(
+        config.rust_name.clone(),
+        config
+            .type_params
+            .iter()
+            .map(|tp| TypeRef::ident(tp.name.clone()))
+            .collect(),
+    );
+    let ret = to_return_type(
+        &typed_return,
+        sig.catch,
+        sig.is_async,
+        false,
+        sig.error_type.as_ref(),
+        config.cgctx,
+        config.scope,
+        &config.from_module(),
+        super::typemap::ReturnAnchor {
+            base: &sig.rust_name,
+            kind: super::typemap::ReturnAnchorKind::Callable,
+            parent: Some(&config.rust_name),
+        },
+    );
+    let mut wb_parts: Vec<TokenStream> = wb_parts
+        .iter()
+        .filter(|p| !p.to_string().starts_with("js_name"))
+        .cloned()
+        .collect();
+    let js_name = &config.js_name;
+    wb_parts.push(quote! { js_name = #js_name });
+    let bounds: Vec<TokenStream> = config
+        .type_params
+        .iter()
+        .map(|tp| CodegenContext::type_param_decl(config.cgctx, &tp.name))
+        .collect();
+    let generics = render_generic_bounds(&bounds);
+    let doc = super::doc_tokens(&sig.doc);
+    quote! {
+        #doc
+        #[wasm_bindgen(#(#wb_parts),*)]
+        pub fn #typed_ident #generics (#params) -> #ret;
     }
 }
 

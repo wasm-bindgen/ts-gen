@@ -3841,6 +3841,8 @@ extern "C" {
     pub type EventTarget<EventMap = Object<Event>>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<EventTarget, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "EventTarget")]
+    pub fn new_typed<EventMap>() -> Result<EventTarget<EventMap>, JsValue>;
     #[doc = " The **`addEventListener()`** method of the EventTarget interface sets up a function that will be called whenever the specified event is delivered to the target."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)"]
@@ -4247,11 +4249,20 @@ extern "C" {
     pub type CustomEvent<T = JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(r#type: impl ::wasm_bindgen::JsStringLike) -> Result<CustomEvent, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "CustomEvent")]
+    pub fn new_typed<T>(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<CustomEvent<T>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_init(
         r#type: impl ::wasm_bindgen::JsStringLike,
         init: &CustomEventCustomEventInit,
     ) -> Result<CustomEvent, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "CustomEvent")]
+    pub fn new_with_init_typed<T>(
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        init: &CustomEventCustomEventInit,
+    ) -> Result<CustomEvent<T>, JsValue>;
     #[doc = " The read-only **`detail`** property of the CustomEvent interface returns any data passed when initializing the event."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/CustomEvent/detail)"]
@@ -8764,25 +8775,52 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new<CfHostMetadata, Cf>(input: &Request<CfHostMetadata, Cf>)
         -> Result<Request, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Request")]
+    pub fn new_typed<CfHostMetadata, Cf>(
+        input: &Request<CfHostMetadata, Cf>,
+    ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str(input: impl ::wasm_bindgen::JsStringLike) -> Result<Request, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Request")]
+    pub fn new_with_str_typed<CfHostMetadata, Cf>(
+        input: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url(input: &URL) -> Result<Request, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Request")]
+    pub fn new_with_url_typed<CfHostMetadata, Cf>(
+        input: &URL,
+    ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_init<Cf, CfHostMetadata, Cf2>(
         input: &Request<CfHostMetadata, Cf2>,
         init: &RequestInit<Cf>,
     ) -> Result<Request<JsValue, Cf>, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Request")]
+    pub fn new_with_init_typed<CfHostMetadata, Cf>(
+        input: &Request<CfHostMetadata, Cf2>,
+        init: &RequestInit<Cf>,
+    ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str_and_init<Cf>(
         input: impl ::wasm_bindgen::JsStringLike,
         init: &RequestInit<Cf>,
     ) -> Result<Request<JsValue, Cf>, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Request")]
+    pub fn new_with_str_and_init_typed<CfHostMetadata, Cf>(
+        input: impl ::wasm_bindgen::JsStringLike,
+        init: &RequestInit<Cf>,
+    ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_url_and_init<Cf>(
         input: &URL,
         init: &RequestInit<Cf>,
     ) -> Result<Request<JsValue, Cf>, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "Request")]
+    pub fn new_with_url_and_init_typed<CfHostMetadata, Cf>(
+        input: &URL,
+        init: &RequestInit<Cf>,
+    ) -> Result<Request<CfHostMetadata, Cf>, JsValue>;
     #[doc = " The **`clone()`** method of the Request interface creates a copy of the current `Request` object."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/clone)"]
@@ -13258,15 +13296,17 @@ extern "C" {
     pub type ReadableStream<R = JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<ReadableStream, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "ReadableStream")]
+    pub fn new_typed<R>() -> Result<ReadableStream<R>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_underlying_byte_source(
         underlying_source: &UnderlyingByteSource,
-    ) -> Result<ReadableStream, JsValue>;
+    ) -> Result<ReadableStream<Uint8Array>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_underlying_byte_source_and_queuing_strategy(
         underlying_source: &UnderlyingByteSource,
         strategy: &QueuingStrategy<Uint8Array>,
-    ) -> Result<ReadableStream, JsValue>;
+    ) -> Result<ReadableStream<Uint8Array>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_underlying_source<R>(
         underlying_source: &UnderlyingSource<R>,
@@ -13395,6 +13435,10 @@ extern "C" {
     pub type ReadableStreamDefaultReader<R = JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new<R>(stream: &ReadableStream<R>) -> Result<ReadableStreamDefaultReader, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "ReadableStreamDefaultReader")]
+    pub fn new_typed<R>(
+        stream: &ReadableStream<R>,
+    ) -> Result<ReadableStreamDefaultReader<R>, JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn closed<R>(this: &ReadableStreamDefaultReader<R>) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch)]
@@ -13794,15 +13838,26 @@ extern "C" {
     pub type WritableStream<W = JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<WritableStream, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "WritableStream")]
+    pub fn new_typed<W>() -> Result<WritableStream<W>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_underlying_sink(
         underlying_sink: &UnderlyingSink,
     ) -> Result<WritableStream, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "WritableStream")]
+    pub fn new_with_underlying_sink_typed<W>(
+        underlying_sink: &UnderlyingSink,
+    ) -> Result<WritableStream<W>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_underlying_sink_and_queuing_strategy(
         underlying_sink: &UnderlyingSink,
         queuing_strategy: &QueuingStrategy,
     ) -> Result<WritableStream, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "WritableStream")]
+    pub fn new_with_underlying_sink_and_queuing_strategy_typed<W>(
+        underlying_sink: &UnderlyingSink,
+        queuing_strategy: &QueuingStrategy,
+    ) -> Result<WritableStream<W>, JsValue>;
     #[doc = " The **`locked`** read-only property of the WritableStream interface returns a boolean indicating whether the `WritableStream` is locked to a writer."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/locked)"]
@@ -13859,6 +13914,10 @@ extern "C" {
     pub type WritableStreamDefaultWriter<W = JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new<W>(stream: &WritableStream<W>) -> Result<WritableStreamDefaultWriter, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "WritableStreamDefaultWriter")]
+    pub fn new_typed<W>(
+        stream: &WritableStream<W>,
+    ) -> Result<WritableStreamDefaultWriter<W>, JsValue>;
     #[doc = " The **`closed`** read-only property of the the stream errors or the writer's lock is released."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/closed)"]
@@ -13953,6 +14012,8 @@ extern "C" {
     pub type TransformStream<I = JsValue, O = JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<TransformStream, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "TransformStream")]
+    pub fn new_typed<I, O>() -> Result<TransformStream<I, O>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_transformer<I, O>(
         transformer: &Transformer<I, O>,

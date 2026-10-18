@@ -1713,6 +1713,7 @@ mod tests {
                 type_params: vec![],
                 doc: None,
                 throws: crate::ir::Throws::None,
+                return_type: None,
             })
         };
         let mut base = vec![

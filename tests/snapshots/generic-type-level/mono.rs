@@ -30,6 +30,8 @@ extern "C" {
     pub type EventTarget<EventMap = Object<Event>>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<EventTarget, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "EventTarget")]
+    pub fn new_typed<EventMap>() -> Result<EventTarget<EventMap>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "dispatchEvent")]
     pub fn dispatch_event<EventMap>(
         this: &EventTarget<EventMap>,
@@ -144,6 +146,8 @@ extern "C" {
     pub type TransformStream<I = JsValue, O = JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<TransformStream, JsValue>;
+    #[wasm_bindgen(constructor, catch, js_name = "TransformStream")]
+    pub fn new_typed<I, O>() -> Result<TransformStream<I, O>, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_transformer<I, O>(
         transformer: &Transformer<I, O>,
@@ -184,6 +188,10 @@ extern "C" {
     pub type Chained<A = JsString, B = A, C = Number>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new<C>(c: &C) -> Result<Chained<String, String, C>, JsValue>
+    where
+        C: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    #[wasm_bindgen(constructor, catch, js_name = "Chained")]
+    pub fn new_typed<A, B, C>(c: &C) -> Result<Chained<A, B, C>, JsValue>
     where
         C: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
