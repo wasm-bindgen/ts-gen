@@ -28,6 +28,28 @@
   ;; read(key: string, type: "text"): string
   (import "literal-overloads-mono" "Store.read" (func $literal-overloads-mono:Store.read (param $this externref) (param $key externref) (param $type externref) (result externref)))
 
+  ;; GetOptions
+  ;; {} as GetOptions
+  (import "literal-overloads-mono" "GetOptions.new" (func $literal-overloads-mono:GetOptions.new (result externref)))
+  ;; type: Type
+  (import "literal-overloads-mono" "GetOptions.type" (func $literal-overloads-mono:GetOptions.type (param $this externref) (result externref)))
+  ;; set type(value: Type)
+  (import "literal-overloads-mono" "GetOptions.set_type" (func $literal-overloads-mono:GetOptions.set_type (param $this externref) (param $value externref)))
+  ;; cacheTtl?: number
+  (import "literal-overloads-mono" "GetOptions.cache_ttl" (func $literal-overloads-mono:GetOptions.cache_ttl (param $this externref) (result externref)))
+  ;; set cacheTtl(value: number)
+  (import "literal-overloads-mono" "GetOptions.set_cache_ttl" (func $literal-overloads-mono:GetOptions.set_cache_ttl (param $this externref) (param $value f64)))
+
+  ;; Namespace
+  ;; get(key: string): Promise<string | null>
+  (import "literal-overloads-mono" "Namespace.get" (func $literal-overloads-mono:Namespace.get (param $this externref) (param $key externref) (result externref)))
+  ;; get(key: string, options: GetOptions<undefined>): Promise<string | null>
+  (import "literal-overloads-mono" "Namespace.get_with_str_and_get_options" (func $literal-overloads-mono:Namespace.get_with_str_and_get_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
+  ;; get(key: string[]): Promise<Map<string, string | null>>
+  (import "literal-overloads-mono" "Namespace.get_with_slice" (func $literal-overloads-mono:Namespace.get_with_slice (param $this externref) (param $key externref) (result externref)))
+  ;; get(key: string[], options: GetOptions<"text">): Promise<Map<string, string | null>>
+  (import "literal-overloads-mono" "Namespace.get_with_slice_and_get_options" (func $literal-overloads-mono:Namespace.get_with_slice_and_get_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
+
   ;; Cell
   ;; take(mode: "now"): V
   (import "literal-overloads-mono" "Cell.take" (func $literal-overloads-mono:Cell.take (param $this externref) (param $mode externref) (result externref)))
