@@ -23,6 +23,8 @@
 //! arms (`f(kind: "a" | "b", x: T | null)`) also drops the `null` parameter
 //! here, and its union alias arguments convert here (see [`into_target`]),
 //! since the arm wrappers are already the public face of the extern.
+//! A literal type argument of a dictionary parameter is the third: the
+//! wrapper sets the field it types on a copy of the caller's options.
 
 use super::null_arms;
 use proc_macro2::{Span, TokenStream};
@@ -39,12 +41,19 @@ const MARKER_PREFIX: &str = "__TsGenWide";
 const LITERAL_ATTR: &str = "ts_gen_literal";
 /// Names the extern a wrapper calls, so [`copy_abi_bounds`] can find it.
 const WRAPS_ATTR: &str = "ts_gen_wraps";
+const FIELD_LITERAL_ATTR: &str = "ts_gen_field_literal";
 
 /// The attribute the signature layer puts on a literal-keyed extern fn:
 /// `#[ts_gen_literal(binding(__get), positions(1), arm("text", get_text), arm("json", get_json))]`.
 /// The extern is renamed to `binding`; positions index the parameters
 /// after `this`.
 pub(crate) fn literal_attr(sig: &crate::codegen::signatures::FunctionSignature) -> TokenStream {
+    if let Some(field) = &sig.field_literal {
+        let attr = format_ident!("{FIELD_LITERAL_ATTR}");
+        let position = proc_macro2::Literal::usize_unsuffixed(field.position);
+        let (name, value) = (&field.field, &field.value);
+        return quote! { #[#attr(#position, #name, #value)] };
+    }
     let Some(spec) = &sig.literal else {
         return quote! {};
     };
@@ -72,6 +81,41 @@ fn take_literal_attr(item: &mut ForeignItemFn) -> Option<LiteralArms> {
         .attrs
         .iter()
         .position(|a| a.path().is_ident(LITERAL_ATTR))?;
+    let attr = item.attrs.remove(idx);
+    let syn::Meta::List(list) = attr.meta else {
+        return None;
+    };
+    syn::parse2(list.tokens).ok()
+}
+
+/// `#[ts_gen_field_literal(position, "field", "value")]`; see
+/// [`crate::codegen::signatures::FieldLiteral`].
+struct FieldLiteral {
+    position: usize,
+    field: String,
+    value: String,
+}
+
+impl syn::parse::Parse for FieldLiteral {
+    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
+        let position: syn::LitInt = input.parse()?;
+        input.parse::<syn::Token![,]>()?;
+        let field: syn::LitStr = input.parse()?;
+        input.parse::<syn::Token![,]>()?;
+        let value: syn::LitStr = input.parse()?;
+        Ok(Self {
+            position: position.base10_parse()?,
+            field: field.value(),
+            value: value.value(),
+        })
+    }
+}
+
+fn take_field_literal_attr(item: &mut ForeignItemFn) -> Option<FieldLiteral> {
+    let idx = item
+        .attrs
+        .iter()
+        .position(|a| a.path().is_ident(FIELD_LITERAL_ATTR))?;
     let attr = item.attrs.remove(idx);
     let syn::Meta::List(list) = attr.meta else {
         return None;
@@ -162,7 +206,9 @@ pub(crate) fn bind_into_targets(sig: &mut Signature) -> bool {
 }
 
 fn is_literal_keyed(item: &ForeignItemFn) -> bool {
-    item.attrs.iter().any(|a| a.path().is_ident(LITERAL_ATTR))
+    item.attrs
+        .iter()
+        .any(|a| a.path().is_ident(LITERAL_ATTR) || a.path().is_ident(FIELD_LITERAL_ATTR))
 }
 
 /// The placeholder type the emitters use for a 64-bit scalar on a `number`.
@@ -597,6 +643,7 @@ fn name_elided_lifetimes(ty: &mut Type) -> bool {
 
 fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
     let literal = take_literal_attr(item);
+    let field = take_field_literal_attr(item);
     let Some((attr_idx, binding)) = read_binding(item) else {
         return Vec::new();
     };
@@ -616,7 +663,7 @@ fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
         })
         .collect();
     let converts = return_shape.converts() || param_shapes.iter().any(Shape::converts);
-    if !converts && literal.is_none() {
+    if !converts && literal.is_none() && field.is_none() {
         return Vec::new();
     }
     let is_null_arm =
@@ -830,6 +877,9 @@ fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
             let call_args = param_names.iter().enumerate().map(|(i, pname)| {
                 match values.iter().find(|(pos, _)| *pos == i) {
                     Some((_, lit)) => quote! { #lit },
+                    None if field.as_ref().is_some_and(|f| f.position == i) => {
+                        quote! { ::wasm_bindgen::JsCast::unchecked_ref(&#pname) }
+                    }
                     None if null_positions.contains(&i) => {
                         quote! { &::wasm_bindgen::JsValue::NULL }
                     }
@@ -839,6 +889,27 @@ fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
             });
             let call = quote! { #callee(#(#call_args),*)#await_tokens };
             let body = from_extern(call, &return_shape);
+            let body = match field
+                .as_ref()
+                .and_then(|f| Some((f, param_names.get(f.position)?)))
+            {
+                Some((f, pname)) => {
+                    let (name, value) = (&f.field, &f.value);
+                    quote! {
+                        let #pname: ::js_sys::Object = ::js_sys::Object::assign(
+                            &::js_sys::Object::new(),
+                            ::wasm_bindgen::JsCast::unchecked_ref(#pname),
+                        );
+                        let _ = ::js_sys::Reflect::set_str(
+                            &#pname,
+                            &::js_sys::JsString::from(#name),
+                            &::wasm_bindgen::JsValue::from_str(#value),
+                        );
+                        #body
+                    }
+                }
+                None => body,
+            };
             let mut sig = public_sig.clone();
             sig.ident = name;
             sig.inputs = receiver
@@ -934,7 +1005,10 @@ fn render_wrappers(wrappers: Vec<Wrapper>) -> Vec<Item> {
 /// carry one in a convertible position or a literal cohort.
 pub(crate) fn apply(file: &mut syn::File) {
     let text = file.to_token_stream().to_string();
-    if !text.contains(MARKER_PREFIX) && !text.contains(LITERAL_ATTR) {
+    if !text.contains(MARKER_PREFIX)
+        && !text.contains(LITERAL_ATTR)
+        && !text.contains(FIELD_LITERAL_ATTR)
+    {
         return;
     }
     process_items(&mut file.items);

@@ -3661,7 +3661,19 @@ impl CompressionStream {
   with its overload's return and type parameters, named
   `<base>_<literal>` plus the remaining parameters' suffix and the keyed
   parameter's name (`get_json_with_options<T>(key, &GetOptions<String>)
-  -> Option<T>`, `get_text_with_slice_and_options`).
+  -> Option<T>`, `get_text_with_slice_and_options`). When the literal
+  types exactly one property of a dictionary (`type: Type`), the binding
+  is an inline wrapper that sets that property to the literal on a copy
+  of the caller's options, so the options cannot ask for a reading other
+  than the return's:
+
+  ```rust
+  pub async fn get_json_with_options<T>(&self, key: impl JsStringLike, options: &GetOptions<String>) -> Result<Option<T>, JsValue> {
+      let options: ::js_sys::Object = ::js_sys::Object::assign(&::js_sys::Object::new(), ::wasm_bindgen::JsCast::unchecked_ref(options));
+      let _ = ::js_sys::Reflect::set_str(&options, &::js_sys::JsString::from("type"), &::wasm_bindgen::JsValue::from_str("json"));
+      self.__get_json_with_options(key, ::wasm_bindgen::JsCast::unchecked_ref(&options)).await
+  }
+  ```
 
 ## `@rust` JSDoc → Rust scalar
 
