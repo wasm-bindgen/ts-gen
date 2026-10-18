@@ -165,7 +165,10 @@ pub(crate) fn refresh_partials(gctx: &mut GlobalContext) {
             .into_iter()
             .map(|member| match member {
                 Member::Getter(mut g) => {
-                    g.optional = true;
+                    if !g.optional {
+                        g.type_ref = g.type_ref.or_undefined();
+                        g.optional = true;
+                    }
                     Member::Getter(g)
                 }
                 m => m,

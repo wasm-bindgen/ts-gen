@@ -58,12 +58,13 @@ fn literal_attr_without_determined(
     if let Some(field) = &sig.field_literal {
         let attr = format_ident!("{FIELD_LITERAL_ATTR}");
         let position = proc_macro2::Literal::usize_unsuffixed(field.position);
-        let (name, value) = (&field.field, &field.value);
+        let setter = format_ident!("{}", field.setter);
+        let value = &field.value;
         let head = field.head.as_ref().map(|h| {
             let h = format_ident!("{h}");
             quote! { , #h }
         });
-        return quote! { #[#attr(#position, #name, #value #head)] };
+        return quote! { #[#attr(#position, #setter, #value #head)] };
     }
     let Some(spec) = &sig.literal else {
         return quote! {};
@@ -101,11 +102,11 @@ fn take_literal_attr(item: &mut ForeignItemFn) -> Option<LiteralArms> {
     })
 }
 
-/// `#[ts_gen_field_literal(position, "field", "value", Head?)]`; see
+/// `#[ts_gen_field_literal(position, set_field, "value", Head?)]`; see
 /// [`crate::codegen::signatures::FieldLiteral`].
 struct FieldLiteral {
     position: usize,
-    field: String,
+    setter: String,
     value: String,
     head: Option<Ident>,
 }
@@ -114,7 +115,7 @@ impl syn::parse::Parse for FieldLiteral {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
         let position: syn::LitInt = input.parse()?;
         input.parse::<syn::Token![,]>()?;
-        let field: syn::LitStr = input.parse()?;
+        let setter: Ident = input.parse()?;
         input.parse::<syn::Token![,]>()?;
         let value: syn::LitStr = input.parse()?;
         let head = if input.parse::<Option<syn::Token![,]>>()?.is_some() {
@@ -124,7 +125,7 @@ impl syn::parse::Parse for FieldLiteral {
         };
         Ok(Self {
             position: position.base10_parse()?,
-            field: field.value(),
+            setter: setter.to_string(),
             value: value.value(),
             head,
         })
@@ -912,6 +913,18 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn, mono: bool) -> Vec<Wra
         }
     }
     let typed_inputs: Vec<FnArg> = public_sig.inputs.iter().skip(skip).cloned().collect();
+    // The copy of the caller's options is the extern's full dictionary,
+    // whose setter takes the literal.
+    let field_ty = field
+        .as_ref()
+        .and_then(|f| match item.sig.inputs.iter().nth(skip + f.position)? {
+            FnArg::Typed(pat) => match &*pat.ty {
+                Type::Reference(r) => Some((*r.elem).clone()),
+                _ => None,
+            },
+            FnArg::Receiver(_) => None,
+        })
+        .map(|ty| quote! { #ty });
     let receiver: Vec<FnArg> = public_sig.inputs.iter().take(skip).cloned().collect();
     arms.into_iter()
         .map(|(values, name)| {
@@ -929,7 +942,7 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn, mono: bool) -> Vec<Wra
                         _ => quote! { #pname },
                     },
                     None if field.as_ref().is_some_and(|f| f.position == i) => {
-                        quote! { ::wasm_bindgen::JsCast::unchecked_ref(&#pname) }
+                        quote! { &#pname }
                     }
                     None => to_extern(quote! { #pname }, s),
                 }
@@ -941,17 +954,16 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn, mono: bool) -> Vec<Wra
                 .and_then(|f| Some((f, &param_shapes.get(f.position)?.0)))
             {
                 Some((f, pname)) => {
-                    let (name, value) = (&f.field, &f.value);
+                    let setter = format_ident!("{}", f.setter);
+                    let value = &f.value;
                     quote! {
-                        let #pname: ::js_sys::Object = ::js_sys::Object::assign(
-                            &::js_sys::Object::new(),
-                            ::wasm_bindgen::JsCast::unchecked_ref(#pname),
+                        let #pname: #field_ty = ::wasm_bindgen::JsCast::unchecked_into(
+                            ::js_sys::Object::assign(
+                                &::js_sys::Object::new(),
+                                ::wasm_bindgen::JsCast::unchecked_ref(#pname),
+                            ),
                         );
-                        let _ = ::js_sys::Reflect::set_str(
-                            &#pname,
-                            &::js_sys::JsString::from(#name),
-                            &::wasm_bindgen::JsValue::from_str(#value),
-                        );
+                        #pname.#setter(&::core::convert::From::from(#value));
                         #body
                     }
                 }

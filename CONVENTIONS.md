@@ -610,6 +610,11 @@ because JS constructors can always throw.
 `abstract` classes skip the constructor (you can't `new` an abstract
 class).
 
+Under `--experimental-generic-mono`, a method returning `this` returns the
+type that declares it (or inherits it as a copied member), so it chains:
+`Span::set_attribute(..) -> Result<Span, Error>`. Without the flag it is
+`JsValue`.
+
 ## Interfaces (class-like vs dictionary)
 
 Interfaces are classified by shape (see `parse/classify.rs`):
@@ -1707,6 +1712,15 @@ each kept only when the shorter name is still unique:
   comes first: R2's `put_with_options(&R2PutOptions)` beside
   `put_with_r2_bucket_put_options`. Unrelated ones keep their type names
   (`new_with_underlying_byte_source` / `new_with_underlying_source`).
+* A parameter name's `maybe` prefix only says it is optional, which the
+  suffix already does: `json_with_init` for `maybeInit?`.
+* A parameter named for its arms (`measureOptionsOrStartMark?:
+  PerformanceMeasureOptions | string`) names each arm by its part: a
+  named type by the part its name ends with, a last unmatched arm by the
+  last unmatched part (`measure_with_measure_options`,
+  `measure_with_start_mark`; D1's `with_session_with_constraint` /
+  `with_session_with_bookmark` for `constraintOrBookmark?:
+  D1SessionBookmark | D1SessionConstraint`).
 
 ### `_with_<type>` suffix vocabulary
 
@@ -2143,7 +2157,8 @@ signatures take native leaves the same way (see
 [Function types](#function-types)).
 
 A parameter's `Partial<X>` names a synthesized `XPartial`, X with every
-property optional, so its builder requires none of X's fields. One is
+property optional (each getter returns an `Option`), so its builder
+requires none of X's fields. One is
 synthesized per X and declaration, beside the declaration; one of a class,
 whose instances callers already hold, is the class. Elsewhere `Partial<X>`
 is `X`:
@@ -2926,16 +2941,17 @@ impl CompressionStream {
   (`get_json_with_options<T>`, `get_text_with_slice_and_options`). When
   the literal types exactly one property of a dictionary (`type: Type`),
   the binding is an inline wrapper that sets that property to the
-  literal on a copy of the caller's options, so the options cannot ask
-  for a reading other than the return's. The caller's options take the
+  literal on a copy of the caller's options, through the full
+  dictionary's setter, so the options cannot ask for a reading other
+  than the return's. The caller's options take the
   dictionary's [`Partial`](#in-scope-generic-type-parameters) where one
   is declared:
 
   ```rust
   pub async fn get_json_with_options<T>(&self, key: impl JsStringLike, options: &GetOptionsPartial<String>) -> Result<Option<T>, JsValue> {
-      let options: ::js_sys::Object = ::js_sys::Object::assign(&::js_sys::Object::new(), ::wasm_bindgen::JsCast::unchecked_ref(options));
-      let _ = ::js_sys::Reflect::set_str(&options, &::js_sys::JsString::from("type"), &::wasm_bindgen::JsValue::from_str("json"));
-      self.get_json_with_options_js(key, ::wasm_bindgen::JsCast::unchecked_ref(&options)).await
+      let options: GetOptions<String> = ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(&::js_sys::Object::new(), ::wasm_bindgen::JsCast::unchecked_ref(options)));
+      options.set_type(&::core::convert::From::from("json"));
+      self.get_json_with_options_js(key, &options).await
   }
   ```
 * Under per-monomorphization, a dictionary parameter whose every

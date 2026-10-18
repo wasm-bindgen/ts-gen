@@ -263,6 +263,179 @@ impl From<GetOptions> for GetOptionsBuilder {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type MeasureOptions;
+    #[wasm_bindgen(method, getter)]
+    pub fn start(this: &MeasureOptions) -> Option<String>;
+    #[wasm_bindgen(method, getter, js_name = "start")]
+    pub fn start_js_string(this: &MeasureOptions) -> Option<JsString>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_start(this: &MeasureOptions, val: impl ::wasm_bindgen::JsStringLike);
+}
+impl MeasureOptions {
+    pub fn new() -> MeasureOptions {
+        Self::builder().build()
+    }
+    pub fn builder() -> MeasureOptionsBuilder {
+        MeasureOptionsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+pub struct MeasureOptionsBuilder {
+    inner: MeasureOptions,
+}
+impl MeasureOptionsBuilder {
+    pub fn start(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_start(val);
+        self
+    }
+    pub fn build(self) -> MeasureOptions {
+        self.inner
+    }
+}
+impl From<MeasureOptions> for MeasureOptionsBuilder {
+    fn from(inner: MeasureOptions) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Performance;
+    #[wasm_bindgen(method)]
+    pub fn measure(this: &Performance, name: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, catch, js_name = "measure")]
+    pub fn try_measure(
+        this: &Performance,
+        name: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "measure")]
+    pub fn measure_with_measure_options(
+        this: &Performance,
+        name: impl ::wasm_bindgen::JsStringLike,
+        measure_options_or_start_mark: &MeasureOptions,
+    );
+    #[wasm_bindgen(method, catch, js_name = "measure")]
+    pub fn try_measure_with_measure_options(
+        this: &Performance,
+        name: impl ::wasm_bindgen::JsStringLike,
+        measure_options_or_start_mark: &MeasureOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "measure")]
+    pub fn measure_with_start_mark(
+        this: &Performance,
+        name: impl ::wasm_bindgen::JsStringLike,
+        measure_options_or_start_mark: impl ::wasm_bindgen::JsStringLike,
+    );
+    #[wasm_bindgen(method, catch, js_name = "measure")]
+    pub fn try_measure_with_start_mark(
+        this: &Performance,
+        name: impl ::wasm_bindgen::JsStringLike,
+        measure_options_or_start_mark: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "measure")]
+    pub fn measure_with_measure_options_and_end_mark(
+        this: &Performance,
+        name: impl ::wasm_bindgen::JsStringLike,
+        measure_options_or_start_mark: &MeasureOptions,
+        maybe_end_mark: impl ::wasm_bindgen::JsStringLike,
+    );
+    #[wasm_bindgen(method, catch, js_name = "measure")]
+    pub fn try_measure_with_measure_options_and_end_mark(
+        this: &Performance,
+        name: impl ::wasm_bindgen::JsStringLike,
+        measure_options_or_start_mark: &MeasureOptions,
+        maybe_end_mark: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "measure")]
+    pub fn measure_with_start_mark_and_end_mark(
+        this: &Performance,
+        name: impl ::wasm_bindgen::JsStringLike,
+        measure_options_or_start_mark: impl ::wasm_bindgen::JsStringLike,
+        maybe_end_mark: impl ::wasm_bindgen::JsStringLike,
+    );
+    #[wasm_bindgen(method, catch, js_name = "measure")]
+    pub fn try_measure_with_start_mark_and_end_mark(
+        this: &Performance,
+        name: impl ::wasm_bindgen::JsStringLike,
+        measure_options_or_start_mark: impl ::wasm_bindgen::JsStringLike,
+        maybe_end_mark: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn session(this: &Performance);
+    #[wasm_bindgen(method, catch, js_name = "session")]
+    pub fn try_session(this: &Performance) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "session")]
+    pub fn session_with_bookmark(
+        this: &Performance,
+        constraint_or_bookmark: impl ::wasm_bindgen::JsStringLike,
+    );
+    #[wasm_bindgen(method, catch, js_name = "session")]
+    pub fn try_session_with_bookmark(
+        this: &Performance,
+        constraint_or_bookmark: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "session")]
+    pub fn session_with_constraint(this: &Performance, constraint_or_bookmark: Constraint);
+    #[wasm_bindgen(method, catch, js_name = "session")]
+    pub fn try_session_with_constraint(
+        this: &Performance,
+        constraint_or_bookmark: Constraint,
+    ) -> Result<(), JsValue>;
+}
+#[allow(dead_code)]
+pub type Bookmark = String;
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Constraint {
+    FirstPrimary = "first-primary",
+    FirstUnconstrained = "first-unconstrained",
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Response;
+    # [wasm_bindgen (static_method_of = Response)]
+    pub fn json(any: &JsValue) -> Response;
+    # [wasm_bindgen (static_method_of = Response , catch , js_name = "json")]
+    pub fn try_json(any: &JsValue) -> Result<Response, JsValue>;
+    # [wasm_bindgen (static_method_of = Response , js_name = "json")]
+    pub fn json_with_init(any: &JsValue, maybe_init: &RequestInit) -> Response;
+    # [wasm_bindgen (static_method_of = Response , catch , js_name = "json")]
+    pub fn try_json_with_init(any: &JsValue, maybe_init: &RequestInit)
+        -> Result<Response, JsValue>;
+    # [wasm_bindgen (static_method_of = Response , js_name = "json")]
+    pub fn json_with_response(any: &JsValue, maybe_init: &Response) -> Response;
+    # [wasm_bindgen (static_method_of = Response , catch , js_name = "json")]
+    pub fn try_json_with_response(
+        any: &JsValue,
+        maybe_init: &Response,
+    ) -> Result<Response, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Span;
+    #[wasm_bindgen(method, js_name = "setAttribute")]
+    pub fn set_attribute(
+        this: &Span,
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> Span;
+    #[wasm_bindgen(method, catch, js_name = "setAttribute")]
+    pub fn try_set_attribute(
+        this: &Span,
+        key: impl ::wasm_bindgen::JsStringLike,
+        value: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Span, JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Bucket;
     #[wasm_bindgen(method)]
     pub fn get(this: &Bucket, key: impl ::wasm_bindgen::JsStringLike, options: &BucketGetOptions);
