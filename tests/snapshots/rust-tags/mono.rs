@@ -57,7 +57,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "setMatrix")]
     pub fn set_matrix(this: &Response, rows: &[Array<Number>]) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn codes(this: &Response) -> Result<Vec<JsNullable<Number>>, JsValue>;
+    pub fn codes(this: &Response) -> Result<Vec<Option<u16>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "setCodes")]
     pub fn set_codes(this: &Response, codes: &[JsNullable<Number>]) -> Result<(), JsValue>;
 }

@@ -52458,7 +52458,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_js_string(this: &TraceEventInfo) -> JsString;
         #[wasm_bindgen(method, getter)]
-        pub fn traces(this: &TraceEventInfo) -> Vec<JsNullable<JsString>>;
+        pub fn traces(this: &TraceEventInfo) -> Vec<Option<String>>;
     }
     impl TraceEventInfo {
         #[allow(clippy::new_without_default)]

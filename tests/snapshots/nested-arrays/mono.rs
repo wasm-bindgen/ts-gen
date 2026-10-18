@@ -88,14 +88,14 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "nullableStrings")]
     pub fn nullable_strings(
         values: &[JsNullable<JsString>],
-    ) -> Result<Vec<JsNullable<JsString>>, JsValue>;
+    ) -> Result<Vec<Option<String>>, JsValue>;
 }
 #[wasm_bindgen(module = "nested-arrays", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "nullableRows")]
     pub fn nullable_rows(
         rows: &[JsNullable<Array<String>>],
-    ) -> Result<Vec<JsNullable<Array<String>>>, JsValue>;
+    ) -> Result<Vec<Option<Array<String>>>, JsValue>;
 }
 #[wasm_bindgen(module = "nested-arrays", experimental_generic_mono)]
 extern "C" {

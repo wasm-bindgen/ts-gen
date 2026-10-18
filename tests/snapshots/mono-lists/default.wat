@@ -109,6 +109,14 @@
   ;; value: number
   (import "mono-lists" "Total.value" (func $mono-lists:Total.value (param $this externref) (result f64)))
 
+  ;; Trace
+  ;; traces: (string | null)[]
+  (import "mono-lists" "Trace.traces" (func $mono-lists:Trace.traces (param $this externref) (result externref)))
+  ;; errors?: (Total | null)[]
+  (import "mono-lists" "Trace.errors" (func $mono-lists:Trace.errors (param $this externref) (result externref)))
+  ;; values: (any | null)[]
+  (import "mono-lists" "Trace.values" (func $mono-lists:Trace.values (param $this externref) (result externref)))
+
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
 

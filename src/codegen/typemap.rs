@@ -2274,12 +2274,27 @@ pub fn to_syn_type(
             } else {
                 let repr = ctx.and_then(|c| c.enum_repr(inner, scope));
                 let inner = repr.as_ref().unwrap_or(inner);
-                let elem_pos = if is_native_array_element(inner, ctx, scope) {
-                    TypePosition::RETURN
-                } else {
-                    TypePosition::RETURN.to_inner()
+                let element = |inner: &TypeRef| {
+                    let elem_pos = if is_native_array_element(inner, ctx, scope) {
+                        TypePosition::RETURN
+                    } else {
+                        TypePosition::RETURN.to_inner()
+                    };
+                    to_syn_type(inner, elem_pos, ctx, scope, from_module)
                 };
-                let elem = to_syn_type(inner, elem_pos, ctx, scope, from_module);
+                // Per-mono a returned `Vec` reads a nullable element as
+                // `Option` (`Vec<Option<String>>`), either empty as `None`.
+                if !pos.is_argument() && CodegenContext::generic_mono(ctx) {
+                    if let Some((elem, _)) = inner.split_empties() {
+                        let elem = element(&elem);
+                        return if is_jsvalue_arg(&elem) {
+                            quote! { Vec<JsValue> }
+                        } else {
+                            quote! { Vec<Option<#elem>> }
+                        };
+                    }
+                }
+                let elem = element(inner);
                 if pos.is_argument() {
                     quote! { &[#elem] }
                 } else {

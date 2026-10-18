@@ -345,7 +345,10 @@ classes stay unborrowed (`&[EmailAttachment]`, not
 `&[&EmailAttachment]`); numbers stay bare (`&[f64]`, not
 `&[Number]`). With `type Row = string[]`, `Row[]` is
 `&[Array<JsString>]` / `Vec<Array<JsString>>`, the same as
-`string[][]`.
+`string[][]`. Under `--experimental-generic-mono` a returned list's
+`T | null` element is `Option` of the element form, either empty reading
+as `None`: `(string | null)[]` is `Vec<Option<String>>`, `(Log |
+null)[]` is `Vec<Option<Log>>`, and `(any | null)[]` stays `Vec<JsValue>`.
 
 Inside a built-in container (`Promise<Array<T>>`, `Map<K, Array<V>>`,
 …) the element stays the `Array<T'>` handle, which type-checks against

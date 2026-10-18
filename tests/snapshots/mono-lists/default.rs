@@ -308,6 +308,18 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn value(this: &Total) -> f64;
 }
+#[wasm_bindgen(module = "mono-lists")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Trace;
+    #[wasm_bindgen(method, getter)]
+    pub fn traces(this: &Trace) -> Vec<JsNullable<JsString>>;
+    #[wasm_bindgen(method, getter)]
+    pub fn errors(this: &Trace) -> Option<Vec<JsNullable<Total>>>;
+    #[wasm_bindgen(method, getter)]
+    pub fn values(this: &Trace) -> Vec<JsValue>;
+}
 #[wasm_bindgen(private)]
 pub enum GetValueReturnKind {
     String(String),
