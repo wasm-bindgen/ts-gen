@@ -109,11 +109,11 @@ extern "C" {
     pub fn maybe_holder(this: &Probe) -> Holder<Option<Mode>>;
     #[wasm_bindgen(method, catch, js_name = "maybeHolder")]
     pub fn try_maybe_holder(this: &Probe) -> Result<Holder<Option<Mode>>, JsValue>;
-    #[wasm_bindgen(method, js_name = "nextMode")]
+    #[wasm_bindgen(method, catch, js_name = "nextMode")]
     pub fn next_mode(this: &Probe) -> Promise<Mode>;
-    #[wasm_bindgen(method, js_name = "nextLevel")]
+    #[wasm_bindgen(method, catch, js_name = "nextLevel")]
     pub fn next_level(this: &Probe) -> Promise<Option<Level>>;
-    #[wasm_bindgen(method, js_name = "nextDetails")]
+    #[wasm_bindgen(method, catch, js_name = "nextDetails")]
     pub fn next_details(this: &Probe) -> Promise<Details<Mode>>;
     #[wasm_bindgen(method)]
     pub fn levels(this: &Probe, #[wasm_bindgen(slice = "array")] ls: &[f64]) -> Vec<f64>;

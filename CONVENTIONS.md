@@ -1894,7 +1894,7 @@ the one binding is both awaited (`kv.get(key).await?`) and handed to JS
 (`ctx.wait_until(&promise)`), and there is no `_promise` twin:
 
 ```rust
-#[wasm_bindgen(method, js_name = "get")]
+#[wasm_bindgen(method, catch, js_name = "get")]
 pub fn get(this: &KVNamespace, key: impl JsStringLike) -> Promise<Option<String>>;
 ```
 
@@ -1903,8 +1903,9 @@ pub fn get(this: &KVNamespace, key: impl JsStringLike) -> Promise<Option<String>
   through its `From<JsValue>`, but a tail `x.await` returning
   `Result<T, E>` is `Ok(x.await?)`, and `@throws` types do not reach the
   awaited error.
-* The import does not `catch` (a `Promise<T>` return is not a `Result`),
-  so a synchronous throw is not caught.
+* The import keeps `catch`, where wasm-bindgen returns a synchronous
+  throw as the rejected promise (`Promise::reject_typed`), so it too
+  arrives at `.await` as `Err`.
 
 ### Awaited values lower like sync returns
 

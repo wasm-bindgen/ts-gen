@@ -217,19 +217,19 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Bucket;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn put(
         this: &Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &ArrayBuffer,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_str(
         this: &Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     fn put_with_null_js(
         this: &Bucket,
         key: impl ::wasm_bindgen::JsStringLike,

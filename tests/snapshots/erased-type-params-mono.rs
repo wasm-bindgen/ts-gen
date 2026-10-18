@@ -123,9 +123,9 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn list(this: &Store) -> Promise<ListResult<JsValue>>;
-    #[wasm_bindgen(method, js_name = "list")]
+    #[wasm_bindgen(method, catch, js_name = "list")]
     pub fn list_typed<M>(this: &Store) -> Promise<ListResult<M>>;
 }
 #[wasm_bindgen(experimental_generic_mono)]

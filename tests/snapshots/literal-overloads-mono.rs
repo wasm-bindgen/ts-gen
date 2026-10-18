@@ -9,19 +9,19 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn get_text_js(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<String>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn get_text_js_string_js(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<JsString>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn get_json_js<T>(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
@@ -155,68 +155,68 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Namespace;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn get(this: &Namespace, key: impl ::wasm_bindgen::JsStringLike)
         -> Promise<Option<String>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_js_string(
         this: &Namespace,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<JsString>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_with_options(
         this: &Namespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptionsPartial<()>,
     ) -> Promise<Option<String>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_with_options_js_string(
         this: &Namespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptionsPartial<()>,
     ) -> Promise<Option<JsString>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn get_text_with_options_js(
         this: &Namespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions<String>,
     ) -> Promise<Option<String>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn get_text_with_options_js_string_js(
         this: &Namespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions<String>,
     ) -> Promise<Option<JsString>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn get_json_with_options_js<T>(
         this: &Namespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions<String>,
     ) -> Promise<Option<T>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn get_array_buffer_with_options_js(
         this: &Namespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions<String>,
     ) -> Promise<Option<ArrayBuffer>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_with_slice(
         this: &Namespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<Map<String, Option<String>>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn get_text_with_slice_and_options_js(
         this: &Namespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &GetOptions<String>,
     ) -> Promise<Map<String, Option<String>>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn get_json_with_slice_and_options_js(
         this: &Namespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &GetOptions<String>,
     ) -> Promise<Map<String, JsValue>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn get_json_with_slice_and_options_typed_js<T>(
         this: &Namespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
@@ -377,7 +377,7 @@ extern "C" {
         this: &Cell<V>,
         mode: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<V, JsValue>;
-    #[wasm_bindgen(method, js_name = "take")]
+    #[wasm_bindgen(method, catch, js_name = "take")]
     fn take_later_js<V>(this: &Cell<V>, mode: impl ::wasm_bindgen::JsStringLike) -> Promise<V>;
 }
 impl<V> Cell<V> {
@@ -460,9 +460,9 @@ extern "C" {
     fn get_reader_byob_js(this: &Stream, options: &ReaderOptions) -> f64;
     #[wasm_bindgen(method, catch, js_name = "getReader")]
     fn try_get_reader_byob_js(this: &Stream, options: &ReaderOptions) -> Result<f64, JsValue>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn raw(this: &Stream) -> Promise<Vec<JsValue>>;
-    #[wasm_bindgen(method, js_name = "raw")]
+    #[wasm_bindgen(method, catch, js_name = "raw")]
     fn raw_with_column_names_js(
         this: &Stream,
         options: &StreamRawOptions,

@@ -386,6 +386,7 @@ impl From<Settings> for SettingsBuilder {
 pub type BufferSource = JsValue;
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
+    #[wasm_bindgen(catch)]
     pub fn verify(
         algorithm: impl ::wasm_bindgen::JsStringLike,
         signature: impl ::js_sys::BufferSourceLike,
@@ -394,7 +395,7 @@ extern "C" {
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "verify")]
+    #[wasm_bindgen(catch, js_name = "verify")]
     pub fn verify_with_algorithm(
         algorithm: &Target,
         signature: impl ::js_sys::BufferSourceLike,

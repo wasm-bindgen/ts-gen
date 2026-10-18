@@ -139,7 +139,7 @@ extern "C" {
     pub fn new(stream: &Stream<impl Sized>) -> Result<Reader, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Reader")]
     pub fn new_typed<R>(stream: &Stream<R>) -> Result<Reader<R>, JsValue>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn read<R>(this: &Reader<R>) -> Promise<R>;
 }
 #[wasm_bindgen(experimental_generic_mono)]

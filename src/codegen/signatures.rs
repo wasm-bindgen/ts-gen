@@ -430,12 +430,6 @@ impl FunctionSignature {
     pub fn promise_import(&self, cgctx: Option<&CodegenContext<'_>>) -> bool {
         self.is_async && CodegenContext::generic_mono(cgctx)
     }
-
-    /// Whether the import carries `catch`. A per-mono `Promise<T>` return
-    /// is not a `Result`, so it does not yet.
-    pub fn catch_attr(&self, cgctx: Option<&CodegenContext<'_>>) -> bool {
-        self.catch && !(self.is_async && CodegenContext::generic_mono(cgctx))
-    }
 }
 
 /// Recursively collect every in-scope type-parameter name reachable

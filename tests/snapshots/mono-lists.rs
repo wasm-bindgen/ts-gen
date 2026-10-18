@@ -339,12 +339,12 @@ extern "C" {
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "fetchTags")]
+    #[wasm_bindgen(catch, js_name = "fetchTags")]
     pub fn fetch_tags() -> Promise<Vec<String>>;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "fetchTags")]
+    #[wasm_bindgen(catch, js_name = "fetchTags")]
     pub fn fetch_tags_js_string() -> Promise<Array<JsString>>;
 }
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]

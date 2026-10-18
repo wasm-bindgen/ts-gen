@@ -200,7 +200,7 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
-    #[wasm_bindgen(method, js_name = "blockConcurrencyWhile")]
+    #[wasm_bindgen(method, catch, js_name = "blockConcurrencyWhile")]
     pub fn block_concurrency_while<T>(
         this: &Store,
         callback: &Function<fn() -> Promise<T>>,
@@ -212,6 +212,6 @@ extern "C" {
         this: &Store,
         callback: &Function<fn(String, String, Store)>,
     ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn sync(this: &Store) -> Promise<()>;
 }
