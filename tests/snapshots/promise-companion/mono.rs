@@ -10,79 +10,38 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type State;
     #[doc = " `block_concurrency_while` + `block_concurrency_while_promise`."]
-    #[wasm_bindgen(method, catch, js_name = "blockConcurrencyWhile")]
-    pub async fn block_concurrency_while(
-        this: &State,
-        callback: &Function<fn() -> Promise<()>>,
-    ) -> Result<(), JsValue>;
-    #[doc = " `block_concurrency_while` + `block_concurrency_while_promise`."]
     #[wasm_bindgen(method, js_name = "blockConcurrencyWhile")]
-    pub fn block_concurrency_while_promise(
+    pub fn block_concurrency_while(
         this: &State,
         callback: &Function<fn() -> Promise<()>>,
     ) -> Promise<()>;
     #[doc = " Overloads: each expansion gets its own `_promise`."]
-    #[wasm_bindgen(method, catch)]
-    pub async fn fetch(
-        this: &State,
-        url: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Response, JsValue>;
-    #[doc = " Overloads: each expansion gets its own `_promise`."]
+    #[wasm_bindgen(method)]
+    pub fn fetch(this: &State, url: impl ::wasm_bindgen::JsStringLike) -> Promise<Response>;
     #[wasm_bindgen(method, js_name = "fetch")]
-    pub fn fetch_promise(this: &State, url: impl ::wasm_bindgen::JsStringLike)
-        -> Promise<Response>;
-    #[wasm_bindgen(method, catch, js_name = "fetch")]
-    pub async fn fetch_with_init(
-        this: &State,
-        url: impl ::wasm_bindgen::JsStringLike,
-        init: &RequestInit,
-    ) -> Result<Response, JsValue>;
-    #[wasm_bindgen(method, js_name = "fetch")]
-    pub fn fetch_with_init_promise(
+    pub fn fetch_with_init(
         this: &State,
         url: impl ::wasm_bindgen::JsStringLike,
         init: &RequestInit,
     ) -> Promise<Response>;
     #[doc = " Awaited: `Option<String>` (`Nullable<String>` under `--strict-nullable`); the promise form's `string | null` is an inner position: `Promise<JsNullable<JsString>>`."]
-    #[wasm_bindgen(method, catch)]
-    pub async fn get(
-        this: &State,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Option<String>, JsValue>;
-    #[doc = " Awaited: `Option<String>` (`Nullable<String>` under `--strict-nullable`); the promise form's `string | null` is an inner position: `Promise<JsNullable<JsString>>`."]
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_js_string(
-        this: &State,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Option<JsString>, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn get(this: &State, key: impl ::wasm_bindgen::JsStringLike) -> Promise<Option<String>>;
     #[doc = " Awaited: `Option<String>` (`Nullable<String>` under `--strict-nullable`); the promise form's `string | null` is an inner position: `Promise<JsNullable<JsString>>`."]
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_promise(
+    pub fn get_js_string(
         this: &State,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<JsString>>;
     #[doc = " A `null` argument arm gets its own `_promise` form too."]
-    #[wasm_bindgen(method, catch)]
-    pub async fn put(
-        this: &State,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<(), JsValue>;
-    #[doc = " A `null` argument arm gets its own `_promise` form too."]
-    #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_promise(
+    #[wasm_bindgen(method)]
+    pub fn put(
         this: &State,
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
-    async fn __put_with_null(
-        this: &State,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &::wasm_bindgen::JsValue,
-    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    fn __put_with_null_promise(
+    fn __put_with_null(
         this: &State,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &::wasm_bindgen::JsValue,
@@ -90,24 +49,12 @@ extern "C" {
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `TypeError` — on an invalid key"]
-    #[wasm_bindgen(method, catch)]
-    pub async fn delete(
-        this: &State,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<bool, TypeError>;
-    #[doc = " ## Errors"]
-    #[doc = ""]
-    #[doc = " * `TypeError` — on an invalid key"]
-    #[wasm_bindgen(method, js_name = "delete")]
-    pub fn delete_promise(this: &State, key: impl ::wasm_bindgen::JsStringLike) -> Promise<bool>;
+    #[wasm_bindgen(method)]
+    pub fn delete(this: &State, key: impl ::wasm_bindgen::JsStringLike) -> Promise<bool>;
     #[doc = " `@throws {never}` drops `catch` from the async form; the promise"]
     #[doc = " form is plain under every policy."]
     #[wasm_bindgen(method)]
-    pub async fn ready(this: &State) -> bool;
-    #[doc = " `@throws {never}` drops `catch` from the async form; the promise"]
-    #[doc = " form is plain under every policy."]
-    #[wasm_bindgen(method, js_name = "ready")]
-    pub fn ready_promise(this: &State) -> Promise<bool>;
+    pub fn ready(this: &State) -> Promise<bool>;
     #[doc = " Sync methods are untouched."]
     #[wasm_bindgen(method, catch)]
     pub fn id(this: &State) -> Result<String, JsValue>;
@@ -120,16 +67,8 @@ extern "C" {
 }
 impl State {
     #[doc = " A `null` argument arm gets its own `_promise` form too."]
-    pub async fn put_with_null(
-        &self,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<(), JsValue> {
+    pub fn put_with_null(&self, key: impl ::wasm_bindgen::JsStringLike) -> Promise<()> {
         self.__put_with_null(key, &::wasm_bindgen::JsValue::NULL)
-            .await
-    }
-    #[doc = " A `null` argument arm gets its own `_promise` form too."]
-    pub fn put_with_null_promise(&self, key: impl ::wasm_bindgen::JsStringLike) -> Promise<()> {
-        self.__put_with_null_promise(key, &::wasm_bindgen::JsValue::NULL)
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -184,11 +123,5 @@ impl From<RequestInit> for RequestInitBuilder {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch)]
-    pub async fn sleep(ms: f64) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "sleep")]
-    pub fn sleep_promise(ms: f64) -> Promise<()>;
+    pub fn sleep(ms: f64) -> Promise<()>;
 }

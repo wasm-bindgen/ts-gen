@@ -172,57 +172,35 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
-    #[wasm_bindgen(method, catch)]
-    pub async fn get(
-        this: &Store,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_js_string(
-        this: &Store,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<JsString, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn get_promise(
-        this: &Store,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Promise<String>, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_store_get_options(
+    #[wasm_bindgen(method)]
+    pub fn get(this: &Store, key: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_js_string(this: &Store, key: impl ::wasm_bindgen::JsStringLike)
+        -> Promise<JsString>;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_with_store_get_options(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &StoreGetOptions,
-    ) -> Result<Option<String>, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_store_get_options_js_string(
+    ) -> Promise<Option<String>>;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_with_store_get_options_js_string(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &StoreGetOptions,
-    ) -> Result<Option<JsString>, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn get_with_store_get_options_promise(
-        this: &Store,
-        key: impl ::wasm_bindgen::JsStringLike,
-        options: &StoreGetOptions,
-    ) -> Result<Promise<Option<JsString>>, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_options(
+    ) -> Promise<Option<JsString>>;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_with_options(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions,
-    ) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_options_js_string(
+    ) -> Promise<String>;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_with_options_js_string(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions,
-    ) -> Result<JsString, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn get_with_options_promise(
-        this: &Store,
-        key: impl ::wasm_bindgen::JsStringLike,
-        options: &GetOptions,
-    ) -> Result<Promise<String>, JsValue>;
+    ) -> Promise<JsString>;
     #[wasm_bindgen(method, catch)]
     pub fn refine(this: &Store, value: &Derived) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -371,21 +349,13 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Fetcher;
-    #[wasm_bindgen(method, catch)]
-    pub async fn fetch(
+    #[wasm_bindgen(method)]
+    pub fn fetch(this: &Fetcher, input: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
+    #[wasm_bindgen(method, js_name = "fetch")]
+    pub fn fetch_js_string(
         this: &Fetcher,
         input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "fetch")]
-    pub async fn fetch_js_string(
-        this: &Fetcher,
-        input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<JsString, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "fetch")]
-    pub fn fetch_promise(
-        this: &Fetcher,
-        input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Promise<String>, JsValue>;
+    ) -> Promise<JsString>;
 }
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
@@ -412,21 +382,16 @@ extern "C" {
     # [wasm_bindgen (extends = Provider < T > , extends = Fetcher , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type GenericStub<T = JsValue>;
-    #[wasm_bindgen(method, catch)]
-    pub async fn fetch<T>(
+    #[wasm_bindgen(method)]
+    pub fn fetch<T>(
         this: &GenericStub<T>,
         input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "fetch")]
-    pub async fn fetch_js_string<T>(
+    ) -> Promise<String>;
+    #[wasm_bindgen(method, js_name = "fetch")]
+    pub fn fetch_js_string<T>(
         this: &GenericStub<T>,
         input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<JsString, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "fetch")]
-    pub fn fetch_promise<T>(
-        this: &GenericStub<T>,
-        input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Promise<String>, JsValue>;
+    ) -> Promise<JsString>;
     #[wasm_bindgen(method, getter)]
     pub fn id<T>(this: &GenericStub<T>) -> String;
     #[wasm_bindgen(method, getter, js_name = "id")]
@@ -437,21 +402,13 @@ extern "C" {
     # [wasm_bindgen (extends = Fetcher , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Unknown;
-    #[wasm_bindgen(method, catch)]
-    pub async fn fetch(
+    #[wasm_bindgen(method)]
+    pub fn fetch(this: &Unknown, input: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
+    #[wasm_bindgen(method, js_name = "fetch")]
+    pub fn fetch_js_string(
         this: &Unknown,
         input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "fetch")]
-    pub async fn fetch_js_string(
-        this: &Unknown,
-        input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<JsString, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "fetch")]
-    pub fn fetch_promise(
-        this: &Unknown,
-        input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Promise<String>, JsValue>;
+    ) -> Promise<JsString>;
     #[wasm_bindgen(method, getter)]
     pub fn id(this: &Unknown) -> String;
     #[wasm_bindgen(method, getter, js_name = "id")]

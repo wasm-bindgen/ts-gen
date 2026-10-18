@@ -7,23 +7,13 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "promise-builtins", experimental_generic_mono)]
 extern "C" {
     #[doc = " The `--lib-name` module is the user's: `Result<Promise<JsString>, JsValue>`."]
-    #[wasm_bindgen(catch)]
-    pub async fn load(url: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
+    pub fn load(url: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
 }
 #[wasm_bindgen(module = "promise-builtins", experimental_generic_mono)]
 extern "C" {
     #[doc = " The `--lib-name` module is the user's: `Result<Promise<JsString>, JsValue>`."]
-    #[wasm_bindgen(catch, js_name = "load")]
-    pub async fn load_js_string(
-        url: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<JsString, JsValue>;
-}
-#[wasm_bindgen(module = "promise-builtins", experimental_generic_mono)]
-extern "C" {
-    #[doc = " The `--lib-name` module is the user's: `Result<Promise<JsString>, JsValue>`."]
-    #[wasm_bindgen(catch, js_name = "load")]
-    pub fn load_promise(url: impl ::wasm_bindgen::JsStringLike)
-        -> Result<Promise<String>, JsValue>;
+    #[wasm_bindgen(js_name = "load")]
+    pub fn load_js_string(url: impl ::wasm_bindgen::JsStringLike) -> Promise<JsString>;
 }
 #[wasm_bindgen(module = "promise-builtins", experimental_generic_mono)]
 extern "C" {
@@ -32,31 +22,12 @@ extern "C" {
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `TypeError` — on a malformed key"]
-    #[wasm_bindgen(catch)]
-    pub async fn count(key: impl ::wasm_bindgen::JsStringLike) -> Result<f64, TypeError>;
-}
-#[wasm_bindgen(module = "promise-builtins", experimental_generic_mono)]
-extern "C" {
-    #[doc = " Typed: `Result<Promise<Number>, TypeError>`."]
-    #[doc = ""]
-    #[doc = " ## Errors"]
-    #[doc = ""]
-    #[doc = " * `TypeError` — on a malformed key"]
-    #[wasm_bindgen(catch, js_name = "count")]
-    pub fn count_promise(key: impl ::wasm_bindgen::JsStringLike)
-        -> Result<Promise<f64>, TypeError>;
+    pub fn count(key: impl ::wasm_bindgen::JsStringLike) -> Promise<f64>;
 }
 #[wasm_bindgen(module = "promise-builtins", experimental_generic_mono)]
 extern "C" {
     #[doc = " Declared `async`: plain `Promise<Number>`."]
-    #[wasm_bindgen(catch)]
-    pub async fn size(key: impl ::wasm_bindgen::JsStringLike) -> Result<f64, JsValue>;
-}
-#[wasm_bindgen(module = "promise-builtins", experimental_generic_mono)]
-extern "C" {
-    #[doc = " Declared `async`: plain `Promise<Number>`."]
-    #[wasm_bindgen(js_name = "size")]
-    pub fn size_promise(key: impl ::wasm_bindgen::JsStringLike) -> Promise<f64>;
+    pub fn size(key: impl ::wasm_bindgen::JsStringLike) -> Promise<f64>;
 }
 #[wasm_bindgen(module = "promise-builtins", experimental_generic_mono)]
 extern "C" {
@@ -64,55 +35,27 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
     #[doc = " User module: `Result<Promise<JsString>, JsValue>`."]
-    #[wasm_bindgen(method, catch)]
-    pub async fn get(
-        this: &Store,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<String, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn get(this: &Store, key: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
     #[doc = " User module: `Result<Promise<JsString>, JsValue>`."]
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_js_string(
-        this: &Store,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<JsString, JsValue>;
-    #[doc = " User module: `Result<Promise<JsString>, JsValue>`."]
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn get_promise(
-        this: &Store,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Promise<String>, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_js_string(this: &Store, key: impl ::wasm_bindgen::JsStringLike)
+        -> Promise<JsString>;
     #[doc = " Declared `async`: plain."]
-    #[wasm_bindgen(method, catch)]
-    pub async fn put(
-        this: &Store,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<(), JsValue>;
-    #[doc = " Declared `async`: plain."]
-    #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_promise(
+    #[wasm_bindgen(method)]
+    pub fn put(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<()>;
     #[doc = " Declared `async`: plain."]
-    # [wasm_bindgen (static_method_of = Store , catch)]
-    pub async fn open(name: impl ::wasm_bindgen::JsStringLike) -> Result<Store, JsValue>;
-    #[doc = " Declared `async`: plain."]
-    # [wasm_bindgen (static_method_of = Store , js_name = "open")]
-    pub fn open_promise(name: impl ::wasm_bindgen::JsStringLike) -> Promise<Store>;
+    # [wasm_bindgen (static_method_of = Store)]
+    pub fn open(name: impl ::wasm_bindgen::JsStringLike) -> Promise<Store>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[doc = " A global function: plain `Promise<Undefined>`."]
-    #[wasm_bindgen(catch)]
-    pub async fn sleep(ms: f64) -> Result<(), JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[doc = " A global function: plain `Promise<Undefined>`."]
-    #[wasm_bindgen(js_name = "sleep")]
-    pub fn sleep_promise(ms: f64) -> Promise<()>;
+    pub fn sleep(ms: f64) -> Promise<()>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -120,20 +63,11 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Cache;
     #[doc = " A global class's method: plain."]
-    #[wasm_bindgen(method, catch, js_name = "match")]
-    pub async fn match_(
-        this: &Cache,
-        url: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Option<String>, JsValue>;
-    #[doc = " A global class's method: plain."]
-    #[wasm_bindgen(method, catch, js_name = "match")]
-    pub async fn match_js_string(
-        this: &Cache,
-        url: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Option<JsString>, JsValue>;
+    #[wasm_bindgen(method, js_name = "match")]
+    pub fn match_(this: &Cache, url: impl ::wasm_bindgen::JsStringLike) -> Promise<Option<String>>;
     #[doc = " A global class's method: plain."]
     #[wasm_bindgen(method, js_name = "match")]
-    pub fn match__promise(
+    pub fn match_js_string(
         this: &Cache,
         url: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<JsString>>;
@@ -143,30 +77,15 @@ extern "C" {
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `TypeError` — on a non-GET request"]
-    #[wasm_bindgen(method, catch)]
-    pub async fn put(
-        this: &Cache,
-        url: impl ::wasm_bindgen::JsStringLike,
-        body: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<(), TypeError>;
-    #[doc = " `@throws` types the rejection: the `async fn` form is"]
-    #[doc = " `Result<(), TypeError>`, the `_promise` form stays plain."]
-    #[doc = ""]
-    #[doc = " ## Errors"]
-    #[doc = ""]
-    #[doc = " * `TypeError` — on a non-GET request"]
-    #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_promise(
+    #[wasm_bindgen(method)]
+    pub fn put(
         this: &Cache,
         url: impl ::wasm_bindgen::JsStringLike,
         body: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<()>;
     #[doc = " A global class's static: plain."]
-    # [wasm_bindgen (static_method_of = Cache , catch)]
-    pub async fn open(name: impl ::wasm_bindgen::JsStringLike) -> Result<Cache, JsValue>;
-    #[doc = " A global class's static: plain."]
-    # [wasm_bindgen (static_method_of = Cache , js_name = "open")]
-    pub fn open_promise(name: impl ::wasm_bindgen::JsStringLike) -> Promise<Cache>;
+    # [wasm_bindgen (static_method_of = Cache)]
+    pub fn open(name: impl ::wasm_bindgen::JsStringLike) -> Promise<Cache>;
 }
 pub mod scheduler {
     #[allow(unused_imports)]
@@ -174,14 +93,8 @@ pub mod scheduler {
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         #[doc = " A function of a global namespace: plain."]
-        #[wasm_bindgen(catch, js_namespace = "scheduler")]
-        pub async fn wait(ms: f64) -> Result<(), JsValue>;
-    }
-    #[wasm_bindgen(experimental_generic_mono)]
-    extern "C" {
-        #[doc = " A function of a global namespace: plain."]
-        #[wasm_bindgen(js_name = "wait", js_namespace = "scheduler")]
-        pub fn wait_promise(ms: f64) -> Promise<()>;
+        #[wasm_bindgen(js_namespace = "scheduler")]
+        pub fn wait(ms: f64) -> Promise<()>;
     }
 }
 pub mod node {
@@ -193,24 +106,16 @@ pub mod node {
         #[wasm_bindgen(module = "node:fs", experimental_generic_mono)]
         extern "C" {
             #[doc = " `node:` builtin: plain."]
-            #[wasm_bindgen(catch, js_name = "readFile")]
-            pub async fn read_file(
-                path: impl ::wasm_bindgen::JsStringLike,
-            ) -> Result<String, JsValue>;
-        }
-        #[wasm_bindgen(module = "node:fs", experimental_generic_mono)]
-        extern "C" {
-            #[doc = " `node:` builtin: plain."]
-            #[wasm_bindgen(catch, js_name = "readFile")]
-            pub async fn read_file_js_string(
-                path: impl ::wasm_bindgen::JsStringLike,
-            ) -> Result<JsString, JsValue>;
+            #[wasm_bindgen(js_name = "readFile")]
+            pub fn read_file(path: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
         }
         #[wasm_bindgen(module = "node:fs", experimental_generic_mono)]
         extern "C" {
             #[doc = " `node:` builtin: plain."]
             #[wasm_bindgen(js_name = "readFile")]
-            pub fn read_file_promise(path: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
+            pub fn read_file_js_string(
+                path: impl ::wasm_bindgen::JsStringLike,
+            ) -> Promise<JsString>;
         }
     }
 }
@@ -220,22 +125,14 @@ pub mod fs {
     #[wasm_bindgen(module = "fs", experimental_generic_mono)]
     extern "C" {
         #[doc = " Bare Node builtin: plain."]
-        #[wasm_bindgen(catch, js_name = "readFile")]
-        pub async fn read_file(path: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
-    }
-    #[wasm_bindgen(module = "fs", experimental_generic_mono)]
-    extern "C" {
-        #[doc = " Bare Node builtin: plain."]
-        #[wasm_bindgen(catch, js_name = "readFile")]
-        pub async fn read_file_js_string(
-            path: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<JsString, JsValue>;
+        #[wasm_bindgen(js_name = "readFile")]
+        pub fn read_file(path: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
     }
     #[wasm_bindgen(module = "fs", experimental_generic_mono)]
     extern "C" {
         #[doc = " Bare Node builtin: plain."]
         #[wasm_bindgen(js_name = "readFile")]
-        pub fn read_file_promise(path: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
+        pub fn read_file_js_string(path: impl ::wasm_bindgen::JsStringLike) -> Promise<JsString>;
     }
 }
 pub mod cloudflare {
@@ -250,25 +147,13 @@ pub mod cloudflare {
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type Socket;
             #[doc = " `cloudflare:` builtin method: plain."]
-            #[wasm_bindgen(method, catch)]
-            pub async fn close(this: &Socket) -> Result<(), JsValue>;
-            #[doc = " `cloudflare:` builtin method: plain."]
-            #[wasm_bindgen(method, js_name = "close")]
-            pub fn close_promise(this: &Socket) -> Promise<()>;
+            #[wasm_bindgen(method)]
+            pub fn close(this: &Socket) -> Promise<()>;
         }
         #[wasm_bindgen(module = "cloudflare:sockets", experimental_generic_mono)]
         extern "C" {
             #[doc = " `cloudflare:` builtin: plain."]
-            #[wasm_bindgen(catch)]
-            pub async fn connect(
-                address: impl ::wasm_bindgen::JsStringLike,
-            ) -> Result<Socket, JsValue>;
-        }
-        #[wasm_bindgen(module = "cloudflare:sockets", experimental_generic_mono)]
-        extern "C" {
-            #[doc = " `cloudflare:` builtin: plain."]
-            #[wasm_bindgen(js_name = "connect")]
-            pub fn connect_promise(address: impl ::wasm_bindgen::JsStringLike) -> Promise<Socket>;
+            pub fn connect(address: impl ::wasm_bindgen::JsStringLike) -> Promise<Socket>;
         }
     }
 }
@@ -281,14 +166,7 @@ pub mod bun {
         #[wasm_bindgen(module = "bun:sqlite", experimental_generic_mono)]
         extern "C" {
             #[doc = " Any other specifier with a `scheme:` is a builtin: plain."]
-            #[wasm_bindgen(catch)]
-            pub async fn open(path: impl ::wasm_bindgen::JsStringLike) -> Result<f64, JsValue>;
-        }
-        #[wasm_bindgen(module = "bun:sqlite", experimental_generic_mono)]
-        extern "C" {
-            #[doc = " Any other specifier with a `scheme:` is a builtin: plain."]
-            #[wasm_bindgen(js_name = "open")]
-            pub fn open_promise(path: impl ::wasm_bindgen::JsStringLike) -> Promise<f64>;
+            pub fn open(path: impl ::wasm_bindgen::JsStringLike) -> Promise<f64>;
         }
     }
 }
@@ -298,24 +176,14 @@ pub mod user_lib {
     #[wasm_bindgen(module = "user-lib", experimental_generic_mono)]
     extern "C" {
         #[doc = " A user module: `Result<Promise<JsString>, JsValue>`."]
-        #[wasm_bindgen(catch, js_name = "fetchText")]
-        pub async fn fetch_text(url: impl ::wasm_bindgen::JsStringLike) -> Result<String, JsValue>;
+        #[wasm_bindgen(js_name = "fetchText")]
+        pub fn fetch_text(url: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
     }
     #[wasm_bindgen(module = "user-lib", experimental_generic_mono)]
     extern "C" {
         #[doc = " A user module: `Result<Promise<JsString>, JsValue>`."]
-        #[wasm_bindgen(catch, js_name = "fetchText")]
-        pub async fn fetch_text_js_string(
-            url: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<JsString, JsValue>;
-    }
-    #[wasm_bindgen(module = "user-lib", experimental_generic_mono)]
-    extern "C" {
-        #[doc = " A user module: `Result<Promise<JsString>, JsValue>`."]
-        #[wasm_bindgen(catch, js_name = "fetchText")]
-        pub fn fetch_text_promise(
-            url: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Promise<String>, JsValue>;
+        #[wasm_bindgen(js_name = "fetchText")]
+        pub fn fetch_text_js_string(url: impl ::wasm_bindgen::JsStringLike) -> Promise<JsString>;
     }
 }
 pub mod npm {
@@ -327,26 +195,16 @@ pub mod npm {
         #[wasm_bindgen(module = "npm:lodash", experimental_generic_mono)]
         extern "C" {
             #[doc = " A package registry's scheme is no builtin: `Result<Promise<JsString>, JsValue>`."]
-            #[wasm_bindgen(catch, js_name = "fetchText")]
-            pub async fn fetch_text(
-                url: impl ::wasm_bindgen::JsStringLike,
-            ) -> Result<String, JsValue>;
+            #[wasm_bindgen(js_name = "fetchText")]
+            pub fn fetch_text(url: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
         }
         #[wasm_bindgen(module = "npm:lodash", experimental_generic_mono)]
         extern "C" {
             #[doc = " A package registry's scheme is no builtin: `Result<Promise<JsString>, JsValue>`."]
-            #[wasm_bindgen(catch, js_name = "fetchText")]
-            pub async fn fetch_text_js_string(
+            #[wasm_bindgen(js_name = "fetchText")]
+            pub fn fetch_text_js_string(
                 url: impl ::wasm_bindgen::JsStringLike,
-            ) -> Result<JsString, JsValue>;
-        }
-        #[wasm_bindgen(module = "npm:lodash", experimental_generic_mono)]
-        extern "C" {
-            #[doc = " A package registry's scheme is no builtin: `Result<Promise<JsString>, JsValue>`."]
-            #[wasm_bindgen(catch, js_name = "fetchText")]
-            pub fn fetch_text_promise(
-                url: impl ::wasm_bindgen::JsStringLike,
-            ) -> Result<Promise<String>, JsValue>;
+            ) -> Promise<JsString>;
         }
     }
 }
@@ -362,26 +220,16 @@ pub mod jsr {
             #[wasm_bindgen(module = "jsr:@std/path", experimental_generic_mono)]
             extern "C" {
                 #[doc = " A package registry's scheme is no builtin: `Result<Promise<JsString>, JsValue>`."]
-                #[wasm_bindgen(catch, js_name = "fetchText")]
-                pub async fn fetch_text(
-                    url: impl ::wasm_bindgen::JsStringLike,
-                ) -> Result<String, JsValue>;
+                #[wasm_bindgen(js_name = "fetchText")]
+                pub fn fetch_text(url: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
             }
             #[wasm_bindgen(module = "jsr:@std/path", experimental_generic_mono)]
             extern "C" {
                 #[doc = " A package registry's scheme is no builtin: `Result<Promise<JsString>, JsValue>`."]
-                #[wasm_bindgen(catch, js_name = "fetchText")]
-                pub async fn fetch_text_js_string(
+                #[wasm_bindgen(js_name = "fetchText")]
+                pub fn fetch_text_js_string(
                     url: impl ::wasm_bindgen::JsStringLike,
-                ) -> Result<JsString, JsValue>;
-            }
-            #[wasm_bindgen(module = "jsr:@std/path", experimental_generic_mono)]
-            extern "C" {
-                #[doc = " A package registry's scheme is no builtin: `Result<Promise<JsString>, JsValue>`."]
-                #[wasm_bindgen(catch, js_name = "fetchText")]
-                pub fn fetch_text_promise(
-                    url: impl ::wasm_bindgen::JsStringLike,
-                ) -> Result<Promise<String>, JsValue>;
+                ) -> Promise<JsString>;
             }
         }
     }
@@ -398,26 +246,16 @@ pub mod https {
             #[wasm_bindgen(module = "https://esm.sh/foo", experimental_generic_mono)]
             extern "C" {
                 #[doc = " A URL is no builtin: `Result<Promise<JsString>, JsValue>`."]
-                #[wasm_bindgen(catch, js_name = "fetchText")]
-                pub async fn fetch_text(
-                    url: impl ::wasm_bindgen::JsStringLike,
-                ) -> Result<String, JsValue>;
+                #[wasm_bindgen(js_name = "fetchText")]
+                pub fn fetch_text(url: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
             }
             #[wasm_bindgen(module = "https://esm.sh/foo", experimental_generic_mono)]
             extern "C" {
                 #[doc = " A URL is no builtin: `Result<Promise<JsString>, JsValue>`."]
-                #[wasm_bindgen(catch, js_name = "fetchText")]
-                pub async fn fetch_text_js_string(
+                #[wasm_bindgen(js_name = "fetchText")]
+                pub fn fetch_text_js_string(
                     url: impl ::wasm_bindgen::JsStringLike,
-                ) -> Result<JsString, JsValue>;
-            }
-            #[wasm_bindgen(module = "https://esm.sh/foo", experimental_generic_mono)]
-            extern "C" {
-                #[doc = " A URL is no builtin: `Result<Promise<JsString>, JsValue>`."]
-                #[wasm_bindgen(catch, js_name = "fetchText")]
-                pub fn fetch_text_promise(
-                    url: impl ::wasm_bindgen::JsStringLike,
-                ) -> Result<Promise<String>, JsValue>;
+                ) -> Promise<JsString>;
             }
         }
     }

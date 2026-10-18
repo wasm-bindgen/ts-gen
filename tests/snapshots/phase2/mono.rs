@@ -226,11 +226,5 @@ impl ::core::convert::From<&Request> for RequestInfoKind {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch)]
-    pub async fn fetch(input: impl RequestInfo) -> Result<Response, JsValue>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "fetch")]
-    pub fn fetch_promise(input: impl RequestInfo) -> Promise<Response>;
+    pub fn fetch(input: impl RequestInfo) -> Promise<Response>;
 }

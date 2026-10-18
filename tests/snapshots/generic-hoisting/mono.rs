@@ -109,21 +109,16 @@ extern "C" {
         this: &Courier,
         envelope: &Envelope<String, Body>,
     ) -> Result<JsString, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "sendAsync")]
-    pub async fn send_async<Meta, Body>(
+    #[wasm_bindgen(method, js_name = "sendAsync")]
+    pub fn send_async<Meta, Body>(
         this: &Courier,
         envelope: &Envelope<Meta, Body>,
-    ) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "sendAsync")]
-    pub async fn send_async_js_string<Meta, Body>(
+    ) -> Promise<String>;
+    #[wasm_bindgen(method, js_name = "sendAsync")]
+    pub fn send_async_js_string<Meta, Body>(
         this: &Courier,
         envelope: &Envelope<Meta, Body>,
-    ) -> Result<JsString, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "sendAsync")]
-    pub fn send_async_promise<Meta, Body>(
-        this: &Courier,
-        envelope: &Envelope<Meta, Body>,
-    ) -> Result<Promise<String>, JsValue>;
+    ) -> Promise<JsString>;
     #[wasm_bindgen(method, catch, js_name = "sendEither")]
     pub fn send_either<Meta, Body>(
         this: &Courier,
@@ -176,23 +171,13 @@ extern "C" {
 }
 #[wasm_bindgen(module = "generic-hoisting", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "postAsync")]
-    pub async fn post_async<Meta, Body>(envelope: &Envelope<Meta, Body>)
-        -> Result<String, JsValue>;
+    #[wasm_bindgen(js_name = "postAsync")]
+    pub fn post_async<Meta, Body>(envelope: &Envelope<Meta, Body>) -> Promise<String>;
 }
 #[wasm_bindgen(module = "generic-hoisting", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "postAsync")]
-    pub async fn post_async_js_string<Meta, Body>(
-        envelope: &Envelope<Meta, Body>,
-    ) -> Result<JsString, JsValue>;
-}
-#[wasm_bindgen(module = "generic-hoisting", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "postAsync")]
-    pub fn post_async_promise<Meta, Body>(
-        envelope: &Envelope<Meta, Body>,
-    ) -> Result<Promise<String>, JsValue>;
+    #[wasm_bindgen(js_name = "postAsync")]
+    pub fn post_async_js_string<Meta, Body>(envelope: &Envelope<Meta, Body>) -> Promise<JsString>;
 }
 #[wasm_bindgen(module = "generic-hoisting", experimental_generic_mono)]
 extern "C" {

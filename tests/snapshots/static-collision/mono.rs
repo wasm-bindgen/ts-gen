@@ -15,10 +15,8 @@ extern "C" {
     pub fn json_static_with_init(data: &JsValue, init: &ResponseInit) -> Result<Response, JsValue>;
     # [wasm_bindgen (static_method_of = Response , catch)]
     pub fn error() -> Result<Response, JsValue>;
-    #[wasm_bindgen(method, catch)]
-    pub async fn json(this: &Response) -> Result<JsValue, JsValue>;
-    #[wasm_bindgen(method, js_name = "json")]
-    pub fn json_promise(this: &Response) -> Promise;
+    #[wasm_bindgen(method)]
+    pub fn json(this: &Response) -> Promise<JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn ok(this: &Response) -> bool;
     # [wasm_bindgen (static_method_of = Response , getter , js_name = "ok")]

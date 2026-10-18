@@ -16,11 +16,8 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "bar")]
     pub fn bar_js_string(this: &Foo, x: f64) -> Result<JsString, ::js_sys::Error>;
     #[doc = " Async method — `Result<T, Error>` instead of `Result<T, JsValue>`."]
-    #[wasm_bindgen(method, catch)]
-    pub async fn baz(this: &Foo) -> Result<f64, ::js_sys::Error>;
-    #[doc = " Async method — `Result<T, Error>` instead of `Result<T, JsValue>`."]
-    #[wasm_bindgen(method, js_name = "baz")]
-    pub fn baz_promise(this: &Foo) -> Promise<f64>;
+    #[wasm_bindgen(method)]
+    pub fn baz(this: &Foo) -> Promise<f64>;
     #[doc = " Method with explicit `@throws` — the typed error wins regardless"]
     #[doc = " of the flag."]
     #[doc = ""]
@@ -42,22 +39,12 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[doc = " Free function — same default-error rule."]
-    #[wasm_bindgen(catch, js_name = "fetchData")]
-    pub async fn fetch_data(
-        url: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<String, ::js_sys::Error>;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    #[doc = " Free function — same default-error rule."]
-    #[wasm_bindgen(catch, js_name = "fetchData")]
-    pub async fn fetch_data_js_string(
-        url: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<JsString, ::js_sys::Error>;
+    #[wasm_bindgen(js_name = "fetchData")]
+    pub fn fetch_data(url: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[doc = " Free function — same default-error rule."]
     #[wasm_bindgen(js_name = "fetchData")]
-    pub fn fetch_data_promise(url: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
+    pub fn fetch_data_js_string(url: impl ::wasm_bindgen::JsStringLike) -> Promise<JsString>;
 }

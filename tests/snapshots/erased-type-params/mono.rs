@@ -94,31 +94,17 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
-    #[wasm_bindgen(method, catch)]
-    pub async fn get(
-        this: &Store,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Option<String>, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_js_string(
-        this: &Store,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Option<JsString>, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn get(this: &Store, key: impl ::wasm_bindgen::JsStringLike) -> Promise<Option<String>>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_promise(
+    pub fn get_js_string(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<JsString>>;
-    #[wasm_bindgen(method, catch)]
-    pub async fn list(this: &Store) -> Result<ListResult, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn list(this: &Store) -> Promise<ListResult>;
     #[wasm_bindgen(method, js_name = "list")]
-    pub fn list_promise(this: &Store) -> Promise<ListResult>;
-    #[wasm_bindgen(method, catch, js_name = "list")]
-    pub async fn list_typed<Metadata>(this: &Store) -> Result<ListResult<Metadata>, JsValue>
-    where
-        Metadata: 'static;
-    #[wasm_bindgen(method, js_name = "list")]
-    pub fn list_typed_promise<Metadata>(this: &Store) -> Promise<ListResult<Metadata>>;
+    pub fn list_typed<Metadata>(this: &Store) -> Promise<ListResult<Metadata>>;
     #[wasm_bindgen(method, catch)]
     pub fn tag(
         this: &Store,

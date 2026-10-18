@@ -166,12 +166,8 @@ extern "C" {
     pub fn of<T>(value: &T) -> Result<Labelled<T>, JsValue>
     where
         T: ::wasm_bindgen::convert::RefIntoWasmAbi;
-    # [wasm_bindgen (static_method_of = Labelled , catch)]
-    pub async fn load<T>() -> Result<T, JsValue>
-    where
-        T: ::wasm_bindgen::convert::FromWasmAbi + 'static;
-    # [wasm_bindgen (static_method_of = Labelled , js_name = "load")]
-    pub fn load_promise<T>() -> Promise<T>;
+    # [wasm_bindgen (static_method_of = Labelled)]
+    pub fn load<T>() -> Promise<T>;
     #[wasm_bindgen(method, getter)]
     pub fn value<T>(this: &Labelled<T>) -> T
     where
@@ -196,28 +192,13 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Storage<Props = JsValue>;
-    #[wasm_bindgen(method, catch)]
-    pub async fn get<Props, T>(
-        this: &Storage<Props>,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Option<T>, JsValue>
-    where
-        Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
-        T: 'static;
-    #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_promise<Props, T>(
+    #[wasm_bindgen(method)]
+    pub fn get<Props, T>(
         this: &Storage<Props>,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<T>>;
-    #[wasm_bindgen(method, catch)]
-    pub async fn run<Props, T>(
-        this: &Storage<Props>,
-        callback: &Function<fn() -> Promise<T>>,
-    ) -> Result<T, JsValue>
-    where
-        T: ::wasm_bindgen::convert::FromWasmAbi + 'static;
-    #[wasm_bindgen(method, js_name = "run")]
-    pub fn run_promise<Props, T>(
+    #[wasm_bindgen(method)]
+    pub fn run<Props, T>(
         this: &Storage<Props>,
         callback: &Function<fn() -> Promise<T>>,
     ) -> Promise<T>;
@@ -228,13 +209,6 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "loadValue")]
-    pub async fn load_value<T>() -> Result<T, JsValue>
-    where
-        T: ::wasm_bindgen::convert::FromWasmAbi + 'static;
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
     #[wasm_bindgen(js_name = "loadValue")]
-    pub fn load_value_promise<T>() -> Promise<T>;
+    pub fn load_value<T>() -> Promise<T>;
 }

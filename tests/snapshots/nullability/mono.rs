@@ -1016,51 +1016,28 @@ extern "C" {
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "fetchNull")]
-    pub async fn fetch_null() -> Result<Option<Registry>, JsValue>;
+    #[wasm_bindgen(js_name = "fetchNull")]
+    pub fn fetch_null() -> Promise<Option<Registry>>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "fetchNull")]
-    pub fn fetch_null_promise() -> Result<Promise<Option<Registry>>, JsValue>;
+    #[wasm_bindgen(js_name = "fetchOptional")]
+    pub fn fetch_optional() -> Promise<Option<f64>>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "fetchOptional")]
-    pub async fn fetch_optional() -> Result<Option<f64>, JsValue>;
+    #[wasm_bindgen(js_name = "fetchBoth")]
+    pub fn fetch_both() -> Promise<Option<String>>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "fetchOptional")]
-    pub fn fetch_optional_promise() -> Result<Promise<Option<Number>>, JsValue>;
+    #[wasm_bindgen(js_name = "fetchBoth")]
+    pub fn fetch_both_js_string() -> Promise<Option<JsString>>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "fetchBoth")]
-    pub async fn fetch_both() -> Result<Option<String>, JsValue>;
-}
-#[wasm_bindgen(module = "nullability", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "fetchBoth")]
-    pub async fn fetch_both_js_string() -> Result<Option<JsString>, JsValue>;
-}
-#[wasm_bindgen(module = "nullability", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "fetchBoth")]
-    pub fn fetch_both_promise() -> Result<Promise<Option<JsString>>, JsValue>;
-}
-#[wasm_bindgen(module = "nullability", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "fetchGeneric")]
-    pub async fn fetch_generic<T>() -> Result<Option<T>, JsValue>
-    where
-        Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
-        T: 'static;
-}
-#[wasm_bindgen(module = "nullability", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(catch, js_name = "fetchGeneric")]
-    pub fn fetch_generic_promise<T>() -> Result<Promise<Option<T>>, JsValue>;
+    #[wasm_bindgen(js_name = "fetchGeneric")]
+    pub fn fetch_generic<T>() -> Promise<Option<T>>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {

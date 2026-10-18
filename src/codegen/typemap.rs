@@ -3318,7 +3318,9 @@ pub fn to_return_type(
         }
     };
 
-    if catch {
+    if is_async && CodegenContext::generic_mono(ctx) {
+        quote! { Promise<#inner> }
+    } else if catch {
         let err = error_type_tokens(error_ty, ctx, scope, from_module);
         quote! { Result<#inner, #err> }
     } else {

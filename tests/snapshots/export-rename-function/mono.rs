@@ -71,8 +71,6 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Socket;
-    #[wasm_bindgen(method, catch)]
-    pub async fn close(this: &Socket) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "close")]
-    pub fn close_promise(this: &Socket) -> Promise<()>;
+    #[wasm_bindgen(method)]
+    pub fn close(this: &Socket) -> Promise<()>;
 }

@@ -235,15 +235,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
-    #[wasm_bindgen(method, catch, js_name = "blockConcurrencyWhile")]
-    pub async fn block_concurrency_while<T>(
-        this: &Store,
-        callback: &Function<fn() -> Promise<T>>,
-    ) -> Result<T, JsValue>
-    where
-        T: ::wasm_bindgen::convert::FromWasmAbi + 'static;
     #[wasm_bindgen(method, js_name = "blockConcurrencyWhile")]
-    pub fn block_concurrency_while_promise<T>(
+    pub fn block_concurrency_while<T>(
         this: &Store,
         callback: &Function<fn() -> Promise<T>>,
     ) -> Promise<T>;
@@ -252,8 +245,6 @@ extern "C" {
         this: &Store,
         callback: &Function<fn(String, String, Store)>,
     ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, catch)]
-    pub async fn sync(this: &Store) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "sync")]
-    pub fn sync_promise(this: &Store) -> Promise<()>;
+    #[wasm_bindgen(method)]
+    pub fn sync(this: &Store) -> Promise<()>;
 }

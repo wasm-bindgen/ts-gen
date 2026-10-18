@@ -140,12 +140,8 @@ extern "C" {
     pub fn new<R>(stream: &Stream<R>) -> Result<Reader, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Reader")]
     pub fn new_typed<R>(stream: &Stream<R>) -> Result<Reader<R>, JsValue>;
-    #[wasm_bindgen(method, catch)]
-    pub async fn read<R>(this: &Reader<R>) -> Result<R, JsValue>
-    where
-        R: ::wasm_bindgen::convert::FromWasmAbi + 'static;
-    #[wasm_bindgen(method, js_name = "read")]
-    pub fn read_promise<R>(this: &Reader<R>) -> Promise<R>;
+    #[wasm_bindgen(method)]
+    pub fn read<R>(this: &Reader<R>) -> Promise<R>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

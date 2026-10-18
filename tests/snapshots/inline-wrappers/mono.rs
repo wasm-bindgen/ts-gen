@@ -13,26 +13,16 @@ extern "C" {
     fn __size(this: &R2Object) -> f64;
     #[wasm_bindgen(method, getter, js_name = "uploadedAt")]
     fn __uploaded_at(this: &R2Object) -> Option<f64>;
-    #[wasm_bindgen(method, catch, js_name = "list")]
-    async fn __list(this: &R2Object, limit: f64) -> Result<Vec<R2Object>, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "list")]
-    fn __list_promise(this: &R2Object, limit: f64) -> Result<Promise<Array<R2Object>>, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "list")]
-    async fn __list_with_prefix(
+    #[wasm_bindgen(method, js_name = "list")]
+    fn __list(this: &R2Object, limit: f64) -> Promise<Vec<R2Object>>;
+    #[wasm_bindgen(method, js_name = "list")]
+    fn __list_with_prefix(
         this: &R2Object,
         limit: f64,
         prefix: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Vec<R2Object>, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "list")]
-    fn __list_with_prefix_promise(
-        this: &R2Object,
-        limit: f64,
-        prefix: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Promise<Array<R2Object>>, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "count")]
-    async fn __count(this: &R2Object) -> Result<f64, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "count")]
-    pub fn count_promise(this: &R2Object) -> Result<Promise<Number>, JsValue>;
+    ) -> Promise<Vec<R2Object>>;
+    #[wasm_bindgen(method)]
+    pub fn count(this: &R2Object) -> Promise<f64>;
     #[wasm_bindgen(method, catch, js_name = "sizes")]
     fn __sizes(this: &R2Object) -> Result<Vec<f64>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "upload")]
@@ -76,28 +66,15 @@ impl R2Object {
     pub fn uploaded_at(&self) -> Option<u64> {
         self.__uploaded_at().map(|v| v as u64)
     }
-    pub async fn list(&self, limit: u64) -> Result<Vec<R2Object>, JsValue> {
-        self.__list(limit as f64).await
+    pub fn list(&self, limit: u64) -> Promise<Vec<R2Object>> {
+        self.__list(limit as f64)
     }
-    pub fn list_promise(&self, limit: u64) -> Result<Promise<Array<R2Object>>, JsValue> {
-        self.__list_promise(limit as f64)
-    }
-    pub async fn list_with_prefix(
+    pub fn list_with_prefix(
         &self,
         limit: u64,
         prefix: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Vec<R2Object>, JsValue> {
-        self.__list_with_prefix(limit as f64, prefix).await
-    }
-    pub fn list_with_prefix_promise(
-        &self,
-        limit: u64,
-        prefix: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Promise<Array<R2Object>>, JsValue> {
-        self.__list_with_prefix_promise(limit as f64, prefix)
-    }
-    pub async fn count(&self) -> Result<u64, JsValue> {
-        self.__count().await.map(|v| v as u64)
+    ) -> Promise<Vec<R2Object>> {
+        self.__list_with_prefix(limit as f64, prefix)
     }
     pub fn sizes(&self) -> Result<Vec<u64>, JsValue> {
         self.__sizes()

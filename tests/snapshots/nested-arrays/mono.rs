@@ -13,10 +13,8 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Grid;
-    #[wasm_bindgen(method, catch)]
-    pub async fn rows(this: &Grid) -> Result<Vec<Array<String>>, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "rows")]
-    pub fn rows_promise(this: &Grid) -> Result<Promise<Array<Array<String>>>, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn rows(this: &Grid) -> Promise<Vec<Array<String>>>;
     #[wasm_bindgen(method, catch, js_name = "putRows")]
     pub fn put_rows(this: &Grid, rows: &[Array<f64>]) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]
