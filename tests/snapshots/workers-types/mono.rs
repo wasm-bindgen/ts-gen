@@ -7498,6 +7498,15 @@ extern "C" {
     ) -> Result<(), JsValue>
     where
         This: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    pub fn iterator(this: &FormData) -> Iterator<ArrayTuple<(String, JsValue)>>;
+}
+impl<'a> ::core::iter::IntoIterator for &'a FormData {
+    type Item = (String, JsValue);
+    type IntoIter = ::js_sys::Entries<String, JsValue>;
+    fn into_iter(self) -> Self::IntoIter {
+        ::js_sys::Entries::from(self.iterator())
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -8237,6 +8246,15 @@ extern "C" {
     pub fn keys(this: &Headers) -> Result<Iterator<String>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn values(this: &Headers) -> Result<Iterator<String>, JsValue>;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    pub fn iterator(this: &Headers) -> Iterator<ArrayTuple<(String, String)>>;
+}
+impl<'a> ::core::iter::IntoIterator for &'a Headers {
+    type Item = (String, String);
+    type IntoIter = ::js_sys::Entries<String, String>;
+    fn into_iter(self) -> Self::IntoIter {
+        ::js_sys::Entries::from(self.iterator())
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -15119,6 +15137,15 @@ extern "C" {
     pub fn try_to_string(this: &URLSearchParams) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "toString")]
     pub fn to_string_js_string(this: &URLSearchParams) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    pub fn iterator(this: &URLSearchParams) -> Iterator<ArrayTuple<(String, String)>>;
+}
+impl<'a> ::core::iter::IntoIterator for &'a URLSearchParams {
+    type Item = (String, String);
+    type IntoIter = ::js_sys::Entries<String, String>;
+    fn into_iter(self) -> Self::IntoIter {
+        ::js_sys::Entries::from(self.iterator())
+    }
 }
 impl core::fmt::Display for URLSearchParams {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -15986,6 +16013,18 @@ extern "C" {
     pub fn rows_read<T>(this: &SqlStorageCursor<T>) -> f64;
     #[wasm_bindgen(method, getter, js_name = "rowsWritten")]
     pub fn rows_written<T>(this: &SqlStorageCursor<T>) -> f64;
+    #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+    pub fn iterator<T>(this: &SqlStorageCursor<T>) -> Iterator<T>;
+}
+impl<'a, T> ::core::iter::IntoIterator for &'a SqlStorageCursor<T>
+where
+    Iterator<T>: ::core::iter::IntoIterator<Item = T>,
+{
+    type Item = T;
+    type IntoIter = <Iterator<T> as ::core::iter::IntoIterator>::IntoIter;
+    fn into_iter(self) -> Self::IntoIter {
+        ::core::iter::IntoIterator::into_iter(self.iterator())
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

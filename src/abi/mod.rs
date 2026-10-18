@@ -797,10 +797,16 @@ fn build_members(
     // Overloads of one JS callable expand together so their variants carry
     // the Rust bindings' `_with_x` suffixes rather than numeric dedup.
     let constructed = TypeRef::ident(local);
+    // A declared well-known-symbol method (named `[Symbol.iterator]` by the
+    // parser) has no import of its own here.
+    let members: Vec<&Member> = members
+        .iter()
+        .filter(|m| !matches!(m, Member::Method(m) if m.name.starts_with('[')))
+        .collect();
     let mut method_overloads: HashMap<&str, Vec<Overload>> = HashMap::new();
     let mut static_overloads: HashMap<&str, Vec<Overload>> = HashMap::new();
     let mut ctor_overloads: Vec<Overload> = Vec::new();
-    for member in members {
+    for &member in &members {
         match member {
             Member::Method(m) => method_overloads
                 .entry(m.js_name.as_str())
@@ -842,7 +848,7 @@ fn build_members(
     let mut expanded: HashSet<(bool, &str)> = HashSet::new();
     let mut ctor_expanded = false;
 
-    for member in members {
+    for &member in &members {
         match member {
             Member::Getter(g) => {
                 let name = used.declare(
