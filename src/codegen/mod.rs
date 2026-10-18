@@ -171,6 +171,10 @@ pub enum ExportSpec {
     /// JS module specifier whose declarations are emitted in its
     /// `pub mod`.
     Module(String),
+    /// Public name of an export, optionally dotted through namespaces.
+    /// Emits that export of every file's globals and every module, as if
+    /// its root were listed with only that export in it.
+    Decl(String),
 }
 
 /// Generate Rust source code from a parsed IR module + global context.
@@ -402,6 +406,12 @@ fn generate_tokens(
     let global_items = root.generate(&mut Vec::new(), &cgctx);
     cgctx.emit_path.replace(Vec::new());
 
+    for name in &surface.missing {
+        cgctx.error(format!(
+            "`--export {name}`: no declaration named `{name}` in the input files"
+        ));
+    }
+
     let error_enum = options.error_enum.as_deref().map(|name| {
         let names = error_enum::collect_throws_names(&module.types, &surface);
         error_enum::generate_error_enum(name, &names, &cgctx)
@@ -581,7 +591,7 @@ fn generate_declaration(
             Some(cgctx),
             decl.scope_id,
         )),
-        TypeKind::Interface(i) => match i.classification {
+        TypeKind::Interface(i) => match classes::effective_classification(i, Some(cgctx)) {
             InterfaceClassification::ClassLike | InterfaceClassification::Unclassified => {
                 Some(classes::generate_class_like_interface(
                     i,
@@ -911,7 +921,7 @@ fn generate_ns_declaration(
             Some(cgctx),
             decl.scope_id,
         )),
-        TypeKind::Interface(i) => match i.classification {
+        TypeKind::Interface(i) => match classes::effective_classification(i, Some(cgctx)) {
             InterfaceClassification::ClassLike | InterfaceClassification::Unclassified => {
                 Some(classes::generate_class_like_interface(
                     i,

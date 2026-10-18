@@ -24,7 +24,7 @@
   ;; Number(x)
   (import "./bindings.wasm" "Number.value" (func $Number.value (param $x externref) (result f64)))
 
-  ;; var onmessage: any
+  ;; var onmessage: undefined
   (import "./bindings.wasm" "onmessage" (func $onmessage (result externref)))
 
   ;; DOMException
@@ -642,17 +642,17 @@
   ;; set HTMLRewriter(value: typeof query)
   (import "./bindings.wasm" "ServiceWorkerGlobalScope.set_html_rewriter" (func $ServiceWorkerGlobalScope.set_html_rewriter (param $this externref) (param $value externref)))
 
-  ;; addEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>): void
+  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>): void
   (import "./bindings.wasm" "addEventListener" (func $addEventListener (param $type externref) (param $handler externref)))
-  ;; addEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>, options: EventTargetAddEventListenerOptions): void
+  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: EventTargetAddEventListenerOptions): void
   (import "./bindings.wasm" "addEventListener_with_event_target_add_event_listener_options" (func $addEventListener_with_event_target_add_event_listener_options (param $type externref) (param $handler externref) (param $options externref)))
-  ;; addEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>, options: boolean): void
+  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: boolean): void
   (import "./bindings.wasm" "addEventListener_with_bool" (func $addEventListener_with_bool (param $type externref) (param $handler externref) (param $options i32)))
-  ;; removeEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>): void
+  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>): void
   (import "./bindings.wasm" "removeEventListener" (func $removeEventListener (param $type externref) (param $handler externref)))
-  ;; removeEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>, options: EventTargetEventListenerOptions): void
+  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: EventTargetEventListenerOptions): void
   (import "./bindings.wasm" "removeEventListener_with_event_target_event_listener_options" (func $removeEventListener_with_event_target_event_listener_options (param $type externref) (param $handler externref) (param $options externref)))
-  ;; removeEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>, options: boolean): void
+  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: boolean): void
   (import "./bindings.wasm" "removeEventListener_with_bool" (func $removeEventListener_with_bool (param $type externref) (param $handler externref) (param $options i32)))
   ;; dispatchEvent(event: indexed access type): boolean
   (import "./bindings.wasm" "dispatchEvent" (func $dispatchEvent (param $event externref) (result i32)))
@@ -1216,17 +1216,17 @@
   ;; EventTarget
   ;; constructor()
   (import "./bindings.wasm" "EventTarget.new" (func $EventTarget.new (result externref)))
-  ;; addEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>): void
+  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>): void
   (import "./bindings.wasm" "EventTarget.add_event_listener" (func $EventTarget.add_event_listener (param $this externref) (param $type externref) (param $handler externref)))
-  ;; addEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>, options: EventTargetAddEventListenerOptions): void
+  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: EventTargetAddEventListenerOptions): void
   (import "./bindings.wasm" "EventTarget.add_event_listener_with_event_target_add_event_listener_options" (func $EventTarget.add_event_listener_with_event_target_add_event_listener_options (param $this externref) (param $type externref) (param $handler externref) (param $options externref)))
-  ;; addEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>, options: boolean): void
+  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: boolean): void
   (import "./bindings.wasm" "EventTarget.add_event_listener_with_bool" (func $EventTarget.add_event_listener_with_bool (param $this externref) (param $type externref) (param $handler externref) (param $options i32)))
-  ;; removeEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>): void
+  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>): void
   (import "./bindings.wasm" "EventTarget.remove_event_listener" (func $EventTarget.remove_event_listener (param $this externref) (param $type externref) (param $handler externref)))
-  ;; removeEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>, options: EventTargetEventListenerOptions): void
+  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: EventTargetEventListenerOptions): void
   (import "./bindings.wasm" "EventTarget.remove_event_listener_with_event_target_event_listener_options" (func $EventTarget.remove_event_listener_with_event_target_event_listener_options (param $this externref) (param $type externref) (param $handler externref) (param $options externref)))
-  ;; removeEventListener(type: Type, handler: EventListenerOrEventListenerObject<indexed access type>, options: boolean): void
+  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: boolean): void
   (import "./bindings.wasm" "EventTarget.remove_event_listener_with_bool" (func $EventTarget.remove_event_listener_with_bool (param $this externref) (param $type externref) (param $handler externref) (param $options i32)))
   ;; dispatchEvent(event: indexed access type): boolean
   (import "./bindings.wasm" "EventTarget.dispatch_event" (func $EventTarget.dispatch_event (param $this externref) (param $event externref) (result i32)))
@@ -2556,9 +2556,9 @@
   ;; KVNamespaceListKey
   ;; {} as KVNamespaceListKey
   (import "./bindings.wasm" "KVNamespaceListKey.new" (func $KVNamespaceListKey.new (result externref)))
-  ;; name: Key
+  ;; name: string
   (import "./bindings.wasm" "KVNamespaceListKey.name" (func $KVNamespaceListKey.name (param $this externref) (result externref)))
-  ;; set name(value: Key)
+  ;; set name(value: string)
   (import "./bindings.wasm" "KVNamespaceListKey.set_name" (func $KVNamespaceListKey.set_name (param $this externref) (param $value externref)))
   ;; expiration?: number
   (import "./bindings.wasm" "KVNamespaceListKey.expiration" (func $KVNamespaceListKey.expiration (param $this externref) (result externref)))
@@ -2570,51 +2570,51 @@
   (import "./bindings.wasm" "KVNamespaceListKey.set_metadata" (func $KVNamespaceListKey.set_metadata (param $this externref) (param $value externref)))
 
   ;; KVNamespace
-  ;; get(key: Key): Promise<string | null>
+  ;; get(key: string): Promise<string | null>
   (import "./bindings.wasm" "KVNamespace.get" (func $KVNamespace.get (param $this externref) (param $key externref) (result externref)))
-  ;; get(key: Key, options: KVNamespaceGetOptions<undefined>): Promise<string | null>
-  (import "./bindings.wasm" "KVNamespace.get_with_key_and_options" (func $KVNamespace.get_with_key_and_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
-  ;; get(key: Key, type: "text"): Promise<string | null>
-  (import "./bindings.wasm" "KVNamespace.get_with_key_and_type" (func $KVNamespace.get_with_key_and_type (param $this externref) (param $key externref) (param $type externref) (result externref)))
-  ;; get(key: Key[], type: "text"): Promise<Map<string, string | null>>
+  ;; get(key: string, options: KVNamespaceGetOptions<undefined>): Promise<string | null>
+  (import "./bindings.wasm" "KVNamespace.get_with_str_and_options" (func $KVNamespace.get_with_str_and_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
+  ;; get(key: string, type: "text"): Promise<string | null>
+  (import "./bindings.wasm" "KVNamespace.get_with_str_and_type" (func $KVNamespace.get_with_str_and_type (param $this externref) (param $key externref) (param $type externref) (result externref)))
+  ;; get(key: string[], type: "text"): Promise<Map<string, string | null>>
   (import "./bindings.wasm" "KVNamespace.get_with_slice_and_type" (func $KVNamespace.get_with_slice_and_type (param $this externref) (param $key externref) (param $type externref) (result externref)))
-  ;; get(key: Key[]): Promise<Map<string, string | null>>
+  ;; get(key: string[]): Promise<Map<string, string | null>>
   (import "./bindings.wasm" "KVNamespace.get_with_slice" (func $KVNamespace.get_with_slice (param $this externref) (param $key externref) (result externref)))
-  ;; get(key: Key[], options: KVNamespaceGetOptions<undefined>): Promise<Map<string, string | null>>
+  ;; get(key: string[], options: KVNamespaceGetOptions<undefined>): Promise<Map<string, string | null>>
   (import "./bindings.wasm" "KVNamespace.get_with_slice_and_options" (func $KVNamespace.get_with_slice_and_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
-  ;; list(): Promise<KVNamespaceListResult<Metadata, Key>>
+  ;; list(): Promise<KVNamespaceListResult<Metadata, string>>
   (import "./bindings.wasm" "KVNamespace.list" (func $KVNamespace.list (param $this externref) (result externref)))
-  ;; list(options: KVNamespaceListOptions): Promise<KVNamespaceListResult<Metadata, Key>>
+  ;; list(options: KVNamespaceListOptions): Promise<KVNamespaceListResult<Metadata, string>>
   (import "./bindings.wasm" "KVNamespace.list_with_options" (func $KVNamespace.list_with_options (param $this externref) (param $options externref) (result externref)))
-  ;; put(key: Key, value: string): Promise<void>
+  ;; put(key: string, value: string): Promise<void>
   (import "./bindings.wasm" "KVNamespace.put" (func $KVNamespace.put (param $this externref) (param $key externref) (param $value externref) (result externref)))
-  ;; put(key: Key, value: ArrayBuffer): Promise<void>
+  ;; put(key: string, value: ArrayBuffer): Promise<void>
   (import "./bindings.wasm" "KVNamespace.put_with_array_buffer" (func $KVNamespace.put_with_array_buffer (param $this externref) (param $key externref) (param $value externref) (result externref)))
-  ;; put(key: Key, value: ArrayBufferView): Promise<void>
+  ;; put(key: string, value: ArrayBufferView): Promise<void>
   (import "./bindings.wasm" "KVNamespace.put_with_typed_array" (func $KVNamespace.put_with_typed_array (param $this externref) (param $key externref) (param $value externref) (result externref)))
-  ;; put(key: Key, value: ReadableStream): Promise<void>
+  ;; put(key: string, value: ReadableStream): Promise<void>
   (import "./bindings.wasm" "KVNamespace.put_with_readable_stream" (func $KVNamespace.put_with_readable_stream (param $this externref) (param $key externref) (param $value externref) (result externref)))
-  ;; put(key: Key, value: string, options: KVNamespacePutOptions): Promise<void>
+  ;; put(key: string, value: string, options: KVNamespacePutOptions): Promise<void>
   (import "./bindings.wasm" "KVNamespace.put_with_str_and_options" (func $KVNamespace.put_with_str_and_options (param $this externref) (param $key externref) (param $value externref) (param $options externref) (result externref)))
-  ;; put(key: Key, value: ArrayBuffer, options: KVNamespacePutOptions): Promise<void>
+  ;; put(key: string, value: ArrayBuffer, options: KVNamespacePutOptions): Promise<void>
   (import "./bindings.wasm" "KVNamespace.put_with_array_buffer_and_options" (func $KVNamespace.put_with_array_buffer_and_options (param $this externref) (param $key externref) (param $value externref) (param $options externref) (result externref)))
-  ;; put(key: Key, value: ArrayBufferView, options: KVNamespacePutOptions): Promise<void>
+  ;; put(key: string, value: ArrayBufferView, options: KVNamespacePutOptions): Promise<void>
   (import "./bindings.wasm" "KVNamespace.put_with_typed_array_and_options" (func $KVNamespace.put_with_typed_array_and_options (param $this externref) (param $key externref) (param $value externref) (param $options externref) (result externref)))
-  ;; put(key: Key, value: ReadableStream, options: KVNamespacePutOptions): Promise<void>
+  ;; put(key: string, value: ReadableStream, options: KVNamespacePutOptions): Promise<void>
   (import "./bindings.wasm" "KVNamespace.put_with_readable_stream_and_options" (func $KVNamespace.put_with_readable_stream_and_options (param $this externref) (param $key externref) (param $value externref) (param $options externref) (result externref)))
-  ;; getWithMetadata(key: Key): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>
+  ;; getWithMetadata(key: string): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>
   (import "./bindings.wasm" "KVNamespace.get_with_metadata" (func $KVNamespace.get_with_metadata (param $this externref) (param $key externref) (result externref)))
-  ;; getWithMetadata(key: Key, options: KVNamespaceGetOptions<undefined>): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>
-  (import "./bindings.wasm" "KVNamespace.get_with_metadata_with_key_and_options" (func $KVNamespace.get_with_metadata_with_key_and_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
-  ;; getWithMetadata(key: Key, type: "text"): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>
-  (import "./bindings.wasm" "KVNamespace.get_with_metadata_with_key_and_type" (func $KVNamespace.get_with_metadata_with_key_and_type (param $this externref) (param $key externref) (param $type externref) (result externref)))
-  ;; getWithMetadata(key: Key[], type: "text"): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>
+  ;; getWithMetadata(key: string, options: KVNamespaceGetOptions<undefined>): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>
+  (import "./bindings.wasm" "KVNamespace.get_with_metadata_with_str_and_options" (func $KVNamespace.get_with_metadata_with_str_and_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
+  ;; getWithMetadata(key: string, type: "text"): Promise<KVNamespaceGetWithMetadataResult<string, Metadata>>
+  (import "./bindings.wasm" "KVNamespace.get_with_metadata_with_str_and_type" (func $KVNamespace.get_with_metadata_with_str_and_type (param $this externref) (param $key externref) (param $type externref) (result externref)))
+  ;; getWithMetadata(key: string[], type: "text"): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>
   (import "./bindings.wasm" "KVNamespace.get_with_metadata_with_slice_and_type" (func $KVNamespace.get_with_metadata_with_slice_and_type (param $this externref) (param $key externref) (param $type externref) (result externref)))
-  ;; getWithMetadata(key: Key[]): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>
+  ;; getWithMetadata(key: string[]): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>
   (import "./bindings.wasm" "KVNamespace.get_with_metadata_with_slice" (func $KVNamespace.get_with_metadata_with_slice (param $this externref) (param $key externref) (result externref)))
-  ;; getWithMetadata(key: Key[], options: KVNamespaceGetOptions<undefined>): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>
+  ;; getWithMetadata(key: string[], options: KVNamespaceGetOptions<undefined>): Promise<Map<string, KVNamespaceGetWithMetadataResult<string, Metadata>>>
   (import "./bindings.wasm" "KVNamespace.get_with_metadata_with_slice_and_options" (func $KVNamespace.get_with_metadata_with_slice_and_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
-  ;; delete(key: Key): Promise<void>
+  ;; delete(key: string): Promise<void>
   (import "./bindings.wasm" "KVNamespace.delete" (func $KVNamespace.delete (param $this externref) (param $key externref) (result externref)))
 
   ;; KVNamespaceListOptions
@@ -2952,11 +2952,11 @@
   ;; R2Range
   ;; {} as R2Range
   (import "./bindings.wasm" "R2Range.new" (func $R2Range.new (result externref)))
-  ;; offset?: number | number
+  ;; offset?: number
   (import "./bindings.wasm" "R2Range.offset" (func $R2Range.offset (param $this externref) (result externref)))
   ;; set offset(value: number)
   (import "./bindings.wasm" "R2Range.set_offset" (func $R2Range.set_offset (param $this externref) (param $value f64)))
-  ;; length?: number | number
+  ;; length?: number
   (import "./bindings.wasm" "R2Range.length" (func $R2Range.length (param $this externref) (result externref)))
   ;; set length(value: number)
   (import "./bindings.wasm" "R2Range.set_length" (func $R2Range.set_length (param $this externref) (param $value f64)))
@@ -3360,8 +3360,10 @@
   (import "./bindings.wasm" "ReadableStream.cancel" (func $ReadableStream.cancel (param $this externref) (result externref)))
   ;; cancel(reason: any): Promise<void>
   (import "./bindings.wasm" "ReadableStream.cancel_with_reason" (func $ReadableStream.cancel_with_reason (param $this externref) (param $reason externref) (result externref)))
+  ;; getReader(): ReadableStreamDefaultReader<R>
+  (import "./bindings.wasm" "ReadableStream.get_reader" (func $ReadableStream.get_reader (param $this externref) (result externref)))
   ;; getReader(options: ReadableStreamGetReaderOptions): ReadableStreamBYOBReader
-  (import "./bindings.wasm" "ReadableStream.get_reader" (func $ReadableStream.get_reader (param $this externref) (param $options externref) (result externref)))
+  (import "./bindings.wasm" "ReadableStream.get_reader_with_options" (func $ReadableStream.get_reader_with_options (param $this externref) (param $options externref) (result externref)))
   ;; pipeThrough(transform: ReadableWritablePair<T, R>): ReadableStream<T>
   (import "./bindings.wasm" "ReadableStream.pipe_through" (func $ReadableStream.pipe_through (param $this externref) (param $transform externref) (result externref)))
   ;; pipeThrough(transform: ReadableWritablePair<T, R>, options: StreamPipeOptions): ReadableStream<T>
@@ -4276,7 +4278,7 @@
   (import "./bindings.wasm" "SqlStorage.set_statement" (func $SqlStorage.set_statement (param $this externref) (param $value externref)))
 
   ;; SqlStorageCursor
-  ;; next(): object | object
+  ;; next(): SqlStorageCursorNextReturn<T>
   (import "./bindings.wasm" "SqlStorageCursor.next" (func $SqlStorageCursor.next (param $this externref) (result externref)))
   ;; toArray(): T[]
   (import "./bindings.wasm" "SqlStorageCursor.to_array" (func $SqlStorageCursor.to_array (param $this externref) (result externref)))
@@ -4292,6 +4294,18 @@
   (import "./bindings.wasm" "SqlStorageCursor.rows_read" (func $SqlStorageCursor.rows_read (param $this externref) (result f64)))
   ;; rowsWritten: number
   (import "./bindings.wasm" "SqlStorageCursor.rows_written" (func $SqlStorageCursor.rows_written (param $this externref) (result f64)))
+
+  ;; SqlStorageCursorNextReturn
+  ;; {} as SqlStorageCursorNextReturn
+  (import "./bindings.wasm" "SqlStorageCursorNextReturn.new" (func $SqlStorageCursorNextReturn.new (result externref)))
+  ;; done?: false | true
+  (import "./bindings.wasm" "SqlStorageCursorNextReturn.done" (func $SqlStorageCursorNextReturn.done (param $this externref) (result externref)))
+  ;; set done(value: false)
+  (import "./bindings.wasm" "SqlStorageCursorNextReturn.set_done" (func $SqlStorageCursorNextReturn.set_done (param $this externref) (param $value i32)))
+  ;; value?: T
+  (import "./bindings.wasm" "SqlStorageCursorNextReturn.value" (func $SqlStorageCursorNextReturn.value (param $this externref) (result externref)))
+  ;; set value(value: T | undefined)
+  (import "./bindings.wasm" "SqlStorageCursorNextReturn.set_value" (func $SqlStorageCursorNextReturn.set_value (param $this externref) (param $value externref)))
 
   ;; Socket
   ;; readable: ReadableStream
@@ -7022,9 +7036,9 @@
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages.functions" (func $Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages.set_functions" (func $Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages.tools" (func $Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages.set_tools" (func $Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages.set_tools (param $this externref) (param $value externref)))
   ;; stream?: boolean
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages.stream" (func $Ai_Cf_Meta_Llama_3_2_11B_Vision_Instruct_Messages.stream (param $this externref) (result externref)))
@@ -7164,9 +7178,9 @@
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages.functions" (func $Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages.set_functions" (func $Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages.tools" (func $Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages.set_tools" (func $Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages.set_tools (param $this externref) (param $value externref)))
   ;; response_format?: Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_JSON_Mode_1
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages.response_format" (func $Ai_Cf_Meta_Llama_3_3_70B_Instruct_Fp8_Fast_Messages.response_format (param $this externref) (result externref)))
@@ -7416,9 +7430,9 @@
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages.functions" (func $Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages.set_functions" (func $Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages.tools" (func $Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages.set_tools" (func $Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages.set_tools (param $this externref) (param $value externref)))
   ;; response_format?: Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_JSON_Mode_1
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages.response_format" (func $Ai_Cf_Qwen_Qwen2_5_Coder_32B_Instruct_Messages.response_format (param $this externref) (result externref)))
@@ -7566,9 +7580,9 @@
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwq_32B_Messages.functions" (func $Ai_Cf_Qwen_Qwq_32B_Messages.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwq_32B_Messages.set_functions" (func $Ai_Cf_Qwen_Qwq_32B_Messages.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwq_32B_Messages.tools" (func $Ai_Cf_Qwen_Qwq_32B_Messages.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwq_32B_Messages.set_tools" (func $Ai_Cf_Qwen_Qwq_32B_Messages.set_tools (param $this externref) (param $value externref)))
   ;; guided_json?: object
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwq_32B_Messages.guided_json" (func $Ai_Cf_Qwen_Qwq_32B_Messages.guided_json (param $this externref) (result externref)))
@@ -7704,9 +7718,9 @@
   (import "./bindings.wasm" "Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages.functions" (func $Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages.set_functions" (func $Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages.tools" (func $Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages.set_tools" (func $Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages.set_tools (param $this externref) (param $value externref)))
   ;; guided_json?: object
   (import "./bindings.wasm" "Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages.guided_json" (func $Ai_Cf_Mistralai_Mistral_Small_3_1_24B_Instruct_Messages.guided_json (param $this externref) (result externref)))
@@ -7842,9 +7856,9 @@
   (import "./bindings.wasm" "Ai_Cf_Google_Gemma_3_12B_It_Messages.functions" (func $Ai_Cf_Google_Gemma_3_12B_It_Messages.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Google_Gemma_3_12B_It_Messages.set_functions" (func $Ai_Cf_Google_Gemma_3_12B_It_Messages.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Google_Gemma_3_12B_It_Messages.tools" (func $Ai_Cf_Google_Gemma_3_12B_It_Messages.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Google_Gemma_3_12B_It_Messages.set_tools" (func $Ai_Cf_Google_Gemma_3_12B_It_Messages.set_tools (param $this externref) (param $value externref)))
   ;; guided_json?: object
   (import "./bindings.wasm" "Ai_Cf_Google_Gemma_3_12B_It_Messages.guided_json" (func $Ai_Cf_Google_Gemma_3_12B_It_Messages.guided_json (param $this externref) (result externref)))
@@ -7996,9 +8010,9 @@
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages.functions" (func $Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages.set_functions" (func $Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages.tools" (func $Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages.set_tools" (func $Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages.set_tools (param $this externref) (param $value externref)))
   ;; response_format?: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages.response_format" (func $Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages.response_format (param $this externref) (result externref)))
@@ -8124,9 +8138,9 @@
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner.functions" (func $Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner.set_functions" (func $Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner.tools" (func $Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner.set_tools" (func $Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner.set_tools (param $this externref) (param $value externref)))
   ;; response_format?: Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_JSON_Mode
   (import "./bindings.wasm" "Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner.response_format" (func $Ai_Cf_Meta_Llama_4_Scout_17B_16E_Instruct_Messages_Inner.response_format (param $this externref) (result externref)))
@@ -8282,9 +8296,9 @@
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages.functions" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages.set_functions" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages.tools" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages.set_tools" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages.set_tools (param $this externref) (param $value externref)))
   ;; response_format?: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_1
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages.response_format" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages.response_format (param $this externref) (result externref)))
@@ -8430,9 +8444,9 @@
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1.functions" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1.set_functions" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1.tools" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1.set_tools" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1.set_tools (param $this externref) (param $value externref)))
   ;; response_format?: Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_JSON_Mode_3
   (import "./bindings.wasm" "Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1.response_format" (func $Ai_Cf_Qwen_Qwen3_30B_A3B_Fp8_Messages_1.response_format (param $this externref) (result externref)))
@@ -9080,9 +9094,9 @@
   (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages.functions" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages.set_functions" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages.tools" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages.set_tools" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages.set_tools (param $this externref) (param $value externref)))
   ;; response_format?: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_1
   (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages.response_format" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages.response_format (param $this externref) (result externref)))
@@ -9228,9 +9242,9 @@
   (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1.functions" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1.functions (param $this externref) (result externref)))
   ;; set functions(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1.set_functions" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1.set_functions (param $this externref) (param $value externref)))
-  ;; tools?: (object | object)[]
+  ;; tools?: object[]
   (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1.tools" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1.tools (param $this externref) (result externref)))
-  ;; set tools(value: (object | object)[])
+  ;; set tools(value: object[])
   (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1.set_tools" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1.set_tools (param $this externref) (param $value externref)))
   ;; response_format?: Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_JSON_Mode_3
   (import "./bindings.wasm" "Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1.response_format" (func $Ai_Cf_Aisingapore_Gemma_Sea_Lion_V4_27B_It_Messages_1.response_format (param $this externref) (result externref)))
@@ -10008,9 +10022,9 @@
   (import "./bindings.wasm" "Ai.ai_search" (func $Ai.ai_search (param $this externref) (result externref)))
   ;; autorag(autorag_id: string): AutoRAG
   (import "./bindings.wasm" "Ai.autorag" (func $Ai.autorag (param $this externref) (param $autorag_id externref) (result externref)))
-  ;; run(model: Name, inputs: InputOptions): Promise<conditional type>
+  ;; run(model: string, inputs: InputOptions): Promise<conditional type>
   (import "./bindings.wasm" "Ai.run" (func $Ai.run (param $this externref) (param $model externref) (param $inputs externref) (result externref)))
-  ;; run(model: Name, inputs: InputOptions, options: Options): Promise<conditional type>
+  ;; run(model: string, inputs: InputOptions, options: Options): Promise<conditional type>
   (import "./bindings.wasm" "Ai.run_with_options" (func $Ai.run_with_options (param $this externref) (param $model externref) (param $inputs externref) (param $options externref) (result externref)))
   ;; models(): Promise<AiModelsSearchObject[]>
   (import "./bindings.wasm" "Ai.models" (func $Ai.models (param $this externref) (result externref)))
@@ -10220,7 +10234,7 @@
   (import "./bindings.wasm" "AIGatewayHeaders.set_cf_aig_metadata" (func $AIGatewayHeaders.set_cf_aig_metadata (param $this externref) (param $value externref)))
   ;; set cf-aig-metadata(value: string)
   (import "./bindings.wasm" "AIGatewayHeaders.set_cf_aig_metadata_with_str" (func $AIGatewayHeaders.set_cf_aig_metadata_with_str (param $this externref) (param $value externref)))
-  ;; cf-aig-custom-cost: object | object | string
+  ;; cf-aig-custom-cost: object | string
   (import "./bindings.wasm" "AIGatewayHeaders.cf_aig_custom_cost" (func $AIGatewayHeaders.cf_aig_custom_cost (param $this externref) (result externref)))
   ;; set cf-aig-custom-cost(value: object)
   (import "./bindings.wasm" "AIGatewayHeaders.set_cf_aig_custom_cost" (func $AIGatewayHeaders.set_cf_aig_custom_cost (param $this externref) (param $value externref)))
@@ -10644,7 +10658,7 @@
   (import "./bindings.wasm" "RequestInitCfPropertiesImage.origin_auth" (func $RequestInitCfPropertiesImage.origin_auth (param $this externref) (result externref)))
   ;; set origin-auth(value: "share-publicly")
   (import "./bindings.wasm" "RequestInitCfPropertiesImage.set_origin_auth" (func $RequestInitCfPropertiesImage.set_origin_auth (param $this externref) (param $value externref)))
-  ;; border?: object | object
+  ;; border?: object
   (import "./bindings.wasm" "RequestInitCfPropertiesImage.border" (func $RequestInitCfPropertiesImage.border (param $this externref) (result externref)))
   ;; set border(value: object)
   (import "./bindings.wasm" "RequestInitCfPropertiesImage.set_border" (func $RequestInitCfPropertiesImage.set_border (param $this externref) (param $value externref)))
@@ -11082,9 +11096,9 @@
   (import "./bindings.wasm" "D1Response.meta" (func $D1Response.meta (param $this externref) (result externref)))
   ;; set meta(value: D1Meta & Record<string, unknown>)
   (import "./bindings.wasm" "D1Response.set_meta" (func $D1Response.set_meta (param $this externref) (param $value externref)))
-  ;; error?: any
+  ;; error?: undefined
   (import "./bindings.wasm" "D1Response.error" (func $D1Response.error (param $this externref) (result externref)))
-  ;; set error(value: any)
+  ;; set error(value: undefined)
   (import "./bindings.wasm" "D1Response.set_error" (func $D1Response.set_error (param $this externref) (param $value externref)))
 
   ;; D1Result
@@ -11332,7 +11346,7 @@
   (import "./bindings.wasm" "ImageTransform.blur" (func $ImageTransform.blur (param $this externref) (result externref)))
   ;; set blur(value: number)
   (import "./bindings.wasm" "ImageTransform.set_blur" (func $ImageTransform.set_blur (param $this externref) (param $value f64)))
-  ;; border?: object | object
+  ;; border?: object
   (import "./bindings.wasm" "ImageTransform.border" (func $ImageTransform.border (param $this externref) (result externref)))
   ;; set border(value: object)
   (import "./bindings.wasm" "ImageTransform.set_border" (func $ImageTransform.set_border (param $this externref) (param $value externref)))
@@ -11716,8 +11730,16 @@
   ;; NodeStyleServer
   ;; listen(...args: unknown[]): this
   (import "cloudflare:node" "NodeStyleServer.listen" (func $cloudflare:node:NodeStyleServer.listen (param $this externref) (param $args (ref null $anyrefs)) (result externref)))
-  ;; address(): object
+  ;; address(): NodeStyleServerAddressReturn
   (import "cloudflare:node" "NodeStyleServer.address" (func $cloudflare:node:NodeStyleServer.address (param $this externref) (result externref)))
+
+  ;; NodeStyleServerAddressReturn
+  ;; {} as NodeStyleServerAddressReturn
+  (import "cloudflare:node" "NodeStyleServerAddressReturn.new" (func $cloudflare:node:NodeStyleServerAddressReturn.new (result externref)))
+  ;; port?: number | null
+  (import "cloudflare:node" "NodeStyleServerAddressReturn.port" (func $cloudflare:node:NodeStyleServerAddressReturn.port (param $this externref) (result externref)))
+  ;; set port(value: number | null | undefined)
+  (import "cloudflare:node" "NodeStyleServerAddressReturn.set_port" (func $cloudflare:node:NodeStyleServerAddressReturn.set_port (param $this externref) (param $value externref)))
 
   ;; httpServerHandler(port: number): ExportedHandler
   (import "cloudflare:node" "httpServerHandler" (func $cloudflare:node:httpServerHandler (param $port f64) (result externref)))
@@ -11753,9 +11775,9 @@
   (import "./bindings.wasm" "EventContext.env" (func $EventContext.env (param $this externref) (result externref)))
   ;; set env(value: Env)
   (import "./bindings.wasm" "EventContext.set_env" (func $EventContext.set_env (param $this externref) (param $value externref)))
-  ;; params: Params<P>
+  ;; params: Params<string>
   (import "./bindings.wasm" "EventContext.params" (func $EventContext.params (param $this externref) (result externref)))
-  ;; set params(value: Params<P>)
+  ;; set params(value: Params<string>)
   (import "./bindings.wasm" "EventContext.set_params" (func $EventContext.set_params (param $this externref) (param $value externref)))
   ;; data: Data
   (import "./bindings.wasm" "EventContext.data" (func $EventContext.data (param $this externref) (result externref)))
@@ -11789,9 +11811,9 @@
   (import "./bindings.wasm" "EventPluginContext.env" (func $EventPluginContext.env (param $this externref) (result externref)))
   ;; set env(value: Env)
   (import "./bindings.wasm" "EventPluginContext.set_env" (func $EventPluginContext.set_env (param $this externref) (param $value externref)))
-  ;; params: Params<P>
+  ;; params: Params<string>
   (import "./bindings.wasm" "EventPluginContext.params" (func $EventPluginContext.params (param $this externref) (result externref)))
-  ;; set params(value: Params<P>)
+  ;; set params(value: Params<string>)
   (import "./bindings.wasm" "EventPluginContext.set_params" (func $EventPluginContext.set_params (param $this externref) (param $value externref)))
   ;; data: Data
   (import "./bindings.wasm" "EventPluginContext.data" (func $EventPluginContext.data (param $this externref) (result externref)))

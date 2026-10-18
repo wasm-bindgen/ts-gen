@@ -572,6 +572,31 @@ pub struct TypeParam {
     pub default: Option<TypeRef>,
 }
 
+impl TypeParam {
+    /// A parameter constrained to a primitive (`Key extends string`, or a
+    /// union of literals of one primitive) can only be instantiated with
+    /// subtypes that share the primitive's ABI, so it has no useful Rust
+    /// generic form and reads as the primitive itself.
+    pub fn erasure(&self) -> Option<crate::parse::scope::Erasure> {
+        use crate::parse::scope::Erasure;
+        fn of(ty: &TypeRef) -> Option<Erasure> {
+            match ty {
+                TypeRef::String | TypeRef::StringLiteral(_) => Some(Erasure::String),
+                TypeRef::Number | TypeRef::NumberLiteral(_) => Some(Erasure::Number),
+                TypeRef::Boolean | TypeRef::BooleanLiteral(_) => Some(Erasure::Boolean),
+                TypeRef::BigInt => Some(Erasure::BigInt),
+                TypeRef::Union(items) => {
+                    let mut iter = items.iter().map(of);
+                    let first = iter.next()??;
+                    iter.all(|e| e == Some(first)).then_some(first)
+                }
+                _ => None,
+            }
+        }
+        of(self.constraint.as_ref()?)
+    }
+}
+
 // ─── Top-level Module ────────────────────────────────────────────────
 
 /// A parsed module — references types and scopes in the `GlobalContext`.
@@ -952,6 +977,58 @@ pub enum Member {
     StaticGetter(StaticGetterMember),
     StaticSetter(StaticSetterMember),
     StaticMethod(StaticMethodMember),
+}
+
+impl Member {
+    /// The member with the parent's type parameters replaced, for
+    /// inheriting it through `extends Parent<Arg>`.
+    pub fn substitute(&self, map: &HashMap<String, TypeRef>) -> Member {
+        let params = |ps: &[Param]| -> Vec<Param> {
+            ps.iter()
+                .map(|p| Param {
+                    type_ref: p.type_ref.substitute(map),
+                    ..p.clone()
+                })
+                .collect()
+        };
+        match self {
+            Member::Getter(g) => Member::Getter(GetterMember {
+                type_ref: g.type_ref.substitute(map),
+                ..g.clone()
+            }),
+            Member::Setter(st) => Member::Setter(SetterMember {
+                type_ref: st.type_ref.substitute(map),
+                ..st.clone()
+            }),
+            Member::Method(m) => Member::Method(MethodMember {
+                params: params(&m.params),
+                return_type: m.return_type.substitute(map),
+                ..m.clone()
+            }),
+            Member::Constructor(c) => Member::Constructor(ConstructorMember {
+                params: params(&c.params),
+                ..c.clone()
+            }),
+            Member::IndexSignature(i) => Member::IndexSignature(IndexSigMember {
+                key_type: i.key_type.substitute(map),
+                value_type: i.value_type.substitute(map),
+                ..i.clone()
+            }),
+            Member::StaticGetter(g) => Member::StaticGetter(StaticGetterMember {
+                type_ref: g.type_ref.substitute(map),
+                ..g.clone()
+            }),
+            Member::StaticSetter(st) => Member::StaticSetter(StaticSetterMember {
+                type_ref: st.type_ref.substitute(map),
+                ..st.clone()
+            }),
+            Member::StaticMethod(m) => Member::StaticMethod(StaticMethodMember {
+                params: params(&m.params),
+                return_type: m.return_type.substitute(map),
+                ..m.clone()
+            }),
+        }
+    }
 }
 
 /// Instance property getter binding.

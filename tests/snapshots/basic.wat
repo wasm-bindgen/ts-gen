@@ -55,6 +55,10 @@
   (import "./bindings.wasm" "Response.json_with_maybe_init" (func $Response.json_with_maybe_init (param $any externref) (param $maybe_init externref) (result externref)))
   ;; clone(): Response
   (import "./bindings.wasm" "Response.clone" (func $Response.clone (param $this externref) (result externref)))
+  ;; text(): Promise<string>
+  (import "./bindings.wasm" "Response.text" (func $Response.text (param $this externref) (result externref)))
+  ;; text(encoding: string): Promise<string>
+  (import "./bindings.wasm" "Response.text_with_encoding" (func $Response.text_with_encoding (param $this externref) (param $encoding externref) (result externref)))
   ;; status: number
   (import "./bindings.wasm" "Response.status" (func $Response.status (param $this externref) (result f64)))
   ;; statusText: string
