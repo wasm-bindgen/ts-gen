@@ -39548,12 +39548,12 @@ extern "C" {
     pub async fn raw_with_d1_prepared_statement_options(
         this: &D1PreparedStatement,
         options: &D1PreparedStatementOptions,
-    ) -> Result<ArrayTuple<(Array<JsString>, Array<Array>)>, JsValue>;
+    ) -> Result<Vec<JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "raw")]
     pub fn raw_with_d1_prepared_statement_options_promise(
         this: &D1PreparedStatement,
         options: &D1PreparedStatementOptions,
-    ) -> Promise<ArrayTuple<(Array<JsString>, Array<Array>)>>;
+    ) -> Promise<Array>;
     #[wasm_bindgen(method, catch, js_name = "raw")]
     pub async fn raw_with_d1_prepared_statement_options2(
         this: &D1PreparedStatement,

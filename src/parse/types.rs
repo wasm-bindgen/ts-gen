@@ -119,7 +119,15 @@ pub(crate) fn convert_ts_type_with_arena(
                 .iter()
                 .map(|elem| convert_tuple_element(elem, scope, scopes, diag))
                 .collect();
-            TypeRef::Tuple(types)
+            let has_rest = tuple
+                .element_types
+                .iter()
+                .any(|elem| matches!(elem, TSTupleElement::TSRestType(_)));
+            if has_rest {
+                rest_tuple_array(tuple, types)
+            } else {
+                TypeRef::Tuple(types)
+            }
         }
 
         // === Function types ===
@@ -336,6 +344,27 @@ fn collect_type_name_path(type_name: &TSTypeName<'_>) -> (String, Vec<String>) {
         }
         TSTypeName::ThisExpression(_) => ("this".to_string(), Vec::new()),
     }
+}
+
+/// A tuple with a rest element (`[string[], ...T[]]`) has no fixed
+/// length, so it is the array of its elements' common type, or of `any`.
+fn rest_tuple_array(tuple: &TSTupleType<'_>, types: Vec<TypeRef>) -> TypeRef {
+    let mut elements = Vec::new();
+    for (elem, ty) in tuple.element_types.iter().zip(types) {
+        match (elem, ty) {
+            (TSTupleElement::TSRestType(_), TypeRef::Array(inner)) => elements.push(*inner),
+            (TSTupleElement::TSRestType(_), TypeRef::Tuple(inner)) => elements.extend(inner),
+            (TSTupleElement::TSRestType(_), _) => elements.push(TypeRef::Any),
+            (_, ty) => elements.push(ty),
+        }
+    }
+    let first = elements.first().cloned().unwrap_or(TypeRef::Any);
+    let common = if elements.iter().all(|t| *t == first) {
+        first
+    } else {
+        TypeRef::Any
+    };
+    TypeRef::Array(Box::new(common))
 }
 
 /// Convert a tuple element to a `TypeRef`.

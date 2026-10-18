@@ -199,6 +199,12 @@ classes stay unborrowed (`&[EmailAttachment]`, not
 as `None`: `(string | null)[]` is `Vec<Option<String>>`, `(Log |
 null)[]` is `Vec<Option<Log>>`, and `(any | null)[]` stays `Vec<JsValue>`.
 
+A tuple with a rest element has no fixed length, so it is not an
+`ArrayTuple`: it lowers as the array of its elements' common type, or
+of `any` when they differ. `[string, ...string[]]` is `Vec<String>`;
+D1's `raw<T>(): Promise<[string[], ...T[]]>` (column names, then rows)
+is `Promise<Array>` (`Promise<Vec<JsValue>>` per-mono).
+
 Inside a built-in container (`Promise<Array<T>>`, `Map<K, Array<V>>`,
 …) the element stays the `Array<T'>` handle, which type-checks against
 both the stable js-sys API and `js_sys_unstable_apis`, where container
