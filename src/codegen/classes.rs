@@ -70,6 +70,41 @@ pub(crate) struct ClassConfig<'a> {
     /// Scope for type reference resolution. For class-like configs
     /// this is the type's body scope (holds its `<T, …>`).
     scope: ScopeId,
+    /// The item type a declared `[Symbol.iterator]()` yields; see
+    /// [`take_symbol_methods`].
+    iterable: Option<TypeRef>,
+}
+
+/// Splits declared well-known-symbol methods out of `members` (the parser
+/// names them `[Symbol.iterator]`, where a synthesized wrapper's method is
+/// `iterator`), returning the item type of a sync `[Symbol.iterator]()`.
+/// Per-mono it becomes `IntoIterator for &Type`; otherwise it is dropped,
+/// as before the parser kept it.
+fn take_symbol_methods(members: &mut Vec<Member>) -> Option<TypeRef> {
+    let mut item = None;
+    members.retain(|m| match m {
+        Member::Method(m) if m.name.starts_with('[') => {
+            if m.js_name == "[Symbol.iterator]" && m.params.is_empty() && m.type_params.is_empty() {
+                item = match &m.return_type {
+                    TypeRef::Reference {
+                        segments,
+                        generic_args,
+                    } if segments.len() == 1
+                        && matches!(
+                            segments[0].as_str(),
+                            "IterableIterator" | "Iterator" | "IteratorObject" | "ArrayIterator"
+                        ) =>
+                    {
+                        generic_args.first().cloned()
+                    }
+                    _ => None,
+                };
+            }
+            false
+        }
+        _ => true,
+    });
+    item
 }
 
 /// What a member base names; instance and static members of the same JS
@@ -332,6 +367,7 @@ impl<'a> ClassConfig<'a> {
         };
 
         let mut members = decl.members.clone();
+        let iterable = take_symbol_methods(&mut members);
         super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
         ClassConfig {
             rust_name: decl.name.clone(),
@@ -348,6 +384,7 @@ impl<'a> ClassConfig<'a> {
             type_params: decl.type_params.clone(),
             cgctx,
             scope,
+            iterable,
         }
     }
 
@@ -367,6 +404,7 @@ impl<'a> ClassConfig<'a> {
 
         let inherited = inherited_members(&decl.extends, cgctx);
         let mut members = inherit_into(inherited.beyond_first, &decl.members);
+        let iterable = take_symbol_methods(&mut members);
         super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
 
         ClassConfig {
@@ -381,6 +419,7 @@ impl<'a> ClassConfig<'a> {
             type_params: decl.type_params.clone(),
             cgctx,
             scope,
+            iterable,
         }
     }
 
@@ -403,6 +442,7 @@ impl<'a> ClassConfig<'a> {
             type_params: self.type_params.clone(),
             cgctx: self.cgctx,
             scope: self.scope,
+            iterable: self.iterable.clone(),
         }
     }
 
@@ -423,6 +463,7 @@ impl<'a> ClassConfig<'a> {
             ModuleContext::Global => None,
         };
         let mut members = decl.members.clone();
+        let iterable = take_symbol_methods(&mut members);
         super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
         ClassConfig {
             rust_name: decl.name.clone(),
@@ -436,6 +477,7 @@ impl<'a> ClassConfig<'a> {
             type_params: decl.type_params.clone(),
             cgctx,
             scope,
+            iterable,
         }
     }
 
@@ -1888,6 +1930,14 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
             }
         }
     }
+    let into_iterator = match &config.iterable {
+        Some(item) if CodegenContext::generic_mono(config.cgctx) => {
+            let (method, into_iterator) = generate_into_iterator(config, item, &mut names);
+            items.push(method);
+            into_iterator
+        }
+        _ => quote! {},
+    };
 
     // Build the extern block with optional module attribute
     let wb_extern_attr = CodegenContext::extern_attr(config.cgctx, config.module.as_deref());
@@ -1911,8 +1961,84 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
         extern "C" {
             #(#items)*
         }
+        #into_iterator
         #public_alias
     }
+}
+
+/// Per-mono, a declared `[Symbol.iterator]()` binds as `iterator()` and
+/// makes `&Type` iterable, as js-sys's own collections are: a `[K, V]`
+/// tuple item iterates as `(K, V)` through `js_sys::Entries`
+/// (`for (name, value) in &headers`), any other as the item itself.
+fn generate_into_iterator(
+    config: &ClassConfig,
+    item: &TypeRef,
+    names: &mut LocalScope,
+) -> (TokenStream, TokenStream) {
+    let ident = super::typemap::make_ident(&names.declare("iterator", Suffix::Snake));
+    let this_type = super::typemap::make_ident(&config.effective_rust_name());
+    let args = config.type_generics_args();
+    let generics = config.type_generics_decl();
+    let from_module = config.from_module();
+    let lower = |t: &TypeRef| {
+        super::typemap::to_syn_type(
+            t,
+            TypePosition::RETURN.to_container(config.cgctx),
+            config.cgctx,
+            config.scope,
+            &from_module,
+        )
+    };
+    let (iter_ty, item_ty, into_iter, body, bound) = match item {
+        TypeRef::Tuple(elems) if elems.len() == 2 => {
+            let (k, v) = (lower(&elems[0]), lower(&elems[1]));
+            (
+                quote! { Iterator<ArrayTuple<(#k, #v)>> },
+                quote! { (#k, #v) },
+                quote! { ::js_sys::Entries<#k, #v> },
+                quote! { ::js_sys::Entries::from(self.#ident()) },
+                quote! { ::js_sys::Entries<#k, #v>: ::core::iter::Iterator<Item = (#k, #v)> },
+            )
+        }
+        _ => {
+            let t = lower(item);
+            (
+                quote! { Iterator<#t> },
+                quote! { #t },
+                quote! { <Iterator<#t> as ::core::iter::IntoIterator>::IntoIter },
+                quote! { ::core::iter::IntoIterator::into_iter(self.#ident()) },
+                quote! { Iterator<#t>: ::core::iter::IntoIterator<Item = #t> },
+            )
+        }
+    };
+    let where_clause = if config.type_params.is_empty() {
+        quote! {}
+    } else {
+        quote! { where #bound }
+    };
+    let method = quote! {
+        #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
+        pub fn #ident #generics (this: &#this_type #args) -> #iter_ty;
+    };
+    let impl_generics = if config.type_params.is_empty() {
+        quote! { <'a> }
+    } else {
+        let params = config
+            .type_params
+            .iter()
+            .map(|tp| super::typemap::make_ident(&tp.name));
+        quote! { <'a, #(#params),*> }
+    };
+    let into_iterator = quote! {
+        impl #impl_generics ::core::iter::IntoIterator for &'a #this_type #args #where_clause {
+            type Item = #item_ty;
+            type IntoIter = #into_iter;
+            fn into_iter(self) -> Self::IntoIter {
+                #body
+            }
+        }
+    };
+    (method, into_iterator)
 }
 
 /// Generate the type declaration:

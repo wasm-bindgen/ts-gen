@@ -936,7 +936,7 @@ fn convert_method_signature(
     parent_scope: ScopeId,
     ctx: &mut ParseCtx<'_, '_>,
 ) -> Vec<Member> {
-    let js_name = match property_key_name(&method.key) {
+    let js_name = match property_key_name(&method.key).or_else(|| symbol_key_name(&method.key)) {
         Some(n) => n,
         None => return vec![],
     };
@@ -1052,7 +1052,7 @@ fn convert_class_method(
     parent_scope: ScopeId,
     ctx: &mut ParseCtx<'_, '_>,
 ) -> Vec<Member> {
-    let js_name = match property_key_name(&method.key) {
+    let js_name = match property_key_name(&method.key).or_else(|| symbol_key_name(&method.key)) {
         Some(n) => n,
         None => return vec![],
     };
@@ -1316,6 +1316,21 @@ fn convert_accessor_property(
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────
+
+/// The bracketed `js_name` of a well-known-symbol method key
+/// (`[Symbol.iterator]`). Its member keeps that name as its `name` too,
+/// which is how codegen tells it from a synthesized wrapper's `iterator`.
+fn symbol_key_name(key: &PropertyKey<'_>) -> Option<String> {
+    let PropertyKey::StaticMemberExpression(m) = key else {
+        return None;
+    };
+    let oxc_ast::ast::Expression::Identifier(obj) = &m.object else {
+        return None;
+    };
+    let prop = m.property.name.as_str();
+    (obj.name == "Symbol" && matches!(prop, "iterator" | "asyncIterator"))
+        .then(|| format!("[Symbol.{prop}]"))
+}
 
 /// Extract a string name from a `PropertyKey`.
 pub fn property_key_name(key: &PropertyKey<'_>) -> Option<String> {

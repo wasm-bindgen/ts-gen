@@ -1927,6 +1927,23 @@ methods. Nested occurrences (inside unions, arrays, etc.) are not
 synthesized — they erase to `JsValue`, matching the existing
 parameter-synthesis limitation.
 
+A class or interface that declares `[Symbol.iterator]()` itself
+(`Headers`, `FormData`, `URLSearchParams`) emits no binding for it,
+except under `--experimental-generic-mono`, where it binds as
+`iterator()` and makes `&Type` iterable as js-sys's collections are. A
+`[K, V]` item iterates as `(K, V)` through `js_sys::Entries`, and any
+other item iterates as itself:
+
+```rust
+pub fn iterator(this: &Headers) -> Iterator<ArrayTuple<(String, String)>>;
+impl<'a> IntoIterator for &'a Headers {
+    type Item = (String, String);
+    type IntoIter = js_sys::Entries<String, String>;
+    /* Entries::from(self.iterator()) */
+}
+// for (name, value) in &headers { … }
+```
+
 Under `--experimental-generic-mono` an `Iterable<T>` argument (a union
 arm included) is taken like `T[]`, as a slice reaching JS as an `Array`,
 which is itself iterable: `sendBatch(messages: Iterable<Message>)` is
