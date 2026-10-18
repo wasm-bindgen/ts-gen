@@ -1,8 +1,8 @@
-//! `--annotate`: layer `@rust` and `@throws` tags from a side `.d.ts`
-//! onto declarations of the main input, matched by declaration and
-//! member name. Upstream declaration files carry no such tags, and
-//! editing a vendored copy does not survive an upgrade; a side file that
-//! re-declares only the annotated members does.
+//! `--annotate`: layer `@rust`, `@throws`, `{@string}` and `@retype`
+//! tags from a side `.d.ts` onto declarations of the main input, matched
+//! by declaration and member name. Upstream declaration files carry no
+//! such tags, and editing a vendored copy does not survive an upgrade; a
+//! side file that re-declares only the annotated members does.
 
 use crate::context::{GlobalContext, TypeId};
 use crate::ir::{
@@ -20,19 +20,45 @@ pub fn apply(
     agctx: &GlobalContext,
 ) -> Vec<String> {
     let mut errors = Vec::new();
-    for &aid in &annotations.types {
+    apply_in(gctx, &module.types, &annotations.types, agctx, &mut errors);
+    errors
+}
+
+/// The side declarations `side` onto the input declarations `targets`,
+/// the top level or one namespace's members.
+fn apply_in(
+    gctx: &mut GlobalContext,
+    targets: &[TypeId],
+    side: &[TypeId],
+    agctx: &GlobalContext,
+    errors: &mut Vec<String>,
+) {
+    for &aid in side {
         let adecl = agctx.get_type(aid);
         let (name, members, type_params, string_mode) = match &adecl.kind {
             TypeKind::Class(c) => (&c.name, &c.members, &c.type_params, c.string_mode),
             TypeKind::Interface(i) => (&i.name, &i.members, &i.type_params, i.string_mode),
             TypeKind::Function(f) => {
-                apply_function(gctx, module, adecl.doc.as_deref(), f, &mut errors);
+                apply_function(gctx, targets, adecl.doc.as_deref(), f, errors);
                 continue;
             }
             // An alias carries no members; only its type-parameter
             // defaults can be overridden (`RequestInfo<…, Cf = …>`).
             TypeKind::TypeAlias(a) if a.type_params.iter().any(|tp| tp.default.is_some()) => {
-                apply_type_param_defaults(gctx, module, &a.name, &a.type_params, &mut errors);
+                apply_type_param_defaults(gctx, targets, &a.name, &a.type_params, errors);
+                continue;
+            }
+            TypeKind::Namespace(ns) => {
+                match find_decl(gctx, targets, &ns.name) {
+                    Ok(id) => match &gctx.get_type(id).kind {
+                        TypeKind::Namespace(target) => {
+                            let inner = target.declarations.clone();
+                            apply_in(gctx, &inner, &ns.declarations, agctx, errors);
+                        }
+                        _ => errors.push(format!("`{}` is not a namespace", ns.name)),
+                    },
+                    Err(e) => errors.push(e),
+                }
                 continue;
             }
             // The side file is a curated list: a declaration this pass
@@ -40,48 +66,49 @@ pub fn apply(
             other => {
                 let name = crate::parse::declaration_name(other).unwrap_or_default();
                 errors.push(format!(
-                    "`{name}`: only classes, interfaces and functions can be annotated \
-                     (namespaces, modules, aliases and variables are not scoped yet)"
+                    "`{name}`: only classes, interfaces, functions and namespaces can be \
+                     annotated (modules, aliases and variables are not scoped yet)"
                 ));
                 continue;
             }
         };
-        apply_members(gctx, module, name, members, &mut errors);
-        apply_type_param_defaults(gctx, module, name, type_params, &mut errors);
-        apply_string_default(gctx, module, name, string_mode, &mut errors);
+        apply_members(gctx, targets, name, members, errors);
+        apply_type_param_defaults(gctx, targets, name, type_params, errors);
+        apply_string_default(gctx, targets, name, string_mode, errors);
     }
-    errors
 }
 
 /// Every side declaration of a function applies to every input
 /// declaration of it, as side method overloads do in `apply_members`.
 fn apply_function(
     gctx: &mut GlobalContext,
-    module: &Module,
+    targets: &[TypeId],
     doc: Option<&str>,
     f: &FunctionDecl,
     errors: &mut Vec<String>,
 ) {
-    let side: Vec<Overlay<'_>> = std::iter::once(Overlay {
-        own: scalar_leaf(&f.return_type),
-        params: &f.params,
-        throws: &f.throws,
-        string_mode: f.string_mode,
+    let side: Vec<Overlay<'_>> = std::iter::once(Overlay::new(
+        &f.return_type,
+        &f.params,
+        &f.throws,
+        f.string_mode,
         doc,
-    })
-    .chain(f.overloads.iter().map(|o| Overlay {
-        own: scalar_leaf(&o.return_type),
-        params: &o.params,
-        throws: &o.throws,
-        string_mode: o.string_mode,
-        doc: o.doc.as_deref(),
+    ))
+    .chain(f.overloads.iter().map(|o| {
+        Overlay::new(
+            &o.return_type,
+            &o.params,
+            &o.throws,
+            o.string_mode,
+            o.doc.as_deref(),
+        )
     }))
     .filter(|o| !o.is_empty())
     .collect();
     if side.is_empty() {
         return;
     }
-    let id = match find_decl(gctx, module, &f.js_name) {
+    let id = match find_decl(gctx, targets, &f.js_name) {
         Ok(id) => id,
         Err(e) => {
             errors.push(e);
@@ -116,6 +143,7 @@ fn apply_function(
             )
         }));
         for (ret, params, throws, doc, string_mode) in targets {
+            overlay.apply_retype(ret);
             overlay.apply_string_mode(string_mode);
             match overlay.apply_return(ret) {
                 Some(m) => return_mismatches.push(m),
@@ -146,7 +174,7 @@ fn apply_function(
 /// parameters that declare a default in the side file are touched.
 fn apply_type_param_defaults(
     gctx: &mut GlobalContext,
-    module: &Module,
+    targets: &[TypeId],
     name: &str,
     side: &[TypeParam],
     errors: &mut Vec<String>,
@@ -154,7 +182,7 @@ fn apply_type_param_defaults(
     if side.iter().all(|tp| tp.default.is_none()) {
         return;
     }
-    let Ok(id) = find_decl(gctx, module, name) else {
+    let Ok(id) = find_decl(gctx, targets, name) else {
         return;
     };
     let targets: &mut Vec<TypeParam> = match &mut gctx.get_type_mut(id).kind {
@@ -176,7 +204,7 @@ fn apply_type_param_defaults(
 /// member of it that no tag (input or side) has set.
 fn apply_string_default(
     gctx: &mut GlobalContext,
-    module: &Module,
+    targets: &[TypeId],
     name: &str,
     mode: Option<StringModeHint>,
     errors: &mut Vec<String>,
@@ -184,7 +212,7 @@ fn apply_string_default(
     if mode.is_none() {
         return;
     }
-    let id = match find_decl(gctx, module, name) {
+    let id = match find_decl(gctx, targets, name) {
         Ok(id) => id,
         Err(e) => {
             errors.push(e);
@@ -203,9 +231,8 @@ fn apply_string_default(
 
 /// The input declaration a side name targets. A name declared more than
 /// once (globally and in a module) cannot be targeted by bare name.
-fn find_decl(gctx: &GlobalContext, module: &Module, name: &str) -> Result<TypeId, String> {
-    let matches: Vec<TypeId> = module
-        .types
+fn find_decl(gctx: &GlobalContext, targets: &[TypeId], name: &str) -> Result<TypeId, String> {
+    let matches: Vec<TypeId> = targets
         .iter()
         .copied()
         .filter(|&id| {
@@ -216,6 +243,7 @@ fn find_decl(gctx: &GlobalContext, module: &Module, name: &str) -> Result<TypeId
                 TypeKind::DiscriminatedUnion(d) => d.name == name,
                 TypeKind::TypeAlias(a) => a.name == name,
                 TypeKind::Function(f) => f.js_name == name,
+                TypeKind::Namespace(n) => n.name == name,
                 _ => false,
             }
         })
@@ -234,6 +262,10 @@ fn find_decl(gctx: &GlobalContext, module: &Module, name: &str) -> Result<TypeId
 struct Overlay<'a> {
     /// `@rust <type>`: the property type or callable return.
     own: Option<RustScalar>,
+    /// `@retype`: the side member's own type replaces the property type or
+    /// callable return, for an input type that erases what the API
+    /// produces (`get body(): ReadableStream | null` of bytes).
+    retype: Option<&'a TypeRef>,
     /// Parameters, of which only `@rust`-tagged ones are applied.
     params: &'a [Param],
     throws: &'a Throws,
@@ -241,19 +273,61 @@ struct Overlay<'a> {
     string_mode: Option<StringModeHint>,
     /// Rendered side doc (the `## Errors` section of `@throws`), appended
     /// to the target's doc.
-    doc: Option<&'a str>,
+    doc: Option<std::borrow::Cow<'a, str>>,
+}
+
+const RETYPE_TAG: &str = "@retype";
+
+/// The side doc without a `@retype` line (an unknown tag the renderer
+/// passes through), and whether it had one.
+fn take_retype(doc: Option<&str>) -> (Option<std::borrow::Cow<'_, str>>, bool) {
+    let Some(doc) = doc else {
+        return (None, false);
+    };
+    if !doc.lines().any(|l| l.trim() == RETYPE_TAG) {
+        return (Some(doc.into()), false);
+    }
+    let rest: Vec<&str> = doc.lines().filter(|l| l.trim() != RETYPE_TAG).collect();
+    (Some(rest.join("\n").into()), true)
+}
+
+impl<'a> Overlay<'a> {
+    fn new(
+        own_type: &'a TypeRef,
+        params: &'a [Param],
+        throws: &'a Throws,
+        string_mode: Option<StringModeHint>,
+        doc: Option<&'a str>,
+    ) -> Self {
+        let (doc, retype) = take_retype(doc);
+        Overlay {
+            own: scalar_leaf(own_type),
+            retype: retype.then_some(own_type),
+            params,
+            throws,
+            string_mode,
+            doc,
+        }
+    }
 }
 
 impl Overlay<'_> {
+    fn apply_retype(&self, ty: &mut TypeRef) {
+        if let Some(side) = self.retype {
+            *ty = side.clone();
+        }
+    }
+
     fn is_empty(&self) -> bool {
         self.own.is_none()
+            && self.retype.is_none()
             && self
                 .params
                 .iter()
                 .all(|p| scalar_leaf(&p.type_ref).is_none())
             && matches!(self.throws, Throws::None)
             && self.string_mode.is_none()
-            && self.doc.is_none_or(|d| d.trim().is_empty())
+            && self.doc.as_deref().is_none_or(|d| d.trim().is_empty())
     }
 
     /// The mismatch message when the input's leaf cannot carry the
@@ -310,7 +384,7 @@ impl Overlay<'_> {
     }
 
     fn apply_doc(&self, doc: &mut Option<String>) {
-        let Some(extra) = self.doc.map(str::trim).filter(|d| !d.is_empty()) else {
+        let Some(extra) = self.doc.as_deref().map(str::trim).filter(|d| !d.is_empty()) else {
             return;
         };
         *doc = Some(match doc.take().filter(|d| !d.trim().is_empty()) {
@@ -356,52 +430,41 @@ fn side_member(m: &Member) -> Option<(Key<'_>, Overlay<'_>)> {
     Some(match m {
         Member::Getter(g) => (
             Key::Property(&g.js_name),
-            Overlay {
-                own: scalar_leaf(&g.type_ref),
-                params: &[],
-                throws: &g.throws,
-                string_mode: g.string_mode,
-                doc: g.doc.as_deref(),
-            },
+            Overlay::new(&g.type_ref, &[], &g.throws, g.string_mode, g.doc.as_deref()),
         ),
         Member::StaticGetter(g) => (
             Key::StaticProperty(&g.js_name),
-            Overlay {
-                own: scalar_leaf(&g.type_ref),
-                params: &[],
-                throws: &g.throws,
-                string_mode: g.string_mode,
-                doc: g.doc.as_deref(),
-            },
+            Overlay::new(&g.type_ref, &[], &g.throws, g.string_mode, g.doc.as_deref()),
         ),
         Member::Method(m) => (
             Key::Method(&m.js_name),
-            Overlay {
-                own: scalar_leaf(&m.return_type),
-                params: &m.params,
-                throws: &m.throws,
-                string_mode: m.string_mode,
-                doc: m.doc.as_deref(),
-            },
+            Overlay::new(
+                &m.return_type,
+                &m.params,
+                &m.throws,
+                m.string_mode,
+                m.doc.as_deref(),
+            ),
         ),
         Member::StaticMethod(m) => (
             Key::StaticMethod(&m.js_name),
-            Overlay {
-                own: scalar_leaf(&m.return_type),
-                params: &m.params,
-                throws: &m.throws,
-                string_mode: m.string_mode,
-                doc: m.doc.as_deref(),
-            },
+            Overlay::new(
+                &m.return_type,
+                &m.params,
+                &m.throws,
+                m.string_mode,
+                m.doc.as_deref(),
+            ),
         ),
         Member::Constructor(c) => (
             Key::Constructor,
             Overlay {
                 own: None,
+                retype: None,
                 params: &c.params,
                 throws: &c.throws,
                 string_mode: None,
-                doc: c.doc.as_deref(),
+                doc: c.doc.as_deref().map(Into::into),
             },
         ),
         Member::Setter(_) | Member::StaticSetter(_) | Member::IndexSignature(_) => return None,
@@ -410,12 +473,12 @@ fn side_member(m: &Member) -> Option<(Key<'_>, Overlay<'_>)> {
 
 fn apply_members(
     gctx: &mut GlobalContext,
-    module: &Module,
+    targets: &[TypeId],
     name: &str,
     annotated: &[Member],
     errors: &mut Vec<String>,
 ) {
-    let id = match find_decl(gctx, module, name) {
+    let id = match find_decl(gctx, targets, name) {
         Ok(id) => id,
         Err(e) => {
             errors.push(e);
@@ -455,6 +518,7 @@ fn apply_members(
             match (m, &key) {
                 (Member::Getter(t), Key::Property(n)) if t.js_name == *n => {
                     hit = true;
+                    overlay.apply_retype(&mut t.type_ref);
                     mismatched.extend(overlay.apply_return(&mut t.type_ref));
                     overlay.apply_string_mode(&mut t.string_mode);
                     overlay.apply_throws(&mut t.throws);
@@ -465,6 +529,7 @@ fn apply_members(
                 }
                 (Member::StaticGetter(t), Key::StaticProperty(n)) if t.js_name == *n => {
                     hit = true;
+                    overlay.apply_retype(&mut t.type_ref);
                     mismatched.extend(overlay.apply_return(&mut t.type_ref));
                     overlay.apply_string_mode(&mut t.string_mode);
                     overlay.apply_throws(&mut t.throws);
@@ -475,6 +540,7 @@ fn apply_members(
                 }
                 (Member::Method(t), Key::Method(n)) if t.js_name == *n => {
                     hit = true;
+                    overlay.apply_retype(&mut t.return_type);
                     on_return(overlay.apply_return(&mut t.return_type));
                     overlay.apply_string_mode(&mut t.string_mode);
                     overlay.apply_params(&mut t.params, &mut found, &mut mismatched);
@@ -483,6 +549,7 @@ fn apply_members(
                 }
                 (Member::StaticMethod(t), Key::StaticMethod(n)) if t.js_name == *n => {
                     hit = true;
+                    overlay.apply_retype(&mut t.return_type);
                     on_return(overlay.apply_return(&mut t.return_type));
                     overlay.apply_string_mode(&mut t.string_mode);
                     overlay.apply_params(&mut t.params, &mut found, &mut mismatched);
@@ -597,10 +664,21 @@ mod tests {
 
     #[test]
     fn unsupported_declaration_kind() {
-        let side = "declare namespace NS { interface Inner { /** @rust u16 */ a: number; } }";
+        let side = "type Alias = string;";
         let errs = errors(INPUT, side);
         assert_eq!(errs.len(), 1);
-        assert!(errs[0].starts_with("`NS`: only classes"), "{errs:?}");
+        assert!(errs[0].starts_with("`Alias`: only classes"), "{errs:?}");
+    }
+
+    #[test]
+    fn namespace_members_apply() {
+        let input = "declare namespace NS { interface Inner { readonly a: number; } }";
+        let side =
+            "declare namespace NS { interface Inner { /** @rust u16 */ readonly a: number; } }";
+        assert!(errors(input, side).is_empty());
+        let side =
+            "declare namespace NS { interface Nope { /** @rust u16 */ readonly a: number; } }";
+        assert_eq!(errors(input, side), ["no declaration named `Nope`"]);
     }
 
     #[test]

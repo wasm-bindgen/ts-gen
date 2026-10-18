@@ -13,6 +13,8 @@ extern "C" {
     pub fn status(this: &Response) -> u16;
     #[wasm_bindgen(method, getter)]
     pub fn ok(this: &Response) -> bool;
+    #[wasm_bindgen(method, getter)]
+    pub fn body(this: &Response) -> Option<ReadableStream<Uint8Array>>;
     #[doc = " Creates a clone of the response."]
     #[doc = ""]
     #[doc = " ## Errors"]
@@ -27,6 +29,20 @@ extern "C" {
     #[doc = " * `TypeError` — if the body has already been used"]
     #[wasm_bindgen(method, catch, js_name = "clone")]
     pub fn try_clone(this: &Response) -> Result<Response, TypeError>;
+    #[doc = " The body as bytes."]
+    #[wasm_bindgen(method, catch)]
+    pub async fn bytes(this: &Response) -> Result<Uint8Array, JsValue>;
+    #[doc = " The body as bytes."]
+    #[wasm_bindgen(method, js_name = "bytes")]
+    pub fn bytes_promise(this: &Response) -> Promise<Uint8Array>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ReadableStream<R: ::wasm_bindgen::JsGeneric = JsValue>;
+    #[wasm_bindgen(method, getter)]
+    pub fn locked<R: ::wasm_bindgen::JsGeneric>(this: &ReadableStream<R>) -> bool;
 }
 #[wasm_bindgen]
 extern "C" {

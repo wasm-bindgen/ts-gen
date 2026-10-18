@@ -5,6 +5,14 @@ interface Response {
   readonly status: number;
   /** @throws {TypeError} if the body has already been used */
   clone(): Response;
+  // `@retype`: the side member's type replaces the input's.
+  /** @retype */
+  readonly body: ReadableStream<Uint8Array> | null;
+  /**
+   * The body as bytes.
+   * @retype
+   */
+  bytes(): Promise<Uint8Array>;
 }
 
 interface ResponseInit {

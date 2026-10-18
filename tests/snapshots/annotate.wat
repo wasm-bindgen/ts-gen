@@ -27,8 +27,16 @@
   (import "./bindings.wasm" "Response.status" (func $Response.status (param $this externref) (result externref)))
   ;; ok: boolean
   (import "./bindings.wasm" "Response.ok" (func $Response.ok (param $this externref) (result i32)))
+  ;; body: ReadableStream<Uint8Array> | null
+  (import "./bindings.wasm" "Response.body" (func $Response.body (param $this externref) (result externref)))
   ;; clone(): Response
   (import "./bindings.wasm" "Response.clone" (func $Response.clone (param $this externref) (result externref)))
+  ;; bytes(): Promise<Uint8Array>
+  (import "./bindings.wasm" "Response.bytes" (func $Response.bytes (param $this externref) (result externref)))
+
+  ;; ReadableStream
+  ;; locked: boolean
+  (import "./bindings.wasm" "ReadableStream.locked" (func $ReadableStream.locked (param $this externref) (result i32)))
 
   ;; ResponseInit
   ;; {} as ResponseInit
