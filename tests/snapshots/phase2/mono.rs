@@ -226,5 +226,6 @@ impl ::core::convert::From<&Request> for RequestInfoKind {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
+    #[wasm_bindgen(catch)]
     pub fn fetch(input: impl RequestInfo) -> Promise<Response>;
 }

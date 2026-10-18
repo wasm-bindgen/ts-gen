@@ -978,12 +978,12 @@ pub mod web_assembly {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_namespace = "WebAssembly")]
+        #[wasm_bindgen(catch, js_namespace = "WebAssembly")]
         pub fn instantiate(module: &Module) -> Promise<Instance>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_name = "instantiate", js_namespace = "WebAssembly")]
+        #[wasm_bindgen(catch, js_name = "instantiate", js_namespace = "WebAssembly")]
         pub fn instantiate_with_imports(
             module: &Module,
             imports: &Object<Object>,
@@ -1107,31 +1107,31 @@ extern "C" {
         T: ::wasm_bindgen::convert::RefIntoWasmAbi + ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "reportError")]
     pub fn report_error(this: &ServiceWorkerGlobalScope, error: &JsValue) -> Result<(), JsValue>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn fetch<CfHostMetadata, Cf>(
         this: &ServiceWorkerGlobalScope,
         input: &Request<CfHostMetadata, Cf>,
     ) -> Promise<Response>;
-    #[wasm_bindgen(method, js_name = "fetch")]
+    #[wasm_bindgen(method, catch, js_name = "fetch")]
     pub fn fetch_with_str(
         this: &ServiceWorkerGlobalScope,
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Response>;
-    #[wasm_bindgen(method, js_name = "fetch")]
+    #[wasm_bindgen(method, catch, js_name = "fetch")]
     pub fn fetch_with_url(this: &ServiceWorkerGlobalScope, input: &URL) -> Promise<Response>;
-    #[wasm_bindgen(method, js_name = "fetch")]
+    #[wasm_bindgen(method, catch, js_name = "fetch")]
     pub fn fetch_with_init<CfHostMetadata, Cf>(
         this: &ServiceWorkerGlobalScope,
         input: &Request<CfHostMetadata, Cf>,
         init: &RequestInit<RequestInitCfProperties>,
     ) -> Promise<Response>;
-    #[wasm_bindgen(method, js_name = "fetch")]
+    #[wasm_bindgen(method, catch, js_name = "fetch")]
     pub fn fetch_with_str_and_init(
         this: &ServiceWorkerGlobalScope,
         input: impl ::wasm_bindgen::JsStringLike,
         init: &RequestInit<RequestInitCfProperties>,
     ) -> Promise<Response>;
-    #[wasm_bindgen(method, js_name = "fetch")]
+    #[wasm_bindgen(method, catch, js_name = "fetch")]
     pub fn fetch_with_url_and_init(
         this: &ServiceWorkerGlobalScope,
         input: &URL,
@@ -2180,21 +2180,22 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
+    #[wasm_bindgen(catch)]
     pub fn fetch<CfHostMetadata, Cf>(input: &Request<CfHostMetadata, Cf>) -> Promise<Response>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "fetch")]
+    #[wasm_bindgen(catch, js_name = "fetch")]
     pub fn fetch_with_str(input: impl ::wasm_bindgen::JsStringLike) -> Promise<Response>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "fetch")]
+    #[wasm_bindgen(catch, js_name = "fetch")]
     pub fn fetch_with_url(input: &URL) -> Promise<Response>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "fetch")]
+    #[wasm_bindgen(catch, js_name = "fetch")]
     pub fn fetch_with_init<CfHostMetadata, Cf>(
         input: &Request<CfHostMetadata, Cf>,
         init: &RequestInit<RequestInitCfProperties>,
@@ -2202,7 +2203,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "fetch")]
+    #[wasm_bindgen(catch, js_name = "fetch")]
     pub fn fetch_with_str_and_init(
         input: impl ::wasm_bindgen::JsStringLike,
         init: &RequestInit<RequestInitCfProperties>,
@@ -2210,7 +2211,7 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "fetch")]
+    #[wasm_bindgen(catch, js_name = "fetch")]
     pub fn fetch_with_url_and_init(
         input: &URL,
         init: &RequestInit<RequestInitCfProperties>,
@@ -3059,7 +3060,7 @@ extern "C" {
     pub fn container<Props>(this: &DurableObjectState<Props>) -> Option<Container>;
     #[wasm_bindgen(method, setter)]
     pub fn set_container<Props>(this: &DurableObjectState<Props>, val: &Container);
-    #[wasm_bindgen(method, js_name = "blockConcurrencyWhile")]
+    #[wasm_bindgen(method, catch, js_name = "blockConcurrencyWhile")]
     pub fn block_concurrency_while<Props, T>(
         this: &DurableObjectState<Props>,
         callback: &Function<fn() -> Promise<T>>,
@@ -3138,54 +3139,54 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObjectTransaction;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn get<T>(
         this: &DurableObjectTransaction,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<T>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_with_options<T>(
         this: &DurableObjectTransaction,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &DurableObjectGetOptions,
     ) -> Promise<Option<T>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_with_keys(
         this: &DurableObjectTransaction,
         keys: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<Map<String, JsValue>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_with_keys_and_options(
         this: &DurableObjectTransaction,
         keys: &[impl ::wasm_bindgen::JsStringLike],
         options: &DurableObjectGetOptions,
     ) -> Promise<Map<String, JsValue>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_with_keys_typed<T>(
         this: &DurableObjectTransaction,
         keys: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<Map<String, T>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_with_keys_and_options_typed<T>(
         this: &DurableObjectTransaction,
         keys: &[impl ::wasm_bindgen::JsStringLike],
         options: &DurableObjectGetOptions,
     ) -> Promise<Map<String, T>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn list(this: &DurableObjectTransaction) -> Promise<Map<String, JsValue>>;
-    #[wasm_bindgen(method, js_name = "list")]
+    #[wasm_bindgen(method, catch, js_name = "list")]
     pub fn list_with_options(
         this: &DurableObjectTransaction,
         options: &DurableObjectListOptions,
     ) -> Promise<Map<String, JsValue>>;
-    #[wasm_bindgen(method, js_name = "list")]
+    #[wasm_bindgen(method, catch, js_name = "list")]
     pub fn list_typed<T>(this: &DurableObjectTransaction) -> Promise<Map<String, T>>;
-    #[wasm_bindgen(method, js_name = "list")]
+    #[wasm_bindgen(method, catch, js_name = "list")]
     pub fn list_with_options_typed<T>(
         this: &DurableObjectTransaction,
         options: &DurableObjectListOptions,
     ) -> Promise<Map<String, T>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn put<T>(
         this: &DurableObjectTransaction,
         key: impl ::wasm_bindgen::JsStringLike,
@@ -3193,7 +3194,7 @@ extern "C" {
     ) -> Promise<()>
     where
         T: ::wasm_bindgen::convert::RefIntoWasmAbi;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_options<T>(
         this: &DurableObjectTransaction,
         key: impl ::wasm_bindgen::JsStringLike,
@@ -3202,32 +3203,32 @@ extern "C" {
     ) -> Promise<()>
     where
         T: ::wasm_bindgen::convert::RefIntoWasmAbi;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_entries<T>(this: &DurableObjectTransaction, entries: &Object<T>)
         -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_entries_and_options<T>(
         this: &DurableObjectTransaction,
         entries: &Object<T>,
         options: &DurableObjectPutOptions,
     ) -> Promise<()>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn delete(
         this: &DurableObjectTransaction,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<bool>;
-    #[wasm_bindgen(method, js_name = "delete")]
+    #[wasm_bindgen(method, catch, js_name = "delete")]
     pub fn delete_with_options(
         this: &DurableObjectTransaction,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &DurableObjectPutOptions,
     ) -> Promise<bool>;
-    #[wasm_bindgen(method, js_name = "delete")]
+    #[wasm_bindgen(method, catch, js_name = "delete")]
     pub fn delete_with_keys(
         this: &DurableObjectTransaction,
         keys: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<f64>;
-    #[wasm_bindgen(method, js_name = "delete")]
+    #[wasm_bindgen(method, catch, js_name = "delete")]
     pub fn delete_with_keys_and_options(
         this: &DurableObjectTransaction,
         keys: &[impl ::wasm_bindgen::JsStringLike],
@@ -3235,35 +3236,35 @@ extern "C" {
     ) -> Promise<f64>;
     #[wasm_bindgen(method, catch)]
     pub fn rollback(this: &DurableObjectTransaction) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "getAlarm")]
+    #[wasm_bindgen(method, catch, js_name = "getAlarm")]
     pub fn get_alarm(this: &DurableObjectTransaction) -> Promise<Option<f64>>;
-    #[wasm_bindgen(method, js_name = "getAlarm")]
+    #[wasm_bindgen(method, catch, js_name = "getAlarm")]
     pub fn get_alarm_with_options(
         this: &DurableObjectTransaction,
         options: &DurableObjectGetAlarmOptions,
     ) -> Promise<Option<f64>>;
-    #[wasm_bindgen(method, js_name = "setAlarm")]
+    #[wasm_bindgen(method, catch, js_name = "setAlarm")]
     pub fn set_alarm(this: &DurableObjectTransaction, scheduled_time: f64) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "setAlarm")]
+    #[wasm_bindgen(method, catch, js_name = "setAlarm")]
     pub fn set_alarm_with_date(
         this: &DurableObjectTransaction,
         scheduled_time: &Date,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "setAlarm")]
+    #[wasm_bindgen(method, catch, js_name = "setAlarm")]
     pub fn set_alarm_with_options(
         this: &DurableObjectTransaction,
         scheduled_time: f64,
         options: &DurableObjectSetAlarmOptions,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "setAlarm")]
+    #[wasm_bindgen(method, catch, js_name = "setAlarm")]
     pub fn set_alarm_with_date_and_options(
         this: &DurableObjectTransaction,
         scheduled_time: &Date,
         options: &DurableObjectSetAlarmOptions,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "deleteAlarm")]
+    #[wasm_bindgen(method, catch, js_name = "deleteAlarm")]
     pub fn delete_alarm(this: &DurableObjectTransaction) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "deleteAlarm")]
+    #[wasm_bindgen(method, catch, js_name = "deleteAlarm")]
     pub fn delete_alarm_with_options(
         this: &DurableObjectTransaction,
         options: &DurableObjectSetAlarmOptions,
@@ -3274,54 +3275,54 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObjectStorage;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn get<T>(
         this: &DurableObjectStorage,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<T>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_with_options<T>(
         this: &DurableObjectStorage,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &DurableObjectGetOptions,
     ) -> Promise<Option<T>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_with_keys(
         this: &DurableObjectStorage,
         keys: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<Map<String, JsValue>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_with_keys_and_options(
         this: &DurableObjectStorage,
         keys: &[impl ::wasm_bindgen::JsStringLike],
         options: &DurableObjectGetOptions,
     ) -> Promise<Map<String, JsValue>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_with_keys_typed<T>(
         this: &DurableObjectStorage,
         keys: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<Map<String, T>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_with_keys_and_options_typed<T>(
         this: &DurableObjectStorage,
         keys: &[impl ::wasm_bindgen::JsStringLike],
         options: &DurableObjectGetOptions,
     ) -> Promise<Map<String, T>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn list(this: &DurableObjectStorage) -> Promise<Map<String, JsValue>>;
-    #[wasm_bindgen(method, js_name = "list")]
+    #[wasm_bindgen(method, catch, js_name = "list")]
     pub fn list_with_options(
         this: &DurableObjectStorage,
         options: &DurableObjectListOptions,
     ) -> Promise<Map<String, JsValue>>;
-    #[wasm_bindgen(method, js_name = "list")]
+    #[wasm_bindgen(method, catch, js_name = "list")]
     pub fn list_typed<T>(this: &DurableObjectStorage) -> Promise<Map<String, T>>;
-    #[wasm_bindgen(method, js_name = "list")]
+    #[wasm_bindgen(method, catch, js_name = "list")]
     pub fn list_with_options_typed<T>(
         this: &DurableObjectStorage,
         options: &DurableObjectListOptions,
     ) -> Promise<Map<String, T>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn put<T>(
         this: &DurableObjectStorage,
         key: impl ::wasm_bindgen::JsStringLike,
@@ -3329,7 +3330,7 @@ extern "C" {
     ) -> Promise<()>
     where
         T: ::wasm_bindgen::convert::RefIntoWasmAbi;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_options<T>(
         this: &DurableObjectStorage,
         key: impl ::wasm_bindgen::JsStringLike,
@@ -3338,79 +3339,79 @@ extern "C" {
     ) -> Promise<()>
     where
         T: ::wasm_bindgen::convert::RefIntoWasmAbi;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_entries<T>(this: &DurableObjectStorage, entries: &Object<T>) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_entries_and_options<T>(
         this: &DurableObjectStorage,
         entries: &Object<T>,
         options: &DurableObjectPutOptions,
     ) -> Promise<()>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn delete(
         this: &DurableObjectStorage,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<bool>;
-    #[wasm_bindgen(method, js_name = "delete")]
+    #[wasm_bindgen(method, catch, js_name = "delete")]
     pub fn delete_with_options(
         this: &DurableObjectStorage,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &DurableObjectPutOptions,
     ) -> Promise<bool>;
-    #[wasm_bindgen(method, js_name = "delete")]
+    #[wasm_bindgen(method, catch, js_name = "delete")]
     pub fn delete_with_keys(
         this: &DurableObjectStorage,
         keys: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<f64>;
-    #[wasm_bindgen(method, js_name = "delete")]
+    #[wasm_bindgen(method, catch, js_name = "delete")]
     pub fn delete_with_keys_and_options(
         this: &DurableObjectStorage,
         keys: &[impl ::wasm_bindgen::JsStringLike],
         options: &DurableObjectPutOptions,
     ) -> Promise<f64>;
-    #[wasm_bindgen(method, js_name = "deleteAll")]
+    #[wasm_bindgen(method, catch, js_name = "deleteAll")]
     pub fn delete_all(this: &DurableObjectStorage) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "deleteAll")]
+    #[wasm_bindgen(method, catch, js_name = "deleteAll")]
     pub fn delete_all_with_options(
         this: &DurableObjectStorage,
         options: &DurableObjectPutOptions,
     ) -> Promise<()>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn transaction<T>(
         this: &DurableObjectStorage,
         closure: &Function<fn(DurableObjectTransaction) -> Promise<T>>,
     ) -> Promise<T>;
-    #[wasm_bindgen(method, js_name = "getAlarm")]
+    #[wasm_bindgen(method, catch, js_name = "getAlarm")]
     pub fn get_alarm(this: &DurableObjectStorage) -> Promise<Option<f64>>;
-    #[wasm_bindgen(method, js_name = "getAlarm")]
+    #[wasm_bindgen(method, catch, js_name = "getAlarm")]
     pub fn get_alarm_with_options(
         this: &DurableObjectStorage,
         options: &DurableObjectGetAlarmOptions,
     ) -> Promise<Option<f64>>;
-    #[wasm_bindgen(method, js_name = "setAlarm")]
+    #[wasm_bindgen(method, catch, js_name = "setAlarm")]
     pub fn set_alarm(this: &DurableObjectStorage, scheduled_time: f64) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "setAlarm")]
+    #[wasm_bindgen(method, catch, js_name = "setAlarm")]
     pub fn set_alarm_with_date(this: &DurableObjectStorage, scheduled_time: &Date) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "setAlarm")]
+    #[wasm_bindgen(method, catch, js_name = "setAlarm")]
     pub fn set_alarm_with_options(
         this: &DurableObjectStorage,
         scheduled_time: f64,
         options: &DurableObjectSetAlarmOptions,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "setAlarm")]
+    #[wasm_bindgen(method, catch, js_name = "setAlarm")]
     pub fn set_alarm_with_date_and_options(
         this: &DurableObjectStorage,
         scheduled_time: &Date,
         options: &DurableObjectSetAlarmOptions,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "deleteAlarm")]
+    #[wasm_bindgen(method, catch, js_name = "deleteAlarm")]
     pub fn delete_alarm(this: &DurableObjectStorage) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "deleteAlarm")]
+    #[wasm_bindgen(method, catch, js_name = "deleteAlarm")]
     pub fn delete_alarm_with_options(
         this: &DurableObjectStorage,
         options: &DurableObjectSetAlarmOptions,
     ) -> Promise<()>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn sync(this: &DurableObjectStorage) -> Promise<()>;
     #[wasm_bindgen(method, getter)]
     pub fn sql(this: &DurableObjectStorage) -> SqlStorage;
@@ -3427,33 +3428,33 @@ extern "C" {
     ) -> Result<T, JsValue>
     where
         T: ::wasm_bindgen::convert::FromWasmAbi;
-    #[wasm_bindgen(method, js_name = "getCurrentBookmark")]
+    #[wasm_bindgen(method, catch, js_name = "getCurrentBookmark")]
     pub fn get_current_bookmark(this: &DurableObjectStorage) -> Promise<String>;
-    #[wasm_bindgen(method, js_name = "getCurrentBookmark")]
+    #[wasm_bindgen(method, catch, js_name = "getCurrentBookmark")]
     pub fn get_current_bookmark_js_string(this: &DurableObjectStorage) -> Promise<JsString>;
-    #[wasm_bindgen(method, js_name = "getBookmarkForTime")]
+    #[wasm_bindgen(method, catch, js_name = "getBookmarkForTime")]
     pub fn get_bookmark_for_time(this: &DurableObjectStorage, timestamp: f64) -> Promise<String>;
-    #[wasm_bindgen(method, js_name = "getBookmarkForTime")]
+    #[wasm_bindgen(method, catch, js_name = "getBookmarkForTime")]
     pub fn get_bookmark_for_time_js_string(
         this: &DurableObjectStorage,
         timestamp: f64,
     ) -> Promise<JsString>;
-    #[wasm_bindgen(method, js_name = "getBookmarkForTime")]
+    #[wasm_bindgen(method, catch, js_name = "getBookmarkForTime")]
     pub fn get_bookmark_for_time_with_date(
         this: &DurableObjectStorage,
         timestamp: &Date,
     ) -> Promise<String>;
-    #[wasm_bindgen(method, js_name = "getBookmarkForTime")]
+    #[wasm_bindgen(method, catch, js_name = "getBookmarkForTime")]
     pub fn get_bookmark_for_time_with_date_js_string(
         this: &DurableObjectStorage,
         timestamp: &Date,
     ) -> Promise<JsString>;
-    #[wasm_bindgen(method, js_name = "onNextSessionRestoreBookmark")]
+    #[wasm_bindgen(method, catch, js_name = "onNextSessionRestoreBookmark")]
     pub fn on_next_session_restore_bookmark(
         this: &DurableObjectStorage,
         bookmark: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<String>;
-    #[wasm_bindgen(method, js_name = "onNextSessionRestoreBookmark")]
+    #[wasm_bindgen(method, catch, js_name = "onNextSessionRestoreBookmark")]
     pub fn on_next_session_restore_bookmark_js_string(
         this: &DurableObjectStorage,
         bookmark: impl ::wasm_bindgen::JsStringLike,
@@ -4385,9 +4386,9 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Scheduler;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn wait(this: &Scheduler, delay: f64) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "wait")]
+    #[wasm_bindgen(method, catch, js_name = "wait")]
     pub fn wait_with_maybe_options(
         this: &Scheduler,
         delay: f64,
@@ -4599,22 +4600,22 @@ extern "C" {
     #[doc = " The **`arrayBuffer()`** method of the Blob interface returns a Promise that resolves with the contents of the blob as binary data contained in an ArrayBuffer."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/arrayBuffer)"]
-    #[wasm_bindgen(method, js_name = "arrayBuffer")]
+    #[wasm_bindgen(method, catch, js_name = "arrayBuffer")]
     pub fn array_buffer(this: &Blob) -> Promise<ArrayBuffer>;
     #[doc = " The **`bytes()`** method of the Blob interface returns a Promise that resolves with a Uint8Array containing the contents of the blob as an array of bytes."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/bytes)"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn bytes(this: &Blob) -> Promise<Uint8Array>;
     #[doc = " The **`text()`** method of the string containing the contents of the blob, interpreted as UTF-8."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/text)"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn text(this: &Blob) -> Promise<String>;
     #[doc = " The **`text()`** method of the string containing the contents of the blob, interpreted as UTF-8."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/text)"]
-    #[wasm_bindgen(method, js_name = "text")]
+    #[wasm_bindgen(method, catch, js_name = "text")]
     pub fn text_js_string(this: &Blob) -> Promise<JsString>;
     #[doc = " The **`stream()`** method of the Blob interface returns a ReadableStream which upon reading returns the data contained within the `Blob`."]
     #[doc = ""]
@@ -4758,7 +4759,7 @@ extern "C" {
     #[doc = " The **`open()`** method of the the Cache object matching the `cacheName`."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/CacheStorage/open)"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn open(
         this: &CacheStorage,
         cache_name: impl ::wasm_bindgen::JsStringLike,
@@ -4771,79 +4772,79 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Cache;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn delete<CfHostMetadata, Cf>(
         this: &Cache,
         request: &Request<CfHostMetadata, Cf>,
     ) -> Promise<bool>;
-    #[wasm_bindgen(method, js_name = "delete")]
+    #[wasm_bindgen(method, catch, js_name = "delete")]
     pub fn delete_with_str(
         this: &Cache,
         request: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<bool>;
-    #[wasm_bindgen(method, js_name = "delete")]
+    #[wasm_bindgen(method, catch, js_name = "delete")]
     pub fn delete_with_url(this: &Cache, request: &URL) -> Promise<bool>;
-    #[wasm_bindgen(method, js_name = "delete")]
+    #[wasm_bindgen(method, catch, js_name = "delete")]
     pub fn delete_with_options<CfHostMetadata, Cf>(
         this: &Cache,
         request: &Request<CfHostMetadata, Cf>,
         options: &CacheQueryOptions,
     ) -> Promise<bool>;
-    #[wasm_bindgen(method, js_name = "delete")]
+    #[wasm_bindgen(method, catch, js_name = "delete")]
     pub fn delete_with_str_and_options(
         this: &Cache,
         request: impl ::wasm_bindgen::JsStringLike,
         options: &CacheQueryOptions,
     ) -> Promise<bool>;
-    #[wasm_bindgen(method, js_name = "delete")]
+    #[wasm_bindgen(method, catch, js_name = "delete")]
     pub fn delete_with_url_and_options(
         this: &Cache,
         request: &URL,
         options: &CacheQueryOptions,
     ) -> Promise<bool>;
-    #[wasm_bindgen(method, js_name = "match")]
+    #[wasm_bindgen(method, catch, js_name = "match")]
     pub fn match_<CfHostMetadata, Cf>(
         this: &Cache,
         request: &Request<CfHostMetadata, Cf>,
     ) -> Promise<Option<Response>>;
-    #[wasm_bindgen(method, js_name = "match")]
+    #[wasm_bindgen(method, catch, js_name = "match")]
     pub fn match_with_str(
         this: &Cache,
         request: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<Response>>;
-    #[wasm_bindgen(method, js_name = "match")]
+    #[wasm_bindgen(method, catch, js_name = "match")]
     pub fn match_with_url(this: &Cache, request: &URL) -> Promise<Option<Response>>;
-    #[wasm_bindgen(method, js_name = "match")]
+    #[wasm_bindgen(method, catch, js_name = "match")]
     pub fn match_with_options<CfHostMetadata, Cf>(
         this: &Cache,
         request: &Request<CfHostMetadata, Cf>,
         options: &CacheQueryOptions,
     ) -> Promise<Option<Response>>;
-    #[wasm_bindgen(method, js_name = "match")]
+    #[wasm_bindgen(method, catch, js_name = "match")]
     pub fn match_with_str_and_options(
         this: &Cache,
         request: impl ::wasm_bindgen::JsStringLike,
         options: &CacheQueryOptions,
     ) -> Promise<Option<Response>>;
-    #[wasm_bindgen(method, js_name = "match")]
+    #[wasm_bindgen(method, catch, js_name = "match")]
     pub fn match_with_url_and_options(
         this: &Cache,
         request: &URL,
         options: &CacheQueryOptions,
     ) -> Promise<Option<Response>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn put<CfHostMetadata, Cf>(
         this: &Cache,
         request: &Request<CfHostMetadata, Cf>,
         response: &Response,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_str(
         this: &Cache,
         request: impl ::wasm_bindgen::JsStringLike,
         response: &Response,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_url(this: &Cache, request: &URL, response: &Response) -> Promise<()>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -4931,7 +4932,7 @@ extern "C" {
     #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn encrypt(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
@@ -4941,7 +4942,7 @@ extern "C" {
     #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
-    #[wasm_bindgen(method, js_name = "encrypt")]
+    #[wasm_bindgen(method, catch, js_name = "encrypt")]
     pub fn encrypt_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
@@ -4951,7 +4952,7 @@ extern "C" {
     #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn decrypt(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
@@ -4961,7 +4962,7 @@ extern "C" {
     #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
-    #[wasm_bindgen(method, js_name = "decrypt")]
+    #[wasm_bindgen(method, catch, js_name = "decrypt")]
     pub fn decrypt_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
@@ -4971,7 +4972,7 @@ extern "C" {
     #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn sign(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
@@ -4981,7 +4982,7 @@ extern "C" {
     #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
-    #[wasm_bindgen(method, js_name = "sign")]
+    #[wasm_bindgen(method, catch, js_name = "sign")]
     pub fn sign_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
@@ -4991,7 +4992,7 @@ extern "C" {
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn verify(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
@@ -5002,7 +5003,7 @@ extern "C" {
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, js_name = "verify")]
+    #[wasm_bindgen(method, catch, js_name = "verify")]
     pub fn verify_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
@@ -5013,7 +5014,7 @@ extern "C" {
     #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn digest(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
@@ -5022,7 +5023,7 @@ extern "C" {
     #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
-    #[wasm_bindgen(method, js_name = "digest")]
+    #[wasm_bindgen(method, catch, js_name = "digest")]
     pub fn digest_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoHashAlgorithm,
@@ -5031,7 +5032,7 @@ extern "C" {
     #[doc = " The **`generateKey()`** method of the SubtleCrypto interface is used to generate a new key (for symmetric algorithms) or key pair (for public-key algorithms)."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey)"]
-    #[wasm_bindgen(method, js_name = "generateKey")]
+    #[wasm_bindgen(method, catch, js_name = "generateKey")]
     pub fn generate_key(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
@@ -5041,7 +5042,7 @@ extern "C" {
     #[doc = " The **`generateKey()`** method of the SubtleCrypto interface is used to generate a new key (for symmetric algorithms) or key pair (for public-key algorithms)."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey)"]
-    #[wasm_bindgen(method, js_name = "generateKey")]
+    #[wasm_bindgen(method, catch, js_name = "generateKey")]
     pub fn generate_key_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoGenerateKeyAlgorithm,
@@ -5051,7 +5052,7 @@ extern "C" {
     #[doc = " The **`deriveKey()`** method of the SubtleCrypto interface can be used to derive a secret key from a master key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
-    #[wasm_bindgen(method, js_name = "deriveKey")]
+    #[wasm_bindgen(method, catch, js_name = "deriveKey")]
     pub fn derive_key(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
@@ -5063,7 +5064,7 @@ extern "C" {
     #[doc = " The **`deriveKey()`** method of the SubtleCrypto interface can be used to derive a secret key from a master key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
-    #[wasm_bindgen(method, js_name = "deriveKey")]
+    #[wasm_bindgen(method, catch, js_name = "deriveKey")]
     pub fn derive_key_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
@@ -5075,7 +5076,7 @@ extern "C" {
     #[doc = " The **`deriveKey()`** method of the SubtleCrypto interface can be used to derive a secret key from a master key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
-    #[wasm_bindgen(method, js_name = "deriveKey")]
+    #[wasm_bindgen(method, catch, js_name = "deriveKey")]
     pub fn derive_key_with_derived_key_algorithm(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
@@ -5087,7 +5088,7 @@ extern "C" {
     #[doc = " The **`deriveKey()`** method of the SubtleCrypto interface can be used to derive a secret key from a master key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)"]
-    #[wasm_bindgen(method, js_name = "deriveKey")]
+    #[wasm_bindgen(method, catch, js_name = "deriveKey")]
     pub fn derive_key_with_algorithm_and_derived_key_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
@@ -5099,7 +5100,7 @@ extern "C" {
     #[doc = " The **`deriveBits()`** method of the key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
-    #[wasm_bindgen(method, js_name = "deriveBits")]
+    #[wasm_bindgen(method, catch, js_name = "deriveBits")]
     pub fn derive_bits(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
@@ -5108,7 +5109,7 @@ extern "C" {
     #[doc = " The **`deriveBits()`** method of the key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
-    #[wasm_bindgen(method, js_name = "deriveBits")]
+    #[wasm_bindgen(method, catch, js_name = "deriveBits")]
     pub fn derive_bits_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
@@ -5117,7 +5118,7 @@ extern "C" {
     #[doc = " The **`deriveBits()`** method of the key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
-    #[wasm_bindgen(method, js_name = "deriveBits")]
+    #[wasm_bindgen(method, catch, js_name = "deriveBits")]
     pub fn derive_bits_with_length(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
@@ -5127,21 +5128,21 @@ extern "C" {
     #[doc = " The **`deriveBits()`** method of the key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)"]
-    #[wasm_bindgen(method, js_name = "deriveBits")]
+    #[wasm_bindgen(method, catch, js_name = "deriveBits")]
     pub fn derive_bits_with_algorithm_and_length(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
         base_key: &CryptoKey,
         length: f64,
     ) -> Promise<ArrayBuffer>;
-    #[wasm_bindgen(method, js_name = "deriveBits")]
+    #[wasm_bindgen(method, catch, js_name = "deriveBits")]
     fn __derive_bits_with_null(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         base_key: &CryptoKey,
         length: &::wasm_bindgen::JsValue,
     ) -> Promise<ArrayBuffer>;
-    #[wasm_bindgen(method, js_name = "deriveBits")]
+    #[wasm_bindgen(method, catch, js_name = "deriveBits")]
     fn __derive_bits_with_algorithm_and_null(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoDeriveKeyAlgorithm,
@@ -5151,7 +5152,7 @@ extern "C" {
     #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
-    #[wasm_bindgen(method, js_name = "importKey")]
+    #[wasm_bindgen(method, catch, js_name = "importKey")]
     pub fn import_key(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
@@ -5163,7 +5164,7 @@ extern "C" {
     #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
-    #[wasm_bindgen(method, js_name = "importKey")]
+    #[wasm_bindgen(method, catch, js_name = "importKey")]
     pub fn import_key_with_key_data(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
@@ -5175,7 +5176,7 @@ extern "C" {
     #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
-    #[wasm_bindgen(method, js_name = "importKey")]
+    #[wasm_bindgen(method, catch, js_name = "importKey")]
     pub fn import_key_with_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
@@ -5187,7 +5188,7 @@ extern "C" {
     #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
-    #[wasm_bindgen(method, js_name = "importKey")]
+    #[wasm_bindgen(method, catch, js_name = "importKey")]
     pub fn import_key_with_key_data_and_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
@@ -5199,7 +5200,7 @@ extern "C" {
     #[doc = " The **`exportKey()`** method of the SubtleCrypto interface exports a key: that is, it takes as input a CryptoKey object and gives you the key in an external, portable format."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/exportKey)"]
-    #[wasm_bindgen(method, js_name = "exportKey")]
+    #[wasm_bindgen(method, catch, js_name = "exportKey")]
     pub fn export_key(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
@@ -5208,7 +5209,7 @@ extern "C" {
     #[doc = " The **`wrapKey()`** method of the SubtleCrypto interface 'wraps' a key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/wrapKey)"]
-    #[wasm_bindgen(method, js_name = "wrapKey")]
+    #[wasm_bindgen(method, catch, js_name = "wrapKey")]
     pub fn wrap_key(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
@@ -5219,7 +5220,7 @@ extern "C" {
     #[doc = " The **`wrapKey()`** method of the SubtleCrypto interface 'wraps' a key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/wrapKey)"]
-    #[wasm_bindgen(method, js_name = "wrapKey")]
+    #[wasm_bindgen(method, catch, js_name = "wrapKey")]
     pub fn wrap_key_with_wrap_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
@@ -5230,7 +5231,7 @@ extern "C" {
     #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, js_name = "unwrapKey")]
+    #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
     pub fn unwrap_key(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
@@ -5244,7 +5245,7 @@ extern "C" {
     #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, js_name = "unwrapKey")]
+    #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
     pub fn unwrap_key_with_unwrap_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
@@ -5258,7 +5259,7 @@ extern "C" {
     #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, js_name = "unwrapKey")]
+    #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
     pub fn unwrap_key_with_unwrapped_key_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
@@ -5272,7 +5273,7 @@ extern "C" {
     #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, js_name = "unwrapKey")]
+    #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
     pub fn unwrap_key_with_unwrap_algorithm_and_unwrapped_key_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
@@ -7582,19 +7583,19 @@ extern "C" {
     pub fn body(this: &Body) -> Option<ReadableStream>;
     #[wasm_bindgen(method, getter, js_name = "bodyUsed")]
     pub fn body_used(this: &Body) -> bool;
-    #[wasm_bindgen(method, js_name = "arrayBuffer")]
+    #[wasm_bindgen(method, catch, js_name = "arrayBuffer")]
     pub fn array_buffer(this: &Body) -> Promise<ArrayBuffer>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn bytes(this: &Body) -> Promise<Uint8Array>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn text(this: &Body) -> Promise<String>;
-    #[wasm_bindgen(method, js_name = "text")]
+    #[wasm_bindgen(method, catch, js_name = "text")]
     pub fn text_js_string(this: &Body) -> Promise<JsString>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn json<T>(this: &Body) -> Promise<T>;
-    #[wasm_bindgen(method, js_name = "formData")]
+    #[wasm_bindgen(method, catch, js_name = "formData")]
     pub fn form_data(this: &Body) -> Promise<FormData>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn blob(this: &Body) -> Promise<Blob>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -8270,31 +8271,31 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Fetcher<T = ()>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn fetch<T, CfHostMetadata, Cf>(
         this: &Fetcher<T>,
         input: &Request<CfHostMetadata, Cf>,
     ) -> Promise<Response>;
-    #[wasm_bindgen(method, js_name = "fetch")]
+    #[wasm_bindgen(method, catch, js_name = "fetch")]
     pub fn fetch_with_str<T>(
         this: &Fetcher<T>,
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Response>;
-    #[wasm_bindgen(method, js_name = "fetch")]
+    #[wasm_bindgen(method, catch, js_name = "fetch")]
     pub fn fetch_with_url<T>(this: &Fetcher<T>, input: &URL) -> Promise<Response>;
-    #[wasm_bindgen(method, js_name = "fetch")]
+    #[wasm_bindgen(method, catch, js_name = "fetch")]
     pub fn fetch_with_init<T, CfHostMetadata, Cf>(
         this: &Fetcher<T>,
         input: &Request<CfHostMetadata, Cf>,
         init: &RequestInit,
     ) -> Promise<Response>;
-    #[wasm_bindgen(method, js_name = "fetch")]
+    #[wasm_bindgen(method, catch, js_name = "fetch")]
     pub fn fetch_with_str_and_init<T>(
         this: &Fetcher<T>,
         input: impl ::wasm_bindgen::JsStringLike,
         init: &RequestInit,
     ) -> Promise<Response>;
-    #[wasm_bindgen(method, js_name = "fetch")]
+    #[wasm_bindgen(method, catch, js_name = "fetch")]
     pub fn fetch_with_url_and_init<T>(
         this: &Fetcher<T>,
         input: &URL,
@@ -8517,423 +8518,423 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type KVNamespace;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn get(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<String>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_js_string(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<JsString>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_with_options(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Promise<Option<String>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_with_options_js_string(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Promise<Option<JsString>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn __get_text(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<String>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn __get_text_js_string(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<JsString>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn __get_json<ExpectedValue>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<ExpectedValue>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn __get_array_buffer(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<ArrayBuffer>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn __get_stream(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<ReadableStream>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn __get_text_with_options(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Option<String>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn __get_text_with_options_js_string(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Option<JsString>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn __get_json_with_options<ExpectedValue>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Option<ExpectedValue>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn __get_array_buffer_with_options(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Option<ArrayBuffer>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn __get_stream_with_options(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Option<ReadableStream>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn __get_text_with_slice(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Map<String, Nullable<String>>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn __get_json_with_slice(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Map<String, JsValue>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_with_slice(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<Map<String, Nullable<String>>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_with_slice_and_options(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Promise<Map<String, Nullable<String>>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn __get_text_with_slice_and_options(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Map<String, Nullable<String>>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn __get_json_with_slice_and_options(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Map<String, JsValue>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn __get_json_with_slice_typed<ExpectedValue>(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Map<String, Nullable<ExpectedValue>>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     fn __get_json_with_slice_and_options_typed<ExpectedValue>(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Map<String, Nullable<ExpectedValue>>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn list(this: &KVNamespace) -> Promise<KVNamespaceListResult>;
-    #[wasm_bindgen(method, js_name = "list")]
+    #[wasm_bindgen(method, catch, js_name = "list")]
     pub fn list_with_options(
         this: &KVNamespace,
         options: &KVNamespaceListOptions,
     ) -> Promise<KVNamespaceListResult>;
-    #[wasm_bindgen(method, js_name = "list")]
+    #[wasm_bindgen(method, catch, js_name = "list")]
     pub fn list_typed<Metadata>(this: &KVNamespace) -> Promise<KVNamespaceListResult<Metadata>>;
-    #[wasm_bindgen(method, js_name = "list")]
+    #[wasm_bindgen(method, catch, js_name = "list")]
     pub fn list_with_options_typed<Metadata>(
         this: &KVNamespace,
         options: &KVNamespaceListOptions,
     ) -> Promise<KVNamespaceListResult<Metadata>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn put(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_buffer_source(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::js_sys::BufferSourceLike,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_readable_stream<R>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &ReadableStream<R>,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_options(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespacePutOptions,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_buffer_source_and_options(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::js_sys::BufferSourceLike,
         options: &KVNamespacePutOptions,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_readable_stream_and_options<R>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &ReadableStream<R>,
         options: &KVNamespacePutOptions,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     pub fn get_with_metadata(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<String>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     pub fn get_with_metadata_js_string(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<JsString>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     pub fn get_with_metadata_with_options(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Promise<KVNamespaceGetWithMetadataResult<String>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     pub fn get_with_metadata_with_options_js_string(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Promise<KVNamespaceGetWithMetadataResult<JsString>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_text(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<String>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_text_js_string(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<JsString>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_json(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_array_buffer(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_stream(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ReadableStream>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_text_with_options(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<KVNamespaceGetWithMetadataResult<String>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_text_with_options_js_string(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<KVNamespaceGetWithMetadataResult<JsString>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_json_with_options(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<KVNamespaceGetWithMetadataResult>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_array_buffer_with_options(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_stream_with_options(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ReadableStream>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_text_with_slice(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult<String>>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_json_with_slice(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     pub fn get_with_metadata_with_slice(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult<String>>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     pub fn get_with_metadata_with_slice_and_options(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult<String>>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_text_with_slice_and_options(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult<String>>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_json_with_slice_and_options(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     pub fn get_with_metadata_typed<Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     pub fn get_with_metadata_typed_js_string<Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<JsString, Metadata>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     pub fn get_with_metadata_with_options_typed<Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     pub fn get_with_metadata_with_options_typed_js_string<Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Promise<KVNamespaceGetWithMetadataResult<JsString, Metadata>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_text_typed<Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_text_typed_js_string<Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<JsString, Metadata>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_json_typed<ExpectedValue, Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_array_buffer_typed<Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_stream_typed<Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_text_with_options_typed<Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_text_with_options_typed_js_string<Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<KVNamespaceGetWithMetadataResult<JsString, Metadata>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_json_with_options_typed<ExpectedValue, Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_array_buffer_with_options_typed<Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_stream_with_options_typed<Metadata>(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_text_with_slice_typed<Metadata>(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult<String, Metadata>>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_json_with_slice_typed<ExpectedValue, Metadata>(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     pub fn get_with_metadata_with_slice_typed<Metadata>(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult<String, Metadata>>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     pub fn get_with_metadata_with_slice_and_options_typed<Metadata>(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &PartialKvNamespaceGetOptionsUndefined,
     ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult<String, Metadata>>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_text_with_slice_and_options_typed<Metadata>(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult<String, Metadata>>>;
-    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
     fn __get_with_metadata_json_with_slice_and_options_typed<ExpectedValue, Metadata>(
         this: &KVNamespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn delete(this: &KVNamespace, key: impl ::wasm_bindgen::JsStringLike) -> Promise<()>;
 }
 impl KVNamespace {
@@ -9716,11 +9717,11 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Queue<Body = JsValue>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn send<Body>(this: &Queue<Body>, message: &Body) -> Promise<()>
     where
         Body: ::wasm_bindgen::convert::RefIntoWasmAbi;
-    #[wasm_bindgen(method, js_name = "send")]
+    #[wasm_bindgen(method, catch, js_name = "send")]
     pub fn send_with_options<Body>(
         this: &Queue<Body>,
         message: &Body,
@@ -9728,14 +9729,14 @@ extern "C" {
     ) -> Promise<()>
     where
         Body: ::wasm_bindgen::convert::RefIntoWasmAbi;
-    #[wasm_bindgen(method, js_name = "sendBatch")]
+    #[wasm_bindgen(method, catch, js_name = "sendBatch")]
     pub fn send_batch<Body>(
         this: &Queue<Body>,
         messages: &[MessageSendRequest<Body>],
     ) -> Promise<()>
     where
         MessageSendRequest<Body>: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
-    #[wasm_bindgen(method, js_name = "sendBatch")]
+    #[wasm_bindgen(method, catch, js_name = "sendBatch")]
     pub fn send_batch_with_options<Body>(
         this: &Queue<Body>,
         messages: &[MessageSendRequest<Body>],
@@ -10136,134 +10137,134 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type R2Bucket;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn head(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<R2Object>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn get(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<R2ObjectBody>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_with_r2_bucket_get_options(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &R2BucketGetOptions,
     ) -> Promise<Option<R2Object>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_with_options(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &R2GetOptions,
     ) -> Promise<Option<R2ObjectBody>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn put<R>(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &ReadableStream<R>,
     ) -> Promise<Option<R2Object>>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_buffer_source(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::js_sys::BufferSourceLike,
     ) -> Promise<Option<R2Object>>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_str(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<R2Object>>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_blob(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &Blob,
     ) -> Promise<Option<R2Object>>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     fn __put_with_null(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &::wasm_bindgen::JsValue,
     ) -> Promise<Option<R2Object>>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_readable_stream_and_r2_bucket_put_options<R>(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &ReadableStream<R>,
         options: &R2BucketPutOptions,
     ) -> Promise<Option<R2Object>>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_buffer_source_and_r2_bucket_put_options(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::js_sys::BufferSourceLike,
         options: &R2BucketPutOptions,
     ) -> Promise<Option<R2Object>>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_str_and_r2_bucket_put_options(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
         options: &R2BucketPutOptions,
     ) -> Promise<Option<R2Object>>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_blob_and_r2_bucket_put_options(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &Blob,
         options: &R2BucketPutOptions,
     ) -> Promise<Option<R2Object>>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     fn __put_with_null_and_r2_bucket_put_options(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &::wasm_bindgen::JsValue,
         options: &R2BucketPutOptions,
     ) -> Promise<Option<R2Object>>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_readable_stream_and_options<R>(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &ReadableStream<R>,
         options: &R2PutOptions,
     ) -> Promise<R2Object>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_buffer_source_and_options(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::js_sys::BufferSourceLike,
         options: &R2PutOptions,
     ) -> Promise<R2Object>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_str_and_options(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
         options: &R2PutOptions,
     ) -> Promise<R2Object>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_blob_and_options(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &Blob,
         options: &R2PutOptions,
     ) -> Promise<R2Object>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     fn __put_with_null_and_options(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &::wasm_bindgen::JsValue,
         options: &R2PutOptions,
     ) -> Promise<R2Object>;
-    #[wasm_bindgen(method, js_name = "createMultipartUpload")]
+    #[wasm_bindgen(method, catch, js_name = "createMultipartUpload")]
     pub fn create_multipart_upload(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<R2MultipartUpload>;
-    #[wasm_bindgen(method, js_name = "createMultipartUpload")]
+    #[wasm_bindgen(method, catch, js_name = "createMultipartUpload")]
     pub fn create_multipart_upload_with_options(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
@@ -10275,16 +10276,16 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
         upload_id: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<R2MultipartUpload, JsValue>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn delete(this: &R2Bucket, keys: impl ::wasm_bindgen::JsStringLike) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "delete")]
+    #[wasm_bindgen(method, catch, js_name = "delete")]
     pub fn delete_with_slice(
         this: &R2Bucket,
         keys: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<()>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn list(this: &R2Bucket) -> Promise<R2Objects>;
-    #[wasm_bindgen(method, js_name = "list")]
+    #[wasm_bindgen(method, catch, js_name = "list")]
     pub fn list_with_options(this: &R2Bucket, options: &R2ListOptions) -> Promise<R2Objects>;
 }
 impl R2Bucket {
@@ -10488,61 +10489,61 @@ extern "C" {
     pub fn upload_id(this: &R2MultipartUpload) -> String;
     #[wasm_bindgen(method, getter, js_name = "uploadId")]
     pub fn upload_id_js_string(this: &R2MultipartUpload) -> JsString;
-    #[wasm_bindgen(method, js_name = "uploadPart")]
+    #[wasm_bindgen(method, catch, js_name = "uploadPart")]
     pub fn upload_part<R>(
         this: &R2MultipartUpload,
         part_number: f64,
         value: &ReadableStream<R>,
     ) -> Promise<R2UploadedPart>;
-    #[wasm_bindgen(method, js_name = "uploadPart")]
+    #[wasm_bindgen(method, catch, js_name = "uploadPart")]
     pub fn upload_part_with_buffer_source(
         this: &R2MultipartUpload,
         part_number: f64,
         value: impl ::js_sys::BufferSourceLike,
     ) -> Promise<R2UploadedPart>;
-    #[wasm_bindgen(method, js_name = "uploadPart")]
+    #[wasm_bindgen(method, catch, js_name = "uploadPart")]
     pub fn upload_part_with_str(
         this: &R2MultipartUpload,
         part_number: f64,
         value: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<R2UploadedPart>;
-    #[wasm_bindgen(method, js_name = "uploadPart")]
+    #[wasm_bindgen(method, catch, js_name = "uploadPart")]
     pub fn upload_part_with_blob(
         this: &R2MultipartUpload,
         part_number: f64,
         value: &Blob,
     ) -> Promise<R2UploadedPart>;
-    #[wasm_bindgen(method, js_name = "uploadPart")]
+    #[wasm_bindgen(method, catch, js_name = "uploadPart")]
     pub fn upload_part_with_options<R>(
         this: &R2MultipartUpload,
         part_number: f64,
         value: &ReadableStream<R>,
         options: &R2UploadPartOptions,
     ) -> Promise<R2UploadedPart>;
-    #[wasm_bindgen(method, js_name = "uploadPart")]
+    #[wasm_bindgen(method, catch, js_name = "uploadPart")]
     pub fn upload_part_with_buffer_source_and_options(
         this: &R2MultipartUpload,
         part_number: f64,
         value: impl ::js_sys::BufferSourceLike,
         options: &R2UploadPartOptions,
     ) -> Promise<R2UploadedPart>;
-    #[wasm_bindgen(method, js_name = "uploadPart")]
+    #[wasm_bindgen(method, catch, js_name = "uploadPart")]
     pub fn upload_part_with_str_and_options(
         this: &R2MultipartUpload,
         part_number: f64,
         value: impl ::wasm_bindgen::JsStringLike,
         options: &R2UploadPartOptions,
     ) -> Promise<R2UploadedPart>;
-    #[wasm_bindgen(method, js_name = "uploadPart")]
+    #[wasm_bindgen(method, catch, js_name = "uploadPart")]
     pub fn upload_part_with_blob_and_options(
         this: &R2MultipartUpload,
         part_number: f64,
         value: &Blob,
         options: &R2UploadPartOptions,
     ) -> Promise<R2UploadedPart>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn abort(this: &R2MultipartUpload) -> Promise<()>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn complete(
         this: &R2MultipartUpload,
         uploaded_parts: &[R2UploadedPart],
@@ -10625,17 +10626,17 @@ extern "C" {
     pub fn body(this: &R2ObjectBody) -> ReadableStream;
     #[wasm_bindgen(method, getter, js_name = "bodyUsed")]
     pub fn body_used(this: &R2ObjectBody) -> bool;
-    #[wasm_bindgen(method, js_name = "arrayBuffer")]
+    #[wasm_bindgen(method, catch, js_name = "arrayBuffer")]
     pub fn array_buffer(this: &R2ObjectBody) -> Promise<ArrayBuffer>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn bytes(this: &R2ObjectBody) -> Promise<Uint8Array>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn text(this: &R2ObjectBody) -> Promise<String>;
-    #[wasm_bindgen(method, js_name = "text")]
+    #[wasm_bindgen(method, catch, js_name = "text")]
     pub fn text_js_string(this: &R2ObjectBody) -> Promise<JsString>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn json<T>(this: &R2ObjectBody) -> Promise<T>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn blob(this: &R2ObjectBody) -> Promise<Blob>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -12121,12 +12122,12 @@ extern "C" {
     #[doc = " The **`cancel()`** method of the ReadableStream interface returns a Promise that resolves when the stream is canceled."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/cancel)"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn cancel<R>(this: &ReadableStream<R>) -> Promise<()>;
     #[doc = " The **`cancel()`** method of the ReadableStream interface returns a Promise that resolves when the stream is canceled."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/cancel)"]
-    #[wasm_bindgen(method, js_name = "cancel")]
+    #[wasm_bindgen(method, catch, js_name = "cancel")]
     pub fn cancel_with_reason<R>(this: &ReadableStream<R>, reason: &JsValue) -> Promise<()>;
     #[doc = " The **`getReader()`** method of the ReadableStream interface creates a reader and locks the stream to it."]
     #[doc = ""]
@@ -12160,12 +12161,12 @@ extern "C" {
     #[doc = " The **`pipeTo()`** method of the ReadableStream interface pipes the current `ReadableStream` to a given WritableStream and returns a Promise that fulfills when the piping process completes successfully, or rejects if any errors were encountered."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/pipeTo)"]
-    #[wasm_bindgen(method, js_name = "pipeTo")]
+    #[wasm_bindgen(method, catch, js_name = "pipeTo")]
     pub fn pipe_to<R>(this: &ReadableStream<R>, destination: &WritableStream<R>) -> Promise<()>;
     #[doc = " The **`pipeTo()`** method of the ReadableStream interface pipes the current `ReadableStream` to a given WritableStream and returns a Promise that fulfills when the piping process completes successfully, or rejects if any errors were encountered."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/pipeTo)"]
-    #[wasm_bindgen(method, js_name = "pipeTo")]
+    #[wasm_bindgen(method, catch, js_name = "pipeTo")]
     pub fn pipe_to_with_options<R>(
         this: &ReadableStream<R>,
         destination: &WritableStream<R>,
@@ -12207,9 +12208,9 @@ extern "C" {
     ) -> Result<ReadableStreamDefaultReader<R>, JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn closed<R>(this: &ReadableStreamDefaultReader<R>) -> Promise<()>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn cancel<R>(this: &ReadableStreamDefaultReader<R>) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "cancel")]
+    #[wasm_bindgen(method, catch, js_name = "cancel")]
     pub fn cancel_with_reason<R>(
         this: &ReadableStreamDefaultReader<R>,
         reason: &JsValue,
@@ -12217,7 +12218,7 @@ extern "C" {
     #[doc = " The **`read()`** method of the ReadableStreamDefaultReader interface returns a Promise providing access to the next chunk in the stream's internal queue."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamDefaultReader/read)"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn read<R>(this: &ReadableStreamDefaultReader<R>) -> Promise<ReadableStreamReadResult<R>>;
     #[doc = " The **`releaseLock()`** method of the ReadableStreamDefaultReader interface releases the reader's lock on the stream."]
     #[doc = ""]
@@ -12234,14 +12235,14 @@ extern "C" {
     pub fn new<R>(stream: &ReadableStream<R>) -> Result<ReadableStreamBYOBReader, JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn closed(this: &ReadableStreamBYOBReader) -> Promise<()>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn cancel(this: &ReadableStreamBYOBReader) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "cancel")]
+    #[wasm_bindgen(method, catch, js_name = "cancel")]
     pub fn cancel_with_reason(this: &ReadableStreamBYOBReader, reason: &JsValue) -> Promise<()>;
     #[doc = " The **`read()`** method of the ReadableStreamBYOBReader interface is used to read data into a view on a user-supplied buffer from an associated readable byte stream."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBReader/read)"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn read<T>(
         this: &ReadableStreamBYOBReader,
         view: &T,
@@ -12253,7 +12254,7 @@ extern "C" {
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBReader/releaseLock)"]
     #[wasm_bindgen(method, catch, js_name = "releaseLock")]
     pub fn release_lock(this: &ReadableStreamBYOBReader) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "readAtLeast")]
+    #[wasm_bindgen(method, catch, js_name = "readAtLeast")]
     pub fn read_at_least<T>(
         this: &ReadableStreamBYOBReader,
         min_elements: f64,
@@ -12566,17 +12567,17 @@ extern "C" {
     #[doc = " The **`abort()`** method of the WritableStream interface aborts the stream, signaling that the producer can no longer successfully write to the stream and it is to be immediately moved to an error state, with any queued writes discarded."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/abort)"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn abort<W>(this: &WritableStream<W>) -> Promise<()>;
     #[doc = " The **`abort()`** method of the WritableStream interface aborts the stream, signaling that the producer can no longer successfully write to the stream and it is to be immediately moved to an error state, with any queued writes discarded."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/abort)"]
-    #[wasm_bindgen(method, js_name = "abort")]
+    #[wasm_bindgen(method, catch, js_name = "abort")]
     pub fn abort_with_reason<W>(this: &WritableStream<W>, reason: &JsValue) -> Promise<()>;
     #[doc = " The **`close()`** method of the WritableStream interface closes the associated stream."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStream/close)"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn close<W>(this: &WritableStream<W>) -> Promise<()>;
     #[doc = " The **`getWriter()`** method of the WritableStream interface returns a new instance of WritableStreamDefaultWriter and locks the stream to that instance."]
     #[doc = ""]
@@ -12615,12 +12616,12 @@ extern "C" {
     #[doc = " The **`abort()`** method of the the producer can no longer successfully write to the stream and it is to be immediately moved to an error state, with any queued writes discarded."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/abort)"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn abort<W>(this: &WritableStreamDefaultWriter<W>) -> Promise<()>;
     #[doc = " The **`abort()`** method of the the producer can no longer successfully write to the stream and it is to be immediately moved to an error state, with any queued writes discarded."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/abort)"]
-    #[wasm_bindgen(method, js_name = "abort")]
+    #[wasm_bindgen(method, catch, js_name = "abort")]
     pub fn abort_with_reason<W>(
         this: &WritableStreamDefaultWriter<W>,
         reason: &JsValue,
@@ -12628,17 +12629,17 @@ extern "C" {
     #[doc = " The **`close()`** method of the stream."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/close)"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn close<W>(this: &WritableStreamDefaultWriter<W>) -> Promise<()>;
     #[doc = " The **`write()`** method of the operation."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/write)"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn write<W>(this: &WritableStreamDefaultWriter<W>) -> Promise<()>;
     #[doc = " The **`write()`** method of the operation."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/write)"]
-    #[wasm_bindgen(method, js_name = "write")]
+    #[wasm_bindgen(method, catch, js_name = "write")]
     pub fn write_with_chunk<W>(this: &WritableStreamDefaultWriter<W>, chunk: &W) -> Promise<()>
     where
         W: ::wasm_bindgen::convert::RefIntoWasmAbi;
@@ -15113,7 +15114,7 @@ extern "C" {
     pub fn upgraded(this: &Socket) -> bool;
     #[wasm_bindgen(method, getter, js_name = "secureTransport")]
     pub fn secure_transport(this: &Socket) -> SecureTransportKind;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn close(this: &Socket) -> Promise<()>;
     #[wasm_bindgen(method, catch, js_name = "startTls")]
     pub fn start_tls(this: &Socket) -> Result<Socket, JsValue>;
@@ -15421,30 +15422,30 @@ extern "C" {
         this: &Container,
         options: &ContainerStartupOptions,
     ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn monitor(this: &Container) -> Promise<()>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn destroy(this: &Container) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "destroy")]
+    #[wasm_bindgen(method, catch, js_name = "destroy")]
     pub fn destroy_with_error(this: &Container, error: &JsValue) -> Promise<()>;
     #[wasm_bindgen(method, catch)]
     pub fn signal(this: &Container, signo: f64) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getTcpPort")]
     pub fn get_tcp_port(this: &Container, port: f64) -> Result<Fetcher, JsValue>;
-    #[wasm_bindgen(method, js_name = "setInactivityTimeout")]
+    #[wasm_bindgen(method, catch, js_name = "setInactivityTimeout")]
     pub fn set_inactivity_timeout(this: &Container, duration_ms: f64) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "setInactivityTimeout")]
+    #[wasm_bindgen(method, catch, js_name = "setInactivityTimeout")]
     pub fn set_inactivity_timeout_with_big_int(
         this: &Container,
         duration_ms: &BigInt,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "interceptOutboundHttp")]
+    #[wasm_bindgen(method, catch, js_name = "interceptOutboundHttp")]
     pub fn intercept_outbound_http(
         this: &Container,
         addr: impl ::wasm_bindgen::JsStringLike,
         binding: &Fetcher,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "interceptAllOutboundHttp")]
+    #[wasm_bindgen(method, catch, js_name = "interceptAllOutboundHttp")]
     pub fn intercept_all_outbound_http(this: &Container, binding: &Fetcher) -> Promise<()>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -16490,7 +16491,7 @@ extern "C" {
     #[doc = " * `params` - Search request with messages and AI search options"]
     #[doc = ""]
     #[doc = " Returns: Search response with matching chunks"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn search(
         this: &AiSearchInstanceService,
         params: &AiSearchSearchRequest,
@@ -16500,13 +16501,13 @@ extern "C" {
     #[doc = " * `params` - Chat completions request with optional streaming"]
     #[doc = ""]
     #[doc = " Returns: Response object (if streaming) or chat completion result"]
-    #[wasm_bindgen(method, js_name = "chatCompletions")]
+    #[wasm_bindgen(method, catch, js_name = "chatCompletions")]
     pub fn chat_completions(
         this: &AiSearchInstanceService,
         params: &AiSearchChatCompletionsRequest,
     ) -> Promise<ChatCompletionsReturnKind>;
     #[doc = " Delete this AI Search instance."]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn delete(this: &AiSearchInstanceService) -> Promise<()>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -16517,7 +16518,7 @@ extern "C" {
     #[doc = " List all AI Search instances in the account."]
     #[doc = ""]
     #[doc = " Returns: Array of AI Search instances"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn list(this: &AiSearchAccountService) -> Promise<Vec<Object>>;
     #[doc = " Get an AI Search instance by ID."]
     #[doc = ""]
@@ -16534,7 +16535,7 @@ extern "C" {
     #[doc = " * `config` - Instance configuration"]
     #[doc = ""]
     #[doc = " Returns: Instance service for performing operations"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn create(
         this: &AiSearchAccountService,
         config: &AiSearchConfig,
@@ -35055,7 +35056,7 @@ extern "C" {
         this: &Ai<AiModelList>,
         autorag_id: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<AutoRAG, JsValue>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn run<AiModelList, InputOptions>(
         this: &Ai<AiModelList>,
         model: impl ::wasm_bindgen::JsStringLike,
@@ -35063,7 +35064,7 @@ extern "C" {
     ) -> Promise<JsValue>
     where
         InputOptions: ::wasm_bindgen::convert::RefIntoWasmAbi;
-    #[wasm_bindgen(method, js_name = "run")]
+    #[wasm_bindgen(method, catch, js_name = "run")]
     pub fn run_with_options<AiModelList, InputOptions, Options>(
         this: &Ai<AiModelList>,
         model: impl ::wasm_bindgen::JsStringLike,
@@ -35073,32 +35074,32 @@ extern "C" {
     where
         InputOptions: ::wasm_bindgen::convert::RefIntoWasmAbi,
         Options: ::wasm_bindgen::convert::RefIntoWasmAbi;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn models<AiModelList>(this: &Ai<AiModelList>) -> Promise<Vec<AiModelsSearchObject>>;
-    #[wasm_bindgen(method, js_name = "models")]
+    #[wasm_bindgen(method, catch, js_name = "models")]
     pub fn models_with_params<AiModelList>(
         this: &Ai<AiModelList>,
         params: &AiModelsSearchParams,
     ) -> Promise<Vec<AiModelsSearchObject>>;
     #[wasm_bindgen(method, catch, js_name = "toMarkdown")]
     pub fn to_markdown<AiModelList>(this: &Ai<AiModelList>) -> Result<ToMarkdownService, JsValue>;
-    #[wasm_bindgen(method, js_name = "toMarkdown")]
+    #[wasm_bindgen(method, catch, js_name = "toMarkdown")]
     pub fn to_markdown_with_slice<AiModelList>(
         this: &Ai<AiModelList>,
         files: &[MarkdownDocument],
     ) -> Promise<Vec<ConversionResponse>>;
-    #[wasm_bindgen(method, js_name = "toMarkdown")]
+    #[wasm_bindgen(method, catch, js_name = "toMarkdown")]
     pub fn to_markdown_with_slice_and_options<AiModelList>(
         this: &Ai<AiModelList>,
         files: &[MarkdownDocument],
         options: &ConversionRequestOptions,
     ) -> Promise<Vec<ConversionResponse>>;
-    #[wasm_bindgen(method, js_name = "toMarkdown")]
+    #[wasm_bindgen(method, catch, js_name = "toMarkdown")]
     pub fn to_markdown_with_files<AiModelList>(
         this: &Ai<AiModelList>,
         files: &MarkdownDocument,
     ) -> Promise<ConversionResponse>;
-    #[wasm_bindgen(method, js_name = "toMarkdown")]
+    #[wasm_bindgen(method, catch, js_name = "toMarkdown")]
     pub fn to_markdown_with_files_and_options<AiModelList>(
         this: &Ai<AiModelList>,
         files: &MarkdownDocument,
@@ -35895,56 +35896,56 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type AiGateway;
-    #[wasm_bindgen(method, js_name = "patchLog")]
+    #[wasm_bindgen(method, catch, js_name = "patchLog")]
     pub fn patch_log(
         this: &AiGateway,
         log_id: impl ::wasm_bindgen::JsStringLike,
         data: &AiGatewayPatchLog,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "getLog")]
+    #[wasm_bindgen(method, catch, js_name = "getLog")]
     pub fn get_log(
         this: &AiGateway,
         log_id: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<AiGatewayLog>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn run(this: &AiGateway, data: &AIGatewayUniversalRequest) -> Promise<Response>;
-    #[wasm_bindgen(method, js_name = "run")]
+    #[wasm_bindgen(method, catch, js_name = "run")]
     pub fn run_with_slice(
         this: &AiGateway,
         data: &[AIGatewayUniversalRequest],
     ) -> Promise<Response>;
-    #[wasm_bindgen(method, js_name = "run")]
+    #[wasm_bindgen(method, catch, js_name = "run")]
     pub fn run_with_options(
         this: &AiGateway,
         data: &AIGatewayUniversalRequest,
         options: &AiGatewayRunOptions,
     ) -> Promise<Response>;
-    #[wasm_bindgen(method, js_name = "run")]
+    #[wasm_bindgen(method, catch, js_name = "run")]
     pub fn run_with_slice_and_options(
         this: &AiGateway,
         data: &[AIGatewayUniversalRequest],
         options: &AiGatewayRunOptions,
     ) -> Promise<Response>;
-    #[wasm_bindgen(method, js_name = "getUrl")]
+    #[wasm_bindgen(method, catch, js_name = "getUrl")]
     pub fn get_url(this: &AiGateway) -> Promise<String>;
-    #[wasm_bindgen(method, js_name = "getUrl")]
+    #[wasm_bindgen(method, catch, js_name = "getUrl")]
     pub fn get_url_js_string(this: &AiGateway) -> Promise<JsString>;
-    #[wasm_bindgen(method, js_name = "getUrl")]
+    #[wasm_bindgen(method, catch, js_name = "getUrl")]
     pub fn get_url_with_ai_gateway_providers(
         this: &AiGateway,
         provider: AIGatewayProviders,
     ) -> Promise<String>;
-    #[wasm_bindgen(method, js_name = "getUrl")]
+    #[wasm_bindgen(method, catch, js_name = "getUrl")]
     pub fn get_url_with_ai_gateway_providers_js_string(
         this: &AiGateway,
         provider: AIGatewayProviders,
     ) -> Promise<JsString>;
-    #[wasm_bindgen(method, js_name = "getUrl")]
+    #[wasm_bindgen(method, catch, js_name = "getUrl")]
     pub fn get_url_with_str(
         this: &AiGateway,
         provider: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<String>;
-    #[wasm_bindgen(method, js_name = "getUrl")]
+    #[wasm_bindgen(method, catch, js_name = "getUrl")]
     pub fn get_url_with_str_js_string(
         this: &AiGateway,
         provider: impl ::wasm_bindgen::JsStringLike,
@@ -36821,21 +36822,21 @@ extern "C" {
     pub type AutoRAG;
     #[doc = " @deprecated Use `env.AI.aiSearch.list()` instead."]
     #[doc = " @see AiSearchAccountService.list"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn list(this: &AutoRAG) -> Promise<Vec<Object>>;
     #[doc = " @deprecated Use `env.AI.aiSearch.get(id).search(...)` instead."]
     #[doc = " Note: The new API uses a messages array instead of a query string."]
     #[doc = " @see AiSearchInstanceService.search"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn search(this: &AutoRAG, params: &AutoRagSearchRequest) -> Promise<AutoRagSearchResponse>;
     #[doc = " @deprecated Use `env.AI.aiSearch.get(id).chatCompletions(...)` instead."]
     #[doc = " @see AiSearchInstanceService.chatCompletions"]
-    #[wasm_bindgen(method, js_name = "aiSearch")]
+    #[wasm_bindgen(method, catch, js_name = "aiSearch")]
     pub fn ai_search(this: &AutoRAG, params: &AutoRagAiSearchRequestStreaming)
         -> Promise<Response>;
     #[doc = " @deprecated Use `env.AI.aiSearch.get(id).chatCompletions(...)` instead."]
     #[doc = " @see AiSearchInstanceService.chatCompletions"]
-    #[wasm_bindgen(method, js_name = "aiSearch")]
+    #[wasm_bindgen(method, catch, js_name = "aiSearch")]
     pub fn ai_search_with_auto_rag_ai_search_request(
         this: &AutoRAG,
         params: &AutoRagAiSearchRequest,
@@ -42820,14 +42821,14 @@ extern "C" {
         this: &D1Database,
         query: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<D1PreparedStatement, JsValue>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn batch(this: &D1Database, statements: &[D1PreparedStatement]) -> Promise<Vec<D1Result>>;
-    #[wasm_bindgen(method, js_name = "batch")]
+    #[wasm_bindgen(method, catch, js_name = "batch")]
     pub fn batch_typed<T>(
         this: &D1Database,
         statements: &[D1PreparedStatement],
     ) -> Promise<Vec<D1Result<T>>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn exec(
         this: &D1Database,
         query: impl ::wasm_bindgen::JsStringLike,
@@ -42860,7 +42861,7 @@ extern "C" {
         constraint_or_bookmark: D1SessionConstraint,
     ) -> Result<D1DatabaseSession, JsValue>;
     #[doc = " @deprecated dump() will be removed soon, only applies to deprecated alpha v1 databases."]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn dump(this: &D1Database) -> Promise<ArrayBuffer>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -42873,12 +42874,12 @@ extern "C" {
         this: &D1DatabaseSession,
         query: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<D1PreparedStatement, JsValue>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn batch(
         this: &D1DatabaseSession,
         statements: &[D1PreparedStatement],
     ) -> Promise<Vec<D1Result>>;
-    #[wasm_bindgen(method, js_name = "batch")]
+    #[wasm_bindgen(method, catch, js_name = "batch")]
     pub fn batch_typed<T>(
         this: &D1DatabaseSession,
         statements: &[D1PreparedStatement],
@@ -42904,31 +42905,31 @@ extern "C" {
         this: &D1PreparedStatement,
         values: &[JsValue],
     ) -> Result<D1PreparedStatement, JsValue>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn first<T>(this: &D1PreparedStatement) -> Promise<Option<T>>;
-    #[wasm_bindgen(method, js_name = "first")]
+    #[wasm_bindgen(method, catch, js_name = "first")]
     pub fn first_with_col_name<T>(
         this: &D1PreparedStatement,
         col_name: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<T>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn run(this: &D1PreparedStatement) -> Promise<D1Result>;
-    #[wasm_bindgen(method, js_name = "run")]
+    #[wasm_bindgen(method, catch, js_name = "run")]
     pub fn run_typed<T>(this: &D1PreparedStatement) -> Promise<D1Result<T>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn all(this: &D1PreparedStatement) -> Promise<D1Result>;
-    #[wasm_bindgen(method, js_name = "all")]
+    #[wasm_bindgen(method, catch, js_name = "all")]
     pub fn all_typed<T>(this: &D1PreparedStatement) -> Promise<D1Result<T>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn raw(this: &D1PreparedStatement) -> Promise<Vec<Array>>;
-    #[wasm_bindgen(method, js_name = "raw")]
+    #[wasm_bindgen(method, catch, js_name = "raw")]
     fn __raw_with_column_names(
         this: &D1PreparedStatement,
         options: &D1PreparedStatementRawOptions,
     ) -> Promise<ArrayTuple<(Array<String>, Array<Array>)>>;
-    #[wasm_bindgen(method, js_name = "raw")]
+    #[wasm_bindgen(method, catch, js_name = "raw")]
     pub fn raw_typed<T>(this: &D1PreparedStatement) -> Promise<Vec<T>>;
-    #[wasm_bindgen(method, js_name = "raw")]
+    #[wasm_bindgen(method, catch, js_name = "raw")]
     fn __raw_with_column_names_typed<T>(
         this: &D1PreparedStatement,
         options: &D1PreparedStatementRawOptions,
@@ -43060,7 +43061,7 @@ extern "C" {
     #[doc = " * `headers` - A [Headers object](https://developer.mozilla.org/en-US/docs/Web/API/Headers)."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves when the email message is forwarded."]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn forward(
         this: &ForwardableEmailMessage,
         rcpt_to: impl ::wasm_bindgen::JsStringLike,
@@ -43071,7 +43072,7 @@ extern "C" {
     #[doc = " * `headers` - A [Headers object](https://developer.mozilla.org/en-US/docs/Web/API/Headers)."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves when the email message is forwarded."]
-    #[wasm_bindgen(method, js_name = "forward")]
+    #[wasm_bindgen(method, catch, js_name = "forward")]
     pub fn forward_with_headers(
         this: &ForwardableEmailMessage,
         rcpt_to: impl ::wasm_bindgen::JsStringLike,
@@ -43082,7 +43083,7 @@ extern "C" {
     #[doc = " * `message` - The reply message."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves when the email message is replied."]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn reply(
         this: &ForwardableEmailMessage,
         message: &cloudflare::email::EmailMessage,
@@ -43250,12 +43251,12 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SendEmail;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn send(
         this: &SendEmail,
         message: &cloudflare::email::EmailMessage,
     ) -> Promise<EmailSendResult>;
-    #[wasm_bindgen(method, js_name = "send")]
+    #[wasm_bindgen(method, catch, js_name = "send")]
     pub fn send_with_builder(
         this: &SendEmail,
         builder: &SendEmailSendBuilder,
@@ -43635,7 +43636,7 @@ pub mod cloudflare {
             #[doc = " * `metadata` - Information about the specific pipeline calling the transformation entrypoint"]
             #[doc = ""]
             #[doc = " Returns: A promise containing the transformed PipelineRecord array"]
-            #[wasm_bindgen(method)]
+            #[wasm_bindgen(method, catch)]
             pub fn run<Env, I, O>(
                 this: &PipelineTransformationEntrypoint<Env, I, O>,
                 #[wasm_bindgen(slice = "array")] records: &[I],
@@ -43689,7 +43690,7 @@ pub mod cloudflare {
             #[doc = " The Pipeline interface represents the type of a binding to a Pipeline"]
             #[doc = ""]
             #[doc = " * `records` - The records to send to the pipeline"]
-            #[wasm_bindgen(method)]
+            #[wasm_bindgen(method, catch)]
             pub fn send<T>(
                 this: &Pipeline<T>,
                 #[wasm_bindgen(slice = "array")] records: &[T],
@@ -44241,13 +44242,13 @@ pub mod cloudflare {
             # [wasm_bindgen (extends = Object)]
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type WorkflowStep;
-            #[wasm_bindgen(method, js_name = "do")]
+            #[wasm_bindgen(method, catch, js_name = "do")]
             pub fn do_<T>(
                 this: &WorkflowStep,
                 name: impl ::wasm_bindgen::JsStringLike,
                 callback: &Function<fn(WorkflowStepContext) -> Promise<T>>,
             ) -> Promise<T>;
-            #[wasm_bindgen(method, js_name = "do")]
+            #[wasm_bindgen(method, catch, js_name = "do")]
             pub fn do_with_config<T>(
                 this: &WorkflowStep,
                 name: impl ::wasm_bindgen::JsStringLike,
@@ -44269,13 +44270,13 @@ pub mod cloudflare {
                 this: &WorkflowStep,
                 val: &Function<fn(String, JsValue) -> Promise<()>>,
             );
-            #[wasm_bindgen(method, js_name = "waitForEvent")]
+            #[wasm_bindgen(method, catch, js_name = "waitForEvent")]
             pub fn wait_for_event(
                 this: &WorkflowStep,
                 name: impl ::wasm_bindgen::JsStringLike,
                 options: &WorkflowStepWaitForEventOptions,
             ) -> Promise<WorkflowStepEvent>;
-            #[wasm_bindgen(method, js_name = "waitForEvent")]
+            #[wasm_bindgen(method, catch, js_name = "waitForEvent")]
             pub fn wait_for_event_typed<T>(
                 this: &WorkflowStep,
                 name: impl ::wasm_bindgen::JsStringLike,
@@ -44376,7 +44377,7 @@ pub mod cloudflare {
             pub fn set_env<Env, T>(this: &WorkflowEntrypoint<Env, T>, val: &Env)
             where
                 Env: ::wasm_bindgen::convert::RefIntoWasmAbi;
-            #[wasm_bindgen(method)]
+            #[wasm_bindgen(method, catch)]
             pub fn run<Env, T>(
                 this: &WorkflowEntrypoint<Env, T>,
                 event: &WorkflowEvent<T>,
@@ -44481,10 +44482,10 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type HelloWorldBinding;
     #[doc = " Retrieve the current stored value"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn get(this: &HelloWorldBinding) -> Promise<Object>;
     #[doc = " Set a new stored value"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn set(this: &HelloWorldBinding, value: impl ::wasm_bindgen::JsStringLike) -> Promise<()>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -45409,7 +45410,7 @@ extern "C" {
     #[doc = " * `imageId` - The ID of the image (UUID or custom ID)"]
     #[doc = ""]
     #[doc = " Returns: Image metadata, or null if not found"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn details(
         this: &HostedImagesBinding,
         image_id: impl ::wasm_bindgen::JsStringLike,
@@ -45419,7 +45420,7 @@ extern "C" {
     #[doc = " * `imageId` - The ID of the image (UUID or custom ID)"]
     #[doc = ""]
     #[doc = " Returns: ReadableStream of image bytes, or null if not found"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn image(
         this: &HostedImagesBinding,
         image_id: impl ::wasm_bindgen::JsStringLike,
@@ -45434,7 +45435,7 @@ extern "C" {
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `ImagesError` — if upload fails"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn upload(
         this: &HostedImagesBinding,
         image: &ReadableStream<Uint8Array>,
@@ -45449,7 +45450,7 @@ extern "C" {
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `ImagesError` — if upload fails"]
-    #[wasm_bindgen(method, js_name = "upload")]
+    #[wasm_bindgen(method, catch, js_name = "upload")]
     pub fn upload_with_array_buffer(
         this: &HostedImagesBinding,
         image: &ArrayBuffer,
@@ -45464,7 +45465,7 @@ extern "C" {
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `ImagesError` — if upload fails"]
-    #[wasm_bindgen(method, js_name = "upload")]
+    #[wasm_bindgen(method, catch, js_name = "upload")]
     pub fn upload_with_options(
         this: &HostedImagesBinding,
         image: &ReadableStream<Uint8Array>,
@@ -45480,7 +45481,7 @@ extern "C" {
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `ImagesError` — if upload fails"]
-    #[wasm_bindgen(method, js_name = "upload")]
+    #[wasm_bindgen(method, catch, js_name = "upload")]
     pub fn upload_with_array_buffer_and_options(
         this: &HostedImagesBinding,
         image: &ArrayBuffer,
@@ -45496,7 +45497,7 @@ extern "C" {
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `ImagesError` — if update fails"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn update(
         this: &HostedImagesBinding,
         image_id: impl ::wasm_bindgen::JsStringLike,
@@ -45507,7 +45508,7 @@ extern "C" {
     #[doc = " * `imageId` - The ID of the image"]
     #[doc = ""]
     #[doc = " Returns: True if deleted, false if not found"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn delete(
         this: &HostedImagesBinding,
         image_id: impl ::wasm_bindgen::JsStringLike,
@@ -45521,7 +45522,7 @@ extern "C" {
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `ImagesError` — if list fails"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn list(this: &HostedImagesBinding) -> Promise<ImageList>;
     #[doc = " List hosted images with pagination"]
     #[doc = ""]
@@ -45532,7 +45533,7 @@ extern "C" {
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `ImagesError` — if list fails"]
-    #[wasm_bindgen(method, js_name = "list")]
+    #[wasm_bindgen(method, catch, js_name = "list")]
     pub fn list_with_options(
         this: &HostedImagesBinding,
         options: &ImageListOptions,
@@ -45550,7 +45551,7 @@ extern "C" {
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `ImagesError` — with code 9412 if input is not an image"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn info(
         this: &ImagesBinding,
         stream: &ReadableStream<Uint8Array>,
@@ -45562,7 +45563,7 @@ extern "C" {
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `ImagesError` — with code 9412 if input is not an image"]
-    #[wasm_bindgen(method, js_name = "info")]
+    #[wasm_bindgen(method, catch, js_name = "info")]
     pub fn info_with_options(
         this: &ImagesBinding,
         stream: &ReadableStream<Uint8Array>,
@@ -45653,7 +45654,7 @@ extern "C" {
     #[doc = " provided input"]
     #[doc = ""]
     #[doc = " * `options` - Options that apply to the output e.g. output format"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn output(
         this: &ImageTransformer,
         options: &ImageOutputOptions,
@@ -45844,22 +45845,22 @@ extern "C" {
     #[doc = " Returns the transformed media as a readable stream of bytes."]
     #[doc = ""]
     #[doc = " Returns: A promise containing a readable stream with the transformed media"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn media(this: &MediaTransformationResult) -> Promise<ReadableStream<Uint8Array>>;
     #[doc = " Returns the transformed media as an HTTP response object."]
     #[doc = ""]
     #[doc = " Returns: The transformed media as a Promise<Response>, ready to store in cache or return to users"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn response(this: &MediaTransformationResult) -> Promise<Response>;
     #[doc = " Returns the MIME type of the transformed media."]
     #[doc = ""]
     #[doc = " Returns: A promise containing the content type string (e.g., 'image/jpeg', 'video/mp4')"]
-    #[wasm_bindgen(method, js_name = "contentType")]
+    #[wasm_bindgen(method, catch, js_name = "contentType")]
     pub fn content_type(this: &MediaTransformationResult) -> Promise<String>;
     #[doc = " Returns the MIME type of the transformed media."]
     #[doc = ""]
     #[doc = " Returns: A promise containing the content type string (e.g., 'image/jpeg', 'video/mp4')"]
-    #[wasm_bindgen(method, js_name = "contentType")]
+    #[wasm_bindgen(method, catch, js_name = "contentType")]
     pub fn content_type_js_string(this: &MediaTransformationResult) -> Promise<JsString>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -46415,7 +46416,7 @@ extern "C" {
     #[doc = " @see https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/"]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with the outcome of the rate limit."]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn limit(this: &RateLimit, options: &RateLimitOptions) -> Promise<RateLimitOutcome>;
 }
 pub mod rpc {
@@ -46586,11 +46587,11 @@ extern "C" {
     pub type SecretsStoreSecret;
     #[doc = " Get a secret from the Secrets Store, returning a string of the secret value"]
     #[doc = " if it exists, or throws an error if it does not exist"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn get(this: &SecretsStoreSecret) -> Promise<String>;
     #[doc = " Get a secret from the Secrets Store, returning a string of the secret value"]
     #[doc = " if it exists, or throws an error if it does not exist"]
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_js_string(this: &SecretsStoreSecret) -> Promise<JsString>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -46621,7 +46622,7 @@ extern "C" {
     #[doc = " * `MaxFileSizeError` — if the file size is too large"]
     #[doc = " * `RateLimitedError` — if the server received too many requests"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn upload(this: &StreamBinding, file: &File) -> Promise<StreamVideo>;
     #[doc = " Uploads a new video from a provided URL."]
     #[doc = ""]
@@ -46638,7 +46639,7 @@ extern "C" {
     #[doc = " * `RateLimitedError` — if the server received too many requests"]
     #[doc = " * `AlreadyUploadedError` — if a video was already uploaded to this URL"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method, js_name = "upload")]
+    #[wasm_bindgen(method, catch, js_name = "upload")]
     pub fn upload_with_url(
         this: &StreamBinding,
         url: impl ::wasm_bindgen::JsStringLike,
@@ -46658,7 +46659,7 @@ extern "C" {
     #[doc = " * `RateLimitedError` — if the server received too many requests"]
     #[doc = " * `AlreadyUploadedError` — if a video was already uploaded to this URL"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method, js_name = "upload")]
+    #[wasm_bindgen(method, catch, js_name = "upload")]
     pub fn upload_with_url_and_params(
         this: &StreamBinding,
         url: impl ::wasm_bindgen::JsStringLike,
@@ -46675,7 +46676,7 @@ extern "C" {
     #[doc = " * `BadRequestError` — if the parameters are invalid"]
     #[doc = " * `RateLimitedError` — if the server received too many requests"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method, js_name = "createDirectUpload")]
+    #[wasm_bindgen(method, catch, js_name = "createDirectUpload")]
     pub fn create_direct_upload(
         this: &StreamBinding,
         params: &StreamDirectUploadCreateParams,
@@ -46710,7 +46711,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `NotFoundError` — if the video is not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn details(this: &StreamVideoHandle) -> Promise<StreamVideo>;
     #[doc = " Update details for a single video."]
     #[doc = ""]
@@ -46723,7 +46724,7 @@ extern "C" {
     #[doc = " * `NotFoundError` — if the video is not found"]
     #[doc = " * `BadRequestError` — if the parameters are invalid"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn update(
         this: &StreamVideoHandle,
         params: &StreamUpdateVideoParams,
@@ -46736,7 +46737,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `NotFoundError` — if the video is not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn delete(this: &StreamVideoHandle) -> Promise<()>;
     #[doc = " Creates a signed URL token for a video."]
     #[doc = ""]
@@ -46745,7 +46746,7 @@ extern "C" {
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `InternalError` — if the signing key cannot be retrieved or the token cannot be signed"]
-    #[wasm_bindgen(method, js_name = "generateToken")]
+    #[wasm_bindgen(method, catch, js_name = "generateToken")]
     pub fn generate_token(this: &StreamVideoHandle) -> Promise<String>;
     #[doc = " Creates a signed URL token for a video."]
     #[doc = ""]
@@ -46754,7 +46755,7 @@ extern "C" {
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `InternalError` — if the signing key cannot be retrieved or the token cannot be signed"]
-    #[wasm_bindgen(method, js_name = "generateToken")]
+    #[wasm_bindgen(method, catch, js_name = "generateToken")]
     pub fn generate_token_js_string(this: &StreamVideoHandle) -> Promise<JsString>;
     #[wasm_bindgen(method, getter)]
     pub fn downloads(this: &StreamVideoHandle) -> StreamScopedDownloads;
@@ -48037,7 +48038,7 @@ extern "C" {
     #[doc = " * `BadRequestError` — if the language or file is invalid"]
     #[doc = " * `MaxFileSizeError` — if the file size is too large"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn upload(
         this: &StreamScopedCaptions,
         language: impl ::wasm_bindgen::JsStringLike,
@@ -48058,7 +48059,7 @@ extern "C" {
     #[doc = " * `StreamError` — if the video is missing audio"]
     #[doc = " * `StreamError` — if the requested language is not supported"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn generate(
         this: &StreamScopedCaptions,
         language: impl ::wasm_bindgen::JsStringLike,
@@ -48074,7 +48075,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `NotFoundError` — if the video or caption is not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn list(this: &StreamScopedCaptions) -> Promise<Vec<StreamCaption>>;
     #[doc = " Lists the captions or subtitles."]
     #[doc = " Use the language parameter to filter by a specific language."]
@@ -48087,7 +48088,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `NotFoundError` — if the video or caption is not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method, js_name = "list")]
+    #[wasm_bindgen(method, catch, js_name = "list")]
     pub fn list_with_language(
         this: &StreamScopedCaptions,
         language: impl ::wasm_bindgen::JsStringLike,
@@ -48102,7 +48103,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `NotFoundError` — if the video or caption is not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn delete(
         this: &StreamScopedCaptions,
         language: impl ::wasm_bindgen::JsStringLike,
@@ -48127,7 +48128,7 @@ extern "C" {
     #[doc = " * `StreamError` — if the video duration is too long to generate a download"]
     #[doc = " * `StreamError` — if the video is not ready to stream"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn generate(this: &StreamScopedDownloads) -> Promise<StreamDownloadGetResponse>;
     #[doc = " Generates a download for a video when a video is ready to view. Available"]
     #[doc = " types are `default` and `audio`. Defaults to `default` when omitted."]
@@ -48143,7 +48144,7 @@ extern "C" {
     #[doc = " * `StreamError` — if the video duration is too long to generate a download"]
     #[doc = " * `StreamError` — if the video is not ready to stream"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method, js_name = "generate")]
+    #[wasm_bindgen(method, catch, js_name = "generate")]
     pub fn generate_with_download_type(
         this: &StreamScopedDownloads,
         download_type: StreamDownloadType,
@@ -48156,7 +48157,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `NotFoundError` — if the video or downloads are not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn get(this: &StreamScopedDownloads) -> Promise<StreamDownloadGetResponse>;
     #[doc = " Delete the downloads for a video. Available types are `default` and `audio`."]
     #[doc = " Defaults to `default` when omitted."]
@@ -48169,7 +48170,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `NotFoundError` — if the video or downloads are not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn delete(this: &StreamScopedDownloads) -> Promise<()>;
     #[doc = " Delete the downloads for a video. Available types are `default` and `audio`."]
     #[doc = " Defaults to `default` when omitted."]
@@ -48182,7 +48183,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `NotFoundError` — if the video or downloads are not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method, js_name = "delete")]
+    #[wasm_bindgen(method, catch, js_name = "delete")]
     pub fn delete_with_download_type(
         this: &StreamScopedDownloads,
         download_type: StreamDownloadType,
@@ -48201,7 +48202,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `BadRequestError` — if the parameters are invalid"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn list(this: &StreamVideos) -> Promise<Vec<StreamVideo>>;
     #[doc = " Lists all videos in a users account."]
     #[doc = ""]
@@ -48211,7 +48212,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `BadRequestError` — if the parameters are invalid"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method, js_name = "list")]
+    #[wasm_bindgen(method, catch, js_name = "list")]
     pub fn list_with_params(
         this: &StreamVideos,
         params: &StreamVideosListParams,
@@ -48236,7 +48237,7 @@ extern "C" {
     #[doc = " * `MaxFileSizeError` — if the file size is too large"]
     #[doc = " * `TooManyWatermarksError` — if the number of allowed watermarks is reached"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn generate(
         this: &StreamWatermarks,
         file: &File,
@@ -48256,7 +48257,7 @@ extern "C" {
     #[doc = " * `MaxFileSizeError` — if the file size is too large"]
     #[doc = " * `TooManyWatermarksError` — if the number of allowed watermarks is reached"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method, js_name = "generate")]
+    #[wasm_bindgen(method, catch, js_name = "generate")]
     pub fn generate_with_url(
         this: &StreamWatermarks,
         url: impl ::wasm_bindgen::JsStringLike,
@@ -48269,7 +48270,7 @@ extern "C" {
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn list(this: &StreamWatermarks) -> Promise<Vec<StreamWatermark>>;
     #[doc = " Retrieves details for a single watermark profile."]
     #[doc = ""]
@@ -48281,7 +48282,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `NotFoundError` — if the watermark is not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn get(
         this: &StreamWatermarks,
         watermark_id: impl ::wasm_bindgen::JsStringLike,
@@ -48296,7 +48297,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `NotFoundError` — if the watermark is not found"]
     #[doc = " * `InternalError` — if an unexpected error occurs"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn delete(
         this: &StreamWatermarks,
         watermark_id: impl ::wasm_bindgen::JsStringLike,
@@ -49665,29 +49666,29 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ToMarkdownService;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn transform(
         this: &ToMarkdownService,
         files: &[MarkdownDocument],
     ) -> Promise<Vec<ConversionResponse>>;
-    #[wasm_bindgen(method, js_name = "transform")]
+    #[wasm_bindgen(method, catch, js_name = "transform")]
     pub fn transform_with_options(
         this: &ToMarkdownService,
         files: &[MarkdownDocument],
         options: &ConversionRequestOptions,
     ) -> Promise<Vec<ConversionResponse>>;
-    #[wasm_bindgen(method, js_name = "transform")]
+    #[wasm_bindgen(method, catch, js_name = "transform")]
     pub fn transform_with_files(
         this: &ToMarkdownService,
         files: &MarkdownDocument,
     ) -> Promise<ConversionResponse>;
-    #[wasm_bindgen(method, js_name = "transform")]
+    #[wasm_bindgen(method, catch, js_name = "transform")]
     pub fn transform_with_files_and_options(
         this: &ToMarkdownService,
         files: &MarkdownDocument,
         options: &ConversionRequestOptions,
     ) -> Promise<ConversionResponse>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn supported(this: &ToMarkdownService) -> Promise<Vec<SupportedFileFormat>>;
 }
 pub mod tail_stream {
@@ -51187,7 +51188,7 @@ extern "C" {
     #[doc = " Get information about the currently bound index."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with information about the current index."]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn describe(this: &VectorizeIndex) -> Promise<VectorizeIndexDetails>;
     #[doc = " Use the provided vector to perform a similarity search across the index."]
     #[doc = ""]
@@ -51195,7 +51196,7 @@ extern "C" {
     #[doc = " * `options` - Configuration options to massage the returned data."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with matched and scored vectors."]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn query(this: &VectorizeIndex, vector: impl VectorFloatArray)
         -> Promise<VectorizeMatches>;
     #[doc = " Use the provided vector to perform a similarity search across the index."]
@@ -51204,7 +51205,7 @@ extern "C" {
     #[doc = " * `options` - Configuration options to massage the returned data."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with matched and scored vectors."]
-    #[wasm_bindgen(method, js_name = "query")]
+    #[wasm_bindgen(method, catch, js_name = "query")]
     pub fn query_with_slice(
         this: &VectorizeIndex,
         #[wasm_bindgen(slice = "array")] vector: &[f64],
@@ -51215,7 +51216,7 @@ extern "C" {
     #[doc = " * `options` - Configuration options to massage the returned data."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with matched and scored vectors."]
-    #[wasm_bindgen(method, js_name = "query")]
+    #[wasm_bindgen(method, catch, js_name = "query")]
     pub fn query_with_options(
         this: &VectorizeIndex,
         vector: impl VectorFloatArray,
@@ -51227,7 +51228,7 @@ extern "C" {
     #[doc = " * `options` - Configuration options to massage the returned data."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with matched and scored vectors."]
-    #[wasm_bindgen(method, js_name = "query")]
+    #[wasm_bindgen(method, catch, js_name = "query")]
     pub fn query_with_slice_and_options(
         this: &VectorizeIndex,
         #[wasm_bindgen(slice = "array")] vector: &[f64],
@@ -51238,7 +51239,7 @@ extern "C" {
     #[doc = " * `vectors` - List of vectors that will be inserted."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with the ids & count of records that were successfully processed."]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn insert(
         this: &VectorizeIndex,
         vectors: &[VectorizeVector],
@@ -51248,7 +51249,7 @@ extern "C" {
     #[doc = " * `vectors` - List of vectors that will be upserted."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with the ids & count of records that were successfully processed."]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn upsert(
         this: &VectorizeIndex,
         vectors: &[VectorizeVector],
@@ -51258,7 +51259,7 @@ extern "C" {
     #[doc = " * `ids` - List of vector ids that should be deleted."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with the ids & count of records that were successfully processed (and thus deleted)."]
-    #[wasm_bindgen(method, js_name = "deleteByIds")]
+    #[wasm_bindgen(method, catch, js_name = "deleteByIds")]
     pub fn delete_by_ids(
         this: &VectorizeIndex,
         ids: &[impl ::wasm_bindgen::JsStringLike],
@@ -51268,7 +51269,7 @@ extern "C" {
     #[doc = " * `ids` - List of vector ids that should be returned."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with the raw unscored vectors matching the id set."]
-    #[wasm_bindgen(method, js_name = "getByIds")]
+    #[wasm_bindgen(method, catch, js_name = "getByIds")]
     pub fn get_by_ids(
         this: &VectorizeIndex,
         ids: &[impl ::wasm_bindgen::JsStringLike],
@@ -51282,7 +51283,7 @@ extern "C" {
     #[doc = " Get information about the currently bound index."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with information about the current index."]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn describe(this: &Vectorize) -> Promise<VectorizeIndexInfo>;
     #[doc = " Use the provided vector to perform a similarity search across the index."]
     #[doc = ""]
@@ -51290,7 +51291,7 @@ extern "C" {
     #[doc = " * `options` - Configuration options to massage the returned data."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with matched and scored vectors."]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn query(this: &Vectorize, vector: impl VectorFloatArray) -> Promise<VectorizeMatches>;
     #[doc = " Use the provided vector to perform a similarity search across the index."]
     #[doc = ""]
@@ -51298,7 +51299,7 @@ extern "C" {
     #[doc = " * `options` - Configuration options to massage the returned data."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with matched and scored vectors."]
-    #[wasm_bindgen(method, js_name = "query")]
+    #[wasm_bindgen(method, catch, js_name = "query")]
     pub fn query_with_slice(
         this: &Vectorize,
         #[wasm_bindgen(slice = "array")] vector: &[f64],
@@ -51309,7 +51310,7 @@ extern "C" {
     #[doc = " * `options` - Configuration options to massage the returned data."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with matched and scored vectors."]
-    #[wasm_bindgen(method, js_name = "query")]
+    #[wasm_bindgen(method, catch, js_name = "query")]
     pub fn query_with_options(
         this: &Vectorize,
         vector: impl VectorFloatArray,
@@ -51321,7 +51322,7 @@ extern "C" {
     #[doc = " * `options` - Configuration options to massage the returned data."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with matched and scored vectors."]
-    #[wasm_bindgen(method, js_name = "query")]
+    #[wasm_bindgen(method, catch, js_name = "query")]
     pub fn query_with_slice_and_options(
         this: &Vectorize,
         #[wasm_bindgen(slice = "array")] vector: &[f64],
@@ -51333,7 +51334,7 @@ extern "C" {
     #[doc = " * `options` - Configuration options to massage the returned data."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with matched and scored vectors."]
-    #[wasm_bindgen(method, js_name = "queryById")]
+    #[wasm_bindgen(method, catch, js_name = "queryById")]
     pub fn query_by_id(
         this: &Vectorize,
         vector_id: impl ::wasm_bindgen::JsStringLike,
@@ -51344,7 +51345,7 @@ extern "C" {
     #[doc = " * `options` - Configuration options to massage the returned data."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with matched and scored vectors."]
-    #[wasm_bindgen(method, js_name = "queryById")]
+    #[wasm_bindgen(method, catch, js_name = "queryById")]
     pub fn query_by_id_with_options(
         this: &Vectorize,
         vector_id: impl ::wasm_bindgen::JsStringLike,
@@ -51355,7 +51356,7 @@ extern "C" {
     #[doc = " * `vectors` - List of vectors that will be inserted."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with a unique identifier of a mutation containing the insert changeset."]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn insert(this: &Vectorize, vectors: &[VectorizeVector])
         -> Promise<VectorizeAsyncMutation>;
     #[doc = " Upsert a list of vectors into the index dataset. If a provided id exists, it will be replaced with the new values."]
@@ -51363,7 +51364,7 @@ extern "C" {
     #[doc = " * `vectors` - List of vectors that will be upserted."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with a unique identifier of a mutation containing the upsert changeset."]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn upsert(this: &Vectorize, vectors: &[VectorizeVector])
         -> Promise<VectorizeAsyncMutation>;
     #[doc = " Delete a list of vectors with a matching id."]
@@ -51371,7 +51372,7 @@ extern "C" {
     #[doc = " * `ids` - List of vector ids that should be deleted."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with a unique identifier of a mutation containing the delete changeset."]
-    #[wasm_bindgen(method, js_name = "deleteByIds")]
+    #[wasm_bindgen(method, catch, js_name = "deleteByIds")]
     pub fn delete_by_ids(
         this: &Vectorize,
         ids: &[impl ::wasm_bindgen::JsStringLike],
@@ -51381,7 +51382,7 @@ extern "C" {
     #[doc = " * `ids` - List of vector ids that should be returned."]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with the raw unscored vectors matching the id set."]
-    #[wasm_bindgen(method, js_name = "getByIds")]
+    #[wasm_bindgen(method, catch, js_name = "getByIds")]
     pub fn get_by_ids(
         this: &Vectorize,
         ids: &[impl ::wasm_bindgen::JsStringLike],
@@ -51604,7 +51605,7 @@ extern "C" {
     #[doc = " * `id` - Id for the instance of this Workflow"]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with a handle for the Instance"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn get<PARAMS>(
         this: &Workflow<PARAMS>,
         id: impl ::wasm_bindgen::JsStringLike,
@@ -51614,14 +51615,14 @@ extern "C" {
     #[doc = " * `options` - Options when creating an instance including id and params"]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with a handle for the Instance"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn create<PARAMS>(this: &Workflow<PARAMS>) -> Promise<WorkflowInstance>;
     #[doc = " Create a new instance and return a handle to it. If a provided id exists, an error will be thrown."]
     #[doc = ""]
     #[doc = " * `options` - Options when creating an instance including id and params"]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with a handle for the Instance"]
-    #[wasm_bindgen(method, js_name = "create")]
+    #[wasm_bindgen(method, catch, js_name = "create")]
     pub fn create_with_options<PARAMS>(
         this: &Workflow<PARAMS>,
         options: &WorkflowInstanceCreateOptions<PARAMS>,
@@ -51632,7 +51633,7 @@ extern "C" {
     #[doc = " * `batch` - List of Options when creating an instance including name and params"]
     #[doc = ""]
     #[doc = " Returns: A promise that resolves with a list of handles for the created instances."]
-    #[wasm_bindgen(method, js_name = "createBatch")]
+    #[wasm_bindgen(method, catch, js_name = "createBatch")]
     pub fn create_batch<PARAMS>(
         this: &Workflow<PARAMS>,
         batch: &[WorkflowInstanceCreateOptions<PARAMS>],
@@ -52015,22 +52016,22 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_id(this: &WorkflowInstance, val: impl ::wasm_bindgen::JsStringLike);
     #[doc = " Pause the instance."]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn pause(this: &WorkflowInstance) -> Promise<()>;
     #[doc = " Resume the instance. If it is already running, an error will be thrown."]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn resume(this: &WorkflowInstance) -> Promise<()>;
     #[doc = " Terminate the instance. If it is errored, terminated or complete, an error will be thrown."]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn terminate(this: &WorkflowInstance) -> Promise<()>;
     #[doc = " Restart the instance."]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn restart(this: &WorkflowInstance) -> Promise<()>;
     #[doc = " Returns the current status of the instance."]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn status(this: &WorkflowInstance) -> Promise<InstanceStatus>;
     #[doc = " Send an event to this instance."]
-    #[wasm_bindgen(method, js_name = "sendEvent")]
+    #[wasm_bindgen(method, catch, js_name = "sendEvent")]
     pub fn send_event(this: &WorkflowInstance, arg0: &WorkflowInstanceSendEvent) -> Promise<()>;
 }
 #[wasm_bindgen(experimental_generic_mono)]

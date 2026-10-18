@@ -13,15 +13,15 @@ extern "C" {
     fn __size(this: &R2Object) -> f64;
     #[wasm_bindgen(method, getter, js_name = "uploadedAt")]
     fn __uploaded_at(this: &R2Object) -> Option<f64>;
-    #[wasm_bindgen(method, js_name = "list")]
+    #[wasm_bindgen(method, catch, js_name = "list")]
     fn __list(this: &R2Object, limit: f64) -> Promise<Vec<R2Object>>;
-    #[wasm_bindgen(method, js_name = "list")]
+    #[wasm_bindgen(method, catch, js_name = "list")]
     fn __list_with_prefix(
         this: &R2Object,
         limit: f64,
         prefix: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Vec<R2Object>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn count(this: &R2Object) -> Promise<f64>;
     #[wasm_bindgen(method, catch, js_name = "sizes")]
     fn __sizes(this: &R2Object) -> Result<Vec<f64>, JsValue>;

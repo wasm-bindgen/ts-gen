@@ -83,9 +83,9 @@ extern "C" {
         start: Option<DayLikeKind>,
         end: impl DayLike,
     ) -> Result<JsString, JsValue>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn later(this: &Day, other: impl DayLike) -> Promise<String>;
-    #[wasm_bindgen(method, js_name = "later")]
+    #[wasm_bindgen(method, catch, js_name = "later")]
     pub fn later_js_string(this: &Day, other: impl DayLike) -> Promise<JsString>;
 }
 impl Day {

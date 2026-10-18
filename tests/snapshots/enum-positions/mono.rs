@@ -143,9 +143,9 @@ extern "C" {
     pub fn rest(this: &Probe, ms: &[impl ::wasm_bindgen::JsStringLike]) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "onMode")]
     pub fn on_mode(this: &Probe, cb: &Function<fn(Mode) -> Level>) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "nextMode")]
+    #[wasm_bindgen(method, catch, js_name = "nextMode")]
     pub fn next_mode(this: &Probe) -> Promise<Mode>;
-    #[wasm_bindgen(method, js_name = "maybeMode")]
+    #[wasm_bindgen(method, catch, js_name = "maybeMode")]
     pub fn maybe_mode(this: &Probe) -> Promise<Option<Mode>>;
     #[wasm_bindgen(method, catch, js_name = "modeMap")]
     pub fn mode_map(this: &Probe) -> Result<Map<String, Mode>, JsValue>;
@@ -167,9 +167,9 @@ extern "C" {
     pub fn details(this: &Probe, d: &Details<Mode>) -> Result<Details<Level>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "maybeHolder")]
     pub fn maybe_holder(this: &Probe) -> Result<Holder<Nullable<Mode>>, JsValue>;
-    #[wasm_bindgen(method, js_name = "nextLevel")]
+    #[wasm_bindgen(method, catch, js_name = "nextLevel")]
     pub fn next_level(this: &Probe) -> Promise<Option<Level>>;
-    #[wasm_bindgen(method, js_name = "nextDetails")]
+    #[wasm_bindgen(method, catch, js_name = "nextDetails")]
     pub fn next_details(this: &Probe) -> Promise<Details<Mode>>;
     #[wasm_bindgen(method, catch, js_name = "modeOrNumberArg")]
     pub fn mode_or_number_arg(this: &Probe, x: Mode) -> Result<ModeOrNumberReturnKind, JsValue>;

@@ -2646,7 +2646,7 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
     if has_variadic {
         wb_parts.push(quote! { variadic });
     }
-    if sig.catch_attr(config.cgctx) {
+    if sig.catch {
         wb_parts.push(quote! { catch });
     }
 
@@ -2840,7 +2840,7 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
     if has_variadic {
         wb_parts.push(quote! { variadic });
     }
-    if sig.catch_attr(config.cgctx) {
+    if sig.catch {
         wb_parts.push(quote! { catch });
     }
     if super::typemap::needs_js_name(&rust_ident, &sig.js_name) {
@@ -2924,7 +2924,7 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
     if has_variadic {
         wb_parts.push(quote! { variadic });
     }
-    if sig.catch_attr(config.cgctx) {
+    if sig.catch {
         wb_parts.push(quote! { catch });
     }
     if super::typemap::needs_js_name(&rust_ident, &sig.js_name) {

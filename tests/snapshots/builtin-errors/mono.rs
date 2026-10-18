@@ -46,12 +46,12 @@ extern "C" {
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `URIError | TypeError`"]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn parse(this: &Codec, input: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `URIError | TypeError`"]
-    #[wasm_bindgen(method, js_name = "parse")]
+    #[wasm_bindgen(method, catch, js_name = "parse")]
     pub fn parse_js_string(
         this: &Codec,
         input: impl ::wasm_bindgen::JsStringLike,

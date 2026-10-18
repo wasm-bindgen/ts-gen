@@ -94,16 +94,16 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn get(this: &Store, key: impl ::wasm_bindgen::JsStringLike) -> Promise<Option<String>>;
-    #[wasm_bindgen(method, js_name = "get")]
+    #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_js_string(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<JsString>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn list(this: &Store) -> Promise<ListResult>;
-    #[wasm_bindgen(method, js_name = "list")]
+    #[wasm_bindgen(method, catch, js_name = "list")]
     pub fn list_typed<Metadata>(this: &Store) -> Promise<ListResult<Metadata>>;
     #[wasm_bindgen(method, catch)]
     pub fn tag(

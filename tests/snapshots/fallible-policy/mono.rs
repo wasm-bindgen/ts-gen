@@ -40,10 +40,10 @@ extern "C" {
     #[wasm_bindgen(method)]
     pub fn has(this: &Headers, name: impl ::wasm_bindgen::JsStringLike) -> bool;
     #[doc = " Async — unchanged: already a single `Result` form."]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn text(this: &Headers) -> Promise<String>;
     #[doc = " Async — unchanged: already a single `Result` form."]
-    #[wasm_bindgen(method, js_name = "text")]
+    #[wasm_bindgen(method, catch, js_name = "text")]
     pub fn text_js_string(this: &Headers) -> Promise<JsString>;
     #[doc = " Getter — infallible by default."]
     #[wasm_bindgen(method, getter)]

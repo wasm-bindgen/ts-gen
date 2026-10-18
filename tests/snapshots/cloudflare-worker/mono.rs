@@ -91,17 +91,17 @@ extern "C" {
     pub fn signal(this: &Request) -> AbortSignal;
     #[wasm_bindgen(method, catch)]
     pub fn clone(this: &Request) -> Result<Request, JsValue>;
-    #[wasm_bindgen(method, js_name = "arrayBuffer")]
+    #[wasm_bindgen(method, catch, js_name = "arrayBuffer")]
     pub fn array_buffer(this: &Request) -> Promise<ArrayBuffer>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn text(this: &Request) -> Promise<String>;
-    #[wasm_bindgen(method, js_name = "text")]
+    #[wasm_bindgen(method, catch, js_name = "text")]
     pub fn text_js_string(this: &Request) -> Promise<JsString>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn json<T>(this: &Request) -> Promise<T>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn blob(this: &Request) -> Promise<Blob>;
-    #[wasm_bindgen(method, js_name = "formData")]
+    #[wasm_bindgen(method, catch, js_name = "formData")]
     pub fn form_data(this: &Request) -> Promise<FormData>;
 }
 #[diagnostic::on_unimplemented(
@@ -421,17 +421,17 @@ extern "C" {
     pub fn url_js_string(this: &Response) -> JsString;
     #[wasm_bindgen(method, catch)]
     pub fn clone(this: &Response) -> Result<Response, JsValue>;
-    #[wasm_bindgen(method, js_name = "arrayBuffer")]
+    #[wasm_bindgen(method, catch, js_name = "arrayBuffer")]
     pub fn array_buffer(this: &Response) -> Promise<ArrayBuffer>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn text(this: &Response) -> Promise<String>;
-    #[wasm_bindgen(method, js_name = "text")]
+    #[wasm_bindgen(method, catch, js_name = "text")]
     pub fn text_js_string(this: &Response) -> Promise<JsString>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn json<T>(this: &Response) -> Promise<T>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn blob(this: &Response) -> Promise<Blob>;
-    #[wasm_bindgen(method, js_name = "formData")]
+    #[wasm_bindgen(method, catch, js_name = "formData")]
     pub fn form_data(this: &Response) -> Promise<FormData>;
 }
 impl Response {
@@ -535,7 +535,7 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ExportedHandler<E = Env>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn fetch<E>(
         this: &ExportedHandler<E>,
         request: &Request,
@@ -544,7 +544,7 @@ extern "C" {
     ) -> Promise<Response>
     where
         E: ::wasm_bindgen::convert::RefIntoWasmAbi;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn scheduled<E>(
         this: &ExportedHandler<E>,
         controller: &ScheduledController,
@@ -570,11 +570,12 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
+    #[wasm_bindgen(catch)]
     pub fn fetch(input: impl RequestInfo) -> Promise<Response>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "fetch")]
+    #[wasm_bindgen(catch, js_name = "fetch")]
     pub fn fetch_with_init(input: impl RequestInfo, init: &RequestInit) -> Promise<Response>;
 }
 #[wasm_bindgen(experimental_generic_mono)]

@@ -52,7 +52,7 @@ impl NoErasure {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[doc = " The awaited value is a top-level return: the enum is synthesised."]
-    #[wasm_bindgen(js_name = "fetchValue")]
+    #[wasm_bindgen(catch, js_name = "fetchValue")]
     pub fn fetch_value() -> Promise<FetchValueReturnKind>;
 }
 #[wasm_bindgen(private)]

@@ -74,7 +74,7 @@ extern "C" {
         this: &ExportedHandler,
         val: &Function<fn(Array<String>, Env, ExecutionContext) -> Option<Promise<()>>>,
     );
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn scheduled(
         this: &ExportedHandler,
         cron: impl ::wasm_bindgen::JsStringLike,

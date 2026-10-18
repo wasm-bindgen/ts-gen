@@ -50,9 +50,9 @@ extern "C" {
         this: &Client,
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn pairs(this: &Client) -> Promise<ArrayTuple<(f64, String)>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn same(this: &Client) -> Promise<ArrayTuple<(f64, f64)>>;
     #[wasm_bindgen(method, catch)]
     pub fn boxed(this: &Client, items: &[impl ::wasm_bindgen::JsStringLike])

@@ -303,7 +303,7 @@ pub mod shadow {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_namespace = "Shadow")]
+        #[wasm_bindgen(catch, js_namespace = "Shadow")]
         pub fn next() -> Promise<super::Mode>;
     }
 }

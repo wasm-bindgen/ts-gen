@@ -223,7 +223,7 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Store;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn put<T>(this: &Store, key: impl ::wasm_bindgen::JsStringLike, value: &T) -> Promise<()>
     where
         T: ::wasm_bindgen::convert::RefIntoWasmAbi;
@@ -231,35 +231,35 @@ extern "C" {
     pub fn append<T>(this: &Store, items: &[T]) -> Result<Row<T>, JsValue>
     where
         T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn get<T>(this: &Store, key: impl ::wasm_bindgen::JsStringLike) -> Promise<Option<T>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn first<T>(this: &Store) -> Promise<Option<T>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn json<T>(this: &Store) -> Promise<T>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn transaction<T>(this: &Store, closure: &Function<fn(Store) -> Promise<T>>) -> Promise<T>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn collect(this: &Store, make: &Function<fn() -> Promise>)
         -> Promise<Map<String, JsValue>>;
-    #[wasm_bindgen(method, js_name = "collect")]
+    #[wasm_bindgen(method, catch, js_name = "collect")]
     pub fn collect_typed<T>(
         this: &Store,
         make: &Function<fn() -> Promise<T>>,
     ) -> Promise<Map<String, T>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn each<T>(this: &Store, r#fn: &Function<fn(T)>) -> Promise<Map<String, T>>;
-    #[wasm_bindgen(method, js_name = "eachRest")]
+    #[wasm_bindgen(method, catch, js_name = "eachRest")]
     pub fn each_rest(this: &Store, r#fn: &Function) -> Promise<Map<String, JsValue>>;
-    #[wasm_bindgen(method, js_name = "eachRest")]
+    #[wasm_bindgen(method, catch, js_name = "eachRest")]
     pub fn each_rest_typed<T>(this: &Store, r#fn: &Function) -> Promise<Map<String, T>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn run(this: &Store) -> Promise<Row>;
-    #[wasm_bindgen(method, js_name = "run")]
+    #[wasm_bindgen(method, catch, js_name = "run")]
     pub fn run_typed<T>(this: &Store) -> Promise<Row<T>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn list(this: &Store) -> Promise<Map<String, JsValue>>;
-    #[wasm_bindgen(method, js_name = "list")]
+    #[wasm_bindgen(method, catch, js_name = "list")]
     pub fn list_typed<T>(this: &Store) -> Promise<Map<String, T>>;
     #[wasm_bindgen(method, catch)]
     pub fn scan(this: &Store) -> Result<Cursor<String>, JsValue>;

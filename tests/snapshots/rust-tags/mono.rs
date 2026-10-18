@@ -21,9 +21,9 @@ extern "C" {
         status: u16,
         reason: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<u32, JsValue>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn count(this: &Response) -> Promise<u32>;
-    #[wasm_bindgen(method, js_name = "maybeCount")]
+    #[wasm_bindgen(method, catch, js_name = "maybeCount")]
     pub fn maybe_count(this: &Response) -> Promise<Option<u32>>;
     #[wasm_bindgen(method, catch, js_name = "uploadPart")]
     pub fn upload_part(this: &Response, part_number: u16) -> Result<(), JsValue>;

@@ -146,12 +146,12 @@ pub mod my_module {
     use super::*;
     #[wasm_bindgen(module = "my-module", experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_name = "doWork")]
+        #[wasm_bindgen(catch, js_name = "doWork")]
         pub fn do_work(input: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
     }
     #[wasm_bindgen(module = "my-module", experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(js_name = "doWork")]
+        #[wasm_bindgen(catch, js_name = "doWork")]
         pub fn do_work_js_string(input: impl ::wasm_bindgen::JsStringLike) -> Promise<JsString>;
     }
     #[wasm_bindgen(module = "my-module", experimental_generic_mono)]
@@ -229,12 +229,12 @@ extern "C" {
     pub type DefaultProcessor;
     #[wasm_bindgen(constructor, catch)]
     pub fn new(config: &Object) -> Result<DefaultProcessor, JsValue>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn process(
         this: &DefaultProcessor,
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<String>;
-    #[wasm_bindgen(method, js_name = "process")]
+    #[wasm_bindgen(method, catch, js_name = "process")]
     pub fn process_js_string(
         this: &DefaultProcessor,
         input: impl ::wasm_bindgen::JsStringLike,
@@ -520,12 +520,12 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Cache;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn get(
         this: &Cache,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<Map<String, Array<String>>>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn set(
         this: &Cache,
         key: impl ::wasm_bindgen::JsStringLike,

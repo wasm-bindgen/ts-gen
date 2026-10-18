@@ -16,7 +16,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "bar")]
     pub fn bar_js_string(this: &Foo, x: f64) -> Result<JsString, ::js_sys::Error>;
     #[doc = " Async method — `Result<T, Error>` instead of `Result<T, JsValue>`."]
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn baz(this: &Foo) -> Promise<f64>;
     #[doc = " Method with explicit `@throws` — the typed error wins regardless"]
     #[doc = " of the flag."]
@@ -39,12 +39,12 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[doc = " Free function — same default-error rule."]
-    #[wasm_bindgen(js_name = "fetchData")]
+    #[wasm_bindgen(catch, js_name = "fetchData")]
     pub fn fetch_data(url: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[doc = " Free function — same default-error rule."]
-    #[wasm_bindgen(js_name = "fetchData")]
+    #[wasm_bindgen(catch, js_name = "fetchData")]
     pub fn fetch_data_js_string(url: impl ::wasm_bindgen::JsStringLike) -> Promise<JsString>;
 }

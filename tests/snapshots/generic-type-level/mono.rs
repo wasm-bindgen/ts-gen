@@ -166,7 +166,7 @@ extern "C" {
     pub fn of<T>(value: &T) -> Result<Labelled<T>, JsValue>
     where
         T: ::wasm_bindgen::convert::RefIntoWasmAbi;
-    # [wasm_bindgen (static_method_of = Labelled)]
+    # [wasm_bindgen (static_method_of = Labelled , catch)]
     pub fn load<T>() -> Promise<T>;
     #[wasm_bindgen(method, getter)]
     pub fn value<T>(this: &Labelled<T>) -> T
@@ -192,12 +192,12 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Storage<Props = JsValue>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn get<Props, T>(
         this: &Storage<Props>,
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<T>>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn run<Props, T>(
         this: &Storage<Props>,
         callback: &Function<fn() -> Promise<T>>,
@@ -209,6 +209,6 @@ extern "C" {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "loadValue")]
+    #[wasm_bindgen(catch, js_name = "loadValue")]
     pub fn load_value<T>() -> Promise<T>;
 }

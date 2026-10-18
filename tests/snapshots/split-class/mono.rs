@@ -9,7 +9,7 @@ extern "C" {
     # [wasm_bindgen (extends = cloudflare :: email :: EmailMessage , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ForwardableEmailMessage;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn reply(
         this: &ForwardableEmailMessage,
         message: &cloudflare::email::EmailMessage,

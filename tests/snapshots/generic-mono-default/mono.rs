@@ -34,28 +34,28 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DefaultFlags;
-    #[wasm_bindgen(method, js_name = "getStringDetails")]
+    #[wasm_bindgen(method, catch, js_name = "getStringDetails")]
     pub fn get_string_details(
         this: &DefaultFlags,
         default_value: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<DefaultDetails<String>>;
-    #[wasm_bindgen(method, js_name = "getStringDetails")]
+    #[wasm_bindgen(method, catch, js_name = "getStringDetails")]
     pub fn get_string_details_js_string(
         this: &DefaultFlags,
         default_value: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<DefaultDetails<JsString>>;
-    #[wasm_bindgen(method, js_name = "getBooleanDetails")]
+    #[wasm_bindgen(method, catch, js_name = "getBooleanDetails")]
     pub fn get_boolean_details(
         this: &DefaultFlags,
         default_value: bool,
     ) -> Promise<DefaultDetails<bool>>;
-    #[wasm_bindgen(method, js_name = "getNumberDetails")]
+    #[wasm_bindgen(method, catch, js_name = "getNumberDetails")]
     pub fn get_number_details(
         this: &DefaultFlags,
         default_value: f64,
     ) -> Promise<DefaultDetails<f64>>;
-    #[wasm_bindgen(method, js_name = "getStringArray")]
+    #[wasm_bindgen(method, catch, js_name = "getStringArray")]
     pub fn get_string_array(this: &DefaultFlags) -> Promise<Vec<String>>;
-    #[wasm_bindgen(method, js_name = "getStringArray")]
+    #[wasm_bindgen(method, catch, js_name = "getStringArray")]
     pub fn get_string_array_js_string(this: &DefaultFlags) -> Promise<Array<JsString>>;
 }

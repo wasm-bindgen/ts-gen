@@ -22,7 +22,7 @@ extern "C" {
     #[doc = " * `TypeError` — if the body has already been used"]
     #[wasm_bindgen(method, catch)]
     pub fn clone(this: &Response) -> Result<Response, TypeError>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn bytes(this: &Response) -> Promise<Uint8Array>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -90,17 +90,17 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Cache;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn put(this: &Cache, url: impl ::wasm_bindgen::JsStringLike) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_ttl(
         this: &Cache,
         url: impl ::wasm_bindgen::JsStringLike,
         ttl: u32,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_request(this: &Cache, request: &Response) -> Promise<()>;
-    #[wasm_bindgen(method, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put")]
     pub fn put_with_request_and_ttl(this: &Cache, request: &Response, ttl: u32) -> Promise<()>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -108,9 +108,9 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Storage;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn delete(this: &Storage, key: impl ::wasm_bindgen::JsStringLike) -> Promise<bool>;
-    #[wasm_bindgen(method, js_name = "delete")]
+    #[wasm_bindgen(method, catch, js_name = "delete")]
     pub fn delete_with_keys(
         this: &Storage,
         keys: &[impl ::wasm_bindgen::JsStringLike],
@@ -263,10 +263,11 @@ impl<Meta, Cf> Default for Request<Meta, Cf> {
 pub type RequestInfo = JsValue;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
+    #[wasm_bindgen(catch)]
     pub fn fetch(input: &Request) -> Promise<Request>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "fetch")]
+    #[wasm_bindgen(catch, js_name = "fetch")]
     pub fn fetch_with_str(input: impl ::wasm_bindgen::JsStringLike) -> Promise<Request>;
 }

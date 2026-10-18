@@ -109,12 +109,12 @@ extern "C" {
         this: &Courier,
         envelope: &Envelope<String, Body>,
     ) -> Result<JsString, JsValue>;
-    #[wasm_bindgen(method, js_name = "sendAsync")]
+    #[wasm_bindgen(method, catch, js_name = "sendAsync")]
     pub fn send_async<Meta, Body>(
         this: &Courier,
         envelope: &Envelope<Meta, Body>,
     ) -> Promise<String>;
-    #[wasm_bindgen(method, js_name = "sendAsync")]
+    #[wasm_bindgen(method, catch, js_name = "sendAsync")]
     pub fn send_async_js_string<Meta, Body>(
         this: &Courier,
         envelope: &Envelope<Meta, Body>,
@@ -171,12 +171,12 @@ extern "C" {
 }
 #[wasm_bindgen(module = "generic-hoisting", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "postAsync")]
+    #[wasm_bindgen(catch, js_name = "postAsync")]
     pub fn post_async<Meta, Body>(envelope: &Envelope<Meta, Body>) -> Promise<String>;
 }
 #[wasm_bindgen(module = "generic-hoisting", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "postAsync")]
+    #[wasm_bindgen(catch, js_name = "postAsync")]
     pub fn post_async_js_string<Meta, Body>(envelope: &Envelope<Meta, Body>) -> Promise<JsString>;
 }
 #[wasm_bindgen(module = "generic-hoisting", experimental_generic_mono)]

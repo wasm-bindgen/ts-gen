@@ -44,7 +44,7 @@ extern "C" {
     pub fn body(this: &Meta) -> String;
     #[wasm_bindgen(method, getter, js_name = "body")]
     pub fn body_js_string(this: &Meta) -> JsString;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn text(this: &Meta) -> Promise<JsString>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -56,11 +56,11 @@ extern "C" {
     pub fn content_type(this: &Body) -> String;
     #[wasm_bindgen(method, getter)]
     pub fn length(this: &Body) -> f64;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn text(this: &Body) -> Promise<String>;
-    #[wasm_bindgen(method, js_name = "text")]
+    #[wasm_bindgen(method, catch, js_name = "text")]
     pub fn text_js_string(this: &Body) -> Promise<JsString>;
-    #[wasm_bindgen(method)]
+    #[wasm_bindgen(method, catch)]
     pub fn json(this: &Body) -> Promise<JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]

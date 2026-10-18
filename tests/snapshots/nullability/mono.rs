@@ -1016,27 +1016,27 @@ extern "C" {
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "fetchNull")]
+    #[wasm_bindgen(catch, js_name = "fetchNull")]
     pub fn fetch_null() -> Promise<Option<Registry>>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "fetchOptional")]
+    #[wasm_bindgen(catch, js_name = "fetchOptional")]
     pub fn fetch_optional() -> Promise<Option<f64>>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "fetchBoth")]
+    #[wasm_bindgen(catch, js_name = "fetchBoth")]
     pub fn fetch_both() -> Promise<Option<String>>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "fetchBoth")]
+    #[wasm_bindgen(catch, js_name = "fetchBoth")]
     pub fn fetch_both_js_string() -> Promise<Option<JsString>>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "fetchGeneric")]
+    #[wasm_bindgen(catch, js_name = "fetchGeneric")]
     pub fn fetch_generic<T>() -> Promise<Option<T>>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
