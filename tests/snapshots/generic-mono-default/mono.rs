@@ -13,20 +13,6 @@ extern "C" {
     pub fn value<T>(this: &DefaultDetails<T>) -> T
     where
         T: ::wasm_bindgen::convert::FromWasmAbi;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_value<T>(this: &DefaultDetails<T>, val: &T)
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
-}
-impl<T> DefaultDetails<T>
-where
-    T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-{
-    pub fn new(value: &T) -> DefaultDetails<T> {
-        let inner: DefaultDetails<T> = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_value(value);
-        inner
-    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

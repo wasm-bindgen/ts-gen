@@ -13,40 +13,6 @@ extern "C" {
     pub fn md5(this: &Checksums) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "md5")]
     pub fn md5_js_string(this: &Checksums) -> Option<JsString>;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_md5(this: &Checksums, val: impl ::wasm_bindgen::JsStringLike);
-}
-impl Checksums {
-    pub fn new() -> Checksums {
-        Self::builder().build()
-    }
-    pub fn builder() -> ChecksumsBuilder {
-        ChecksumsBuilder {
-            inner: JsCast::unchecked_into(js_sys::Object::new()),
-        }
-    }
-}
-impl Default for Checksums {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-pub struct ChecksumsBuilder {
-    inner: Checksums,
-}
-impl ChecksumsBuilder {
-    pub fn md5(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
-        self.inner.set_md5(val);
-        self
-    }
-    pub fn build(self) -> Checksums {
-        self.inner
-    }
-}
-impl From<Checksums> for ChecksumsBuilder {
-    fn from(inner: Checksums) -> Self {
-        Self { inner }
-    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -145,15 +111,6 @@ extern "C" {
     pub fn key_js_string(this: &BucketObject) -> JsString;
     #[wasm_bindgen(method, getter)]
     pub fn checksums(this: &BucketObject) -> Checksums;
-}
-impl BucketObject {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> BucketObject {
-        #[allow(unused_unsafe)]
-        unsafe {
-            JsValue::from(js_sys::Object::new()).unchecked_into()
-        }
-    }
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -255,15 +212,6 @@ extern "C" {
     pub type Socket;
     #[wasm_bindgen(method, getter)]
     pub fn closed(this: &Socket) -> Promise<()>;
-}
-impl Socket {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Socket {
-        #[allow(unused_unsafe)]
-        unsafe {
-            JsValue::from(js_sys::Object::new()).unchecked_into()
-        }
-    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

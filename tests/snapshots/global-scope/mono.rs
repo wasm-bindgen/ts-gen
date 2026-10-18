@@ -80,15 +80,6 @@ extern "C" {
     pub type XF;
     #[wasm_bindgen(method, getter)]
     pub fn a(this: &XF) -> f64;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_a(this: &XF, val: f64);
-}
-impl XF {
-    pub fn new(a: f64) -> XF {
-        let inner: XF = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_a(a);
-        inner
-    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -116,15 +107,6 @@ extern "C" {
     pub type Proc;
     #[wasm_bindgen(method, getter)]
     pub fn pid(this: &Proc) -> f64;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_pid(this: &Proc, val: f64);
-}
-impl Proc {
-    pub fn new(pid: f64) -> Proc {
-        let inner: Proc = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_pid(pid);
-        inner
-    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -155,15 +137,6 @@ extern "C" {
     pub type FX;
     #[wasm_bindgen(method, getter)]
     pub fn a(this: &FX) -> f64;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_a(this: &FX, val: f64);
-}
-impl FX {
-    pub fn new(a: f64) -> FX {
-        let inner: FX = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_a(a);
-        inner
-    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

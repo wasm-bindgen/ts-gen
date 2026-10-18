@@ -23,55 +23,10 @@ extern "C" {
     pub type CursorNextReturn<T = JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn done<T>(this: &CursorNextReturn<T>) -> Option<bool>;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_done<T>(this: &CursorNextReturn<T>, val: bool);
     #[wasm_bindgen(method, getter)]
     pub fn value<T>(this: &CursorNextReturn<T>) -> Option<T>
     where
         Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_value<T>(this: &CursorNextReturn<T>, val: &T)
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
-}
-impl<T> CursorNextReturn<T> {
-    pub fn new() -> CursorNextReturn<T> {
-        Self::builder().build()
-    }
-    pub fn builder() -> CursorNextReturnBuilder<T> {
-        CursorNextReturnBuilder {
-            inner: JsCast::unchecked_into(js_sys::Object::new()),
-        }
-    }
-}
-impl<T> Default for CursorNextReturn<T> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-pub struct CursorNextReturnBuilder<T> {
-    inner: CursorNextReturn<T>,
-}
-impl<T> CursorNextReturnBuilder<T> {
-    pub fn done(self, val: bool) -> Self {
-        self.inner.set_done(val);
-        self
-    }
-    pub fn value(self, val: &T) -> Self
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        self.inner.set_value(val);
-        self
-    }
-    pub fn build(self) -> CursorNextReturn<T> {
-        self.inner
-    }
-}
-impl<T> From<CursorNextReturn<T>> for CursorNextReturnBuilder<T> {
-    fn from(inner: CursorNextReturn<T>) -> Self {
-        Self { inner }
-    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -80,22 +35,10 @@ extern "C" {
     pub type CursorAddressReturn;
     #[wasm_bindgen(method, getter)]
     pub fn port(this: &CursorAddressReturn) -> f64;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_port(this: &CursorAddressReturn, val: f64);
     #[wasm_bindgen(method, getter)]
     pub fn family(this: &CursorAddressReturn) -> String;
     #[wasm_bindgen(method, getter, js_name = "family")]
     pub fn family_js_string(this: &CursorAddressReturn) -> JsString;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_family(this: &CursorAddressReturn, val: impl ::wasm_bindgen::JsStringLike);
-}
-impl CursorAddressReturn {
-    pub fn new(port: f64, family: impl ::wasm_bindgen::JsStringLike) -> CursorAddressReturn {
-        let inner: CursorAddressReturn = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_port(port);
-        inner.set_family(family);
-        inner
-    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

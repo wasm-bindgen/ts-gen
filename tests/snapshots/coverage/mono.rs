@@ -260,47 +260,10 @@ extern "C" {
     pub fn value(this: &TreeNode) -> String;
     #[wasm_bindgen(method, getter, js_name = "value")]
     pub fn value_js_string(this: &TreeNode) -> JsString;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_value(this: &TreeNode, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
     pub fn children(this: &TreeNode) -> Vec<TreeNode>;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_children(this: &TreeNode, val: &[TreeNode]);
     #[wasm_bindgen(method, getter)]
     pub fn parent(this: &TreeNode) -> Option<TreeNode>;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_parent(this: &TreeNode, val: &TreeNode);
-}
-impl TreeNode {
-    pub fn new(value: impl ::wasm_bindgen::JsStringLike, children: &[TreeNode]) -> TreeNode {
-        Self::builder(value, children).build()
-    }
-    pub fn builder(
-        value: impl ::wasm_bindgen::JsStringLike,
-        children: &[TreeNode],
-    ) -> TreeNodeBuilder {
-        let inner: TreeNode = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_value(value);
-        inner.set_children(children);
-        TreeNodeBuilder { inner }
-    }
-}
-pub struct TreeNodeBuilder {
-    inner: TreeNode,
-}
-impl TreeNodeBuilder {
-    pub fn parent(self, val: &TreeNode) -> Self {
-        self.inner.set_parent(val);
-        self
-    }
-    pub fn build(self) -> TreeNode {
-        self.inner
-    }
-}
-impl From<TreeNode> for TreeNodeBuilder {
-    fn from(inner: TreeNode) -> Self {
-        Self { inner }
-    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -309,33 +272,8 @@ extern "C" {
     pub type LinkedList;
     #[wasm_bindgen(method, getter)]
     pub fn data(this: &LinkedList) -> JsValue;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_data(this: &LinkedList, val: &JsValue);
     #[wasm_bindgen(method, getter)]
     pub fn next(this: &LinkedList) -> Option<LinkedList>;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_next(this: &LinkedList, val: &LinkedList);
-    #[wasm_bindgen(method, setter, js_name = "next")]
-    fn __set_next_with_null(this: &LinkedList, val: &::wasm_bindgen::JsValue);
-}
-impl LinkedList {
-    pub fn set_next_with_null(&self) {
-        self.__set_next_with_null(&::wasm_bindgen::JsValue::NULL)
-    }
-}
-impl LinkedList {
-    pub fn new(data: &JsValue, next: &LinkedList) -> LinkedList {
-        let inner: LinkedList = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_data(data);
-        inner.set_next(next);
-        inner
-    }
-    pub fn new_with_null(data: &JsValue) -> LinkedList {
-        let inner: LinkedList = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_data(data);
-        inner.set_next_with_null();
-        inner
-    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

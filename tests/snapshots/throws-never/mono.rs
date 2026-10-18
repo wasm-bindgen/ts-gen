@@ -55,15 +55,6 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn ready(this: &Loaded) -> bool;
 }
-impl Loaded {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Loaded {
-        #[allow(unused_unsafe)]
-        unsafe {
-            JsValue::from(js_sys::Object::new()).unchecked_into()
-        }
-    }
-}
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[doc = " Free function with `@throws {never}` — no `try_pure_compute`."]

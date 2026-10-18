@@ -147,15 +147,6 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn at(this: &ImportSpecifier) -> Option<Vec<ArrayTuple<(String, String)>>>;
 }
-impl ImportSpecifier {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> ImportSpecifier {
-        #[allow(unused_unsafe)]
-        unsafe {
-            JsValue::from(js_sys::Object::new()).unchecked_into()
-        }
-    }
-}
 #[wasm_bindgen(module = "es-module-lexer", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -287,15 +278,6 @@ extern "C" {
     #[doc = " End of local name, or -1."]
     #[wasm_bindgen(method, getter)]
     pub fn le(this: &ExportSpecifier) -> f64;
-}
-impl ExportSpecifier {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> ExportSpecifier {
-        #[allow(unused_unsafe)]
-        unsafe {
-            JsValue::from(js_sys::Object::new()).unchecked_into()
-        }
-    }
 }
 #[wasm_bindgen(module = "es-module-lexer", experimental_generic_mono)]
 extern "C" {

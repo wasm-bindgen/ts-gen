@@ -11,15 +11,6 @@ extern "C" {
     pub type InspectOptions;
     #[wasm_bindgen(method, getter)]
     pub fn depth(this: &InspectOptions) -> f64;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_depth(this: &InspectOptions, val: f64);
-}
-impl InspectOptions {
-    pub fn new(depth: f64) -> InspectOptions {
-        let inner: InspectOptions = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_depth(depth);
-        inner
-    }
 }
 #[wasm_bindgen(module = "module-namespace-values", experimental_generic_mono)]
 extern "C" {

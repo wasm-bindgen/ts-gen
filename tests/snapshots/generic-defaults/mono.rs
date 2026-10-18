@@ -192,20 +192,6 @@ extern "C" {
     pub fn results<T>(this: &Row<T>) -> Vec<T>
     where
         Vec<T>: ::wasm_bindgen::convert::FromWasmAbi;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_results<T>(this: &Row<T>, #[wasm_bindgen(slice = "array")] val: &[T])
-    where
-        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
-}
-impl<T> Row<T>
-where
-    T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,
-{
-    pub fn new(results: &[T]) -> Row<T> {
-        let inner: Row<T> = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_results(results);
-        inner
-    }
 }
 #[wasm_bindgen(module = "generic-defaults", experimental_generic_mono)]
 extern "C" {

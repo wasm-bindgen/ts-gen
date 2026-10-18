@@ -174,15 +174,6 @@ extern "C" {
     pub type Opts;
     #[wasm_bindgen(method, getter)]
     pub fn a(this: &Opts) -> f64;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_a(this: &Opts, val: f64);
-}
-impl Opts {
-    pub fn new(a: f64) -> Opts {
-        let inner: Opts = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_a(a);
-        inner
-    }
 }
 pub mod opts {
     #[allow(unused_imports)]

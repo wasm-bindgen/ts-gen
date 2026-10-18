@@ -1209,6 +1209,30 @@ impl FooWithReadonly {
 Callers must construct the underlying JS object themselves and cast
 into `FooWithReadonly` — there's no Rust-side builder for these.
 
+### Only ever read → no write side
+
+Under `--experimental-generic-mono` a dictionary or discriminated union
+that the bindings only ever read has no factories, setters or builder,
+only its getters: KV's `KVNamespaceListResult` (a `list()` result), its
+`KVNamespaceListKey` elements, `KVNamespaceGetWithMetadataResult`. A
+type is read where it is returned, a getter's type or a callback's
+argument, and written where it is an argument, a setter's type or a
+callback's return; type arguments take their position's direction, and
+a function type's parameters flip it. A dictionary's own fields count as
+written only once it is written itself, while a class's or class-like
+interface's setters always do. A type reached as input anywhere keeps its
+write side, and so does one no position reaches (a declaration root used
+on its own):
+
+```ts
+type ListResult<M> = { complete: false; keys: ListKey<M>[]; cursor: string } | { complete: true; keys: ListKey<M>[] };
+type Listener = (event: Event) => Reply;
+declare class Store {
+  list<M = unknown>(): Promise<ListResult<M>>; // ListResult, ListKey: getters only
+  on(listener: Listener): void;                // Event: getters only; Reply: new(status)
+}
+```
+
 ### Optional-property union setters
 
 When an *optional* property's setter has union types, each variant

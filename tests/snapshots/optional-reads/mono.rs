@@ -28,90 +28,21 @@ extern "C" {
     #[doc = " Anything, `null`, or absent: all in-band."]
     #[wasm_bindgen(method, getter)]
     pub fn data(this: &Settings) -> JsValue;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_data(this: &Settings, val: &JsValue);
     #[doc = " Anything, `null`, or absent: all in-band."]
     #[wasm_bindgen(method, getter)]
     pub fn detail(this: &Settings) -> JsValue;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_detail(this: &Settings, val: &JsValue);
     #[doc = " No member subtypes the other, so it erases."]
     #[wasm_bindgen(method, getter)]
     pub fn stamp(this: &Settings) -> Option<JsValue>;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_stamp(this: &Settings, val: &JsValue);
     #[doc = " Erased, `null`, or absent."]
     #[wasm_bindgen(method, getter)]
     pub fn cleared(this: &Settings) -> Option<JsValue>;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_cleared(this: &Settings, val: &JsValue);
-    #[wasm_bindgen(method, setter, js_name = "cleared")]
-    fn __set_cleared_with_null(this: &Settings, val: &::wasm_bindgen::JsValue);
     #[doc = " Required, but admitting `undefined`."]
     #[wasm_bindgen(method, getter)]
     pub fn maybe(this: &Settings) -> Option<JsValue>;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_maybe(this: &Settings, val: &JsValue);
     #[doc = " Always present, so bare."]
     #[wasm_bindgen(method, getter)]
     pub fn value(this: &Settings) -> JsValue;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_value(this: &Settings, val: &JsValue);
-}
-impl Settings {
-    pub fn set_cleared_with_null(&self) {
-        self.__set_cleared_with_null(&::wasm_bindgen::JsValue::NULL)
-    }
-}
-impl Settings {
-    #[doc = " * `maybe` - Required, but admitting `undefined`."]
-    #[doc = " * `value` - Always present, so bare."]
-    pub fn new(maybe: Option<&JsValue>, value: &JsValue) -> Settings {
-        Self::builder(maybe, value).build()
-    }
-    #[doc = " * `maybe` - Required, but admitting `undefined`."]
-    #[doc = " * `value` - Always present, so bare."]
-    pub fn builder(maybe: Option<&JsValue>, value: &JsValue) -> SettingsBuilder {
-        let inner: Settings = JsCast::unchecked_into(js_sys::Object::new());
-        if let Some(val) = maybe {
-            inner.set_maybe(val);
-        }
-        inner.set_value(value);
-        SettingsBuilder { inner }
-    }
-}
-pub struct SettingsBuilder {
-    inner: Settings,
-}
-impl SettingsBuilder {
-    pub fn data(self, val: &JsValue) -> Self {
-        self.inner.set_data(val);
-        self
-    }
-    pub fn detail(self, val: &JsValue) -> Self {
-        self.inner.set_detail(val);
-        self
-    }
-    pub fn stamp(self, val: &JsValue) -> Self {
-        self.inner.set_stamp(val);
-        self
-    }
-    pub fn cleared(self, val: &JsValue) -> Self {
-        self.inner.set_cleared(val);
-        self
-    }
-    pub fn cleared_with_null(self) -> Self {
-        self.inner.set_cleared_with_null();
-        self
-    }
-    pub fn build(self) -> Settings {
-        self.inner
-    }
-}
-impl From<Settings> for SettingsBuilder {
-    fn from(inner: Settings) -> Self {
-        Self { inner }
-    }
 }
 #[wasm_bindgen(module = "optional-reads", experimental_generic_mono)]
 extern "C" {

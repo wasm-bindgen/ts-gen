@@ -13,46 +13,10 @@ extern "C" {
     pub fn name<Metadata>(this: &ListKey<Metadata>) -> String;
     #[wasm_bindgen(method, getter, js_name = "name")]
     pub fn name_js_string<Metadata>(this: &ListKey<Metadata>) -> JsString;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_name<Metadata>(this: &ListKey<Metadata>, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
     pub fn metadata<Metadata>(this: &ListKey<Metadata>) -> Option<Metadata>
     where
         Option<Metadata>: ::wasm_bindgen::convert::FromWasmAbi;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_metadata<Metadata>(this: &ListKey<Metadata>, val: &Metadata)
-    where
-        Metadata: ::wasm_bindgen::convert::RefIntoWasmAbi;
-}
-impl<Metadata> ListKey<Metadata> {
-    pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> ListKey<Metadata> {
-        Self::builder(name).build()
-    }
-    pub fn builder(name: impl ::wasm_bindgen::JsStringLike) -> ListKeyBuilder<Metadata> {
-        let inner: ListKey<Metadata> = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_name(name);
-        ListKeyBuilder { inner }
-    }
-}
-pub struct ListKeyBuilder<Metadata> {
-    inner: ListKey<Metadata>,
-}
-impl<Metadata> ListKeyBuilder<Metadata> {
-    pub fn metadata(self, val: &Metadata) -> Self
-    where
-        Metadata: ::wasm_bindgen::convert::RefIntoWasmAbi,
-    {
-        self.inner.set_metadata(val);
-        self
-    }
-    pub fn build(self) -> ListKey<Metadata> {
-        self.inner
-    }
-}
-impl<Metadata> From<ListKey<Metadata>> for ListKeyBuilder<Metadata> {
-    fn from(inner: ListKey<Metadata>) -> Self {
-        Self { inner }
-    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -63,30 +27,10 @@ extern "C" {
     pub fn keys<Metadata>(this: &ListResult<Metadata>) -> Vec<ListKey<Metadata>>
     where
         Vec<ListKey<Metadata>>: ::wasm_bindgen::convert::FromWasmAbi;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_keys<Metadata>(this: &ListResult<Metadata>, val: &[ListKey<Metadata>])
-    where
-        ListKey<Metadata>: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
     #[wasm_bindgen(method, getter)]
     pub fn cursor<Metadata>(this: &ListResult<Metadata>) -> String;
     #[wasm_bindgen(method, getter, js_name = "cursor")]
     pub fn cursor_js_string<Metadata>(this: &ListResult<Metadata>) -> JsString;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_cursor<Metadata>(
-        this: &ListResult<Metadata>,
-        val: impl ::wasm_bindgen::JsStringLike,
-    );
-}
-impl<Metadata> ListResult<Metadata> {
-    pub fn new(
-        keys: &[ListKey<Metadata>],
-        cursor: impl ::wasm_bindgen::JsStringLike,
-    ) -> ListResult<Metadata> {
-        let inner: ListResult<Metadata> = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_keys(keys);
-        inner.set_cursor(cursor);
-        inner
-    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

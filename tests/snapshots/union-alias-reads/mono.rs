@@ -578,65 +578,15 @@ extern "C" {
     #[doc = " Two aliases sharing `Zoned` and `string`, with a dictionary each."]
     #[wasm_bindgen(method, getter, js_name = "relativeTo")]
     pub fn relative_to(this: &RelativeOptions) -> Option<RelativeToKind>;
-    #[wasm_bindgen(method, setter, js_name = "relativeTo")]
-    pub fn set_relative_to(this: &RelativeOptions, val: impl ZonedLike);
-    #[wasm_bindgen(method, setter, js_name = "relativeTo")]
-    pub fn set_relative_to_with_day_like(this: &RelativeOptions, val: impl DayLike);
     #[doc = " A union alias read whole."]
     #[wasm_bindgen(method, getter)]
     pub fn zone(this: &RelativeOptions) -> ZoneKind;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_zone(this: &RelativeOptions, val: impl Zone);
     #[doc = " Its dictionary arm is the read's fallback."]
     #[wasm_bindgen(method, getter)]
     pub fn zoned(this: &RelativeOptions) -> Option<ZonedLikeKind>;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_zoned(this: &RelativeOptions, val: impl ZonedLike);
     #[doc = " Only dictionaries."]
     #[wasm_bindgen(method, getter)]
     pub fn fields(this: &RelativeOptions) -> JsValue;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_fields(this: &RelativeOptions, val: impl Fields);
-}
-impl RelativeOptions {
-    #[doc = " * `zone` - A union alias read whole."]
-    #[doc = " * `fields` - Only dictionaries."]
-    pub fn new(zone: impl Zone, fields: impl Fields) -> RelativeOptions {
-        Self::builder(zone, fields).build()
-    }
-    #[doc = " * `zone` - A union alias read whole."]
-    #[doc = " * `fields` - Only dictionaries."]
-    pub fn builder(zone: impl Zone, fields: impl Fields) -> RelativeOptionsBuilder {
-        let inner: RelativeOptions = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_zone(zone);
-        inner.set_fields(fields);
-        RelativeOptionsBuilder { inner }
-    }
-}
-pub struct RelativeOptionsBuilder {
-    inner: RelativeOptions,
-}
-impl RelativeOptionsBuilder {
-    pub fn relative_to(self, val: impl ZonedLike) -> Self {
-        self.inner.set_relative_to(val);
-        self
-    }
-    pub fn relative_to_with_day_like(self, val: impl DayLike) -> Self {
-        self.inner.set_relative_to_with_day_like(val);
-        self
-    }
-    pub fn zoned(self, val: impl ZonedLike) -> Self {
-        self.inner.set_zoned(val);
-        self
-    }
-    pub fn build(self) -> RelativeOptions {
-        self.inner
-    }
-}
-impl From<RelativeOptions> for RelativeOptionsBuilder {
-    fn from(inner: RelativeOptions) -> Self {
-        Self { inner }
-    }
 }
 #[wasm_bindgen(module = "union-alias-reads", experimental_generic_mono)]
 extern "C" {

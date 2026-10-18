@@ -108,40 +108,6 @@ pub mod shapes {
         pub fn body(this: &Init) -> Option<String>;
         #[wasm_bindgen(method, getter, js_name = "body")]
         pub fn body_js_string(this: &Init) -> Option<JsString>;
-        #[wasm_bindgen(method, setter)]
-        pub fn set_body(this: &Init, val: impl ::wasm_bindgen::JsStringLike);
-    }
-    impl Init {
-        pub fn new() -> Init {
-            Self::builder().build()
-        }
-        pub fn builder() -> InitBuilder {
-            InitBuilder {
-                inner: JsCast::unchecked_into(js_sys::Object::new()),
-            }
-        }
-    }
-    impl Default for Init {
-        fn default() -> Self {
-            Self::new()
-        }
-    }
-    pub struct InitBuilder {
-        inner: Init,
-    }
-    impl InitBuilder {
-        pub fn body(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
-            self.inner.set_body(val);
-            self
-        }
-        pub fn build(self) -> Init {
-            self.inner
-        }
-    }
-    impl From<Init> for InitBuilder {
-        fn from(inner: Init) -> Self {
-            Self { inner }
-        }
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {

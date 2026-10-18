@@ -46,7 +46,10 @@ pub fn generate_discriminated_union(
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) -> TokenStream {
-    let config = ClassConfig::from_discriminated_union(decl, ctx, cgctx, scope);
+    let mut config = ClassConfig::from_discriminated_union(decl, ctx, cgctx, scope);
+    if config.output_only(decl.body_scope) {
+        return generate_extern_block(&config);
+    }
     let extern_block = generate_extern_block(&config);
 
     // For each branch, derive its required-getter list. A property

@@ -11,15 +11,6 @@ extern "C" {
     pub type Options;
     #[wasm_bindgen(method, getter)]
     pub fn depth(this: &Options) -> f64;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_depth(this: &Options, val: f64);
-}
-impl Options {
-    pub fn new(depth: f64) -> Options {
-        let inner: Options = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_depth(depth);
-        inner
-    }
 }
 #[wasm_bindgen(module = "declared-modules", experimental_generic_mono)]
 extern "C" {
@@ -98,13 +89,4 @@ extern "C" {
     pub type Handle;
     #[wasm_bindgen(method, getter)]
     pub fn fd(this: &Handle) -> f64;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_fd(this: &Handle, val: f64);
-}
-impl Handle {
-    pub fn new(fd: f64) -> Handle {
-        let inner: Handle = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_fd(fd);
-        inner
-    }
 }
