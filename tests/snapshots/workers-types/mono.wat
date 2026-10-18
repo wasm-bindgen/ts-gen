@@ -11343,14 +11343,6 @@
   ;; set columnNames(value: true)
   (import "./bindings.wasm" "D1PreparedStatementRawOptions.set_column_names" (func $D1PreparedStatementRawOptions.set_column_names (param $this externref) (param $value i32)))
 
-  ;; D1PreparedStatementRawOptions2
-  ;; {} as D1PreparedStatementRawOptions2
-  (import "./bindings.wasm" "D1PreparedStatementRawOptions2.new" (func $D1PreparedStatementRawOptions2.new (result externref)))
-  ;; columnNames?: false
-  (import "./bindings.wasm" "D1PreparedStatementRawOptions2.column_names" (func $D1PreparedStatementRawOptions2.column_names (param $this externref) (result externref)))
-  ;; set columnNames(value: false)
-  (import "./bindings.wasm" "D1PreparedStatementRawOptions2.set_column_names" (func $D1PreparedStatementRawOptions2.set_column_names (param $this externref) (param $value i32)))
-
   ;; EmailSendResult
   ;; {} as EmailSendResult
   (import "./bindings.wasm" "EmailSendResult.new" (func $EmailSendResult.new (result externref)))

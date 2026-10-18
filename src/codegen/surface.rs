@@ -44,6 +44,7 @@ impl<'d> Surface<'d> {
             items: HashMap::new(),
             names: HashMap::new(),
             queue: Vec::new(),
+            mono: options.experimental_generic_mono,
         };
         builder.index(&module.types, None);
         let all = options.exports.is_empty();
@@ -147,6 +148,7 @@ struct Builder<'a, 'd> {
     names: HashMap<TypeId, Vec<String>>,
     /// Emitted declarations whose signatures are still to be followed.
     queue: Vec<TypeId>,
+    mono: bool,
 }
 
 impl<'d> Builder<'_, 'd> {
@@ -574,7 +576,14 @@ impl<'d> Builder<'_, 'd> {
         while let Some(id) = self.queue.pop() {
             let decl = self.items[&id][0].clone();
             let mut refs = Vec::new();
-            declaration_refs(&decl, &mut refs);
+            // Per-mono a trailing dictionary that can only be empty is the
+            // omitted argument, so no binding names it.
+            let (gctx, mono) = (self.gctx, self.mono);
+            let omitted = |ty: &TypeRef, scope: ScopeId| {
+                mono && super::signatures::determined_dictionary(ty, gctx, scope)
+                    == Some(super::signatures::Determined::Absent)
+            };
+            declaration_refs(&decl, &mut refs, &omitted);
             for (name, scope) in refs {
                 if let Some(target) = self.resolve(&name, scope) {
                     self.reach(target);
@@ -637,7 +646,11 @@ fn bound_in(root: Root, bindings: ScopeId) -> ScopeId {
     }
 }
 
-fn declaration_refs(decl: &TypeDeclaration, out: &mut Vec<(String, ScopeId)>) {
+/// Omitted is the predicate for a trailing optional parameter's
+/// alternatives that no binding takes.
+type Omitted<'o> = &'o dyn Fn(&TypeRef, ScopeId) -> bool;
+
+fn declaration_refs(decl: &TypeDeclaration, out: &mut Vec<(String, ScopeId)>, omitted: Omitted) {
     let mut walk = |ty: &TypeRef, scope: ScopeId| type_refs(ty, scope, out);
     match &decl.kind {
         TypeKind::Class(c) => {
@@ -648,31 +661,31 @@ fn declaration_refs(decl: &TypeDeclaration, out: &mut Vec<(String, ScopeId)>) {
             for ty in &c.implements {
                 walk(ty, c.body_scope);
             }
-            members(&c.members, &mut walk);
+            members(&c.members, &mut walk, omitted);
         }
         TypeKind::Interface(i) => {
             type_params(&i.type_params, i.body_scope, &mut walk);
             for parent in &i.extends {
                 walk(&parent.type_ref, parent.scope);
             }
-            members(&i.members, &mut walk);
+            members(&i.members, &mut walk, omitted);
         }
         TypeKind::DiscriminatedUnion(d) => {
             type_params(&d.type_params, d.body_scope, &mut walk);
-            members(&d.members, &mut walk);
+            members(&d.members, &mut walk, omitted);
             for branch in &d.branches {
-                members(branch, &mut walk);
+                members(branch, &mut walk, omitted);
             }
         }
         TypeKind::TypeAlias(a) => {
             type_params(&a.type_params, a.body_scope, &mut walk);
             walk(&a.target, a.body_scope);
         }
-        TypeKind::Function(f) => function(f, &mut walk),
+        TypeKind::Function(f) => function(f, &mut walk, omitted),
         TypeKind::Variable(v) => {
             walk(&v.type_ref, decl.scope_id);
             for f in &v.constructs {
-                function(f, &mut walk);
+                function(f, &mut walk, omitted);
             }
         }
         TypeKind::StringEnum(_)
@@ -682,17 +695,17 @@ fn declaration_refs(decl: &TypeDeclaration, out: &mut Vec<(String, ScopeId)>) {
     }
 }
 
-fn function(f: &crate::ir::FunctionDecl, walk: &mut impl FnMut(&TypeRef, ScopeId)) {
+fn function(
+    f: &crate::ir::FunctionDecl,
+    walk: &mut impl FnMut(&TypeRef, ScopeId),
+    omitted: Omitted,
+) {
     type_params(&f.type_params, f.body_scope, walk);
-    for p in &f.params {
-        walk(&p.type_ref, f.body_scope);
-    }
+    params(&f.params, f.body_scope, walk, omitted);
     walk(&f.return_type, f.body_scope);
     for o in &f.overloads {
         type_params(&o.type_params, o.body_scope, walk);
-        for p in &o.params {
-            walk(&p.type_ref, o.body_scope);
-        }
+        params(&o.params, o.body_scope, walk, omitted);
         walk(&o.return_type, o.body_scope);
     }
     if let Some(ty) = f.throws.as_type() {
@@ -712,7 +725,31 @@ fn type_params(
     }
 }
 
-fn members(members: &[Member], walk: &mut impl FnMut(&TypeRef, ScopeId)) {
+fn params(
+    params: &[crate::ir::Param],
+    scope: ScopeId,
+    walk: &mut impl FnMut(&TypeRef, ScopeId),
+    omitted: Omitted,
+) {
+    let last = params.iter().rposition(|p| !p.variadic);
+    for (i, p) in params.iter().enumerate() {
+        if Some(i) != last || !p.optional {
+            walk(&p.type_ref, scope);
+            continue;
+        }
+        // The empties are not types to emit; each other alternative is,
+        // unless omitting the argument is all it means.
+        let alternatives = match &p.type_ref {
+            TypeRef::Union(u) => u.values(),
+            ty => std::slice::from_ref(ty),
+        };
+        for alt in alternatives.iter().filter(|alt| !omitted(alt, scope)) {
+            walk(alt, scope);
+        }
+    }
+}
+
+fn members(members: &[Member], walk: &mut impl FnMut(&TypeRef, ScopeId), omitted: Omitted) {
     for m in members {
         match m {
             Member::Getter(g) => walk(&g.type_ref, g.scope),
@@ -724,18 +761,14 @@ fn members(members: &[Member], walk: &mut impl FnMut(&TypeRef, ScopeId)) {
                 walk(&i.value_type, i.scope);
             }
             Member::Constructor(c) => {
-                for p in &c.params {
-                    walk(&p.type_ref, c.scope);
-                }
+                params(&c.params, c.scope, walk, omitted);
                 if let Some(ty) = c.throws.as_type() {
                     walk(ty, c.scope);
                 }
             }
             Member::Method(m) => {
                 type_params(&m.type_params, m.body_scope, walk);
-                for p in &m.params {
-                    walk(&p.type_ref, m.body_scope);
-                }
+                params(&m.params, m.body_scope, walk, omitted);
                 walk(&m.return_type, m.body_scope);
                 if let Some(ty) = m.throws.as_type() {
                     walk(ty, m.body_scope);
@@ -743,9 +776,7 @@ fn members(members: &[Member], walk: &mut impl FnMut(&TypeRef, ScopeId)) {
             }
             Member::StaticMethod(m) => {
                 type_params(&m.type_params, m.body_scope, walk);
-                for p in &m.params {
-                    walk(&p.type_ref, m.body_scope);
-                }
+                params(&m.params, m.body_scope, walk, omitted);
                 walk(&m.return_type, m.body_scope);
                 if let Some(ty) = m.throws.as_type() {
                     walk(ty, m.body_scope);

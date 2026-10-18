@@ -161,14 +161,6 @@
   ;; set columnNames(value: true)
   (import "literal-overloads" "StreamRawOptions.set_column_names" (func $literal-overloads:StreamRawOptions.set_column_names (param $this externref) (param $value i32)))
 
-  ;; StreamRawOptions2
-  ;; {} as StreamRawOptions2
-  (import "literal-overloads" "StreamRawOptions2.new" (func $literal-overloads:StreamRawOptions2.new (result externref)))
-  ;; columnNames?: false
-  (import "literal-overloads" "StreamRawOptions2.column_names" (func $literal-overloads:StreamRawOptions2.column_names (param $this externref) (result externref)))
-  ;; set columnNames(value: false)
-  (import "literal-overloads" "StreamRawOptions2.set_column_names" (func $literal-overloads:StreamRawOptions2.set_column_names (param $this externref) (param $value i32)))
-
   ;; PartialGetOptionsUndefined
   ;; {} as PartialGetOptionsUndefined
   (import "literal-overloads" "PartialGetOptionsUndefined.new" (func $literal-overloads:PartialGetOptionsUndefined.new (result externref)))

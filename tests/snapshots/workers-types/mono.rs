@@ -42957,48 +42957,6 @@ impl D1PreparedStatementRawOptions {
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type D1PreparedStatementRawOptions2;
-    #[wasm_bindgen(method, getter, js_name = "columnNames")]
-    pub fn column_names(this: &D1PreparedStatementRawOptions2) -> Option<bool>;
-    #[wasm_bindgen(method, setter, js_name = "columnNames")]
-    pub fn set_column_names(this: &D1PreparedStatementRawOptions2, val: bool);
-}
-impl D1PreparedStatementRawOptions2 {
-    pub fn new() -> D1PreparedStatementRawOptions2 {
-        Self::builder().build()
-    }
-    pub fn builder() -> D1PreparedStatementRawOptions2Builder {
-        D1PreparedStatementRawOptions2Builder {
-            inner: JsCast::unchecked_into(js_sys::Object::new()),
-        }
-    }
-}
-impl Default for D1PreparedStatementRawOptions2 {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-pub struct D1PreparedStatementRawOptions2Builder {
-    inner: D1PreparedStatementRawOptions2,
-}
-impl D1PreparedStatementRawOptions2Builder {
-    pub fn column_names(self, val: bool) -> Self {
-        self.inner.set_column_names(val);
-        self
-    }
-    pub fn build(self) -> D1PreparedStatementRawOptions2 {
-        self.inner
-    }
-}
-impl From<D1PreparedStatementRawOptions2> for D1PreparedStatementRawOptions2Builder {
-    fn from(inner: D1PreparedStatementRawOptions2) -> Self {
-        Self { inner }
-    }
-}
-#[wasm_bindgen(experimental_generic_mono)]
-extern "C" {
-    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Disposable;
 }
 #[wasm_bindgen(experimental_generic_mono)]
