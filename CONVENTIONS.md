@@ -2046,7 +2046,29 @@ native leaves too (`Promise<String>`, `Map<String, f64>`, `Array<bool>`,
 
 Constructors bind only the class parameters their arguments mention; the rest
 take their declared defaults, as without per-monomorphization, so
-`TransformStream::new()` needs no annotation.
+`TransformStream::new()` needs no annotation. Such a constructor also gets a
+`_typed` twin binding every class parameter, for a typed instance from the
+same JS constructor, and a construct signature that returns concrete
+arguments returns them as written:
+
+```ts
+declare class TransformStream<I = any, O = any> { constructor(transformer?: Transformer<I, O>); }
+declare const ReadableStream: {
+  new (source: UnderlyingByteSource): ReadableStream<Uint8Array>;
+  new <R = any>(source?: UnderlyingSource<R>): ReadableStream<R>;
+};
+```
+
+```rust
+pub fn new() -> Result<TransformStream, JsValue>;
+#[wasm_bindgen(constructor, catch, js_name = "TransformStream")]
+pub fn new_typed<I, O>() -> Result<TransformStream<I, O>, JsValue>;
+pub fn new_with_underlying_byte_source(source: &UnderlyingByteSource) -> Result<ReadableStream<Uint8Array>, JsValue>;
+pub fn new_with_underlying_source<R>(source: &UnderlyingSource<R>) -> Result<ReadableStream<R>, JsValue>;
+```
+
+`let t: TransformStream<Uint8Array, Uint8Array> = TransformStream::new_typed()?`
+(or `TransformStream::<Uint8Array, Uint8Array>::new_typed()?`) is the typed form.
 
 Direct string arguments use argument-position `impl JsStringLike`, allowing
 `&str`, `String`, `&JsString`, and `JsString` without caller-side conversion.

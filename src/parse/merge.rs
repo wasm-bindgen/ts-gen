@@ -79,12 +79,17 @@ pub fn convert_construct_signature(
         None => (None, crate::parse::docs::JsDocInfo::default()),
     };
     crate::parse::members::apply_rust_tags(&info, None, &mut params, "constructor", ctx);
+    let return_type = ctor
+        .return_type
+        .as_ref()
+        .map(|rt| convert_ts_type_scoped(&rt.type_annotation, scope, ctx));
     ConstructorMember {
         scope,
         type_params,
         params,
         doc,
         throws: info.throws(),
+        return_type,
     }
 }
 

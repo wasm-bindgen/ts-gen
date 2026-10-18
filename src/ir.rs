@@ -1157,6 +1157,7 @@ impl Member {
             }),
             Member::Constructor(c) => Member::Constructor(ConstructorMember {
                 params: params(&c.params),
+                return_type: c.return_type.as_ref().map(|t| t.substitute(map)),
                 ..c.clone()
             }),
             Member::IndexSignature(i) => Member::IndexSignature(IndexSigMember {
@@ -1264,6 +1265,9 @@ pub struct ConstructorMember {
     /// `Throws::Never` here is effectively a no-op for codegen — only
     /// `Throws::Type` (custom error type) changes behavior.
     pub throws: Throws,
+    /// A construct signature's declared return (`new (…): Foo<Uint8Array>`);
+    /// class `constructor(…)` members have none.
+    pub return_type: Option<TypeRef>,
 }
 
 #[derive(Clone, Debug)]

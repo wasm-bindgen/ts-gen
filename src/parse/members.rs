@@ -1118,6 +1118,7 @@ fn convert_class_method(
                 params,
                 doc,
                 throws: info.throws(),
+                return_type: None,
             })]
         }
         MethodDefinitionKind::Get => {
