@@ -123,6 +123,13 @@ impl<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric> TransformerBuil
         self.inner
     }
 }
+impl<I: ::wasm_bindgen::JsGeneric, O: ::wasm_bindgen::JsGeneric> From<Transformer<I, O>>
+    for TransformerBuilder<I, O>
+{
+    fn from(inner: Transformer<I, O>) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]

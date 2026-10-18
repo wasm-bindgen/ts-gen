@@ -186,6 +186,11 @@ pub mod my_module {
             self.inner
         }
     }
+    impl From<WorkResult> for WorkResultBuilder {
+        fn from(inner: WorkResult) -> Self {
+            Self { inner }
+        }
+    }
 }
 #[wasm_bindgen]
 extern "C" {
@@ -276,6 +281,11 @@ impl TreeNodeBuilder {
     }
     pub fn build(self) -> TreeNode {
         self.inner
+    }
+}
+impl From<TreeNode> for TreeNodeBuilder {
+    fn from(inner: TreeNode) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen]
@@ -596,6 +606,11 @@ impl FetchOptionsBuilder {
         self.inner
     }
 }
+impl From<FetchOptions> for FetchOptionsBuilder {
+    fn from(inner: FetchOptions) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -626,6 +641,11 @@ impl SimpleConfigBuilder {
     }
     pub fn build(self) -> SimpleConfig {
         self.inner
+    }
+}
+impl From<SimpleConfig> for SimpleConfigBuilder {
+    fn from(inner: SimpleConfig) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen]
@@ -682,6 +702,11 @@ impl NotificationOptionsBuilder {
     }
     pub fn build(self) -> NotificationOptions {
         self.inner
+    }
+}
+impl From<NotificationOptions> for NotificationOptionsBuilder {
+    fn from(inner: NotificationOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen]

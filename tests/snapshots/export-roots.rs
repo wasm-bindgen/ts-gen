@@ -36,6 +36,11 @@ impl ChecksumsBuilder {
         self.inner
     }
 }
+impl From<Checksums> for ChecksumsBuilder {
+    fn from(inner: Checksums) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -68,6 +73,11 @@ impl ConditionalBuilder {
         self.inner
     }
 }
+impl From<Conditional> for ConditionalBuilder {
+    fn from(inner: Conditional) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -98,6 +108,11 @@ impl GetOptionsBuilder {
     }
     pub fn build(self) -> GetOptions {
         self.inner
+    }
+}
+impl From<GetOptions> for GetOptionsBuilder {
+    fn from(inner: GetOptions) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen]
@@ -212,6 +227,11 @@ impl SocketOptionsBuilder {
     }
     pub fn build(self) -> SocketOptions {
         self.inner
+    }
+}
+impl From<SocketOptions> for SocketOptionsBuilder {
+    fn from(inner: SocketOptions) -> Self {
+        Self { inner }
     }
 }
 pub mod cloudflare {

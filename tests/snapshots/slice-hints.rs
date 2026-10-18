@@ -219,6 +219,11 @@ impl TargetBuilder {
         self.inner
     }
 }
+impl From<Target> for TargetBuilder {
+    fn from(inner: Target) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(module = "slice-hints")]
 extern "C" {
     #[wasm_bindgen(js_name = "describeTarget")]

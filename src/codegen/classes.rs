@@ -1535,6 +1535,12 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                     self.inner
                 }
             }
+
+            impl #type_decl From<#rust_type> for #builder_name {
+                fn from(inner: #rust_type) -> Self {
+                    Self { inner }
+                }
+            }
         }
     } else {
         // All-required dictionary: the builder would be empty, so we
