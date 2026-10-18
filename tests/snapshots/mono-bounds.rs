@@ -154,7 +154,14 @@ extern "C" {
     where
         Option<T>: FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<T: RefIntoWasmAbi>(this: &Step<T>, val: Option<&T>);
+    pub fn set_value<T: RefIntoWasmAbi>(this: &Step<T>, val: &T);
+    #[wasm_bindgen(method, setter, js_name = "value")]
+    fn set_value_with_null_js<T>(this: &Step<T>, val: &JsValue);
+}
+impl<T> Step<T> {
+    pub fn set_value_with_null(&self) {
+        self.set_value_with_null_js(&::wasm_bindgen::JsValue::NULL)
+    }
 }
 impl<T> Step<T> {
     pub fn new() -> Step<T> {
@@ -178,7 +185,11 @@ impl<T> StepBuilder<T> {
     where
         T: RefIntoWasmAbi,
     {
-        self.inner.set_value(Some(val));
+        self.inner.set_value(val);
+        self
+    }
+    pub fn value_with_null(self) -> Self {
+        self.inner.set_value_with_null();
         self
     }
     pub fn build(self) -> Step<T> {

@@ -153,12 +153,35 @@ extern "C" {
     pub fn tag<T>(
         this: &Queue<T>,
         names: &[impl ::wasm_bindgen::JsStringLike],
-        #[wasm_bindgen(slice = "array")] scores: Option<&[f64]>,
+        #[wasm_bindgen(slice = "array")] scores: &[f64],
     );
     #[wasm_bindgen(method, catch, js_name = "tag")]
     pub fn try_tag<T>(
         this: &Queue<T>,
         names: &[impl ::wasm_bindgen::JsStringLike],
-        #[wasm_bindgen(slice = "array")] scores: Option<&[f64]>,
+        #[wasm_bindgen(slice = "array")] scores: &[f64],
     ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "tag")]
+    fn tag_with_null_js<T>(
+        this: &Queue<T>,
+        names: &[impl ::wasm_bindgen::JsStringLike],
+        scores: &JsValue,
+    );
+    #[wasm_bindgen(method, catch, js_name = "tag")]
+    fn try_tag_with_null_js<T>(
+        this: &Queue<T>,
+        names: &[impl ::wasm_bindgen::JsStringLike],
+        scores: &JsValue,
+    ) -> Result<(), JsValue>;
+}
+impl<T> Queue<T> {
+    pub fn tag_with_null(&self, names: &[impl ::wasm_bindgen::JsStringLike]) {
+        self.tag_with_null_js(names, &::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn try_tag_with_null(
+        &self,
+        names: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<(), JsValue> {
+        self.try_tag_with_null_js(names, &::wasm_bindgen::JsValue::NULL)
+    }
 }

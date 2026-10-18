@@ -1736,14 +1736,15 @@ fn is_buffer_source_param(p: &ConcreteParam, cgctx: Option<&CodegenContext<'_>>)
     }
 }
 
-/// Per-mono, a `null`-admitting union that fans out into overloads takes
-/// each alternative bare and gives `null` an arm of its own
-/// (`new_with_str(body)`, `new_with_null_and_init(init)`), rather than an `Option` on
-/// every arm. The `null` arm's parameter is dropped from its signature and
-/// passed as `null` (see [`typemap::to_syn_type`]'s `TypeRef::Null`).
+/// Per-mono, a `null`-admitting argument takes each alternative bare and
+/// gives `null` an arm of its own (`set_prefix(v)` and
+/// `set_prefix_with_null()`, `new_with_null_and_init(init)`), rather than an
+/// `Option` whose `None` would send `undefined`. The `null` arm's parameter
+/// is dropped from its signature and passed as `null` (see
+/// [`typemap::to_syn_type`]'s `TypeRef::Null`).
 fn split_null_arm(alts: Vec<TypeRef>) -> Vec<TypeRef> {
     let nullable = |t: &TypeRef| matches!(t, TypeRef::Nullable(_, n) if n.null);
-    if alts.len() < 2 || !alts.iter().any(nullable) {
+    if !alts.iter().any(nullable) {
         return alts;
     }
     let mut out: Vec<TypeRef> = alts
@@ -1753,7 +1754,13 @@ fn split_null_arm(alts: Vec<TypeRef>) -> Vec<TypeRef> {
             t => t,
         })
         .collect();
-    out.push(TypeRef::Null);
+    // `any | null` is `any`, whose `JsValue` already takes `null`.
+    if !out
+        .iter()
+        .any(|t| matches!(t, TypeRef::Any | TypeRef::Unknown))
+    {
+        out.push(TypeRef::Null);
+    }
     out
 }
 

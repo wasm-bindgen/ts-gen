@@ -118,9 +118,8 @@ No coercion is assumed anywhere.
   (`JsValue::NULL` is the empty) for the nullable forms. Union inners
   fan out as usual with each alternative keeping its nullability
   (`&JsNullable<JsString>` / `&JsNullable<Blob>` overloads, suffixed
-  as the carried type: `_with_str`, `_with_slice`); in
-  per-mono mode a `null`-admitting primitive union has no marker-trait
-  carrier and is `&JsValue`.
+  as the carried type: `_with_str`, `_with_slice`). Per-mono a `null`
+  arm is its own binding instead; see below.
 * **Inner positions** (a `_promise` form's `Promise<T | null>`,
   `Array<T | undefined>`): `JsNullable<T>` when `null` is admitted
   (`T | null | undefined` too; `is_empty` covers both), `JsOption<T>`
@@ -141,25 +140,26 @@ No coercion is assumed anywhere.
 * A discriminated-union branch whose property is required in one
   branch and `?: undefined` in another has a merged setter of the
   optional shape; the branch factory takes that setter's type.
-* Under `--experimental-generic-mono` a `null`-admitting argument lowers
-  like an undefined-only one (`Option<impl JsStringLike>`, `Option<f64>`,
-  `Option<&Signal>`, `Option<&[…]>`), since the `JsNullable` carrier would
-  take strings and numbers off their native ABI. `None` crosses as
-  `undefined`, which a WebIDL nullable (`T?`) converts to `null`; a
-  non-WebIDL callee that tests `=== null` needs the explicit form. A
-  type-parameter inner is borrowed like any other (`Option<&T>`). A union
-  that fans out into overloads instead takes each arm bare and gives
-  `null` an arm of its own, which passes `null` itself and drops the
-  parameter: `Response(body?: BodyInit | null, init?)` gives
-  `new_with_str(body)`, `new_with_readable_stream(&stream)`, …,
-  `new_with_null_and_init(&init)`. An optional parameter's `null` arm
-  with nothing after it would read as omitting the argument, so there is
-  no `new_with_null()` beside `new()`. A setter's
-  `null` arm clears the property (`set_body_with_null()`). A
-  dictionary builder's method for an optional nullable field takes the
-  value bare and passes `Some(…)` to the setter, since not calling it is
-  the field's empty: `.prefix("a")`, `.signal(&signal)`;
-  `set_prefix(None::<&str>)` still clears it.
+* Under `--experimental-generic-mono` a written `null` is exact: `null` is
+  an ordinary arm of an argument's union, so each other alternative is
+  taken bare and `null` has a binding of its own, which drops the
+  parameter and passes `null` itself. A `JsNullable` carrier would take
+  strings and numbers off their native ABI, and an `Option`'s `None`
+  would send `undefined`. So `clearTimeout(id: number | null)` gives
+  `clear_timeout(id)` and `clear_timeout_with_null()`, and
+  `Response(body?: BodyInit | null, init?)` gives `new_with_str(body)`,
+  `new_with_readable_stream(&stream)`, …, `new_with_null_and_init(&init)`.
+  Setters, dictionary factories and builders follow the same expansion:
+  `prefix?: string | null` gives `set_prefix(v)` and
+  `set_prefix_with_null()`, and a builder's `.prefix(v)` and
+  `.prefix_with_null()`, whose omission leaves the field absent; a
+  required `holder: string | null` gives `new(holder)` and
+  `new_with_null()`. An optional parameter's `null` arm with nothing
+  after it would read as omitting the argument, so there is no
+  `new_with_null()` beside `new()`, and `any | null` is `any`, whose
+  `&JsValue` already takes `null`. Reads are unaffected: a return, getter
+  or callback argument admitting `null` is `Option<T>`, either empty
+  reading as `None`.
 
 ## Array and slice types
 

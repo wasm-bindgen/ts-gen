@@ -55,6 +55,25 @@
   ;; clearTimeout(id: number | null): void
   (import "./bindings.wasm" "clearTimeout" (func $clearTimeout (param $id externref)))
 
+  ;; PutOptions
+  ;; {} as PutOptions
+  (import "./bindings.wasm" "PutOptions.new" (func $PutOptions.new (result externref)))
+  ;; metadata?: any | null
+  (import "./bindings.wasm" "PutOptions.metadata" (func $PutOptions.metadata (param $this externref) (result externref)))
+  ;; set metadata(value: any | null)
+  (import "./bindings.wasm" "PutOptions.set_metadata" (func $PutOptions.set_metadata (param $this externref) (param $value externref)))
+
+  ;; Lease
+  ;; {} as Lease
+  (import "./bindings.wasm" "Lease.new" (func $Lease.new (result externref)))
+  ;; holder: string | null
+  (import "./bindings.wasm" "Lease.holder" (func $Lease.holder (param $this externref) (result externref)))
+  ;; set holder(value: string | null)
+  (import "./bindings.wasm" "Lease.set_holder" (func $Lease.set_holder (param $this externref) (param $value externref)))
+
+  ;; lease(options: PutOptions, lease: Lease): void
+  (import "./bindings.wasm" "lease" (func $lease (param $options externref) (param $lease externref)))
+
   ;; ResponseInit
   ;; {} as ResponseInit
   (import "./bindings.wasm" "ResponseInit.new" (func $ResponseInit.new (result externref)))

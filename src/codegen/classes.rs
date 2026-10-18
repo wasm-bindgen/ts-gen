@@ -1502,6 +1502,20 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                             None => format!("* {bullet_head}"),
                         });
                     }
+                    // A `null` arm's setter passes `null` itself, so the arm
+                    // only names the factory (`new_with_null`).
+                    FieldOption::Value {
+                        param,
+                        scope,
+                        setter_ident,
+                        ..
+                    } if matches!(param.type_ref, TypeRef::Null)
+                        && CodegenContext::generic_mono(config.cgctx) =>
+                    {
+                        init_calls.push(quote! { inner.#setter_ident(); });
+                        value_params.push(param.clone());
+                        value_scopes.push(*scope);
+                    }
                     FieldOption::Value {
                         field_doc,
                         param,
@@ -1565,13 +1579,20 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 continue;
             }
             let new_ident = super::typemap::make_ident(&format!("new{full_suffix}"));
+            let (value_params, value_scopes): (Vec<ConcreteParam>, Vec<ScopeId>) = plan
+                .value_params
+                .iter()
+                .zip(&plan.value_scopes)
+                .filter(|(p, _)| !matches!(p.type_ref, TypeRef::Null))
+                .map(|(p, s)| (p.clone(), *s))
+                .unzip();
             let DictionaryParams {
                 bounds: abv_bounds,
                 params: params_tokens,
                 ..
             } = super::signatures::generate_dictionary_params_in(
-                &plan.value_params,
-                &plan.value_scopes,
+                &value_params,
+                &value_scopes,
                 config.cgctx,
                 config.scope,
                 &config.from_module(),
@@ -1585,8 +1606,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             // redeclares all bounds because each `pub fn` there is
             // independent (see `generic_params_for_method`).
             let mut combo_bounds: Vec<TokenStream> = Vec::new();
-            let combo_param_tys: Vec<&TypeRef> =
-                plan.value_params.iter().map(|p| &p.type_ref).collect();
+            let combo_param_tys: Vec<&TypeRef> = value_params.iter().map(|p| &p.type_ref).collect();
             combo_bounds.extend(config.local_generic_bounds(config.scope, &combo_param_tys));
             combo_bounds.extend(abv_bounds);
             let generics = render_generic_bounds(&combo_bounds);
@@ -1694,14 +1714,15 @@ pub(crate) fn generate_dictionary_factory_with_passes(
     for g in &optional_getters {
         let base = config.member_base(MemberKind::Property, &g.js_name);
         let setter_name = config.setter_name(MemberKind::Property, &g.js_name);
-        for sig in resolve_setter_sigs(g) {
-            // Not calling the builder method already leaves the field unset.
-            if sig
-                .params
-                .iter()
-                .any(|p| matches!(p.type_ref, TypeRef::Null))
-            {
-                continue;
+        for mut sig in resolve_setter_sigs(g) {
+            // Per-mono, a `null` arm sets the field to `null` (`.prefix_with_null()`),
+            // which not calling the method would leave unset.
+            let is_null = |p: &ConcreteParam| matches!(p.type_ref, TypeRef::Null);
+            if sig.params.iter().any(is_null) {
+                if !CodegenContext::generic_mono(config.cgctx) {
+                    continue;
+                }
+                sig.params.retain(|p| !is_null(p));
             }
             // The builder has no methods of its own to avoid, so it follows
             // the getter's name, with the setter's expansion suffix.

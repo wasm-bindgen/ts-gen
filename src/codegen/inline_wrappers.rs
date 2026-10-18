@@ -509,23 +509,6 @@ fn split_generics(generics: &Generics, impl_args: &[Ident]) -> (Generics, Generi
     (on_impl, on_fn)
 }
 
-/// The generics declared on the foreign `type` of this name, defaults stripped.
-fn declared_generics(block: &ItemForeignMod, name: &Ident) -> Option<Generics> {
-    block.items.iter().find_map(|item| match item {
-        ForeignItem::Type(t) if &t.ident == name => {
-            let mut g = t.generics.clone();
-            for p in g.params.iter_mut() {
-                if let GenericParam::Type(tp) = p {
-                    tp.eq_token = None;
-                    tp.default = None;
-                }
-            }
-            Some(g)
-        }
-        _ => None,
-    })
-}
-
 fn generic_args(generics: &Generics) -> TokenStream {
     if generics.params.is_empty() {
         return quote! {};
@@ -569,7 +552,7 @@ fn type_param_idents(generics: &Generics) -> impl Iterator<Item = Ident> + '_ {
     })
 }
 
-fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn, mono: bool) -> Vec<Wrapper> {
+fn wrap(item: &mut ForeignItemFn, mono: bool) -> Vec<Wrapper> {
     let literal = take_literal_attr(item);
     let field = take_field_literal_attr(item);
     let determined = take_determined_attr(item);
@@ -692,10 +675,23 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn, mono: bool) -> Vec<Wra
             quote! { self.#extern_name },
         )
     } else if let Some(ty) = binding.static_of {
-        let generics = declared_generics(block, &ty).unwrap_or_default();
-        let args = generic_args(&generics);
+        // A bare `static_method_of` binds the type's defaults, unless the
+        // static returns the type itself, which hoists its arguments.
+        let ret_args = match &public_sig.output {
+            ReturnType::Type(_, ret) => type_head(result_ok(ret))
+                .filter(|(head, _)| *head == ty)
+                .map(|(_, args)| args),
+            ReturnType::Default => None,
+        };
+        let (on_impl, on_fn) = split_generics(&public_sig.generics, &ret_args.unwrap_or_default());
+        public_sig.generics = on_fn;
+        let args = generic_args(&on_impl);
         (
-            Target::Associated { ty, generics, args },
+            Target::Associated {
+                ty,
+                generics: on_impl,
+                args,
+            },
             quote! { Self::#extern_name },
         )
     } else if binding.constructor {
@@ -853,13 +849,12 @@ fn process_items(items: &mut Vec<Item>) {
                 out.push(item);
             }
             Item::ForeignMod(block) if mentions_marker(block) || mentions_literal(block) => {
-                let snapshot = block.clone();
                 let mono = mentions_mono(block);
                 let mut wrappers = Vec::new();
                 for fi in block.items.iter_mut() {
                     if let ForeignItem::Fn(f) = fi {
                         if mentions_marker(&f.sig) || f.attrs.iter().any(is_wrapper_attr) {
-                            wrappers.extend(wrap(&snapshot, f, mono));
+                            wrappers.extend(wrap(f, mono));
                         }
                     }
                 }
