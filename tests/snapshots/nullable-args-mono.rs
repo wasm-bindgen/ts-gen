@@ -258,7 +258,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type PutOptions;
     #[wasm_bindgen(method, getter)]
-    pub fn metadata(this: &PutOptions) -> JsValue;
+    pub fn metadata(this: &PutOptions) -> Option<JsValue>;
     #[wasm_bindgen(method, setter)]
     pub fn set_metadata(this: &PutOptions, val: &JsValue);
 }

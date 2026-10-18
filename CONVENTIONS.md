@@ -95,9 +95,10 @@ No coercion is assumed anywhere.
 
 * **Return position**: `Option<T>` for all three. `Option<JsValue>`
   collapses to `JsValue`, which carries both in-band, except that under
-  `--experimental-generic-mono` an undefined-only empty (`cf?: any`)
-  stays `Option<JsValue>`, so absence reads like any other optional
-  property.
+  `--experimental-generic-mono` a `JsValue` read stays `Option<JsValue>`
+  (`cf?: any`, `deserializeAttachment(): any | null`), so an empty reads
+  like any other. An awaited value and a callback's argument are reads
+  too (`Promise<Option<JsValue>>`, `Function<fn(Option<String>)>`).
 * **Argument position**, by which empties the type admits:
 
   | TS                          | Rust                      | to pass a value / the empty            |
@@ -2252,7 +2253,15 @@ stays a type parameter. Built-in JS containers, tuples and iterators take
 native leaves too (`Promise<String>`, `Map<String, f64>`, `Array<bool>`,
 `ArrayTuple<(String, String)>`, `Object<String>` for a `Record`), since
 `js_sys_unstable_apis` monomorphizes their element APIs, and an awaited
-`T | undefined` is `Option<T>`; `Promise<void>` is `Promise<()>`. An
+`T | undefined` is `Option<T>`; `Promise<void>` is `Promise<()>`. A type
+argument has no direction, so one admitting `null` keeps it exact as
+`JsNullable` over the native leaf, and an undefined-only one is an
+`Option`: KV's bulk `get` is `Promise<Map<String, JsNullable<String>>>`,
+`ArrayLike<number | null>` is `Array<JsNullable<f64>>`, `Holder<string |
+null>` is `Holder<JsNullable<String>>`, and a callback returning `string |
+null` is `Function<fn() -> JsNullable<String>>`. The awaited value and a
+callback's arguments are reads, folding both empties (`Promise<string |
+null>` is `Promise<Option<String>>`). An
 `undefined` type argument or default is `()` too
 (`KVNamespaceGetOptions<()>`, `DurableObjectStub<T = ()>`). Callback
 signatures take native leaves the same way (see

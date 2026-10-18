@@ -105,9 +105,9 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "details")]
     pub fn try_details(this: &Probe, d: &Details<Mode>) -> Result<Details<Level>, JsValue>;
     #[wasm_bindgen(method, js_name = "maybeHolder")]
-    pub fn maybe_holder(this: &Probe) -> Holder<Option<Mode>>;
+    pub fn maybe_holder(this: &Probe) -> Holder<JsNullable<Mode>>;
     #[wasm_bindgen(method, catch, js_name = "maybeHolder")]
-    pub fn try_maybe_holder(this: &Probe) -> Result<Holder<Option<Mode>>, JsValue>;
+    pub fn try_maybe_holder(this: &Probe) -> Result<Holder<JsNullable<Mode>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "nextMode")]
     pub fn next_mode(this: &Probe) -> Promise<Mode>;
     #[wasm_bindgen(method, catch, js_name = "nextLevel")]

@@ -158,6 +158,10 @@ pub struct TypePosition {
     /// (`Function<fn(String)>`) count as containers; other erased generics
     /// reset it.
     pub native_leaves: bool,
+    /// A read inside such a container, an awaited value or a callback's
+    /// argument, where a `null`-admitting leaf is `Option<T>` rather than a
+    /// type argument's `JsNullable<T>`.
+    pub read: bool,
 }
 
 impl TypePosition {
@@ -166,12 +170,14 @@ impl TypePosition {
         direction: Direction::Argument,
         inner: false,
         native_leaves: false,
+        read: false,
     };
     /// Top-level function return position.
     pub const RETURN: Self = Self {
         direction: Direction::Return,
         inner: false,
         native_leaves: false,
+        read: false,
     };
 
     /// Convert to inner position (for generic type parameters).
@@ -181,6 +187,7 @@ impl TypePosition {
             direction: self.direction,
             inner: true,
             native_leaves: false,
+            read: false,
         }
     }
 
@@ -191,6 +198,16 @@ impl TypePosition {
             direction: self.direction,
             inner: true,
             native_leaves: CodegenContext::generic_mono(ctx),
+            read: false,
+        }
+    }
+
+    /// [`Self::to_container`] for a value the bindings read; see
+    /// [`Self::read`].
+    pub fn to_container_read(self, ctx: Option<&CodegenContext<'_>>) -> Self {
+        Self {
+            read: true,
+            ..self.to_container(ctx)
         }
     }
 
@@ -1535,10 +1552,17 @@ pub fn to_syn_type(
             TypeRef::Number | TypeRef::NumberLiteral(_) => return quote! { f64 },
             TypeRef::String | TypeRef::StringLiteral(_) => return quote! { String },
             TypeRef::Void | TypeRef::Undefined => return quote! { () },
-            TypeRef::Nullable(inner, _) => {
+            // A type argument keeps `null` exact (`Map<String,
+            // JsNullable<String>>`); a read folds both empties.
+            TypeRef::Nullable(inner, n) => {
                 let inner_ty = to_syn_type(inner, pos, ctx, scope, from_module);
-                return if is_jsvalue_arg(&inner_ty) || inner_ty.to_string() == "()" {
+                let jsvalue = is_jsvalue_arg(&inner_ty) || inner_ty.to_string() == "()";
+                return if jsvalue && !pos.read {
                     quote! { JsValue }
+                } else if jsvalue {
+                    quote! { Option<JsValue> }
+                } else if n.null && !pos.read {
+                    quote! { JsNullable<#inner_ty> }
                 } else {
                     quote! { Option<#inner_ty> }
                 };
@@ -1708,10 +1732,10 @@ pub fn to_syn_type(
             if !pos.is_argument() {
                 let inner_ty = to_syn_type(inner, pos, ctx, scope, from_module);
                 // `Option<T>` reads both empties as `None`. `Option<JsValue>`
-                // is redundant: `JsValue` carries them in-band. Per-mono an
-                // undefined-only empty (`cf?: any`) is still an `Option`,
-                // so absence reads like any other optional property.
-                let in_band = !(n.undefined && !n.null && CodegenContext::generic_mono(ctx));
+                // is redundant: `JsValue` carries them in-band. Per-mono a
+                // `JsValue` read is still an `Option` (`cf?: any`, `any |
+                // null`), so an empty reads like any other.
+                let in_band = !CodegenContext::generic_mono(ctx);
                 return if in_band && is_jsvalue_arg(&inner_ty) {
                     quote! { JsValue }
                 } else {
@@ -1796,11 +1820,16 @@ pub fn to_syn_type(
             } else {
                 pos.to_inner()
             };
+            let param_pos = if mono {
+                pos.to_container_read(ctx)
+            } else {
+                inner_pos
+            };
             let params: Vec<TokenStream> = sig
                 .params
                 .iter()
                 .take(8)
-                .map(|p| to_syn_type(&p.type_ref, inner_pos, ctx, scope, from_module))
+                .map(|p| to_syn_type(&p.type_ref, param_pos, ctx, scope, from_module))
                 .collect();
             // `Function<fn() -> Promise<T>>` with a type parameter `T`
             // does not satisfy wasm-bindgen's erased `JsFunction` (the
@@ -2330,7 +2359,12 @@ fn lower_reference(
     match head {
         "Promise" | "PromiseLike" => {
             let inner = generic_args.first().cloned().unwrap_or(TypeRef::Any);
-            return generic_container(quote! { Promise }, &inner, pos, ctx, scope, from_module);
+            let arg = to_syn_type(&inner, pos.to_container_read(ctx), ctx, scope, from_module);
+            return if is_jsvalue_arg(&arg) {
+                quote! { Promise }
+            } else {
+                quote! { Promise<#arg> }
+            };
         }
         "Set" | "ReadonlySet" => {
             let inner = generic_args.first().cloned().unwrap_or(TypeRef::Any);
@@ -2738,9 +2772,13 @@ fn to_mono_user_generic_arg_impl(
         t if is_mono_native_leaf(t, ctx, scope) => {
             to_syn_type(t, TypePosition::RETURN, Some(ctx), scope, from_module)
         }
-        TypeRef::Nullable(inner, _) => {
+        TypeRef::Nullable(inner, n) => {
             let inner = to_mono_user_generic_arg_impl(inner, ctx, scope, from_module, visited);
-            quote! { Option<#inner> }
+            if n.null {
+                quote! { JsNullable<#inner> }
+            } else {
+                quote! { Option<#inner> }
+            }
         }
         t if local_generic_args(t, ctx, scope).is_some() => {
             to_syn_type(t, TypePosition::RETURN, Some(ctx), scope, from_module)
@@ -2841,6 +2879,21 @@ fn to_mono_js_string_return_type_impl(
                 .map(|arg| {
                     let mut visited = visited.clone();
                     if has_mono_js_string_return_impl(arg, ctx, scope, &mut visited.clone()) {
+                        // A type argument keeps `null` exact, as in
+                        // `to_mono_user_generic_arg_impl`.
+                        let peeled = peel_mono(arg, ctx, scope, &mut visited.clone());
+                        if let TypeRef::Nullable(inner, n) = peeled.as_ref() {
+                            if n.null {
+                                let inner = to_mono_js_string_return_type_impl(
+                                    inner,
+                                    ctx,
+                                    scope,
+                                    from_module,
+                                    &mut visited,
+                                );
+                                return quote! { JsNullable<#inner> };
+                            }
+                        }
                         to_mono_js_string_return_type_impl(
                             arg,
                             ctx,
@@ -4472,7 +4525,7 @@ mod tests {
             assert_eq!(user_arg(&lits(&["a", "b"]), ctx, scope), "String");
             assert_eq!(
                 user_arg(&TypeRef::ident("MaybeId"), ctx, scope),
-                "Option < String >"
+                "JsNullable < String >"
             );
             // Built-in containers take native leaves too.
             assert_eq!(

@@ -198,13 +198,13 @@ extern "C" {
     pub fn get_with_slice(
         this: &Namespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Promise<Map<String, Option<String>>>;
+    ) -> Promise<Map<String, JsNullable<String>>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     fn get_text_with_slice_and_options_js(
         this: &Namespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &GetOptions<String>,
-    ) -> Promise<Map<String, Option<String>>>;
+    ) -> Promise<Map<String, JsNullable<String>>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     fn get_json_with_slice_and_options_js(
         this: &Namespace,
@@ -216,7 +216,7 @@ extern "C" {
         this: &Namespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &GetOptions<String>,
-    ) -> Promise<Map<String, Option<T>>>;
+    ) -> Promise<Map<String, JsNullable<T>>>;
 }
 impl Namespace {
     pub fn get_text_with_options(
@@ -275,7 +275,7 @@ impl Namespace {
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &GetOptionsPartial<String>,
-    ) -> Promise<Map<String, Option<String>>> {
+    ) -> Promise<Map<String, JsNullable<String>>> {
         let options: GetOptions<String> =
             ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
                 &::js_sys::Object::new(),
@@ -301,7 +301,7 @@ impl Namespace {
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &GetOptionsPartial<String>,
-    ) -> Promise<Map<String, Option<T>>> {
+    ) -> Promise<Map<String, JsNullable<T>>> {
         let options: GetOptions<String> =
             ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
                 &::js_sys::Object::new(),
