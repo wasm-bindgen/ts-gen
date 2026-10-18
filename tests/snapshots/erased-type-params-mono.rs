@@ -18,9 +18,12 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn meta<M>(this: &Entry<M>) -> Option<M>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_meta<M>(this: &Entry<M>, val: M);
+    pub fn set_meta<M>(this: &Entry<M>, val: &M);
 }
-impl<M: ::wasm_bindgen::convert::IntoWasmAbi> Entry<M> {
+impl<M> Entry<M>
+where
+    for<'__wbg> &'__wbg M: ::wasm_bindgen::convert::IntoWasmAbi,
+{
     pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> Entry<M> {
         Self::builder(name).build()
     }
@@ -33,8 +36,11 @@ impl<M: ::wasm_bindgen::convert::IntoWasmAbi> Entry<M> {
 pub struct EntryBuilder<M> {
     inner: Entry<M>,
 }
-impl<M: ::wasm_bindgen::convert::IntoWasmAbi> EntryBuilder<M> {
-    pub fn meta(self, val: M) -> Self {
+impl<M> EntryBuilder<M>
+where
+    for<'__wbg> &'__wbg M: ::wasm_bindgen::convert::IntoWasmAbi,
+{
+    pub fn meta(self, val: &M) -> Self {
         self.inner.set_meta(val);
         self
     }
@@ -42,7 +48,7 @@ impl<M: ::wasm_bindgen::convert::IntoWasmAbi> EntryBuilder<M> {
         self.inner
     }
 }
-impl<M: ::wasm_bindgen::convert::IntoWasmAbi> From<Entry<M>> for EntryBuilder<M> {
+impl<M> From<Entry<M>> for EntryBuilder<M> {
     fn from(inner: Entry<M>) -> Self {
         Self { inner }
     }
@@ -67,7 +73,10 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_cursor<M>(this: &ListResult<M>, val: impl ::wasm_bindgen::JsStringLike);
 }
-impl<M: ::wasm_bindgen::convert::IntoWasmAbi> ListResult<M> {
+impl<M> ListResult<M>
+where
+    for<'__wbg> &'__wbg M: ::wasm_bindgen::convert::IntoWasmAbi,
+{
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `done: false`"]
@@ -100,7 +109,10 @@ impl<M: ::wasm_bindgen::convert::IntoWasmAbi> ListResult<M> {
 pub struct ListResultBuilder<M> {
     inner: ListResult<M>,
 }
-impl<M: ::wasm_bindgen::convert::IntoWasmAbi> ListResultBuilder<M> {
+impl<M> ListResultBuilder<M>
+where
+    for<'__wbg> &'__wbg M: ::wasm_bindgen::convert::IntoWasmAbi,
+{
     pub fn cursor(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_cursor(val);
         self
@@ -109,7 +121,7 @@ impl<M: ::wasm_bindgen::convert::IntoWasmAbi> ListResultBuilder<M> {
         self.inner
     }
 }
-impl<M: ::wasm_bindgen::convert::IntoWasmAbi> From<ListResult<M>> for ListResultBuilder<M> {
+impl<M> From<ListResult<M>> for ListResultBuilder<M> {
     fn from(inner: ListResult<M>) -> Self {
         Self { inner }
     }

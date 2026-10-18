@@ -26,19 +26,19 @@ extern "C" {
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<JsNullable<JsString>>;
+    ) -> Promise<Option<String>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     async fn get_json_js<T>(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<JsNullable<T>, JsValue>;
+    ) -> Result<Option<T>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     fn get_json_promise_js<T>(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<JsNullable<T>>;
+    ) -> Promise<Option<T>>;
     #[wasm_bindgen(method, js_name = "read")]
     fn read_text_js(
         this: &Store,
@@ -92,24 +92,21 @@ impl Store {
     pub fn get_text_promise(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<JsNullable<JsString>> {
+    ) -> Promise<Option<String>> {
         self.get_text_promise_js(key, "text")
     }
     pub async fn get_json<T>(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<JsNullable<T>, JsValue>
+    ) -> Result<Option<T>, JsValue>
     where
-        JsNullable<T>: ::wasm_bindgen::convert::FromWasmAbi + 'static,
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi + 'static,
     {
         self.get_json_js(key, "json").await
     }
-    pub fn get_json_promise<T>(
-        &self,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<JsNullable<T>>
+    pub fn get_json_promise<T>(&self, key: impl ::wasm_bindgen::JsStringLike) -> Promise<Option<T>>
     where
-        Promise<JsNullable<T>>:
+        Promise<Option<T>>:
             ::wasm_bindgen::convert::FromWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
     {
         self.get_json_promise_js(key, "json")
