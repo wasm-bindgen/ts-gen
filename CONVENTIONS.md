@@ -2543,10 +2543,26 @@ pub fn send_with_number_or_string(to: impl ::js_sys::JsNumberOrStringLike);
   `level: "low" | "high" | number` is `set_level(LevelKind)` plus
   `set_level_with_f64(f64)`.
 
+`ArrayBuffer | ArrayBufferView` (however spelled, `BufferSource` included)
+groups the same way into one `impl js_sys::BufferSourceLike` alternative,
+suffixed `_with_buffer_source`. Every buffer handle (`ArrayBuffer`, each
+typed array, `DataView`, owned or borrowed) crosses as itself through the
+one import, `&[u8]` as a view of wasm memory and `Vec<u8>` as a copy:
+
+```ts
+verify(algorithm: string | Algorithm, key: CryptoKey, signature: BufferSource, data: BufferSource): Promise<boolean>;
+```
+
+```rust
+pub async fn verify(this: &SubtleCrypto, algorithm: impl JsStringLike, key: &CryptoKey, signature: impl BufferSourceLike, data: impl BufferSourceLike) -> Result<bool, JsValue>;
+pub async fn verify_with_algorithm(this: &SubtleCrypto, algorithm: &Algorithm, key: &CryptoKey, signature: impl BufferSourceLike, data: impl BufferSourceLike) -> Result<bool, JsValue>;
+```
+
 Return positions are unchanged: an erased union still becomes a
 [dynamic-union enum](#erased-return-position-unions-become-dynamic-union-enums).
 Without `--experimental-generic-mono` the traits aren't available, so
-primitive unions (including `PropertyKey`) keep the per-member fan-out.
+primitive unions (including `PropertyKey`) and buffer sources keep the
+per-member fan-out.
 
 ## `@throws` JSDoc → typed error
 

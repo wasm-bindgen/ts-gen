@@ -1582,7 +1582,10 @@ fn flatten_type_with(
     if flatten_into(ty, cgctx, scope, &mut out) {
         pair_typed_array_slice(&mut out, cgctx, scope);
         if cgctx.is_some_and(|ctx| ctx.experimental_generic_mono) {
-            return split_null_arm(primitive_unions::group_alternatives(out, keep_literals));
+            return split_null_arm(group_buffer_source(primitive_unions::group_alternatives(
+                out,
+                keep_literals,
+            )));
         }
         return out;
     }
@@ -1596,6 +1599,52 @@ fn flatten_type_with(
         ));
     }
     vec![flatten_collapse_to_lub(ty, cgctx, scope)]
+}
+
+/// Per-mono, `ArrayBuffer | ArrayBufferView` (`BufferSource`) is one
+/// alternative, at the first one's position, which lowers to `impl
+/// js_sys::BufferSourceLike`: every buffer handle and `&[u8]` / `Vec<u8>`
+/// crosses as itself through one import.
+fn group_buffer_source(mut alts: Vec<TypeRef>) -> Vec<TypeRef> {
+    fn peel(t: &TypeRef) -> (&TypeRef, Option<crate::ir::Nullability>) {
+        match t {
+            TypeRef::Nullable(inner, n) => (inner, Some(*n)),
+            t => (t, None),
+        }
+    }
+    let buffer = alts
+        .iter()
+        .position(|t| peel(t).0.as_ident() == Some("ArrayBuffer"));
+    let view = alts
+        .iter()
+        .position(|t| matches!(peel(t).0, TypeRef::ArrayBufferView));
+    let (Some(buffer), Some(view)) = (buffer, view) else {
+        return alts;
+    };
+    let n = peel(&alts[buffer]).1;
+    if n != peel(&alts[view]).1 {
+        return alts;
+    }
+    let grouped = buffer_source_union();
+    let grouped = match n {
+        Some(n) => TypeRef::Nullable(Box::new(grouped), n),
+        None => grouped,
+    };
+    let (first, second) = (buffer.min(view), buffer.max(view));
+    alts.remove(second);
+    alts[first] = grouped;
+    alts
+}
+
+fn buffer_source_union() -> TypeRef {
+    TypeRef::Union(vec![
+        TypeRef::ident("ArrayBuffer"),
+        TypeRef::ArrayBufferView,
+    ])
+}
+
+pub(crate) fn is_buffer_source(ty: &TypeRef) -> bool {
+    *ty == buffer_source_union()
 }
 
 /// Per-mono, a `null`-admitting union that fans out into overloads takes
@@ -2213,6 +2262,7 @@ fn type_snake_name(ty: &TypeRef) -> String {
         // Grouped per-mono primitive unions (`number_or_string`,
         // `property_key`). Outside that mode `PropertyKey` has already
         // fanned out into its members.
+        ty if is_buffer_source(ty) => "buffer_source".to_string(),
         TypeRef::Union(_) | TypeRef::PropertyKey => primitive_unions::PrimitiveUnion::classify(ty)
             .map_or_else(|| "js_value".to_string(), |u| u.suffix()),
         // Snake-case every segment of a named reference, so `A.X` is
@@ -2386,6 +2436,7 @@ fn mono_argument_type(ty: &TypeRef) -> Option<TokenStream> {
         TypeRef::String | TypeRef::StringLiteral(_) => {
             Some(quote! { ::wasm_bindgen::JsStringLike })
         }
+        ty if is_buffer_source(ty) => Some(quote! { ::js_sys::BufferSourceLike }),
         _ => primitive_unions::PrimitiveUnion::classify(ty).map(|u| u.trait_path()),
     };
     match ty {
