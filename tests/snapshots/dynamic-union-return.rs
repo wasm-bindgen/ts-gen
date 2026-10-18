@@ -48,9 +48,15 @@ impl NoErasure {
 }
 #[wasm_bindgen]
 extern "C" {
-    #[doc = " Async function with an inner-erased Promise — no enum synthesis."]
+    #[doc = " The awaited value is a top-level return: the enum is synthesised."]
     #[wasm_bindgen(catch, js_name = "fetchValue")]
-    pub async fn fetch_value() -> Result<JsValue, JsValue>;
+    pub async fn fetch_value() -> Result<FetchValueReturnKind, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    #[doc = " The awaited value is a top-level return: the enum is synthesised."]
+    #[wasm_bindgen(js_name = "fetchValue")]
+    pub fn fetch_value_promise() -> Promise;
 }
 #[wasm_bindgen(private)]
 pub enum ContentKind {
@@ -62,4 +68,9 @@ pub enum ContentKind {
 pub enum VariantKind {
     A = "a",
     B = "b",
+}
+#[wasm_bindgen(private)]
+pub enum FetchValueReturnKind {
+    F64(f64),
+    Foo = "foo",
 }

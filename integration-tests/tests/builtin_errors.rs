@@ -1,6 +1,6 @@
 #![cfg(target_arch = "wasm32")]
 
-use js_sys::{AggregateError, Error, JsString, UriError};
+use js_sys::{AggregateError, Error, UriError};
 
 use ts_gen_integration_tests::builtin_errors::Codec;
 
@@ -10,5 +10,5 @@ use ts_gen_integration_tests::builtin_errors::Codec;
 async fn builtin_errors_compile(codec: &Codec) {
     let _: Result<String, UriError> = codec.try_decode("%");
     let _: Result<String, AggregateError> = codec.try_decode_all("%");
-    let _: Result<JsString, Error> = codec.parse("%").await;
+    let _: Result<String, Error> = codec.parse("%").await;
 }
