@@ -13,6 +13,7 @@ interface UnderlyingSource<R = any> {
 }
 interface UnderlyingByteSource {
   type: "bytes";
+  autoAllocateChunkSize?: number;
 }
 interface Stream<R = any> {
   readonly locked: boolean;

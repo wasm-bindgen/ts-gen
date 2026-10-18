@@ -33,12 +33,28 @@ use crate::ir::RustScalar;
 const MARKER_PREFIX: &str = "__TsGenWide";
 const LITERAL_ATTR: &str = "ts_gen_literal";
 const FIELD_LITERAL_ATTR: &str = "ts_gen_field_literal";
+const DETERMINED_ATTR: &str = "ts_gen_determined";
 const NULL_MARKER: &str = "__TsGenNull";
 
 /// The attribute the signature layer puts on a literal-keyed extern fn:
 /// `#[ts_gen_literal(positions(1), arm("text", get_text), arm("json", get_json))]`.
 /// Positions index the parameters after `this`.
 pub(crate) fn literal_attr(sig: &crate::codegen::signatures::FunctionSignature) -> TokenStream {
+    let determined = (!sig.determined.is_empty()).then(|| {
+        let attr = format_ident!("{DETERMINED_ATTR}");
+        let positions = sig
+            .determined
+            .iter()
+            .map(|p| proc_macro2::Literal::usize_unsuffixed(*p));
+        quote! { #[#attr(#(#positions),*)] }
+    });
+    let attr = literal_attr_without_determined(sig);
+    quote! { #determined #attr }
+}
+
+fn literal_attr_without_determined(
+    sig: &crate::codegen::signatures::FunctionSignature,
+) -> TokenStream {
     if let Some(field) = &sig.field_literal {
         let attr = format_ident!("{FIELD_LITERAL_ATTR}");
         let position = proc_macro2::Literal::usize_unsuffixed(field.position);
@@ -113,6 +129,24 @@ impl syn::parse::Parse for FieldLiteral {
             head,
         })
     }
+}
+
+/// `#[ts_gen_determined(positions…)]`: dictionaries the wrapper builds
+/// with their factory; see [`crate::codegen::signatures::Determined`].
+fn take_determined_attr(item: &mut ForeignItemFn) -> Vec<usize> {
+    let Some(idx) = item
+        .attrs
+        .iter()
+        .position(|a| a.path().is_ident(DETERMINED_ATTR))
+    else {
+        return Vec::new();
+    };
+    let attr = item.attrs.remove(idx);
+    attr.parse_args_with(
+        syn::punctuated::Punctuated::<syn::LitInt, syn::Token![,]>::parse_terminated,
+    )
+    .map(|list| list.iter().filter_map(|l| l.base10_parse().ok()).collect())
+    .unwrap_or_default()
 }
 
 fn take_field_literal_attr(item: &mut ForeignItemFn) -> Option<FieldLiteral> {
@@ -345,12 +379,15 @@ fn mentions_mono(block: &ItemForeignMod) -> bool {
     })
 }
 
+fn is_wrapper_attr(attr: &syn::Attribute) -> bool {
+    [LITERAL_ATTR, FIELD_LITERAL_ATTR, DETERMINED_ATTR]
+        .iter()
+        .any(|name| attr.path().is_ident(name))
+}
+
 fn mentions_literal(block: &ItemForeignMod) -> bool {
     block.items.iter().any(|i| match i {
-        ForeignItem::Fn(f) => f
-            .attrs
-            .iter()
-            .any(|a| a.path().is_ident(LITERAL_ATTR) || a.path().is_ident(FIELD_LITERAL_ATTR)),
+        ForeignItem::Fn(f) => f.attrs.iter().any(is_wrapper_attr),
         _ => false,
     })
 }
@@ -690,6 +727,7 @@ fn type_param_idents(generics: &Generics) -> impl Iterator<Item = Ident> + '_ {
 fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn, mono: bool) -> Vec<Wrapper> {
     let literal = take_literal_attr(item);
     let field = take_field_literal_attr(item);
+    let determined = take_determined_attr(item);
     let Some((attr_idx, binding)) = read_binding(item) else {
         return Vec::new();
     };
@@ -712,7 +750,7 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn, mono: bool) -> Vec<Wra
         })
         .collect();
     let converts = return_shape.converts() || param_shapes.iter().any(|(_, s)| s.converts());
-    if !converts && literal.is_none() && field.is_none() {
+    if !converts && literal.is_none() && field.is_none() && determined.is_empty() {
         return Vec::new();
     }
 
@@ -880,6 +918,16 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn, mono: bool) -> Vec<Wra
             let call_args = param_shapes.iter().enumerate().map(|(i, (pname, s))| {
                 match values.iter().find(|(pos, _)| *pos == i) {
                     Some((_, lit)) => quote! { #lit },
+                    None if determined.contains(&i) => match typed_inputs.get(i) {
+                        Some(FnArg::Typed(pat)) => {
+                            let ty = match &*pat.ty {
+                                Type::Reference(r) => &*r.elem,
+                                ty => ty,
+                            };
+                            quote! { &<#ty>::new() }
+                        }
+                        _ => quote! { #pname },
+                    },
                     None if field.as_ref().is_some_and(|f| f.position == i) => {
                         quote! { ::wasm_bindgen::JsCast::unchecked_ref(&#pname) }
                     }
@@ -920,6 +968,7 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn, mono: bool) -> Vec<Wra
                         .enumerate()
                         .filter(|(i, _)| {
                             !values.iter().any(|(pos, _)| pos == i)
+                                && !determined.contains(i)
                                 && !matches!(param_shapes.get(*i), Some((_, Shape::Null)))
                         })
                         .map(|(_, a)| a.clone()),
@@ -953,12 +1002,7 @@ fn process_items(items: &mut Vec<Item>) {
                 let mut wrappers = Vec::new();
                 for fi in block.items.iter_mut() {
                     if let ForeignItem::Fn(f) = fi {
-                        if mentions_marker(&f.sig)
-                            || f.attrs.iter().any(|a| {
-                                a.path().is_ident(LITERAL_ATTR)
-                                    || a.path().is_ident(FIELD_LITERAL_ATTR)
-                            })
-                        {
+                        if mentions_marker(&f.sig) || f.attrs.iter().any(is_wrapper_attr) {
                             wrappers.extend(wrap(&snapshot, f, mono));
                         }
                     }
@@ -1010,9 +1054,15 @@ fn render_wrappers(wrappers: Vec<Wrapper>) -> Vec<Item> {
 /// carry one in a convertible position.
 pub(crate) fn apply(file: &mut syn::File) {
     let text = file.to_token_stream().to_string();
-    if ![MARKER_PREFIX, NULL_MARKER, LITERAL_ATTR, FIELD_LITERAL_ATTR]
-        .iter()
-        .any(|m| text.contains(m))
+    if ![
+        MARKER_PREFIX,
+        NULL_MARKER,
+        LITERAL_ATTR,
+        FIELD_LITERAL_ATTR,
+        DETERMINED_ATTR,
+    ]
+    .iter()
+    .any(|m| text.contains(m))
     {
         return;
     }

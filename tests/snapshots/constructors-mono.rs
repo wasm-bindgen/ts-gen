@@ -52,15 +52,42 @@ extern "C" {
     pub fn type_js_string(this: &UnderlyingByteSource) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &UnderlyingByteSource, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, getter, js_name = "autoAllocateChunkSize")]
+    pub fn auto_allocate_chunk_size(this: &UnderlyingByteSource) -> Option<f64>;
+    #[wasm_bindgen(method, setter, js_name = "autoAllocateChunkSize")]
+    pub fn set_auto_allocate_chunk_size(this: &UnderlyingByteSource, val: f64);
 }
 impl UnderlyingByteSource {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"bytes\"`"]
     pub fn new() -> UnderlyingByteSource {
+        Self::builder().build()
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `type: \"bytes\"`"]
+    pub fn builder() -> UnderlyingByteSourceBuilder {
         let inner: UnderlyingByteSource = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("bytes");
-        inner
+        UnderlyingByteSourceBuilder { inner }
+    }
+}
+pub struct UnderlyingByteSourceBuilder {
+    inner: UnderlyingByteSource,
+}
+impl UnderlyingByteSourceBuilder {
+    pub fn auto_allocate_chunk_size(self, val: f64) -> Self {
+        self.inner.set_auto_allocate_chunk_size(val);
+        self
+    }
+    pub fn build(self) -> UnderlyingByteSource {
+        self.inner
+    }
+}
+impl From<UnderlyingByteSource> for UnderlyingByteSourceBuilder {
+    fn from(inner: UnderlyingByteSource) -> Self {
+        Self { inner }
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]

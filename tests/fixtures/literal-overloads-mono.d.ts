@@ -6,7 +6,9 @@
 // parameter (`get_json_with_options`); each sets the field the literal types
 // on a copy of the caller's options, which take the declared
 // `Partial<GetOptions<…>>` (`GetOptionsPartial`). A `Partial` of a class
-// is the class.
+// is the class. A dictionary of literals is built by the binding
+// (`get_reader_byob`, `raw_with_column_names`), and one of optional `false`
+// flags is the omitted argument.
 
 export interface Store {
   get(key: string, type: "text"): Promise<string | null>;
@@ -35,5 +37,14 @@ export declare class Config {
 }
 export interface Admin {
   update(config: Partial<Config>): void;
+}
+export interface ReaderOptions {
+  mode: "byob";
+}
+export interface Stream {
+  getReader(): string;
+  getReader(options: ReaderOptions): number;
+  raw(options: { columnNames: true }): Promise<[string[], ...unknown[]]>;
+  raw(options?: { columnNames?: false }): Promise<unknown[]>;
 }
 export declare function store(): Store;

@@ -76,6 +76,40 @@
   ;; update(config: ConfigPartial): void
   (import "literal-overloads-mono" "Admin.update" (func $literal-overloads-mono:Admin.update (param $this externref) (param $config externref)))
 
+  ;; ReaderOptions
+  ;; {} as ReaderOptions
+  (import "literal-overloads-mono" "ReaderOptions.new" (func $literal-overloads-mono:ReaderOptions.new (result externref)))
+  ;; mode: "byob"
+  (import "literal-overloads-mono" "ReaderOptions.mode" (func $literal-overloads-mono:ReaderOptions.mode (param $this externref) (result externref)))
+  ;; set mode(value: "byob")
+  (import "literal-overloads-mono" "ReaderOptions.set_mode" (func $literal-overloads-mono:ReaderOptions.set_mode (param $this externref) (param $value externref)))
+
+  ;; Stream
+  ;; getReader(): string
+  (import "literal-overloads-mono" "Stream.get_reader" (func $literal-overloads-mono:Stream.get_reader (param $this externref) (result externref)))
+  ;; getReader(options: ReaderOptions): number
+  (import "literal-overloads-mono" "Stream.get_reader_with_options" (func $literal-overloads-mono:Stream.get_reader_with_options (param $this externref) (param $options externref) (result f64)))
+  ;; raw(): Promise<unknown[]>
+  (import "literal-overloads-mono" "Stream.raw" (func $literal-overloads-mono:Stream.raw (param $this externref) (result externref)))
+  ;; raw(options: StreamRawOptions): Promise<[string[], unknown[]]>
+  (import "literal-overloads-mono" "Stream.raw_with_options" (func $literal-overloads-mono:Stream.raw_with_options (param $this externref) (param $options externref) (result externref)))
+
+  ;; StreamRawOptions
+  ;; {} as StreamRawOptions
+  (import "literal-overloads-mono" "StreamRawOptions.new" (func $literal-overloads-mono:StreamRawOptions.new (result externref)))
+  ;; columnNames: true
+  (import "literal-overloads-mono" "StreamRawOptions.column_names" (func $literal-overloads-mono:StreamRawOptions.column_names (param $this externref) (result i32)))
+  ;; set columnNames(value: true)
+  (import "literal-overloads-mono" "StreamRawOptions.set_column_names" (func $literal-overloads-mono:StreamRawOptions.set_column_names (param $this externref) (param $value i32)))
+
+  ;; StreamRawOptions2
+  ;; {} as StreamRawOptions2
+  (import "literal-overloads-mono" "StreamRawOptions2.new" (func $literal-overloads-mono:StreamRawOptions2.new (result externref)))
+  ;; columnNames?: false
+  (import "literal-overloads-mono" "StreamRawOptions2.column_names" (func $literal-overloads-mono:StreamRawOptions2.column_names (param $this externref) (result externref)))
+  ;; set columnNames(value: false)
+  (import "literal-overloads-mono" "StreamRawOptions2.set_column_names" (func $literal-overloads-mono:StreamRawOptions2.set_column_names (param $this externref) (param $value i32)))
+
   ;; store(): Store
   (import "literal-overloads-mono" "store" (func $literal-overloads-mono:store (result externref)))
 
