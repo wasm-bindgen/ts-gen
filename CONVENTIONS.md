@@ -2004,8 +2004,11 @@ Under `--experimental-generic-mono` a dictionary arm is also named
 after its parameter rather than its type, kept only when the shorter
 name is still unique: `listen_with_options` / `listen_with_bool` for
 `options?: ListenerOptions | boolean`, `put_with_options` for
-`KVNamespacePutOptions`. A second dictionary arm at the same position
-collides and keeps its type name (`new_with_source`,
+`KVNamespacePutOptions`. Where the cohort passes several dictionary
+types at the position, only the one the others extend takes the
+parameter name, whichever comes first: R2's
+`put_with_options(&R2PutOptions)` beside `put_with_r2_bucket_put_options`.
+Unrelated ones keep their type names (`new_with_underlying_byte_source` /
 `new_with_underlying_source`).
 
 ### Named union aliases

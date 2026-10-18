@@ -110,19 +110,19 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise(this: &Store, key: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_options(
+    pub async fn get_with_conditional(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &Conditional,
     ) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_options_js_string(
+    pub async fn get_with_conditional_js_string(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &Conditional,
     ) -> Result<Option<JsString>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_options_promise(
+    pub fn get_with_conditional_promise(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &Conditional,

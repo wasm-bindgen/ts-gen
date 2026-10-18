@@ -562,7 +562,15 @@ pub fn expand_signatures(
         (Some(c), Some(scope)) => is_dictionary_type(ty, c, scope),
         _ => false,
     };
-    let rules: SuffixRules<'_> = type_arg_arms.then_some(&is_dictionary);
+    let extends = |child: &TypeRef, parent: &TypeRef| match (cgctx, scope) {
+        (Some(c), Some(scope)) => type_extends(child, parent, c, scope),
+        _ => false,
+    };
+    let mono = MonoSuffixes {
+        is_dictionary: &is_dictionary,
+        extends: &extends,
+    };
+    let rules: SuffixRules<'_> = type_arg_arms.then_some(&mono);
     let plain: Vec<Vec<ConcreteParam>> = deduped
         .iter()
         .zip(&stripped)
@@ -664,9 +672,36 @@ fn suffixes_among<'a>(
         .collect()
 }
 
-/// Per-mono suffix rules, carrying whether a type is a dictionary (see
-/// [`compute_rust_names`]). `None` keeps the plain rules.
-type SuffixRules<'a> = Option<&'a dyn Fn(&TypeRef) -> bool>;
+/// Per-mono suffix rules (see [`compute_rust_names`]). `None` keeps the
+/// plain rules.
+type SuffixRules<'a> = Option<&'a MonoSuffixes<'a>>;
+
+struct MonoSuffixes<'a> {
+    is_dictionary: &'a dyn Fn(&TypeRef) -> bool,
+    /// Whether the first type declares the second among its ancestors.
+    extends: &'a dyn Fn(&TypeRef, &TypeRef) -> bool,
+}
+
+fn type_extends(
+    child: &TypeRef,
+    parent: &TypeRef,
+    cgctx: &CodegenContext<'_>,
+    scope: ScopeId,
+) -> bool {
+    fn head(ty: &TypeRef) -> Option<String> {
+        match ty {
+            TypeRef::Reference { segments, .. } if segments.len() == 1 => Some(segments[0].clone()),
+            _ => head(&ty.split_empties()?.0),
+        }
+    }
+    let (Some(child), Some(parent)) = (head(child), head(parent)) else {
+        return false;
+    };
+    let (child, parent) = (child.as_str(), parent.as_str());
+    super::subtyping::ancestor_chain(child, cgctx, scope)
+        .iter()
+        .any(|a| a == parent)
+}
 
 /// A reference to a dictionary interface (an options bag).
 fn is_dictionary_type(ty: &TypeRef, cgctx: &CodegenContext<'_>, scope: ScopeId) -> bool {
@@ -1834,6 +1869,22 @@ fn compute_rust_names(
     //
     // Only the "middle" params that differ contribute to naming suffixes.
     let (trim_start, trim_end) = compute_trim(signatures);
+    // Per-mono, where the cohort passes several dictionary types at a
+    // position, only the one the others extend is named by its parameter,
+    // so the name does not depend on which comes first: R2's
+    // `put_with_options(&R2PutOptions)` beside
+    // `put_with_r2_bucket_put_options`.
+    let by_parameter = |abs_idx: usize, ty: &TypeRef| {
+        let Some(rules) = rules else {
+            return false;
+        };
+        signatures
+            .iter()
+            .filter_map(|s| s.get(abs_idx))
+            .map(|p| &p.type_ref)
+            .filter(|t| *t != ty && (rules.is_dictionary)(t))
+            .all(|t| (rules.extends)(t, ty))
+    };
 
     // Greedy single-pass naming: the first signature with a given
     // candidate suffix keeps it; subsequent siblings whose
@@ -1941,7 +1992,11 @@ fn compute_rust_names(
                 param_snake,
             };
             let mono_part = match rules {
-                Some(is_dictionary) if part.from_type && is_dictionary(&param.type_ref) => {
+                Some(mono)
+                    if part.from_type
+                        && (mono.is_dictionary)(&param.type_ref)
+                        && by_parameter(abs_idx, &param.type_ref) =>
+                {
                     SuffixPart {
                         text: part.param_snake.clone(),
                         ..part.clone()

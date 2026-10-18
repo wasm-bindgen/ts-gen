@@ -188,37 +188,37 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Promise<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_options(
+    pub async fn get_with_store_get_options(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &StoreGetOptions,
     ) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_options_js_string(
+    pub async fn get_with_store_get_options_js_string(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &StoreGetOptions,
     ) -> Result<Option<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn get_with_options_promise(
+    pub fn get_with_store_get_options_promise(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &StoreGetOptions,
     ) -> Result<Promise<Option<JsString>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_get_options(
+    pub async fn get_with_options(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions,
     ) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_get_options_js_string(
+    pub async fn get_with_options_js_string(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions,
     ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn get_with_get_options_promise(
+    pub fn get_with_options_promise(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions,

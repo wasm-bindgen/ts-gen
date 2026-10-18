@@ -82,6 +82,10 @@
   (import "./bindings.wasm" "Bucket.put" (func $Bucket.put (param $this externref) (param $key externref)))
   ;; put(key: string, options: BucketPutOptions): void
   (import "./bindings.wasm" "Bucket.put_with_options" (func $Bucket.put_with_options (param $this externref) (param $key externref) (param $options externref)))
+  ;; head(key: string): void
+  (import "./bindings.wasm" "Bucket.head" (func $Bucket.head (param $this externref) (param $key externref)))
+  ;; head(key: string, options: BucketHeadOptions): void
+  (import "./bindings.wasm" "Bucket.head_with_options" (func $Bucket.head_with_options (param $this externref) (param $key externref) (param $options externref)))
 
   ;; BucketGetOptions
   ;; {} as BucketGetOptions
@@ -98,6 +102,14 @@
   (import "./bindings.wasm" "BucketPutOptions.md5" (func $BucketPutOptions.md5 (param $this externref) (result externref)))
   ;; set md5(value: string)
   (import "./bindings.wasm" "BucketPutOptions.set_md5" (func $BucketPutOptions.set_md5 (param $this externref) (param $value externref)))
+
+  ;; BucketHeadOptions
+  ;; {} as BucketHeadOptions
+  (import "./bindings.wasm" "BucketHeadOptions.new" (func $BucketHeadOptions.new (result externref)))
+  ;; onlyIf: string
+  (import "./bindings.wasm" "BucketHeadOptions.only_if" (func $BucketHeadOptions.only_if (param $this externref) (result externref)))
+  ;; set onlyIf(value: string)
+  (import "./bindings.wasm" "BucketHeadOptions.set_only_if" (func $BucketHeadOptions.set_only_if (param $this externref) (param $value externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

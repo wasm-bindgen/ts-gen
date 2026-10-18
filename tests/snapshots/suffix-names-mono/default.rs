@@ -281,6 +281,26 @@ extern "C" {
         key: &str,
         options: &BucketOptions2,
     ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn head(this: &Bucket, key: &str);
+    #[wasm_bindgen(method, catch, js_name = "head")]
+    pub fn try_head(this: &Bucket, key: &str) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "head")]
+    pub fn head_with_bucket_options3(this: &Bucket, key: &str, options: &BucketOptions3);
+    #[wasm_bindgen(method, catch, js_name = "head")]
+    pub fn try_head_with_bucket_options3(
+        this: &Bucket,
+        key: &str,
+        options: &BucketOptions3,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "head")]
+    pub fn head_with_get_options(this: &Bucket, key: &str, options: &GetOptions);
+    #[wasm_bindgen(method, catch, js_name = "head")]
+    pub fn try_head_with_get_options(
+        this: &Bucket,
+        key: &str,
+        options: &GetOptions,
+    ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -358,6 +378,43 @@ impl BucketOptions2Builder {
 }
 impl From<BucketOptions2> for BucketOptions2Builder {
     fn from(inner: BucketOptions2) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = GetOptions , extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type BucketOptions3;
+    #[wasm_bindgen(method, getter, js_name = "onlyIf")]
+    pub fn only_if(this: &BucketOptions3) -> String;
+    #[wasm_bindgen(method, setter, js_name = "onlyIf")]
+    pub fn set_only_if(this: &BucketOptions3, val: &str);
+}
+impl BucketOptions3 {
+    pub fn new(only_if: &str) -> BucketOptions3 {
+        Self::builder(only_if).build()
+    }
+    pub fn builder(only_if: &str) -> BucketOptions3Builder {
+        let inner: BucketOptions3 = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_only_if(only_if);
+        BucketOptions3Builder { inner }
+    }
+}
+pub struct BucketOptions3Builder {
+    inner: BucketOptions3,
+}
+impl BucketOptions3Builder {
+    pub fn range(self, val: f64) -> Self {
+        self.inner.set_range(val);
+        self
+    }
+    pub fn build(self) -> BucketOptions3 {
+        self.inner
+    }
+}
+impl From<BucketOptions3> for BucketOptions3Builder {
+    fn from(inner: BucketOptions3) -> Self {
         Self { inner }
     }
 }
