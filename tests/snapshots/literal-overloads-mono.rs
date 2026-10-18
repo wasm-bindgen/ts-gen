@@ -499,43 +499,6 @@ impl StreamRawOptions {
 }
 #[wasm_bindgen(module = "literal-overloads-mono", experimental_generic_mono)]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type StreamRawOptions2;
-    #[wasm_bindgen(method, getter, js_name = "columnNames")]
-    pub fn column_names(this: &StreamRawOptions2) -> Option<bool>;
-    #[wasm_bindgen(method, setter, js_name = "columnNames")]
-    pub fn set_column_names(this: &StreamRawOptions2, val: bool);
-}
-impl StreamRawOptions2 {
-    pub fn new() -> StreamRawOptions2 {
-        Self::builder().build()
-    }
-    pub fn builder() -> StreamRawOptions2Builder {
-        StreamRawOptions2Builder {
-            inner: JsCast::unchecked_into(js_sys::Object::new()),
-        }
-    }
-}
-pub struct StreamRawOptions2Builder {
-    inner: StreamRawOptions2,
-}
-impl StreamRawOptions2Builder {
-    pub fn column_names(self, val: bool) -> Self {
-        self.inner.set_column_names(val);
-        self
-    }
-    pub fn build(self) -> StreamRawOptions2 {
-        self.inner
-    }
-}
-impl From<StreamRawOptions2> for StreamRawOptions2Builder {
-    fn from(inner: StreamRawOptions2) -> Self {
-        Self { inner }
-    }
-}
-#[wasm_bindgen(module = "literal-overloads-mono", experimental_generic_mono)]
-extern "C" {
     pub fn store() -> Store;
 }
 #[wasm_bindgen(module = "literal-overloads-mono", experimental_generic_mono)]

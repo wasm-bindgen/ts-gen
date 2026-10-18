@@ -257,7 +257,7 @@ pub(crate) enum Determined {
 
 pub(crate) fn determined_dictionary(
     ty: &TypeRef,
-    cgctx: &CodegenContext<'_>,
+    gctx: &crate::context::GlobalContext,
     scope: ScopeId,
 ) -> Option<Determined> {
     use crate::ir::{Member, TypeKind};
@@ -267,8 +267,8 @@ pub(crate) fn determined_dictionary(
     let [name] = segments.as_slice() else {
         return None;
     };
-    let id = cgctx.gctx.resolve_path(scope, name)?;
-    let TypeKind::Interface(iface) = &cgctx.gctx.get_type(id).kind else {
+    let id = gctx.resolve_path(scope, name)?;
+    let TypeKind::Interface(iface) = &gctx.get_type(id).kind else {
         return None;
     };
     if !iface.extends.is_empty() {
@@ -625,8 +625,11 @@ pub fn expand_signatures(
                     .iter()
                     .enumerate()
                     .filter_map(|(i, p)| {
-                        match determined_dictionary(&p.type_ref, c, overloads[overload].body_scope)?
-                        {
+                        match determined_dictionary(
+                            &p.type_ref,
+                            c.gctx,
+                            overloads[overload].body_scope,
+                        )? {
                             Determined::Required(tag) => Some((i, tag)),
                             Determined::Absent => None,
                         }
@@ -1550,7 +1553,7 @@ fn expand_single_overload(
                 || cgctx
                     .filter(|c| c.experimental_generic_mono)
                     .is_some_and(|c| {
-                        determined_dictionary(ty, c, scope) == Some(Determined::Absent)
+                        determined_dictionary(ty, c.gctx, scope) == Some(Determined::Absent)
                     })
         };
         sigs.retain(|sig| {

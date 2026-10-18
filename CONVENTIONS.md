@@ -3087,7 +3087,9 @@ impl CompressionStream {
   `raw_with_column_names`). Literals that do not read as a name (`"0"`,
   `""`) keep the plain parameter. A dictionary of optional `false` flags
   (`{ columnNames?: false }`) is what omitting the argument means, so
-  that overload binds no form taking it. Setters are exempt.
+  that overload binds no form taking it, and a type that only such a
+  parameter reaches (the synthesized `D1PreparedStatementRawOptions2`)
+  is not emitted. Setters are exempt.
 
 ## `--annotate` side files
 
