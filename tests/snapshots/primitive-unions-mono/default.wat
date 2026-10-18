@@ -176,6 +176,10 @@
   (import "primitive-unions-mono" "Hashes.salt" (func $primitive-unions-mono:Hashes.salt (param $this externref) (result externref)))
   ;; set salt(value: BufferSource)
   (import "primitive-unions-mono" "Hashes.set_salt" (func $primitive-unions-mono:Hashes.set_salt (param $this externref) (param $value externref)))
+  ;; iv?: BufferSource
+  (import "primitive-unions-mono" "Hashes.iv" (func $primitive-unions-mono:Hashes.iv (param $this externref) (result externref)))
+  ;; set iv(value: BufferSource)
+  (import "primitive-unions-mono" "Hashes.set_iv" (func $primitive-unions-mono:Hashes.set_iv (param $this externref) (param $value externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

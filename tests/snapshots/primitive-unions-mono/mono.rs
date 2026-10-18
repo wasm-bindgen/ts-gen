@@ -625,14 +625,18 @@ extern "C" {
     pub type Hashes;
     #[wasm_bindgen(method, getter)]
     pub fn md5(this: &Hashes) -> Option<Md5Kind>;
-    #[wasm_bindgen(method, setter)]
+    #[wasm_bindgen(method, setter, slice = "copy")]
     pub fn set_md5(this: &Hashes, val: impl ::js_sys::BufferSourceLike);
     #[wasm_bindgen(method, setter, js_name = "md5")]
     pub fn set_md5_with_str(this: &Hashes, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
     pub fn salt(this: &Hashes) -> SaltKind;
-    #[wasm_bindgen(method, setter)]
+    #[wasm_bindgen(method, setter, slice = "copy")]
     pub fn set_salt(this: &Hashes, val: impl ::js_sys::BufferSourceLike);
+    #[wasm_bindgen(method, getter)]
+    pub fn iv(this: &Hashes) -> Option<SaltKind>;
+    #[wasm_bindgen(method, setter, slice = "copy")]
+    pub fn set_iv(this: &Hashes, val: impl ::js_sys::BufferSourceLike);
 }
 impl Hashes {
     pub fn new(salt: impl ::js_sys::BufferSourceLike) -> Hashes {
@@ -654,6 +658,10 @@ impl HashesBuilder {
     }
     pub fn md5_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_md5_with_str(val);
+        self
+    }
+    pub fn iv(self, val: impl ::js_sys::BufferSourceLike) -> Self {
+        self.inner.set_iv(val);
         self
     }
     pub fn build(self) -> Hashes {

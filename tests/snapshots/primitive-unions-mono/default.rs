@@ -901,6 +901,12 @@ extern "C" {
     pub fn set_salt<T: ::js_sys::TypedArray>(this: &Hashes, val: &T);
     #[wasm_bindgen(method, setter, js_name = "salt")]
     pub fn set_salt_with_array_buffer(this: &Hashes, val: &ArrayBuffer);
+    #[wasm_bindgen(method, getter)]
+    pub fn iv(this: &Hashes) -> Option<SaltKind>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_iv<T: ::js_sys::TypedArray>(this: &Hashes, val: &T);
+    #[wasm_bindgen(method, setter, js_name = "iv")]
+    pub fn set_iv_with_array_buffer(this: &Hashes, val: &ArrayBuffer);
 }
 impl Hashes {
     pub fn new<T: ::js_sys::TypedArray>(salt: &T) -> Hashes {
@@ -934,6 +940,14 @@ impl HashesBuilder {
     }
     pub fn md5_with_str(self, val: &str) -> Self {
         self.inner.set_md5_with_str(val);
+        self
+    }
+    pub fn iv<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
+        self.inner.set_iv(val);
+        self
+    }
+    pub fn iv_with_array_buffer(self, val: &ArrayBuffer) -> Self {
+        self.inner.set_iv_with_array_buffer(val);
         self
     }
     pub fn build(self) -> Hashes {
