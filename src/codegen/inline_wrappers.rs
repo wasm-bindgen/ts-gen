@@ -17,6 +17,8 @@
 //! Overloads distinguished only by a string-literal argument are the second
 //! use: the extern takes `&str` and the signature layer tags it (see
 //! [`literal_attr`]) with one wrapper per literal, each baking its value in.
+//! A literal type argument of a dictionary parameter is the third: the
+//! wrapper sets the field it types on a copy of the caller's options.
 
 use proc_macro2::{Span, TokenStream};
 use quote::{format_ident, quote, ToTokens};
@@ -30,12 +32,23 @@ use crate::ir::RustScalar;
 
 const MARKER_PREFIX: &str = "__TsGenWide";
 const LITERAL_ATTR: &str = "ts_gen_literal";
+const FIELD_LITERAL_ATTR: &str = "ts_gen_field_literal";
 const NULL_MARKER: &str = "__TsGenNull";
 
 /// The attribute the signature layer puts on a literal-keyed extern fn:
 /// `#[ts_gen_literal(positions(1), arm("text", get_text), arm("json", get_json))]`.
 /// Positions index the parameters after `this`.
 pub(crate) fn literal_attr(sig: &crate::codegen::signatures::FunctionSignature) -> TokenStream {
+    if let Some(field) = &sig.field_literal {
+        let attr = format_ident!("{FIELD_LITERAL_ATTR}");
+        let position = proc_macro2::Literal::usize_unsuffixed(field.position);
+        let (name, value) = (&field.field, &field.value);
+        let head = field.head.as_ref().map(|h| {
+            let h = format_ident!("{h}");
+            quote! { , #h }
+        });
+        return quote! { #[#attr(#position, #name, #value #head)] };
+    }
     let Some(spec) = &sig.literal else {
         return quote! {};
     };
@@ -70,6 +83,48 @@ fn take_literal_attr(item: &mut ForeignItemFn) -> Option<LiteralArms> {
         positions: parsed.positions,
         arms: parsed.arms,
     })
+}
+
+/// `#[ts_gen_field_literal(position, "field", "value", Head?)]`; see
+/// [`crate::codegen::signatures::FieldLiteral`].
+struct FieldLiteral {
+    position: usize,
+    field: String,
+    value: String,
+    head: Option<Ident>,
+}
+
+impl syn::parse::Parse for FieldLiteral {
+    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
+        let position: syn::LitInt = input.parse()?;
+        input.parse::<syn::Token![,]>()?;
+        let field: syn::LitStr = input.parse()?;
+        input.parse::<syn::Token![,]>()?;
+        let value: syn::LitStr = input.parse()?;
+        let head = if input.parse::<Option<syn::Token![,]>>()?.is_some() {
+            Some(input.parse()?)
+        } else {
+            None
+        };
+        Ok(Self {
+            position: position.base10_parse()?,
+            field: field.value(),
+            value: value.value(),
+            head,
+        })
+    }
+}
+
+fn take_field_literal_attr(item: &mut ForeignItemFn) -> Option<FieldLiteral> {
+    let idx = item
+        .attrs
+        .iter()
+        .position(|a| a.path().is_ident(FIELD_LITERAL_ATTR))?;
+    let attr = item.attrs.remove(idx);
+    let syn::Meta::List(list) = attr.meta else {
+        return None;
+    };
+    syn::parse2(list.tokens).ok()
 }
 
 struct LiteralArmsTokens {
@@ -292,7 +347,10 @@ fn mentions_mono(block: &ItemForeignMod) -> bool {
 
 fn mentions_literal(block: &ItemForeignMod) -> bool {
     block.items.iter().any(|i| match i {
-        ForeignItem::Fn(f) => f.attrs.iter().any(|a| a.path().is_ident(LITERAL_ATTR)),
+        ForeignItem::Fn(f) => f
+            .attrs
+            .iter()
+            .any(|a| a.path().is_ident(LITERAL_ATTR) || a.path().is_ident(FIELD_LITERAL_ATTR)),
         _ => false,
     })
 }
@@ -631,6 +689,7 @@ fn type_param_idents(generics: &Generics) -> impl Iterator<Item = Ident> + '_ {
 
 fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn, mono: bool) -> Vec<Wrapper> {
     let literal = take_literal_attr(item);
+    let field = take_field_literal_attr(item);
     let Some((attr_idx, binding)) = read_binding(item) else {
         return Vec::new();
     };
@@ -653,7 +712,7 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn, mono: bool) -> Vec<Wra
         })
         .collect();
     let converts = return_shape.converts() || param_shapes.iter().any(|(_, s)| s.converts());
-    if !converts && literal.is_none() {
+    if !converts && literal.is_none() && field.is_none() {
         return Vec::new();
     }
 
@@ -681,6 +740,22 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn, mono: bool) -> Vec<Wra
     if let ReturnType::Type(_, ty) = &mut public_sig.output {
         let to_f64 = !return_shape.converts();
         Resolve { to_f64 }.visit_type_mut(ty);
+    }
+    // The caller's options take the dictionary's `Partial`, whose `field`
+    // the wrapper sets.
+    let field_arg = field.as_ref().and_then(|f| {
+        let head = f.head.as_ref()?;
+        match public_sig.inputs.iter_mut().nth(skip + f.position)? {
+            FnArg::Typed(pat) => Some((head, &mut *pat.ty)),
+            FnArg::Receiver(_) => None,
+        }
+    });
+    if let Some((head, Type::Reference(r))) = field_arg {
+        if let Type::Path(p) = &mut *r.elem {
+            if let Some(last) = p.path.segments.last_mut() {
+                last.ident = head.clone();
+            }
+        }
     }
 
     // Extern binding: markers resolve to f64, private name, explicit JS name
@@ -805,11 +880,35 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn, mono: bool) -> Vec<Wra
             let call_args = param_shapes.iter().enumerate().map(|(i, (pname, s))| {
                 match values.iter().find(|(pos, _)| *pos == i) {
                     Some((_, lit)) => quote! { #lit },
+                    None if field.as_ref().is_some_and(|f| f.position == i) => {
+                        quote! { ::wasm_bindgen::JsCast::unchecked_ref(&#pname) }
+                    }
                     None => to_extern(quote! { #pname }, s),
                 }
             });
             let call = quote! { #callee(#(#call_args),*)#await_tokens };
             let body = from_extern(call, &return_shape);
+            let body = match field
+                .as_ref()
+                .and_then(|f| Some((f, &param_shapes.get(f.position)?.0)))
+            {
+                Some((f, pname)) => {
+                    let (name, value) = (&f.field, &f.value);
+                    quote! {
+                        let #pname: ::js_sys::Object = ::js_sys::Object::assign(
+                            &::js_sys::Object::new(),
+                            ::wasm_bindgen::JsCast::unchecked_ref(#pname),
+                        );
+                        let _ = ::js_sys::Reflect::set_str(
+                            &#pname,
+                            &::js_sys::JsString::from(#name),
+                            &::wasm_bindgen::JsValue::from_str(#value),
+                        );
+                        #body
+                    }
+                }
+                None => body,
+            };
             let mut sig = public_sig.clone();
             sig.ident = name;
             sig.inputs = receiver
@@ -855,7 +954,10 @@ fn process_items(items: &mut Vec<Item>) {
                 for fi in block.items.iter_mut() {
                     if let ForeignItem::Fn(f) = fi {
                         if mentions_marker(&f.sig)
-                            || f.attrs.iter().any(|a| a.path().is_ident(LITERAL_ATTR))
+                            || f.attrs.iter().any(|a| {
+                                a.path().is_ident(LITERAL_ATTR)
+                                    || a.path().is_ident(FIELD_LITERAL_ATTR)
+                            })
                         {
                             wrappers.extend(wrap(&snapshot, f, mono));
                         }
@@ -908,7 +1010,7 @@ fn render_wrappers(wrappers: Vec<Wrapper>) -> Vec<Item> {
 /// carry one in a convertible position.
 pub(crate) fn apply(file: &mut syn::File) {
     let text = file.to_token_stream().to_string();
-    if ![MARKER_PREFIX, NULL_MARKER, LITERAL_ATTR]
+    if ![MARKER_PREFIX, NULL_MARKER, LITERAL_ATTR, FIELD_LITERAL_ATTR]
         .iter()
         .any(|m| text.contains(m))
     {

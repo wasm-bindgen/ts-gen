@@ -274,6 +274,21 @@ impl LiteralSpec {
     }
 }
 
+/// A binding keyed by a literal type argument of a dictionary parameter
+/// (`options: KVNamespaceGetOptions<"json">`), which sets the field that
+/// argument types itself so the caller's options cannot ask for another
+/// reading. The emitter adds an inline wrapper taking the dictionary's
+/// declared `Partial` (`head`) where there is one, which passes a copy of
+/// the options with `field` set to `value`.
+#[derive(Clone, Debug, PartialEq)]
+pub struct FieldLiteral {
+    /// Index among the parameters after `this`.
+    pub position: usize,
+    pub field: String,
+    pub value: String,
+    pub head: Option<String>,
+}
+
 /// A fully-resolved emitter input: an [`ExpandedSignature`] augmented with
 /// the per-emit decisions (final Rust name, `catch`, `async`, return type,
 /// doc, error type) that the per-callable layer made.
@@ -312,6 +327,7 @@ pub struct FunctionSignature {
     /// only by string-literal arguments; `rust_name` is then the first
     /// arm's wrapper name and the extern itself is emitted privately.
     pub literal: Option<LiteralSpec>,
+    pub field_literal: Option<FieldLiteral>,
 }
 
 /// Recursively collect every in-scope type-parameter name reachable
@@ -708,6 +724,65 @@ fn literal_arm(
     }
 }
 
+/// The [`FieldLiteral`] of a type-argument arm: its one literal argument
+/// instantiates the parameter exactly one property of the dictionary has as
+/// its type.
+fn field_literal(
+    params: &[ConcreteParam],
+    arm: &LiteralArm,
+    cgctx: &CodegenContext<'_>,
+    scope: ScopeId,
+) -> Option<FieldLiteral> {
+    use crate::ir::{Member, TypeKind};
+    let [(position, value)] = arm.values.as_slice() else {
+        return None;
+    };
+    let TypeRef::Reference {
+        segments,
+        generic_args,
+    } = &params.get(*position)?.type_ref
+    else {
+        return None;
+    };
+    let [name] = segments.as_slice() else {
+        return None;
+    };
+    let literal_args: Vec<usize> = generic_args
+        .iter()
+        .enumerate()
+        .filter(|(_, a)| matches!(a, TypeRef::StringLiteral(_)))
+        .map(|(i, _)| i)
+        .collect();
+    let [arg] = literal_args.as_slice() else {
+        return None;
+    };
+    let id = cgctx.gctx.resolve_path(scope, name)?;
+    let TypeKind::Interface(iface) = &cgctx.gctx.get_type(id).kind else {
+        return None;
+    };
+    let param = TypeRef::ident(iface.type_params.get(*arg)?.name.clone());
+    let mut fields = iface.members.iter().filter_map(|m| match m {
+        Member::Getter(g) if g.type_ref == param => Some(&g.js_name),
+        _ => None,
+    });
+    let field = fields.next()?.clone();
+    if fields.next().is_some() {
+        return None;
+    }
+    let head = cgctx.gctx.partials.get(&id).and_then(|&partial| {
+        let TypeKind::Interface(p) = &cgctx.gctx.get_type(partial).kind else {
+            return None;
+        };
+        (cgctx.gctx.resolve_path(scope, &p.name) == Some(partial)).then(|| p.name.clone())
+    });
+    Some(FieldLiteral {
+        position: *position,
+        field,
+        value: value.clone(),
+        head,
+    })
+}
+
 fn has_literal_arg(args: &[TypeRef]) -> bool {
     args.iter().any(|a| matches!(a, TypeRef::StringLiteral(_)))
 }
@@ -832,6 +907,7 @@ pub fn build_signatures_with_postfix(
         overload: usize,
         primary_name: String,
         literal: Option<LiteralSpec>,
+        field_literal: Option<FieldLiteral>,
     }
     let mut units: Vec<Unit> = Vec::new();
     for exp in expansions {
@@ -845,11 +921,15 @@ pub fn build_signatures_with_postfix(
                     .join("_");
                 let candidate =
                     public_rust_name(&format!("{base}_{tag}{}{postfix}", exp.name_suffix));
+                let field_literal = cgctx.filter(|_| per_mono).and_then(|c| {
+                    field_literal(&exp.params, arm, c, spec.overloads[arm.overload].body_scope)
+                });
                 units.push(Unit {
                     params: exp.params.clone(),
                     overload: arm.overload,
                     primary_name: names.declare(&candidate, Suffix::Snake),
                     literal: None,
+                    field_literal,
                 });
             }
             continue;
@@ -862,6 +942,7 @@ pub fn build_signatures_with_postfix(
                 overload: exp.overload,
                 primary_name: names.declare(&primary_candidate, Suffix::Snake),
                 literal: None,
+                field_literal: None,
             });
             continue;
         }
@@ -896,6 +977,7 @@ pub fn build_signatures_with_postfix(
                     positions: positions.clone(),
                     arms,
                 }),
+                field_literal: None,
             });
         }
     }
@@ -906,6 +988,7 @@ pub fn build_signatures_with_postfix(
             overload,
             primary_name,
             literal,
+            field_literal,
         } = unit;
         let overload = spec.overloads[overload];
         let scope = overload.body_scope;
@@ -956,6 +1039,7 @@ pub fn build_signatures_with_postfix(
             doc: overload.doc.clone(),
             body_scope: scope,
             literal: primary_literal,
+            field_literal: field_literal.clone(),
         };
         push_with_js_string_return(&mut out, primary, overload.string_mode, names, cgctx, scope);
 
@@ -988,6 +1072,7 @@ pub fn build_signatures_with_postfix(
                 doc: overload.doc.clone(),
                 body_scope: scope,
                 literal: promise_literal,
+                field_literal: field_literal.clone(),
             });
         }
 
@@ -1009,6 +1094,7 @@ pub fn build_signatures_with_postfix(
                 doc: overload.doc.clone(),
                 body_scope: scope,
                 literal: try_literal,
+                field_literal: field_literal.clone(),
             };
             push_with_js_string_return(
                 &mut out,

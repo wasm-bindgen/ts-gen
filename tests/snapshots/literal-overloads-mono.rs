@@ -222,43 +222,43 @@ extern "C" {
         options: &GetOptionsPartial<()>,
     ) -> Promise<Option<String>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_text_with_options(
+    async fn get_text_with_options_js(
         this: &Namespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions<String>,
     ) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_text_with_options_js_string(
+    async fn get_text_with_options_js_string_js(
         this: &Namespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions<String>,
     ) -> Result<Option<JsString>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_text_with_options_promise(
+    fn get_text_with_options_promise_js(
         this: &Namespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions<String>,
     ) -> Promise<Option<String>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_json_with_options<T>(
+    async fn get_json_with_options_js<T>(
         this: &Namespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions<String>,
     ) -> Result<Option<T>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_json_with_options_promise<T>(
+    fn get_json_with_options_promise_js<T>(
         this: &Namespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions<String>,
     ) -> Promise<Option<T>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_array_buffer_with_options(
+    async fn get_array_buffer_with_options_js(
         this: &Namespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions<String>,
     ) -> Result<Option<ArrayBuffer>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_array_buffer_with_options_promise(
+    fn get_array_buffer_with_options_promise_js(
         this: &Namespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions<String>,
@@ -274,41 +274,288 @@ extern "C" {
         key: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<Map<String, Option<String>>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_text_with_slice_and_options(
+    async fn get_text_with_slice_and_options_js(
         this: &Namespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &GetOptions<String>,
     ) -> Result<Map<String, Option<String>>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_text_with_slice_and_options_promise(
+    fn get_text_with_slice_and_options_promise_js(
         this: &Namespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &GetOptions<String>,
     ) -> Promise<Map<String, Option<String>>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_json_with_slice_and_options(
+    async fn get_json_with_slice_and_options_js(
         this: &Namespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &GetOptions<String>,
     ) -> Result<Map<String, JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_json_with_slice_and_options_promise(
+    fn get_json_with_slice_and_options_promise_js(
         this: &Namespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &GetOptions<String>,
     ) -> Promise<Map<String, JsValue>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_json_with_slice_and_options_typed<T>(
+    async fn get_json_with_slice_and_options_typed_js<T>(
         this: &Namespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &GetOptions<String>,
     ) -> Result<Map<String, Option<T>>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_json_with_slice_and_options_typed_promise<T>(
+    fn get_json_with_slice_and_options_typed_promise_js<T>(
         this: &Namespace,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &GetOptions<String>,
     ) -> Promise<Map<String, Option<T>>>;
+}
+impl Namespace {
+    pub async fn get_text_with_options(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &GetOptionsPartial<String>,
+    ) -> Result<Option<String>, JsValue> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("text"),
+        );
+        self.get_text_with_options_js(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+            .await
+    }
+    pub async fn get_text_with_options_js_string(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &GetOptionsPartial<String>,
+    ) -> Result<Option<JsString>, JsValue> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("text"),
+        );
+        self.get_text_with_options_js_string_js(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+        .await
+    }
+    pub fn get_text_with_options_promise(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &GetOptionsPartial<String>,
+    ) -> Promise<Option<String>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("text"),
+        );
+        self.get_text_with_options_promise_js(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+    }
+    pub async fn get_json_with_options<T>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &GetOptionsPartial<String>,
+    ) -> Result<Option<T>, JsValue>
+    where
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi + 'static,
+    {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.get_json_with_options_js(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+            .await
+    }
+    pub fn get_json_with_options_promise<T>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &GetOptionsPartial<String>,
+    ) -> Promise<Option<T>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.get_json_with_options_promise_js(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+    }
+    pub async fn get_array_buffer_with_options(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &GetOptionsPartial<String>,
+    ) -> Result<Option<ArrayBuffer>, JsValue> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("arrayBuffer"),
+        );
+        self.get_array_buffer_with_options_js(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+            .await
+    }
+    pub fn get_array_buffer_with_options_promise(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &GetOptionsPartial<String>,
+    ) -> Promise<Option<ArrayBuffer>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("arrayBuffer"),
+        );
+        self.get_array_buffer_with_options_promise_js(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+    }
+    pub async fn get_text_with_slice_and_options(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &GetOptionsPartial<String>,
+    ) -> Result<Map<String, Option<String>>, JsValue> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("text"),
+        );
+        self.get_text_with_slice_and_options_js(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+        .await
+    }
+    pub fn get_text_with_slice_and_options_promise(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &GetOptionsPartial<String>,
+    ) -> Promise<Map<String, Option<String>>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("text"),
+        );
+        self.get_text_with_slice_and_options_promise_js(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+    }
+    pub async fn get_json_with_slice_and_options(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &GetOptionsPartial<String>,
+    ) -> Result<Map<String, JsValue>, JsValue> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.get_json_with_slice_and_options_js(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+        .await
+    }
+    pub fn get_json_with_slice_and_options_promise(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &GetOptionsPartial<String>,
+    ) -> Promise<Map<String, JsValue>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.get_json_with_slice_and_options_promise_js(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+    }
+    pub async fn get_json_with_slice_and_options_typed<T>(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &GetOptionsPartial<String>,
+    ) -> Result<Map<String, Option<T>>, JsValue>
+    where
+        Map<String, Option<T>>: ::wasm_bindgen::convert::FromWasmAbi + 'static,
+    {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.get_json_with_slice_and_options_typed_js(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+        .await
+    }
+    pub fn get_json_with_slice_and_options_typed_promise<T>(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &GetOptionsPartial<String>,
+    ) -> Promise<Map<String, Option<T>>> {
+        let options: ::js_sys::Object = ::js_sys::Object::assign(
+            &::js_sys::Object::new(),
+            ::wasm_bindgen::JsCast::unchecked_ref(options),
+        );
+        let _ = ::js_sys::Reflect::set_str(
+            &options,
+            &::js_sys::JsString::from("type"),
+            &::wasm_bindgen::JsValue::from_str("json"),
+        );
+        self.get_json_with_slice_and_options_typed_promise_js(
+            key,
+            ::wasm_bindgen::JsCast::unchecked_ref(&options),
+        )
+    }
 }
 #[wasm_bindgen(module = "literal-overloads-mono", experimental_generic_mono)]
 extern "C" {

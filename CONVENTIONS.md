@@ -2925,11 +2925,24 @@ impl CompressionStream {
 * Under per-monomorphization, overloads that differ only in a string
   literal *type argument* of a parameter (`options?: GetOptions<"json">`,
   `GetOptions<"text">`) form a cohort too. The literal travels inside
-  the argument, so nothing is baked in: each arm is a binding of its own
-  with its overload's return and type parameters, named
-  `<base>_<literal>` plus the remaining parameters' suffix and the keyed
-  parameter's name (`get_json_with_options<T>(key, &GetOptions<String>)
-  -> Option<T>`, `get_text_with_slice_and_options`).
+  the argument: each arm is a binding of its own with its overload's
+  return and type parameters, named `<base>_<literal>` plus the
+  remaining parameters' suffix and the keyed parameter's name
+  (`get_json_with_options<T>`, `get_text_with_slice_and_options`). When
+  the literal types exactly one property of a dictionary (`type: Type`),
+  the binding is an inline wrapper that sets that property to the
+  literal on a copy of the caller's options, so the options cannot ask
+  for a reading other than the return's. The caller's options take the
+  dictionary's [`Partial`](#in-scope-generic-type-parameters) where one
+  is declared:
+
+  ```rust
+  pub async fn get_json_with_options<T>(&self, key: impl JsStringLike, options: &GetOptionsPartial<String>) -> Result<Option<T>, JsValue> {
+      let options: ::js_sys::Object = ::js_sys::Object::assign(&::js_sys::Object::new(), ::wasm_bindgen::JsCast::unchecked_ref(options));
+      let _ = ::js_sys::Reflect::set_str(&options, &::js_sys::JsString::from("type"), &::wasm_bindgen::JsValue::from_str("json"));
+      self.get_json_with_options_js(key, ::wasm_bindgen::JsCast::unchecked_ref(&options)).await
+  }
+  ```
 
 ## `--annotate` side files
 
