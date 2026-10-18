@@ -41,3 +41,10 @@ export declare class Total {
   constructor(...values: number[]);
   readonly value: number;
 }
+
+// A returned list's nullable elements read as `Option`.
+export declare class Trace {
+  readonly traces: (string | null)[];
+  readonly errors?: (Total | null)[];
+  readonly values: (any | null)[];
+}
