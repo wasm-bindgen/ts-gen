@@ -208,19 +208,19 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<Option<String>>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_str_and_options(
+    pub async fn get_with_options(
         this: &Namespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions<Undefined>,
     ) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub async fn get_with_str_and_options_js_string(
+    pub async fn get_with_options_js_string(
         this: &Namespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions<Undefined>,
     ) -> Result<Option<JsString>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
-    pub fn get_with_str_and_options_promise(
+    pub fn get_with_options_promise(
         this: &Namespace,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions<Undefined>,

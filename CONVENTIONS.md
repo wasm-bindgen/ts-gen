@@ -1675,6 +1675,20 @@ pub fn show_with_f64_and_opts(value: f64, opts: &ShowOpts);
 disambiguation, including readability adjustments when the same
 parameter name appears in multiple alternatives.
 
+Under `--experimental-generic-mono` two rules shorten the suffix,
+each kept only when the shorter name is still unique:
+
+* A union arm the primary (unsuffixed) expansion takes at the same
+  position is implied, so it adds nothing: `fetch(input: Request |
+  string | URL, init?)` gives `fetch`, `fetch_with_str`,
+  `fetch_with_url`, `fetch_with_init` and `fetch_with_str_and_init`
+  (not `fetch_with_request_and_init`).
+* A dictionary arm is named after its parameter rather than its type:
+  `listen_with_options` / `listen_with_bool` for `options?:
+  ListenerOptions | boolean`, `put_with_options` for `KVNamespacePutOptions`.
+  A second dictionary arm at the same position collides and keeps
+  its type name (`new_with_source`, `new_with_underlying_source`).
+
 ### `_with_<type>` suffix vocabulary
 
 When a union expansion drives the suffix (same parameter name,

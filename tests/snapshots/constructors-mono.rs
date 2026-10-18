@@ -73,9 +73,7 @@ extern "C" {
     #[wasm_bindgen(constructor, catch, js_name = "Stream")]
     pub fn new_typed<R>() -> Result<Stream<R>, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Stream")]
-    pub fn new_with_underlying_byte_source(
-        source: &UnderlyingByteSource,
-    ) -> Result<Stream<Uint8Array>, JsValue>;
+    pub fn new_with_source(source: &UnderlyingByteSource) -> Result<Stream<Uint8Array>, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Stream")]
     pub fn new_with_underlying_source<R>(
         source: &UnderlyingSource<R>,
