@@ -124,3 +124,28 @@ extern "C" {
         data: &Float64Array,
     ) -> Result<JsString, JsValue>;
 }
+#[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Queue<T = JsValue>;
+    #[wasm_bindgen(method, js_name = "sendBatch")]
+    pub fn send_batch<T>(this: &Queue<T>, #[wasm_bindgen(slice = "array")] messages: &[T]);
+    #[wasm_bindgen(method, catch, js_name = "sendBatch")]
+    pub fn try_send_batch<T>(
+        this: &Queue<T>,
+        #[wasm_bindgen(slice = "array")] messages: &[T],
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn tag<T>(
+        this: &Queue<T>,
+        names: &[impl ::wasm_bindgen::JsStringLike],
+        #[wasm_bindgen(slice = "array")] scores: Option<&[f64]>,
+    );
+    #[wasm_bindgen(method, catch, js_name = "tag")]
+    pub fn try_tag<T>(
+        this: &Queue<T>,
+        names: &[impl ::wasm_bindgen::JsStringLike],
+        #[wasm_bindgen(slice = "array")] scores: Option<&[f64]>,
+    ) -> Result<(), JsValue>;
+}

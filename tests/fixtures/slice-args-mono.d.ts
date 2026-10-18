@@ -11,3 +11,9 @@ export declare class Bag<T> {
   take(values: T[]): string;
 }
 export declare function mixed<T>(values: T[], weights: number[], data: Float64Array | number[]): string;
+
+// An `Iterable<T>` argument is taken like `T[]`.
+export declare class Queue<T> {
+  sendBatch(messages: Iterable<T>): void;
+  tag(names: Iterable<string>, scores: Iterable<number> | null): void;
+}

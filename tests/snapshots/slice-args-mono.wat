@@ -36,6 +36,12 @@
   ;; mixed(values: T[], weights: number[], data: Float64Array): string
   (import "slice-args-mono" "mixed_with_float64_array" (func $slice-args-mono:mixed_with_float64_array (param $values externref) (param $weights externref) (param $data externref) (result externref)))
 
+  ;; Queue
+  ;; sendBatch(messages: Iterable<T>): void
+  (import "slice-args-mono" "Queue.send_batch" (func $slice-args-mono:Queue.send_batch (param $this externref) (param $messages externref)))
+  ;; tag(names: Iterable<string>, scores: Iterable<number> | null): void
+  (import "slice-args-mono" "Queue.tag" (func $slice-args-mono:Queue.tag (param $this externref) (param $names externref) (param $scores externref)))
+
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
 

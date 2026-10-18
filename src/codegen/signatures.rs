@@ -1302,6 +1302,14 @@ fn flatten_into(
                 if let Some(target) = c.resolve_alias_instance(ty, scope) {
                     return flatten_into(&target, cgctx, scope, out);
                 }
+                // Per-mono, an `Iterable<T>` argument is taken as a slice,
+                // which reaches JS as an `Array` (itself iterable).
+                if c.experimental_generic_mono {
+                    if let Some(elem) = typemap::iterable_elem(ty) {
+                        out.push(TypeRef::Array(Box::new(elem.clone())));
+                        return true;
+                    }
+                }
             }
             out.push(ty.clone());
             true

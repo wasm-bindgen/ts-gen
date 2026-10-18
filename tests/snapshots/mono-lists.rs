@@ -5,7 +5,7 @@ use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
 #[allow(dead_code)]
-pub type Tag = JsString;
+pub type Tag = String;
 #[wasm_bindgen(module = "mono-lists", experimental_generic_mono)]
 extern "C" {
     pub fn tags(values: &[impl ::wasm_bindgen::JsStringLike]) -> String;

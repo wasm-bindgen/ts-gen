@@ -143,6 +143,10 @@ extern "C" {
     pub fn status(this: &ResponseInit) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
     pub fn set_status(this: &ResponseInit, val: f64);
+    #[wasm_bindgen(method, getter)]
+    pub fn cf(this: &ResponseInit) -> Option<JsValue>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_cf(this: &ResponseInit, val: &JsValue);
 }
 impl ResponseInit {
     pub fn new() -> ResponseInit {
@@ -160,6 +164,10 @@ pub struct ResponseInitBuilder {
 impl ResponseInitBuilder {
     pub fn status(self, val: f64) -> Self {
         self.inner.set_status(val);
+        self
+    }
+    pub fn cf(self, val: &JsValue) -> Self {
+        self.inner.set_cf(val);
         self
     }
     pub fn build(self) -> ResponseInit {

@@ -62,6 +62,10 @@
   (import "./bindings.wasm" "ResponseInit.status" (func $ResponseInit.status (param $this externref) (result externref)))
   ;; set status(value: number)
   (import "./bindings.wasm" "ResponseInit.set_status" (func $ResponseInit.set_status (param $this externref) (param $value f64)))
+  ;; cf?: any
+  (import "./bindings.wasm" "ResponseInit.cf" (func $ResponseInit.cf (param $this externref) (result externref)))
+  ;; set cf(value: any)
+  (import "./bindings.wasm" "ResponseInit.set_cf" (func $ResponseInit.set_cf (param $this externref) (param $value externref)))
 
   ;; Reply
   ;; constructor()

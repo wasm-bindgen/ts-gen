@@ -22,6 +22,8 @@ declare function clearTimeout(id: number | null): void;
 type BodyInit = string | ArrayBuffer | Signal;
 interface ResponseInit {
   status?: number;
+  // An optional `any` reads as `Option<JsValue>`.
+  cf?: any;
 }
 declare class Reply {
   constructor(body?: BodyInit | null, init?: ResponseInit);
