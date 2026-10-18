@@ -3,6 +3,8 @@
 #[allow(unused_imports)]
 use js_sys::*;
 #[allow(unused_imports)]
+use wasm_bindgen::convert::{FromWasmAbi, RefIntoWasmAbi};
+#[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -29,21 +31,15 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Pair<A = JsValue, B = JsValue>;
     #[wasm_bindgen(method, getter)]
-    pub fn a<A, B>(this: &Pair<A, B>) -> A;
+    pub fn a<A: FromWasmAbi, B>(this: &Pair<A, B>) -> A;
     #[wasm_bindgen(method, setter)]
-    pub fn set_a<A, B>(this: &Pair<A, B>, val: &A);
+    pub fn set_a<A: RefIntoWasmAbi, B>(this: &Pair<A, B>, val: &A);
     #[wasm_bindgen(method, getter)]
-    pub fn b<A, B>(this: &Pair<A, B>) -> B;
+    pub fn b<A, B: FromWasmAbi>(this: &Pair<A, B>) -> B;
     #[wasm_bindgen(method, setter)]
-    pub fn set_b<A, B>(this: &Pair<A, B>, val: &B);
+    pub fn set_b<A, B: RefIntoWasmAbi>(this: &Pair<A, B>, val: &B);
 }
-impl<A, B> Pair<A, B>
-where
-    for<'__wbg> &'__wbg A:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-    for<'__wbg> &'__wbg B:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<A: RefIntoWasmAbi, B: RefIntoWasmAbi> Pair<A, B> {
     pub fn new(a: &A, b: &B) -> Pair<A, B> {
         let inner: Pair<A, B> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_a(a);

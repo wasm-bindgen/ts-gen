@@ -3,6 +3,8 @@
 #[allow(unused_imports)]
 use js_sys::*;
 #[allow(unused_imports)]
+use wasm_bindgen::convert::{FromWasmAbi, RefIntoWasmAbi};
+#[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "literal-overloads-mono", experimental_generic_mono)]
 extern "C" {
@@ -52,13 +54,13 @@ extern "C" {
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, js_name = "read")]
-    fn read_json_js<T>(
+    fn read_json_js<T: FromWasmAbi>(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
     ) -> T;
     #[wasm_bindgen(method, catch, js_name = "read")]
-    fn try_read_json_js<T>(
+    fn try_read_json_js<T: FromWasmAbi>(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -92,16 +94,13 @@ impl Store {
     ) -> Result<JsString, JsValue> {
         self.try_read_text_js_string_js(key, "text")
     }
-    pub fn read_json<T>(&self, key: impl ::wasm_bindgen::JsStringLike) -> T
-    where
-        T: ::wasm_bindgen::convert::FromWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-    {
+    pub fn read_json<T: FromWasmAbi>(&self, key: impl ::wasm_bindgen::JsStringLike) -> T {
         self.read_json_js(key, "json")
     }
-    pub fn try_read_json<T>(&self, key: impl ::wasm_bindgen::JsStringLike) -> Result<T, JsValue>
-    where
-        T: ::wasm_bindgen::convert::FromWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-    {
+    pub fn try_read_json<T: FromWasmAbi>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<T, JsValue> {
         self.try_read_json_js(key, "json")
     }
 }
@@ -111,19 +110,15 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type GetOptions<Type = JsValue>;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_<Type>(this: &GetOptions<Type>) -> Type;
+    pub fn type_<Type: FromWasmAbi>(this: &GetOptions<Type>) -> Type;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type<Type>(this: &GetOptions<Type>, val: &Type);
+    pub fn set_type<Type: RefIntoWasmAbi>(this: &GetOptions<Type>, val: &Type);
     #[wasm_bindgen(method, getter, js_name = "cacheTtl")]
     pub fn cache_ttl<Type>(this: &GetOptions<Type>) -> Option<f64>;
     #[wasm_bindgen(method, setter, js_name = "cacheTtl")]
     pub fn set_cache_ttl<Type>(this: &GetOptions<Type>, val: f64);
 }
-impl<Type> GetOptions<Type>
-where
-    for<'__wbg> &'__wbg Type:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<Type: RefIntoWasmAbi> GetOptions<Type> {
     pub fn new(r#type: &Type) -> GetOptions<Type> {
         Self::builder(r#type).build()
     }
@@ -322,9 +317,11 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type GetOptionsPartial<Type = JsValue>;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_<Type>(this: &GetOptionsPartial<Type>) -> Option<Type>;
+    pub fn type_<Type>(this: &GetOptionsPartial<Type>) -> Option<Type>
+    where
+        Option<Type>: FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_type<Type>(this: &GetOptionsPartial<Type>, val: &Type);
+    pub fn set_type<Type: RefIntoWasmAbi>(this: &GetOptionsPartial<Type>, val: &Type);
     #[wasm_bindgen(method, getter, js_name = "cacheTtl")]
     pub fn cache_ttl<Type>(this: &GetOptionsPartial<Type>) -> Option<f64>;
     #[wasm_bindgen(method, setter, js_name = "cacheTtl")]
@@ -346,8 +343,7 @@ pub struct GetOptionsPartialBuilder<Type> {
 impl<Type> GetOptionsPartialBuilder<Type> {
     pub fn type_(self, val: &Type) -> Self
     where
-        for<'__wbg> &'__wbg Type:
-            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+        Type: RefIntoWasmAbi,
     {
         self.inner.set_type(val);
         self
@@ -371,9 +367,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Cell<V = JsValue>;
     #[wasm_bindgen(method, js_name = "take")]
-    fn take_now_js<V>(this: &Cell<V>, mode: impl ::wasm_bindgen::JsStringLike) -> V;
+    fn take_now_js<V: FromWasmAbi>(this: &Cell<V>, mode: impl ::wasm_bindgen::JsStringLike) -> V;
     #[wasm_bindgen(method, catch, js_name = "take")]
-    fn try_take_now_js<V>(
+    fn try_take_now_js<V: FromWasmAbi>(
         this: &Cell<V>,
         mode: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<V, JsValue>;
@@ -383,13 +379,13 @@ extern "C" {
 impl<V> Cell<V> {
     pub fn take_now(&self) -> V
     where
-        V: ::wasm_bindgen::convert::FromWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+        V: FromWasmAbi,
     {
         self.take_now_js("now")
     }
     pub fn try_take_now(&self) -> Result<V, JsValue>
     where
-        V: ::wasm_bindgen::convert::FromWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+        V: FromWasmAbi,
     {
         self.try_take_now_js("now")
     }

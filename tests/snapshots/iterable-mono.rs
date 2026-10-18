@@ -3,6 +3,8 @@
 #[allow(unused_imports)]
 use js_sys::*;
 #[allow(unused_imports)]
+use wasm_bindgen::convert::FromWasmAbi;
+#[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -59,9 +61,13 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Cursor<T = JsValue>;
     #[wasm_bindgen(method)]
-    pub fn next<T>(this: &Cursor<T>) -> Option<T>;
+    pub fn next<T>(this: &Cursor<T>) -> Option<T>
+    where
+        Option<T>: FromWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "next")]
-    pub fn try_next<T>(this: &Cursor<T>) -> Result<Option<T>, JsValue>;
+    pub fn try_next<T>(this: &Cursor<T>) -> Result<Option<T>, JsValue>
+    where
+        Option<T>: FromWasmAbi;
     #[wasm_bindgen(method, js_name = "[Symbol.iterator]")]
     pub fn iterator<T>(this: &Cursor<T>) -> Iterator<T>;
 }

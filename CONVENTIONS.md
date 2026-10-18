@@ -2149,48 +2149,65 @@ Passing `--experimental-generic-mono` selects wasm-bindgen's experimental
 per-monomorphization path. Every generated extern block receives
 `experimental_generic_mono`, type parameters omit the `JsGeneric` bound, and
 each concrete Rust type uses its native ABI representation. A bare
-type-parameter argument is lent like any other argument (`&T`), which
-wasm-bindgen marshals through `for<'a> &'a T: IntoWasmAbi`, so `&x` keeps
-`T = X` and a handle is not moved:
+type-parameter argument is lent like any other argument (`&T`), so `&x` keeps
+`T = X` and a handle is not moved.
+
+wasm-bindgen adds no ABI bounds to a per-mono import: the declaration's
+bounds are its whole contract. Each type parameter therefore carries, inline,
+the trait its position needs, imported once from `wasm_bindgen::convert`:
+
+| position | bound |
+|---|---|
+| argument `T` | `T: IntoWasmAbi` |
+| argument `&T`, `Option<&T>` | `T: RefIntoWasmAbi` |
+| argument `Option<T>` | `Option<T>: IntoWasmAbi` |
+| argument `&[T]` | `T: VectorRefIntoWasmAbi` |
+| return `T` (or a `catch` `Result<T, _>`) | `T: FromWasmAbi` |
+| return `Option<T>` | `Option<T>: FromWasmAbi` |
+| return `Vec<T>` | `Vec<T>: FromWasmAbi` |
+
+A parameter inside another generic (`&Foo<T>`, `&Function<fn(String, Env)>`,
+`Promise<T>`, `&[Foo<T>]`) needs nothing, since an imported type's ABI holds
+for every instantiation, and an `impl JsStringLike`-style argument already
+implies its ABI trait. Any other shape naming a parameter bare is bounded as a
+whole, in a `where` clause. `Option<T>` is one: `OptionFromWasmAbi` only
+covers the types whose `None` fits in their own ABI, so `T: OptionFromWasmAbi`
+would reject `Option<f64>`, which has an ABI of its own:
 
 ```rust
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
-    pub fn identity<T>(value: &T) -> T;
+    pub fn identity<T: RefIntoWasmAbi + FromWasmAbi>(value: &T) -> T;
+    pub fn rows<T>(this: &Rows<T>) -> Vec<T>
+    where
+        Vec<T>: FromWasmAbi;
+    pub fn set_handler<Env>(this: &Handler<Env>, val: &Function<fn(String, Env)>);
 }
 ```
 
-Generated dictionary helpers call their extern setters from ordinary Rust, so
-their `impl` restates, for each argument shape that names a type parameter
-bare, the bound wasm-bindgen puts on the setter's import: `&T` needs `for<'a>
-&'a T: IntoWasmAbi`, `Option<&T>` needs `for<'a> Option<&'a T>: IntoWasmAbi`,
-and `&[T]` needs `T: VectorRefIntoWasmAbi`. A parameter inside another
-generic (`&Foo<T>`, `&Function<fn(String, Env)>`, `&[Foo<T>]`) needs nothing,
-since a handle's ABI holds for every instantiation. The extern declarations
-themselves remain unconstrained:
+Generated dictionary helpers and wrappers call these imports from ordinary
+Rust, so they restate the same bounds, inline on the parameters they
+declare:
 
 ```rust
-impl<T> Slot<T>
-where
-    for<'__wbg> Option<&'__wbg T>: IntoWasmAbi + WasmDescribe,
-    for<'__wbg> &'__wbg T: IntoWasmAbi + WasmDescribe,
-{ /* new(value: Option<&T>), builder(value: Option<&T>) */ }
-impl<T> Rows<T> where T: VectorRefIntoWasmAbi { /* new(rows: &[T]) */ }
+impl<T: RefIntoWasmAbi> Slot<T> { /* new(value: Option<&T>), builder(value: Option<&T>) */ }
+impl<T: VectorRefIntoWasmAbi> Rows<T> { /* new(rows: &[T]) */ }
 impl<Env> Handler<Env> { /* fetch(val: &Function<fn(String, Env)>) */ }
 ```
 
 The factories' bounds stay on their `impl` block; a builder method carries
 its own, so a builder whose type argument one field cannot take still has
 the others (`GetOptionsPartial::<()>::builder().cache_ttl(60)`, though
-`&()` has no ABI for `.type_(…)`). Nothing is attached to the builder struct
-itself, so merely storing or returning a builder does not constrain its
-type parameter:
+`&()` has no ABI for `.type_(…)`). A bound on the builder's own parameter
+is a method-level `where`, since that parameter is the `impl`'s. Nothing is
+attached to the builder struct itself, so merely storing or returning a
+builder does not constrain its type parameter:
 
 ```rust
 impl<T> SlotBuilder<T> {
     pub fn fallback(self, val: &T) -> Self
     where
-        for<'__wbg> &'__wbg T: IntoWasmAbi + WasmDescribe,
+        T: RefIntoWasmAbi,
     { /* … */ }
 }
 ```

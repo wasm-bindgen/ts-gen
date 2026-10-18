@@ -3,6 +3,8 @@
 #[allow(unused_imports)]
 use js_sys::*;
 #[allow(unused_imports)]
+use wasm_bindgen::convert::{FromWasmAbi, RefIntoWasmAbi};
+#[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
 #[allow(dead_code)]
 pub type Id = String;
@@ -74,11 +76,11 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Holder<T = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<T>(value: &T) -> Result<Holder<T>, JsValue>;
+    pub fn new<T: RefIntoWasmAbi>(value: &T) -> Result<Holder<T>, JsValue>;
     #[wasm_bindgen(method)]
-    pub fn get<T>(this: &Holder<T>) -> T;
+    pub fn get<T: FromWasmAbi>(this: &Holder<T>) -> T;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get<T>(this: &Holder<T>) -> Result<T, JsValue>;
+    pub fn try_get<T: FromWasmAbi>(this: &Holder<T>) -> Result<T, JsValue>;
 }
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {

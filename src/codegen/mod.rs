@@ -3,6 +3,7 @@
 //! The main entry point is [`generate`], which takes a parsed IR [`Module`]
 //! and produces formatted Rust source code as a string.
 
+mod abi_bounds;
 pub mod classes;
 pub mod discriminated_unions;
 pub mod enums;
@@ -199,6 +200,7 @@ pub fn generate_with_options(
         anyhow::anyhow!("generated tokens are not valid syn:\n{e}\n\nTokens:\n{tokens}")
     })?;
     inline_wrappers::apply(&mut file);
+    abi_bounds::apply(&mut file);
     split_unshared_views(&mut file.items);
     let formatted = rustfmt(&quote::ToTokens::to_token_stream(&file).to_string())?;
     // Prepend a header comment. Line comments don't survive `quote!`

@@ -759,10 +759,8 @@ impl<'a> ClassConfig<'a> {
             .filter_map(|f| syn::parse2::<syn::ImplItemFn>(f.clone()).ok())
             .map(|f| f.sig)
             .collect();
-        let mut preds = super::inline_wrappers::mono_arg_bounds(
-            sigs.iter().flat_map(|s| s.inputs.iter()),
-            &idents,
-        );
+        let mut preds =
+            super::abi_bounds::argument_bounds(sigs.iter().flat_map(|s| s.inputs.iter()), &idents);
         let mut seen = std::collections::HashSet::new();
         preds.retain(|p| seen.insert(quote::ToTokens::to_token_stream(p).to_string()));
         preds

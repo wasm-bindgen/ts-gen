@@ -3,6 +3,8 @@
 #[allow(unused_imports)]
 use js_sys::*;
 #[allow(unused_imports)]
+use wasm_bindgen::convert::RefIntoWasmAbi;
+#[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -42,9 +44,9 @@ extern "C" {
         tags: Option<&[impl ::wasm_bindgen::JsStringLike]>,
     ) -> Result<Body, JsValue>;
     #[wasm_bindgen(method)]
-    pub fn put<T, V>(this: &Body<T>, value: Option<&V>);
+    pub fn put<T, V: RefIntoWasmAbi>(this: &Body<T>, value: Option<&V>);
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub fn try_put<T, V>(this: &Body<T>, value: Option<&V>) -> Result<(), JsValue>;
+    pub fn try_put<T, V: RefIntoWasmAbi>(this: &Body<T>, value: Option<&V>) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

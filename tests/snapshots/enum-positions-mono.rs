@@ -3,6 +3,8 @@
 #[allow(unused_imports)]
 use js_sys::*;
 #[allow(unused_imports)]
+use wasm_bindgen::convert::{FromWasmAbi, RefIntoWasmAbi};
+#[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -25,15 +27,15 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Holder<T = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<T>(value: &T) -> Result<Holder<T>, JsValue>;
+    pub fn new<T: RefIntoWasmAbi>(value: &T) -> Result<Holder<T>, JsValue>;
     #[wasm_bindgen(method)]
-    pub fn get<T>(this: &Holder<T>) -> T;
+    pub fn get<T: FromWasmAbi>(this: &Holder<T>) -> T;
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get<T>(this: &Holder<T>) -> Result<T, JsValue>;
+    pub fn try_get<T: FromWasmAbi>(this: &Holder<T>) -> Result<T, JsValue>;
     #[wasm_bindgen(method)]
-    pub fn set<T>(this: &Holder<T>, value: &T);
+    pub fn set<T: RefIntoWasmAbi>(this: &Holder<T>, value: &T);
     #[wasm_bindgen(method, catch, js_name = "set")]
-    pub fn try_set<T>(this: &Holder<T>, value: &T) -> Result<(), JsValue>;
+    pub fn try_set<T: RefIntoWasmAbi>(this: &Holder<T>, value: &T) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "enum-positions-mono", experimental_generic_mono)]
 extern "C" {
@@ -41,19 +43,17 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Details<T = JsValue>;
     #[wasm_bindgen(method, getter)]
-    pub fn value<T>(this: &Details<T>) -> T;
+    pub fn value<T: FromWasmAbi>(this: &Details<T>) -> T;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<T>(this: &Details<T>, val: &T);
+    pub fn set_value<T: RefIntoWasmAbi>(this: &Details<T>, val: &T);
     #[wasm_bindgen(method, getter)]
-    pub fn fallback<T>(this: &Details<T>) -> Option<T>;
+    pub fn fallback<T>(this: &Details<T>) -> Option<T>
+    where
+        Option<T>: FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_fallback<T>(this: &Details<T>, val: &T);
+    pub fn set_fallback<T: RefIntoWasmAbi>(this: &Details<T>, val: &T);
 }
-impl<T> Details<T>
-where
-    for<'__wbg> &'__wbg T:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<T: RefIntoWasmAbi> Details<T> {
     pub fn new(value: &T) -> Details<T> {
         Self::builder(value).build()
     }
@@ -69,8 +69,7 @@ pub struct DetailsBuilder<T> {
 impl<T> DetailsBuilder<T> {
     pub fn fallback(self, val: &T) -> Self
     where
-        for<'__wbg> &'__wbg T:
-            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+        T: RefIntoWasmAbi,
     {
         self.inner.set_fallback(val);
         self

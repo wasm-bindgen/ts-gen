@@ -371,7 +371,7 @@ fn mentions_marker(tokens: &impl ToTokens) -> bool {
 }
 
 /// Whether the block's `#[wasm_bindgen(...)]` sets `experimental_generic_mono`.
-fn mentions_mono(block: &ItemForeignMod) -> bool {
+pub(crate) fn mentions_mono(block: &ItemForeignMod) -> bool {
     block.attrs.iter().any(|a| {
         a.path().is_ident("wasm_bindgen")
             && a.to_token_stream()
@@ -562,162 +562,6 @@ struct Wrapper {
 }
 
 /// Whether `ty` names one of `params`.
-fn mentions(ty: &Type, params: &[Ident]) -> bool {
-    struct Find<'a> {
-        params: &'a [Ident],
-        found: bool,
-    }
-    impl VisitMut for Find<'_> {
-        fn visit_path_mut(&mut self, path: &mut syn::Path) {
-            if path.leading_colon.is_none()
-                && path.segments.len() == 1
-                && self.params.contains(&path.segments[0].ident)
-            {
-                self.found = true;
-            }
-            syn::visit_mut::visit_path_mut(self, path);
-        }
-    }
-    let mut find = Find {
-        params,
-        found: false,
-    };
-    find.visit_type_mut(&mut ty.clone());
-    find.found
-}
-
-/// Whether `ty` names one of `params` outside the arguments of a generic
-/// type other than `Option`/`Vec`. A handle's ABI holds for every
-/// instantiation (`&Foo<T>`, `&Function<fn(T)>`, `Promise<T>`), so only a
-/// bare mention needs a bound.
-fn mentions_bare(ty: &Type, params: &[Ident]) -> bool {
-    struct Find<'a> {
-        params: &'a [Ident],
-        found: bool,
-    }
-    impl VisitMut for Find<'_> {
-        fn visit_path_mut(&mut self, path: &mut syn::Path) {
-            if path.leading_colon.is_none()
-                && path.segments.len() == 1
-                && self.params.contains(&path.segments[0].ident)
-            {
-                self.found = true;
-            }
-            syn::visit_mut::visit_path_mut(self, path);
-        }
-        fn visit_path_segment_mut(&mut self, seg: &mut syn::PathSegment) {
-            let transparent = seg.ident == "Option" || seg.ident == "Vec";
-            if transparent || matches!(seg.arguments, PathArguments::None) {
-                syn::visit_mut::visit_path_segment_mut(self, seg);
-            }
-        }
-    }
-    let mut find = Find {
-        params,
-        found: false,
-    };
-    find.visit_type_mut(&mut ty.clone());
-    find.found
-}
-
-/// `&[E]` or `Option<&[E]>` → `E`.
-fn slice_elem(ty: &Type) -> Option<&Type> {
-    let ty = match ty {
-        Type::Path(p) => {
-            let seg = p.path.segments.last()?;
-            let PathArguments::AngleBracketed(args) = &seg.arguments else {
-                return None;
-            };
-            match (seg.ident == "Option", args.args.first()) {
-                (true, Some(GenericArgument::Type(t))) => t,
-                _ => return None,
-            }
-        }
-        other => other,
-    };
-    match ty {
-        Type::Reference(r) if r.mutability.is_none() => match &*r.elem {
-            Type::Slice(slice) => Some(&slice.elem),
-            _ => None,
-        },
-        _ => None,
-    }
-}
-
-/// The `where` predicates `experimental_generic_mono` puts on an extern fn
-/// for each argument and return type that names a type parameter. Its
-/// wrapper calls it with those parameters, so it must state the ones that
-/// do not hold for every instantiation (see [`mentions_bare`]). An awaited
-/// result also has to be `'static`. The receiver (`skip`) holds for every
-/// instantiation.
-fn mono_bounds(sig: &syn::Signature, skip: usize, params: &[Ident]) -> Vec<syn::WherePredicate> {
-    let mut out = mono_arg_bounds(sig.inputs.iter().skip(skip), params);
-    if let ReturnType::Type(_, ty) = &sig.output {
-        let ok = result_ok(ty);
-        if sig.asyncness.is_some() && mentions(ok, params) {
-            out.push(syn::parse_quote!(#ok: ::wasm_bindgen::convert::FromWasmAbi + 'static));
-        } else if mentions_bare(ok, params) {
-            out.push(syn::parse_quote!(#ok: ::wasm_bindgen::convert::FromWasmAbi + ::wasm_bindgen::describe::WasmDescribe));
-        }
-    }
-    out
-}
-
-/// The argument half of [`mono_bounds`]: one predicate per typed argument
-/// naming a type parameter bare. Receivers are skipped. A borrow nested in
-/// the type (`Option<&T>`) is bound for every lifetime.
-pub(crate) fn mono_arg_bounds<'a>(
-    inputs: impl Iterator<Item = &'a FnArg>,
-    params: &[Ident],
-) -> Vec<syn::WherePredicate> {
-    let mut out: Vec<syn::WherePredicate> = Vec::new();
-    for arg in inputs {
-        let FnArg::Typed(pat) = arg else { continue };
-        let ty = &*pat.ty;
-        if !mentions_bare(ty, params) {
-            continue;
-        }
-        out.push(match (slice_elem(ty), ty) {
-            (Some(elem), _) => {
-                syn::parse_quote!(#elem: ::wasm_bindgen::convert::VectorRefIntoWasmAbi)
-            }
-            (None, Type::Reference(r)) if r.mutability.is_none() => {
-                let elem = &r.elem;
-                syn::parse_quote!(for<'__wbg> &'__wbg #elem: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe)
-            }
-            _ => {
-                let mut ty = ty.clone();
-                if name_elided_lifetimes(&mut ty) {
-                    syn::parse_quote!(for<'__wbg> #ty: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe)
-                } else {
-                    syn::parse_quote!(#ty: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe)
-                }
-            }
-        });
-    }
-    let mut seen = std::collections::HashSet::new();
-    out.retain(|p| seen.insert(p.to_token_stream().to_string()));
-    out
-}
-
-/// Gives every elided borrow in `ty` the lifetime `'__wbg`; whether any
-/// was found.
-fn name_elided_lifetimes(ty: &mut Type) -> bool {
-    struct Name(bool);
-    impl VisitMut for Name {
-        fn visit_type_reference_mut(&mut self, r: &mut syn::TypeReference) {
-            if r.lifetime.is_none() {
-                r.lifetime = Some(syn::Lifetime::new("'__wbg", Span::call_site()));
-                self.0 = true;
-            }
-            syn::visit_mut::visit_type_reference_mut(self, r);
-        }
-    }
-    let mut v = Name(false);
-    v.visit_type_mut(ty);
-    v.0
-}
-
 fn type_param_idents(generics: &Generics) -> impl Iterator<Item = Ident> + '_ {
     generics.params.iter().filter_map(|p| match p {
         GenericParam::Type(t) => Some(t.ident.clone()),
@@ -903,7 +747,7 @@ fn wrap(block: &ItemForeignMod, item: &mut ForeignItemFn, mono: bool) -> Vec<Wra
         let params: Vec<Ident> = type_param_idents(&public_sig.generics)
             .chain(impl_generics.into_iter().flat_map(type_param_idents))
             .collect();
-        let bounds = mono_bounds(&item.sig, skip, &params);
+        let bounds = super::abi_bounds::signature_bounds(&item.sig, skip, &params);
         if !bounds.is_empty() {
             public_sig
                 .generics
@@ -1170,10 +1014,10 @@ mod tests {
                 pub async fn get_json<T>(this: &Kv, key: &str, r#type: &str, rows: &[T], one: &T)
                     -> Result<JsNullable<T>, JsValue>;
             }");
-        assert!(out.contains("T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,"));
-        assert!(out.contains("for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi"));
-        assert!(out.contains("JsNullable<T>: ::wasm_bindgen::convert::FromWasmAbi + 'static,"));
-        assert!(!out.contains("&'__wbg Kv"));
+        assert!(out.contains("T: VectorRefIntoWasmAbi,"));
+        assert!(out.contains("T: RefIntoWasmAbi,"));
+        assert!(out.contains("JsNullable<T>: FromWasmAbi + 'static,"));
+        assert!(!out.contains("Kv:"));
     }
 
     #[test]

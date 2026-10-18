@@ -3,26 +3,33 @@
 #[allow(unused_imports)]
 use js_sys::*;
 #[allow(unused_imports)]
+use wasm_bindgen::convert::VectorRefIntoWasmAbi;
+#[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
-    pub fn generic<T>(#[wasm_bindgen(slice = "array")] values: &[T]) -> String;
+    pub fn generic<T: VectorRefIntoWasmAbi>(
+        #[wasm_bindgen(slice = "array")] values: &[T],
+    ) -> String;
 }
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "generic")]
-    pub fn generic_js_string<T>(#[wasm_bindgen(slice = "array")] values: &[T]) -> JsString;
+    pub fn generic_js_string<T: VectorRefIntoWasmAbi>(
+        #[wasm_bindgen(slice = "array")] values: &[T],
+    ) -> JsString;
 }
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "generic")]
-    pub fn try_generic<T>(#[wasm_bindgen(slice = "array")] values: &[T])
-        -> Result<String, JsValue>;
+    pub fn try_generic<T: VectorRefIntoWasmAbi>(
+        #[wasm_bindgen(slice = "array")] values: &[T],
+    ) -> Result<String, JsValue>;
 }
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "generic")]
-    pub fn try_generic_js_string<T>(
+    pub fn try_generic_js_string<T: VectorRefIntoWasmAbi>(
         #[wasm_bindgen(slice = "array")] values: &[T],
     ) -> Result<JsString, JsValue>;
 }
@@ -36,26 +43,29 @@ extern "C" {
     #[wasm_bindgen(constructor, catch, js_name = "Bag")]
     pub fn new_typed<T>() -> Result<Bag<T>, JsValue>;
     #[wasm_bindgen(method)]
-    pub fn take<T>(this: &Bag<T>, #[wasm_bindgen(slice = "array")] values: &[T]) -> String;
+    pub fn take<T: VectorRefIntoWasmAbi>(
+        this: &Bag<T>,
+        #[wasm_bindgen(slice = "array")] values: &[T],
+    ) -> String;
     #[wasm_bindgen(method, js_name = "take")]
-    pub fn take_js_string<T>(
+    pub fn take_js_string<T: VectorRefIntoWasmAbi>(
         this: &Bag<T>,
         #[wasm_bindgen(slice = "array")] values: &[T],
     ) -> JsString;
     #[wasm_bindgen(method, catch, js_name = "take")]
-    pub fn try_take<T>(
+    pub fn try_take<T: VectorRefIntoWasmAbi>(
         this: &Bag<T>,
         #[wasm_bindgen(slice = "array")] values: &[T],
     ) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "take")]
-    pub fn try_take_js_string<T>(
+    pub fn try_take_js_string<T: VectorRefIntoWasmAbi>(
         this: &Bag<T>,
         #[wasm_bindgen(slice = "array")] values: &[T],
     ) -> Result<JsString, JsValue>;
 }
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
-    pub fn mixed<T>(
+    pub fn mixed<T: VectorRefIntoWasmAbi>(
         #[wasm_bindgen(slice = "array")] values: &[T],
         #[wasm_bindgen(slice = "array")] weights: &[f64],
         #[wasm_bindgen(slice = "copy")] data: &[f64],
@@ -64,7 +74,7 @@ extern "C" {
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "mixed")]
-    pub fn mixed_js_string<T>(
+    pub fn mixed_js_string<T: VectorRefIntoWasmAbi>(
         #[wasm_bindgen(slice = "array")] values: &[T],
         #[wasm_bindgen(slice = "array")] weights: &[f64],
         #[wasm_bindgen(slice = "copy")] data: &[f64],
@@ -73,7 +83,7 @@ extern "C" {
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "mixed")]
-    pub fn try_mixed<T>(
+    pub fn try_mixed<T: VectorRefIntoWasmAbi>(
         #[wasm_bindgen(slice = "array")] values: &[T],
         #[wasm_bindgen(slice = "array")] weights: &[f64],
         #[wasm_bindgen(slice = "copy")] data: &[f64],
@@ -82,7 +92,7 @@ extern "C" {
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "mixed")]
-    pub fn try_mixed_js_string<T>(
+    pub fn try_mixed_js_string<T: VectorRefIntoWasmAbi>(
         #[wasm_bindgen(slice = "array")] values: &[T],
         #[wasm_bindgen(slice = "array")] weights: &[f64],
         #[wasm_bindgen(slice = "copy")] data: &[f64],
@@ -91,7 +101,7 @@ extern "C" {
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "mixed")]
-    pub fn mixed_with_float64_array<T>(
+    pub fn mixed_with_float64_array<T: VectorRefIntoWasmAbi>(
         #[wasm_bindgen(slice = "array")] values: &[T],
         #[wasm_bindgen(slice = "array")] weights: &[f64],
         data: &Float64Array,
@@ -100,7 +110,7 @@ extern "C" {
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "mixed")]
-    pub fn mixed_with_float64_array_js_string<T>(
+    pub fn mixed_with_float64_array_js_string<T: VectorRefIntoWasmAbi>(
         #[wasm_bindgen(slice = "array")] values: &[T],
         #[wasm_bindgen(slice = "array")] weights: &[f64],
         data: &Float64Array,
@@ -109,7 +119,7 @@ extern "C" {
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "mixed")]
-    pub fn try_mixed_with_float64_array<T>(
+    pub fn try_mixed_with_float64_array<T: VectorRefIntoWasmAbi>(
         #[wasm_bindgen(slice = "array")] values: &[T],
         #[wasm_bindgen(slice = "array")] weights: &[f64],
         data: &Float64Array,
@@ -118,7 +128,7 @@ extern "C" {
 #[wasm_bindgen(module = "slice-args-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "mixed")]
-    pub fn try_mixed_with_float64_array_js_string<T>(
+    pub fn try_mixed_with_float64_array_js_string<T: VectorRefIntoWasmAbi>(
         #[wasm_bindgen(slice = "array")] values: &[T],
         #[wasm_bindgen(slice = "array")] weights: &[f64],
         data: &Float64Array,
@@ -130,9 +140,12 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Queue<T = JsValue>;
     #[wasm_bindgen(method, js_name = "sendBatch")]
-    pub fn send_batch<T>(this: &Queue<T>, #[wasm_bindgen(slice = "array")] messages: &[T]);
+    pub fn send_batch<T: VectorRefIntoWasmAbi>(
+        this: &Queue<T>,
+        #[wasm_bindgen(slice = "array")] messages: &[T],
+    );
     #[wasm_bindgen(method, catch, js_name = "sendBatch")]
-    pub fn try_send_batch<T>(
+    pub fn try_send_batch<T: VectorRefIntoWasmAbi>(
         this: &Queue<T>,
         #[wasm_bindgen(slice = "array")] messages: &[T],
     ) -> Result<(), JsValue>;

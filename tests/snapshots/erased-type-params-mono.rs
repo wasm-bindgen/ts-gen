@@ -3,6 +3,8 @@
 #[allow(unused_imports)]
 use js_sys::*;
 #[allow(unused_imports)]
+use wasm_bindgen::convert::{FromWasmAbi, RefIntoWasmAbi};
+#[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -16,9 +18,11 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_name<M>(this: &Entry<M>, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn meta<M>(this: &Entry<M>) -> Option<M>;
+    pub fn meta<M>(this: &Entry<M>) -> Option<M>
+    where
+        Option<M>: FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_meta<M>(this: &Entry<M>, val: &M);
+    pub fn set_meta<M: RefIntoWasmAbi>(this: &Entry<M>, val: &M);
 }
 impl<M> Entry<M> {
     pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> Entry<M> {
@@ -36,8 +40,7 @@ pub struct EntryBuilder<M> {
 impl<M> EntryBuilder<M> {
     pub fn meta(self, val: &M) -> Self
     where
-        for<'__wbg> &'__wbg M:
-            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+        M: RefIntoWasmAbi,
     {
         self.inner.set_meta(val);
         self

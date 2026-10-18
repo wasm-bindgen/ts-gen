@@ -3,6 +3,8 @@
 #[allow(unused_imports)]
 use js_sys::*;
 #[allow(unused_imports)]
+use wasm_bindgen::convert::RefIntoWasmAbi;
+#[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -72,9 +74,12 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ListenerObject<E = Ev>;
     #[wasm_bindgen(method, js_name = "handleEvent")]
-    pub fn handle_event<E>(this: &ListenerObject<E>, event: &E);
+    pub fn handle_event<E: RefIntoWasmAbi>(this: &ListenerObject<E>, event: &E);
     #[wasm_bindgen(method, catch, js_name = "handleEvent")]
-    pub fn try_handle_event<E>(this: &ListenerObject<E>, event: &E) -> Result<(), JsValue>;
+    pub fn try_handle_event<E: RefIntoWasmAbi>(
+        this: &ListenerObject<E>,
+        event: &E,
+    ) -> Result<(), JsValue>;
 }
 #[allow(dead_code)]
 pub type ListenerOrObject = JsValue;

@@ -3,6 +3,8 @@
 #[allow(unused_imports)]
 use js_sys::*;
 #[allow(unused_imports)]
+use wasm_bindgen::convert::{FromWasmAbi, RefIntoWasmAbi, VectorRefIntoWasmAbi};
+#[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -74,14 +76,16 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Rows<T = JsValue>;
     #[wasm_bindgen(method, getter)]
-    pub fn rows<T>(this: &Rows<T>) -> Vec<T>;
+    pub fn rows<T>(this: &Rows<T>) -> Vec<T>
+    where
+        Vec<T>: FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_rows<T>(this: &Rows<T>, #[wasm_bindgen(slice = "array")] val: &[T]);
+    pub fn set_rows<T: VectorRefIntoWasmAbi>(
+        this: &Rows<T>,
+        #[wasm_bindgen(slice = "array")] val: &[T],
+    );
 }
-impl<T> Rows<T>
-where
-    T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,
-{
+impl<T: VectorRefIntoWasmAbi> Rows<T> {
     pub fn new(rows: &[T]) -> Rows<T> {
         let inner: Rows<T> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_rows(rows);
@@ -94,19 +98,19 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Slot<T = JsValue>;
     #[wasm_bindgen(method, getter)]
-    pub fn value<T>(this: &Slot<T>) -> Option<T>;
+    pub fn value<T>(this: &Slot<T>) -> Option<T>
+    where
+        Option<T>: FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<T>(this: &Slot<T>, val: Option<&T>);
+    pub fn set_value<T: RefIntoWasmAbi>(this: &Slot<T>, val: Option<&T>);
     #[wasm_bindgen(method, getter)]
-    pub fn fallback<T>(this: &Slot<T>) -> Option<T>;
+    pub fn fallback<T>(this: &Slot<T>) -> Option<T>
+    where
+        Option<T>: FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_fallback<T>(this: &Slot<T>, val: &T);
+    pub fn set_fallback<T: RefIntoWasmAbi>(this: &Slot<T>, val: &T);
 }
-impl<T> Slot<T>
-where
-    for<'__wbg> Option<&'__wbg T>:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<T: RefIntoWasmAbi> Slot<T> {
     pub fn new(value: Option<&T>) -> Slot<T> {
         Self::builder(value).build()
     }
@@ -122,8 +126,7 @@ pub struct SlotBuilder<T> {
 impl<T> SlotBuilder<T> {
     pub fn fallback(self, val: &T) -> Self
     where
-        for<'__wbg> &'__wbg T:
-            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+        T: RefIntoWasmAbi,
     {
         self.inner.set_fallback(val);
         self
@@ -147,9 +150,11 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_done<T>(this: &Step<T>, val: bool);
     #[wasm_bindgen(method, getter)]
-    pub fn value<T>(this: &Step<T>) -> Option<T>;
+    pub fn value<T>(this: &Step<T>) -> Option<T>
+    where
+        Option<T>: FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<T>(this: &Step<T>, val: Option<&T>);
+    pub fn set_value<T: RefIntoWasmAbi>(this: &Step<T>, val: Option<&T>);
 }
 impl<T> Step<T> {
     pub fn new() -> Step<T> {
@@ -171,8 +176,7 @@ impl<T> StepBuilder<T> {
     }
     pub fn value(self, val: &T) -> Self
     where
-        for<'__wbg> Option<&'__wbg T>:
-            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+        T: RefIntoWasmAbi,
     {
         self.inner.set_value(Some(val));
         self
