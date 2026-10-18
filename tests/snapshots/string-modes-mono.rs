@@ -51,10 +51,8 @@ extern "C" {
     pub fn body(this: &Meta) -> String;
     #[wasm_bindgen(method, getter, js_name = "body")]
     pub fn body_js_string(this: &Meta) -> JsString;
-    #[wasm_bindgen(method, catch)]
-    pub async fn text(this: &Meta) -> Result<JsString, JsValue>;
-    #[wasm_bindgen(method, js_name = "text")]
-    pub fn text_promise(this: &Meta) -> Promise<String>;
+    #[wasm_bindgen(method)]
+    pub fn text(this: &Meta) -> Promise<JsString>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -65,16 +63,12 @@ extern "C" {
     pub fn content_type(this: &Body) -> String;
     #[wasm_bindgen(method, getter)]
     pub fn length(this: &Body) -> f64;
-    #[wasm_bindgen(method, catch)]
-    pub async fn text(this: &Body) -> Result<String, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "text")]
-    pub async fn text_js_string(this: &Body) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn text(this: &Body) -> Promise<String>;
     #[wasm_bindgen(method, js_name = "text")]
-    pub fn text_promise(this: &Body) -> Promise<String>;
-    #[wasm_bindgen(method, catch)]
-    pub async fn json(this: &Body) -> Result<JsValue, JsValue>;
-    #[wasm_bindgen(method, js_name = "json")]
-    pub fn json_promise(this: &Body) -> Promise;
+    pub fn text_js_string(this: &Body) -> Promise<JsString>;
+    #[wasm_bindgen(method)]
+    pub fn json(this: &Body) -> Promise<JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

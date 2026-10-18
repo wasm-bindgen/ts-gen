@@ -1833,6 +1833,9 @@ pub fn consumed_text(this: &Headers) -> Result<String, RangeError>;
 
 ## `Promise<T>` returns become `async fn`
 
+(Per-monomorphization they stay `Promise<T>`; see
+[below](#per-monomorphization-the-promiset-itself).)
+
 ```ts
 function fetch(url: string): Promise<Response>;
 ```
@@ -1875,11 +1878,33 @@ pub fn fetch_promise(url: &str) -> Promise<Response>;
 * A `Promise`-typed *property* is already a sync getter and gets no
   sibling.
 
-The alternative, making the primary itself return `Promise<T>` and
-relying on `IntoFuture`, was rejected: the future's error is always
-`JsValue`, discarding `--error-type` and `@throws` on every async
-binding, and under `--fallible` a sync throw and a rejection would need
-`?.await?`.
+Without `--experimental-generic-mono`, making the primary itself return
+`Promise<T>` and relying on `IntoFuture` was rejected: the future's error
+is always `JsValue`, discarding `--error-type` and `@throws` on every
+async binding, and under `--fallible` a sync throw and a rejection would
+need `?.await?`.
+
+### Per-monomorphization: the `Promise<T>` itself
+
+Under `--experimental-generic-mono` a `Promise`-returning callable is one
+plain import returning `Promise<T>`, with `T` the awaited lowering below
+(`Promise<Vec<D1Result<T>>>`, `Promise<Option<String>>`, `Promise<()>`).
+js-sys implements `IntoFuture<Output = Result<T, JsValue>>` for it, so
+the one binding is both awaited (`kv.get(key).await?`) and handed to JS
+(`ctx.wait_until(&promise)`), and there is no `_promise` twin:
+
+```rust
+#[wasm_bindgen(method, js_name = "get")]
+pub fn get(this: &KVNamespace, key: impl JsStringLike) -> Promise<Option<String>>;
+```
+
+* The JS call happens at the call, not at the first poll.
+* `.await` yields `Result<T, JsValue>`: `?` converts into `--error-type`
+  through its `From<JsValue>`, but a tail `x.await` returning
+  `Result<T, E>` is `Ok(x.await?)`, and `@throws` types do not reach the
+  awaited error.
+* The import does not `catch` (a `Promise<T>` return is not a `Result`),
+  so a synchronous throw is not caught.
 
 ### Awaited values lower like sync returns
 
@@ -2074,7 +2099,7 @@ parameters, as a generic class's constructors do (`new_typed`). The
 plain form stays callable without a turbofish, and the twin names the
 type instead of an `unchecked_into`. `_typed` goes after the expansion
 suffix and before the companions (`run_typed::<Row>()`,
-`list_typed_promise::<M>()`,
+`list_typed_promise::<M>()` (per-mono `list_typed::<M>() -> Promise<…>`),
 `get_with_metadata_json_with_options_typed::<V, M>`). A parameter the
 lowered return drops anyway (an alias that does not use it) has no
 twin, and rule 2 keeps its single form (`get_json::<T>`):
@@ -2867,7 +2892,8 @@ impl R2Object {
 * A generic receiver (`Box<T>`) gives `impl<T: JsGeneric> Box<T>`; the
   method's own type parameters stay on the wrapper fn.
 * The `_promise` companion is handed to JS (`waitUntil`, `Promise.race`),
-  so it keeps `Promise<f64>` and gets no wrapper. The same holds for a
+  so it keeps `Promise<f64>` and gets no wrapper; per-monomorphization
+  that is every async member (`get_alarm() -> Promise<Option<f64>>`). The same holds for a
   scalar inside a callback type.
 * Dictionary factories and builder methods take the public scalar and
   call the wrapper setter, so `R2PutOptions::builder().size(5)` reads as

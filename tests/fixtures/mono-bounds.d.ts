@@ -3,7 +3,8 @@
 // Per-monomorphization type parameters are unbounded. A callback's
 // `Function<fn(..) -> R>` takes native leaves and any parameter (`void` is
 // `()`), and a dictionary helper restates the ABI bound of a setter argument
-// only where it names a parameter bare (`Option<&T>`, `&[T]`).
+// only where it names a parameter bare (`Option<&T>`, `&[T]`). An async
+// member is one binding returning its `Promise<T>` (`sync() -> Promise<()>`).
 
 interface Handler<Env = unknown> {
   fetch?: (request: string, env: Env) => void;

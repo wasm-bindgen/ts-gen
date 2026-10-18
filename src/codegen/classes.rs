@@ -2463,7 +2463,7 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
     if has_variadic {
         wb_parts.push(quote! { variadic });
     }
-    if sig.catch {
+    if sig.catch_attr(config.cgctx) {
         wb_parts.push(quote! { catch });
     }
     // For non-"new" overloads, we need js_name so wasm_bindgen maps them
@@ -2651,7 +2651,7 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
     if has_variadic {
         wb_parts.push(quote! { variadic });
     }
-    if sig.catch {
+    if sig.catch_attr(config.cgctx) {
         wb_parts.push(quote! { catch });
     }
     if super::typemap::needs_js_name(&rust_ident, &sig.js_name) {
@@ -2674,13 +2674,14 @@ fn generate_expanded_method(config: &ClassConfig, sig: &FunctionSignature) -> To
             parent: Some(&config.rust_name),
         },
     );
-    let ret = if is_void_return(&sig.return_type) && !sig.catch {
+    let ret = if is_void_return(&sig.return_type) && !sig.catch && !sig.promise_import(config.cgctx)
+    {
         quote! {}
     } else {
         quote! { -> #ret_ty }
     };
 
-    let async_kw = if sig.is_async {
+    let async_kw = if sig.async_import(config.cgctx) {
         quote! { async }
     } else {
         quote! {}
@@ -2717,7 +2718,7 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
     if has_variadic {
         wb_parts.push(quote! { variadic });
     }
-    if sig.catch {
+    if sig.catch_attr(config.cgctx) {
         wb_parts.push(quote! { catch });
     }
     if super::typemap::needs_js_name(&rust_ident, &sig.js_name) {
@@ -2740,13 +2741,14 @@ fn generate_expanded_static_method(config: &ClassConfig, sig: &FunctionSignature
             parent: Some(&config.rust_name),
         },
     );
-    let ret = if is_void_return(&sig.return_type) && !sig.catch {
+    let ret = if is_void_return(&sig.return_type) && !sig.catch && !sig.promise_import(config.cgctx)
+    {
         quote! {}
     } else {
         quote! { -> #ret_ty }
     };
 
-    let async_kw = if sig.is_async {
+    let async_kw = if sig.async_import(config.cgctx) {
         quote! { async }
     } else {
         quote! {}

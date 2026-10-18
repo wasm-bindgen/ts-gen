@@ -414,6 +414,27 @@ pub struct FunctionSignature {
     pub determined: Vec<usize>,
 }
 
+impl FunctionSignature {
+    /// Whether the import is an `async fn`. Per-mono an async member is a
+    /// plain import returning the `Promise<T>` itself, which the caller
+    /// awaits (`IntoFuture<Output = Result<T, JsValue>>`) or hands to JS.
+    pub fn async_import(&self, cgctx: Option<&CodegenContext<'_>>) -> bool {
+        self.is_async && !CodegenContext::generic_mono(cgctx)
+    }
+
+    /// Whether the import returns the per-mono `Promise<T>` of an async
+    /// member.
+    pub fn promise_import(&self, cgctx: Option<&CodegenContext<'_>>) -> bool {
+        self.is_async && CodegenContext::generic_mono(cgctx)
+    }
+
+    /// Whether the import carries `catch`. A per-mono `Promise<T>` return
+    /// is not a `Result`, so it does not yet.
+    pub fn catch_attr(&self, cgctx: Option<&CodegenContext<'_>>) -> bool {
+        self.catch && !(self.is_async && CodegenContext::generic_mono(cgctx))
+    }
+}
+
 /// Recursively collect every in-scope type-parameter name reachable
 /// from `ty`, in source-appearance order, deduped.
 ///
@@ -1183,7 +1204,7 @@ pub fn build_signatures_with_postfix(
         // the un-awaited form too. Rejection travels inside the
         // returned promise; `catch` here covers only a synchronous
         // throw, which the sync-callable policy decides.
-        if is_async {
+        if is_async && !per_mono {
             let promise_literal = derive(names, &|n| format!("{n}_promise"));
             let promise_name = match &promise_literal {
                 Some(l) => l.arms[0].1.clone(),

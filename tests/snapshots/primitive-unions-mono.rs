@@ -386,17 +386,7 @@ impl From<Settings> for SettingsBuilder {
 pub type BufferSource = JsValue;
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch)]
-    pub async fn verify(
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        signature: impl ::js_sys::BufferSourceLike,
-        data: impl ::js_sys::BufferSourceLike,
-    ) -> Result<bool, JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
-    #[wasm_bindgen(js_name = "verify")]
-    pub fn verify_promise(
+    pub fn verify(
         algorithm: impl ::wasm_bindgen::JsStringLike,
         signature: impl ::js_sys::BufferSourceLike,
         data: impl ::js_sys::BufferSourceLike,
@@ -404,17 +394,8 @@ extern "C" {
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "verify")]
-    pub async fn verify_with_algorithm(
-        algorithm: &Target,
-        signature: impl ::js_sys::BufferSourceLike,
-        data: impl ::js_sys::BufferSourceLike,
-    ) -> Result<bool, JsValue>;
-}
-#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
-extern "C" {
     #[wasm_bindgen(js_name = "verify")]
-    pub fn verify_with_algorithm_promise(
+    pub fn verify_with_algorithm(
         algorithm: &Target,
         signature: impl ::js_sys::BufferSourceLike,
         data: impl ::js_sys::BufferSourceLike,

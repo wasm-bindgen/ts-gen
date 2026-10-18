@@ -217,53 +217,28 @@ extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Bucket;
-    #[wasm_bindgen(method, catch)]
-    pub async fn put(
-        this: &Bucket,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &ArrayBuffer,
-    ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_promise(
+    #[wasm_bindgen(method)]
+    pub fn put(
         this: &Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &ArrayBuffer,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_str(
-        this: &Bucket,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_str_promise(
+    pub fn put_with_str(
         this: &Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
-    async fn put_with_null_js(
-        this: &Bucket,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &JsValue,
-    ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    fn put_with_null_promise_js(
+    fn put_with_null_js(
         this: &Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &JsValue,
     ) -> Promise<()>;
 }
 impl Bucket {
-    pub async fn put_with_null(
-        &self,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<(), JsValue> {
+    pub fn put_with_null(&self, key: impl ::wasm_bindgen::JsStringLike) -> Promise<()> {
         self.put_with_null_js(key, &::wasm_bindgen::JsValue::NULL)
-            .await
-    }
-    pub fn put_with_null_promise(&self, key: impl ::wasm_bindgen::JsStringLike) -> Promise<()> {
-        self.put_with_null_promise_js(key, &::wasm_bindgen::JsValue::NULL)
     }
 }
 #[wasm_bindgen(private)]
