@@ -39,8 +39,8 @@
   (import "./bindings.wasm" "Response.listen" (func $Response.listen (param $this externref) (param $ports externref)))
   ;; offset: u64
   (import "./bindings.wasm" "Response.offset" (func $Response.offset (param $this externref) (result externref)))
-  ;; size: number
-  (import "./bindings.wasm" "Response.size" (func $Response.size (param $this externref) (result f64)))
+  ;; size: u64
+  (import "./bindings.wasm" "Response.size" (func $Response.size (param $this externref) (result externref)))
   ;; statusText: string
   (import "./bindings.wasm" "Response.status_text" (func $Response.status_text (param $this externref) (result externref)))
 

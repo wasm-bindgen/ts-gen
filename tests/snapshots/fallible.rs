@@ -47,15 +47,24 @@ extern "C" {
     pub fn label(this: &Headers) -> String;
     #[wasm_bindgen(method, setter)]
     pub fn set_label(this: &Headers, val: &str);
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Signal;
+    #[doc = " Constructor declared infallible — plain `Signal`, no `catch`."]
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> Signal;
     #[doc = " Static method — same rule as instance methods."]
-    # [wasm_bindgen (static_method_of = Headers , catch)]
+    # [wasm_bindgen (static_method_of = Signal , catch)]
     pub fn parse(raw: &str) -> Result<Headers, crate::Error>;
     #[doc = " Static getter with a typed throws."]
     #[doc = ""]
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `TypeError`"]
-    # [wasm_bindgen (static_method_of = Headers , getter , catch)]
+    # [wasm_bindgen (static_method_of = Signal , getter , catch)]
     pub fn defaults() -> Result<Headers, TypeError>;
 }
 #[wasm_bindgen]
