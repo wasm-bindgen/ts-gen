@@ -213,6 +213,7 @@ dangles if the callee retains it and detaches if memory grows during
 the call), a fresh plain **`Array`**, or a fresh typed-array **copy**
 the callee owns.
 
+Outside [`BufferSource` call arguments](#primitive-union-arguments),
 ts-gen never emits the view: a generated binding cannot assert that a
 callee neither retains the buffer nor re-enters wasm. The TS type picks
 the copy shape instead:
@@ -2598,15 +2599,24 @@ pub fn send_with_number_or_string(to: impl ::js_sys::JsNumberOrStringLike);
 groups the same way into one `impl js_sys::BufferSourceLike` alternative,
 suffixed `_with_buffer_source`. Every buffer handle (`ArrayBuffer`, each
 typed array, `DataView`, owned or borrowed) crosses as itself through the
-one import, `&[u8]` as a view of wasm memory and `Vec<u8>` as a copy:
+one import, and `Vec<u8>` as a copy. A call argument takes `&[u8]` as a
+view of wasm memory, as a `BufferSource` parameter's bytes are copied
+before the call returns (WebIDL's "get a copy of the bytes held by the
+buffer source"). A setter keeps its value, so its import carries an
+inherited `slice = "copy"`, which copies the `&[u8]` instantiation and
+leaves the handle instantiations alone; builders and factories store
+through it:
 
 ```ts
 verify(algorithm: string | Algorithm, key: CryptoKey, signature: BufferSource, data: BufferSource): Promise<boolean>;
 ```
 
 ```rust
-pub async fn verify(this: &SubtleCrypto, algorithm: impl JsStringLike, key: &CryptoKey, signature: impl BufferSourceLike, data: impl BufferSourceLike) -> Result<bool, JsValue>;
-pub async fn verify_with_algorithm(this: &SubtleCrypto, algorithm: &Algorithm, key: &CryptoKey, signature: impl BufferSourceLike, data: impl BufferSourceLike) -> Result<bool, JsValue>;
+pub fn verify(this: &SubtleCrypto, algorithm: impl JsStringLike, key: &CryptoKey, signature: impl BufferSourceLike, data: impl BufferSourceLike) -> Promise<bool>;
+pub fn verify_with_algorithm(this: &SubtleCrypto, algorithm: &Algorithm, key: &CryptoKey, signature: impl BufferSourceLike, data: impl BufferSourceLike) -> Promise<bool>;
+
+#[wasm_bindgen(method, setter, slice = "copy")]
+pub fn set_md5(this: &R2PutOptions, val: impl BufferSourceLike);
 ```
 
 Return positions are unchanged: an erased union still becomes a

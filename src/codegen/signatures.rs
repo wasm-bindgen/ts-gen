@@ -1722,6 +1722,17 @@ pub(crate) fn is_buffer_source(ty: &TypeRef) -> bool {
     *ty == buffer_source_union()
 }
 
+/// Whether a setter's value is a grouped buffer source. The object keeps
+/// what it is given, so a `&[u8]` view must be copied: the setter carries an
+/// inherited `slice = "copy"`, which copies a slice instantiation and leaves
+/// handle instantiations untouched.
+pub(crate) fn stores_buffer_source(params: &[ConcreteParam]) -> bool {
+    params.iter().any(|p| match &p.type_ref {
+        TypeRef::Nullable(inner, _) => is_buffer_source(inner),
+        t => is_buffer_source(t),
+    })
+}
+
 /// Per-mono, a `null`-admitting union that fans out into overloads takes
 /// each alternative bare and gives `null` an arm of its own
 /// (`new_with_str(body)`, `new_with_null_and_init(init)`), rather than an `Option` on

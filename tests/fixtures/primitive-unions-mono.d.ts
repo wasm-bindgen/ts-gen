@@ -53,7 +53,7 @@ export interface Settings {
 
 // `ArrayBuffer | ArrayBufferView` (and the `BufferSource` alias) is one
 // `impl BufferSourceLike` alternative, nullable or not, in methods, setters,
-// builders and factories alike.
+// builders and factories alike. Setters copy a `&[u8]` (`slice = "copy"`).
 export type BufferSource = ArrayBufferView | ArrayBuffer;
 export declare function verify(algorithm: string | Target, signature: BufferSource, data: ArrayBuffer | ArrayBufferView): Promise<boolean>;
 export declare function write(chunk: string | ArrayBuffer | ArrayBufferView | null): void;
@@ -61,4 +61,5 @@ export declare function digest(data?: BufferSource): void;
 export interface Hashes {
   md5?: ArrayBuffer | ArrayBufferView | string;
   salt: BufferSource;
+  iv?: BufferSource | undefined;
 }
