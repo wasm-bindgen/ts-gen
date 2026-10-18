@@ -991,7 +991,7 @@ pub mod web_assembly {
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
-        #[wasm_bindgen(catch, js_namespace = "WebAssembly")]
+        #[wasm_bindgen(catch, js_namespace = "WebAssembly", slice = "copy")]
         pub fn validate(bytes: impl ::js_sys::BufferSourceLike) -> Result<bool, JsValue>;
     }
 }
@@ -2680,7 +2680,7 @@ extern "C" {
         url: impl ::wasm_bindgen::JsStringLike,
         body: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "sendBeacon")]
+    #[wasm_bindgen(method, catch, js_name = "sendBeacon", slice = "copy")]
     pub fn send_beacon_with_buffer_source(
         this: &Navigator,
         url: impl ::wasm_bindgen::JsStringLike,
@@ -4932,7 +4932,7 @@ extern "C" {
     #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
-    #[wasm_bindgen(method, catch)]
+    #[wasm_bindgen(method, catch, slice = "copy")]
     pub fn encrypt(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
@@ -4942,7 +4942,7 @@ extern "C" {
     #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
-    #[wasm_bindgen(method, catch, js_name = "encrypt")]
+    #[wasm_bindgen(method, catch, js_name = "encrypt", slice = "copy")]
     pub fn encrypt_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
@@ -4952,7 +4952,7 @@ extern "C" {
     #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
-    #[wasm_bindgen(method, catch)]
+    #[wasm_bindgen(method, catch, slice = "copy")]
     pub fn decrypt(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
@@ -4962,7 +4962,7 @@ extern "C" {
     #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
-    #[wasm_bindgen(method, catch, js_name = "decrypt")]
+    #[wasm_bindgen(method, catch, js_name = "decrypt", slice = "copy")]
     pub fn decrypt_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
@@ -4972,7 +4972,7 @@ extern "C" {
     #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
-    #[wasm_bindgen(method, catch)]
+    #[wasm_bindgen(method, catch, slice = "copy")]
     pub fn sign(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
@@ -4982,7 +4982,7 @@ extern "C" {
     #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
-    #[wasm_bindgen(method, catch, js_name = "sign")]
+    #[wasm_bindgen(method, catch, js_name = "sign", slice = "copy")]
     pub fn sign_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
@@ -4992,7 +4992,7 @@ extern "C" {
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, catch)]
+    #[wasm_bindgen(method, catch, slice = "copy")]
     pub fn verify(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
@@ -5003,7 +5003,7 @@ extern "C" {
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, catch, js_name = "verify")]
+    #[wasm_bindgen(method, catch, js_name = "verify", slice = "copy")]
     pub fn verify_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
@@ -5014,7 +5014,7 @@ extern "C" {
     #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
-    #[wasm_bindgen(method, catch)]
+    #[wasm_bindgen(method, catch, slice = "copy")]
     pub fn digest(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
@@ -5023,7 +5023,7 @@ extern "C" {
     #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
-    #[wasm_bindgen(method, catch, js_name = "digest")]
+    #[wasm_bindgen(method, catch, js_name = "digest", slice = "copy")]
     pub fn digest_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoHashAlgorithm,
@@ -5152,7 +5152,7 @@ extern "C" {
     #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
-    #[wasm_bindgen(method, catch, js_name = "importKey")]
+    #[wasm_bindgen(method, catch, js_name = "importKey", slice = "copy")]
     pub fn import_key(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
@@ -5176,7 +5176,7 @@ extern "C" {
     #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
-    #[wasm_bindgen(method, catch, js_name = "importKey")]
+    #[wasm_bindgen(method, catch, js_name = "importKey", slice = "copy")]
     pub fn import_key_with_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
@@ -5231,7 +5231,7 @@ extern "C" {
     #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
+    #[wasm_bindgen(method, catch, js_name = "unwrapKey", slice = "copy")]
     pub fn unwrap_key(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
@@ -5245,7 +5245,7 @@ extern "C" {
     #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
+    #[wasm_bindgen(method, catch, js_name = "unwrapKey", slice = "copy")]
     pub fn unwrap_key_with_unwrap_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
@@ -5259,7 +5259,7 @@ extern "C" {
     #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
+    #[wasm_bindgen(method, catch, js_name = "unwrapKey", slice = "copy")]
     pub fn unwrap_key_with_unwrapped_key_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
@@ -5273,7 +5273,7 @@ extern "C" {
     #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
+    #[wasm_bindgen(method, catch, js_name = "unwrapKey", slice = "copy")]
     pub fn unwrap_key_with_unwrap_algorithm_and_unwrapped_key_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
@@ -5284,7 +5284,7 @@ extern "C" {
         extractable: bool,
         key_usages: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<CryptoKey>;
-    #[wasm_bindgen(method, catch, js_name = "timingSafeEqual")]
+    #[wasm_bindgen(method, catch, js_name = "timingSafeEqual", slice = "copy")]
     pub fn timing_safe_equal(
         this: &SubtleCrypto,
         a: impl ::js_sys::BufferSourceLike,
@@ -6361,7 +6361,7 @@ extern "C" {
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
-    #[wasm_bindgen(method, catch, js_name = "decode")]
+    #[wasm_bindgen(method, catch, js_name = "decode", slice = "copy")]
     pub fn decode_with_input(
         this: &TextDecoder,
         input: impl ::js_sys::BufferSourceLike,
@@ -6369,7 +6369,7 @@ extern "C" {
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
-    #[wasm_bindgen(method, catch, js_name = "decode")]
+    #[wasm_bindgen(method, catch, js_name = "decode", slice = "copy")]
     pub fn decode_with_input_js_string(
         this: &TextDecoder,
         input: impl ::js_sys::BufferSourceLike,
@@ -6377,7 +6377,7 @@ extern "C" {
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
-    #[wasm_bindgen(method, catch, js_name = "decode")]
+    #[wasm_bindgen(method, catch, js_name = "decode", slice = "copy")]
     pub fn decode_with_input_and_options(
         this: &TextDecoder,
         input: impl ::js_sys::BufferSourceLike,
@@ -6386,7 +6386,7 @@ extern "C" {
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
-    #[wasm_bindgen(method, catch, js_name = "decode")]
+    #[wasm_bindgen(method, catch, js_name = "decode", slice = "copy")]
     pub fn decode_with_input_and_options_js_string(
         this: &TextDecoder,
         input: impl ::js_sys::BufferSourceLike,
@@ -7610,7 +7610,7 @@ extern "C" {
         -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str(body: impl ::wasm_bindgen::JsStringLike) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch)]
+    #[wasm_bindgen(constructor, catch, slice = "copy")]
     pub fn new_with_buffer_source(
         body: impl ::js_sys::BufferSourceLike,
     ) -> Result<Response, JsValue>;
@@ -7636,7 +7636,7 @@ extern "C" {
         body: impl ::wasm_bindgen::JsStringLike,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch)]
+    #[wasm_bindgen(constructor, catch, slice = "copy")]
     pub fn new_with_buffer_source_and_init(
         body: impl ::js_sys::BufferSourceLike,
         init: &ResponseInit,
@@ -8667,7 +8667,7 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put", slice = "copy")]
     pub fn put_with_buffer_source(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
@@ -8686,7 +8686,7 @@ extern "C" {
         value: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespacePutOptions,
     ) -> Promise<()>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put", slice = "copy")]
     pub fn put_with_buffer_source_and_options(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
@@ -10165,7 +10165,7 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
         value: &ReadableStream<R>,
     ) -> Promise<Option<R2Object>>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put", slice = "copy")]
     pub fn put_with_buffer_source(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
@@ -10196,7 +10196,7 @@ extern "C" {
         value: &ReadableStream<R>,
         options: &R2BucketPutOptions,
     ) -> Promise<Option<R2Object>>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put", slice = "copy")]
     pub fn put_with_buffer_source_and_r2_bucket_put_options(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
@@ -10231,7 +10231,7 @@ extern "C" {
         value: &ReadableStream<R>,
         options: &R2PutOptions,
     ) -> Promise<R2Object>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
+    #[wasm_bindgen(method, catch, js_name = "put", slice = "copy")]
     pub fn put_with_buffer_source_and_options(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
@@ -10495,7 +10495,7 @@ extern "C" {
         part_number: f64,
         value: &ReadableStream<R>,
     ) -> Promise<R2UploadedPart>;
-    #[wasm_bindgen(method, catch, js_name = "uploadPart")]
+    #[wasm_bindgen(method, catch, js_name = "uploadPart", slice = "copy")]
     pub fn upload_part_with_buffer_source(
         this: &R2MultipartUpload,
         part_number: f64,
@@ -10520,7 +10520,7 @@ extern "C" {
         value: &ReadableStream<R>,
         options: &R2UploadPartOptions,
     ) -> Promise<R2UploadedPart>;
-    #[wasm_bindgen(method, catch, js_name = "uploadPart")]
+    #[wasm_bindgen(method, catch, js_name = "uploadPart", slice = "copy")]
     pub fn upload_part_with_buffer_source_and_options(
         this: &R2MultipartUpload,
         part_number: f64,
@@ -12357,7 +12357,7 @@ extern "C" {
     #[doc = " The **`respondWithNewView()`** method of the ReadableStreamBYOBRequest interface specifies a new view that the consumer of the associated readable byte stream should write to instead of ReadableStreamBYOBRequest.view."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBRequest/respondWithNewView)"]
-    #[wasm_bindgen(method, catch, js_name = "respondWithNewView")]
+    #[wasm_bindgen(method, catch, js_name = "respondWithNewView", slice = "copy")]
     pub fn respond_with_new_view(
         this: &ReadableStreamBYOBRequest,
         view: impl ::js_sys::BufferSourceLike,
@@ -12427,7 +12427,7 @@ extern "C" {
     #[doc = " The **`enqueue()`** method of the ReadableByteStreamController interface enqueues a given chunk on the associated readable byte stream (the chunk is copied into the stream's internal queues)."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/enqueue)"]
-    #[wasm_bindgen(method, catch)]
+    #[wasm_bindgen(method, catch, slice = "copy")]
     pub fn enqueue(
         this: &ReadableByteStreamController,
         chunk: impl ::js_sys::BufferSourceLike,
@@ -14497,7 +14497,7 @@ extern "C" {
     #[doc = " The **`WebSocket.send()`** method enqueues the specified data to be transmitted to the server over the WebSocket connection, increasing the value of `bufferedAmount` by the number of bytes needed to contain the data."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/send)"]
-    #[wasm_bindgen(method, catch)]
+    #[wasm_bindgen(method, catch, slice = "copy")]
     pub fn send(this: &WebSocket, message: impl ::js_sys::BufferSourceLike) -> Result<(), JsValue>;
     #[doc = " The **`WebSocket.send()`** method enqueues the specified data to be transmitted to the server over the WebSocket connection, increasing the value of `bufferedAmount` by the number of bytes needed to contain the data."]
     #[doc = ""]

@@ -1947,15 +1947,16 @@ pub(crate) fn is_buffer_source(ty: &TypeRef) -> bool {
     *ty == buffer_source_union()
 }
 
-/// Whether a setter's value is a grouped buffer source. The object keeps
-/// what it is given, so a `&[u8]` view must be copied: the setter carries an
-/// inherited `slice = "copy"`, which copies a slice instantiation and leaves
-/// handle instantiations untouched.
-pub(crate) fn stores_buffer_source(params: &[ConcreteParam]) -> bool {
-    params.iter().any(|p| match p.type_ref.split_empties() {
-        Some((core, _)) => is_buffer_source(&core),
+/// Whether `p` lowers to `impl BufferSourceLike` (bare or `Option`).
+fn is_buffer_source_param(p: &ConcreteParam, cgctx: Option<&CodegenContext<'_>>) -> bool {
+    if p.variadic || !CodegenContext::generic_mono(cgctx) {
+        return false;
+    }
+    match p.type_ref.split_empties() {
+        Some((core, Nullability::Undefined)) => is_buffer_source(&core),
+        Some(_) => false,
         None => is_buffer_source(&p.type_ref),
-    })
+    }
 }
 
 fn pair_typed_array_slice(
@@ -2788,6 +2789,14 @@ fn param_attr(
     // The string-literal spelling rather than the bare ident: rustfmt
     // only normalises `name = <literal>` attribute arms, leaving
     // `slice = array` token-spaced verbatim.
+    if is_buffer_source_param(p, cgctx) {
+        let marker = match p.slice_mode {
+            Some(crate::ir::SliceModeHint::Handle) => return quote! {},
+            Some(crate::ir::SliceModeHint::View) => super::BUFFER_SOURCE_VIEW,
+            _ => super::BUFFER_SOURCE_COPY,
+        };
+        return quote! { #[wasm_bindgen(slice = #marker)] };
+    }
     match typemap::param_slice_mode(p, cgctx, scope) {
         Some(typemap::SliceMode::View) => quote! { #[wasm_bindgen(slice = "view")] },
         Some(typemap::SliceMode::UnsharedView) => {
@@ -2888,6 +2897,15 @@ pub(crate) fn render_param_type(
     }
     if matches!(param.type_ref, TypeRef::Null) {
         return super::null_arms::marker();
+    }
+    if param.slice_mode == Some(crate::ir::SliceModeHint::Handle)
+        && is_buffer_source_param(param, cgctx)
+    {
+        let bound = quote! { ::js_sys::BufferSourceLike + AsRef<::wasm_bindgen::JsValue> };
+        return match param.type_ref.split_empties() {
+            Some(_) => quote! { Option<impl #bound> },
+            None => quote! { impl #bound },
+        };
     }
     if let Some(ty) =
         cgctx.and_then(|ctx| typemap::union_alias_argument(&param.type_ref, ctx, scope))

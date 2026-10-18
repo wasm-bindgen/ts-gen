@@ -3188,9 +3188,6 @@ fn generate_setter(
                 let js_name = &setter.js_name;
                 wb_parts.push(quote! { js_name = #js_name });
             }
-            if super::signatures::stores_buffer_source(&sig.params) {
-                wb_parts.push(quote! { slice = "copy" });
-            }
 
             let doc = super::doc_tokens(&sig.doc);
             quote! {
@@ -3345,9 +3342,6 @@ fn generate_static_setter(
             if super::typemap::needs_js_name(&rust_ident, &format!("set_{}", setter.js_name)) {
                 let js_name = &setter.js_name;
                 wb_parts.push(quote! { js_name = #js_name });
-            }
-            if super::signatures::stores_buffer_source(&sig.params) {
-                wb_parts.push(quote! { slice = "copy" });
             }
 
             let doc = super::doc_tokens(&sig.doc);

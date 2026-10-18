@@ -895,8 +895,9 @@ pub struct Param {
     pub slice_mode: Option<SliceModeHint>,
 }
 
-/// A slice mode named by a `{@slice view|array|copy}` JSDoc inline tag,
-/// mapping 1:1 to wasm-bindgen's `#[wasm_bindgen(slice = "..")]`.
+/// A slice mode named by a `{@slice view|array|copy|handle}` JSDoc inline
+/// tag. The first three map 1:1 to wasm-bindgen's
+/// `#[wasm_bindgen(slice = "..")]`.
 ///
 /// `View` is the author asserting, as a fact about the host API, that the
 /// callee neither retains the buffer past the call nor re-enters wasm —
@@ -906,6 +907,9 @@ pub enum SliceModeHint {
     View,
     Array,
     Copy,
+    /// The callee needs the caller's own buffer, so a buffer source takes
+    /// JS handles only.
+    Handle,
 }
 
 impl SliceModeHint {
@@ -915,6 +919,7 @@ impl SliceModeHint {
             "view" => Some(Self::View),
             "array" => Some(Self::Array),
             "copy" => Some(Self::Copy),
+            "handle" => Some(Self::Handle),
             _ => None,
         }
     }
@@ -925,7 +930,7 @@ impl SliceModeHint {
     /// array kept as a handle overload — "Rust callers hold native
     /// elements here". The empties are kept beside the union.
     pub fn widen_bare_typed_array(self, ty: &TypeRef) -> Option<TypeRef> {
-        if self == Self::Array {
+        if matches!(self, Self::Array | Self::Handle) {
             return None;
         }
         if let Some((core, n)) = ty.split_empties() {

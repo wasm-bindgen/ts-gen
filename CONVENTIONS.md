@@ -367,7 +367,6 @@ dangles if the callee retains it and detaches if memory grows during
 the call), a fresh plain **`Array`**, or a fresh typed-array **copy**
 the callee owns.
 
-Outside [`BufferSource` call arguments](#primitive-union-arguments),
 ts-gen never emits the view: a generated binding cannot assert that a
 callee neither retains the buffer nor re-enters wasm. The TS type picks
 the copy shape instead:
@@ -383,6 +382,9 @@ the copy shape instead:
   non-numeric `T`, which reaches JS as a fresh `Array` anyway.
 * A typed slice from a [typed-array union](#typed-array-unions) gets
   `slice = "copy"`.
+* Under per-monomorphization, a function taking a
+  [buffer source](#primitive-union-arguments) (`impl BufferSourceLike`)
+  gets `slice = "copy"` on the function, as below.
 
 ```rs
 pub fn set_weights(#[wasm_bindgen(slice = "array")] weights: &[f64]);
@@ -402,9 +404,25 @@ format changes. The mode goes on the argument rather than the
 function, so a typed copy sharing a signature with a `T[]` stays a
 copy, and no inherited mode reaches a parameter it can't act on.
 
+The exception is `impl BufferSourceLike`, whose instantiations are
+handles as well as `&[u8]`: a mode written on the argument must fit
+every instantiation, and `slice` doesn't fit a handle. wasm-bindgen
+applies an inherited mode only where it fits, so the function carries
+it, copying the `&[u8]` instantiation and leaving handles and `Vec<u8>`
+as they are. One mode covers every buffer source on the function: the
+view only when each asks for it with `{@slice view}`, the copy
+otherwise. Other slice parameters on it keep their own, written modes.
+
+```rs
+#[wasm_bindgen(method, slice = "copy")]
+pub fn enqueue(this: &ReadableByteStreamController, chunk: impl BufferSourceLike);
+#[wasm_bindgen(method, setter, slice = "copy")]
+pub fn set_md5(this: &R2PutOptions, val: impl BufferSourceLike);
+```
+
 ### `{@slice}` JSDoc hints
 
-A `{@slice view|array|copy}` inline tag in a `@param` description (or
+A `{@slice view|array|copy|handle}` inline tag in a `@param` description (or
 in a property's JSDoc, for its setter value) selects the mode for that
 parameter, overriding the inferred one where the lowering is
 slice-shaped:
@@ -453,6 +471,27 @@ pub fn digest_with_uint8_array(data: &Uint8Array);
 
 The split is on the whole function because wasm-bindgen doesn't evaluate
 a `cfg_attr` on a parameter.
+
+On a [buffer source](#primitive-union-arguments), `view` makes the
+function's `&[u8]` instantiation a view, for callees that copy the
+bytes before returning (a `Response` body, WebCrypto). `handle` is for
+a callee that needs the caller's own buffer (a BYOB request's
+`respondWithNewView` must hand back the buffer it lent), which no
+`&[u8]` can be: the parameter takes handles only, owned or borrowed.
+
+```ts
+/** @param chunk {@slice view} copied before returning */
+write(chunk: BufferSource): void;
+/** @param view {@slice handle} */
+respondWithNewView(view: ArrayBuffer | ArrayBufferView): void;
+```
+
+```rs
+#[wasm_bindgen(method, slice = "view")]
+pub fn write(this: &Writer, chunk: impl BufferSourceLike);
+#[wasm_bindgen(method, js_name = "respondWithNewView")]
+pub fn respond_with_new_view(this: &ReadableStreamBYOBRequest, view: impl BufferSourceLike + AsRef<JsValue>);
+```
 
 The tag is stripped from the rendered doc comment. A hint whose
 parameter's lowering isn't slice-shaped is dropped by shape, the same
@@ -3358,13 +3397,9 @@ not emitted. `ArrayBuffer | ArrayBufferView` (however spelled,
 `BufferSource` included) is the one union that groups, into one `impl
 js_sys::BufferSourceLike` alternative suffixed `_with_buffer_source`.
 Every buffer handle (`ArrayBuffer`, each typed array, `DataView`, owned
-or borrowed) crosses as itself through the one import, and `Vec<u8>` as
-a copy. A call argument takes `&[u8]` as a view of wasm memory, as a
-`BufferSource` parameter's bytes are copied before the call returns
-(WebIDL's "get a copy of the bytes held by the buffer source"). A setter
-keeps its value, so its import carries an inherited `slice = "copy"`,
-which copies the `&[u8]` instantiation and leaves the handle
-instantiations alone; builders and factories store through it:
+or borrowed) crosses as itself through the one import, and `&[u8]` and
+`Vec<u8>` as copies (see [slice modes](#slice-modes) for the `{@slice
+view}` opt-in):
 
 ```ts
 verify(algorithm: string | Algorithm, key: CryptoKey, signature: BufferSource, data: BufferSource): Promise<boolean>;
@@ -3373,9 +3408,6 @@ verify(algorithm: string | Algorithm, key: CryptoKey, signature: BufferSource, d
 ```rust
 pub fn verify(this: &SubtleCrypto, algorithm: impl JsStringLike, key: &CryptoKey, signature: impl BufferSourceLike, data: impl BufferSourceLike) -> Promise<bool>;
 pub fn verify_with_algorithm(this: &SubtleCrypto, algorithm: &Algorithm, key: &CryptoKey, signature: impl BufferSourceLike, data: impl BufferSourceLike) -> Promise<bool>;
-
-#[wasm_bindgen(method, setter, slice = "copy")]
-pub fn set_md5(this: &R2PutOptions, val: impl BufferSourceLike);
 ```
 
 Without `--experimental-generic-mono` buffer sources keep the per-member
@@ -3955,8 +3987,8 @@ ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
 
 * `@rust` applies as if written on the input member; a property's tag
   reaches its setter too. Parameters match by name.
-* `@throws` replaces the input member's failure mode. Getters are
-  infallible, so on a property it contributes only its doc.
+* A parameter's `{@slice mode}` replaces the input parameter's.
+* `@throws` replaces the input member's failure mode.
 * `{@string mode}` replaces the input member's mode; one in a side
   declaration's doc is the default for every input member of it that no
   tag (input or side) sets.
