@@ -3253,6 +3253,15 @@ pub enum EmailAttachmentContentKind {
 pub fn content(this: &EmailAttachment) -> EmailAttachmentContentKind;
 ```
 
+An optional getter's union is `Option` of the enum. Under
+`--experimental-generic-mono` so is a callable's `T | null` return,
+awaited or not (elsewhere it stays `JsValue`):
+
+```rust
+// get(name: string): (File | string) | null;
+pub fn get(this: &FormData, name: impl JsStringLike) -> Option<GetReturnKind>;
+```
+
 #### Naming
 
 The enum gets a `Kind` suffix (Rust idiom for discriminated-enum

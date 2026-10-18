@@ -2555,7 +2555,17 @@ pub fn to_return_type(
     } else {
         match maybe_synthesise_return_union(ty, ctx, scope, from_module, anchor) {
             Some(tokens) => tokens,
-            None => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
+            // Per-mono `(File | string) | null` is `Option` of the enum, as
+            // an optional getter's is.
+            None => match ty {
+                TypeRef::Nullable(inner, _) if CodegenContext::generic_mono(ctx) => {
+                    match maybe_synthesise_return_union(inner, ctx, scope, from_module, anchor) {
+                        Some(tokens) => quote! { Option<#tokens> },
+                        None => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
+                    }
+                }
+                _ => to_syn_type(ty, TypePosition::RETURN, ctx, scope, from_module),
+            },
         }
     };
 
