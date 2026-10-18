@@ -740,7 +740,8 @@ impl<'a> CodegenContext<'a> {
 
     /// The Rust target of a local type alias, lowered in the alias's own
     /// scope so its type parameters bind. An enum target has no inner form,
-    /// so it is named directly.
+    /// so it is named directly. Per-mono, leaves are native as in a js-sys
+    /// container (`type Bookmark = string` is `String`).
     pub(crate) fn alias_target(
         &self,
         alias: &ir::TypeAliasDecl,
@@ -764,7 +765,7 @@ impl<'a> CodegenContext<'a> {
         let pos = if self.enum_kind(&alias.target, alias.body_scope).is_some() {
             TypePosition::RETURN
         } else {
-            TypePosition::ARGUMENT.to_inner()
+            TypePosition::ARGUMENT.to_container(Some(self))
         };
         to_syn_type(
             &alias.target,
@@ -2555,6 +2556,17 @@ fn generic_container(
         base
     } else {
         quote! { #base<#arg> }
+    }
+}
+
+/// The element type of an `Iterable<T>` reference.
+pub(crate) fn iterable_elem(ty: &TypeRef) -> Option<&TypeRef> {
+    match ty {
+        TypeRef::Reference {
+            segments,
+            generic_args,
+        } if segments.len() == 1 && segments[0] == "Iterable" => generic_args.first(),
+        _ => None,
     }
 }
 

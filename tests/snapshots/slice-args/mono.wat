@@ -114,6 +114,14 @@
   ;; mixedGeneric(values: T[], weights: number[], data: Float64Array): string
   (import "slice-args" "mixedGeneric_with_float64_array" (func $slice-args:mixedGeneric_with_float64_array (param $values externref) (param $weights externref) (param $data externref) (result externref)))
 
+  ;; Queue
+  ;; sendBatch(messages: Iterable<T>): void
+  (import "slice-args" "Queue.send_batch" (func $slice-args:Queue.send_batch (param $this externref) (param $messages externref)))
+  ;; tag(names: Iterable<string>, scores: Iterable<number>): void
+  (import "slice-args" "Queue.tag" (func $slice-args:Queue.tag (param $this externref) (param $names externref) (param $scores externref)))
+  ;; tag(names: Iterable<string>, scores: null): void
+  (import "slice-args" "Queue.tag_with_null" (func $slice-args:Queue.tag_with_null (param $this externref) (param $names externref) (param $scores externref)))
+
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
 

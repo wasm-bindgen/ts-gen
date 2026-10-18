@@ -11,7 +11,7 @@ pub mod x {
         #[allow(unused_imports)]
         use super::*;
         #[allow(dead_code)]
-        pub type Id = JsString;
+        pub type Id = String;
         #[wasm_bindgen(module = "x:shapes", experimental_generic_mono)]
         extern "C" {
             # [wasm_bindgen (extends = Object)]

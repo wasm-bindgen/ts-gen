@@ -2022,7 +2022,13 @@ extern "C" {
         body: &FormData,
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "sendBeacon")]
-    pub fn send_beacon_with_iterable(
+    pub fn send_beacon_with_slice(
+        this: &Navigator,
+        url: impl ::wasm_bindgen::JsStringLike,
+        body: &[JsValue],
+    ) -> Result<bool, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "sendBeacon")]
+    pub fn send_beacon_with_async_iterable(
         this: &Navigator,
         url: impl ::wasm_bindgen::JsStringLike,
         body: &JsValue,
@@ -8145,7 +8151,7 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_headers(init: &Headers) -> Result<Headers, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_iterable(init: &JsValue) -> Result<Headers, JsValue>;
+    pub fn new_with_slice(init: &[JsValue]) -> Result<Headers, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_record(init: &Object<String>) -> Result<Headers, JsValue>;
     #[doc = " The **`get()`** method of the Headers interface returns a byte string of all the values of a header within a `Headers` object with a given name."]
@@ -8293,7 +8299,9 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_form_data(body: &FormData) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_iterable(body: &JsValue) -> Result<Response, JsValue>;
+    pub fn new_with_slice(body: &[JsValue]) -> Result<Response, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_async_iterable(body: &JsValue) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     fn __new_with_null(body: &::wasm_bindgen::JsValue) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
@@ -8329,7 +8337,12 @@ extern "C" {
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_iterable_and_init(
+    pub fn new_with_slice_and_init(
+        body: &[JsValue],
+        init: &ResponseInit,
+    ) -> Result<Response, JsValue>;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new_with_async_iterable_and_init(
         body: &JsValue,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
@@ -8462,7 +8475,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_headers(this: &ResponseInit, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
-    pub fn set_headers_with_iterable(this: &ResponseInit, val: &JsValue);
+    pub fn set_headers_with_slice(this: &ResponseInit, val: &[JsValue]);
     #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_record(this: &ResponseInit, val: &Object<String>);
     #[wasm_bindgen(method, getter)]
@@ -8516,8 +8529,8 @@ impl ResponseInitBuilder {
         self.inner.set_headers(val);
         self
     }
-    pub fn headers_with_iterable(self, val: &JsValue) -> Self {
-        self.inner.set_headers_with_iterable(val);
+    pub fn headers_with_slice(self, val: &[JsValue]) -> Self {
+        self.inner.set_headers_with_slice(val);
         self
     }
     pub fn headers_with_record(self, val: &Object<String>) -> Self {
@@ -8739,7 +8752,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_headers<Cf>(this: &RequestInit<Cf>, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
-    pub fn set_headers_with_iterable<Cf>(this: &RequestInit<Cf>, val: &JsValue);
+    pub fn set_headers_with_slice<Cf>(this: &RequestInit<Cf>, val: &[JsValue]);
     #[wasm_bindgen(method, setter, js_name = "headers")]
     pub fn set_headers_with_record<Cf>(this: &RequestInit<Cf>, val: &Object<String>);
     #[wasm_bindgen(method, getter)]
@@ -8761,7 +8774,9 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "body")]
     pub fn set_body_with_form_data<Cf>(this: &RequestInit<Cf>, val: &FormData);
     #[wasm_bindgen(method, setter, js_name = "body")]
-    pub fn set_body_with_iterable<Cf>(this: &RequestInit<Cf>, val: &JsValue);
+    pub fn set_body_with_slice<Cf>(this: &RequestInit<Cf>, val: &[JsValue]);
+    #[wasm_bindgen(method, setter, js_name = "body")]
+    pub fn set_body_with_async_iterable<Cf>(this: &RequestInit<Cf>, val: &JsValue);
     #[wasm_bindgen(method, setter, js_name = "body")]
     fn __set_body_with_null<Cf>(this: &RequestInit<Cf>, val: &::wasm_bindgen::JsValue);
     #[wasm_bindgen(method, getter)]
@@ -8851,8 +8866,8 @@ where
         self.inner.set_headers(val);
         self
     }
-    pub fn headers_with_iterable(self, val: &JsValue) -> Self {
-        self.inner.set_headers_with_iterable(val);
+    pub fn headers_with_slice(self, val: &[JsValue]) -> Self {
+        self.inner.set_headers_with_slice(val);
         self
     }
     pub fn headers_with_record(self, val: &Object<String>) -> Self {
@@ -8890,8 +8905,12 @@ where
         self.inner.set_body_with_form_data(val);
         self
     }
-    pub fn body_with_iterable(self, val: &JsValue) -> Self {
-        self.inner.set_body_with_iterable(val);
+    pub fn body_with_slice(self, val: &[JsValue]) -> Self {
+        self.inner.set_body_with_slice(val);
+        self
+    }
+    pub fn body_with_async_iterable(self, val: &JsValue) -> Self {
+        self.inner.set_body_with_async_iterable(val);
         self
     }
     pub fn body_with_null(self) -> Self {
@@ -10244,21 +10263,35 @@ extern "C" {
     where
         Body: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "sendBatch")]
-    pub async fn send_batch<Body>(this: &Queue<Body>, messages: &JsValue) -> Result<(), JsValue>;
+    pub async fn send_batch<Body>(
+        this: &Queue<Body>,
+        messages: &[MessageSendRequest<Body>],
+    ) -> Result<(), JsValue>
+    where
+        MessageSendRequest<Body>: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
     #[wasm_bindgen(method, js_name = "sendBatch")]
-    pub fn send_batch_promise<Body>(this: &Queue<Body>, messages: &JsValue) -> Promise<()>;
+    pub fn send_batch_promise<Body>(
+        this: &Queue<Body>,
+        messages: &[MessageSendRequest<Body>],
+    ) -> Promise<()>
+    where
+        MessageSendRequest<Body>: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "sendBatch")]
     pub async fn send_batch_with_options<Body>(
         this: &Queue<Body>,
-        messages: &JsValue,
+        messages: &[MessageSendRequest<Body>],
         options: &QueueSendBatchOptions,
-    ) -> Result<(), JsValue>;
+    ) -> Result<(), JsValue>
+    where
+        MessageSendRequest<Body>: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
     #[wasm_bindgen(method, js_name = "sendBatch")]
     pub fn send_batch_with_options_promise<Body>(
         this: &Queue<Body>,
-        messages: &JsValue,
+        messages: &[MessageSendRequest<Body>],
         options: &QueueSendBatchOptions,
-    ) -> Promise<()>;
+    ) -> Promise<()>
+    where
+        MessageSendRequest<Body>: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -14861,7 +14894,7 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new() -> Result<URLSearchParams, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_iterable(init: &JsValue) -> Result<URLSearchParams, JsValue>;
+    pub fn new_with_slice(init: &[JsValue]) -> Result<URLSearchParams, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_record(init: &Object<String>) -> Result<URLSearchParams, JsValue>;
     #[wasm_bindgen(constructor, catch)]
@@ -32300,7 +32333,7 @@ impl From<Ai_Cf_Leonardo_Phoenix_1_0_Input> for Ai_Cf_Leonardo_Phoenix_1_0_Input
     }
 }
 #[allow(dead_code)]
-pub type Ai_Cf_Leonardo_Phoenix_1_0_Output = JsString;
+pub type Ai_Cf_Leonardo_Phoenix_1_0_Output = String;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -32583,7 +32616,7 @@ impl From<Ai_Cf_Deepgram_Aura_1_Input> for Ai_Cf_Deepgram_Aura_1_InputBuilder {
     }
 }
 #[allow(dead_code)]
-pub type Ai_Cf_Deepgram_Aura_1_Output = JsString;
+pub type Ai_Cf_Deepgram_Aura_1_Output = String;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -34799,7 +34832,7 @@ impl From<Ai_Cf_Deepgram_Aura_2_En_Input> for Ai_Cf_Deepgram_Aura_2_En_InputBuil
     }
 }
 #[allow(dead_code)]
-pub type Ai_Cf_Deepgram_Aura_2_En_Output = JsString;
+pub type Ai_Cf_Deepgram_Aura_2_En_Output = String;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -34916,7 +34949,7 @@ impl From<Ai_Cf_Deepgram_Aura_2_Es_Input> for Ai_Cf_Deepgram_Aura_2_Es_InputBuil
     }
 }
 #[allow(dead_code)]
-pub type Ai_Cf_Deepgram_Aura_2_Es_Output = JsString;
+pub type Ai_Cf_Deepgram_Aura_2_Es_Output = String;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -43349,7 +43382,7 @@ pub enum CertVerificationStatus {
     Failed = "FAILED",
 }
 #[allow(dead_code)]
-pub type IncomingRequestCfPropertiesEdgeRequestKeepAliveStatus = Number;
+pub type IncomingRequestCfPropertiesEdgeRequestKeepAliveStatus = f64;
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Iso3166Alpha2Code {
@@ -43883,7 +43916,7 @@ pub enum D1SessionConstraint {
     FirstUnconstrained = "first-unconstrained",
 }
 #[allow(dead_code)]
-pub type D1SessionBookmark = JsString;
+pub type D1SessionBookmark = String;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]

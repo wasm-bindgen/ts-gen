@@ -2563,6 +2563,12 @@ methods. Nested occurrences (inside unions, arrays, etc.) are not
 synthesized — they erase to `JsValue`, matching the existing
 parameter-synthesis limitation.
 
+Under `--experimental-generic-mono` an `Iterable<T>` argument (a union
+arm included) is taken like `T[]`, as a slice reaching JS as an `Array`,
+which is itself iterable: `sendBatch(messages: Iterable<Message>)` is
+`send_batch(messages: &[Message])`, `Iterable<string>` is
+`&[impl JsStringLike]`.
+
 Type parameters mentioned by the iteration item bubble up onto the
 synthesized wrapper, so `Iterable<[string, T]>` produces
 `<Parent>List<T>` rather than erasing `T`. The method returning it
@@ -4611,6 +4617,10 @@ namespace exported under its own name as well keeps it.
   }
   pub fn on_event(name: &str, listener: &Function<fn(JsString) -> Undefined>);
   ```
+
+  Under `--experimental-generic-mono` the declaration's leaves are
+  native, as in a js-sys container: `pub type Name = String;`,
+  `pub type Listener<E> = Function<fn(E)>;`.
 * A generic alias instantiation `Foo<A, B>` chases to the target with
   the parameters substituted, so `type Info<M> = Request<M> | string`
   used as `send(input: Info<Meta>)` fans out exactly like the written

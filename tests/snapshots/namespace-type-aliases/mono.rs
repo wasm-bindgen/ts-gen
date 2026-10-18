@@ -85,9 +85,9 @@ pub mod events {
         }
     }
     #[allow(dead_code)]
-    pub type Name = JsString;
+    pub type Name = String;
     #[allow(dead_code)]
-    pub type Label = JsString;
+    pub type Label = String;
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -142,7 +142,7 @@ pub mod events {
         #[allow(unused_imports)]
         use super::*;
         #[allow(dead_code)]
-        pub type Id = JsString;
+        pub type Id = String;
         #[allow(dead_code)]
         pub type Tagged<T> = ArrayTuple<(T, super::Shadowed)>;
         #[wasm_bindgen(experimental_generic_mono)]

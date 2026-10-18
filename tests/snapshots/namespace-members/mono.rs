@@ -26,7 +26,7 @@ pub mod events {
     #[allow(unused_imports)]
     use super::*;
     #[allow(dead_code)]
-    pub type Name = JsString;
+    pub type Name = String;
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]

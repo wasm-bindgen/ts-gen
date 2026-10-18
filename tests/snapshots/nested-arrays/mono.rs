@@ -7,7 +7,7 @@ use wasm_bindgen::prelude::*;
 #[allow(dead_code)]
 pub type Row = Array<String>;
 #[allow(dead_code)]
-pub type Id = JsString;
+pub type Id = String;
 #[wasm_bindgen(module = "nested-arrays", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object)]

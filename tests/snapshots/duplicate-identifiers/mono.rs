@@ -46,7 +46,7 @@ impl IfaceFirst {
     }
 }
 #[allow(dead_code)]
-pub type Prim = JsString;
+pub type Prim = String;
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Mode {

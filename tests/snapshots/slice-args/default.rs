@@ -463,3 +463,44 @@ extern "C" {
         data: &Float64Array,
     ) -> Result<String, JsValue>;
 }
+#[wasm_bindgen(module = "slice-args")]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Queue<T: ::wasm_bindgen::JsGeneric = JsValue>;
+    #[wasm_bindgen(method, js_name = "sendBatch")]
+    pub fn send_batch<T: ::wasm_bindgen::JsGeneric>(this: &Queue<T>, messages: &JsValue);
+    #[wasm_bindgen(method, catch, js_name = "sendBatch")]
+    pub fn try_send_batch<T: ::wasm_bindgen::JsGeneric>(
+        this: &Queue<T>,
+        messages: &JsValue,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn tag<T: ::wasm_bindgen::JsGeneric>(this: &Queue<T>, names: &JsValue, scores: &JsValue);
+    #[wasm_bindgen(method, catch, js_name = "tag")]
+    pub fn try_tag<T: ::wasm_bindgen::JsGeneric>(
+        this: &Queue<T>,
+        names: &JsValue,
+        scores: &JsValue,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "tag")]
+    fn __tag_with_null<T: ::wasm_bindgen::JsGeneric>(
+        this: &Queue<T>,
+        names: &JsValue,
+        scores: &::wasm_bindgen::JsValue,
+    );
+    #[wasm_bindgen(method, catch, js_name = "tag")]
+    fn __try_tag_with_null<T: ::wasm_bindgen::JsGeneric>(
+        this: &Queue<T>,
+        names: &JsValue,
+        scores: &::wasm_bindgen::JsValue,
+    ) -> Result<(), JsValue>;
+}
+impl<T: ::wasm_bindgen::JsGeneric> Queue<T> {
+    pub fn tag_with_null(&self, names: &JsValue) {
+        self.__tag_with_null(names, &::wasm_bindgen::JsValue::NULL)
+    }
+    pub fn try_tag_with_null(&self, names: &JsValue) -> Result<(), JsValue> {
+        self.__try_tag_with_null(names, &::wasm_bindgen::JsValue::NULL)
+    }
+}

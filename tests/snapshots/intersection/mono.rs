@@ -166,7 +166,7 @@ impl Unrelated {
     }
 }
 #[allow(dead_code)]
-pub type Str = JsString;
+pub type Str = String;
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -534,13 +534,13 @@ impl From<Message> for MessageBuilder {
     }
 }
 #[allow(dead_code)]
-pub type Str2 = JsString;
+pub type Str2 = String;
 #[allow(dead_code)]
-pub type ViaStr2 = JsString;
+pub type ViaStr2 = String;
 #[allow(dead_code)]
-pub type ViaStr = JsString;
+pub type ViaStr = String;
 #[allow(dead_code)]
-pub type ViaViaStr = JsString;
+pub type ViaViaStr = String;
 #[allow(dead_code)]
 pub type ViaBranded = Base;
 #[allow(dead_code)]

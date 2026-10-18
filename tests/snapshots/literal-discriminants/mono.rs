@@ -5,7 +5,7 @@ use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
 #[allow(dead_code)]
-pub type KeepAlive = Number;
+pub type KeepAlive = f64;
 #[wasm_bindgen(module = "literal-discriminants", experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]

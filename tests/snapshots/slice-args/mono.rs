@@ -5,7 +5,7 @@ use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
 #[allow(dead_code)]
-pub type Count = Number;
+pub type Count = f64;
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u32)]
@@ -544,4 +544,37 @@ extern "C" {
     ) -> Result<JsString, JsValue>
     where
         T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+}
+#[wasm_bindgen(module = "slice-args", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Queue<T = JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "sendBatch")]
+    pub fn send_batch<T>(
+        this: &Queue<T>,
+        #[wasm_bindgen(slice = "array")] messages: &[T],
+    ) -> Result<(), JsValue>
+    where
+        T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
+    #[wasm_bindgen(method, catch)]
+    pub fn tag<T>(
+        this: &Queue<T>,
+        names: &[impl ::wasm_bindgen::JsStringLike],
+        #[wasm_bindgen(slice = "array")] scores: &[f64],
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "tag")]
+    fn __tag_with_null<T>(
+        this: &Queue<T>,
+        names: &[impl ::wasm_bindgen::JsStringLike],
+        scores: &::wasm_bindgen::JsValue,
+    ) -> Result<(), JsValue>;
+}
+impl<T> Queue<T> {
+    pub fn tag_with_null(
+        &self,
+        names: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<(), JsValue> {
+        self.__tag_with_null(names, &::wasm_bindgen::JsValue::NULL)
+    }
 }
