@@ -2509,6 +2509,32 @@ extern "C" {
         keys: &[impl ::wasm_bindgen::JsStringLike],
         options: &DurableObjectGetOptions,
     ) -> Promise<Map<String, JsValue>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub async fn get_with_keys_typed<T>(
+        this: &DurableObjectTransaction,
+        keys: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<Map<String, T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_with_keys_typed_promise<T>(
+        this: &DurableObjectTransaction,
+        keys: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Promise<Map<String, T>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub async fn get_with_keys_and_options_typed<T>(
+        this: &DurableObjectTransaction,
+        keys: &[impl ::wasm_bindgen::JsStringLike],
+        options: &DurableObjectGetOptions,
+    ) -> Result<Map<String, T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_with_keys_and_options_typed_promise<T>(
+        this: &DurableObjectTransaction,
+        keys: &[impl ::wasm_bindgen::JsStringLike],
+        options: &DurableObjectGetOptions,
+    ) -> Promise<Map<String, T>>;
     #[wasm_bindgen(method, catch)]
     pub async fn list(this: &DurableObjectTransaction) -> Result<Map<String, JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "list")]
@@ -2523,6 +2549,24 @@ extern "C" {
         this: &DurableObjectTransaction,
         options: &DurableObjectListOptions,
     ) -> Promise<Map<String, JsValue>>;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub async fn list_typed<T>(this: &DurableObjectTransaction) -> Result<Map<String, T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "list")]
+    pub fn list_typed_promise<T>(this: &DurableObjectTransaction) -> Promise<Map<String, T>>;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub async fn list_with_options_typed<T>(
+        this: &DurableObjectTransaction,
+        options: &DurableObjectListOptions,
+    ) -> Result<Map<String, T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "list")]
+    pub fn list_with_options_typed_promise<T>(
+        this: &DurableObjectTransaction,
+        options: &DurableObjectListOptions,
+    ) -> Promise<Map<String, T>>;
     #[wasm_bindgen(method, catch)]
     pub async fn put<T>(
         this: &DurableObjectTransaction,
@@ -2750,6 +2794,32 @@ extern "C" {
         keys: &[impl ::wasm_bindgen::JsStringLike],
         options: &DurableObjectGetOptions,
     ) -> Promise<Map<String, JsValue>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub async fn get_with_keys_typed<T>(
+        this: &DurableObjectStorage,
+        keys: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<Map<String, T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_with_keys_typed_promise<T>(
+        this: &DurableObjectStorage,
+        keys: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Promise<Map<String, T>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub async fn get_with_keys_and_options_typed<T>(
+        this: &DurableObjectStorage,
+        keys: &[impl ::wasm_bindgen::JsStringLike],
+        options: &DurableObjectGetOptions,
+    ) -> Result<Map<String, T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_with_keys_and_options_typed_promise<T>(
+        this: &DurableObjectStorage,
+        keys: &[impl ::wasm_bindgen::JsStringLike],
+        options: &DurableObjectGetOptions,
+    ) -> Promise<Map<String, T>>;
     #[wasm_bindgen(method, catch)]
     pub async fn list(this: &DurableObjectStorage) -> Result<Map<String, JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "list")]
@@ -2764,6 +2834,24 @@ extern "C" {
         this: &DurableObjectStorage,
         options: &DurableObjectListOptions,
     ) -> Promise<Map<String, JsValue>>;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub async fn list_typed<T>(this: &DurableObjectStorage) -> Result<Map<String, T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "list")]
+    pub fn list_typed_promise<T>(this: &DurableObjectStorage) -> Promise<Map<String, T>>;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub async fn list_with_options_typed<T>(
+        this: &DurableObjectStorage,
+        options: &DurableObjectListOptions,
+    ) -> Result<Map<String, T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "list")]
+    pub fn list_with_options_typed_promise<T>(
+        this: &DurableObjectStorage,
+        options: &DurableObjectListOptions,
+    ) -> Promise<Map<String, T>>;
     #[wasm_bindgen(method, catch)]
     pub async fn put<T>(
         this: &DurableObjectStorage,
@@ -9472,6 +9560,34 @@ extern "C" {
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Map<String, JsValue>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    async fn __get_json_with_slice_typed<ExpectedValue>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Map<String, Nullable<ExpectedValue>>, JsValue>
+    where
+        ExpectedValue: 'static;
+    #[wasm_bindgen(method, js_name = "get")]
+    fn __get_json_with_slice_typed_promise<ExpectedValue>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<Map<String, Nullable<ExpectedValue>>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub async fn get_json_with_slice_and_options_typed<ExpectedValue>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions<String>,
+    ) -> Result<Map<String, Nullable<ExpectedValue>>, JsValue>
+    where
+        ExpectedValue: 'static;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_json_with_slice_and_options_typed_promise<ExpectedValue>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions<String>,
+    ) -> Promise<Map<String, Nullable<ExpectedValue>>>;
     #[wasm_bindgen(method, catch)]
     pub async fn list(this: &KVNamespace) -> Result<KVNamespaceListResult, JsValue>;
     #[wasm_bindgen(method, js_name = "list")]
@@ -9486,6 +9602,28 @@ extern "C" {
         this: &KVNamespace,
         options: &KVNamespaceListOptions,
     ) -> Promise<KVNamespaceListResult>;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub async fn list_typed<Metadata>(
+        this: &KVNamespace,
+    ) -> Result<KVNamespaceListResult<Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "list")]
+    pub fn list_typed_promise<Metadata>(
+        this: &KVNamespace,
+    ) -> Promise<KVNamespaceListResult<Metadata>>;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub async fn list_with_options_typed<Metadata>(
+        this: &KVNamespace,
+        options: &KVNamespaceListOptions,
+    ) -> Result<KVNamespaceListResult<Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "list")]
+    pub fn list_with_options_typed_promise<Metadata>(
+        this: &KVNamespace,
+        options: &KVNamespaceListOptions,
+    ) -> Promise<KVNamespaceListResult<Metadata>>;
     #[wasm_bindgen(method, catch)]
     pub async fn put(
         this: &KVNamespace,
@@ -9801,6 +9939,261 @@ extern "C" {
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    pub async fn get_with_metadata_typed<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<String, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    pub async fn get_with_metadata_typed_js_string<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    pub fn get_with_metadata_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    pub async fn get_with_metadata_with_options_typed<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &PartialKvNamespaceGetOptionsUndefined,
+    ) -> Result<KVNamespaceGetWithMetadataResult<String, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    pub async fn get_with_metadata_with_options_typed_js_string<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &PartialKvNamespaceGetOptionsUndefined,
+    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    pub fn get_with_metadata_with_options_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &PartialKvNamespaceGetOptionsUndefined,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_text_typed<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<String, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_text_typed_js_string<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    fn __get_with_metadata_text_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_json_typed<ExpectedValue, Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>, JsValue>
+    where
+        ExpectedValue: 'static,
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    fn __get_with_metadata_json_typed_promise<ExpectedValue, Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_array_buffer_typed<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    fn __get_with_metadata_array_buffer_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_stream_typed<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    fn __get_with_metadata_stream_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    pub async fn get_with_metadata_text_with_options_typed<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions<String>,
+    ) -> Result<KVNamespaceGetWithMetadataResult<String, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    pub async fn get_with_metadata_text_with_options_typed_js_string<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions<String>,
+    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    pub fn get_with_metadata_text_with_options_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions<String>,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    pub async fn get_with_metadata_json_with_options_typed<ExpectedValue, Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions<String>,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>, JsValue>
+    where
+        ExpectedValue: 'static,
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    pub fn get_with_metadata_json_with_options_typed_promise<ExpectedValue, Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions<String>,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    pub async fn get_with_metadata_array_buffer_with_options_typed<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions<String>,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    pub fn get_with_metadata_array_buffer_with_options_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions<String>,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    pub async fn get_with_metadata_stream_with_options_typed<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions<String>,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    pub fn get_with_metadata_stream_with_options_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &KVNamespaceGetOptions<String>,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_text_with_slice_typed<Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Map<String, KVNamespaceGetWithMetadataResult<String, Metadata>>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    fn __get_with_metadata_text_with_slice_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult<String, Metadata>>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    async fn __get_with_metadata_json_with_slice_typed<ExpectedValue, Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Map<String, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>, JsValue>
+    where
+        ExpectedValue: 'static,
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    fn __get_with_metadata_json_with_slice_typed_promise<ExpectedValue, Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        r#type: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    pub async fn get_with_metadata_with_slice_typed<Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<Map<String, KVNamespaceGetWithMetadataResult<String, Metadata>>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    pub fn get_with_metadata_with_slice_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult<String, Metadata>>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    pub async fn get_with_metadata_with_slice_and_options_typed<Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &PartialKvNamespaceGetOptionsUndefined,
+    ) -> Result<Map<String, KVNamespaceGetWithMetadataResult<String, Metadata>>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    pub fn get_with_metadata_with_slice_and_options_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &PartialKvNamespaceGetOptionsUndefined,
+    ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult<String, Metadata>>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    pub async fn get_with_metadata_text_with_slice_and_options_typed<Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions<String>,
+    ) -> Result<Map<String, KVNamespaceGetWithMetadataResult<String, Metadata>>, JsValue>
+    where
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    pub fn get_with_metadata_text_with_slice_and_options_typed_promise<Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions<String>,
+    ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult<String, Metadata>>>;
+    #[wasm_bindgen(method, catch, js_name = "getWithMetadata")]
+    pub async fn get_with_metadata_json_with_slice_and_options_typed<ExpectedValue, Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions<String>,
+    ) -> Result<Map<String, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>, JsValue>
+    where
+        ExpectedValue: 'static,
+        Metadata: 'static;
+    #[wasm_bindgen(method, js_name = "getWithMetadata")]
+    pub fn get_with_metadata_json_with_slice_and_options_typed_promise<ExpectedValue, Metadata>(
+        this: &KVNamespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &KVNamespaceGetOptions<String>,
+    ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>>;
     #[wasm_bindgen(method, catch)]
     pub async fn delete(
         this: &KVNamespace,
@@ -9895,6 +10288,21 @@ impl KVNamespace {
     ) -> Promise<Map<String, JsValue>> {
         self.__get_json_with_slice_promise(key, "json")
     }
+    pub async fn get_json_with_slice_typed<ExpectedValue>(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<Map<String, Nullable<ExpectedValue>>, JsValue>
+    where
+        ExpectedValue: 'static,
+    {
+        self.__get_json_with_slice_typed(key, "json").await
+    }
+    pub fn get_json_with_slice_typed_promise<ExpectedValue>(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Promise<Map<String, Nullable<ExpectedValue>>> {
+        self.__get_json_with_slice_typed_promise(key, "json")
+    }
     pub async fn get_with_metadata_text(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
@@ -9973,6 +10381,111 @@ impl KVNamespace {
         key: &[impl ::wasm_bindgen::JsStringLike],
     ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult>> {
         self.__get_with_metadata_json_with_slice_promise(key, "json")
+    }
+    pub async fn get_with_metadata_text_typed<Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<String, Metadata>, JsValue>
+    where
+        Metadata: 'static,
+    {
+        self.__get_with_metadata_text_typed(key, "text").await
+    }
+    pub async fn get_with_metadata_text_typed_js_string<Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<JsString, Metadata>, JsValue>
+    where
+        Metadata: 'static,
+    {
+        self.__get_with_metadata_text_typed_js_string(key, "text")
+            .await
+    }
+    pub fn get_with_metadata_text_typed_promise<Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>> {
+        self.__get_with_metadata_text_typed_promise(key, "text")
+    }
+    pub async fn get_with_metadata_json_typed<ExpectedValue, Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>, JsValue>
+    where
+        ExpectedValue: 'static,
+        Metadata: 'static,
+    {
+        self.__get_with_metadata_json_typed(key, "json").await
+    }
+    pub fn get_with_metadata_json_typed_promise<ExpectedValue, Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>> {
+        self.__get_with_metadata_json_typed_promise(key, "json")
+    }
+    pub async fn get_with_metadata_array_buffer_typed<Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>, JsValue>
+    where
+        Metadata: 'static,
+    {
+        self.__get_with_metadata_array_buffer_typed(key, "arrayBuffer")
+            .await
+    }
+    pub fn get_with_metadata_array_buffer_typed_promise<Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>> {
+        self.__get_with_metadata_array_buffer_typed_promise(key, "arrayBuffer")
+    }
+    pub async fn get_with_metadata_stream_typed<Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>, JsValue>
+    where
+        Metadata: 'static,
+    {
+        self.__get_with_metadata_stream_typed(key, "stream").await
+    }
+    pub fn get_with_metadata_stream_typed_promise<Metadata>(
+        &self,
+        key: impl ::wasm_bindgen::JsStringLike,
+    ) -> Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>> {
+        self.__get_with_metadata_stream_typed_promise(key, "stream")
+    }
+    pub async fn get_with_metadata_text_with_slice_typed<Metadata>(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<Map<String, KVNamespaceGetWithMetadataResult<String, Metadata>>, JsValue>
+    where
+        Metadata: 'static,
+    {
+        self.__get_with_metadata_text_with_slice_typed(key, "text")
+            .await
+    }
+    pub fn get_with_metadata_text_with_slice_typed_promise<Metadata>(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult<String, Metadata>>> {
+        self.__get_with_metadata_text_with_slice_typed_promise(key, "text")
+    }
+    pub async fn get_with_metadata_json_with_slice_typed<ExpectedValue, Metadata>(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Result<Map<String, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>, JsValue>
+    where
+        ExpectedValue: 'static,
+        Metadata: 'static,
+    {
+        self.__get_with_metadata_json_with_slice_typed(key, "json")
+            .await
+    }
+    pub fn get_with_metadata_json_with_slice_typed_promise<ExpectedValue, Metadata>(
+        &self,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+    ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>> {
+        self.__get_with_metadata_json_with_slice_typed_promise(key, "json")
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -15883,6 +16396,12 @@ extern "C" {
         query: impl ::wasm_bindgen::JsStringLike,
         bindings: &[JsValue],
     ) -> Result<SqlStorageCursor, JsValue>;
+    #[wasm_bindgen(method, variadic, catch, js_name = "exec")]
+    pub fn exec_typed<T>(
+        this: &SqlStorage,
+        query: impl ::wasm_bindgen::JsStringLike,
+        bindings: &[JsValue],
+    ) -> Result<SqlStorageCursor<T>, JsValue>;
     #[wasm_bindgen(method, getter, js_name = "databaseSize")]
     pub fn database_size(this: &SqlStorage) -> f64;
     #[wasm_bindgen(method, getter, js_name = "Cursor")]
@@ -15980,6 +16499,8 @@ extern "C" {
         T: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, catch)]
     pub fn raw<T>(this: &SqlStorageCursor<T>) -> Result<Iterator, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "raw")]
+    pub fn raw_typed<T, U>(this: &SqlStorageCursor<T>) -> Result<Iterator<U>, JsValue>;
     #[wasm_bindgen(method, getter, js_name = "columnNames")]
     pub fn column_names<T>(this: &SqlStorageCursor<T>) -> Vec<String>;
     #[wasm_bindgen(method, getter, js_name = "columnNames")]
@@ -16654,6 +17175,13 @@ extern "C" {
         this: &SyncKvStorage,
         options: &SyncKvListOptions,
     ) -> Result<SyncKvStorageList, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub fn list_typed<T>(this: &SyncKvStorage) -> Result<SyncKvStorageList<T>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub fn list_with_options_typed<T>(
+        this: &SyncKvStorage,
+        options: &SyncKvListOptions,
+    ) -> Result<SyncKvStorageList<T>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn put<T>(
         this: &SyncKvStorage,
@@ -16787,6 +17315,19 @@ extern "C" {
         name: impl ::wasm_bindgen::JsStringLike,
         options: &WorkerStubEntrypointOptions,
     ) -> Result<Fetcher, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "getEntrypoint")]
+    pub fn get_entrypoint_typed<T>(this: &WorkerStub) -> Result<Fetcher<T>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "getEntrypoint")]
+    pub fn get_entrypoint_with_name_typed<T>(
+        this: &WorkerStub,
+        name: impl ::wasm_bindgen::JsStringLike,
+    ) -> Result<Fetcher<T>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "getEntrypoint")]
+    pub fn get_entrypoint_with_name_and_options_typed<T>(
+        this: &WorkerStub,
+        name: impl ::wasm_bindgen::JsStringLike,
+        options: &WorkerStubEntrypointOptions,
+    ) -> Result<Fetcher<T>, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -44011,6 +44552,18 @@ extern "C" {
         this: &D1Database,
         statements: &[D1PreparedStatement],
     ) -> Promise<Array<D1Result>>;
+    #[wasm_bindgen(method, catch, js_name = "batch")]
+    pub async fn batch_typed<T>(
+        this: &D1Database,
+        statements: &[D1PreparedStatement],
+    ) -> Result<Vec<D1Result<T>>, JsValue>
+    where
+        Vec<D1Result<T>>: ::wasm_bindgen::convert::FromWasmAbi + 'static;
+    #[wasm_bindgen(method, js_name = "batch")]
+    pub fn batch_typed_promise<T>(
+        this: &D1Database,
+        statements: &[D1PreparedStatement],
+    ) -> Promise<Array<D1Result<T>>>;
     #[wasm_bindgen(method, catch)]
     pub async fn exec(
         this: &D1Database,
@@ -44075,6 +44628,18 @@ extern "C" {
         this: &D1DatabaseSession,
         statements: &[D1PreparedStatement],
     ) -> Promise<Array<D1Result>>;
+    #[wasm_bindgen(method, catch, js_name = "batch")]
+    pub async fn batch_typed<T>(
+        this: &D1DatabaseSession,
+        statements: &[D1PreparedStatement],
+    ) -> Result<Vec<D1Result<T>>, JsValue>
+    where
+        Vec<D1Result<T>>: ::wasm_bindgen::convert::FromWasmAbi + 'static;
+    #[wasm_bindgen(method, js_name = "batch")]
+    pub fn batch_typed_promise<T>(
+        this: &D1DatabaseSession,
+        statements: &[D1PreparedStatement],
+    ) -> Promise<Array<D1Result<T>>>;
     #[doc = "          If no query has been executed yet, `null` is returned."]
     #[doc = ""]
     #[doc = " Returns: The latest session bookmark across all executed queries on the session."]
@@ -44120,10 +44685,22 @@ extern "C" {
     pub async fn run(this: &D1PreparedStatement) -> Result<D1Result, JsValue>;
     #[wasm_bindgen(method, js_name = "run")]
     pub fn run_promise(this: &D1PreparedStatement) -> Promise<D1Result>;
+    #[wasm_bindgen(method, catch, js_name = "run")]
+    pub async fn run_typed<T>(this: &D1PreparedStatement) -> Result<D1Result<T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "run")]
+    pub fn run_typed_promise<T>(this: &D1PreparedStatement) -> Promise<D1Result<T>>;
     #[wasm_bindgen(method, catch)]
     pub async fn all(this: &D1PreparedStatement) -> Result<D1Result, JsValue>;
     #[wasm_bindgen(method, js_name = "all")]
     pub fn all_promise(this: &D1PreparedStatement) -> Promise<D1Result>;
+    #[wasm_bindgen(method, catch, js_name = "all")]
+    pub async fn all_typed<T>(this: &D1PreparedStatement) -> Result<D1Result<T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "all")]
+    pub fn all_typed_promise<T>(this: &D1PreparedStatement) -> Promise<D1Result<T>>;
     #[wasm_bindgen(method, catch)]
     pub async fn raw(this: &D1PreparedStatement) -> Result<Vec<Array>, JsValue>;
     #[wasm_bindgen(method, js_name = "raw")]
@@ -44148,6 +44725,36 @@ extern "C" {
         this: &D1PreparedStatement,
         options: &D1PreparedStatementRawOptions2,
     ) -> Promise<Array<Array>>;
+    #[wasm_bindgen(method, catch, js_name = "raw")]
+    pub async fn raw_typed<T>(this: &D1PreparedStatement) -> Result<Vec<T>, JsValue>
+    where
+        Vec<T>: ::wasm_bindgen::convert::FromWasmAbi + 'static;
+    #[wasm_bindgen(method, js_name = "raw")]
+    pub fn raw_typed_promise<T>(this: &D1PreparedStatement) -> Promise<Array<T>>;
+    #[wasm_bindgen(method, catch, js_name = "raw")]
+    pub async fn raw_with_options_typed<T>(
+        this: &D1PreparedStatement,
+        options: &D1PreparedStatementRawOptions,
+    ) -> Result<ArrayTuple<(Array<String>, Array<T>)>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, js_name = "raw")]
+    pub fn raw_with_options_typed_promise<T>(
+        this: &D1PreparedStatement,
+        options: &D1PreparedStatementRawOptions,
+    ) -> Promise<ArrayTuple<(Array<String>, Array<T>)>>;
+    #[wasm_bindgen(method, catch, js_name = "raw")]
+    pub async fn raw_with_d1_prepared_statement_raw_options2_typed<T>(
+        this: &D1PreparedStatement,
+        options: &D1PreparedStatementRawOptions2,
+    ) -> Result<Vec<T>, JsValue>
+    where
+        Vec<T>: ::wasm_bindgen::convert::FromWasmAbi + 'static;
+    #[wasm_bindgen(method, js_name = "raw")]
+    pub fn raw_with_d1_prepared_statement_raw_options2_typed_promise<T>(
+        this: &D1PreparedStatement,
+        options: &D1PreparedStatementRawOptions2,
+    ) -> Promise<Array<T>>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -45617,6 +46224,20 @@ pub mod cloudflare {
                 name: impl ::wasm_bindgen::JsStringLike,
                 options: &WorkflowStepWaitForEventOptions,
             ) -> Promise<WorkflowStepEvent>;
+            #[wasm_bindgen(method, catch, js_name = "waitForEvent")]
+            pub async fn wait_for_event_typed<T>(
+                this: &WorkflowStep,
+                name: impl ::wasm_bindgen::JsStringLike,
+                options: &WorkflowStepWaitForEventOptions,
+            ) -> Result<WorkflowStepEvent<T>, JsValue>
+            where
+                T: 'static;
+            #[wasm_bindgen(method, js_name = "waitForEvent")]
+            pub fn wait_for_event_typed_promise<T>(
+                this: &WorkflowStep,
+                name: impl ::wasm_bindgen::JsStringLike,
+                options: &WorkflowStepWaitForEventOptions,
+            ) -> Promise<WorkflowStepEvent<T>>;
         }
         #[wasm_bindgen(module = "cloudflare:workers", experimental_generic_mono)]
         extern "C" {

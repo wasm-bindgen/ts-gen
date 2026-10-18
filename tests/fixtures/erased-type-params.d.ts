@@ -15,6 +15,8 @@ interface ListResult<Metadata = unknown, Key extends string = string> {
 }
 interface Store<Key extends string = string> {
   get(key: Key): Promise<string | null>;
+  // Under per-monomorphization the erased method also gets a `_typed`
+  // twin keeping its parameter (`list_typed::<Metadata>`).
   list<Metadata = unknown>(): Promise<ListResult<Metadata, Key>>;
   tag<Level extends "info" | "warn">(level: Level, count: number): void;
   bump<N extends number>(by: N): N;

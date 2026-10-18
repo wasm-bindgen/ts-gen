@@ -11,20 +11,34 @@ extern "C" {
     pub type KeyValueStore;
     #[wasm_bindgen(method, catch)]
     pub fn list(this: &KeyValueStore) -> Result<KeyValueStoreList, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub fn list_typed<T>(this: &KeyValueStore) -> Result<KeyValueStoreList<T>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "listAsync")]
     pub fn list_async(this: &KeyValueStore) -> Result<KeyValueStoreListAsync, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "listAsync")]
+    pub fn list_async_typed<T>(this: &KeyValueStore) -> Result<KeyValueStoreListAsync<T>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn entries(
         this: &KeyValueStore,
     ) -> Result<Iterator<ArrayTuple<(String, JsValue)>>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "entries")]
+    pub fn entries_typed<T>(
+        this: &KeyValueStore,
+    ) -> Result<Iterator<ArrayTuple<(String, T)>>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn keys(this: &KeyValueStore) -> Result<Iterator<String>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn pages(this: &KeyValueStore) -> Result<AsyncIterator, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "pages")]
+    pub fn pages_typed<T>(this: &KeyValueStore) -> Result<AsyncIterator<T>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "asyncEntries")]
     pub fn async_entries(
         this: &KeyValueStore,
     ) -> Result<AsyncIterator<ArrayTuple<(String, JsValue)>>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "asyncEntries")]
+    pub fn async_entries_typed<T>(
+        this: &KeyValueStore,
+    ) -> Result<AsyncIterator<ArrayTuple<(String, T)>>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn put<T>(
         this: &KeyValueStore,
@@ -70,6 +84,8 @@ extern "C" {
     pub type Cursor;
     #[wasm_bindgen(method, catch)]
     pub fn walk(this: &Cursor) -> Result<CursorWalk, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "walk")]
+    pub fn walk_typed<T>(this: &Cursor) -> Result<CursorWalk<T>, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

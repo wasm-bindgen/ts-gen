@@ -1070,6 +1070,20 @@ extern "C" {
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &GetOptions<String>,
     ) -> Result<Promise<Map<String, JsValue>>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub async fn get_json_with_slice_and_options_typed<T>(
+        this: &Namespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &GetOptions<String>,
+    ) -> Result<Map<String, Nullable<T>>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub fn get_json_with_slice_and_options_typed_promise<T>(
+        this: &Namespace,
+        key: &[impl ::wasm_bindgen::JsStringLike],
+        options: &GetOptions<String>,
+    ) -> Result<Promise<Map<String, Nullable<T>>>, JsValue>;
 }
 #[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
 extern "C" {

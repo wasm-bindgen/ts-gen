@@ -876,6 +876,18 @@ pub fn build_signatures(
     names: &mut LocalScope,
     cgctx: Option<&CodegenContext<'_>>,
 ) -> Vec<FunctionSignature> {
+    build_signatures_with_postfix(spec, "", names, cgctx)
+}
+
+/// [`build_signatures`] with `postfix` after every primary name, before
+/// the companions derive from it (`list_typed`, `list_typed_promise`,
+/// `try_list_typed`).
+pub fn build_signatures_with_postfix(
+    spec: &CallableSpec<'_>,
+    postfix: &str,
+    names: &mut LocalScope,
+    cgctx: Option<&CodegenContext<'_>>,
+) -> Vec<FunctionSignature> {
     let base = spec
         .rust_name
         .map_or_else(|| base_rust_name(spec.js_name, spec.kind), ident_chars);
@@ -905,7 +917,8 @@ pub fn build_signatures(
                     .map(|(_, v)| to_snake_case(v))
                     .collect::<Vec<_>>()
                     .join("_");
-                let candidate = public_rust_name(&format!("{base}_{tag}{}", exp.name_suffix));
+                let candidate =
+                    public_rust_name(&format!("{base}_{tag}{}{postfix}", exp.name_suffix));
                 units.push(Unit {
                     params: exp.params.clone(),
                     overload: arm.overload,
@@ -916,7 +929,10 @@ pub fn build_signatures(
             continue;
         }
         if exp.literal_arms.len() < 2 {
-            let primary_candidate = public_rust_name(&join_suffix(&base, &exp.name_suffix));
+            let primary_candidate = public_rust_name(&format!(
+                "{}{postfix}",
+                join_suffix(&base, &exp.name_suffix)
+            ));
             units.push(Unit {
                 params: exp.params,
                 overload: exp.overload,
@@ -940,7 +956,7 @@ pub fn build_signatures(
                 .map(|l| to_snake_case(l))
                 .collect::<Vec<_>>()
                 .join("_");
-            let candidate = public_rust_name(&format!("{base}_{tag}{}", exp.name_suffix));
+            let candidate = public_rust_name(&format!("{base}_{tag}{}{postfix}", exp.name_suffix));
             let name = names.declare(&candidate, Suffix::Snake);
             match groups.iter_mut().find(|(r, _, _)| *r == ret) {
                 Some((_, _, arms)) => arms.push((literals, name)),

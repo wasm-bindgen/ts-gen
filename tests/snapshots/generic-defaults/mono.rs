@@ -89,6 +89,10 @@ extern "C" {
     pub fn make() -> Result<Holder<String, JsValue>, JsValue>;
     # [wasm_bindgen (static_method_of = Holder , catch , js_name = "make")]
     pub fn make_js_string() -> Result<Holder<JsString, JsValue>, JsValue>;
+    # [wasm_bindgen (static_method_of = Holder , catch , js_name = "make")]
+    pub fn make_typed<V>() -> Result<Holder<String, V>, JsValue>;
+    # [wasm_bindgen (static_method_of = Holder , catch , js_name = "make")]
+    pub fn make_typed_js_string<V>() -> Result<Holder<JsString, V>, JsValue>;
 }
 #[wasm_bindgen(module = "generic-defaults", experimental_generic_mono)]
 extern "C" {
@@ -291,6 +295,18 @@ extern "C" {
         this: &Store,
         make: &Function<fn() -> Promise>,
     ) -> Result<Promise<Map<String, JsValue>>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "collect")]
+    pub async fn collect_typed<T>(
+        this: &Store,
+        make: &Function<fn() -> Promise<T>>,
+    ) -> Result<Map<String, T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, catch, js_name = "collect")]
+    pub fn collect_typed_promise<T>(
+        this: &Store,
+        make: &Function<fn() -> Promise<T>>,
+    ) -> Result<Promise<Map<String, T>>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn each<T>(this: &Store, r#fn: &Function<fn(T)>) -> Result<Map<String, T>, JsValue>
     where
@@ -307,18 +323,44 @@ extern "C" {
         this: &Store,
         r#fn: &Function,
     ) -> Result<Promise<Map<String, JsValue>>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "eachRest")]
+    pub async fn each_rest_typed<T>(
+        this: &Store,
+        r#fn: &Function,
+    ) -> Result<Map<String, T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, catch, js_name = "eachRest")]
+    pub fn each_rest_typed_promise<T>(
+        this: &Store,
+        r#fn: &Function,
+    ) -> Result<Promise<Map<String, T>>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn run(this: &Store) -> Result<Row, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "run")]
     pub fn run_promise(this: &Store) -> Result<Promise<Row>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "run")]
+    pub async fn run_typed<T>(this: &Store) -> Result<Row<T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, catch, js_name = "run")]
+    pub fn run_typed_promise<T>(this: &Store) -> Result<Promise<Row<T>>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn list(this: &Store) -> Result<Map<String, JsValue>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "list")]
     pub fn list_promise(this: &Store) -> Result<Promise<Map<String, JsValue>>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub async fn list_typed<T>(this: &Store) -> Result<Map<String, T>, JsValue>
+    where
+        T: 'static;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub fn list_typed_promise<T>(this: &Store) -> Result<Promise<Map<String, T>>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn scan(this: &Store) -> Result<Cursor<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "scan")]
     pub fn scan_js_string(this: &Store) -> Result<Cursor, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "scan")]
+    pub fn scan_typed<T>(this: &Store) -> Result<Cursor<T>, JsValue>;
     #[wasm_bindgen(method, variadic, catch)]
     pub fn schedule(this: &Store, callback: &Function, args: &[JsValue]) -> Result<f64, JsValue>;
 }
