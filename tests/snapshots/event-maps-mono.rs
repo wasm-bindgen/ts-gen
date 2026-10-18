@@ -257,6 +257,62 @@ extern "C" {
         handler: &ListenerObject<CloseEv>,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "addEventListener")]
+    fn add_event_listener_close_with_options_js(
+        this: &Socket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(CloseEv)>,
+        options: &ListenerOptions,
+    );
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn try_add_event_listener_close_with_options_js(
+        this: &Socket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(CloseEv)>,
+        options: &ListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "addEventListener")]
+    fn add_event_listener_close_with_listener_object_and_options_js(
+        this: &Socket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &ListenerObject<CloseEv>,
+        options: &ListenerOptions,
+    );
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn try_add_event_listener_close_with_listener_object_and_options_js(
+        this: &Socket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &ListenerObject<CloseEv>,
+        options: &ListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "addEventListener")]
+    fn add_event_listener_close_with_bool_js(
+        this: &Socket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(CloseEv)>,
+        options: bool,
+    );
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn try_add_event_listener_close_with_bool_js(
+        this: &Socket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(CloseEv)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "addEventListener")]
+    fn add_event_listener_close_with_listener_object_and_bool_js(
+        this: &Socket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &ListenerObject<CloseEv>,
+        options: bool,
+    );
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn try_add_event_listener_close_with_listener_object_and_bool_js(
+        this: &Socket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &ListenerObject<CloseEv>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "addEventListener")]
     fn add_event_listener_message_js(
         this: &Socket,
         r#type: impl ::wasm_bindgen::JsStringLike,
@@ -280,6 +336,62 @@ extern "C" {
         r#type: impl ::wasm_bindgen::JsStringLike,
         handler: &ListenerObject<MessageEv>,
     ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "addEventListener")]
+    fn add_event_listener_message_with_options_js(
+        this: &Socket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(MessageEv)>,
+        options: &ListenerOptions,
+    );
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn try_add_event_listener_message_with_options_js(
+        this: &Socket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(MessageEv)>,
+        options: &ListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "addEventListener")]
+    fn add_event_listener_message_with_listener_object_and_options_js(
+        this: &Socket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &ListenerObject<MessageEv>,
+        options: &ListenerOptions,
+    );
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn try_add_event_listener_message_with_listener_object_and_options_js(
+        this: &Socket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &ListenerObject<MessageEv>,
+        options: &ListenerOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "addEventListener")]
+    fn add_event_listener_message_with_bool_js(
+        this: &Socket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(MessageEv)>,
+        options: bool,
+    );
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn try_add_event_listener_message_with_bool_js(
+        this: &Socket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &Function<fn(MessageEv)>,
+        options: bool,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "addEventListener")]
+    fn add_event_listener_message_with_listener_object_and_bool_js(
+        this: &Socket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &ListenerObject<MessageEv>,
+        options: bool,
+    );
+    #[wasm_bindgen(method, catch, js_name = "addEventListener")]
+    fn try_add_event_listener_message_with_listener_object_and_bool_js(
+        this: &Socket,
+        r#type: impl ::wasm_bindgen::JsStringLike,
+        handler: &ListenerObject<MessageEv>,
+        options: bool,
+    ) -> Result<(), JsValue>;
 }
 impl Socket {
     pub fn add_event_listener_close(&self, handler: &Function<fn(CloseEv)>) {
@@ -299,6 +411,66 @@ impl Socket {
         handler: &ListenerObject<CloseEv>,
     ) -> Result<(), JsValue> {
         self.try_add_event_listener_close_with_listener_object_js("close", handler)
+    }
+    pub fn add_event_listener_close_with_options(
+        &self,
+        handler: &Function<fn(CloseEv)>,
+        options: &ListenerOptions,
+    ) {
+        self.add_event_listener_close_with_options_js("close", handler, options)
+    }
+    pub fn try_add_event_listener_close_with_options(
+        &self,
+        handler: &Function<fn(CloseEv)>,
+        options: &ListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_close_with_options_js("close", handler, options)
+    }
+    pub fn add_event_listener_close_with_listener_object_and_options(
+        &self,
+        handler: &ListenerObject<CloseEv>,
+        options: &ListenerOptions,
+    ) {
+        self.add_event_listener_close_with_listener_object_and_options_js("close", handler, options)
+    }
+    pub fn try_add_event_listener_close_with_listener_object_and_options(
+        &self,
+        handler: &ListenerObject<CloseEv>,
+        options: &ListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_close_with_listener_object_and_options_js(
+            "close", handler, options,
+        )
+    }
+    pub fn add_event_listener_close_with_bool(
+        &self,
+        handler: &Function<fn(CloseEv)>,
+        options: bool,
+    ) {
+        self.add_event_listener_close_with_bool_js("close", handler, options)
+    }
+    pub fn try_add_event_listener_close_with_bool(
+        &self,
+        handler: &Function<fn(CloseEv)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_close_with_bool_js("close", handler, options)
+    }
+    pub fn add_event_listener_close_with_listener_object_and_bool(
+        &self,
+        handler: &ListenerObject<CloseEv>,
+        options: bool,
+    ) {
+        self.add_event_listener_close_with_listener_object_and_bool_js("close", handler, options)
+    }
+    pub fn try_add_event_listener_close_with_listener_object_and_bool(
+        &self,
+        handler: &ListenerObject<CloseEv>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_close_with_listener_object_and_bool_js(
+            "close", handler, options,
+        )
     }
     pub fn add_event_listener_message(&self, handler: &Function<fn(MessageEv)>) {
         self.add_event_listener_message_js("message", handler)
@@ -320,6 +492,70 @@ impl Socket {
         handler: &ListenerObject<MessageEv>,
     ) -> Result<(), JsValue> {
         self.try_add_event_listener_message_with_listener_object_js("message", handler)
+    }
+    pub fn add_event_listener_message_with_options(
+        &self,
+        handler: &Function<fn(MessageEv)>,
+        options: &ListenerOptions,
+    ) {
+        self.add_event_listener_message_with_options_js("message", handler, options)
+    }
+    pub fn try_add_event_listener_message_with_options(
+        &self,
+        handler: &Function<fn(MessageEv)>,
+        options: &ListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_message_with_options_js("message", handler, options)
+    }
+    pub fn add_event_listener_message_with_listener_object_and_options(
+        &self,
+        handler: &ListenerObject<MessageEv>,
+        options: &ListenerOptions,
+    ) {
+        self.add_event_listener_message_with_listener_object_and_options_js(
+            "message", handler, options,
+        )
+    }
+    pub fn try_add_event_listener_message_with_listener_object_and_options(
+        &self,
+        handler: &ListenerObject<MessageEv>,
+        options: &ListenerOptions,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_message_with_listener_object_and_options_js(
+            "message", handler, options,
+        )
+    }
+    pub fn add_event_listener_message_with_bool(
+        &self,
+        handler: &Function<fn(MessageEv)>,
+        options: bool,
+    ) {
+        self.add_event_listener_message_with_bool_js("message", handler, options)
+    }
+    pub fn try_add_event_listener_message_with_bool(
+        &self,
+        handler: &Function<fn(MessageEv)>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_message_with_bool_js("message", handler, options)
+    }
+    pub fn add_event_listener_message_with_listener_object_and_bool(
+        &self,
+        handler: &ListenerObject<MessageEv>,
+        options: bool,
+    ) {
+        self.add_event_listener_message_with_listener_object_and_bool_js(
+            "message", handler, options,
+        )
+    }
+    pub fn try_add_event_listener_message_with_listener_object_and_bool(
+        &self,
+        handler: &ListenerObject<MessageEv>,
+        options: bool,
+    ) -> Result<(), JsValue> {
+        self.try_add_event_listener_message_with_listener_object_and_bool_js(
+            "message", handler, options,
+        )
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]

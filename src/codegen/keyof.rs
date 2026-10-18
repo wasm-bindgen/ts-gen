@@ -7,9 +7,9 @@
 //! extends EventTarget<WebSocketEventMap>`), the callable gains one
 //! signature per property of `M`: `K` is the property name as a string
 //! literal and `M[K]` its type, so the literal names the binding
-//! (`add_event_listener_message(&Function<fn(MessageEvent)>)`). Trailing
-//! optional parameters that do not mention the key are left to the generic
-//! form.
+//! (`add_event_listener_message(&Function<fn(MessageEvent)>)`), with the
+//! callable's other parameters as they are
+//! (`add_event_listener_message_with_options`).
 
 use std::collections::HashMap;
 
@@ -51,23 +51,10 @@ pub(crate) fn expand_keyof(
     else {
         return Vec::new();
     };
-    let keyed: Vec<bool> = params
-        .iter()
-        .enumerate()
-        .map(|(i, p)| i == key_at || mentions(&p.type_ref, &key_param))
-        .collect();
-    let Some(last) = keyed.iter().rposition(|k| *k) else {
-        return Vec::new();
-    };
-    let required = params
-        .iter()
-        .rposition(|p| !p.optional)
-        .map_or(0, |i| i + 1);
-    let kept = (last + 1).max(required);
     keys.into_iter()
         .map(|(key, value)| {
             let at = |ty: &TypeRef| apply(ty, &key_param, &map, &key, &value);
-            let params = params[..kept]
+            let params = params
                 .iter()
                 .enumerate()
                 .map(|(i, p)| Param {
@@ -131,14 +118,6 @@ fn map_keys(
         })
         .collect();
     (!keys.is_empty()).then_some(keys)
-}
-
-fn mentions(ty: &TypeRef, key: &str) -> bool {
-    let mut found = false;
-    visit(ty, &mut |t| {
-        found |= t.as_ident() == Some(key);
-    });
-    found
 }
 
 fn visit(ty: &TypeRef, f: &mut impl FnMut(&TypeRef)) {
