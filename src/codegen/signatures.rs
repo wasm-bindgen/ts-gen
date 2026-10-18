@@ -235,6 +235,9 @@ pub struct ExpandedSignature {
     /// Positions of [`Determined::Required`] dictionaries, which the
     /// binding builds itself; see [`FunctionSignature::determined`].
     pub determined: Vec<usize>,
+    /// The one literal arm keys the binding (`<base>_<literal>`), as two
+    /// arms would, because another expansion differs at its position.
+    pub discriminant: bool,
 }
 
 /// Per-mono, a dictionary whose every property is a literal type
@@ -681,14 +684,36 @@ pub fn expand_signatures(
             },
         )
         .collect();
+    // Per-mono, a lone literal arm keys its binding too when another
+    // expansion takes something else at the literal's position: the
+    // literal discriminates overloads whose other parameters differ
+    // (`on(type: "close", h: (e: CloseEvent) => void)` beside `"message"`).
+    let discriminant: Vec<bool> = arms
+        .iter()
+        .enumerate()
+        .map(|(k, a)| match a.as_slice() {
+            [arm] if type_arg_arms && literal_cohorts && !arm.in_type_arg => {
+                arm.values.iter().any(|(p, _)| {
+                    deduped.iter().enumerate().any(|(j, other)| {
+                        j != k
+                            && other
+                                .get(*p)
+                                .is_some_and(|o| o.type_ref != deduped[k][*p].type_ref)
+                    })
+                })
+            }
+            _ => false,
+        })
+        .collect();
     let stripped: Vec<Option<Vec<ConcreteParam>>> = deduped
         .iter()
         .zip(&arms)
         .zip(&determined)
-        .map(|((sig, arms), determined)| {
+        .zip(&discriminant)
+        .map(|(((sig, arms), determined), discriminant)| {
             let positions: Vec<usize> = if !determined.is_empty() {
                 determined.iter().map(|(i, _)| *i).collect()
-            } else if arms.len() < 2 {
+            } else if arms.len() < 2 && !discriminant {
                 return None;
             } else {
                 arms[0].values.iter().map(|(i, _)| *i).collect()
@@ -725,17 +750,47 @@ pub fn expand_signatures(
     let mut plain_suffixes = compute_suffixes(&plain, rules).into_iter();
     let keyed_suffixes = suffixes_among(&plain, stripped.iter().flatten(), rules);
     let mut keyed_suffixes = keyed_suffixes.into_iter();
+    // A discriminant arm is suffixed among the expansions with its literals.
+    let strip = |sig: &[ConcreteParam], positions: &[usize]| -> Vec<ConcreteParam> {
+        sig.iter()
+            .enumerate()
+            .filter(|(i, _)| !positions.contains(i))
+            .map(|(_, p)| p.clone())
+            .collect()
+    };
+    let mut discriminant_suffixes: Vec<Option<String>> = vec![None; deduped.len()];
+    for k in 0..deduped.len() {
+        if !discriminant[k] || discriminant_suffixes[k].is_some() {
+            continue;
+        }
+        let values = &arms[k][0].values;
+        let positions: Vec<usize> = values.iter().map(|(i, _)| *i).collect();
+        let group: Vec<usize> = (k..deduped.len())
+            .filter(|&j| discriminant[j] && arms[j][0].values == *values)
+            .collect();
+        let stripped: Vec<Vec<ConcreteParam>> = group
+            .iter()
+            .map(|&j| strip(&deduped[j], &positions))
+            .collect();
+        for (j, suffix) in group.into_iter().zip(compute_suffixes(&stripped, rules)) {
+            discriminant_suffixes[j] = Some(suffix);
+        }
+    }
     let suffixes: Vec<String> = stripped
         .iter()
         .zip(&deduped)
         .zip(&arms)
         .zip(&determined)
-        .map(|(((s, sig), arms), determined)| {
+        .enumerate()
+        .map(|(k, (((s, sig), arms), determined))| {
             let suffix = match s {
                 None => plain_suffixes.next(),
                 Some(_) => keyed_suffixes.next(),
             }
             .unwrap_or_default();
+            if let Some(suffix) = &discriminant_suffixes[k] {
+                return suffix.clone();
+            }
             // A determined dictionary is named by its literals, among
             // the plain expansions as if it were not there:
             // `raw_with_column_names`, `get_reader_byob`.
@@ -764,8 +819,12 @@ pub fn expand_signatures(
         .zip(origins)
         .zip(arms)
         .zip(determined)
+        .zip(discriminant)
         .map(
-            |((((mut name_suffix, params), overload), literal_arms), determined)| {
+            |(
+                ((((mut name_suffix, params), overload), literal_arms), determined),
+                discriminant,
+            )| {
                 // An expansion passing only `null` never takes the bare name,
                 // which reads as omitting the arguments: it is named as it
                 // would be beside the empty call (`f_with_null()` for
@@ -785,6 +844,7 @@ pub fn expand_signatures(
                     params,
                     literal_arms,
                     determined: determined.into_iter().map(|(i, _)| i).collect(),
+                    discriminant,
                 }
             },
         )
@@ -1179,7 +1239,7 @@ pub fn build_signatures_with_postfix(
             }
             continue;
         }
-        if exp.literal_arms.len() < 2 {
+        if exp.literal_arms.len() < 2 && !exp.discriminant {
             let primary_candidate = public_rust_name(&format!(
                 "{}{postfix}",
                 join_suffix(&base, &exp.name_suffix)

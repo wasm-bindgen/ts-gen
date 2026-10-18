@@ -646,17 +646,17 @@
   ;; set HTMLRewriter(value: typeof query)
   (import "./bindings.wasm" "ServiceWorkerGlobalScope.set_html_rewriter" (func $ServiceWorkerGlobalScope.set_html_rewriter (param $this externref) (param $value externref)))
 
-  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>): void
+  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<WorkerGlobalScopeEventMap[Type]>): void
   (import "./bindings.wasm" "addEventListener" (func $addEventListener (param $type externref) (param $handler externref)))
-  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: EventTargetAddEventListenerOptions): void
+  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<WorkerGlobalScopeEventMap[Type]>, options: EventTargetAddEventListenerOptions): void
   (import "./bindings.wasm" "addEventListener_with_event_target_add_event_listener_options" (func $addEventListener_with_event_target_add_event_listener_options (param $type externref) (param $handler externref) (param $options externref)))
-  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: boolean): void
+  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<WorkerGlobalScopeEventMap[Type]>, options: boolean): void
   (import "./bindings.wasm" "addEventListener_with_bool" (func $addEventListener_with_bool (param $type externref) (param $handler externref) (param $options i32)))
-  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>): void
+  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<WorkerGlobalScopeEventMap[Type]>): void
   (import "./bindings.wasm" "removeEventListener" (func $removeEventListener (param $type externref) (param $handler externref)))
-  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: EventTargetEventListenerOptions): void
+  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<WorkerGlobalScopeEventMap[Type]>, options: EventTargetEventListenerOptions): void
   (import "./bindings.wasm" "removeEventListener_with_event_target_event_listener_options" (func $removeEventListener_with_event_target_event_listener_options (param $type externref) (param $handler externref) (param $options externref)))
-  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: boolean): void
+  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<WorkerGlobalScopeEventMap[Type]>, options: boolean): void
   (import "./bindings.wasm" "removeEventListener_with_bool" (func $removeEventListener_with_bool (param $type externref) (param $handler externref) (param $options i32)))
   ;; dispatchEvent(event: FetchEvent): boolean
   (import "./bindings.wasm" "dispatchEvent" (func $dispatchEvent (param $event externref) (result i32)))
@@ -1224,17 +1224,17 @@
   ;; EventTarget
   ;; constructor()
   (import "./bindings.wasm" "EventTarget.new" (func $EventTarget.new (result externref)))
-  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>): void
+  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<EventMap[Type]>): void
   (import "./bindings.wasm" "EventTarget.add_event_listener" (func $EventTarget.add_event_listener (param $this externref) (param $type externref) (param $handler externref)))
-  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: EventTargetAddEventListenerOptions): void
+  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<EventMap[Type]>, options: EventTargetAddEventListenerOptions): void
   (import "./bindings.wasm" "EventTarget.add_event_listener_with_event_target_add_event_listener_options" (func $EventTarget.add_event_listener_with_event_target_add_event_listener_options (param $this externref) (param $type externref) (param $handler externref) (param $options externref)))
-  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: boolean): void
+  ;; addEventListener(type: string, handler: EventListenerOrEventListenerObject<EventMap[Type]>, options: boolean): void
   (import "./bindings.wasm" "EventTarget.add_event_listener_with_bool" (func $EventTarget.add_event_listener_with_bool (param $this externref) (param $type externref) (param $handler externref) (param $options i32)))
-  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>): void
+  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<EventMap[Type]>): void
   (import "./bindings.wasm" "EventTarget.remove_event_listener" (func $EventTarget.remove_event_listener (param $this externref) (param $type externref) (param $handler externref)))
-  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: EventTargetEventListenerOptions): void
+  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<EventMap[Type]>, options: EventTargetEventListenerOptions): void
   (import "./bindings.wasm" "EventTarget.remove_event_listener_with_event_target_event_listener_options" (func $EventTarget.remove_event_listener_with_event_target_event_listener_options (param $this externref) (param $type externref) (param $handler externref) (param $options externref)))
-  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<indexed access type>, options: boolean): void
+  ;; removeEventListener(type: string, handler: EventListenerOrEventListenerObject<EventMap[Type]>, options: boolean): void
   (import "./bindings.wasm" "EventTarget.remove_event_listener_with_bool" (func $EventTarget.remove_event_listener_with_bool (param $this externref) (param $type externref) (param $handler externref) (param $options i32)))
   ;; dispatchEvent(event: indexed access type): boolean
   (import "./bindings.wasm" "EventTarget.dispatch_event" (func $EventTarget.dispatch_event (param $this externref) (param $event externref) (result i32)))

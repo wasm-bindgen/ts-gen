@@ -55,7 +55,7 @@
   (import "./bindings.wasm" "Store.bump" (func $Store.bump (param $this externref) (param $by f64) (result f64)))
 
   ;; Target
-  ;; addEventListener(type: string, handler: (ev: EventMap[string]) => void): void
+  ;; addEventListener(type: string, handler: (ev: EventMap[Type]) => void): void
   (import "./bindings.wasm" "Target.add_event_listener" (func $Target.add_event_listener (param $this externref) (param $type externref) (param $handler externref)))
 
   ;; Env

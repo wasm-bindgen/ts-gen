@@ -199,15 +199,26 @@ pub(crate) fn convert_ts_type_with_arena(
                 ),
                 other => convert_ts_type_with_arena(other, scope, scopes, diag),
             };
-            TypeRef::IndexedAccess(
-                Box::new(object),
-                Box::new(convert_ts_type_with_arena(
-                    &access.index_type,
-                    scope,
-                    scopes,
-                    diag,
-                )),
-            )
+            // The index names an erased `K extends keyof M` itself, not the
+            // `string` it reads as: per-mono, `codegen::keyof` expands `M[K]`
+            // per key of a concrete `M`.
+            let index = match &access.index_type {
+                TSType::TSTypeReference(index) if index.type_arguments.is_none() => {
+                    match &index.type_name {
+                        TSTypeName::IdentifierReference(key)
+                            if matches!(
+                                scopes.resolve_binding(scope, &key.name),
+                                Some(Binding::Erased(_))
+                            ) =>
+                        {
+                            TypeRef::ident(key.name.to_string())
+                        }
+                        _ => convert_ts_type_with_arena(&access.index_type, scope, scopes, diag),
+                    }
+                }
+                other => convert_ts_type_with_arena(other, scope, scopes, diag),
+            };
+            TypeRef::IndexedAccess(Box::new(object), Box::new(index))
         }
         TSType::TSInferType(_) => {
             diag.warn("Infer types are not supported, erasing to JsValue");

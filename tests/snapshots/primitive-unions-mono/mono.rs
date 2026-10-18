@@ -67,7 +67,10 @@ extern "C" {
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setLevel")]
-    pub fn set_level_with_str(level: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
+    fn __set_level(level: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
+}
+pub fn set_level_auto() -> Result<(), JsValue> {
+    __set_level("auto")
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {

@@ -9,6 +9,7 @@ pub mod enums;
 pub mod error_enum;
 pub mod functions;
 pub(crate) mod inline_wrappers;
+mod keyof;
 pub(crate) mod null_arms;
 pub mod provides;
 pub mod signatures;

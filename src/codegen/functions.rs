@@ -53,6 +53,58 @@ fn emit_function(
     value_names: &mut ValueNames,
 ) -> TokenStream {
     let mut decl = decl.clone();
+    if let Some(cgctx) = cgctx.filter(|c| c.experimental_generic_mono) {
+        let mut keyed = Vec::new();
+        let primary = (
+            &decl.type_params,
+            &decl.params,
+            &decl.return_type,
+            decl.body_scope,
+            &decl.throws,
+            doc,
+            decl.string_mode,
+            decl.async_modifier,
+        );
+        let rest = decl.overloads.iter().map(|o| {
+            (
+                &o.type_params,
+                &o.params,
+                &o.return_type,
+                o.body_scope,
+                &o.throws,
+                &o.doc,
+                o.string_mode,
+                o.async_modifier,
+            )
+        });
+        for (
+            type_params,
+            params,
+            return_type,
+            body_scope,
+            throws,
+            doc,
+            string_mode,
+            async_modifier,
+        ) in std::iter::once(primary).chain(rest)
+        {
+            keyed.extend(
+                super::keyof::expand_keyof(params, return_type, cgctx, body_scope)
+                    .into_iter()
+                    .map(|(params, return_type)| crate::ir::FunctionOverload {
+                        type_params: type_params.clone(),
+                        params,
+                        return_type,
+                        body_scope,
+                        throws: throws.clone(),
+                        doc: doc.clone(),
+                        string_mode,
+                        async_modifier,
+                    }),
+            );
+        }
+        decl.overloads.extend(keyed);
+    }
     if let Some(cgctx) = cgctx {
         super::type_params::erase_uninferrable(
             &mut decl.type_params,

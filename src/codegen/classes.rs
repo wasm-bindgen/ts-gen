@@ -83,6 +83,27 @@ pub(crate) struct ClassConfig<'a> {
     typed_twins: Vec<Member>,
 }
 
+/// Per-mono, the per-key forms of `K extends keyof M` methods with a
+/// concrete `M`, declared or reached through the first parent, which the
+/// child otherwise only has through `Deref` (`WebSocket::
+/// add_event_listener_message`); see [`super::keyof`].
+fn add_keyed_methods(
+    members: &mut Vec<Member>,
+    first_chain: &[Member],
+    cgctx: Option<&CodegenContext<'_>>,
+) {
+    let own: Vec<Member> = members.clone();
+    let mut keyed = super::keyof::expand_keyof_methods(&own, cgctx);
+    let declared: HashSet<_> = own.iter().map(crate::parse::member_key).collect();
+    let inherited: Vec<Member> = first_chain
+        .iter()
+        .filter(|m| !declared.contains(&crate::parse::member_key(m)))
+        .cloned()
+        .collect();
+    keyed.extend(super::keyof::expand_keyof_methods(&inherited, cgctx));
+    members.extend(keyed);
+}
+
 /// Per-mono, a method returning `this` returns the receiver's own type,
 /// so it chains (`span.set_attribute(..)?.set_attribute(..)`).
 fn resolve_this_returns(
@@ -463,6 +484,12 @@ impl<'a> ClassConfig<'a> {
         let iterable = take_symbol_methods(&mut members);
         drop_absent_properties(&mut members, cgctx);
         resolve_this_returns(&mut members, &decl.name, &decl.type_params, cgctx);
+        let first_chain = decl
+            .extends
+            .as_ref()
+            .map(|e| inherited_members(std::slice::from_ref(e), cgctx).first_chain)
+            .unwrap_or_default();
+        add_keyed_methods(&mut members, &first_chain, cgctx);
         let typed_twins = super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
         ClassConfig {
             rust_name: decl.name.clone(),
@@ -504,6 +531,7 @@ impl<'a> ClassConfig<'a> {
         let iterable = take_symbol_methods(&mut members);
         drop_absent_properties(&mut members, cgctx);
         resolve_this_returns(&mut members, &decl.name, &decl.type_params, cgctx);
+        add_keyed_methods(&mut members, &inherited.first_chain, cgctx);
         let typed_twins = super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
 
         ClassConfig {

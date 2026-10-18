@@ -813,6 +813,25 @@ impl<'g> Eval<'g> {
                 TypeRef::union(props.into_iter().map(|p| TypeRef::StringLiteral(p.js_name)))
             }
             TypeRef::IndexedAccess(object, index) => {
+                // `M[K]` over a type parameter of the use site itself
+                // (`handler: Listener<EventMap[Type]>`) stays as written:
+                // per-mono, `codegen::keyof` expands it per key of `M`.
+                if let Some(key) = index.as_ident().filter(|k| env.get(k).is_none()) {
+                    let kept = match self.gctx.scopes.resolve_binding(scope, key) {
+                        Some(Binding::TypeParam) => {
+                            let own = self.param_owner(dest, key);
+                            own.is_some() && own == self.param_owner(scope, key)
+                        }
+                        Some(Binding::Erased(_)) => matches!(
+                            self.gctx.scopes.resolve_binding(dest, key),
+                            Some(Binding::Erased(_))
+                        ),
+                        _ => false,
+                    };
+                    if kept {
+                        return Some(TypeRef::IndexedAccess(object.clone(), index.clone()));
+                    }
+                }
                 let keys = self.literal_set(index, scope, env, dest, place)?;
                 let props = self.shape(object, scope, env, dest, place)?;
                 let mut members = Vec::new();

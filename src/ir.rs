@@ -726,6 +726,9 @@ impl TypeRef {
             TypeRef::Union(u) => TypeRef::union(u.members().iter().map(sub)),
             TypeRef::Intersection(ts) => TypeRef::Intersection(ts.iter().map(sub).collect()),
             TypeRef::Tuple(ts) => TypeRef::Tuple(ts.iter().map(sub).collect()),
+            TypeRef::IndexedAccess(o, i) => {
+                TypeRef::IndexedAccess(Box::new(sub(o)), Box::new(sub(i)))
+            }
             TypeRef::Function(sig) => TypeRef::Function(FunctionSig {
                 params: sig
                     .params
