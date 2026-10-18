@@ -135,6 +135,40 @@
   ;; get(key: string[], options: GetOptions<"text">): Promise<Map<string, string | null>>
   (import "literal-overloads" "Namespace.get_with_slice_and_options" (func $literal-overloads:Namespace.get_with_slice_and_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
 
+  ;; ReaderOptions
+  ;; {} as ReaderOptions
+  (import "literal-overloads" "ReaderOptions.new" (func $literal-overloads:ReaderOptions.new (result externref)))
+  ;; mode: "byob"
+  (import "literal-overloads" "ReaderOptions.mode" (func $literal-overloads:ReaderOptions.mode (param $this externref) (result externref)))
+  ;; set mode(value: "byob")
+  (import "literal-overloads" "ReaderOptions.set_mode" (func $literal-overloads:ReaderOptions.set_mode (param $this externref) (param $value externref)))
+
+  ;; Stream
+  ;; getReader(): string
+  (import "literal-overloads" "Stream.get_reader" (func $literal-overloads:Stream.get_reader (param $this externref) (result externref)))
+  ;; getReader(options: ReaderOptions): number
+  (import "literal-overloads" "Stream.get_reader_with_options" (func $literal-overloads:Stream.get_reader_with_options (param $this externref) (param $options externref) (result f64)))
+  ;; raw(): Promise<unknown[]>
+  (import "literal-overloads" "Stream.raw" (func $literal-overloads:Stream.raw (param $this externref) (result externref)))
+  ;; raw(options: StreamOptions): Promise<[string[], unknown[]]>
+  (import "literal-overloads" "Stream.raw_with_options" (func $literal-overloads:Stream.raw_with_options (param $this externref) (param $options externref) (result externref)))
+
+  ;; StreamOptions
+  ;; {} as StreamOptions
+  (import "literal-overloads" "StreamOptions.new" (func $literal-overloads:StreamOptions.new (result externref)))
+  ;; columnNames: true
+  (import "literal-overloads" "StreamOptions.column_names" (func $literal-overloads:StreamOptions.column_names (param $this externref) (result i32)))
+  ;; set columnNames(value: true)
+  (import "literal-overloads" "StreamOptions.set_column_names" (func $literal-overloads:StreamOptions.set_column_names (param $this externref) (param $value i32)))
+
+  ;; StreamOptions2
+  ;; {} as StreamOptions2
+  (import "literal-overloads" "StreamOptions2.new" (func $literal-overloads:StreamOptions2.new (result externref)))
+  ;; columnNames?: false
+  (import "literal-overloads" "StreamOptions2.column_names" (func $literal-overloads:StreamOptions2.column_names (param $this externref) (result externref)))
+  ;; set columnNames(value: false)
+  (import "literal-overloads" "StreamOptions2.set_column_names" (func $literal-overloads:StreamOptions2.set_column_names (param $this externref) (param $value i32)))
+
   ;; PartialGetOptionsUndefined
   ;; {} as PartialGetOptionsUndefined
   (import "literal-overloads" "PartialGetOptionsUndefined.new" (func $literal-overloads:PartialGetOptionsUndefined.new (result externref)))

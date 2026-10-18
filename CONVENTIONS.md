@@ -3669,6 +3669,18 @@ impl CompressionStream {
       self.__get_json_with_options(key, ::wasm_bindgen::JsCast::unchecked_ref(&options)).await
   }
   ```
+* Under per-monomorphization, a dictionary parameter whose every
+  property is a required literal (`getReader(options: { mode: "byob" })`,
+  D1 `raw(options: { columnNames: true })`) leaves the caller nothing to
+  choose, yet each value selects the overload's return. The binding is
+  an inline wrapper without the parameter that passes the dictionary's
+  factory value, named by the literals in place of the parameter's
+  suffix: a string literal by itself, a boolean as `with_<field>` /
+  `without_<field>`, a number as `<field>_<n>` (`get_reader_byob`,
+  `raw_with_column_names`). Literals that do not read as a name (`"0"`,
+  `""`) keep the plain parameter. A dictionary of optional `false` flags
+  (`{ columnNames?: false }`) is what omitting the argument means, so
+  that overload binds no form taking it. Setters are exempt.
 
 ## `@rust` JSDoc → Rust scalar
 

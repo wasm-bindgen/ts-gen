@@ -232,6 +232,85 @@ pub struct ExpandedSignature {
     /// [`FunctionSignature::literal`]); the literal positions render as
     /// `&str` in `params`.
     pub literal_arms: Vec<LiteralArm>,
+    /// Positions of [`Determined::Required`] dictionaries, which the
+    /// binding builds itself; see [`FunctionSignature::determined`].
+    pub determined: Vec<usize>,
+}
+
+/// Per-mono, a dictionary whose every property is a literal type
+/// (`ReadableStreamGetReaderOptions { mode: "byob" }`, D1 `raw`'s
+/// `{ columnNames: true }`) leaves the caller nothing to choose.
+#[derive(Clone, Debug, PartialEq)]
+pub(crate) enum Determined {
+    /// Every property required: the binding passes the one value its
+    /// factory builds, named by the literals (`get_reader_byob`,
+    /// `raw_with_column_names`).
+    Required(String),
+    /// Every property an optional `false` (`{ columnNames?: false }`):
+    /// passing it is omitting it.
+    Absent,
+}
+
+pub(crate) fn determined_dictionary(
+    ty: &TypeRef,
+    cgctx: &CodegenContext<'_>,
+    scope: ScopeId,
+) -> Option<Determined> {
+    use crate::ir::{Member, TypeKind};
+    let TypeRef::Reference { segments, .. } = ty else {
+        return None;
+    };
+    let [name] = segments.as_slice() else {
+        return None;
+    };
+    let id = cgctx.gctx.resolve_path(scope, name)?;
+    let TypeKind::Interface(iface) = &cgctx.gctx.get_type(id).kind else {
+        return None;
+    };
+    if !iface.extends.is_empty() {
+        return None;
+    }
+    let mut tags = Vec::new();
+    let mut optional = Vec::new();
+    let mut all_false = true;
+    for member in &iface.members {
+        let g = match member {
+            Member::Getter(g) => g,
+            Member::Setter(_) => continue,
+            _ => return None,
+        };
+        let literal = match g.type_ref.split_empties() {
+            Some((core, crate::ir::Nullability::Undefined)) if g.optional => core,
+            _ => g.type_ref.clone(),
+        };
+        let field = to_snake_case(&g.js_name);
+        all_false &= matches!(literal, TypeRef::BooleanLiteral(false));
+        tags.push(match &literal {
+            // Only literals that read as a name (`"byob"`, not `"0"` or `""`).
+            TypeRef::StringLiteral(s)
+                if s.starts_with(|c: char| c.is_ascii_alphabetic())
+                    && s.chars()
+                        .all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-') =>
+            {
+                to_snake_case(s)
+            }
+            TypeRef::BooleanLiteral(true) => format!("with_{field}"),
+            TypeRef::BooleanLiteral(false) => format!("without_{field}"),
+            TypeRef::NumberLiteral(n) => {
+                format!("{field}_{}", crate::util::naming::number_literal_snake(*n))
+            }
+            _ => return None,
+        });
+        optional.push(g.optional);
+    }
+    // Only an optional `false` flag reads as the default it omits; an
+    // optional `true` still changes the call.
+    match optional.as_slice() {
+        [] => None,
+        o if o.iter().all(|o| *o) => all_false.then_some(Determined::Absent),
+        o if o.iter().all(|o| !*o) => Some(Determined::Required(tags.join("_"))),
+        _ => None,
+    }
 }
 
 /// One value assignment for the string-literal parameters of an
@@ -344,6 +423,10 @@ pub struct FunctionSignature {
     /// [`LiteralSpec::binding`].
     pub literal: Option<LiteralSpec>,
     pub field_literal: Option<FieldLiteral>,
+    /// Positions (after `this`) of [`Determined::Required`] dictionaries:
+    /// the emitter adds an inline wrapper without them, passing each
+    /// dictionary's factory value (`&ReadableStreamGetReaderOptions::new()`).
+    pub determined: Vec<usize>,
 }
 
 /// Recursively collect every in-scope type-parameter name reachable
@@ -554,14 +637,40 @@ pub fn expand_signatures(
     // and the other cohorts' remaining parameters (a cohort's `null` arm
     // is `_with_null` beside its typed one). The plain expansions are
     // suffixed among themselves.
+    // A dictionary of literals (`{ mode: "byob" }`) is built by the
+    // binding, so its expansion is named as if it were not there too.
+    let determined: Vec<Vec<(usize, String)>> = deduped
+        .iter()
+        .zip(&origins)
+        .map(
+            |(sig, &overload)| match cgctx.filter(|_| type_arg_arms && literal_cohorts) {
+                Some(c) => sig
+                    .iter()
+                    .enumerate()
+                    .filter_map(|(i, p)| {
+                        match determined_dictionary(&p.type_ref, c, overloads[overload].body_scope)?
+                        {
+                            Determined::Required(tag) => Some((i, tag)),
+                            Determined::Absent => None,
+                        }
+                    })
+                    .collect(),
+                None => Vec::new(),
+            },
+        )
+        .collect();
     let stripped: Vec<Option<Vec<ConcreteParam>>> = deduped
         .iter()
         .zip(&arms)
-        .map(|(sig, arms)| {
-            if arms.len() < 2 {
+        .zip(&determined)
+        .map(|((sig, arms), determined)| {
+            let positions: Vec<usize> = if !determined.is_empty() {
+                determined.iter().map(|(i, _)| *i).collect()
+            } else if arms.len() < 2 {
                 return None;
-            }
-            let positions: Vec<usize> = arms[0].values.iter().map(|(i, _)| *i).collect();
+            } else {
+                arms[0].values.iter().map(|(i, _)| *i).collect()
+            };
             Some(
                 sig.iter()
                     .enumerate()
@@ -598,12 +707,20 @@ pub fn expand_signatures(
         .iter()
         .zip(&deduped)
         .zip(&arms)
-        .map(|((s, sig), arms)| {
+        .zip(&determined)
+        .map(|(((s, sig), arms), determined)| {
             let suffix = match s {
                 None => plain_suffixes.next(),
                 Some(_) => keyed_suffixes.next(),
             }
             .unwrap_or_default();
+            // A determined dictionary is named by its literals, among
+            // the plain expansions as if it were not there:
+            // `raw_with_column_names`, `get_reader_byob`.
+            if !determined.is_empty() {
+                let tag: Vec<&str> = determined.iter().map(|(_, t)| t.as_str()).collect();
+                return format!("_{}{suffix}", tag.join("_"));
+            }
             if s.is_none() || !arms[0].in_type_arg {
                 return suffix;
             }
@@ -624,27 +741,31 @@ pub fn expand_signatures(
         .zip(deduped)
         .zip(origins)
         .zip(arms)
-        .map(|(((mut name_suffix, params), overload), literal_arms)| {
-            // An expansion passing only `null` never takes the bare name,
-            // which reads as omitting the arguments: it is named as it
-            // would be beside the empty call (`f_with_null()` for
-            // `f(x: null)`, `mode_with_null()` beside a literal cohort's
-            // `mode_x()`, `set_x_with_null()` for a setter).
-            if name_suffix.is_empty()
-                && !params.is_empty()
-                && params.iter().all(|p| p.type_ref == TypeRef::Null)
-            {
-                name_suffix = compute_suffixes(&[Vec::new(), params.clone()], rules)
-                    .pop()
-                    .unwrap_or_default();
-            }
-            ExpandedSignature {
-                overload,
-                name_suffix,
-                params,
-                literal_arms,
-            }
-        })
+        .zip(determined)
+        .map(
+            |((((mut name_suffix, params), overload), literal_arms), determined)| {
+                // An expansion passing only `null` never takes the bare name,
+                // which reads as omitting the arguments: it is named as it
+                // would be beside the empty call (`f_with_null()` for
+                // `f(x: null)`, `mode_with_null()` beside a literal cohort's
+                // `mode_x()`, `set_x_with_null()` for a setter).
+                if name_suffix.is_empty()
+                    && !params.is_empty()
+                    && params.iter().all(|p| p.type_ref == TypeRef::Null)
+                {
+                    name_suffix = compute_suffixes(&[Vec::new(), params.clone()], rules)
+                        .pop()
+                        .unwrap_or_default();
+                }
+                ExpandedSignature {
+                    overload,
+                    name_suffix,
+                    params,
+                    literal_arms,
+                    determined: determined.into_iter().map(|(i, _)| i).collect(),
+                }
+            },
+        )
         .collect()
 }
 
@@ -1008,6 +1129,7 @@ pub fn build_signatures_with_postfix(
         primary_name: String,
         literal: Option<LiteralSpec>,
         field_literal: Option<FieldLiteral>,
+        determined: Vec<usize>,
     }
     let mut units: Vec<Unit> = Vec::new();
     for exp in expansions {
@@ -1030,6 +1152,7 @@ pub fn build_signatures_with_postfix(
                     primary_name: names.declare(&candidate, Suffix::Snake),
                     literal: None,
                     field_literal,
+                    determined: Vec::new(),
                 });
             }
             continue;
@@ -1045,6 +1168,7 @@ pub fn build_signatures_with_postfix(
                 primary_name: names.declare(&primary_candidate, Suffix::Snake),
                 literal: None,
                 field_literal: None,
+                determined: exp.determined,
             });
             continue;
         }
@@ -1083,6 +1207,7 @@ pub fn build_signatures_with_postfix(
                 primary_name: arms[0].1.clone(),
                 literal: Some(LiteralSpec::new(positions.clone(), arms, stem)),
                 field_literal: None,
+                determined: Vec::new(),
             });
         }
     }
@@ -1094,6 +1219,7 @@ pub fn build_signatures_with_postfix(
             primary_name,
             literal,
             field_literal,
+            determined,
         } = unit;
         let overload = spec.overloads[overload];
         let scope = overload.body_scope;
@@ -1161,6 +1287,7 @@ pub fn build_signatures_with_postfix(
             body_scope: scope,
             literal: primary_literal,
             field_literal: field_literal.clone(),
+            determined: determined.clone(),
         };
         push_with_js_string_return(&mut out, primary, overload.string_mode, names, cgctx, scope);
 
@@ -1202,6 +1329,7 @@ pub fn build_signatures_with_postfix(
                 body_scope: scope,
                 literal: promise_literal,
                 field_literal: field_literal.clone(),
+                determined: determined.clone(),
             });
         }
 
@@ -1224,6 +1352,7 @@ pub fn build_signatures_with_postfix(
                 body_scope: scope,
                 literal: try_literal,
                 field_literal: field_literal.clone(),
+                determined: determined.clone(),
             };
             push_with_js_string_return(
                 &mut out,
@@ -1521,6 +1650,20 @@ fn expand_single_overload(
                     }
                 }
             }
+        }
+    }
+
+    // A trailing optional dictionary that can only be empty (D1 `raw`'s
+    // `{ columnNames?: false }`) reads as omitting the argument, like a
+    // trailing `null` arm does.
+    if variadic_param.is_none() {
+        if let Some(c) = cgctx.filter(|c| c.experimental_generic_mono) {
+            sigs.retain(|sig| {
+                !sig.last().is_some_and(|last| {
+                    determined_dictionary(&last.type_ref, c, scope) == Some(Determined::Absent)
+                        && non_variadic[sig.len() - 1].optional
+                })
+            });
         }
     }
 

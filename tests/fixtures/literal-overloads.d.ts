@@ -93,7 +93,10 @@ export declare class Opener {
 
 // Under per-monomorphization, overloads keyed by a literal *type argument*
 // are bindings of their own, named by the literal and the parameter
-// (`get_json_with_options`); without it they dedup into one as before.
+// (`get_json_with_options`); without it they dedup into one as before. A
+// dictionary of literals is built by the binding (`get_reader_byob`,
+// `raw_with_column_names`), and one of optional `false` flags is the
+// omitted argument.
 export interface GetOptions<Type> {
   type: Type;
   cacheTtl?: number;
@@ -105,4 +108,13 @@ export interface Namespace {
   get(key: string, options?: GetOptions<"arrayBuffer">): Promise<ArrayBuffer | null>;
   get(key: string[], options?: GetOptions<"text">): Promise<Map<string, string | null>>;
   get<T = unknown>(key: string[], options?: GetOptions<"json">): Promise<Map<string, T | null>>;
+}
+export interface ReaderOptions {
+  mode: "byob";
+}
+export interface Stream {
+  getReader(): string;
+  getReader(options: ReaderOptions): number;
+  raw(options: { columnNames: true }): Promise<[string[], ...unknown[]]>;
+  raw(options?: { columnNames?: false }): Promise<unknown[]>;
 }

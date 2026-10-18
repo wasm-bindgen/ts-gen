@@ -1324,6 +1324,128 @@ impl Namespace {
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ReaderOptions;
+    #[wasm_bindgen(method, getter)]
+    pub fn mode(this: &ReaderOptions) -> String;
+    #[wasm_bindgen(method, getter, js_name = "mode")]
+    pub fn mode_js_string(this: &ReaderOptions) -> JsString;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_mode(this: &ReaderOptions, val: impl ::wasm_bindgen::JsStringLike);
+}
+impl ReaderOptions {
+    #[doc = " Construct with `mode: \"byob\"`."]
+    pub fn new() -> ReaderOptions {
+        let inner: ReaderOptions = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_mode("byob");
+        inner
+    }
+}
+#[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Stream;
+    #[wasm_bindgen(method, catch, js_name = "getReader")]
+    pub fn get_reader(this: &Stream) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "getReader")]
+    pub fn get_reader_js_string(this: &Stream) -> Result<JsString, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "getReader")]
+    fn __get_reader_byob(this: &Stream, options: &ReaderOptions) -> Result<f64, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn raw(this: &Stream) -> Result<Vec<JsValue>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "raw")]
+    pub fn raw_promise(this: &Stream) -> Result<Promise<Array>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "raw")]
+    async fn __raw_with_column_names(
+        this: &Stream,
+        options: &StreamRawOptions,
+    ) -> Result<ArrayTuple<(Array<String>, Array)>, JsValue>;
+    #[wasm_bindgen(method, catch, js_name = "raw")]
+    fn __raw_with_column_names_promise(
+        this: &Stream,
+        options: &StreamRawOptions,
+    ) -> Result<Promise<ArrayTuple<(Array<String>, Array)>>, JsValue>;
+}
+impl Stream {
+    pub fn get_reader_byob(&self) -> Result<f64, JsValue> {
+        self.__get_reader_byob(&<ReaderOptions>::new())
+    }
+    pub async fn raw_with_column_names(
+        &self,
+    ) -> Result<ArrayTuple<(Array<String>, Array)>, JsValue> {
+        self.__raw_with_column_names(&<StreamRawOptions>::new())
+            .await
+    }
+    pub fn raw_with_column_names_promise(
+        &self,
+    ) -> Result<Promise<ArrayTuple<(Array<String>, Array)>>, JsValue> {
+        self.__raw_with_column_names_promise(&<StreamRawOptions>::new())
+    }
+}
+#[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StreamRawOptions;
+    #[wasm_bindgen(method, getter, js_name = "columnNames")]
+    pub fn column_names(this: &StreamRawOptions) -> bool;
+    #[wasm_bindgen(method, setter, js_name = "columnNames")]
+    pub fn set_column_names(this: &StreamRawOptions, val: bool);
+}
+impl StreamRawOptions {
+    #[doc = " Construct with `columnNames: true`."]
+    pub fn new() -> StreamRawOptions {
+        let inner: StreamRawOptions = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_column_names(true);
+        inner
+    }
+}
+#[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StreamRawOptions2;
+    #[wasm_bindgen(method, getter, js_name = "columnNames")]
+    pub fn column_names(this: &StreamRawOptions2) -> Option<bool>;
+    #[wasm_bindgen(method, setter, js_name = "columnNames")]
+    pub fn set_column_names(this: &StreamRawOptions2, val: bool);
+}
+impl StreamRawOptions2 {
+    pub fn new() -> StreamRawOptions2 {
+        Self::builder().build()
+    }
+    pub fn builder() -> StreamRawOptions2Builder {
+        StreamRawOptions2Builder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for StreamRawOptions2 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct StreamRawOptions2Builder {
+    inner: StreamRawOptions2,
+}
+impl StreamRawOptions2Builder {
+    pub fn column_names(self, val: bool) -> Self {
+        self.inner.set_column_names(val);
+        self
+    }
+    pub fn build(self) -> StreamRawOptions2 {
+        self.inner
+    }
+}
+impl From<StreamRawOptions2> for StreamRawOptions2Builder {
+    fn from(inner: StreamRawOptions2) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
     pub type PartialGetOptionsUndefined;
     #[wasm_bindgen(method, getter, js_name = "cacheTtl")]
     pub fn cache_ttl(this: &PartialGetOptionsUndefined) -> Option<f64>;

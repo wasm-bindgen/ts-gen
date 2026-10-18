@@ -941,6 +941,125 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type ReaderOptions;
+    #[wasm_bindgen(method, getter)]
+    pub fn mode(this: &ReaderOptions) -> String;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_mode(this: &ReaderOptions, val: &str);
+}
+impl ReaderOptions {
+    #[doc = " Construct with `mode: \"byob\"`."]
+    pub fn new() -> ReaderOptions {
+        let inner: ReaderOptions = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_mode("byob");
+        inner
+    }
+}
+#[wasm_bindgen(module = "literal-overloads")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Stream;
+    #[wasm_bindgen(method, js_name = "getReader")]
+    pub fn get_reader(this: &Stream) -> String;
+    #[wasm_bindgen(method, catch, js_name = "getReader")]
+    pub fn try_get_reader(this: &Stream) -> Result<String, JsValue>;
+    #[wasm_bindgen(method, js_name = "getReader")]
+    pub fn get_reader_with_options(this: &Stream, options: &ReaderOptions) -> f64;
+    #[wasm_bindgen(method, catch, js_name = "getReader")]
+    pub fn try_get_reader_with_options(
+        this: &Stream,
+        options: &ReaderOptions,
+    ) -> Result<f64, JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn raw(this: &Stream) -> Result<Vec<JsValue>, JsValue>;
+    #[wasm_bindgen(method, js_name = "raw")]
+    pub fn raw_promise(this: &Stream) -> Promise<Array>;
+    #[wasm_bindgen(method, catch, js_name = "raw")]
+    pub async fn raw_with_stream_options(
+        this: &Stream,
+        options: &StreamOptions,
+    ) -> Result<ArrayTuple<(Array<JsString>, Array)>, JsValue>;
+    #[wasm_bindgen(method, js_name = "raw")]
+    pub fn raw_with_stream_options_promise(
+        this: &Stream,
+        options: &StreamOptions,
+    ) -> Promise<ArrayTuple<(Array<JsString>, Array)>>;
+    #[wasm_bindgen(method, catch, js_name = "raw")]
+    pub async fn raw_with_stream_options2(
+        this: &Stream,
+        options: &StreamOptions2,
+    ) -> Result<Vec<JsValue>, JsValue>;
+    #[wasm_bindgen(method, js_name = "raw")]
+    pub fn raw_with_stream_options2_promise(
+        this: &Stream,
+        options: &StreamOptions2,
+    ) -> Promise<Array>;
+}
+#[wasm_bindgen(module = "literal-overloads")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StreamOptions;
+    #[wasm_bindgen(method, getter, js_name = "columnNames")]
+    pub fn column_names(this: &StreamOptions) -> bool;
+    #[wasm_bindgen(method, setter, js_name = "columnNames")]
+    pub fn set_column_names(this: &StreamOptions, val: bool);
+}
+impl StreamOptions {
+    #[doc = " Construct with `columnNames: true`."]
+    pub fn new() -> StreamOptions {
+        let inner: StreamOptions = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_column_names(true);
+        inner
+    }
+}
+#[wasm_bindgen(module = "literal-overloads")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type StreamOptions2;
+    #[wasm_bindgen(method, getter, js_name = "columnNames")]
+    pub fn column_names(this: &StreamOptions2) -> Option<bool>;
+    #[wasm_bindgen(method, setter, js_name = "columnNames")]
+    pub fn set_column_names(this: &StreamOptions2, val: bool);
+}
+impl StreamOptions2 {
+    pub fn new() -> StreamOptions2 {
+        Self::builder().build()
+    }
+    pub fn builder() -> StreamOptions2Builder {
+        StreamOptions2Builder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for StreamOptions2 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct StreamOptions2Builder {
+    inner: StreamOptions2,
+}
+impl StreamOptions2Builder {
+    pub fn column_names(self, val: bool) -> Self {
+        self.inner.set_column_names(val);
+        self
+    }
+    pub fn build(self) -> StreamOptions2 {
+        self.inner
+    }
+}
+impl From<StreamOptions2> for StreamOptions2Builder {
+    fn from(inner: StreamOptions2) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen(module = "literal-overloads")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
     pub type PartialGetOptionsUndefined;
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &PartialGetOptionsUndefined) -> Undefined;

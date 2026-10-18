@@ -35,6 +35,10 @@
   (import "./bindings.wasm" "UnderlyingByteSource.type" (func $UnderlyingByteSource.type (param $this externref) (result externref)))
   ;; set type(value: "bytes")
   (import "./bindings.wasm" "UnderlyingByteSource.set_type" (func $UnderlyingByteSource.set_type (param $this externref) (param $value externref)))
+  ;; autoAllocateChunkSize?: number
+  (import "./bindings.wasm" "UnderlyingByteSource.auto_allocate_chunk_size" (func $UnderlyingByteSource.auto_allocate_chunk_size (param $this externref) (result externref)))
+  ;; set autoAllocateChunkSize(value: number)
+  (import "./bindings.wasm" "UnderlyingByteSource.set_auto_allocate_chunk_size" (func $UnderlyingByteSource.set_auto_allocate_chunk_size (param $this externref) (param $value f64)))
 
   ;; Stream
   ;; constructor()

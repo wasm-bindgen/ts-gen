@@ -14451,11 +14451,8 @@ extern "C" {
     pub fn get_reader<R>(
         this: &ReadableStream<R>,
     ) -> Result<ReadableStreamDefaultReader<R>, JsValue>;
-    #[doc = " The **`getReader()`** method of the ReadableStream interface creates a reader and locks the stream to it."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/getReader)"]
     #[wasm_bindgen(method, catch, js_name = "getReader")]
-    pub fn get_reader_with_options<R>(
+    fn __get_reader_byob<R>(
         this: &ReadableStream<R>,
         options: &ReadableStreamGetReaderOptions,
     ) -> Result<ReadableStreamBYOBReader, JsValue>;
@@ -14524,6 +14521,14 @@ extern "C" {
         this: &ReadableStream<R>,
         options: &ReadableStreamValuesOptions,
     ) -> Result<AsyncIterator<R>, JsValue>;
+}
+impl<R> ReadableStream<R> {
+    #[doc = " The **`getReader()`** method of the ReadableStream interface creates a reader and locks the stream to it."]
+    #[doc = ""]
+    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStream/getReader)"]
+    pub fn get_reader_byob(&self) -> Result<ReadableStreamBYOBReader, JsValue> {
+        self.__get_reader_byob(&<ReadableStreamGetReaderOptions>::new())
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -45389,25 +45394,15 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "raw")]
     pub fn raw_promise(this: &D1PreparedStatement) -> Promise<Array<Array>>;
     #[wasm_bindgen(method, catch, js_name = "raw")]
-    pub async fn raw_with_d1_prepared_statement_raw_options(
+    async fn __raw_with_column_names(
         this: &D1PreparedStatement,
         options: &D1PreparedStatementRawOptions,
     ) -> Result<ArrayTuple<(Array<String>, Array<Array>)>, JsValue>;
     #[wasm_bindgen(method, js_name = "raw")]
-    pub fn raw_with_d1_prepared_statement_raw_options_promise(
+    fn __raw_with_column_names_promise(
         this: &D1PreparedStatement,
         options: &D1PreparedStatementRawOptions,
     ) -> Promise<ArrayTuple<(Array<String>, Array<Array>)>>;
-    #[wasm_bindgen(method, catch, js_name = "raw")]
-    pub async fn raw_with_d1_prepared_statement_raw_options2(
-        this: &D1PreparedStatement,
-        options: &D1PreparedStatementRawOptions2,
-    ) -> Result<Vec<Array>, JsValue>;
-    #[wasm_bindgen(method, js_name = "raw")]
-    pub fn raw_with_d1_prepared_statement_raw_options2_promise(
-        this: &D1PreparedStatement,
-        options: &D1PreparedStatementRawOptions2,
-    ) -> Promise<Array<Array>>;
     #[wasm_bindgen(method, catch, js_name = "raw")]
     pub async fn raw_typed<T>(this: &D1PreparedStatement) -> Result<Vec<T>, JsValue>
     where
@@ -45415,29 +45410,44 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "raw")]
     pub fn raw_typed_promise<T>(this: &D1PreparedStatement) -> Promise<Array<T>>;
     #[wasm_bindgen(method, catch, js_name = "raw")]
-    pub async fn raw_with_d1_prepared_statement_raw_options_typed<T>(
+    async fn __raw_with_column_names_typed<T>(
         this: &D1PreparedStatement,
         options: &D1PreparedStatementRawOptions,
     ) -> Result<ArrayTuple<(Array<String>, Array<T>)>, JsValue>
     where
         T: 'static;
     #[wasm_bindgen(method, js_name = "raw")]
-    pub fn raw_with_d1_prepared_statement_raw_options_typed_promise<T>(
+    fn __raw_with_column_names_typed_promise<T>(
         this: &D1PreparedStatement,
         options: &D1PreparedStatementRawOptions,
     ) -> Promise<ArrayTuple<(Array<String>, Array<T>)>>;
-    #[wasm_bindgen(method, catch, js_name = "raw")]
-    pub async fn raw_with_d1_prepared_statement_raw_options2_typed<T>(
-        this: &D1PreparedStatement,
-        options: &D1PreparedStatementRawOptions2,
-    ) -> Result<Vec<T>, JsValue>
+}
+impl D1PreparedStatement {
+    pub async fn raw_with_column_names(
+        &self,
+    ) -> Result<ArrayTuple<(Array<String>, Array<Array>)>, JsValue> {
+        self.__raw_with_column_names(&<D1PreparedStatementRawOptions>::new())
+            .await
+    }
+    pub fn raw_with_column_names_promise(
+        &self,
+    ) -> Promise<ArrayTuple<(Array<String>, Array<Array>)>> {
+        self.__raw_with_column_names_promise(&<D1PreparedStatementRawOptions>::new())
+    }
+    pub async fn raw_with_column_names_typed<T>(
+        &self,
+    ) -> Result<ArrayTuple<(Array<String>, Array<T>)>, JsValue>
     where
-        Vec<T>: ::wasm_bindgen::convert::FromWasmAbi + 'static;
-    #[wasm_bindgen(method, js_name = "raw")]
-    pub fn raw_with_d1_prepared_statement_raw_options2_typed_promise<T>(
-        this: &D1PreparedStatement,
-        options: &D1PreparedStatementRawOptions2,
-    ) -> Promise<Array<T>>;
+        T: 'static,
+    {
+        self.__raw_with_column_names_typed(&<D1PreparedStatementRawOptions>::new())
+            .await
+    }
+    pub fn raw_with_column_names_typed_promise<T>(
+        &self,
+    ) -> Promise<ArrayTuple<(Array<String>, Array<T>)>> {
+        self.__raw_with_column_names_typed_promise(&<D1PreparedStatementRawOptions>::new())
+    }
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
