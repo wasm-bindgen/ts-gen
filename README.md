@@ -87,6 +87,17 @@ collapsing them to their common ancestor:
 ts-gen --input types.d.ts --output src/bindings.rs --error-enum
 ```
 
+Select roots from a large declaration file and layer `@rust` / `@throws`
+tags onto it from a side file (see `CONVENTIONS.md`, "Root selection" and
+"`--annotate`"):
+
+```sh
+ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
+  --output src/bindings.rs \
+  --export Request --export Response --export KVNamespace \
+  --annotate types/annotations.d.ts
+```
+
 Opt generic imports into wasm-bindgen's experimental per-monomorphization
 codegen:
 
