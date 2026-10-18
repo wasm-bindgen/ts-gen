@@ -24,9 +24,9 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_headers(init: &Headers) -> Result<Headers, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_record(init: &Object<JsString>) -> Result<Headers, JsValue>;
+    pub fn new_with_record(init: &Object<String>) -> Result<Headers, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_slice(init: &[ArrayTuple<(JsString, JsString)>]) -> Result<Headers, JsValue>;
+    pub fn new_with_slice(init: &[ArrayTuple<(String, String)>]) -> Result<Headers, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn append(
         this: &Headers,
@@ -54,11 +54,11 @@ extern "C" {
         value: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn entries(this: &Headers) -> Result<Iterator<ArrayTuple<(JsString, JsString)>>, JsValue>;
+    pub fn entries(this: &Headers) -> Result<Iterator<ArrayTuple<(String, String)>>, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn keys(this: &Headers) -> Result<Iterator<JsString>, JsValue>;
+    pub fn keys(this: &Headers) -> Result<Iterator<String>, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn values(this: &Headers) -> Result<Iterator<JsString>, JsValue>;
+    pub fn values(this: &Headers) -> Result<Iterator<String>, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -100,7 +100,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "text")]
     pub async fn text_js_string(this: &Request) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, js_name = "text")]
-    pub fn text_promise(this: &Request) -> Promise<JsString>;
+    pub fn text_promise(this: &Request) -> Promise<String>;
     #[wasm_bindgen(method, catch)]
     pub async fn json<T>(this: &Request) -> Result<T, JsValue>
     where
@@ -188,9 +188,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_headers(this: &RequestInit, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
-    pub fn set_headers_with_record(this: &RequestInit, val: &Object<JsString>);
+    pub fn set_headers_with_record(this: &RequestInit, val: &Object<String>);
     #[wasm_bindgen(method, setter, js_name = "headers")]
-    pub fn set_headers_with_slice(this: &RequestInit, val: &[ArrayTuple<(JsString, JsString)>]);
+    pub fn set_headers_with_slice(this: &RequestInit, val: &[ArrayTuple<(String, String)>]);
     #[wasm_bindgen(method, getter)]
     pub fn body(this: &RequestInit) -> Option<BodyInitKind>;
     #[wasm_bindgen(method, setter)]
@@ -240,11 +240,11 @@ impl RequestInitBuilder {
         self.inner.set_headers(val);
         self
     }
-    pub fn headers_with_record(self, val: &Object<JsString>) -> Self {
+    pub fn headers_with_record(self, val: &Object<String>) -> Self {
         self.inner.set_headers_with_record(val);
         self
     }
-    pub fn headers_with_slice(self, val: &[ArrayTuple<(JsString, JsString)>]) -> Self {
+    pub fn headers_with_slice(self, val: &[ArrayTuple<(String, String)>]) -> Self {
         self.inner.set_headers_with_slice(val);
         self
     }
@@ -442,7 +442,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "text")]
     pub async fn text_js_string(this: &Response) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, js_name = "text")]
-    pub fn text_promise(this: &Response) -> Promise<JsString>;
+    pub fn text_promise(this: &Response) -> Promise<String>;
     #[wasm_bindgen(method, catch)]
     pub async fn json<T>(this: &Response) -> Result<T, JsValue>
     where
@@ -486,9 +486,9 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_headers(this: &ResponseInit, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
-    pub fn set_headers_with_record(this: &ResponseInit, val: &Object<JsString>);
+    pub fn set_headers_with_record(this: &ResponseInit, val: &Object<String>);
     #[wasm_bindgen(method, setter, js_name = "headers")]
-    pub fn set_headers_with_slice(this: &ResponseInit, val: &[ArrayTuple<(JsString, JsString)>]);
+    pub fn set_headers_with_slice(this: &ResponseInit, val: &[ArrayTuple<(String, String)>]);
 }
 impl ResponseInit {
     pub fn new() -> ResponseInit {
@@ -521,11 +521,11 @@ impl ResponseInitBuilder {
         self.inner.set_headers(val);
         self
     }
-    pub fn headers_with_record(self, val: &Object<JsString>) -> Self {
+    pub fn headers_with_record(self, val: &Object<String>) -> Self {
         self.inner.set_headers_with_record(val);
         self
     }
-    pub fn headers_with_slice(self, val: &[ArrayTuple<(JsString, JsString)>]) -> Self {
+    pub fn headers_with_slice(self, val: &[ArrayTuple<(String, String)>]) -> Self {
         self.inner.set_headers_with_slice(val);
         self
     }
@@ -563,38 +563,38 @@ extern "C" {
     pub async fn fetch<E>(
         this: &ExportedHandler<E>,
         request: &Request,
-        env: E,
+        env: &E,
         ctx: &ExecutionContext,
     ) -> Result<Response, JsValue>
     where
-        E: ::wasm_bindgen::convert::IntoWasmAbi;
+        E: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, js_name = "fetch")]
     pub fn fetch_promise<E>(
         this: &ExportedHandler<E>,
         request: &Request,
-        env: E,
+        env: &E,
         ctx: &ExecutionContext,
     ) -> Promise<Response>
     where
-        E: ::wasm_bindgen::convert::IntoWasmAbi;
+        E: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, catch)]
     pub async fn scheduled<E>(
         this: &ExportedHandler<E>,
         controller: &ScheduledController,
-        env: E,
+        env: &E,
         ctx: &ExecutionContext,
     ) -> Result<(), JsValue>
     where
-        E: ::wasm_bindgen::convert::IntoWasmAbi;
+        E: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, js_name = "scheduled")]
     pub fn scheduled_promise<E>(
         this: &ExportedHandler<E>,
         controller: &ScheduledController,
-        env: E,
+        env: &E,
         ctx: &ExecutionContext,
     ) -> Promise<Undefined>
     where
-        E: ::wasm_bindgen::convert::IntoWasmAbi;
+        E: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -734,6 +734,6 @@ extern "C" {
 #[wasm_bindgen(private, fallback)]
 pub enum HeadersKind {
     Headers(Headers),
-    VecOfTuple(Vec<ArrayTuple<(JsString, JsString)>>),
-    Record(Object<JsString>),
+    VecOfTuple(Vec<ArrayTuple<(String, String)>>),
+    Record(Object<String>),
 }

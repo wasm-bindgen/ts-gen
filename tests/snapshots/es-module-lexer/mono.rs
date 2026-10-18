@@ -145,7 +145,7 @@ extern "C" {
     #[doc = " // Returns [['type', 'json'], ['integrity', 'sha384-...']]"]
     #[doc = " ```"]
     #[wasm_bindgen(method, getter)]
-    pub fn at(this: &ImportSpecifier) -> Option<Vec<ArrayTuple<(JsString, JsString)>>>;
+    pub fn at(this: &ImportSpecifier) -> Option<Vec<ArrayTuple<(String, String)>>>;
 }
 impl ImportSpecifier {
     #[allow(clippy::new_without_default)]
@@ -326,15 +326,7 @@ extern "C" {
     #[wasm_bindgen(catch)]
     pub fn parse(
         source: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<
-        ArrayTuple<(
-            Array<ImportSpecifier>,
-            Array<ExportSpecifier>,
-            Boolean,
-            Boolean,
-        )>,
-        JsValue,
-    >;
+    ) -> Result<ArrayTuple<(Array<ImportSpecifier>, Array<ExportSpecifier>, bool, bool)>, JsValue>;
 }
 #[wasm_bindgen(module = "es-module-lexer", experimental_generic_mono)]
 extern "C" {
@@ -349,15 +341,7 @@ extern "C" {
     pub fn parse_with_name(
         source: impl ::wasm_bindgen::JsStringLike,
         name: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<
-        ArrayTuple<(
-            Array<ImportSpecifier>,
-            Array<ExportSpecifier>,
-            Boolean,
-            Boolean,
-        )>,
-        JsValue,
-    >;
+    ) -> Result<ArrayTuple<(Array<ImportSpecifier>, Array<ExportSpecifier>, bool, bool)>, JsValue>;
 }
 #[wasm_bindgen(module = "es-module-lexer", experimental_generic_mono)]
 extern "C" {

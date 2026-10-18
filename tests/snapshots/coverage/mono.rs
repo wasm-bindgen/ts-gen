@@ -161,7 +161,7 @@ pub mod my_module {
         #[wasm_bindgen(catch, js_name = "doWork")]
         pub fn do_work_promise(
             input: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Promise<JsString>, JsValue>;
+        ) -> Result<Promise<String>, JsValue>;
     }
     #[wasm_bindgen(module = "my-module", experimental_generic_mono)]
     extern "C" {
@@ -252,7 +252,7 @@ extern "C" {
     pub fn process_promise(
         this: &DefaultProcessor,
         input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<JsString>;
+    ) -> Promise<String>;
     #[wasm_bindgen(method, getter)]
     pub fn name(this: &DefaultProcessor) -> String;
     #[wasm_bindgen(method, getter, js_name = "name")]
@@ -538,12 +538,12 @@ extern "C" {
     pub async fn get(
         this: &Cache,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Option<Map<JsString, Array<JsString>>>, JsValue>;
+    ) -> Result<Option<Map<String, Array<String>>>, JsValue>;
     #[wasm_bindgen(method, js_name = "get")]
     pub fn get_promise(
         this: &Cache,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Option<Map<JsString, Array<JsString>>>>;
+    ) -> Promise<Option<Map<String, Array<String>>>>;
     #[wasm_bindgen(method, catch)]
     pub async fn set(
         this: &Cache,
@@ -573,7 +573,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_headers(this: &FetchOptions, val: &Headers);
     #[wasm_bindgen(method, setter, js_name = "headers")]
-    pub fn set_headers_with_record(this: &FetchOptions, val: &Object<JsString>);
+    pub fn set_headers_with_record(this: &FetchOptions, val: &Object<String>);
     #[wasm_bindgen(method, getter)]
     pub fn body(this: &FetchOptions) -> Option<BodyKind>;
     #[wasm_bindgen(method, setter)]
@@ -625,7 +625,7 @@ impl FetchOptionsBuilder {
         self.inner.set_headers(val);
         self
     }
-    pub fn headers_with_record(self, val: &Object<JsString>) -> Self {
+    pub fn headers_with_record(self, val: &Object<String>) -> Self {
         self.inner.set_headers_with_record(val);
         self
     }
@@ -804,7 +804,7 @@ impl MutableWidget {
 #[wasm_bindgen(private, fallback)]
 pub enum HeadersKind {
     Headers(Headers),
-    Record(Object<JsString>),
+    Record(Object<String>),
 }
 #[wasm_bindgen(private)]
 pub enum BodyKind {

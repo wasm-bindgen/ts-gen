@@ -88,7 +88,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "later")]
     pub async fn later_js_string(this: &Day, other: impl DayLike) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "later")]
-    pub fn later_promise(this: &Day, other: impl DayLike) -> Result<Promise<JsString>, JsValue>;
+    pub fn later_promise(this: &Day, other: impl DayLike) -> Result<Promise<String>, JsValue>;
 }
 impl Day {
     pub fn pick_with_null(&self) -> Result<String, JsValue> {

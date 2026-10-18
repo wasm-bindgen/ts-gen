@@ -78,11 +78,11 @@ extern "C" {
     where
         HostMetadata: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter, js_name = "hostMetadata")]
-    pub fn set_host_metadata<HostMetadata>(this: &Properties<HostMetadata>, val: HostMetadata)
+    pub fn set_host_metadata<HostMetadata>(this: &Properties<HostMetadata>, val: &HostMetadata)
     where
-        HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi;
+        HostMetadata: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
-impl<HostMetadata: ::wasm_bindgen::convert::IntoWasmAbi> Properties<HostMetadata> {
+impl<HostMetadata> Properties<HostMetadata> {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Properties<HostMetadata> {
         #[allow(unused_unsafe)]
@@ -105,7 +105,7 @@ extern "C" {
     where
         T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi;
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> QueryResult<T> {
+impl<T> QueryResult<T> {
     #[allow(clippy::new_without_default)]
     pub fn new() -> QueryResult<T> {
         #[allow(unused_unsafe)]
@@ -120,7 +120,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Stub<T = JsValue>;
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Stub<T> {
+impl<T> Stub<T> {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Stub<T> {
         #[allow(unused_unsafe)]
@@ -148,7 +148,7 @@ extern "C" {
     pub fn fetch_promise<T>(
         this: &Endpoint<T>,
         input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<JsString>;
+    ) -> Promise<String>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -185,15 +185,18 @@ extern "C" {
     where
         R: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<R>(this: &Range<R>, val: R)
+    pub fn set_value<R>(this: &Range<R>, val: &R)
     where
-        R: ::wasm_bindgen::convert::IntoWasmAbi;
+        R: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
-impl<R: ::wasm_bindgen::convert::IntoWasmAbi> Range<R> {
-    pub fn new(value: R) -> Range<R> {
+impl<R> Range<R>
+where
+    for<'__wbg> &'__wbg R: ::wasm_bindgen::convert::IntoWasmAbi,
+{
+    pub fn new(value: &R) -> Range<R> {
         Self::builder(value).build()
     }
-    pub fn builder(value: R) -> RangeBuilder<R> {
+    pub fn builder(value: &R) -> RangeBuilder<R> {
         let inner: Range<R> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_value(value);
         RangeBuilder { inner }
@@ -202,7 +205,10 @@ impl<R: ::wasm_bindgen::convert::IntoWasmAbi> Range<R> {
 pub struct RangeBuilder<R> {
     inner: Range<R>,
 }
-impl<R: ::wasm_bindgen::convert::IntoWasmAbi> RangeBuilder<R> {
+impl<R> RangeBuilder<R>
+where
+    for<'__wbg> &'__wbg R: ::wasm_bindgen::convert::IntoWasmAbi,
+{
     pub fn offset(self, val: f64) -> Self {
         self.inner.set_offset(val);
         self
@@ -211,7 +217,7 @@ impl<R: ::wasm_bindgen::convert::IntoWasmAbi> RangeBuilder<R> {
         self.inner
     }
 }
-impl<R: ::wasm_bindgen::convert::IntoWasmAbi> From<Range<R>> for RangeBuilder<R> {
+impl<R> From<Range<R>> for RangeBuilder<R> {
     fn from(inner: Range<R>) -> Self {
         Self { inner }
     }
@@ -230,13 +236,16 @@ extern "C" {
     where
         Option<R>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<R>(this: &ReadResult<R>, val: R)
+    pub fn set_value<R>(this: &ReadResult<R>, val: &R)
     where
-        R: ::wasm_bindgen::convert::IntoWasmAbi;
+        R: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
-impl<R: ::wasm_bindgen::convert::IntoWasmAbi> ReadResult<R> {
+impl<R> ReadResult<R>
+where
+    for<'__wbg> &'__wbg R: ::wasm_bindgen::convert::IntoWasmAbi,
+{
     #[doc = " Construct with `done: false`."]
-    pub fn new_false(value: R) -> ReadResult<R> {
+    pub fn new_false(value: &R) -> ReadResult<R> {
         let inner: ReadResult<R> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_done(false);
         inner.set_value(value);
@@ -256,8 +265,11 @@ impl<R: ::wasm_bindgen::convert::IntoWasmAbi> ReadResult<R> {
 pub struct ReadResultBuilder<R> {
     inner: ReadResult<R>,
 }
-impl<R: ::wasm_bindgen::convert::IntoWasmAbi> ReadResultBuilder<R> {
-    pub fn value(self, val: R) -> Self {
+impl<R> ReadResultBuilder<R>
+where
+    for<'__wbg> &'__wbg R: ::wasm_bindgen::convert::IntoWasmAbi,
+{
+    pub fn value(self, val: &R) -> Self {
         self.inner.set_value(val);
         self
     }
@@ -265,7 +277,7 @@ impl<R: ::wasm_bindgen::convert::IntoWasmAbi> ReadResultBuilder<R> {
         self.inner
     }
 }
-impl<R: ::wasm_bindgen::convert::IntoWasmAbi> From<ReadResult<R>> for ReadResultBuilder<R> {
+impl<R> From<ReadResult<R>> for ReadResultBuilder<R> {
     fn from(inner: ReadResult<R>) -> Self {
         Self { inner }
     }

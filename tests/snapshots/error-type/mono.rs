@@ -20,7 +20,7 @@ extern "C" {
     pub async fn baz(this: &Foo) -> Result<f64, crate::Error>;
     #[doc = " Async method — `Result<T, crate::Error>`."]
     #[wasm_bindgen(method, js_name = "baz")]
-    pub fn baz_promise(this: &Foo) -> Promise<Number>;
+    pub fn baz_promise(this: &Foo) -> Promise<f64>;
     #[doc = " Explicit `@throws` still wins over the configured default."]
     #[doc = ""]
     #[doc = " ## Errors"]
@@ -57,5 +57,5 @@ extern "C" {
 extern "C" {
     #[doc = " Free function — same default-error rule."]
     #[wasm_bindgen(js_name = "fetchData")]
-    pub fn fetch_data_promise(url: impl ::wasm_bindgen::JsStringLike) -> Promise<JsString>;
+    pub fn fetch_data_promise(url: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
 }

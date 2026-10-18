@@ -186,7 +186,7 @@ extern "C" {
     pub fn get_promise(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Promise<JsString>, JsValue>;
+    ) -> Result<Promise<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_store_options(
         this: &Store,
@@ -222,7 +222,7 @@ extern "C" {
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions,
-    ) -> Result<Promise<JsString>, JsValue>;
+    ) -> Result<Promise<String>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn refine(this: &Store, value: &Derived) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]
@@ -232,9 +232,9 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub fn shape(this: &Store, value: &StoreValue) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn generic<T>(this: &Store, value: T) -> Result<(), JsValue>
+    pub fn generic<T>(this: &Store, value: &T) -> Result<(), JsValue>
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, catch)]
     pub fn primitive(this: &Store, value: impl ::wasm_bindgen::JsStringLike)
         -> Result<(), JsValue>;
@@ -385,7 +385,7 @@ extern "C" {
     pub fn fetch_promise(
         this: &Fetcher,
         input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Promise<JsString>, JsValue>;
+    ) -> Result<Promise<String>, JsValue>;
 }
 #[wasm_bindgen(module = "intersection", experimental_generic_mono)]
 extern "C" {
@@ -426,7 +426,7 @@ extern "C" {
     pub fn fetch_promise<T>(
         this: &GenericStub<T>,
         input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Promise<JsString>, JsValue>;
+    ) -> Result<Promise<String>, JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn id<T>(this: &GenericStub<T>) -> String;
     #[wasm_bindgen(method, getter, js_name = "id")]
@@ -451,7 +451,7 @@ extern "C" {
     pub fn fetch_promise(
         this: &Unknown,
         input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Promise<JsString>, JsValue>;
+    ) -> Result<Promise<String>, JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn id(this: &Unknown) -> String;
     #[wasm_bindgen(method, getter, js_name = "id")]
@@ -571,7 +571,7 @@ pub type ViaSame = Base;
 #[allow(dead_code)]
 pub type ProviderOf<T> = Provider<Array<T>>;
 #[allow(dead_code)]
-pub type ViaProviderOf = Provider<Array<JsString>>;
+pub type ViaProviderOf = Provider<Array<String>>;
 #[wasm_bindgen(private)]
 pub enum RoleKind {
     User = "user",

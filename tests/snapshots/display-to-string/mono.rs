@@ -150,9 +150,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Boxed<T = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<T>(value: T) -> Result<Boxed<T>, JsValue>
+    pub fn new<T>(value: &T) -> Result<Boxed<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "toString")]
     pub fn try_to_string<T>(this: &Boxed<T>) -> Result<String, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "toString")]

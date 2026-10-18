@@ -66,7 +66,7 @@ extern "C" {
     pub fn parse_promise(
         this: &Codec,
         input: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Promise<JsString>, Error>;
+    ) -> Result<Promise<String>, Error>;
 }
 #[wasm_bindgen(module = "builtin-errors", experimental_generic_mono)]
 extern "C" {

@@ -16,23 +16,23 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub fn entries(
         this: &KeyValueStore,
-    ) -> Result<Iterator<ArrayTuple<(JsString, JsValue)>>, JsValue>;
+    ) -> Result<Iterator<ArrayTuple<(String, JsValue)>>, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn keys(this: &KeyValueStore) -> Result<Iterator<JsString>, JsValue>;
+    pub fn keys(this: &KeyValueStore) -> Result<Iterator<String>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn pages(this: &KeyValueStore) -> Result<AsyncIterator, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "asyncEntries")]
     pub fn async_entries(
         this: &KeyValueStore,
-    ) -> Result<AsyncIterator<ArrayTuple<(JsString, JsValue)>>, JsValue>;
+    ) -> Result<AsyncIterator<ArrayTuple<(String, JsValue)>>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn put<T>(
         this: &KeyValueStore,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: T,
+        value: &T,
     ) -> Result<(), JsValue>
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, catch)]
     pub fn get<T>(
         this: &KeyValueStore,
@@ -50,7 +50,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "[Symbol.iterator]")]
     pub fn iterator<T>(
         this: &KeyValueStoreList<T>,
-    ) -> Result<Iterator<ArrayTuple<(JsString, T)>>, JsValue>;
+    ) -> Result<Iterator<ArrayTuple<(String, T)>>, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -61,7 +61,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "[Symbol.asyncIterator]")]
     pub fn async_iterator<T>(
         this: &KeyValueStoreListAsync<T>,
-    ) -> Result<AsyncIterator<ArrayTuple<(JsString, T)>>, JsValue>;
+    ) -> Result<AsyncIterator<ArrayTuple<(String, T)>>, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

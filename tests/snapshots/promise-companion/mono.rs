@@ -99,8 +99,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `TypeError` — on an invalid key"]
     #[wasm_bindgen(method, js_name = "delete")]
-    pub fn delete_promise(this: &State, key: impl ::wasm_bindgen::JsStringLike)
-        -> Promise<Boolean>;
+    pub fn delete_promise(this: &State, key: impl ::wasm_bindgen::JsStringLike) -> Promise<bool>;
     #[doc = " `@throws {never}` drops `catch` from the async form; the promise"]
     #[doc = " form is plain under every policy."]
     #[wasm_bindgen(method)]
@@ -108,7 +107,7 @@ extern "C" {
     #[doc = " `@throws {never}` drops `catch` from the async form; the promise"]
     #[doc = " form is plain under every policy."]
     #[wasm_bindgen(method, js_name = "ready")]
-    pub fn ready_promise(this: &State) -> Promise<Boolean>;
+    pub fn ready_promise(this: &State) -> Promise<bool>;
     #[doc = " Sync methods are untouched."]
     #[wasm_bindgen(method, catch)]
     pub fn id(this: &State) -> Result<String, JsValue>;

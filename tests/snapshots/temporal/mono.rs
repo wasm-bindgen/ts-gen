@@ -1560,7 +1560,10 @@ pub mod temporal {
         #[wasm_bindgen(method, setter, js_name = "roundingMode")]
         pub fn set_rounding_mode<Units>(this: &RoundingOptions<Units>, val: RoundingModeKind);
     }
-    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi> RoundingOptions<Units> {
+    impl<Units> RoundingOptions<Units>
+    where
+        for<'__wbg> &'__wbg Units: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
         pub fn new() -> RoundingOptions<Units> {
             Self::builder().build()
         }
@@ -1570,7 +1573,7 @@ pub mod temporal {
             }
         }
     }
-    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi> Default for RoundingOptions<Units> {
+    impl<Units> Default for RoundingOptions<Units> {
         fn default() -> Self {
             Self::new()
         }
@@ -1578,7 +1581,10 @@ pub mod temporal {
     pub struct RoundingOptionsBuilder<Units> {
         inner: RoundingOptions<Units>,
     }
-    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi> RoundingOptionsBuilder<Units> {
+    impl<Units> RoundingOptionsBuilder<Units>
+    where
+        for<'__wbg> &'__wbg Units: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
         pub fn smallest_unit(self, val: PluralizeUnit) -> Self {
             self.inner.set_smallest_unit(val);
             self
@@ -1595,9 +1601,7 @@ pub mod temporal {
             self.inner
         }
     }
-    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi> From<RoundingOptions<Units>>
-        for RoundingOptionsBuilder<Units>
-    {
+    impl<Units> From<RoundingOptions<Units>> for RoundingOptionsBuilder<Units> {
         fn from(inner: RoundingOptions<Units>) -> Self {
             Self { inner }
         }
@@ -1617,7 +1621,10 @@ pub mod temporal {
             val: LargestUnitKind,
         );
     }
-    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi> RoundingOptionsWithLargestUnit<Units> {
+    impl<Units> RoundingOptionsWithLargestUnit<Units>
+    where
+        for<'__wbg> &'__wbg Units: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
         pub fn new() -> RoundingOptionsWithLargestUnit<Units> {
             Self::builder().build()
         }
@@ -1627,9 +1634,7 @@ pub mod temporal {
             }
         }
     }
-    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi> Default
-        for RoundingOptionsWithLargestUnit<Units>
-    {
+    impl<Units> Default for RoundingOptionsWithLargestUnit<Units> {
         fn default() -> Self {
             Self::new()
         }
@@ -1637,7 +1642,10 @@ pub mod temporal {
     pub struct RoundingOptionsWithLargestUnitBuilder<Units> {
         inner: RoundingOptionsWithLargestUnit<Units>,
     }
-    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi> RoundingOptionsWithLargestUnitBuilder<Units> {
+    impl<Units> RoundingOptionsWithLargestUnitBuilder<Units>
+    where
+        for<'__wbg> &'__wbg Units: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
         pub fn smallest_unit(self, val: PluralizeUnit) -> Self {
             self.inner.set_smallest_unit(val);
             self
@@ -1658,7 +1666,7 @@ pub mod temporal {
             self.inner
         }
     }
-    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi> From<RoundingOptionsWithLargestUnit<Units>>
+    impl<Units> From<RoundingOptionsWithLargestUnit<Units>>
         for RoundingOptionsWithLargestUnitBuilder<Units>
     {
         fn from(inner: RoundingOptionsWithLargestUnit<Units>) -> Self {
@@ -1685,7 +1693,10 @@ pub mod temporal {
             val: RoundingModeKind,
         );
     }
-    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi> ToStringRoundingOptions<Units> {
+    impl<Units> ToStringRoundingOptions<Units>
+    where
+        for<'__wbg> &'__wbg Units: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
         pub fn new() -> ToStringRoundingOptions<Units> {
             Self::builder().build()
         }
@@ -1695,7 +1706,7 @@ pub mod temporal {
             }
         }
     }
-    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi> Default for ToStringRoundingOptions<Units> {
+    impl<Units> Default for ToStringRoundingOptions<Units> {
         fn default() -> Self {
             Self::new()
         }
@@ -1703,7 +1714,10 @@ pub mod temporal {
     pub struct ToStringRoundingOptionsBuilder<Units> {
         inner: ToStringRoundingOptions<Units>,
     }
-    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi> ToStringRoundingOptionsBuilder<Units> {
+    impl<Units> ToStringRoundingOptionsBuilder<Units>
+    where
+        for<'__wbg> &'__wbg Units: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
         pub fn smallest_unit(self, val: PluralizeUnit) -> Self {
             self.inner.set_smallest_unit(val);
             self
@@ -1716,9 +1730,7 @@ pub mod temporal {
             self.inner
         }
     }
-    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi> From<ToStringRoundingOptions<Units>>
-        for ToStringRoundingOptionsBuilder<Units>
-    {
+    impl<Units> From<ToStringRoundingOptions<Units>> for ToStringRoundingOptionsBuilder<Units> {
         fn from(inner: ToStringRoundingOptions<Units>) -> Self {
             Self { inner }
         }
@@ -1743,8 +1755,9 @@ pub mod temporal {
             val: f64,
         );
     }
-    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi>
-        ToStringRoundingOptionsWithFractionalSeconds<Units>
+    impl<Units> ToStringRoundingOptionsWithFractionalSeconds<Units>
+    where
+        for<'__wbg> &'__wbg Units: ::wasm_bindgen::convert::IntoWasmAbi,
     {
         pub fn new() -> ToStringRoundingOptionsWithFractionalSeconds<Units> {
             Self::builder().build()
@@ -1755,9 +1768,7 @@ pub mod temporal {
             }
         }
     }
-    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi> Default
-        for ToStringRoundingOptionsWithFractionalSeconds<Units>
-    {
+    impl<Units> Default for ToStringRoundingOptionsWithFractionalSeconds<Units> {
         fn default() -> Self {
             Self::new()
         }
@@ -1765,8 +1776,9 @@ pub mod temporal {
     pub struct ToStringRoundingOptionsWithFractionalSecondsBuilder<Units> {
         inner: ToStringRoundingOptionsWithFractionalSeconds<Units>,
     }
-    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi>
-        ToStringRoundingOptionsWithFractionalSecondsBuilder<Units>
+    impl<Units> ToStringRoundingOptionsWithFractionalSecondsBuilder<Units>
+    where
+        for<'__wbg> &'__wbg Units: ::wasm_bindgen::convert::IntoWasmAbi,
     {
         pub fn smallest_unit(self, val: PluralizeUnit) -> Self {
             self.inner.set_smallest_unit(val);
@@ -1788,8 +1800,7 @@ pub mod temporal {
             self.inner
         }
     }
-    impl<Units: ::wasm_bindgen::convert::IntoWasmAbi>
-        From<ToStringRoundingOptionsWithFractionalSeconds<Units>>
+    impl<Units> From<ToStringRoundingOptionsWithFractionalSeconds<Units>>
         for ToStringRoundingOptionsWithFractionalSecondsBuilder<Units>
     {
         fn from(inner: ToStringRoundingOptionsWithFractionalSeconds<Units>) -> Self {

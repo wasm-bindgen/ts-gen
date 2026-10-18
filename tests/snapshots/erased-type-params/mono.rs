@@ -20,11 +20,14 @@ extern "C" {
     where
         Option<Metadata>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_metadata<Metadata>(this: &ListKey<Metadata>, val: Metadata)
+    pub fn set_metadata<Metadata>(this: &ListKey<Metadata>, val: &Metadata)
     where
-        Metadata: ::wasm_bindgen::convert::IntoWasmAbi;
+        Metadata: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
-impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> ListKey<Metadata> {
+impl<Metadata> ListKey<Metadata>
+where
+    for<'__wbg> &'__wbg Metadata: ::wasm_bindgen::convert::IntoWasmAbi,
+{
     pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> ListKey<Metadata> {
         Self::builder(name).build()
     }
@@ -37,8 +40,11 @@ impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> ListKey<Metadata> {
 pub struct ListKeyBuilder<Metadata> {
     inner: ListKey<Metadata>,
 }
-impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> ListKeyBuilder<Metadata> {
-    pub fn metadata(self, val: Metadata) -> Self {
+impl<Metadata> ListKeyBuilder<Metadata>
+where
+    for<'__wbg> &'__wbg Metadata: ::wasm_bindgen::convert::IntoWasmAbi,
+{
+    pub fn metadata(self, val: &Metadata) -> Self {
         self.inner.set_metadata(val);
         self
     }
@@ -46,9 +52,7 @@ impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> ListKeyBuilder<Metadata> {
         self.inner
     }
 }
-impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> From<ListKey<Metadata>>
-    for ListKeyBuilder<Metadata>
-{
+impl<Metadata> From<ListKey<Metadata>> for ListKeyBuilder<Metadata> {
     fn from(inner: ListKey<Metadata>) -> Self {
         Self { inner }
     }
@@ -76,7 +80,10 @@ extern "C" {
         val: impl ::wasm_bindgen::JsStringLike,
     );
 }
-impl<Metadata: ::wasm_bindgen::convert::IntoWasmAbi> ListResult<Metadata> {
+impl<Metadata> ListResult<Metadata>
+where
+    for<'__wbg> &'__wbg Metadata: ::wasm_bindgen::convert::IntoWasmAbi,
+{
     pub fn new(
         keys: &[ListKey<Metadata>],
         cursor: impl ::wasm_bindgen::JsStringLike,
@@ -186,12 +193,15 @@ extern "C" {
     where
         V: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<V>(this: &Slot<V>, val: V)
+    pub fn set_value<V>(this: &Slot<V>, val: &V)
     where
-        V: ::wasm_bindgen::convert::IntoWasmAbi;
+        V: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
-impl<V: ::wasm_bindgen::convert::IntoWasmAbi> Slot<V> {
-    pub fn new(value: V) -> Slot<V> {
+impl<V> Slot<V>
+where
+    for<'__wbg> &'__wbg V: ::wasm_bindgen::convert::IntoWasmAbi,
+{
+    pub fn new(value: &V) -> Slot<V> {
         let inner: Slot<V> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_value(value);
         inner

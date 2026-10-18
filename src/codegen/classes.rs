@@ -530,15 +530,31 @@ impl<'a> ClassConfig<'a> {
         if !CodegenContext::generic_mono(self.cgctx) {
             return self.type_generics_decl();
         }
-        let bounds = self
+        let idents = self
             .type_params
             .iter()
             .map(|tp| {
                 let ident = super::typemap::make_ident(&tp.name);
-                quote! { #ident: ::wasm_bindgen::convert::IntoWasmAbi }
+                quote! { #ident }
             })
             .collect::<Vec<_>>();
-        render_generic_bounds(&bounds)
+        render_generic_bounds(&idents)
+    }
+
+    /// The per-monomorphization helpers' `where` clause: they lend their
+    /// values to setters taking `&T`, so each parameter needs the bound
+    /// wasm-bindgen puts on such an import.
+    fn helper_where_clause(&self) -> TokenStream {
+        if !CodegenContext::generic_mono(self.cgctx) || self.type_params.is_empty() {
+            return quote! {};
+        }
+        let idents = self
+            .type_params
+            .iter()
+            .map(|tp| super::typemap::make_ident(&tp.name));
+        quote! {
+            where #(for<'__wbg> &'__wbg #idents: ::wasm_bindgen::convert::IntoWasmAbi),*
+        }
     }
 
     /// Tokens for the type's generic-argument list (`<T, …>`) used in
@@ -1611,9 +1627,10 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         .iter()
         .all(Vec::is_empty)
         .then_some(default_impl);
+    let helper_where = config.helper_where_clause();
     if emit_builder || kept_builder {
         quote! {
-            impl #type_decl #rust_type {
+            impl #type_decl #rust_type #helper_where {
                 #(#new_variants)*
                 #(#builder_variants)*
             }
@@ -1623,7 +1640,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 inner: #rust_type,
             }
 
-            impl #type_decl #builder_name {
+            impl #type_decl #builder_name #helper_where {
                 #(#builder_methods)*
 
                 pub fn build(self) -> #rust_type {
@@ -1641,7 +1658,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         // All-required dictionary: the builder would be empty, so we
         // emit only `new*` factories on the dictionary type itself.
         quote! {
-            impl #type_decl #rust_type {
+            impl #type_decl #rust_type #helper_where {
                 #(#new_variants)*
             }
             #default_impl
@@ -1730,22 +1747,10 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 }
                 expanded_constructors = true;
 
-                // Without per-mono the constructor names the bare class and
+                // The constructor names the bare class in every mode;
                 // `generate_expanded_constructor` instantiates only the
-                // parameters its arguments mention; the rest default.
-                let per_mono = CodegenContext::generic_mono(config.cgctx);
-                let return_type = if per_mono && !config.type_params.is_empty() {
-                    TypeRef::generic(
-                        config.rust_name.clone(),
-                        config
-                            .type_params
-                            .iter()
-                            .map(|tp| TypeRef::ident(tp.name.clone()))
-                            .collect(),
-                    )
-                } else {
-                    TypeRef::ident(config.rust_name.clone())
-                };
+                // parameters its arguments mention and the rest default.
+                let return_type = TypeRef::ident(config.rust_name.clone());
                 // Each constructor resolves in the body of the declaration
                 // it is written in, or in its construct signature's own
                 // scope when that declares `<T>` (`new <T>(…): Foo<T>`).
@@ -2141,10 +2146,7 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
     // class parameter positionally by name.
     let param_tys: Vec<&TypeRef> = sig.params.iter().map(|p| &p.type_ref).collect();
     let mentioned = config.mentioned_type_param_names(scope, &param_tys);
-    let return_type = if CodegenContext::generic_mono(config.cgctx)
-        || config.type_params.is_empty()
-        || mentioned.is_empty()
-    {
+    let return_type = if config.type_params.is_empty() || mentioned.is_empty() {
         sig.return_type.clone()
     } else {
         // An unmentioned parameter's default can name an earlier one
@@ -2191,17 +2193,13 @@ fn generate_expanded_constructor(config: &ClassConfig, sig: &FunctionSignature) 
         wb_parts.push(quote! { catch });
     }
 
-    let mut bounds = if CodegenContext::generic_mono(config.cgctx) {
-        generic_bounds_for_method(config, sig)
-    } else {
-        // A constructor only binds the type parameters its own
-        // arguments mention; the rest are instantiated at their
-        // defaults in the return type so `Foo::new()` needs no turbofish.
-        mentioned
-            .iter()
-            .map(|n| CodegenContext::type_param_decl(config.cgctx, n))
-            .collect()
-    };
+    // A constructor only binds the type parameters its own arguments
+    // mention; the rest are instantiated at their defaults in the return
+    // type so `Foo::new()` needs no turbofish.
+    let mut bounds: Vec<TokenStream> = mentioned
+        .iter()
+        .map(|n| CodegenContext::type_param_decl(config.cgctx, n))
+        .collect();
     let params = generate_callable_params(
         &sig.params,
         &[],

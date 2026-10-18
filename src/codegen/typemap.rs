@@ -175,6 +175,12 @@ pub struct TypePosition {
     /// Whether this type is nested inside a generic or callback.
     /// When true, must use JS-compatible wrapper types.
     pub inner: bool,
+    /// Nested inside a `js_sys` container (`Promise`, `Array`, `Map`, `Set`,
+    /// the iterators, `Record`'s `Object`, a tuple's `ArrayTuple`) under
+    /// per-mono lowering, whose element APIs are monomorphized: primitive
+    /// leaves keep their Rust types (`Promise<String>`, `Map<String, f64>`)
+    /// rather than their handles. Callbacks and other erased generics reset it.
+    pub native_leaves: bool,
 }
 
 impl TypePosition {
@@ -182,16 +188,19 @@ impl TypePosition {
     pub const ARGUMENT: Self = Self {
         direction: Direction::Argument,
         inner: false,
+        native_leaves: false,
     };
     /// Top-level function return position.
     pub const RETURN: Self = Self {
         direction: Direction::Return,
         inner: false,
+        native_leaves: false,
     };
     /// Top-level return of a provided function: a write JS receives.
     pub const EXPORT_RETURN: Self = Self {
         direction: Direction::ExportReturn,
         inner: false,
+        native_leaves: false,
     };
 
     /// Convert to inner position (for generic type parameters).
@@ -200,6 +209,17 @@ impl TypePosition {
         Self {
             direction: self.direction,
             inner: true,
+            native_leaves: false,
+        }
+    }
+
+    /// Inner position of a `js_sys` container's type argument; see
+    /// [`Self::native_leaves`].
+    pub fn to_container(self, ctx: Option<&CodegenContext<'_>>) -> Self {
+        Self {
+            direction: self.direction,
+            inner: true,
+            native_leaves: CodegenContext::generic_mono(ctx),
         }
     }
 
@@ -2062,6 +2082,25 @@ pub fn to_syn_type(
         );
     }
 
+    if pos.native_leaves {
+        match ty {
+            TypeRef::Boolean | TypeRef::BooleanLiteral(_) => return quote! { bool },
+            TypeRef::Number | TypeRef::NumberLiteral(_) => return quote! { f64 },
+            TypeRef::String | TypeRef::StringLiteral(_) => return quote! { String },
+            _ => {}
+        }
+        // Rebase onto main: `T | undefined` / `T | null` are union arms, and
+        // the native leaf keeps main's `Option` / `Nullable` carriers.
+        if let Some((core, n, scope)) = split_empties_in(ty, ctx, scope) {
+            let inner_ty = to_syn_type(&core, pos, ctx, scope, from_module);
+            return if is_jsvalue_arg(&inner_ty) {
+                quote! { JsValue }
+            } else {
+                nullable_carrier(inner_ty, n)
+            };
+        }
+    }
+
     // When inner, intercept primitives and nullable early to use JS wrapper forms
     if pos.inner {
         match ty {
@@ -2274,7 +2313,7 @@ pub fn to_syn_type(
             let base = if elems.is_empty() {
                 quote! { Array }
             } else {
-                let inner_pos = pos.to_inner();
+                let inner_pos = pos.to_container(ctx);
                 let elem_types: Vec<TokenStream> = elems
                     .iter()
                     .map(|e| to_syn_type(e, inner_pos, ctx, scope, from_module))
@@ -2390,19 +2429,19 @@ pub fn to_syn_type(
             }
             if segments.len() == 1 && generic_args.is_empty() {
                 if let Some(c) = ctx {
+                    // A per-mono type parameter is lent like any other
+                    // argument: wasm-bindgen marshals `&T` through
+                    // `for<'a> &'a T: IntoWasmAbi`, which every handle,
+                    // string and primitive satisfies, so `&x` keeps `T = X`.
                     if c.experimental_generic_mono
                         && matches!(
                             c.gctx.scopes.resolve_binding(scope, &segments[0]),
                             Some(crate::parse::scope::Binding::TypeParam),
                         )
                     {
-                        return lower_reference(
-                            segments,
-                            generic_args,
-                            pos,
-                            ctx,
-                            scope,
-                            from_module,
+                        return maybe_ref(
+                            lower_reference(segments, generic_args, pos, ctx, scope, from_module),
+                            borrow,
                         );
                     }
                     // The target lowers from the alias's own scope, where
@@ -2437,7 +2476,7 @@ pub fn to_syn_type(
                 return to_syn_type(&target, pos, ctx, scope, from_module);
             }
             if let Some(repr) = ctx.and_then(|c| c.enum_repr(ty, scope)) {
-                if pos.inner {
+                if pos.inner && !pos.native_leaves {
                     return to_syn_type(&repr, pos, ctx, scope, from_module);
                 }
                 return lower_reference(segments, generic_args, pos, ctx, scope, from_module);
@@ -2494,7 +2533,7 @@ fn generic_container(
     scope: ScopeId,
     from_module: &ModuleContext,
 ) -> TokenStream {
-    let arg = to_syn_type(inner, pos.to_inner(), ctx, scope, from_module);
+    let arg = to_syn_type(inner, pos.to_container(ctx), ctx, scope, from_module);
     if is_jsvalue_arg(&arg) {
         base
     } else {
@@ -2922,7 +2961,7 @@ fn lower_reference(
             return generic_container(quote! { Set }, &inner, pos, ctx, scope, from_module);
         }
         "Map" | "ReadonlyMap" => {
-            let inner_pos = pos.to_inner();
+            let inner_pos = pos.to_container(ctx);
             let k = generic_args.first().cloned().unwrap_or(TypeRef::Any);
             let v = generic_args.get(1).cloned().unwrap_or(TypeRef::Any);
             let k_arg = to_syn_type(&k, inner_pos, ctx, scope, from_module);
@@ -4249,7 +4288,7 @@ fn mono_string_like(
                 leaf.unwrap_or_else(|| {
                     to_syn_type(
                         arg,
-                        TypePosition::ARGUMENT.to_inner(),
+                        TypePosition::ARGUMENT.to_container(Some(ctx)),
                         Some(ctx),
                         scope,
                         from_module,
@@ -5676,7 +5715,7 @@ mod tests {
             );
             assert_eq!(
                 ret(TypeRef::Array(Box::new(TypeRef::String))),
-                "Vec < Array < JsString > >"
+                "Vec < Array < String > >"
             );
         });
     }
@@ -5693,14 +5732,14 @@ mod tests {
                 user_arg(&TypeRef::ident("MaybeId"), ctx, scope),
                 "Nullable < String >"
             );
-            // Built-in containers keep wrapper elements.
+            // Built-in containers take native leaves too.
             assert_eq!(
                 user_arg(
                     &TypeRef::generic("Array", vec![TypeRef::String]),
                     ctx,
                     scope
                 ),
-                "Array < JsString >"
+                "Array < String >"
             );
             assert_eq!(
                 user_arg(&holder(TypeRef::ident("Id")), ctx, scope),
@@ -5728,7 +5767,7 @@ mod tests {
                     ctx,
                     scope
                 ),
-                "Array < JsString >"
+                "Array < Mode >"
             );
         });
     }

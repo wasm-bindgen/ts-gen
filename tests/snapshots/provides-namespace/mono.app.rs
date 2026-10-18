@@ -17,7 +17,7 @@ pub fn add(_a: f64, _b: f64) -> f64 {
 }
 
 /// Types from js_sys in a provider signature.
-pub fn sum(_values: Object<Number>) -> f64 {
+pub fn sum(_values: Object<f64>) -> f64 {
     todo!()
 }
 

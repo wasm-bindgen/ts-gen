@@ -201,11 +201,14 @@ pub mod polish {
         where
             Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
         #[wasm_bindgen(method, setter)]
-        pub fn set_value<T>(this: &Holder<T>, val: T)
+        pub fn set_value<T>(this: &Holder<T>, val: &T)
         where
-            T: ::wasm_bindgen::convert::IntoWasmAbi;
+            T: ::wasm_bindgen::convert::RefIntoWasmAbi;
     }
-    impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Holder<T> {
+    impl<T> Holder<T>
+    where
+        for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
         pub fn new() -> Holder<T> {
             Self::builder().build()
         }
@@ -215,7 +218,7 @@ pub mod polish {
             }
         }
     }
-    impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Default for Holder<T> {
+    impl<T> Default for Holder<T> {
         fn default() -> Self {
             Self::new()
         }
@@ -223,8 +226,11 @@ pub mod polish {
     pub struct HolderBuilder<T> {
         inner: Holder<T>,
     }
-    impl<T: ::wasm_bindgen::convert::IntoWasmAbi> HolderBuilder<T> {
-        pub fn value(self, val: T) -> Self {
+    impl<T> HolderBuilder<T>
+    where
+        for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+    {
+        pub fn value(self, val: &T) -> Self {
             self.inner.set_value(val);
             self
         }
@@ -232,7 +238,7 @@ pub mod polish {
             self.inner
         }
     }
-    impl<T: ::wasm_bindgen::convert::IntoWasmAbi> From<Holder<T>> for HolderBuilder<T> {
+    impl<T> From<Holder<T>> for HolderBuilder<T> {
         fn from(inner: Holder<T>) -> Self {
             Self { inner }
         }

@@ -14,12 +14,15 @@ extern "C" {
     where
         T: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<T>(this: &DefaultDetails<T>, val: T)
+    pub fn set_value<T>(this: &DefaultDetails<T>, val: &T)
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> DefaultDetails<T> {
-    pub fn new(value: T) -> DefaultDetails<T> {
+impl<T> DefaultDetails<T>
+where
+    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+{
+    pub fn new(value: &T) -> DefaultDetails<T> {
         let inner: DefaultDetails<T> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_value(value);
         inner
@@ -72,5 +75,5 @@ extern "C" {
         this: &DefaultFlags,
     ) -> Result<Array<JsString>, JsValue>;
     #[wasm_bindgen(method, js_name = "getStringArray")]
-    pub fn get_string_array_promise(this: &DefaultFlags) -> Promise<Array<JsString>>;
+    pub fn get_string_array_promise(this: &DefaultFlags) -> Promise<Array<String>>;
 }

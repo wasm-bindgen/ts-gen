@@ -14,22 +14,24 @@ extern "C" {
     where
         T: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<T, E>(this: &ResultBox<T, E>, val: T)
+    pub fn set_value<T, E>(this: &ResultBox<T, E>, val: &T)
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, getter)]
     pub fn error<T, E>(this: &ResultBox<T, E>) -> E
     where
         E: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_error<T, E>(this: &ResultBox<T, E>, val: E)
+    pub fn set_error<T, E>(this: &ResultBox<T, E>, val: &E)
     where
-        E: ::wasm_bindgen::convert::IntoWasmAbi;
+        E: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi, E: ::wasm_bindgen::convert::IntoWasmAbi>
-    ResultBox<T, E>
+impl<T, E> ResultBox<T, E>
+where
+    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg E: ::wasm_bindgen::convert::IntoWasmAbi,
 {
-    pub fn new(value: T, error: E) -> ResultBox<T, E> {
+    pub fn new(value: &T, error: &E) -> ResultBox<T, E> {
         let inner: ResultBox<T, E> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_value(value);
         inner.set_error(error);

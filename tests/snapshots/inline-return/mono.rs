@@ -30,11 +30,14 @@ extern "C" {
     where
         Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<T>(this: &CursorNextReturn<T>, val: T)
+    pub fn set_value<T>(this: &CursorNextReturn<T>, val: &T)
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> CursorNextReturn<T> {
+impl<T> CursorNextReturn<T>
+where
+    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+{
     pub fn new() -> CursorNextReturn<T> {
         Self::builder().build()
     }
@@ -44,7 +47,7 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> CursorNextReturn<T> {
         }
     }
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Default for CursorNextReturn<T> {
+impl<T> Default for CursorNextReturn<T> {
     fn default() -> Self {
         Self::new()
     }
@@ -52,12 +55,15 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Default for CursorNextReturn<T> {
 pub struct CursorNextReturnBuilder<T> {
     inner: CursorNextReturn<T>,
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> CursorNextReturnBuilder<T> {
+impl<T> CursorNextReturnBuilder<T>
+where
+    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+{
     pub fn done(self, val: bool) -> Self {
         self.inner.set_done(val);
         self
     }
-    pub fn value(self, val: T) -> Self {
+    pub fn value(self, val: &T) -> Self {
         self.inner.set_value(val);
         self
     }
@@ -65,9 +71,7 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> CursorNextReturnBuilder<T> {
         self.inner
     }
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> From<CursorNextReturn<T>>
-    for CursorNextReturnBuilder<T>
-{
+impl<T> From<CursorNextReturn<T>> for CursorNextReturnBuilder<T> {
     fn from(inner: CursorNextReturn<T>) -> Self {
         Self { inner }
     }

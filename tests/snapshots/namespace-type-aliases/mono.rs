@@ -20,7 +20,7 @@ extern "C" {
 #[wasm_bindgen(module = "namespace-type-aliases", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "outerPair")]
-    pub fn outer_pair(r: &ArrayTuple<(Number, JsString)>) -> Result<(), JsValue>;
+    pub fn outer_pair(r: &ArrayTuple<(f64, String)>) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "namespace-type-aliases", experimental_generic_mono)]
 extern "C" {
@@ -43,7 +43,7 @@ extern "C" {
 #[wasm_bindgen(module = "namespace-type-aliases", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn tagged(t: &ArrayTuple<(Number, events::Shadowed)>) -> Result<(), JsValue>;
+    pub fn tagged(t: &ArrayTuple<(f64, events::Shadowed)>) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -116,7 +116,7 @@ pub mod events {
     #[allow(dead_code)]
     pub type Loose = JsValue;
     #[allow(dead_code)]
-    pub type Result_<T> = ArrayTuple<(T, JsString)>;
+    pub type Result_<T> = ArrayTuple<(T, String)>;
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch, js_namespace = "Events")]
@@ -136,9 +136,7 @@ pub mod events {
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch, js_namespace = "Events")]
-        pub fn pair(
-            p: &ArrayTuple<(JsString, Number)>,
-        ) -> Result<ArrayTuple<(Number, JsString)>, JsValue>;
+        pub fn pair(p: &ArrayTuple<(String, f64)>) -> Result<ArrayTuple<(f64, String)>, JsValue>;
     }
     pub mod inner {
         #[allow(unused_imports)]

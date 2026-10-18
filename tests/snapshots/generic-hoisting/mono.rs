@@ -60,9 +60,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Envelope<Meta = JsValue, Body = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<Meta, Body>(
-        label: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Envelope<Meta, Body>, JsValue>;
+    pub fn new(label: impl ::wasm_bindgen::JsStringLike) -> Result<Envelope, JsValue>;
     #[wasm_bindgen(method, getter)]
     pub fn label<Meta, Body>(this: &Envelope<Meta, Body>) -> String;
     #[wasm_bindgen(method, getter, js_name = "label")]
@@ -121,7 +119,7 @@ extern "C" {
     pub fn send_async_promise<Meta, Body>(
         this: &Courier,
         envelope: &Envelope<Meta, Body>,
-    ) -> Result<Promise<JsString>, JsValue>;
+    ) -> Result<Promise<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "sendEither")]
     pub fn send_either<Meta, Body>(
         this: &Courier,
@@ -190,25 +188,25 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "postAsync")]
     pub fn post_async_promise<Meta, Body>(
         envelope: &Envelope<Meta, Body>,
-    ) -> Result<Promise<JsString>, JsValue>;
+    ) -> Result<Promise<String>, JsValue>;
 }
 #[wasm_bindgen(module = "generic-hoisting", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
     pub fn relay<Meta, Meta2, Body>(
         envelope: &Envelope<Meta2, Body>,
-        meta: Meta,
+        meta: &Meta,
     ) -> Result<String, JsValue>
     where
-        Meta: ::wasm_bindgen::convert::IntoWasmAbi;
+        Meta: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
 #[wasm_bindgen(module = "generic-hoisting", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "relay")]
     pub fn relay_js_string<Meta, Meta2, Body>(
         envelope: &Envelope<Meta2, Body>,
-        meta: Meta,
+        meta: &Meta,
     ) -> Result<JsString, JsValue>
     where
-        Meta: ::wasm_bindgen::convert::IntoWasmAbi;
+        Meta: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }

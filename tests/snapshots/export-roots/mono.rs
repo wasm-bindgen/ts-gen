@@ -243,7 +243,7 @@ impl From<ListDefaults> for ListDefaultsBuilder {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "listBuckets")]
-    pub fn list_buckets() -> Result<Map<JsString, ListDefaults>, JsValue>;
+    pub fn list_buckets() -> Result<Map<String, ListDefaults>, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

@@ -224,9 +224,9 @@ extern "C" {
     where
         T: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<T>(this: &Box_<T>, val: T)
+    pub fn set_value<T>(this: &Box_<T>, val: &T)
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, catch)]
     pub fn unwrap<T>(this: &Box_<T>) -> Result<T, JsValue>
     where

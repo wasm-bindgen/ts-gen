@@ -29,7 +29,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type EventTarget<EventMap = Object<Event>>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<EventMap>() -> Result<EventTarget<EventMap>, JsValue>;
+    pub fn new() -> Result<EventTarget, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "dispatchEvent")]
     pub fn dispatch_event<EventMap>(
         this: &EventTarget<EventMap>,
@@ -77,20 +77,22 @@ extern "C" {
     where
         Option<I>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter, js_name = "readableType")]
-    pub fn set_readable_type<I, O>(this: &Transformer<I, O>, val: I)
+    pub fn set_readable_type<I, O>(this: &Transformer<I, O>, val: &I)
     where
-        I: ::wasm_bindgen::convert::IntoWasmAbi;
+        I: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, getter, js_name = "writableType")]
     pub fn writable_type<I, O>(this: &Transformer<I, O>) -> Option<O>
     where
         Option<O>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter, js_name = "writableType")]
-    pub fn set_writable_type<I, O>(this: &Transformer<I, O>, val: O)
+    pub fn set_writable_type<I, O>(this: &Transformer<I, O>, val: &O)
     where
-        O: ::wasm_bindgen::convert::IntoWasmAbi;
+        O: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
-impl<I: ::wasm_bindgen::convert::IntoWasmAbi, O: ::wasm_bindgen::convert::IntoWasmAbi>
-    Transformer<I, O>
+impl<I, O> Transformer<I, O>
+where
+    for<'__wbg> &'__wbg I: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg O: ::wasm_bindgen::convert::IntoWasmAbi,
 {
     pub fn new() -> Transformer<I, O> {
         Self::builder().build()
@@ -101,9 +103,7 @@ impl<I: ::wasm_bindgen::convert::IntoWasmAbi, O: ::wasm_bindgen::convert::IntoWa
         }
     }
 }
-impl<I: ::wasm_bindgen::convert::IntoWasmAbi, O: ::wasm_bindgen::convert::IntoWasmAbi> Default
-    for Transformer<I, O>
-{
+impl<I, O> Default for Transformer<I, O> {
     fn default() -> Self {
         Self::new()
     }
@@ -111,14 +111,16 @@ impl<I: ::wasm_bindgen::convert::IntoWasmAbi, O: ::wasm_bindgen::convert::IntoWa
 pub struct TransformerBuilder<I, O> {
     inner: Transformer<I, O>,
 }
-impl<I: ::wasm_bindgen::convert::IntoWasmAbi, O: ::wasm_bindgen::convert::IntoWasmAbi>
-    TransformerBuilder<I, O>
+impl<I, O> TransformerBuilder<I, O>
+where
+    for<'__wbg> &'__wbg I: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg O: ::wasm_bindgen::convert::IntoWasmAbi,
 {
-    pub fn readable_type(self, val: I) -> Self {
+    pub fn readable_type(self, val: &I) -> Self {
         self.inner.set_readable_type(val);
         self
     }
-    pub fn writable_type(self, val: O) -> Self {
+    pub fn writable_type(self, val: &O) -> Self {
         self.inner.set_writable_type(val);
         self
     }
@@ -126,9 +128,7 @@ impl<I: ::wasm_bindgen::convert::IntoWasmAbi, O: ::wasm_bindgen::convert::IntoWa
         self.inner
     }
 }
-impl<I: ::wasm_bindgen::convert::IntoWasmAbi, O: ::wasm_bindgen::convert::IntoWasmAbi>
-    From<Transformer<I, O>> for TransformerBuilder<I, O>
-{
+impl<I, O> From<Transformer<I, O>> for TransformerBuilder<I, O> {
     fn from(inner: Transformer<I, O>) -> Self {
         Self { inner }
     }
@@ -139,7 +139,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type TransformStream<I = JsValue, O = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<I, O>() -> Result<TransformStream<I, O>, JsValue>;
+    pub fn new() -> Result<TransformStream, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_transformer<I, O>(
         transformer: &Transformer<I, O>,
@@ -153,15 +153,15 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Labelled<T = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<T>(value: T) -> Result<Labelled<T>, JsValue>
+    pub fn new<T>(value: &T) -> Result<Labelled<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
     # [wasm_bindgen (static_method_of = Labelled , catch)]
     pub fn empty() -> Result<Labelled, JsValue>;
     # [wasm_bindgen (static_method_of = Labelled , catch)]
-    pub fn of<T>(value: T) -> Result<Labelled<T>, JsValue>
+    pub fn of<T>(value: &T) -> Result<Labelled<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
     # [wasm_bindgen (static_method_of = Labelled , catch)]
     pub async fn load<T>() -> Result<T, JsValue>
     where
@@ -179,9 +179,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Chained<A = JsString, B = A, C = Number>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<A, B, C>(c: C) -> Result<Chained<A, B, C>, JsValue>
+    pub fn new<C>(c: &C) -> Result<Chained<String, String, C>, JsValue>
     where
-        C: ::wasm_bindgen::convert::IntoWasmAbi;
+        C: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

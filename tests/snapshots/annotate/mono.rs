@@ -122,10 +122,7 @@ extern "C" {
         key: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, js_name = "delete")]
-    pub fn delete_promise(
-        this: &Storage,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Boolean>;
+    pub fn delete_promise(this: &Storage, key: impl ::wasm_bindgen::JsStringLike) -> Promise<bool>;
     #[wasm_bindgen(method, catch, js_name = "delete")]
     pub async fn delete_with_keys(
         this: &Storage,
@@ -269,9 +266,7 @@ extern "C" {
     where
         Option<Cf>: ::wasm_bindgen::convert::FromWasmAbi;
 }
-impl<Meta: ::wasm_bindgen::convert::IntoWasmAbi, Cf: ::wasm_bindgen::convert::IntoWasmAbi>
-    Request<Meta, Cf>
-{
+impl<Meta, Cf> Request<Meta, Cf> {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Request<Meta, Cf> {
         #[allow(unused_unsafe)]
@@ -280,9 +275,7 @@ impl<Meta: ::wasm_bindgen::convert::IntoWasmAbi, Cf: ::wasm_bindgen::convert::In
         }
     }
 }
-impl<Meta: ::wasm_bindgen::convert::IntoWasmAbi, Cf: ::wasm_bindgen::convert::IntoWasmAbi> Default
-    for Request<Meta, Cf>
-{
+impl<Meta, Cf> Default for Request<Meta, Cf> {
     fn default() -> Self {
         Self::new()
     }

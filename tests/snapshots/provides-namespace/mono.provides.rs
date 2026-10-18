@@ -17,7 +17,7 @@ pub fn add(a: f64, b: f64) -> f64 {
 }
 
 #[wasm_bindgen(js_name = "sum")]
-pub fn sum(values: Object<Number>) -> f64 {
+pub fn sum(values: Object<f64>) -> f64 {
     super::app::sum(values)
 }
 

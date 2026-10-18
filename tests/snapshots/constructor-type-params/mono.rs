@@ -10,11 +10,11 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Holder<Value = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<Value>() -> Result<Holder<Value>, JsValue>;
+    pub fn new() -> Result<Holder, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_initial<Value>(initial: Value) -> Result<Holder<Value>, JsValue>
+    pub fn new_with_initial<Value>(initial: &Value) -> Result<Holder<Value>, JsValue>
     where
-        Value: ::wasm_bindgen::convert::IntoWasmAbi;
+        Value: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, getter)]
     pub fn value<Value>(this: &Holder<Value>) -> Option<Value>
     where
@@ -28,10 +28,10 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Pair<A = JsValue, B = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<A, B>(first: A, second: B) -> Result<Pair<A, B>, JsValue>
+    pub fn new<A, B>(first: &A, second: &B) -> Result<Pair<A, B>, JsValue>
     where
-        A: ::wasm_bindgen::convert::IntoWasmAbi,
-        B: ::wasm_bindgen::convert::IntoWasmAbi;
+        A: ::wasm_bindgen::convert::RefIntoWasmAbi,
+        B: ::wasm_bindgen::convert::RefIntoWasmAbi;
     # [wasm_bindgen (static_method_of = Pair , catch)]
     pub fn swap<A, B>(pair: &Pair<A, B>) -> Result<Pair<B, A>, JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -49,15 +49,15 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Slot<T = JsString>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<T>(value: T) -> Result<Slot<T>, JsValue>
+    pub fn new<T>(value: &T) -> Result<Slot<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, getter)]
     pub fn value<T>(this: &Slot<T>) -> T
     where
         T: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<T>(this: &Slot<T>, val: T)
+    pub fn set_value<T>(this: &Slot<T>, val: &T)
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }

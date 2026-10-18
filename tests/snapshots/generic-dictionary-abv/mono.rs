@@ -33,9 +33,9 @@ extern "C" {
     where
         Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<T>(this: &GenAbv<T>, val: T)
+    pub fn set_value<T>(this: &GenAbv<T>, val: &T)
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, getter)]
     pub fn data<T>(this: &GenAbv<T>) -> Option<Uint8Array>;
     #[wasm_bindgen(method, setter)]
@@ -43,7 +43,10 @@ extern "C" {
     where
         V: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> GenAbv<T> {
+impl<T> GenAbv<T>
+where
+    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+{
     pub fn new() -> GenAbv<T> {
         Self::builder().build()
     }
@@ -53,7 +56,7 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> GenAbv<T> {
         }
     }
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Default for GenAbv<T> {
+impl<T> Default for GenAbv<T> {
     fn default() -> Self {
         Self::new()
     }
@@ -61,8 +64,11 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Default for GenAbv<T> {
 pub struct GenAbvBuilder<T> {
     inner: GenAbv<T>,
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> GenAbvBuilder<T> {
-    pub fn value(self, val: T) -> Self {
+impl<T> GenAbvBuilder<T>
+where
+    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+{
+    pub fn value(self, val: &T) -> Self {
         self.inner.set_value(val);
         self
     }
@@ -77,7 +83,7 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> GenAbvBuilder<T> {
         self.inner
     }
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> From<GenAbv<T>> for GenAbvBuilder<T> {
+impl<T> From<GenAbv<T>> for GenAbvBuilder<T> {
     fn from(inner: GenAbv<T>) -> Self {
         Self { inner }
     }
@@ -92,9 +98,9 @@ extern "C" {
     where
         T: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<T>(this: &ReqAbv<T>, val: T)
+    pub fn set_value<T>(this: &ReqAbv<T>, val: &T)
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, getter)]
     pub fn data<T>(this: &ReqAbv<T>) -> Uint8Array;
     #[wasm_bindgen(method, setter)]
@@ -112,9 +118,12 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_owner<T>(this: &ReqAbv<T>, val: &U);
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> ReqAbv<T> {
+impl<T> ReqAbv<T>
+where
+    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+{
     pub fn new<V: ::js_sys::TypedArray, W: ::js_sys::TypedArray>(
-        value: T,
+        value: &T,
         data: &V,
         other: &W,
         owner: &U,

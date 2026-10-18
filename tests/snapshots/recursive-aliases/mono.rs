@@ -39,7 +39,7 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn wrapped(w: &Wrapped, nested: &[Array<JsString>]) -> Result<(), JsValue>;
+    pub fn wrapped(w: &Wrapped, nested: &[Array<String>]) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

@@ -146,7 +146,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "text")]
     pub async fn text_js_string(this: &Body) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, js_name = "text")]
-    pub fn text_promise(this: &Body) -> Promise<JsString>;
+    pub fn text_promise(this: &Body) -> Promise<String>;
     #[wasm_bindgen(method, catch)]
     pub async fn json<T>(this: &Body) -> Result<T, JsValue>
     where
@@ -187,7 +187,7 @@ extern "C" {
         val: &[Array<impl ::wasm_bindgen::JsStringLike>],
     );
     #[wasm_bindgen(method, setter, js_name = "headers")]
-    pub fn set_headers_with_record(this: &ResponseInit, val: &Object<JsString>);
+    pub fn set_headers_with_record(this: &ResponseInit, val: &Object<String>);
 }
 impl ResponseInit {
     pub fn new() -> ResponseInit {
@@ -224,7 +224,7 @@ impl ResponseInitBuilder {
         self.inner.set_headers_with_slice(val);
         self
     }
-    pub fn headers_with_record(self, val: &Object<JsString>) -> Self {
+    pub fn headers_with_record(self, val: &Object<String>) -> Self {
         self.inner.set_headers_with_record(val);
         self
     }
@@ -609,6 +609,6 @@ extern "C" {
 #[wasm_bindgen(private, fallback)]
 pub enum HeadersKind {
     Headers(Headers),
-    VecOfVecOfString(Vec<Array<JsString>>),
-    Record(Object<JsString>),
+    VecOfVecOfString(Vec<Array<String>>),
+    Record(Object<String>),
 }

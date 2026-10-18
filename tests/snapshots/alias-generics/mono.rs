@@ -14,7 +14,7 @@ extern "C" {
     where
         Meta: ::wasm_bindgen::convert::FromWasmAbi;
 }
-impl<Meta: ::wasm_bindgen::convert::IntoWasmAbi> Request<Meta> {
+impl<Meta> Request<Meta> {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Request<Meta> {
         #[allow(unused_unsafe)]
@@ -51,13 +51,13 @@ extern "C" {
         input: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn pairs(this: &Client) -> Result<ArrayTuple<(Number, JsString)>, JsValue>;
+    pub async fn pairs(this: &Client) -> Result<ArrayTuple<(f64, String)>, JsValue>;
     #[wasm_bindgen(method, js_name = "pairs")]
-    pub fn pairs_promise(this: &Client) -> Promise<ArrayTuple<(Number, JsString)>>;
+    pub fn pairs_promise(this: &Client) -> Promise<ArrayTuple<(f64, String)>>;
     #[wasm_bindgen(method, catch)]
-    pub async fn same(this: &Client) -> Result<ArrayTuple<(Number, Number)>, JsValue>;
+    pub async fn same(this: &Client) -> Result<ArrayTuple<(f64, f64)>, JsValue>;
     #[wasm_bindgen(method, js_name = "same")]
-    pub fn same_promise(this: &Client) -> Promise<ArrayTuple<(Number, Number)>>;
+    pub fn same_promise(this: &Client) -> Promise<ArrayTuple<(f64, f64)>>;
     #[wasm_bindgen(method, catch)]
     pub fn boxed(this: &Client, items: &[impl ::wasm_bindgen::JsStringLike])
         -> Result<(), JsValue>;
@@ -120,7 +120,7 @@ pub mod uses {
     #[wasm_bindgen(module = "uses", experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch)]
-        pub fn tag(t: &ArrayTuple<(JsString, super::shapes::_Shape)>) -> Result<(), JsValue>;
+        pub fn tag(t: &ArrayTuple<(String, super::shapes::_Shape)>) -> Result<(), JsValue>;
     }
     #[wasm_bindgen(module = "uses", experimental_generic_mono)]
     extern "C" {

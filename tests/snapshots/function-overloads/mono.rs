@@ -64,9 +64,9 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn gen<T>(x: T) -> Result<T, JsValue>
+    pub fn gen<T>(x: &T) -> Result<T, JsValue>
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::FromWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi + ::wasm_bindgen::convert::FromWasmAbi;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -110,9 +110,9 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "sz")]
     pub fn sz_with_f64(this: &Twin, x: f64) -> Result<f64, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn gen<T>(this: &Twin, x: T) -> Result<T, JsValue>
+    pub fn gen<T>(this: &Twin, x: &T) -> Result<T, JsValue>
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::convert::FromWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi + ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, catch, js_name = "gen")]
     pub fn gen_with_f64_and_y(this: &Twin, x: f64, y: f64) -> Result<f64, JsValue>;
     #[doc = " Reads text."]

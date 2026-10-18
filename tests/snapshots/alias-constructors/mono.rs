@@ -19,9 +19,9 @@ pub type Wrap<T> = Stub<T>;
 #[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(constructor, js_class = "Wrap", catch)]
-    pub fn new<T>(value: T) -> Result<Stub<T>, JsValue>
+    pub fn new<T>(value: &T) -> Result<Stub<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
 #[wasm_bindgen(module = "alias-constructors", experimental_generic_mono)]
 extern "C" {

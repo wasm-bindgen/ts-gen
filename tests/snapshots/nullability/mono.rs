@@ -943,9 +943,9 @@ pub fn empties_only_with_null() -> Result<Option<Null>, JsValue> {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn generic<T>(x: T) -> Result<Option<T>, JsValue>
+    pub fn generic<T>(x: &T) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi,
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
         Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
@@ -971,9 +971,9 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "genericBoth")]
-    pub fn generic_both_with_x<T>(x: T) -> Result<Option<T>, JsValue>
+    pub fn generic_both_with_x<T>(x: &T) -> Result<Option<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi,
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi,
         Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
@@ -992,15 +992,12 @@ where
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn inner(
-        xs: &Promise<JsNullable<JsString>>,
-        ys: &[JsOption<Number>],
-    ) -> Result<(), JsValue>;
+    pub fn inner(xs: &Promise<Nullable<String>>, ys: &[JsOption<Number>]) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "innerBoth")]
-    pub fn inner_both(xs: &Promise<JsNullable<JsString>>) -> Result<(), JsValue>;
+    pub fn inner_both(xs: &Promise<Option<Nullable<String>>>) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
@@ -1010,7 +1007,7 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn record(r: &Object<JsNullable<JsString>>) -> Result<Object<JsOption<Number>>, JsValue>;
+    pub fn record(r: &Object<Nullable<String>>) -> Result<Object<Option<f64>>, JsValue>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {

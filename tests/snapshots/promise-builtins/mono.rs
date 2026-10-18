@@ -22,9 +22,8 @@ extern "C" {
 extern "C" {
     #[doc = " The `--lib-name` module is the user's: `Result<Promise<JsString>, JsValue>`."]
     #[wasm_bindgen(catch, js_name = "load")]
-    pub fn load_promise(
-        url: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Promise<JsString>, JsValue>;
+    pub fn load_promise(url: impl ::wasm_bindgen::JsStringLike)
+        -> Result<Promise<String>, JsValue>;
 }
 #[wasm_bindgen(module = "promise-builtins", experimental_generic_mono)]
 extern "C" {
@@ -44,9 +43,8 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `TypeError` — on a malformed key"]
     #[wasm_bindgen(catch, js_name = "count")]
-    pub fn count_promise(
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Promise<Number>, TypeError>;
+    pub fn count_promise(key: impl ::wasm_bindgen::JsStringLike)
+        -> Result<Promise<f64>, TypeError>;
 }
 #[wasm_bindgen(module = "promise-builtins", experimental_generic_mono)]
 extern "C" {
@@ -58,7 +56,7 @@ extern "C" {
 extern "C" {
     #[doc = " Declared `async`: plain `Promise<Number>`."]
     #[wasm_bindgen(js_name = "size")]
-    pub fn size_promise(key: impl ::wasm_bindgen::JsStringLike) -> Promise<Number>;
+    pub fn size_promise(key: impl ::wasm_bindgen::JsStringLike) -> Promise<f64>;
 }
 #[wasm_bindgen(module = "promise-builtins", experimental_generic_mono)]
 extern "C" {
@@ -82,7 +80,7 @@ extern "C" {
     pub fn get_promise(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Promise<JsString>, JsValue>;
+    ) -> Result<Promise<String>, JsValue>;
     #[doc = " Declared `async`: plain."]
     #[wasm_bindgen(method, catch)]
     pub async fn put(
@@ -212,7 +210,7 @@ pub mod node {
         extern "C" {
             #[doc = " `node:` builtin: plain."]
             #[wasm_bindgen(js_name = "readFile")]
-            pub fn read_file_promise(path: impl ::wasm_bindgen::JsStringLike) -> Promise<JsString>;
+            pub fn read_file_promise(path: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
         }
     }
 }
@@ -237,7 +235,7 @@ pub mod fs {
     extern "C" {
         #[doc = " Bare Node builtin: plain."]
         #[wasm_bindgen(js_name = "readFile")]
-        pub fn read_file_promise(path: impl ::wasm_bindgen::JsStringLike) -> Promise<JsString>;
+        pub fn read_file_promise(path: impl ::wasm_bindgen::JsStringLike) -> Promise<String>;
     }
 }
 pub mod cloudflare {
@@ -290,7 +288,7 @@ pub mod bun {
         extern "C" {
             #[doc = " Any other specifier with a `scheme:` is a builtin: plain."]
             #[wasm_bindgen(js_name = "open")]
-            pub fn open_promise(path: impl ::wasm_bindgen::JsStringLike) -> Promise<Number>;
+            pub fn open_promise(path: impl ::wasm_bindgen::JsStringLike) -> Promise<f64>;
         }
     }
 }
@@ -317,7 +315,7 @@ pub mod user_lib {
         #[wasm_bindgen(catch, js_name = "fetchText")]
         pub fn fetch_text_promise(
             url: impl ::wasm_bindgen::JsStringLike,
-        ) -> Result<Promise<JsString>, JsValue>;
+        ) -> Result<Promise<String>, JsValue>;
     }
 }
 pub mod npm {
@@ -348,7 +346,7 @@ pub mod npm {
             #[wasm_bindgen(catch, js_name = "fetchText")]
             pub fn fetch_text_promise(
                 url: impl ::wasm_bindgen::JsStringLike,
-            ) -> Result<Promise<JsString>, JsValue>;
+            ) -> Result<Promise<String>, JsValue>;
         }
     }
 }
@@ -383,7 +381,7 @@ pub mod jsr {
                 #[wasm_bindgen(catch, js_name = "fetchText")]
                 pub fn fetch_text_promise(
                     url: impl ::wasm_bindgen::JsStringLike,
-                ) -> Result<Promise<JsString>, JsValue>;
+                ) -> Result<Promise<String>, JsValue>;
             }
         }
     }
@@ -419,7 +417,7 @@ pub mod https {
                 #[wasm_bindgen(catch, js_name = "fetchText")]
                 pub fn fetch_text_promise(
                     url: impl ::wasm_bindgen::JsStringLike,
-                ) -> Result<Promise<JsString>, JsValue>;
+                ) -> Result<Promise<String>, JsValue>;
             }
         }
     }

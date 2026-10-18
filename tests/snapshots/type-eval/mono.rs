@@ -259,7 +259,10 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "largestUnit")]
     pub fn set_largest_unit<U>(this: &Rounding<U>, val: LargestUnitKind);
 }
-impl<U: ::wasm_bindgen::convert::IntoWasmAbi> Rounding<U> {
+impl<U> Rounding<U>
+where
+    for<'__wbg> &'__wbg U: ::wasm_bindgen::convert::IntoWasmAbi,
+{
     pub fn new() -> Rounding<U> {
         Self::builder().build()
     }
@@ -269,7 +272,7 @@ impl<U: ::wasm_bindgen::convert::IntoWasmAbi> Rounding<U> {
         }
     }
 }
-impl<U: ::wasm_bindgen::convert::IntoWasmAbi> Default for Rounding<U> {
+impl<U> Default for Rounding<U> {
     fn default() -> Self {
         Self::new()
     }
@@ -277,7 +280,10 @@ impl<U: ::wasm_bindgen::convert::IntoWasmAbi> Default for Rounding<U> {
 pub struct RoundingBuilder<U> {
     inner: Rounding<U>,
 }
-impl<U: ::wasm_bindgen::convert::IntoWasmAbi> RoundingBuilder<U> {
+impl<U> RoundingBuilder<U>
+where
+    for<'__wbg> &'__wbg U: ::wasm_bindgen::convert::IntoWasmAbi,
+{
     pub fn smallest_unit(self, val: Plural) -> Self {
         self.inner.set_smallest_unit(val);
         self
@@ -290,7 +296,7 @@ impl<U: ::wasm_bindgen::convert::IntoWasmAbi> RoundingBuilder<U> {
         self.inner
     }
 }
-impl<U: ::wasm_bindgen::convert::IntoWasmAbi> From<Rounding<U>> for RoundingBuilder<U> {
+impl<U> From<Rounding<U>> for RoundingBuilder<U> {
     fn from(inner: Rounding<U>) -> Self {
         Self { inner }
     }
@@ -310,9 +316,9 @@ extern "C" {
     where
         T: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<T>(this: &Box_<T>, val: T)
+    pub fn set_value<T>(this: &Box_<T>, val: &T)
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, getter)]
     pub fn label<T>(this: &Box_<T>) -> String;
     #[wasm_bindgen(method, getter, js_name = "label")]
@@ -320,8 +326,11 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_label<T>(this: &Box_<T>, val: impl ::wasm_bindgen::JsStringLike);
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Box_<T> {
-    pub fn new(value: T, label: impl ::wasm_bindgen::JsStringLike) -> Box_<T> {
+impl<T> Box_<T>
+where
+    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+{
+    pub fn new(value: &T, label: impl ::wasm_bindgen::JsStringLike) -> Box_<T> {
         let inner: Box_<T> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_value(value);
         inner.set_label(label);
@@ -338,7 +347,10 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_partial<T>(this: &Holder<T>, val: &PartialBox<T>);
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Holder<T> {
+impl<T> Holder<T>
+where
+    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+{
     pub fn new(partial: &PartialBox<T>) -> Holder<T> {
         let inner: Holder<T> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_partial(partial);
@@ -510,9 +522,9 @@ extern "C" {
 #[wasm_bindgen(module = "type-eval", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn unbound<T>(keys: &JsValue, partial: T) -> Result<(), JsValue>
+    pub fn unbound<T>(keys: &JsValue, partial: &T) -> Result<(), JsValue>
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -736,9 +748,9 @@ extern "C" {
     where
         Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<T>(this: &PartialBox<T>, val: T)
+    pub fn set_value<T>(this: &PartialBox<T>, val: &T)
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, getter)]
     pub fn label<T>(this: &PartialBox<T>) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "label")]
@@ -746,7 +758,10 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_label<T>(this: &PartialBox<T>, val: impl ::wasm_bindgen::JsStringLike);
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> PartialBox<T> {
+impl<T> PartialBox<T>
+where
+    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+{
     pub fn new() -> PartialBox<T> {
         Self::builder().build()
     }
@@ -756,7 +771,7 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> PartialBox<T> {
         }
     }
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Default for PartialBox<T> {
+impl<T> Default for PartialBox<T> {
     fn default() -> Self {
         Self::new()
     }
@@ -764,8 +779,11 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> Default for PartialBox<T> {
 pub struct PartialBoxBuilder<T> {
     inner: PartialBox<T>,
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> PartialBoxBuilder<T> {
-    pub fn value(self, val: T) -> Self {
+impl<T> PartialBoxBuilder<T>
+where
+    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+{
+    pub fn value(self, val: &T) -> Self {
         self.inner.set_value(val);
         self
     }
@@ -777,7 +795,7 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> PartialBoxBuilder<T> {
         self.inner
     }
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> From<PartialBox<T>> for PartialBoxBuilder<T> {
+impl<T> From<PartialBox<T>> for PartialBoxBuilder<T> {
     fn from(inner: PartialBox<T>) -> Self {
         Self { inner }
     }

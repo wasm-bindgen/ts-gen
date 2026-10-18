@@ -49,7 +49,7 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = "asyncByAlias")]
     pub fn async_by_alias_promise(
         id: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<Promise<JsString>, JsValue>;
+    ) -> Result<Promise<String>, JsValue>;
 }
 #[wasm_bindgen(module = "generic-mono-review", experimental_generic_mono)]
 extern "C" {
@@ -62,9 +62,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Holder<T = JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new<T>(value: T) -> Result<Holder<T>, JsValue>
+    pub fn new<T>(value: &T) -> Result<Holder<T>, JsValue>
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, catch)]
     pub fn get<T>(this: &Holder<T>) -> Result<T, JsValue>
     where

@@ -56,13 +56,13 @@ pub mod inspect {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Formatter<T = JsValue>;
         #[wasm_bindgen(method, catch)]
-        pub fn format<T>(this: &Formatter<T>, value: T) -> Result<String, JsValue>
+        pub fn format<T>(this: &Formatter<T>, value: &T) -> Result<String, JsValue>
         where
-            T: ::wasm_bindgen::convert::IntoWasmAbi;
+            T: ::wasm_bindgen::convert::RefIntoWasmAbi;
         #[wasm_bindgen(method, catch, js_name = "format")]
-        pub fn format_js_string<T>(this: &Formatter<T>, value: T) -> Result<JsString, JsValue>
+        pub fn format_js_string<T>(this: &Formatter<T>, value: &T) -> Result<JsString, JsValue>
         where
-            T: ::wasm_bindgen::convert::IntoWasmAbi;
+            T: ::wasm_bindgen::convert::RefIntoWasmAbi;
     }
     #[wasm_bindgen(private)]
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]

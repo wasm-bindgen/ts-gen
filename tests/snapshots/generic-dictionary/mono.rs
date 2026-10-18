@@ -20,9 +20,9 @@ extern "C" {
     where
         T: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_value<T>(this: &EvaluationDetails<T>, val: T)
+    pub fn set_value<T>(this: &EvaluationDetails<T>, val: &T)
     where
-        T: ::wasm_bindgen::convert::IntoWasmAbi;
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, getter)]
     pub fn variant<T>(this: &EvaluationDetails<T>) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "variant")]
@@ -36,13 +36,16 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_reason<T>(this: &EvaluationDetails<T>, val: impl ::wasm_bindgen::JsStringLike);
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> EvaluationDetails<T> {
-    pub fn new(flag_key: impl ::wasm_bindgen::JsStringLike, value: T) -> EvaluationDetails<T> {
+impl<T> EvaluationDetails<T>
+where
+    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+{
+    pub fn new(flag_key: impl ::wasm_bindgen::JsStringLike, value: &T) -> EvaluationDetails<T> {
         Self::builder(flag_key, value).build()
     }
     pub fn builder(
         flag_key: impl ::wasm_bindgen::JsStringLike,
-        value: T,
+        value: &T,
     ) -> EvaluationDetailsBuilder<T> {
         let inner: EvaluationDetails<T> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_flag_key(flag_key);
@@ -53,7 +56,10 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> EvaluationDetails<T> {
 pub struct EvaluationDetailsBuilder<T> {
     inner: EvaluationDetails<T>,
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> EvaluationDetailsBuilder<T> {
+impl<T> EvaluationDetailsBuilder<T>
+where
+    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+{
     pub fn variant(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_variant(val);
         self
@@ -66,9 +72,7 @@ impl<T: ::wasm_bindgen::convert::IntoWasmAbi> EvaluationDetailsBuilder<T> {
         self.inner
     }
 }
-impl<T: ::wasm_bindgen::convert::IntoWasmAbi> From<EvaluationDetails<T>>
-    for EvaluationDetailsBuilder<T>
-{
+impl<T> From<EvaluationDetails<T>> for EvaluationDetailsBuilder<T> {
     fn from(inner: EvaluationDetails<T>) -> Self {
         Self { inner }
     }
