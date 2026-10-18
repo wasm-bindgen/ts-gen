@@ -222,3 +222,148 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new(url: impl ::wasm_bindgen::JsStringLike) -> Result<URL, JsValue>;
 }
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type GetOptions;
+    #[wasm_bindgen(method, getter)]
+    pub fn range(this: &GetOptions) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_range(this: &GetOptions, val: f64);
+}
+impl GetOptions {
+    pub fn new() -> GetOptions {
+        Self::builder().build()
+    }
+    pub fn builder() -> GetOptionsBuilder {
+        GetOptionsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+pub struct GetOptionsBuilder {
+    inner: GetOptions,
+}
+impl GetOptionsBuilder {
+    pub fn range(self, val: f64) -> Self {
+        self.inner.set_range(val);
+        self
+    }
+    pub fn build(self) -> GetOptions {
+        self.inner
+    }
+}
+impl From<GetOptions> for GetOptionsBuilder {
+    fn from(inner: GetOptions) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Bucket;
+    #[wasm_bindgen(method)]
+    pub fn get(this: &Bucket, key: impl ::wasm_bindgen::JsStringLike, options: &BucketGetOptions);
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub fn try_get(
+        this: &Bucket,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &BucketGetOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn put(this: &Bucket, key: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, catch, js_name = "put")]
+    pub fn try_put(this: &Bucket, key: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "put")]
+    pub fn put_with_options(
+        this: &Bucket,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &BucketPutOptions,
+    );
+    #[wasm_bindgen(method, catch, js_name = "put")]
+    pub fn try_put_with_options(
+        this: &Bucket,
+        key: impl ::wasm_bindgen::JsStringLike,
+        options: &BucketPutOptions,
+    ) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = GetOptions , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type BucketGetOptions;
+    #[wasm_bindgen(method, getter, js_name = "onlyIf")]
+    pub fn only_if(this: &BucketGetOptions) -> String;
+    #[wasm_bindgen(method, getter, js_name = "onlyIf")]
+    pub fn only_if_js_string(this: &BucketGetOptions) -> JsString;
+    #[wasm_bindgen(method, setter, js_name = "onlyIf")]
+    pub fn set_only_if(this: &BucketGetOptions, val: impl ::wasm_bindgen::JsStringLike);
+}
+impl BucketGetOptions {
+    pub fn new(only_if: impl ::wasm_bindgen::JsStringLike) -> BucketGetOptions {
+        Self::builder(only_if).build()
+    }
+    pub fn builder(only_if: impl ::wasm_bindgen::JsStringLike) -> BucketGetOptionsBuilder {
+        let inner: BucketGetOptions = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_only_if(only_if);
+        BucketGetOptionsBuilder { inner }
+    }
+}
+pub struct BucketGetOptionsBuilder {
+    inner: BucketGetOptions,
+}
+impl BucketGetOptionsBuilder {
+    pub fn range(self, val: f64) -> Self {
+        self.inner.set_range(val);
+        self
+    }
+    pub fn build(self) -> BucketGetOptions {
+        self.inner
+    }
+}
+impl From<BucketGetOptions> for BucketGetOptionsBuilder {
+    fn from(inner: BucketGetOptions) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type BucketPutOptions;
+    #[wasm_bindgen(method, getter)]
+    pub fn md5(this: &BucketPutOptions) -> Option<String>;
+    #[wasm_bindgen(method, getter, js_name = "md5")]
+    pub fn md5_js_string(this: &BucketPutOptions) -> Option<JsString>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_md5(this: &BucketPutOptions, val: impl ::wasm_bindgen::JsStringLike);
+}
+impl BucketPutOptions {
+    pub fn new() -> BucketPutOptions {
+        Self::builder().build()
+    }
+    pub fn builder() -> BucketPutOptionsBuilder {
+        BucketPutOptionsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+pub struct BucketPutOptionsBuilder {
+    inner: BucketPutOptions,
+}
+impl BucketPutOptionsBuilder {
+    pub fn md5(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_md5(val);
+        self
+    }
+    pub fn build(self) -> BucketPutOptions {
+        self.inner
+    }
+}
+impl From<BucketPutOptions> for BucketPutOptionsBuilder {
+    fn from(inner: BucketPutOptions) -> Self {
+        Self { inner }
+    }
+}

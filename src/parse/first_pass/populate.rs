@@ -57,6 +57,7 @@ struct PopulateCtx<'a, 'docs> {
     /// The classes of constructor-shaped `var`s with no instance interface,
     /// by scope and name.
     constructor_classes: Vec<(ScopeId, String)>,
+    options: crate::parse::ParseOptions,
 }
 
 /// The static side of each constructor-shaped `var` with no instance
@@ -82,6 +83,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
             used_type_names: &mut self.used_type_names,
             synth: &mut self.synth,
             type_arena: self.type_arena,
+            options: self.options,
         }
     }
 
@@ -116,6 +118,7 @@ pub fn populate_declarations<'a, 'docs>(
     scopes: &'a mut ScopeArena,
     type_arena: &'a [ir::TypeDeclaration],
     scope: ScopeId,
+    options: crate::parse::ParseOptions,
 ) -> Populated {
     let mut declarations = Vec::new();
     let file_ctx = super::file_context(program, lib_name);
@@ -136,6 +139,7 @@ pub fn populate_declarations<'a, 'docs>(
         global_scope: !matches!(file_ctx, ir::ModuleContext::Module(_)),
         static_sides: StaticSides::new(),
         constructor_classes: Vec::new(),
+        options,
     };
 
     if let ir::ModuleContext::Module(_) = file_ctx {

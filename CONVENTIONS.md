@@ -1182,6 +1182,14 @@ synthesized types) get a numeric suffix: two methods on the same
 parent both taking `(options: { … })` produce `FooOptions` and
 `FooOptions2`.
 
+Under `--experimental-generic-mono` a method's parameter segment is
+prefixed with the method name, so the name does not depend on which
+method comes first: `R2Bucket.get(key, options: R2GetOptions & { … })`
+and `put(key, value, options?: { … })` synthesize `R2BucketGetOptions`
+and `R2BucketPutOptions`. Constructor parameters keep
+`<Parent><ParamSegment>`, and two overloads of one method still number
+(`D1PreparedStatementRawOptions2`).
+
 ### Hoisting scope
 
 Only **directly-inline** type literals (or unions of such) are
