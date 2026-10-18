@@ -3277,8 +3277,24 @@ A named alias of the union (`type Id = string | number`) is one
 binding instead, taking the alias's own trait (`lookup(id: impl Id)`,
 see [named union aliases](#named-union-aliases)). The `js_sys`
 primitive-union marker traits (`JsNumberOrStringLike` and the rest) are
-not emitted. Return positions are unchanged: an erased
-union still becomes a
+not emitted. `ArrayBuffer | ArrayBufferView` (however spelled,
+`BufferSource` included) is the one union that groups, into one `impl
+js_sys::BufferSourceLike` alternative suffixed `_with_buffer_source`.
+Every buffer handle (`ArrayBuffer`, each typed array, `DataView`, owned
+or borrowed) crosses as itself through the one import, `&[u8]` as a view
+of wasm memory and `Vec<u8>` as a copy:
+
+```ts
+verify(algorithm: string | Algorithm, key: CryptoKey, signature: BufferSource, data: BufferSource): Promise<boolean>;
+```
+
+```rust
+pub async fn verify(this: &SubtleCrypto, algorithm: impl JsStringLike, key: &CryptoKey, signature: impl BufferSourceLike, data: impl BufferSourceLike) -> Result<bool, JsValue>;
+pub async fn verify_with_algorithm(this: &SubtleCrypto, algorithm: &Algorithm, key: &CryptoKey, signature: impl BufferSourceLike, data: impl BufferSourceLike) -> Result<bool, JsValue>;
+```
+
+Without `--experimental-generic-mono` buffer sources keep the per-member
+fan-out. Return positions are unchanged: an erased union still becomes a
 [dynamic-union enum](#erased-return-position-unions-become-dynamic-union-enums).
 
 ## `@throws` JSDoc → typed error

@@ -569,6 +569,117 @@ impl From<Settings> for SettingsBuilder {
         Self { inner }
     }
 }
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub async fn verify(
+        algorithm: impl ::wasm_bindgen::JsStringLike,
+        signature: impl ::js_sys::BufferSourceLike,
+        data: impl ::js_sys::BufferSourceLike,
+    ) -> Result<bool, JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "verify")]
+    pub fn verify_promise(
+        algorithm: impl ::wasm_bindgen::JsStringLike,
+        signature: impl ::js_sys::BufferSourceLike,
+        data: impl ::js_sys::BufferSourceLike,
+    ) -> Result<Promise<bool>, JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "verify")]
+    pub async fn verify_with_algorithm(
+        algorithm: &Target,
+        signature: impl ::js_sys::BufferSourceLike,
+        data: impl ::js_sys::BufferSourceLike,
+    ) -> Result<bool, JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "verify")]
+    pub fn verify_with_algorithm_promise(
+        algorithm: &Target,
+        signature: impl ::js_sys::BufferSourceLike,
+        data: impl ::js_sys::BufferSourceLike,
+    ) -> Result<Promise<bool>, JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub fn write(chunk: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "write")]
+    pub fn write_with_buffer_source(chunk: impl ::js_sys::BufferSourceLike) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "write")]
+    fn __write_with_null(chunk: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+}
+pub fn write_with_null() -> Result<(), JsValue> {
+    __write_with_null(&::wasm_bindgen::JsValue::NULL)
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub fn digest() -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "digest")]
+    pub fn digest_with_data(data: impl ::js_sys::BufferSourceLike) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Hashes;
+    #[wasm_bindgen(method, getter)]
+    pub fn md5(this: &Hashes) -> Option<Md5Kind>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_md5(this: &Hashes, val: impl ::js_sys::BufferSourceLike);
+    #[wasm_bindgen(method, setter, js_name = "md5")]
+    pub fn set_md5_with_str(this: &Hashes, val: impl ::wasm_bindgen::JsStringLike);
+    #[wasm_bindgen(method, getter)]
+    pub fn salt(this: &Hashes) -> SaltKind;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_salt(this: &Hashes, val: impl ::js_sys::BufferSourceLike);
+}
+impl Hashes {
+    pub fn new(salt: impl ::js_sys::BufferSourceLike) -> Hashes {
+        Self::builder(salt).build()
+    }
+    pub fn builder(salt: impl ::js_sys::BufferSourceLike) -> HashesBuilder {
+        let inner: Hashes = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_salt(salt);
+        HashesBuilder { inner }
+    }
+}
+pub struct HashesBuilder {
+    inner: Hashes,
+}
+impl HashesBuilder {
+    pub fn md5(self, val: impl ::js_sys::BufferSourceLike) -> Self {
+        self.inner.set_md5(val);
+        self
+    }
+    pub fn md5_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_md5_with_str(val);
+        self
+    }
+    pub fn build(self) -> Hashes {
+        self.inner
+    }
+}
+impl From<Hashes> for HashesBuilder {
+    fn from(inner: Hashes) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(private)]
 pub enum CurrentReturnKind {
     String(String),
@@ -590,4 +701,15 @@ pub enum FromKind {
     String(String),
     Bool(bool),
     Target(Target),
+}
+#[wasm_bindgen(private)]
+pub enum Md5Kind {
+    ArrayBuffer(ArrayBuffer),
+    Uint8Array(Uint8Array),
+    String(String),
+}
+#[wasm_bindgen(private)]
+pub enum SaltKind {
+    Uint8Array(Uint8Array),
+    ArrayBuffer(ArrayBuffer),
 }

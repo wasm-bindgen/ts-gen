@@ -1755,6 +1755,9 @@ fn flatten_type(ty: &TypeRef, cgctx: Option<&CodegenContext<'_>>, scope: ScopeId
     let mut out: Vec<TypeRef> = Vec::new();
     if flatten_into(ty, cgctx, scope, true, &mut out) {
         pair_typed_array_slice(&mut out, cgctx, scope);
+        if CodegenContext::generic_mono(cgctx) {
+            out = group_buffer_source(out);
+        }
         return split_null_arm(out);
     }
     if let Some(c) = cgctx {
@@ -1826,6 +1829,49 @@ fn split_null_arm(alts: Vec<TypeRef>) -> Vec<TypeRef> {
 /// `Uint8ClampedArray`: both hold `u8`, so the slice is a `Uint8Array`.
 /// A nullable view keeps its empties (`Option<&[u8]>`, `Nullable<&[u8]>`).
 /// `Clamped` has no `Option` form, so a clamped view keeps neither.
+/// Per-mono, `ArrayBuffer | ArrayBufferView` (`BufferSource`) is one
+/// alternative, at the first one's position, which lowers to `impl
+/// js_sys::BufferSourceLike`: every buffer handle and `&[u8]` / `Vec<u8>`
+/// crosses as itself through one import.
+fn group_buffer_source(mut alts: Vec<TypeRef>) -> Vec<TypeRef> {
+    fn peel(t: &TypeRef) -> (TypeRef, Option<Nullability>) {
+        match t.split_empties() {
+            Some((core, n)) => (core, Some(n)),
+            None => (t.clone(), None),
+        }
+    }
+    let buffer = alts
+        .iter()
+        .position(|t| peel(t).0.as_ident() == Some("ArrayBuffer"));
+    let view = alts
+        .iter()
+        .position(|t| matches!(peel(t).0, TypeRef::ArrayBufferView));
+    let (Some(buffer), Some(view)) = (buffer, view) else {
+        return alts;
+    };
+    let n = peel(&alts[buffer]).1;
+    if n != peel(&alts[view]).1 {
+        return alts;
+    }
+    let grouped = buffer_source_union();
+    let grouped = match n {
+        Some(n) => grouped.with_empties(n),
+        None => grouped,
+    };
+    let (first, second) = (buffer.min(view), buffer.max(view));
+    alts.remove(second);
+    alts[first] = grouped;
+    alts
+}
+
+fn buffer_source_union() -> TypeRef {
+    TypeRef::union([TypeRef::ident("ArrayBuffer"), TypeRef::ArrayBufferView])
+}
+
+pub(crate) fn is_buffer_source(ty: &TypeRef) -> bool {
+    *ty == buffer_source_union()
+}
+
 fn pair_typed_array_slice(
     alts: &mut Vec<TypeRef>,
     cgctx: Option<&CodegenContext<'_>>,
@@ -2540,6 +2586,7 @@ fn type_snake_name(ty: &TypeRef) -> String {
         TypeRef::Any | TypeRef::Unknown => "js_value".to_string(),
         TypeRef::Object => "object".to_string(),
         TypeRef::ArrayBufferView => "typed_array".to_string(),
+        ty if is_buffer_source(ty) => "buffer_source".to_string(),
         TypeRef::Union(_) if let Some((core, _)) = ty.split_empties() => type_snake_name(&core),
         TypeRef::Union(_) | TypeRef::PropertyKey => "js_value".to_string(),
         // Snake-case every segment of a named reference, so `A.X` is
@@ -2788,6 +2835,7 @@ fn mono_argument_type(ty: &TypeRef) -> Option<TokenStream> {
         TypeRef::String | TypeRef::StringLiteral(_) => {
             Some(quote! { impl ::wasm_bindgen::JsStringLike })
         }
+        ty if is_buffer_source(ty) => Some(quote! { impl ::js_sys::BufferSourceLike }),
         _ => None,
     }
 }

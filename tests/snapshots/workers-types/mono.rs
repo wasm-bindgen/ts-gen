@@ -718,12 +718,7 @@ pub mod web_assembly {
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
         #[wasm_bindgen(catch, js_namespace = "WebAssembly")]
-        pub fn validate(bytes: &Object) -> Result<bool, JsValue>;
-    }
-    #[wasm_bindgen(experimental_generic_mono)]
-    extern "C" {
-        #[wasm_bindgen(catch, js_name = "validate", js_namespace = "WebAssembly")]
-        pub fn validate_with_array_buffer(bytes: &ArrayBuffer) -> Result<bool, JsValue>;
+        pub fn validate(bytes: impl ::js_sys::BufferSourceLike) -> Result<bool, JsValue>;
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -1988,16 +1983,10 @@ extern "C" {
         body: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "sendBeacon")]
-    pub fn send_beacon_with_array_buffer(
+    pub fn send_beacon_with_buffer_source(
         this: &Navigator,
         url: impl ::wasm_bindgen::JsStringLike,
-        body: &ArrayBuffer,
-    ) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "sendBeacon")]
-    pub fn send_beacon_with_typed_array(
-        this: &Navigator,
-        url: impl ::wasm_bindgen::JsStringLike,
-        body: &Object,
+        body: impl ::js_sys::BufferSourceLike,
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "sendBeacon")]
     pub fn send_beacon_with_blob(
@@ -4704,7 +4693,7 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         key: &CryptoKey,
-        plain_text: &ArrayBuffer,
+        plain_text: impl ::js_sys::BufferSourceLike,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
     #[doc = ""]
@@ -4714,7 +4703,7 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         key: &CryptoKey,
-        plain_text: &ArrayBuffer,
+        plain_text: impl ::js_sys::BufferSourceLike,
     ) -> Promise<ArrayBuffer>;
     #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
     #[doc = ""]
@@ -4724,7 +4713,7 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
         key: &CryptoKey,
-        plain_text: &ArrayBuffer,
+        plain_text: impl ::js_sys::BufferSourceLike,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
     #[doc = ""]
@@ -4734,47 +4723,7 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
         key: &CryptoKey,
-        plain_text: &ArrayBuffer,
-    ) -> Promise<ArrayBuffer>;
-    #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
-    #[wasm_bindgen(method, catch, js_name = "encrypt")]
-    pub async fn encrypt_with_typed_array(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        plain_text: &Object,
-    ) -> Result<ArrayBuffer, JsValue>;
-    #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
-    #[wasm_bindgen(method, js_name = "encrypt")]
-    pub fn encrypt_with_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        plain_text: &Object,
-    ) -> Promise<ArrayBuffer>;
-    #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
-    #[wasm_bindgen(method, catch, js_name = "encrypt")]
-    pub async fn encrypt_with_algorithm_and_typed_array(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoEncryptAlgorithm,
-        key: &CryptoKey,
-        plain_text: &Object,
-    ) -> Result<ArrayBuffer, JsValue>;
-    #[doc = " The **`encrypt()`** method of the SubtleCrypto interface encrypts data."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)"]
-    #[wasm_bindgen(method, js_name = "encrypt")]
-    pub fn encrypt_with_algorithm_and_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoEncryptAlgorithm,
-        key: &CryptoKey,
-        plain_text: &Object,
+        plain_text: impl ::js_sys::BufferSourceLike,
     ) -> Promise<ArrayBuffer>;
     #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
     #[doc = ""]
@@ -4784,7 +4733,7 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         key: &CryptoKey,
-        cipher_text: &ArrayBuffer,
+        cipher_text: impl ::js_sys::BufferSourceLike,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
     #[doc = ""]
@@ -4794,7 +4743,7 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         key: &CryptoKey,
-        cipher_text: &ArrayBuffer,
+        cipher_text: impl ::js_sys::BufferSourceLike,
     ) -> Promise<ArrayBuffer>;
     #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
     #[doc = ""]
@@ -4804,7 +4753,7 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
         key: &CryptoKey,
-        cipher_text: &ArrayBuffer,
+        cipher_text: impl ::js_sys::BufferSourceLike,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
     #[doc = ""]
@@ -4814,47 +4763,7 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoEncryptAlgorithm,
         key: &CryptoKey,
-        cipher_text: &ArrayBuffer,
-    ) -> Promise<ArrayBuffer>;
-    #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
-    #[wasm_bindgen(method, catch, js_name = "decrypt")]
-    pub async fn decrypt_with_typed_array(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        cipher_text: &Object,
-    ) -> Result<ArrayBuffer, JsValue>;
-    #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
-    #[wasm_bindgen(method, js_name = "decrypt")]
-    pub fn decrypt_with_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        cipher_text: &Object,
-    ) -> Promise<ArrayBuffer>;
-    #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
-    #[wasm_bindgen(method, catch, js_name = "decrypt")]
-    pub async fn decrypt_with_algorithm_and_typed_array(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoEncryptAlgorithm,
-        key: &CryptoKey,
-        cipher_text: &Object,
-    ) -> Result<ArrayBuffer, JsValue>;
-    #[doc = " The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)"]
-    #[wasm_bindgen(method, js_name = "decrypt")]
-    pub fn decrypt_with_algorithm_and_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoEncryptAlgorithm,
-        key: &CryptoKey,
-        cipher_text: &Object,
+        cipher_text: impl ::js_sys::BufferSourceLike,
     ) -> Promise<ArrayBuffer>;
     #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
     #[doc = ""]
@@ -4864,7 +4773,7 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         key: &CryptoKey,
-        data: &ArrayBuffer,
+        data: impl ::js_sys::BufferSourceLike,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
     #[doc = ""]
@@ -4874,7 +4783,7 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         key: &CryptoKey,
-        data: &ArrayBuffer,
+        data: impl ::js_sys::BufferSourceLike,
     ) -> Promise<ArrayBuffer>;
     #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
     #[doc = ""]
@@ -4884,7 +4793,7 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
-        data: &ArrayBuffer,
+        data: impl ::js_sys::BufferSourceLike,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
     #[doc = ""]
@@ -4894,47 +4803,7 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
-        data: &ArrayBuffer,
-    ) -> Promise<ArrayBuffer>;
-    #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
-    #[wasm_bindgen(method, catch, js_name = "sign")]
-    pub async fn sign_with_typed_array(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        data: &Object,
-    ) -> Result<ArrayBuffer, JsValue>;
-    #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
-    #[wasm_bindgen(method, js_name = "sign")]
-    pub fn sign_with_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        data: &Object,
-    ) -> Promise<ArrayBuffer>;
-    #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
-    #[wasm_bindgen(method, catch, js_name = "sign")]
-    pub async fn sign_with_algorithm_and_typed_array(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoSignAlgorithm,
-        key: &CryptoKey,
-        data: &Object,
-    ) -> Result<ArrayBuffer, JsValue>;
-    #[doc = " The **`sign()`** method of the SubtleCrypto interface generates a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/sign)"]
-    #[wasm_bindgen(method, js_name = "sign")]
-    pub fn sign_with_algorithm_and_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoSignAlgorithm,
-        key: &CryptoKey,
-        data: &Object,
+        data: impl ::js_sys::BufferSourceLike,
     ) -> Promise<ArrayBuffer>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
@@ -4944,8 +4813,8 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         key: &CryptoKey,
-        signature: &ArrayBuffer,
-        data: &ArrayBuffer,
+        signature: impl ::js_sys::BufferSourceLike,
+        data: impl ::js_sys::BufferSourceLike,
     ) -> Result<bool, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
@@ -4955,8 +4824,8 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         key: &CryptoKey,
-        signature: &ArrayBuffer,
-        data: &ArrayBuffer,
+        signature: impl ::js_sys::BufferSourceLike,
+        data: impl ::js_sys::BufferSourceLike,
     ) -> Promise<bool>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
@@ -4966,8 +4835,8 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
-        signature: &ArrayBuffer,
-        data: &ArrayBuffer,
+        signature: impl ::js_sys::BufferSourceLike,
+        data: impl ::js_sys::BufferSourceLike,
     ) -> Result<bool, JsValue>;
     #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
     #[doc = ""]
@@ -4977,140 +4846,8 @@ extern "C" {
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoSignAlgorithm,
         key: &CryptoKey,
-        signature: &ArrayBuffer,
-        data: &ArrayBuffer,
-    ) -> Promise<bool>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_str_and_typed_array_and_array_buffer(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        signature: &Object,
-        data: &ArrayBuffer,
-    ) -> Result<bool, JsValue>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, js_name = "verify")]
-    pub fn verify_with_str_and_typed_array_and_array_buffer_promise(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        signature: &Object,
-        data: &ArrayBuffer,
-    ) -> Promise<bool>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_algorithm_and_typed_array_and_array_buffer(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoSignAlgorithm,
-        key: &CryptoKey,
-        signature: &Object,
-        data: &ArrayBuffer,
-    ) -> Result<bool, JsValue>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, js_name = "verify")]
-    pub fn verify_with_algorithm_and_typed_array_and_array_buffer_promise(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoSignAlgorithm,
-        key: &CryptoKey,
-        signature: &Object,
-        data: &ArrayBuffer,
-    ) -> Promise<bool>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_str_and_array_buffer_and_typed_array(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        signature: &ArrayBuffer,
-        data: &Object,
-    ) -> Result<bool, JsValue>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, js_name = "verify")]
-    pub fn verify_with_str_and_array_buffer_and_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        signature: &ArrayBuffer,
-        data: &Object,
-    ) -> Promise<bool>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_algorithm_and_array_buffer_and_typed_array(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoSignAlgorithm,
-        key: &CryptoKey,
-        signature: &ArrayBuffer,
-        data: &Object,
-    ) -> Result<bool, JsValue>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, js_name = "verify")]
-    pub fn verify_with_algorithm_and_array_buffer_and_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoSignAlgorithm,
-        key: &CryptoKey,
-        signature: &ArrayBuffer,
-        data: &Object,
-    ) -> Promise<bool>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_typed_array_and_typed_array(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        signature: &Object,
-        data: &Object,
-    ) -> Result<bool, JsValue>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, js_name = "verify")]
-    pub fn verify_with_typed_array_and_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        key: &CryptoKey,
-        signature: &Object,
-        data: &Object,
-    ) -> Promise<bool>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, catch, js_name = "verify")]
-    pub async fn verify_with_algorithm_and_typed_array_and_typed_array(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoSignAlgorithm,
-        key: &CryptoKey,
-        signature: &Object,
-        data: &Object,
-    ) -> Result<bool, JsValue>;
-    #[doc = " The **`verify()`** method of the SubtleCrypto interface verifies a digital signature."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/verify)"]
-    #[wasm_bindgen(method, js_name = "verify")]
-    pub fn verify_with_algorithm_and_typed_array_and_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoSignAlgorithm,
-        key: &CryptoKey,
-        signature: &Object,
-        data: &Object,
+        signature: impl ::js_sys::BufferSourceLike,
+        data: impl ::js_sys::BufferSourceLike,
     ) -> Promise<bool>;
     #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
     #[doc = ""]
@@ -5119,7 +4856,7 @@ extern "C" {
     pub async fn digest(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
-        data: &ArrayBuffer,
+        data: impl ::js_sys::BufferSourceLike,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
     #[doc = ""]
@@ -5128,7 +4865,7 @@ extern "C" {
     pub fn digest_promise(
         this: &SubtleCrypto,
         algorithm: impl ::wasm_bindgen::JsStringLike,
-        data: &ArrayBuffer,
+        data: impl ::js_sys::BufferSourceLike,
     ) -> Promise<ArrayBuffer>;
     #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
     #[doc = ""]
@@ -5137,7 +4874,7 @@ extern "C" {
     pub async fn digest_with_algorithm(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoHashAlgorithm,
-        data: &ArrayBuffer,
+        data: impl ::js_sys::BufferSourceLike,
     ) -> Result<ArrayBuffer, JsValue>;
     #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
     #[doc = ""]
@@ -5146,43 +4883,7 @@ extern "C" {
     pub fn digest_with_algorithm_promise(
         this: &SubtleCrypto,
         algorithm: &SubtleCryptoHashAlgorithm,
-        data: &ArrayBuffer,
-    ) -> Promise<ArrayBuffer>;
-    #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
-    #[wasm_bindgen(method, catch, js_name = "digest")]
-    pub async fn digest_with_typed_array(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        data: &Object,
-    ) -> Result<ArrayBuffer, JsValue>;
-    #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
-    #[wasm_bindgen(method, js_name = "digest")]
-    pub fn digest_with_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        data: &Object,
-    ) -> Promise<ArrayBuffer>;
-    #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
-    #[wasm_bindgen(method, catch, js_name = "digest")]
-    pub async fn digest_with_algorithm_and_typed_array(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoHashAlgorithm,
-        data: &Object,
-    ) -> Result<ArrayBuffer, JsValue>;
-    #[doc = " The **`digest()`** method of the SubtleCrypto interface generates a _digest_ of the given data, using the specified hash function."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)"]
-    #[wasm_bindgen(method, js_name = "digest")]
-    pub fn digest_with_algorithm_and_typed_array_promise(
-        this: &SubtleCrypto,
-        algorithm: &SubtleCryptoHashAlgorithm,
-        data: &Object,
+        data: impl ::js_sys::BufferSourceLike,
     ) -> Promise<ArrayBuffer>;
     #[doc = " The **`generateKey()`** method of the SubtleCrypto interface is used to generate a new key (for symmetric algorithms) or key pair (for public-key algorithms)."]
     #[doc = ""]
@@ -5431,7 +5132,7 @@ extern "C" {
     pub async fn import_key(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        key_data: &ArrayBuffer,
+        key_data: impl ::js_sys::BufferSourceLike,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         extractable: bool,
         key_usages: &[impl ::wasm_bindgen::JsStringLike],
@@ -5443,31 +5144,7 @@ extern "C" {
     pub fn import_key_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        key_data: &ArrayBuffer,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Promise<CryptoKey>;
-    #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
-    #[wasm_bindgen(method, catch, js_name = "importKey")]
-    pub async fn import_key_with_typed_array(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        key_data: &Object,
-        algorithm: impl ::wasm_bindgen::JsStringLike,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Result<CryptoKey, JsValue>;
-    #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
-    #[wasm_bindgen(method, js_name = "importKey")]
-    pub fn import_key_with_typed_array_promise(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        key_data: &Object,
+        key_data: impl ::js_sys::BufferSourceLike,
         algorithm: impl ::wasm_bindgen::JsStringLike,
         extractable: bool,
         key_usages: &[impl ::wasm_bindgen::JsStringLike],
@@ -5503,7 +5180,7 @@ extern "C" {
     pub async fn import_key_with_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        key_data: &ArrayBuffer,
+        key_data: impl ::js_sys::BufferSourceLike,
         algorithm: &SubtleCryptoImportKeyAlgorithm,
         extractable: bool,
         key_usages: &[impl ::wasm_bindgen::JsStringLike],
@@ -5515,31 +5192,7 @@ extern "C" {
     pub fn import_key_with_algorithm_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        key_data: &ArrayBuffer,
-        algorithm: &SubtleCryptoImportKeyAlgorithm,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Promise<CryptoKey>;
-    #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
-    #[wasm_bindgen(method, catch, js_name = "importKey")]
-    pub async fn import_key_with_typed_array_and_algorithm(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        key_data: &Object,
-        algorithm: &SubtleCryptoImportKeyAlgorithm,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Result<CryptoKey, JsValue>;
-    #[doc = " The **`importKey()`** method of the SubtleCrypto interface imports a key: that is, it takes as input a key in an external, portable format and gives you a CryptoKey object that you can use in the Web Crypto API."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/importKey)"]
-    #[wasm_bindgen(method, js_name = "importKey")]
-    pub fn import_key_with_typed_array_and_algorithm_promise(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        key_data: &Object,
+        key_data: impl ::js_sys::BufferSourceLike,
         algorithm: &SubtleCryptoImportKeyAlgorithm,
         extractable: bool,
         key_usages: &[impl ::wasm_bindgen::JsStringLike],
@@ -5637,7 +5290,7 @@ extern "C" {
     pub async fn unwrap_key(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &ArrayBuffer,
+        wrapped_key: impl ::js_sys::BufferSourceLike,
         unwrapping_key: &CryptoKey,
         unwrap_algorithm: impl ::wasm_bindgen::JsStringLike,
         unwrapped_key_algorithm: impl ::wasm_bindgen::JsStringLike,
@@ -5651,35 +5304,7 @@ extern "C" {
     pub fn unwrap_key_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &ArrayBuffer,
-        unwrapping_key: &CryptoKey,
-        unwrap_algorithm: impl ::wasm_bindgen::JsStringLike,
-        unwrapped_key_algorithm: impl ::wasm_bindgen::JsStringLike,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Promise<CryptoKey>;
-    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
-    pub async fn unwrap_key_with_typed_array(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &Object,
-        unwrapping_key: &CryptoKey,
-        unwrap_algorithm: impl ::wasm_bindgen::JsStringLike,
-        unwrapped_key_algorithm: impl ::wasm_bindgen::JsStringLike,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Result<CryptoKey, JsValue>;
-    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, js_name = "unwrapKey")]
-    pub fn unwrap_key_with_typed_array_promise(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &Object,
+        wrapped_key: impl ::js_sys::BufferSourceLike,
         unwrapping_key: &CryptoKey,
         unwrap_algorithm: impl ::wasm_bindgen::JsStringLike,
         unwrapped_key_algorithm: impl ::wasm_bindgen::JsStringLike,
@@ -5693,7 +5318,7 @@ extern "C" {
     pub async fn unwrap_key_with_unwrap_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &ArrayBuffer,
+        wrapped_key: impl ::js_sys::BufferSourceLike,
         unwrapping_key: &CryptoKey,
         unwrap_algorithm: &SubtleCryptoEncryptAlgorithm,
         unwrapped_key_algorithm: impl ::wasm_bindgen::JsStringLike,
@@ -5707,35 +5332,7 @@ extern "C" {
     pub fn unwrap_key_with_unwrap_algorithm_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &ArrayBuffer,
-        unwrapping_key: &CryptoKey,
-        unwrap_algorithm: &SubtleCryptoEncryptAlgorithm,
-        unwrapped_key_algorithm: impl ::wasm_bindgen::JsStringLike,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Promise<CryptoKey>;
-    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
-    pub async fn unwrap_key_with_typed_array_and_unwrap_algorithm(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &Object,
-        unwrapping_key: &CryptoKey,
-        unwrap_algorithm: &SubtleCryptoEncryptAlgorithm,
-        unwrapped_key_algorithm: impl ::wasm_bindgen::JsStringLike,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Result<CryptoKey, JsValue>;
-    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, js_name = "unwrapKey")]
-    pub fn unwrap_key_with_typed_array_and_unwrap_algorithm_promise(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &Object,
+        wrapped_key: impl ::js_sys::BufferSourceLike,
         unwrapping_key: &CryptoKey,
         unwrap_algorithm: &SubtleCryptoEncryptAlgorithm,
         unwrapped_key_algorithm: impl ::wasm_bindgen::JsStringLike,
@@ -5749,7 +5346,7 @@ extern "C" {
     pub async fn unwrap_key_with_unwrapped_key_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &ArrayBuffer,
+        wrapped_key: impl ::js_sys::BufferSourceLike,
         unwrapping_key: &CryptoKey,
         unwrap_algorithm: impl ::wasm_bindgen::JsStringLike,
         unwrapped_key_algorithm: &SubtleCryptoImportKeyAlgorithm,
@@ -5763,35 +5360,7 @@ extern "C" {
     pub fn unwrap_key_with_unwrapped_key_algorithm_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &ArrayBuffer,
-        unwrapping_key: &CryptoKey,
-        unwrap_algorithm: impl ::wasm_bindgen::JsStringLike,
-        unwrapped_key_algorithm: &SubtleCryptoImportKeyAlgorithm,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Promise<CryptoKey>;
-    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
-    pub async fn unwrap_key_with_typed_array_and_unwrapped_key_algorithm(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &Object,
-        unwrapping_key: &CryptoKey,
-        unwrap_algorithm: impl ::wasm_bindgen::JsStringLike,
-        unwrapped_key_algorithm: &SubtleCryptoImportKeyAlgorithm,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Result<CryptoKey, JsValue>;
-    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, js_name = "unwrapKey")]
-    pub fn unwrap_key_with_typed_array_and_unwrapped_key_algorithm_promise(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &Object,
+        wrapped_key: impl ::js_sys::BufferSourceLike,
         unwrapping_key: &CryptoKey,
         unwrap_algorithm: impl ::wasm_bindgen::JsStringLike,
         unwrapped_key_algorithm: &SubtleCryptoImportKeyAlgorithm,
@@ -5805,7 +5374,7 @@ extern "C" {
     pub async fn unwrap_key_with_unwrap_algorithm_and_unwrapped_key_algorithm(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &ArrayBuffer,
+        wrapped_key: impl ::js_sys::BufferSourceLike,
         unwrapping_key: &CryptoKey,
         unwrap_algorithm: &SubtleCryptoEncryptAlgorithm,
         unwrapped_key_algorithm: &SubtleCryptoImportKeyAlgorithm,
@@ -5819,35 +5388,7 @@ extern "C" {
     pub fn unwrap_key_with_unwrap_algorithm_and_unwrapped_key_algorithm_promise(
         this: &SubtleCrypto,
         format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &ArrayBuffer,
-        unwrapping_key: &CryptoKey,
-        unwrap_algorithm: &SubtleCryptoEncryptAlgorithm,
-        unwrapped_key_algorithm: &SubtleCryptoImportKeyAlgorithm,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Promise<CryptoKey>;
-    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, catch, js_name = "unwrapKey")]
-    pub async fn unwrap_key_with_typed_array_and_unwrap_algorithm_and_unwrapped_key_algorithm(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &Object,
-        unwrapping_key: &CryptoKey,
-        unwrap_algorithm: &SubtleCryptoEncryptAlgorithm,
-        unwrapped_key_algorithm: &SubtleCryptoImportKeyAlgorithm,
-        extractable: bool,
-        key_usages: &[impl ::wasm_bindgen::JsStringLike],
-    ) -> Result<CryptoKey, JsValue>;
-    #[doc = " The **`unwrapKey()`** method of the SubtleCrypto interface 'unwraps' a key."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/unwrapKey)"]
-    #[wasm_bindgen(method, js_name = "unwrapKey")]
-    pub fn unwrap_key_with_typed_array_and_unwrap_algorithm_and_unwrapped_key_algorithm_promise(
-        this: &SubtleCrypto,
-        format: impl ::wasm_bindgen::JsStringLike,
-        wrapped_key: &Object,
+        wrapped_key: impl ::js_sys::BufferSourceLike,
         unwrapping_key: &CryptoKey,
         unwrap_algorithm: &SubtleCryptoEncryptAlgorithm,
         unwrapped_key_algorithm: &SubtleCryptoImportKeyAlgorithm,
@@ -5857,26 +5398,8 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "timingSafeEqual")]
     pub fn timing_safe_equal(
         this: &SubtleCrypto,
-        a: &ArrayBuffer,
-        b: &ArrayBuffer,
-    ) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "timingSafeEqual")]
-    pub fn timing_safe_equal_with_typed_array_and_array_buffer(
-        this: &SubtleCrypto,
-        a: &Object,
-        b: &ArrayBuffer,
-    ) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "timingSafeEqual")]
-    pub fn timing_safe_equal_with_array_buffer_and_typed_array(
-        this: &SubtleCrypto,
-        a: &ArrayBuffer,
-        b: &Object,
-    ) -> Result<bool, JsValue>;
-    #[wasm_bindgen(method, catch, js_name = "timingSafeEqual")]
-    pub fn timing_safe_equal_with_typed_array_and_typed_array(
-        this: &SubtleCrypto,
-        a: &Object,
-        b: &Object,
+        a: impl ::js_sys::BufferSourceLike,
+        b: impl ::js_sys::BufferSourceLike,
     ) -> Result<bool, JsValue>;
 }
 impl SubtleCrypto {
@@ -6268,13 +5791,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn salt(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<SaltKind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_salt(this: &SubtleCryptoDeriveKeyAlgorithm, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "salt")]
-    pub fn set_salt_with_typed_array<T: ::js_sys::TypedArray>(
-        this: &SubtleCryptoDeriveKeyAlgorithm,
-        val: &T,
-    ) where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    pub fn set_salt(this: &SubtleCryptoDeriveKeyAlgorithm, val: impl ::js_sys::BufferSourceLike);
     #[wasm_bindgen(method, getter)]
     pub fn iterations(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
@@ -6295,13 +5812,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn info(this: &SubtleCryptoDeriveKeyAlgorithm) -> Option<SaltKind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_info(this: &SubtleCryptoDeriveKeyAlgorithm, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "info")]
-    pub fn set_info_with_typed_array<T: ::js_sys::TypedArray>(
-        this: &SubtleCryptoDeriveKeyAlgorithm,
-        val: &T,
-    ) where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    pub fn set_info(this: &SubtleCryptoDeriveKeyAlgorithm, val: impl ::js_sys::BufferSourceLike);
 }
 impl SubtleCryptoDeriveKeyAlgorithm {
     pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> SubtleCryptoDeriveKeyAlgorithm {
@@ -6319,12 +5830,8 @@ pub struct SubtleCryptoDeriveKeyAlgorithmBuilder {
     inner: SubtleCryptoDeriveKeyAlgorithm,
 }
 impl SubtleCryptoDeriveKeyAlgorithmBuilder {
-    pub fn salt(self, val: &ArrayBuffer) -> Self {
+    pub fn salt(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_salt(val);
-        self
-    }
-    pub fn salt_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
-        self.inner.set_salt_with_typed_array(val);
         self
     }
     pub fn iterations(self, val: f64) -> Self {
@@ -6343,12 +5850,8 @@ impl SubtleCryptoDeriveKeyAlgorithmBuilder {
         self.inner.set_public(val);
         self
     }
-    pub fn info(self, val: &ArrayBuffer) -> Self {
+    pub fn info(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_info(val);
-        self
-    }
-    pub fn info_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
-        self.inner.set_info_with_typed_array(val);
         self
     }
     pub fn build(self) -> SubtleCryptoDeriveKeyAlgorithm {
@@ -6374,23 +5877,14 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn iv(this: &SubtleCryptoEncryptAlgorithm) -> Option<SaltKind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_iv(this: &SubtleCryptoEncryptAlgorithm, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "iv")]
-    pub fn set_iv_with_typed_array<T: ::js_sys::TypedArray>(
-        this: &SubtleCryptoEncryptAlgorithm,
-        val: &T,
-    ) where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    pub fn set_iv(this: &SubtleCryptoEncryptAlgorithm, val: impl ::js_sys::BufferSourceLike);
     #[wasm_bindgen(method, getter, js_name = "additionalData")]
     pub fn additional_data(this: &SubtleCryptoEncryptAlgorithm) -> Option<SaltKind>;
     #[wasm_bindgen(method, setter, js_name = "additionalData")]
-    pub fn set_additional_data(this: &SubtleCryptoEncryptAlgorithm, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "additionalData")]
-    pub fn set_additional_data_with_typed_array<T: ::js_sys::TypedArray>(
+    pub fn set_additional_data(
         this: &SubtleCryptoEncryptAlgorithm,
-        val: &T,
-    ) where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+        val: impl ::js_sys::BufferSourceLike,
+    );
     #[wasm_bindgen(method, getter, js_name = "tagLength")]
     pub fn tag_length(this: &SubtleCryptoEncryptAlgorithm) -> Option<f64>;
     #[wasm_bindgen(method, setter, js_name = "tagLength")]
@@ -6398,13 +5892,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn counter(this: &SubtleCryptoEncryptAlgorithm) -> Option<SaltKind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_counter(this: &SubtleCryptoEncryptAlgorithm, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "counter")]
-    pub fn set_counter_with_typed_array<T: ::js_sys::TypedArray>(
-        this: &SubtleCryptoEncryptAlgorithm,
-        val: &T,
-    ) where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    pub fn set_counter(this: &SubtleCryptoEncryptAlgorithm, val: impl ::js_sys::BufferSourceLike);
     #[wasm_bindgen(method, getter)]
     pub fn length(this: &SubtleCryptoEncryptAlgorithm) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
@@ -6412,13 +5900,7 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn label(this: &SubtleCryptoEncryptAlgorithm) -> Option<SaltKind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_label(this: &SubtleCryptoEncryptAlgorithm, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "label")]
-    pub fn set_label_with_typed_array<T: ::js_sys::TypedArray>(
-        this: &SubtleCryptoEncryptAlgorithm,
-        val: &T,
-    ) where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    pub fn set_label(this: &SubtleCryptoEncryptAlgorithm, val: impl ::js_sys::BufferSourceLike);
 }
 impl SubtleCryptoEncryptAlgorithm {
     pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> SubtleCryptoEncryptAlgorithm {
@@ -6434,44 +5916,28 @@ pub struct SubtleCryptoEncryptAlgorithmBuilder {
     inner: SubtleCryptoEncryptAlgorithm,
 }
 impl SubtleCryptoEncryptAlgorithmBuilder {
-    pub fn iv(self, val: &ArrayBuffer) -> Self {
+    pub fn iv(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_iv(val);
         self
     }
-    pub fn iv_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
-        self.inner.set_iv_with_typed_array(val);
-        self
-    }
-    pub fn additional_data(self, val: &ArrayBuffer) -> Self {
+    pub fn additional_data(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_additional_data(val);
-        self
-    }
-    pub fn additional_data_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
-        self.inner.set_additional_data_with_typed_array(val);
         self
     }
     pub fn tag_length(self, val: f64) -> Self {
         self.inner.set_tag_length(val);
         self
     }
-    pub fn counter(self, val: &ArrayBuffer) -> Self {
+    pub fn counter(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_counter(val);
-        self
-    }
-    pub fn counter_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
-        self.inner.set_counter_with_typed_array(val);
         self
     }
     pub fn length(self, val: f64) -> Self {
         self.inner.set_length(val);
         self
     }
-    pub fn label(self, val: &ArrayBuffer) -> Self {
+    pub fn label(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_label(val);
-        self
-    }
-    pub fn label_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
-        self.inner.set_label_with_typed_array(val);
         self
     }
     pub fn build(self) -> SubtleCryptoEncryptAlgorithm {
@@ -6516,13 +5982,10 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "publicExponent")]
     pub fn public_exponent(this: &SubtleCryptoGenerateKeyAlgorithm) -> Option<SaltKind>;
     #[wasm_bindgen(method, setter, js_name = "publicExponent")]
-    pub fn set_public_exponent(this: &SubtleCryptoGenerateKeyAlgorithm, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "publicExponent")]
-    pub fn set_public_exponent_with_typed_array<T: ::js_sys::TypedArray>(
+    pub fn set_public_exponent(
         this: &SubtleCryptoGenerateKeyAlgorithm,
-        val: &T,
-    ) where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+        val: impl ::js_sys::BufferSourceLike,
+    );
     #[wasm_bindgen(method, getter)]
     pub fn length(this: &SubtleCryptoGenerateKeyAlgorithm) -> Option<f64>;
     #[wasm_bindgen(method, setter)]
@@ -6565,12 +6028,8 @@ impl SubtleCryptoGenerateKeyAlgorithmBuilder {
         self.inner.set_modulus_length(val);
         self
     }
-    pub fn public_exponent(self, val: &ArrayBuffer) -> Self {
+    pub fn public_exponent(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_public_exponent(val);
-        self
-    }
-    pub fn public_exponent_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
-        self.inner.set_public_exponent_with_typed_array(val);
         self
     }
     pub fn length(self, val: f64) -> Self {
@@ -6851,13 +6310,10 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "publicExponent")]
     pub fn public_exponent(this: &CryptoKeyRsaKeyAlgorithm) -> SaltKind;
     #[wasm_bindgen(method, setter, js_name = "publicExponent")]
-    pub fn set_public_exponent(this: &CryptoKeyRsaKeyAlgorithm, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "publicExponent")]
-    pub fn set_public_exponent_with_typed_array<T: ::js_sys::TypedArray>(
+    pub fn set_public_exponent(
         this: &CryptoKeyRsaKeyAlgorithm,
-        val: &T,
-    ) where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+        val: impl ::js_sys::BufferSourceLike,
+    );
     #[wasm_bindgen(method, getter)]
     pub fn hash(this: &CryptoKeyRsaKeyAlgorithm) -> Option<CryptoKeyKeyAlgorithm>;
     #[wasm_bindgen(method, setter)]
@@ -6867,37 +6323,19 @@ impl CryptoKeyRsaKeyAlgorithm {
     pub fn new(
         name: impl ::wasm_bindgen::JsStringLike,
         modulus_length: f64,
-        public_exponent: &ArrayBuffer,
+        public_exponent: impl ::js_sys::BufferSourceLike,
     ) -> CryptoKeyRsaKeyAlgorithm {
         Self::builder(name, modulus_length, public_exponent).build()
-    }
-    pub fn new_with_typed_array<T: ::js_sys::TypedArray>(
-        name: impl ::wasm_bindgen::JsStringLike,
-        modulus_length: f64,
-        public_exponent: &T,
-    ) -> CryptoKeyRsaKeyAlgorithm {
-        Self::builder_with_typed_array(name, modulus_length, public_exponent).build()
     }
     pub fn builder(
         name: impl ::wasm_bindgen::JsStringLike,
         modulus_length: f64,
-        public_exponent: &ArrayBuffer,
+        public_exponent: impl ::js_sys::BufferSourceLike,
     ) -> CryptoKeyRsaKeyAlgorithmBuilder {
         let inner: CryptoKeyRsaKeyAlgorithm = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         inner.set_modulus_length(modulus_length);
         inner.set_public_exponent(public_exponent);
-        CryptoKeyRsaKeyAlgorithmBuilder { inner }
-    }
-    pub fn builder_with_typed_array<T: ::js_sys::TypedArray>(
-        name: impl ::wasm_bindgen::JsStringLike,
-        modulus_length: f64,
-        public_exponent: &T,
-    ) -> CryptoKeyRsaKeyAlgorithmBuilder {
-        let inner: CryptoKeyRsaKeyAlgorithm = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_name(name);
-        inner.set_modulus_length(modulus_length);
-        inner.set_public_exponent_with_typed_array(public_exponent);
         CryptoKeyRsaKeyAlgorithmBuilder { inner }
     }
 }
@@ -7061,65 +6499,34 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
     #[wasm_bindgen(method, catch, js_name = "decode")]
-    pub fn decode_with_array_buffer(
+    pub fn decode_with_input(
         this: &TextDecoder,
-        input: &ArrayBuffer,
+        input: impl ::js_sys::BufferSourceLike,
     ) -> Result<String, JsValue>;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
     #[wasm_bindgen(method, catch, js_name = "decode")]
-    pub fn decode_with_array_buffer_js_string(
+    pub fn decode_with_input_js_string(
         this: &TextDecoder,
-        input: &ArrayBuffer,
+        input: impl ::js_sys::BufferSourceLike,
     ) -> Result<JsString, JsValue>;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
     #[wasm_bindgen(method, catch, js_name = "decode")]
-    pub fn decode_with_typed_array(this: &TextDecoder, input: &Object) -> Result<String, JsValue>;
-    #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
-    #[wasm_bindgen(method, catch, js_name = "decode")]
-    pub fn decode_with_typed_array_js_string(
+    pub fn decode_with_input_and_options(
         this: &TextDecoder,
-        input: &Object,
-    ) -> Result<JsString, JsValue>;
-    #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
-    #[wasm_bindgen(method, catch, js_name = "decode")]
-    pub fn decode_with_array_buffer_and_options(
-        this: &TextDecoder,
-        input: &ArrayBuffer,
+        input: impl ::js_sys::BufferSourceLike,
         options: &TextDecoderDecodeOptions,
     ) -> Result<String, JsValue>;
     #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
     #[wasm_bindgen(method, catch, js_name = "decode")]
-    pub fn decode_with_array_buffer_and_options_js_string(
+    pub fn decode_with_input_and_options_js_string(
         this: &TextDecoder,
-        input: &ArrayBuffer,
-        options: &TextDecoderDecodeOptions,
-    ) -> Result<JsString, JsValue>;
-    #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
-    #[wasm_bindgen(method, catch, js_name = "decode")]
-    pub fn decode_with_typed_array_and_options(
-        this: &TextDecoder,
-        input: &Object,
-        options: &TextDecoderDecodeOptions,
-    ) -> Result<String, JsValue>;
-    #[doc = " The **`TextDecoder.decode()`** method returns a string containing text decoded from the buffer passed as a parameter."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoder/decode)"]
-    #[wasm_bindgen(method, catch, js_name = "decode")]
-    pub fn decode_with_typed_array_and_options_js_string(
-        this: &TextDecoder,
-        input: &Object,
+        input: impl ::js_sys::BufferSourceLike,
         options: &TextDecoderDecodeOptions,
     ) -> Result<JsString, JsValue>;
     #[wasm_bindgen(method, getter)]
@@ -8355,9 +7762,9 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_str(body: impl ::wasm_bindgen::JsStringLike) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_array_buffer(body: &ArrayBuffer) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_typed_array(body: &Object) -> Result<Response, JsValue>;
+    pub fn new_with_buffer_source(
+        body: impl ::js_sys::BufferSourceLike,
+    ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
     pub fn new_with_blob(body: &Blob) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
@@ -8381,13 +7788,8 @@ extern "C" {
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_array_buffer_and_init(
-        body: &ArrayBuffer,
-        init: &ResponseInit,
-    ) -> Result<Response, JsValue>;
-    #[wasm_bindgen(constructor, catch)]
-    pub fn new_with_typed_array_and_init(
-        body: &Object,
+    pub fn new_with_buffer_source_and_init(
+        body: impl ::js_sys::BufferSourceLike,
         init: &ResponseInit,
     ) -> Result<Response, JsValue>;
     #[wasm_bindgen(constructor, catch)]
@@ -8825,11 +8227,10 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "body")]
     pub fn set_body_with_str<Cf>(this: &RequestInit<Cf>, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "body")]
-    pub fn set_body_with_array_buffer<Cf>(this: &RequestInit<Cf>, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "body")]
-    pub fn set_body_with_typed_array<Cf, T: ::js_sys::TypedArray>(this: &RequestInit<Cf>, val: &T)
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    pub fn set_body_with_buffer_source<Cf>(
+        this: &RequestInit<Cf>,
+        val: impl ::js_sys::BufferSourceLike,
+    );
     #[wasm_bindgen(method, setter, js_name = "body")]
     pub fn set_body_with_blob<Cf>(this: &RequestInit<Cf>, val: &Blob);
     #[wasm_bindgen(method, setter, js_name = "body")]
@@ -8937,12 +8338,8 @@ impl<Cf> RequestInitBuilder<Cf> {
         self.inner.set_body_with_str(val);
         self
     }
-    pub fn body_with_array_buffer(self, val: &ArrayBuffer) -> Self {
-        self.inner.set_body_with_array_buffer(val);
-        self
-    }
-    pub fn body_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
-        self.inner.set_body_with_typed_array(val);
+    pub fn body_with_buffer_source(self, val: impl ::js_sys::BufferSourceLike) -> Self {
+        self.inner.set_body_with_buffer_source(val);
         self
     }
     pub fn body_with_blob(self, val: &Blob) -> Self {
@@ -9596,28 +8993,16 @@ extern "C" {
         value: impl ::wasm_bindgen::JsStringLike,
     ) -> Promise<()>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_array_buffer(
+    pub async fn put_with_buffer_source(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ArrayBuffer,
+        value: impl ::js_sys::BufferSourceLike,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_array_buffer_promise(
+    pub fn put_with_buffer_source_promise(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ArrayBuffer,
-    ) -> Promise<()>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_typed_array(
-        this: &KVNamespace,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &Object,
-    ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_typed_array_promise(
-        this: &KVNamespace,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &Object,
+        value: impl ::js_sys::BufferSourceLike,
     ) -> Promise<()>;
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub async fn put_with_readable_stream<R>(
@@ -9646,31 +9031,17 @@ extern "C" {
         options: &KVNamespacePutOptions,
     ) -> Promise<()>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_array_buffer_and_options(
+    pub async fn put_with_buffer_source_and_options(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ArrayBuffer,
+        value: impl ::js_sys::BufferSourceLike,
         options: &KVNamespacePutOptions,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_array_buffer_and_options_promise(
+    pub fn put_with_buffer_source_and_options_promise(
         this: &KVNamespace,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ArrayBuffer,
-        options: &KVNamespacePutOptions,
-    ) -> Promise<()>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_typed_array_and_options(
-        this: &KVNamespace,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &Object,
-        options: &KVNamespacePutOptions,
-    ) -> Result<(), JsValue>;
-    #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_typed_array_and_options_promise(
-        this: &KVNamespace,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &Object,
+        value: impl ::js_sys::BufferSourceLike,
         options: &KVNamespacePutOptions,
     ) -> Promise<()>;
     #[wasm_bindgen(method, catch, js_name = "put")]
@@ -11892,28 +11263,16 @@ extern "C" {
         value: &ReadableStream<R>,
     ) -> Promise<Option<R2Object>>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_array_buffer(
+    pub async fn put_with_buffer_source(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ArrayBuffer,
+        value: impl ::js_sys::BufferSourceLike,
     ) -> Result<Option<R2Object>, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_array_buffer_promise(
+    pub fn put_with_buffer_source_promise(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ArrayBuffer,
-    ) -> Promise<Option<R2Object>>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_typed_array(
-        this: &R2Bucket,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &Object,
-    ) -> Result<Option<R2Object>, JsValue>;
-    #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_typed_array_promise(
-        this: &R2Bucket,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &Object,
+        value: impl ::js_sys::BufferSourceLike,
     ) -> Promise<Option<R2Object>>;
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub async fn put_with_str(
@@ -11966,31 +11325,17 @@ extern "C" {
         options: &R2BucketPutOptions,
     ) -> Promise<Option<R2Object>>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_array_buffer_and_r2_bucket_put_options(
+    pub async fn put_with_buffer_source_and_r2_bucket_put_options(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ArrayBuffer,
+        value: impl ::js_sys::BufferSourceLike,
         options: &R2BucketPutOptions,
     ) -> Result<Option<R2Object>, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_array_buffer_and_r2_bucket_put_options_promise(
+    pub fn put_with_buffer_source_and_r2_bucket_put_options_promise(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ArrayBuffer,
-        options: &R2BucketPutOptions,
-    ) -> Promise<Option<R2Object>>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_typed_array_and_r2_bucket_put_options(
-        this: &R2Bucket,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &Object,
-        options: &R2BucketPutOptions,
-    ) -> Result<Option<R2Object>, JsValue>;
-    #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_typed_array_and_r2_bucket_put_options_promise(
-        this: &R2Bucket,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &Object,
+        value: impl ::js_sys::BufferSourceLike,
         options: &R2BucketPutOptions,
     ) -> Promise<Option<R2Object>>;
     #[wasm_bindgen(method, catch, js_name = "put")]
@@ -12050,31 +11395,17 @@ extern "C" {
         options: &R2PutOptions,
     ) -> Promise<R2Object>;
     #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_array_buffer_and_options(
+    pub async fn put_with_buffer_source_and_options(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ArrayBuffer,
+        value: impl ::js_sys::BufferSourceLike,
         options: &R2PutOptions,
     ) -> Result<R2Object, JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_array_buffer_and_options_promise(
+    pub fn put_with_buffer_source_and_options_promise(
         this: &R2Bucket,
         key: impl ::wasm_bindgen::JsStringLike,
-        value: &ArrayBuffer,
-        options: &R2PutOptions,
-    ) -> Promise<R2Object>;
-    #[wasm_bindgen(method, catch, js_name = "put")]
-    pub async fn put_with_typed_array_and_options(
-        this: &R2Bucket,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &Object,
-        options: &R2PutOptions,
-    ) -> Result<R2Object, JsValue>;
-    #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_typed_array_and_options_promise(
-        this: &R2Bucket,
-        key: impl ::wasm_bindgen::JsStringLike,
-        value: &Object,
+        value: impl ::js_sys::BufferSourceLike,
         options: &R2PutOptions,
     ) -> Promise<R2Object>;
     #[wasm_bindgen(method, catch, js_name = "put")]
@@ -12333,60 +11664,40 @@ impl R2BucketPutOptionsBuilder {
         self.inner.set_custom_metadata(val);
         self
     }
-    pub fn md5(self, val: &ArrayBuffer) -> Self {
+    pub fn md5(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_md5(val);
-        self
-    }
-    pub fn md5_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
-        self.inner.set_md5_with_typed_array(val);
         self
     }
     pub fn md5_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_md5_with_str(val);
         self
     }
-    pub fn sha1(self, val: &ArrayBuffer) -> Self {
+    pub fn sha1(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_sha1(val);
-        self
-    }
-    pub fn sha1_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
-        self.inner.set_sha1_with_typed_array(val);
         self
     }
     pub fn sha1_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_sha1_with_str(val);
         self
     }
-    pub fn sha256(self, val: &ArrayBuffer) -> Self {
+    pub fn sha256(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_sha256(val);
-        self
-    }
-    pub fn sha256_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
-        self.inner.set_sha256_with_typed_array(val);
         self
     }
     pub fn sha256_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_sha256_with_str(val);
         self
     }
-    pub fn sha384(self, val: &ArrayBuffer) -> Self {
+    pub fn sha384(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_sha384(val);
-        self
-    }
-    pub fn sha384_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
-        self.inner.set_sha384_with_typed_array(val);
         self
     }
     pub fn sha384_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_sha384_with_str(val);
         self
     }
-    pub fn sha512(self, val: &ArrayBuffer) -> Self {
+    pub fn sha512(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_sha512(val);
-        self
-    }
-    pub fn sha512_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
-        self.inner.set_sha512_with_typed_array(val);
         self
     }
     pub fn sha512_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
@@ -12440,28 +11751,16 @@ extern "C" {
         value: &ReadableStream<R>,
     ) -> Promise<R2UploadedPart>;
     #[wasm_bindgen(method, catch, js_name = "uploadPart")]
-    pub async fn upload_part_with_array_buffer(
+    pub async fn upload_part_with_buffer_source(
         this: &R2MultipartUpload,
         part_number: f64,
-        value: &ArrayBuffer,
+        value: impl ::js_sys::BufferSourceLike,
     ) -> Result<R2UploadedPart, JsValue>;
     #[wasm_bindgen(method, js_name = "uploadPart")]
-    pub fn upload_part_with_array_buffer_promise(
+    pub fn upload_part_with_buffer_source_promise(
         this: &R2MultipartUpload,
         part_number: f64,
-        value: &ArrayBuffer,
-    ) -> Promise<R2UploadedPart>;
-    #[wasm_bindgen(method, catch, js_name = "uploadPart")]
-    pub async fn upload_part_with_typed_array(
-        this: &R2MultipartUpload,
-        part_number: f64,
-        value: &Object,
-    ) -> Result<R2UploadedPart, JsValue>;
-    #[wasm_bindgen(method, js_name = "uploadPart")]
-    pub fn upload_part_with_typed_array_promise(
-        this: &R2MultipartUpload,
-        part_number: f64,
-        value: &Object,
+        value: impl ::js_sys::BufferSourceLike,
     ) -> Promise<R2UploadedPart>;
     #[wasm_bindgen(method, catch, js_name = "uploadPart")]
     pub async fn upload_part_with_str(
@@ -12502,31 +11801,17 @@ extern "C" {
         options: &R2UploadPartOptions,
     ) -> Promise<R2UploadedPart>;
     #[wasm_bindgen(method, catch, js_name = "uploadPart")]
-    pub async fn upload_part_with_array_buffer_and_options(
+    pub async fn upload_part_with_buffer_source_and_options(
         this: &R2MultipartUpload,
         part_number: f64,
-        value: &ArrayBuffer,
+        value: impl ::js_sys::BufferSourceLike,
         options: &R2UploadPartOptions,
     ) -> Result<R2UploadedPart, JsValue>;
     #[wasm_bindgen(method, js_name = "uploadPart")]
-    pub fn upload_part_with_array_buffer_and_options_promise(
+    pub fn upload_part_with_buffer_source_and_options_promise(
         this: &R2MultipartUpload,
         part_number: f64,
-        value: &ArrayBuffer,
-        options: &R2UploadPartOptions,
-    ) -> Promise<R2UploadedPart>;
-    #[wasm_bindgen(method, catch, js_name = "uploadPart")]
-    pub async fn upload_part_with_typed_array_and_options(
-        this: &R2MultipartUpload,
-        part_number: f64,
-        value: &Object,
-        options: &R2UploadPartOptions,
-    ) -> Result<R2UploadedPart, JsValue>;
-    #[wasm_bindgen(method, js_name = "uploadPart")]
-    pub fn upload_part_with_typed_array_and_options_promise(
-        this: &R2MultipartUpload,
-        part_number: f64,
-        value: &Object,
+        value: impl ::js_sys::BufferSourceLike,
         options: &R2UploadPartOptions,
     ) -> Promise<R2UploadedPart>;
     #[wasm_bindgen(method, catch, js_name = "uploadPart")]
@@ -12910,51 +12195,31 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn md5(this: &R2PutOptions) -> Option<Md5Kind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_md5(this: &R2PutOptions, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "md5")]
-    pub fn set_md5_with_typed_array<T: ::js_sys::TypedArray>(this: &R2PutOptions, val: &T)
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    pub fn set_md5(this: &R2PutOptions, val: impl ::js_sys::BufferSourceLike);
     #[wasm_bindgen(method, setter, js_name = "md5")]
     pub fn set_md5_with_str(this: &R2PutOptions, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
     pub fn sha1(this: &R2PutOptions) -> Option<Md5Kind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_sha1(this: &R2PutOptions, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "sha1")]
-    pub fn set_sha1_with_typed_array<T: ::js_sys::TypedArray>(this: &R2PutOptions, val: &T)
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    pub fn set_sha1(this: &R2PutOptions, val: impl ::js_sys::BufferSourceLike);
     #[wasm_bindgen(method, setter, js_name = "sha1")]
     pub fn set_sha1_with_str(this: &R2PutOptions, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
     pub fn sha256(this: &R2PutOptions) -> Option<Md5Kind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_sha256(this: &R2PutOptions, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "sha256")]
-    pub fn set_sha256_with_typed_array<T: ::js_sys::TypedArray>(this: &R2PutOptions, val: &T)
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    pub fn set_sha256(this: &R2PutOptions, val: impl ::js_sys::BufferSourceLike);
     #[wasm_bindgen(method, setter, js_name = "sha256")]
     pub fn set_sha256_with_str(this: &R2PutOptions, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
     pub fn sha384(this: &R2PutOptions) -> Option<Md5Kind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_sha384(this: &R2PutOptions, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "sha384")]
-    pub fn set_sha384_with_typed_array<T: ::js_sys::TypedArray>(this: &R2PutOptions, val: &T)
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    pub fn set_sha384(this: &R2PutOptions, val: impl ::js_sys::BufferSourceLike);
     #[wasm_bindgen(method, setter, js_name = "sha384")]
     pub fn set_sha384_with_str(this: &R2PutOptions, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
     pub fn sha512(this: &R2PutOptions) -> Option<Md5Kind>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_sha512(this: &R2PutOptions, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "sha512")]
-    pub fn set_sha512_with_typed_array<T: ::js_sys::TypedArray>(this: &R2PutOptions, val: &T)
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    pub fn set_sha512(this: &R2PutOptions, val: impl ::js_sys::BufferSourceLike);
     #[wasm_bindgen(method, setter, js_name = "sha512")]
     pub fn set_sha512_with_str(this: &R2PutOptions, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter, js_name = "storageClass")]
@@ -13009,60 +12274,40 @@ impl R2PutOptionsBuilder {
         self.inner.set_custom_metadata(val);
         self
     }
-    pub fn md5(self, val: &ArrayBuffer) -> Self {
+    pub fn md5(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_md5(val);
-        self
-    }
-    pub fn md5_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
-        self.inner.set_md5_with_typed_array(val);
         self
     }
     pub fn md5_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_md5_with_str(val);
         self
     }
-    pub fn sha1(self, val: &ArrayBuffer) -> Self {
+    pub fn sha1(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_sha1(val);
-        self
-    }
-    pub fn sha1_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
-        self.inner.set_sha1_with_typed_array(val);
         self
     }
     pub fn sha1_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_sha1_with_str(val);
         self
     }
-    pub fn sha256(self, val: &ArrayBuffer) -> Self {
+    pub fn sha256(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_sha256(val);
-        self
-    }
-    pub fn sha256_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
-        self.inner.set_sha256_with_typed_array(val);
         self
     }
     pub fn sha256_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_sha256_with_str(val);
         self
     }
-    pub fn sha384(self, val: &ArrayBuffer) -> Self {
+    pub fn sha384(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_sha384(val);
-        self
-    }
-    pub fn sha384_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
-        self.inner.set_sha384_with_typed_array(val);
         self
     }
     pub fn sha384_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_sha384_with_str(val);
         self
     }
-    pub fn sha512(self, val: &ArrayBuffer) -> Self {
+    pub fn sha512(self, val: impl ::js_sys::BufferSourceLike) -> Self {
         self.inner.set_sha512(val);
-        self
-    }
-    pub fn sha512_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
-        self.inner.set_sha512_with_typed_array(val);
         self
     }
     pub fn sha512_with_str(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
@@ -14515,15 +13760,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "respondWithNewView")]
     pub fn respond_with_new_view(
         this: &ReadableStreamBYOBRequest,
-        view: &ArrayBuffer,
-    ) -> Result<(), JsValue>;
-    #[doc = " The **`respondWithNewView()`** method of the ReadableStreamBYOBRequest interface specifies a new view that the consumer of the associated readable byte stream should write to instead of ReadableStreamBYOBRequest.view."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableStreamBYOBRequest/respondWithNewView)"]
-    #[wasm_bindgen(method, catch, js_name = "respondWithNewView")]
-    pub fn respond_with_new_view_with_typed_array(
-        this: &ReadableStreamBYOBRequest,
-        view: &Object,
+        view: impl ::js_sys::BufferSourceLike,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, getter, js_name = "atLeast")]
     pub fn at_least(this: &ReadableStreamBYOBRequest) -> Option<f64>;
@@ -14591,15 +13828,9 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/enqueue)"]
     #[wasm_bindgen(method, catch)]
-    pub fn enqueue(this: &ReadableByteStreamController, chunk: &ArrayBuffer)
-        -> Result<(), JsValue>;
-    #[doc = " The **`enqueue()`** method of the ReadableByteStreamController interface enqueues a given chunk on the associated readable byte stream (the chunk is copied into the stream's internal queues)."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/ReadableByteStreamController/enqueue)"]
-    #[wasm_bindgen(method, catch, js_name = "enqueue")]
-    pub fn enqueue_with_typed_array(
+    pub fn enqueue(
         this: &ReadableByteStreamController,
-        chunk: &Object,
+        chunk: impl ::js_sys::BufferSourceLike,
     ) -> Result<(), JsValue>;
     #[doc = " The **`error()`** method of the ReadableByteStreamController interface causes any future interactions with the associated stream to error with the specified reason."]
     #[doc = ""]
@@ -16721,12 +15952,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/send)"]
     #[wasm_bindgen(method, catch)]
-    pub fn send(this: &WebSocket, message: &ArrayBuffer) -> Result<(), JsValue>;
-    #[doc = " The **`WebSocket.send()`** method enqueues the specified data to be transmitted to the server over the WebSocket connection, increasing the value of `bufferedAmount` by the number of bytes needed to contain the data."]
-    #[doc = ""]
-    #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/send)"]
-    #[wasm_bindgen(method, catch, js_name = "send")]
-    pub fn send_with_typed_array(this: &WebSocket, message: &Object) -> Result<(), JsValue>;
+    pub fn send(this: &WebSocket, message: impl ::js_sys::BufferSourceLike) -> Result<(), JsValue>;
     #[doc = " The **`WebSocket.send()`** method enqueues the specified data to be transmitted to the server over the WebSocket connection, increasing the value of `bufferedAmount` by the number of bytes needed to contain the data."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebSocket/send)"]
@@ -45434,11 +44660,10 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_content(this: &EmailAttachment, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, setter, js_name = "content")]
-    pub fn set_content_with_array_buffer(this: &EmailAttachment, val: &ArrayBuffer);
-    #[wasm_bindgen(method, setter, js_name = "content")]
-    pub fn set_content_with_typed_array<T: ::js_sys::TypedArray>(this: &EmailAttachment, val: &T)
-    where
-        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    pub fn set_content_with_buffer_source(
+        this: &EmailAttachment,
+        val: impl ::js_sys::BufferSourceLike,
+    );
 }
 impl EmailAttachment {
     #[doc = " Construct with `disposition: \"inline\"`."]
@@ -45457,33 +44682,18 @@ impl EmailAttachment {
         inner
     }
     #[doc = " Construct with `disposition: \"inline\"`."]
-    pub fn new_inline_with_array_buffer(
+    pub fn new_inline_with_buffer_source(
         content_id: impl ::wasm_bindgen::JsStringLike,
         filename: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
-        content: &ArrayBuffer,
+        content: impl ::js_sys::BufferSourceLike,
     ) -> EmailAttachment {
         let inner: EmailAttachment = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_disposition(DispositionKind::Inline);
         inner.set_content_id(content_id);
         inner.set_filename(filename);
         inner.set_type(r#type);
-        inner.set_content_with_array_buffer(content);
-        inner
-    }
-    #[doc = " Construct with `disposition: \"inline\"`."]
-    pub fn new_inline_with_typed_array<T: ::js_sys::TypedArray>(
-        content_id: impl ::wasm_bindgen::JsStringLike,
-        filename: impl ::wasm_bindgen::JsStringLike,
-        r#type: impl ::wasm_bindgen::JsStringLike,
-        content: &T,
-    ) -> EmailAttachment {
-        let inner: EmailAttachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition(DispositionKind::Inline);
-        inner.set_content_id(content_id);
-        inner.set_filename(filename);
-        inner.set_type(r#type);
-        inner.set_content_with_typed_array(content);
+        inner.set_content_with_buffer_source(content);
         inner
     }
     #[doc = " Construct with `disposition: \"attachment\"`."]
@@ -45495,20 +44705,12 @@ impl EmailAttachment {
         Self::builder_attachment(filename, r#type, content).build()
     }
     #[doc = " Construct with `disposition: \"attachment\"`."]
-    pub fn new_attachment_with_array_buffer(
+    pub fn new_attachment_with_buffer_source(
         filename: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
-        content: &ArrayBuffer,
+        content: impl ::js_sys::BufferSourceLike,
     ) -> EmailAttachment {
-        Self::builder_attachment_with_array_buffer(filename, r#type, content).build()
-    }
-    #[doc = " Construct with `disposition: \"attachment\"`."]
-    pub fn new_attachment_with_typed_array<T: ::js_sys::TypedArray>(
-        filename: impl ::wasm_bindgen::JsStringLike,
-        r#type: impl ::wasm_bindgen::JsStringLike,
-        content: &T,
-    ) -> EmailAttachment {
-        Self::builder_attachment_with_typed_array(filename, r#type, content).build()
+        Self::builder_attachment_with_buffer_source(filename, r#type, content).build()
     }
     #[doc = " Start a builder with `disposition: \"attachment\"`."]
     pub fn builder_attachment(
@@ -45524,29 +44726,16 @@ impl EmailAttachment {
         EmailAttachmentBuilder { inner }
     }
     #[doc = " Start a builder with `disposition: \"attachment\"`."]
-    pub fn builder_attachment_with_array_buffer(
+    pub fn builder_attachment_with_buffer_source(
         filename: impl ::wasm_bindgen::JsStringLike,
         r#type: impl ::wasm_bindgen::JsStringLike,
-        content: &ArrayBuffer,
+        content: impl ::js_sys::BufferSourceLike,
     ) -> EmailAttachmentBuilder {
         let inner: EmailAttachment = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_disposition(DispositionKind::Attachment);
         inner.set_filename(filename);
         inner.set_type(r#type);
-        inner.set_content_with_array_buffer(content);
-        EmailAttachmentBuilder { inner }
-    }
-    #[doc = " Start a builder with `disposition: \"attachment\"`."]
-    pub fn builder_attachment_with_typed_array<T: ::js_sys::TypedArray>(
-        filename: impl ::wasm_bindgen::JsStringLike,
-        r#type: impl ::wasm_bindgen::JsStringLike,
-        content: &T,
-    ) -> EmailAttachmentBuilder {
-        let inner: EmailAttachment = JsCast::unchecked_into(js_sys::Object::new());
-        inner.set_disposition(DispositionKind::Attachment);
-        inner.set_filename(filename);
-        inner.set_type(r#type);
-        inner.set_content_with_typed_array(content);
+        inner.set_content_with_buffer_source(content);
         EmailAttachmentBuilder { inner }
     }
 }

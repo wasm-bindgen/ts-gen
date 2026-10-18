@@ -140,6 +140,43 @@
   ;; set from(value: boolean)
   (import "primitive-unions-mono" "Settings.set_from_with_bool" (func $primitive-unions-mono:Settings.set_from_with_bool (param $this externref) (param $value i32)))
 
+  ;; verify(algorithm: string, signature: BufferSource, data: ArrayBuffer): Promise<boolean>
+  (import "primitive-unions-mono" "verify" (func $primitive-unions-mono:verify (param $algorithm externref) (param $signature externref) (param $data externref) (result externref)))
+  ;; verify(algorithm: Target, signature: BufferSource, data: ArrayBuffer): Promise<boolean>
+  (import "primitive-unions-mono" "verify_with_target" (func $primitive-unions-mono:verify_with_target (param $algorithm externref) (param $signature externref) (param $data externref) (result externref)))
+  ;; verify(algorithm: string, signature: BufferSource, data: ArrayBufferView): Promise<boolean>
+  (import "primitive-unions-mono" "verify_with_typed_array" (func $primitive-unions-mono:verify_with_typed_array (param $algorithm externref) (param $signature externref) (param $data externref) (result externref)))
+  ;; verify(algorithm: Target, signature: BufferSource, data: ArrayBufferView): Promise<boolean>
+  (import "primitive-unions-mono" "verify_with_target_and_typed_array" (func $primitive-unions-mono:verify_with_target_and_typed_array (param $algorithm externref) (param $signature externref) (param $data externref) (result externref)))
+  ;; write(chunk: string): void
+  (import "primitive-unions-mono" "write" (func $primitive-unions-mono:write (param $chunk externref)))
+  ;; write(chunk: ArrayBuffer): void
+  (import "primitive-unions-mono" "write_with_array_buffer" (func $primitive-unions-mono:write_with_array_buffer (param $chunk externref)))
+  ;; write(chunk: ArrayBufferView): void
+  (import "primitive-unions-mono" "write_with_typed_array" (func $primitive-unions-mono:write_with_typed_array (param $chunk externref)))
+  ;; write(chunk: null): void
+  (import "primitive-unions-mono" "write_with_null" (func $primitive-unions-mono:write_with_null (param $chunk externref)))
+  ;; digest(): void
+  (import "primitive-unions-mono" "digest" (func $primitive-unions-mono:digest))
+  ;; digest(data: BufferSource): void
+  (import "primitive-unions-mono" "digest_with_data" (func $primitive-unions-mono:digest_with_data (param $data externref)))
+
+  ;; Hashes
+  ;; {} as Hashes
+  (import "primitive-unions-mono" "Hashes.new" (func $primitive-unions-mono:Hashes.new (result externref)))
+  ;; md5?: ArrayBuffer | ArrayBufferView | string
+  (import "primitive-unions-mono" "Hashes.md5" (func $primitive-unions-mono:Hashes.md5 (param $this externref) (result externref)))
+  ;; set md5(value: ArrayBuffer)
+  (import "primitive-unions-mono" "Hashes.set_md5" (func $primitive-unions-mono:Hashes.set_md5 (param $this externref) (param $value externref)))
+  ;; set md5(value: ArrayBufferView)
+  (import "primitive-unions-mono" "Hashes.set_md5_with_typed_array" (func $primitive-unions-mono:Hashes.set_md5_with_typed_array (param $this externref) (param $value externref)))
+  ;; set md5(value: string)
+  (import "primitive-unions-mono" "Hashes.set_md5_with_str" (func $primitive-unions-mono:Hashes.set_md5_with_str (param $this externref) (param $value externref)))
+  ;; salt: BufferSource
+  (import "primitive-unions-mono" "Hashes.salt" (func $primitive-unions-mono:Hashes.salt (param $this externref) (result externref)))
+  ;; set salt(value: BufferSource)
+  (import "primitive-unions-mono" "Hashes.set_salt" (func $primitive-unions-mono:Hashes.set_salt (param $this externref) (param $value externref)))
+
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
 

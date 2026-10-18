@@ -664,6 +664,287 @@ impl From<Settings> for SettingsBuilder {
         Self { inner }
     }
 }
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(catch)]
+    pub async fn verify(
+        algorithm: &str,
+        signature: &Object,
+        data: &ArrayBuffer,
+    ) -> Result<bool, JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(js_name = "verify")]
+    pub fn verify_promise(
+        algorithm: &str,
+        signature: &Object,
+        data: &ArrayBuffer,
+    ) -> Promise<Boolean>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "verify")]
+    pub async fn verify_with_target(
+        algorithm: &Target,
+        signature: &Object,
+        data: &ArrayBuffer,
+    ) -> Result<bool, JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(js_name = "verify")]
+    pub fn verify_with_target_promise(
+        algorithm: &Target,
+        signature: &Object,
+        data: &ArrayBuffer,
+    ) -> Promise<Boolean>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "verify")]
+    pub async fn verify_with_array_buffer(
+        algorithm: &str,
+        signature: &ArrayBuffer,
+        data: &ArrayBuffer,
+    ) -> Result<bool, JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(js_name = "verify")]
+    pub fn verify_with_array_buffer_promise(
+        algorithm: &str,
+        signature: &ArrayBuffer,
+        data: &ArrayBuffer,
+    ) -> Promise<Boolean>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "verify")]
+    pub async fn verify_with_target_and_array_buffer(
+        algorithm: &Target,
+        signature: &ArrayBuffer,
+        data: &ArrayBuffer,
+    ) -> Result<bool, JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(js_name = "verify")]
+    pub fn verify_with_target_and_array_buffer_promise(
+        algorithm: &Target,
+        signature: &ArrayBuffer,
+        data: &ArrayBuffer,
+    ) -> Promise<Boolean>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "verify")]
+    pub async fn verify_with_typed_array(
+        algorithm: &str,
+        signature: &Object,
+        data: &Object,
+    ) -> Result<bool, JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(js_name = "verify")]
+    pub fn verify_with_typed_array_promise(
+        algorithm: &str,
+        signature: &Object,
+        data: &Object,
+    ) -> Promise<Boolean>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "verify")]
+    pub async fn verify_with_target_and_typed_array(
+        algorithm: &Target,
+        signature: &Object,
+        data: &Object,
+    ) -> Result<bool, JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(js_name = "verify")]
+    pub fn verify_with_target_and_typed_array_promise(
+        algorithm: &Target,
+        signature: &Object,
+        data: &Object,
+    ) -> Promise<Boolean>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "verify")]
+    pub async fn verify_with_array_buffer_and_typed_array(
+        algorithm: &str,
+        signature: &ArrayBuffer,
+        data: &Object,
+    ) -> Result<bool, JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(js_name = "verify")]
+    pub fn verify_with_array_buffer_and_typed_array_promise(
+        algorithm: &str,
+        signature: &ArrayBuffer,
+        data: &Object,
+    ) -> Promise<Boolean>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "verify")]
+    pub async fn verify_with_target_and_array_buffer_and_typed_array(
+        algorithm: &Target,
+        signature: &ArrayBuffer,
+        data: &Object,
+    ) -> Result<bool, JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(js_name = "verify")]
+    pub fn verify_with_target_and_array_buffer_and_typed_array_promise(
+        algorithm: &Target,
+        signature: &ArrayBuffer,
+        data: &Object,
+    ) -> Promise<Boolean>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    pub fn write(chunk: &str);
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "write")]
+    pub fn try_write(chunk: &str) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(js_name = "write")]
+    pub fn write_with_array_buffer(chunk: &ArrayBuffer);
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "write")]
+    pub fn try_write_with_array_buffer(chunk: &ArrayBuffer) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(js_name = "write")]
+    pub fn write_with_typed_array(chunk: &Object);
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "write")]
+    pub fn try_write_with_typed_array(chunk: &Object) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(js_name = "write")]
+    fn __write_with_null(chunk: &::wasm_bindgen::JsValue);
+}
+pub fn write_with_null() {
+    __write_with_null(&::wasm_bindgen::JsValue::NULL)
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "write")]
+    fn __try_write_with_null(chunk: &::wasm_bindgen::JsValue) -> Result<(), JsValue>;
+}
+pub fn try_write_with_null() -> Result<(), JsValue> {
+    __try_write_with_null(&::wasm_bindgen::JsValue::NULL)
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    pub fn digest();
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "digest")]
+    pub fn try_digest() -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(js_name = "digest")]
+    pub fn digest_with_typed_array(data: &Object);
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "digest")]
+    pub fn try_digest_with_typed_array(data: &Object) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(js_name = "digest")]
+    pub fn digest_with_array_buffer(data: &ArrayBuffer);
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = "digest")]
+    pub fn try_digest_with_array_buffer(data: &ArrayBuffer) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(module = "primitive-unions-mono")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Hashes;
+    #[wasm_bindgen(method, getter)]
+    pub fn md5(this: &Hashes) -> Option<Md5Kind>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_md5(this: &Hashes, val: &ArrayBuffer);
+    #[wasm_bindgen(method, setter, js_name = "md5")]
+    pub fn set_md5_with_typed_array<T: ::js_sys::TypedArray>(this: &Hashes, val: &T);
+    #[wasm_bindgen(method, setter, js_name = "md5")]
+    pub fn set_md5_with_str(this: &Hashes, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn salt(this: &Hashes) -> SaltKind;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_salt<T: ::js_sys::TypedArray>(this: &Hashes, val: &T);
+    #[wasm_bindgen(method, setter, js_name = "salt")]
+    pub fn set_salt_with_array_buffer(this: &Hashes, val: &ArrayBuffer);
+}
+impl Hashes {
+    pub fn new<T: ::js_sys::TypedArray>(salt: &T) -> Hashes {
+        Self::builder(salt).build()
+    }
+    pub fn new_with_array_buffer(salt: &ArrayBuffer) -> Hashes {
+        Self::builder_with_array_buffer(salt).build()
+    }
+    pub fn builder<T: ::js_sys::TypedArray>(salt: &T) -> HashesBuilder {
+        let inner: Hashes = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_salt(salt);
+        HashesBuilder { inner }
+    }
+    pub fn builder_with_array_buffer(salt: &ArrayBuffer) -> HashesBuilder {
+        let inner: Hashes = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_salt_with_array_buffer(salt);
+        HashesBuilder { inner }
+    }
+}
+pub struct HashesBuilder {
+    inner: Hashes,
+}
+impl HashesBuilder {
+    pub fn md5(self, val: &ArrayBuffer) -> Self {
+        self.inner.set_md5(val);
+        self
+    }
+    pub fn md5_with_typed_array<T: ::js_sys::TypedArray>(self, val: &T) -> Self {
+        self.inner.set_md5_with_typed_array(val);
+        self
+    }
+    pub fn md5_with_str(self, val: &str) -> Self {
+        self.inner.set_md5_with_str(val);
+        self
+    }
+    pub fn build(self) -> Hashes {
+        self.inner
+    }
+}
+impl From<Hashes> for HashesBuilder {
+    fn from(inner: Hashes) -> Self {
+        Self { inner }
+    }
+}
 #[wasm_bindgen(private)]
 pub enum CurrentReturnKind {
     String(String),
@@ -685,4 +966,15 @@ pub enum FromKind {
     String(String),
     Bool(bool),
     Target(Target),
+}
+#[wasm_bindgen(private)]
+pub enum Md5Kind {
+    ArrayBuffer(ArrayBuffer),
+    Uint8Array(Uint8Array),
+    String(String),
+}
+#[wasm_bindgen(private)]
+pub enum SaltKind {
+    Uint8Array(Uint8Array),
+    ArrayBuffer(ArrayBuffer),
 }
