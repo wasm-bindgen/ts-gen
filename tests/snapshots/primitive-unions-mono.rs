@@ -386,20 +386,20 @@ impl From<Settings> for SettingsBuilder {
 pub type BufferSource = JsValue;
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, slice = "copy")]
+    #[wasm_bindgen(catch)]
     pub fn verify(
         algorithm: impl ::wasm_bindgen::JsStringLike,
-        signature: impl ::js_sys::BufferSourceLike,
-        data: impl ::js_sys::BufferSourceLike,
+        #[wasm_bindgen(slice = "copy")] signature: impl ::js_sys::BufferSourceLike,
+        #[wasm_bindgen(slice = "copy")] data: impl ::js_sys::BufferSourceLike,
     ) -> Promise<bool>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "verify", slice = "copy")]
+    #[wasm_bindgen(catch, js_name = "verify")]
     pub fn verify_with_algorithm(
         algorithm: &Target,
-        signature: impl ::js_sys::BufferSourceLike,
-        data: impl ::js_sys::BufferSourceLike,
+        #[wasm_bindgen(slice = "copy")] signature: impl ::js_sys::BufferSourceLike,
+        #[wasm_bindgen(slice = "copy")] data: impl ::js_sys::BufferSourceLike,
     ) -> Promise<bool>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
@@ -413,14 +413,16 @@ extern "C" {
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "write", slice = "copy")]
-    pub fn write_with_buffer_source(chunk: impl ::js_sys::BufferSourceLike);
+    #[wasm_bindgen(js_name = "write")]
+    pub fn write_with_buffer_source(
+        #[wasm_bindgen(slice = "copy")] chunk: impl ::js_sys::BufferSourceLike,
+    );
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "write", slice = "copy")]
+    #[wasm_bindgen(catch, js_name = "write")]
     pub fn try_write_with_buffer_source(
-        chunk: impl ::js_sys::BufferSourceLike,
+        #[wasm_bindgen(slice = "copy")] chunk: impl ::js_sys::BufferSourceLike,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
@@ -450,13 +452,15 @@ extern "C" {
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(js_name = "digest", slice = "copy")]
-    pub fn digest_with_data(data: impl ::js_sys::BufferSourceLike);
+    #[wasm_bindgen(js_name = "digest")]
+    pub fn digest_with_data(#[wasm_bindgen(slice = "copy")] data: impl ::js_sys::BufferSourceLike);
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = "digest", slice = "copy")]
-    pub fn try_digest_with_data(data: impl ::js_sys::BufferSourceLike) -> Result<(), JsValue>;
+    #[wasm_bindgen(catch, js_name = "digest")]
+    pub fn try_digest_with_data(
+        #[wasm_bindgen(slice = "copy")] data: impl ::js_sys::BufferSourceLike,
+    ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "primitive-unions-mono", experimental_generic_mono)]
 extern "C" {
@@ -465,18 +469,27 @@ extern "C" {
     pub type Hashes;
     #[wasm_bindgen(method, getter)]
     pub fn md5(this: &Hashes) -> Option<Md5Kind>;
-    #[wasm_bindgen(method, setter, slice = "copy")]
-    pub fn set_md5(this: &Hashes, val: impl ::js_sys::BufferSourceLike);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_md5(
+        this: &Hashes,
+        #[wasm_bindgen(slice = "copy")] val: impl ::js_sys::BufferSourceLike,
+    );
     #[wasm_bindgen(method, setter, js_name = "md5")]
     pub fn set_md5_with_str(this: &Hashes, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
     pub fn salt(this: &Hashes) -> JsValue;
-    #[wasm_bindgen(method, setter, slice = "copy")]
-    pub fn set_salt(this: &Hashes, val: impl ::js_sys::BufferSourceLike);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_salt(
+        this: &Hashes,
+        #[wasm_bindgen(slice = "copy")] val: impl ::js_sys::BufferSourceLike,
+    );
     #[wasm_bindgen(method, getter)]
     pub fn iv(this: &Hashes) -> Option<JsValue>;
-    #[wasm_bindgen(method, setter, slice = "copy")]
-    pub fn set_iv(this: &Hashes, val: Option<impl ::js_sys::BufferSourceLike>);
+    #[wasm_bindgen(method, setter)]
+    pub fn set_iv(
+        this: &Hashes,
+        #[wasm_bindgen(slice = "copy")] val: Option<impl ::js_sys::BufferSourceLike>,
+    );
 }
 impl Hashes {
     pub fn new(salt: impl ::js_sys::BufferSourceLike) -> Hashes {

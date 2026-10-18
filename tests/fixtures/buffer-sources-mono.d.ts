@@ -1,9 +1,8 @@
 //! @ts-gen --experimental-generic-mono --annotate tests/fixtures/side/buffer-sources-mono.d.ts
 
-// A `&[u8]` passed as `impl BufferSourceLike` is copied unless every buffer
-// source on the import is `{@slice view}`; `{@slice handle}` takes handles
-// only. The mode sits on the fn, as wasm-bindgen applies it only to the
-// slice instantiation.
+// A `&[u8]` passed as `impl BufferSourceLike` is copied unless its parameter
+// is `{@slice view}`, inline or from the side file; `{@slice handle}` takes
+// handles only.
 
 type BufferSource = ArrayBufferView | ArrayBuffer;
 
