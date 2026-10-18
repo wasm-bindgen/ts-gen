@@ -2856,7 +2856,7 @@
   (import "./bindings.wasm" "R2Bucket.head" (func $R2Bucket.head (param $this externref) (param $key externref) (result externref)))
   ;; get(key: string): Promise<R2ObjectBody | null>
   (import "./bindings.wasm" "R2Bucket.get" (func $R2Bucket.get (param $this externref) (param $key externref) (result externref)))
-  ;; get(key: string, options: R2BucketOptions): Promise<R2ObjectBody | R2Object | null>
+  ;; get(key: string, options: R2BucketGetOptions): Promise<R2ObjectBody | R2Object | null>
   (import "./bindings.wasm" "R2Bucket.get_with_options" (func $R2Bucket.get_with_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
   ;; put(key: string, value: ReadableStream): Promise<R2Object | null>
   (import "./bindings.wasm" "R2Bucket.put" (func $R2Bucket.put (param $this externref) (param $key externref) (param $value externref) (result externref)))
@@ -2868,15 +2868,15 @@
   (import "./bindings.wasm" "R2Bucket.put_with_str" (func $R2Bucket.put_with_str (param $this externref) (param $key externref) (param $value externref) (result externref)))
   ;; put(key: string, value: null): Promise<R2Object | null>
   (import "./bindings.wasm" "R2Bucket.put_with_null" (func $R2Bucket.put_with_null (param $this externref) (param $key externref) (param $value externref) (result externref)))
-  ;; put(key: string, value: ReadableStream, options: R2BucketOptions2): Promise<R2Object | null>
+  ;; put(key: string, value: ReadableStream, options: R2BucketPutOptions): Promise<R2Object | null>
   (import "./bindings.wasm" "R2Bucket.put_with_options" (func $R2Bucket.put_with_options (param $this externref) (param $key externref) (param $value externref) (param $options externref) (result externref)))
-  ;; put(key: string, value: ArrayBuffer, options: R2BucketOptions2): Promise<R2Object | null>
+  ;; put(key: string, value: ArrayBuffer, options: R2BucketPutOptions): Promise<R2Object | null>
   (import "./bindings.wasm" "R2Bucket.put_with_array_buffer_and_options" (func $R2Bucket.put_with_array_buffer_and_options (param $this externref) (param $key externref) (param $value externref) (param $options externref) (result externref)))
-  ;; put(key: string, value: ArrayBufferView, options: R2BucketOptions2): Promise<R2Object | null>
+  ;; put(key: string, value: ArrayBufferView, options: R2BucketPutOptions): Promise<R2Object | null>
   (import "./bindings.wasm" "R2Bucket.put_with_typed_array_and_options" (func $R2Bucket.put_with_typed_array_and_options (param $this externref) (param $key externref) (param $value externref) (param $options externref) (result externref)))
-  ;; put(key: string, value: string, options: R2BucketOptions2): Promise<R2Object | null>
+  ;; put(key: string, value: string, options: R2BucketPutOptions): Promise<R2Object | null>
   (import "./bindings.wasm" "R2Bucket.put_with_str_and_options" (func $R2Bucket.put_with_str_and_options (param $this externref) (param $key externref) (param $value externref) (param $options externref) (result externref)))
-  ;; put(key: string, value: null, options: R2BucketOptions2): Promise<R2Object | null>
+  ;; put(key: string, value: null, options: R2BucketPutOptions): Promise<R2Object | null>
   (import "./bindings.wasm" "R2Bucket.put_with_null_and_options" (func $R2Bucket.put_with_null_and_options (param $this externref) (param $key externref) (param $value externref) (param $options externref) (result externref)))
   ;; createMultipartUpload(key: string): Promise<R2MultipartUpload>
   (import "./bindings.wasm" "R2Bucket.create_multipart_upload" (func $R2Bucket.create_multipart_upload (param $this externref) (param $key externref) (result externref)))
@@ -2893,21 +2893,21 @@
   ;; list(options: R2ListOptions): Promise<R2Objects>
   (import "./bindings.wasm" "R2Bucket.list_with_options" (func $R2Bucket.list_with_options (param $this externref) (param $options externref) (result externref)))
 
-  ;; R2BucketOptions
-  ;; {} as R2BucketOptions
-  (import "./bindings.wasm" "R2BucketOptions.new" (func $R2BucketOptions.new (result externref)))
+  ;; R2BucketGetOptions
+  ;; {} as R2BucketGetOptions
+  (import "./bindings.wasm" "R2BucketGetOptions.new" (func $R2BucketGetOptions.new (result externref)))
   ;; onlyIf: R2Conditional | Headers
-  (import "./bindings.wasm" "R2BucketOptions.only_if" (func $R2BucketOptions.only_if (param $this externref) (result externref)))
+  (import "./bindings.wasm" "R2BucketGetOptions.only_if" (func $R2BucketGetOptions.only_if (param $this externref) (result externref)))
   ;; set onlyIf(value: R2Conditional)
-  (import "./bindings.wasm" "R2BucketOptions.set_only_if" (func $R2BucketOptions.set_only_if (param $this externref) (param $value externref)))
+  (import "./bindings.wasm" "R2BucketGetOptions.set_only_if" (func $R2BucketGetOptions.set_only_if (param $this externref) (param $value externref)))
 
-  ;; R2BucketOptions2
-  ;; {} as R2BucketOptions2
-  (import "./bindings.wasm" "R2BucketOptions2.new" (func $R2BucketOptions2.new (result externref)))
+  ;; R2BucketPutOptions
+  ;; {} as R2BucketPutOptions
+  (import "./bindings.wasm" "R2BucketPutOptions.new" (func $R2BucketPutOptions.new (result externref)))
   ;; onlyIf: R2Conditional | Headers
-  (import "./bindings.wasm" "R2BucketOptions2.only_if" (func $R2BucketOptions2.only_if (param $this externref) (result externref)))
+  (import "./bindings.wasm" "R2BucketPutOptions.only_if" (func $R2BucketPutOptions.only_if (param $this externref) (result externref)))
   ;; set onlyIf(value: R2Conditional)
-  (import "./bindings.wasm" "R2BucketOptions2.set_only_if" (func $R2BucketOptions2.set_only_if (param $this externref) (param $value externref)))
+  (import "./bindings.wasm" "R2BucketPutOptions.set_only_if" (func $R2BucketPutOptions.set_only_if (param $this externref) (param $value externref)))
 
   ;; R2MultipartUpload
   ;; key: string
@@ -10478,9 +10478,9 @@
   (import "./bindings.wasm" "AiGateway.run" (func $AiGateway.run (param $this externref) (param $data externref) (result externref)))
   ;; run(data: AIGatewayUniversalRequest[]): Promise<Response>
   (import "./bindings.wasm" "AiGateway.run_with_slice" (func $AiGateway.run_with_slice (param $this externref) (param $data externref) (result externref)))
-  ;; run(data: AIGatewayUniversalRequest, options: AiGatewayOptions): Promise<Response>
+  ;; run(data: AIGatewayUniversalRequest, options: AiGatewayRunOptions): Promise<Response>
   (import "./bindings.wasm" "AiGateway.run_with_options" (func $AiGateway.run_with_options (param $this externref) (param $data externref) (param $options externref) (result externref)))
-  ;; run(data: AIGatewayUniversalRequest[], options: AiGatewayOptions): Promise<Response>
+  ;; run(data: AIGatewayUniversalRequest[], options: AiGatewayRunOptions): Promise<Response>
   (import "./bindings.wasm" "AiGateway.run_with_slice_and_options" (func $AiGateway.run_with_slice_and_options (param $this externref) (param $data externref) (param $options externref) (result externref)))
   ;; getUrl(): Promise<string>
   (import "./bindings.wasm" "AiGateway.get_url" (func $AiGateway.get_url (param $this externref) (result externref)))
@@ -10489,17 +10489,17 @@
   ;; getUrl(provider: string): Promise<string>
   (import "./bindings.wasm" "AiGateway.get_url_with_str" (func $AiGateway.get_url_with_str (param $this externref) (param $provider externref) (result externref)))
 
-  ;; AiGatewayOptions
-  ;; {} as AiGatewayOptions
-  (import "./bindings.wasm" "AiGatewayOptions.new" (func $AiGatewayOptions.new (result externref)))
+  ;; AiGatewayRunOptions
+  ;; {} as AiGatewayRunOptions
+  (import "./bindings.wasm" "AiGatewayRunOptions.new" (func $AiGatewayRunOptions.new (result externref)))
   ;; gateway?: UniversalGatewayOptions
-  (import "./bindings.wasm" "AiGatewayOptions.gateway" (func $AiGatewayOptions.gateway (param $this externref) (result externref)))
+  (import "./bindings.wasm" "AiGatewayRunOptions.gateway" (func $AiGatewayRunOptions.gateway (param $this externref) (result externref)))
   ;; set gateway(value: UniversalGatewayOptions)
-  (import "./bindings.wasm" "AiGatewayOptions.set_gateway" (func $AiGatewayOptions.set_gateway (param $this externref) (param $value externref)))
+  (import "./bindings.wasm" "AiGatewayRunOptions.set_gateway" (func $AiGatewayRunOptions.set_gateway (param $this externref) (param $value externref)))
   ;; extraHeaders?: object
-  (import "./bindings.wasm" "AiGatewayOptions.extra_headers" (func $AiGatewayOptions.extra_headers (param $this externref) (result externref)))
+  (import "./bindings.wasm" "AiGatewayRunOptions.extra_headers" (func $AiGatewayRunOptions.extra_headers (param $this externref) (result externref)))
   ;; set extraHeaders(value: object)
-  (import "./bindings.wasm" "AiGatewayOptions.set_extra_headers" (func $AiGatewayOptions.set_extra_headers (param $this externref) (param $value externref)))
+  (import "./bindings.wasm" "AiGatewayRunOptions.set_extra_headers" (func $AiGatewayRunOptions.set_extra_headers (param $this externref) (param $value externref)))
 
   ;; ComparisonFilter
   ;; {} as ComparisonFilter
@@ -11336,24 +11336,24 @@
   (import "./bindings.wasm" "D1PreparedStatement.all" (func $D1PreparedStatement.all (param $this externref) (result externref)))
   ;; raw(): Promise<T[]>
   (import "./bindings.wasm" "D1PreparedStatement.raw" (func $D1PreparedStatement.raw (param $this externref) (result externref)))
-  ;; raw(options: D1PreparedStatementOptions): Promise<[string[], T[]]>
+  ;; raw(options: D1PreparedStatementRawOptions): Promise<[string[], T[]]>
   (import "./bindings.wasm" "D1PreparedStatement.raw_with_options" (func $D1PreparedStatement.raw_with_options (param $this externref) (param $options externref) (result externref)))
 
-  ;; D1PreparedStatementOptions
-  ;; {} as D1PreparedStatementOptions
-  (import "./bindings.wasm" "D1PreparedStatementOptions.new" (func $D1PreparedStatementOptions.new (result externref)))
+  ;; D1PreparedStatementRawOptions
+  ;; {} as D1PreparedStatementRawOptions
+  (import "./bindings.wasm" "D1PreparedStatementRawOptions.new" (func $D1PreparedStatementRawOptions.new (result externref)))
   ;; columnNames: true
-  (import "./bindings.wasm" "D1PreparedStatementOptions.column_names" (func $D1PreparedStatementOptions.column_names (param $this externref) (result i32)))
+  (import "./bindings.wasm" "D1PreparedStatementRawOptions.column_names" (func $D1PreparedStatementRawOptions.column_names (param $this externref) (result i32)))
   ;; set columnNames(value: true)
-  (import "./bindings.wasm" "D1PreparedStatementOptions.set_column_names" (func $D1PreparedStatementOptions.set_column_names (param $this externref) (param $value i32)))
+  (import "./bindings.wasm" "D1PreparedStatementRawOptions.set_column_names" (func $D1PreparedStatementRawOptions.set_column_names (param $this externref) (param $value i32)))
 
-  ;; D1PreparedStatementOptions2
-  ;; {} as D1PreparedStatementOptions2
-  (import "./bindings.wasm" "D1PreparedStatementOptions2.new" (func $D1PreparedStatementOptions2.new (result externref)))
+  ;; D1PreparedStatementRawOptions2
+  ;; {} as D1PreparedStatementRawOptions2
+  (import "./bindings.wasm" "D1PreparedStatementRawOptions2.new" (func $D1PreparedStatementRawOptions2.new (result externref)))
   ;; columnNames?: false
-  (import "./bindings.wasm" "D1PreparedStatementOptions2.column_names" (func $D1PreparedStatementOptions2.column_names (param $this externref) (result externref)))
+  (import "./bindings.wasm" "D1PreparedStatementRawOptions2.column_names" (func $D1PreparedStatementRawOptions2.column_names (param $this externref) (result externref)))
   ;; set columnNames(value: false)
-  (import "./bindings.wasm" "D1PreparedStatementOptions2.set_column_names" (func $D1PreparedStatementOptions2.set_column_names (param $this externref) (param $value i32)))
+  (import "./bindings.wasm" "D1PreparedStatementRawOptions2.set_column_names" (func $D1PreparedStatementRawOptions2.set_column_names (param $this externref) (param $value i32)))
 
   ;; EmailSendResult
   ;; {} as EmailSendResult
@@ -11394,62 +11394,62 @@
   ;; SendEmail
   ;; send(message: EmailMessage): Promise<EmailSendResult>
   (import "./bindings.wasm" "SendEmail.send" (func $SendEmail.send (param $this externref) (param $message externref) (result externref)))
-  ;; send(builder: SendEmailBuilder): Promise<EmailSendResult>
+  ;; send(builder: SendEmailSendBuilder): Promise<EmailSendResult>
   (import "./bindings.wasm" "SendEmail.send_with_builder" (func $SendEmail.send_with_builder (param $this externref) (param $builder externref) (result externref)))
 
-  ;; SendEmailBuilder
-  ;; {} as SendEmailBuilder
-  (import "./bindings.wasm" "SendEmailBuilder.new" (func $SendEmailBuilder.new (result externref)))
+  ;; SendEmailSendBuilder
+  ;; {} as SendEmailSendBuilder
+  (import "./bindings.wasm" "SendEmailSendBuilder.new" (func $SendEmailSendBuilder.new (result externref)))
   ;; from: string | EmailAddress
-  (import "./bindings.wasm" "SendEmailBuilder.from" (func $SendEmailBuilder.from (param $this externref) (result externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.from" (func $SendEmailSendBuilder.from (param $this externref) (result externref)))
   ;; set from(value: string)
-  (import "./bindings.wasm" "SendEmailBuilder.set_from" (func $SendEmailBuilder.set_from (param $this externref) (param $value externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.set_from" (func $SendEmailSendBuilder.set_from (param $this externref) (param $value externref)))
   ;; set from(value: EmailAddress)
-  (import "./bindings.wasm" "SendEmailBuilder.set_from_with_email_address" (func $SendEmailBuilder.set_from_with_email_address (param $this externref) (param $value externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.set_from_with_email_address" (func $SendEmailSendBuilder.set_from_with_email_address (param $this externref) (param $value externref)))
   ;; to: string | string[]
-  (import "./bindings.wasm" "SendEmailBuilder.to" (func $SendEmailBuilder.to (param $this externref) (result externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.to" (func $SendEmailSendBuilder.to (param $this externref) (result externref)))
   ;; set to(value: string)
-  (import "./bindings.wasm" "SendEmailBuilder.set_to" (func $SendEmailBuilder.set_to (param $this externref) (param $value externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.set_to" (func $SendEmailSendBuilder.set_to (param $this externref) (param $value externref)))
   ;; set to(value: string[])
-  (import "./bindings.wasm" "SendEmailBuilder.set_to_with_slice" (func $SendEmailBuilder.set_to_with_slice (param $this externref) (param $value externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.set_to_with_slice" (func $SendEmailSendBuilder.set_to_with_slice (param $this externref) (param $value externref)))
   ;; subject: string
-  (import "./bindings.wasm" "SendEmailBuilder.subject" (func $SendEmailBuilder.subject (param $this externref) (result externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.subject" (func $SendEmailSendBuilder.subject (param $this externref) (result externref)))
   ;; set subject(value: string)
-  (import "./bindings.wasm" "SendEmailBuilder.set_subject" (func $SendEmailBuilder.set_subject (param $this externref) (param $value externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.set_subject" (func $SendEmailSendBuilder.set_subject (param $this externref) (param $value externref)))
   ;; replyTo?: string | EmailAddress
-  (import "./bindings.wasm" "SendEmailBuilder.reply_to" (func $SendEmailBuilder.reply_to (param $this externref) (result externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.reply_to" (func $SendEmailSendBuilder.reply_to (param $this externref) (result externref)))
   ;; set replyTo(value: string)
-  (import "./bindings.wasm" "SendEmailBuilder.set_reply_to" (func $SendEmailBuilder.set_reply_to (param $this externref) (param $value externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.set_reply_to" (func $SendEmailSendBuilder.set_reply_to (param $this externref) (param $value externref)))
   ;; set replyTo(value: EmailAddress)
-  (import "./bindings.wasm" "SendEmailBuilder.set_reply_to_with_email_address" (func $SendEmailBuilder.set_reply_to_with_email_address (param $this externref) (param $value externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.set_reply_to_with_email_address" (func $SendEmailSendBuilder.set_reply_to_with_email_address (param $this externref) (param $value externref)))
   ;; cc?: string | string[]
-  (import "./bindings.wasm" "SendEmailBuilder.cc" (func $SendEmailBuilder.cc (param $this externref) (result externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.cc" (func $SendEmailSendBuilder.cc (param $this externref) (result externref)))
   ;; set cc(value: string)
-  (import "./bindings.wasm" "SendEmailBuilder.set_cc" (func $SendEmailBuilder.set_cc (param $this externref) (param $value externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.set_cc" (func $SendEmailSendBuilder.set_cc (param $this externref) (param $value externref)))
   ;; set cc(value: string[])
-  (import "./bindings.wasm" "SendEmailBuilder.set_cc_with_slice" (func $SendEmailBuilder.set_cc_with_slice (param $this externref) (param $value externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.set_cc_with_slice" (func $SendEmailSendBuilder.set_cc_with_slice (param $this externref) (param $value externref)))
   ;; bcc?: string | string[]
-  (import "./bindings.wasm" "SendEmailBuilder.bcc" (func $SendEmailBuilder.bcc (param $this externref) (result externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.bcc" (func $SendEmailSendBuilder.bcc (param $this externref) (result externref)))
   ;; set bcc(value: string)
-  (import "./bindings.wasm" "SendEmailBuilder.set_bcc" (func $SendEmailBuilder.set_bcc (param $this externref) (param $value externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.set_bcc" (func $SendEmailSendBuilder.set_bcc (param $this externref) (param $value externref)))
   ;; set bcc(value: string[])
-  (import "./bindings.wasm" "SendEmailBuilder.set_bcc_with_slice" (func $SendEmailBuilder.set_bcc_with_slice (param $this externref) (param $value externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.set_bcc_with_slice" (func $SendEmailSendBuilder.set_bcc_with_slice (param $this externref) (param $value externref)))
   ;; headers?: Record<string, string>
-  (import "./bindings.wasm" "SendEmailBuilder.headers" (func $SendEmailBuilder.headers (param $this externref) (result externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.headers" (func $SendEmailSendBuilder.headers (param $this externref) (result externref)))
   ;; set headers(value: Record<string, string>)
-  (import "./bindings.wasm" "SendEmailBuilder.set_headers" (func $SendEmailBuilder.set_headers (param $this externref) (param $value externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.set_headers" (func $SendEmailSendBuilder.set_headers (param $this externref) (param $value externref)))
   ;; text?: string
-  (import "./bindings.wasm" "SendEmailBuilder.text" (func $SendEmailBuilder.text (param $this externref) (result externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.text" (func $SendEmailSendBuilder.text (param $this externref) (result externref)))
   ;; set text(value: string)
-  (import "./bindings.wasm" "SendEmailBuilder.set_text" (func $SendEmailBuilder.set_text (param $this externref) (param $value externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.set_text" (func $SendEmailSendBuilder.set_text (param $this externref) (param $value externref)))
   ;; html?: string
-  (import "./bindings.wasm" "SendEmailBuilder.html" (func $SendEmailBuilder.html (param $this externref) (result externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.html" (func $SendEmailSendBuilder.html (param $this externref) (result externref)))
   ;; set html(value: string)
-  (import "./bindings.wasm" "SendEmailBuilder.set_html" (func $SendEmailBuilder.set_html (param $this externref) (param $value externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.set_html" (func $SendEmailSendBuilder.set_html (param $this externref) (param $value externref)))
   ;; attachments?: EmailAttachment[]
-  (import "./bindings.wasm" "SendEmailBuilder.attachments" (func $SendEmailBuilder.attachments (param $this externref) (result externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.attachments" (func $SendEmailSendBuilder.attachments (param $this externref) (result externref)))
   ;; set attachments(value: EmailAttachment[])
-  (import "./bindings.wasm" "SendEmailBuilder.set_attachments" (func $SendEmailBuilder.set_attachments (param $this externref) (param $value externref)))
+  (import "./bindings.wasm" "SendEmailSendBuilder.set_attachments" (func $SendEmailSendBuilder.set_attachments (param $this externref) (param $value externref)))
 
   ;; EmailEvent
   ;; message: ForwardableEmailMessage
@@ -12231,22 +12231,22 @@
   (import "cloudflare:workers" "WorkflowStep.sleep_until" (func $cloudflare:workers:WorkflowStep.sleep_until (param $this externref) (result externref)))
   ;; set sleepUntil(value: (name: string, timestamp: Date | number) => Promise<void>)
   (import "cloudflare:workers" "WorkflowStep.set_sleep_until" (func $cloudflare:workers:WorkflowStep.set_sleep_until (param $this externref) (param $value externref)))
-  ;; waitForEvent(name: string, options: WorkflowStepOptions): Promise<WorkflowStepEvent<T>>
+  ;; waitForEvent(name: string, options: WorkflowStepWaitForEventOptions): Promise<WorkflowStepEvent<T>>
   (import "cloudflare:workers" "WorkflowStep.wait_for_event" (func $cloudflare:workers:WorkflowStep.wait_for_event (param $this externref) (param $name externref) (param $options externref) (result externref)))
 
-  ;; WorkflowStepOptions
-  ;; {} as WorkflowStepOptions
-  (import "cloudflare:workers" "WorkflowStepOptions.new" (func $cloudflare:workers:WorkflowStepOptions.new (result externref)))
+  ;; WorkflowStepWaitForEventOptions
+  ;; {} as WorkflowStepWaitForEventOptions
+  (import "cloudflare:workers" "WorkflowStepWaitForEventOptions.new" (func $cloudflare:workers:WorkflowStepWaitForEventOptions.new (result externref)))
   ;; type: string
-  (import "cloudflare:workers" "WorkflowStepOptions.type" (func $cloudflare:workers:WorkflowStepOptions.type (param $this externref) (result externref)))
+  (import "cloudflare:workers" "WorkflowStepWaitForEventOptions.type" (func $cloudflare:workers:WorkflowStepWaitForEventOptions.type (param $this externref) (result externref)))
   ;; set type(value: string)
-  (import "cloudflare:workers" "WorkflowStepOptions.set_type" (func $cloudflare:workers:WorkflowStepOptions.set_type (param $this externref) (param $value externref)))
+  (import "cloudflare:workers" "WorkflowStepWaitForEventOptions.set_type" (func $cloudflare:workers:WorkflowStepWaitForEventOptions.set_type (param $this externref) (param $value externref)))
   ;; timeout?: WorkflowTimeoutDuration | number
-  (import "cloudflare:workers" "WorkflowStepOptions.timeout" (func $cloudflare:workers:WorkflowStepOptions.timeout (param $this externref) (result externref)))
+  (import "cloudflare:workers" "WorkflowStepWaitForEventOptions.timeout" (func $cloudflare:workers:WorkflowStepWaitForEventOptions.timeout (param $this externref) (result externref)))
   ;; set timeout(value: WorkflowTimeoutDuration)
-  (import "cloudflare:workers" "WorkflowStepOptions.set_timeout" (func $cloudflare:workers:WorkflowStepOptions.set_timeout (param $this externref) (param $value externref)))
+  (import "cloudflare:workers" "WorkflowStepWaitForEventOptions.set_timeout" (func $cloudflare:workers:WorkflowStepWaitForEventOptions.set_timeout (param $this externref) (param $value externref)))
   ;; set timeout(value: number)
-  (import "cloudflare:workers" "WorkflowStepOptions.set_timeout_with_f64" (func $cloudflare:workers:WorkflowStepOptions.set_timeout_with_f64 (param $this externref) (param $value f64)))
+  (import "cloudflare:workers" "WorkflowStepWaitForEventOptions.set_timeout_with_f64" (func $cloudflare:workers:WorkflowStepWaitForEventOptions.set_timeout_with_f64 (param $this externref) (param $value f64)))
 
   ;; WorkflowEntrypoint
   ;; ctx: ExecutionContext
@@ -13623,9 +13623,9 @@
   ;; DispatchNamespace
   ;; get(name: string): Fetcher
   (import "./bindings.wasm" "DispatchNamespace.get" (func $DispatchNamespace.get (param $this externref) (param $name externref) (result externref)))
-  ;; get(name: string, args: DispatchNamespaceArgs): Fetcher
+  ;; get(name: string, args: DispatchNamespaceGetArgs): Fetcher
   (import "./bindings.wasm" "DispatchNamespace.get_with_args" (func $DispatchNamespace.get_with_args (param $this externref) (param $name externref) (param $args externref) (result externref)))
-  ;; get(name: string, args: DispatchNamespaceArgs, options: DynamicDispatchOptions): Fetcher
+  ;; get(name: string, args: DispatchNamespaceGetArgs, options: DynamicDispatchOptions): Fetcher
   (import "./bindings.wasm" "DispatchNamespace.get_with_args_and_options" (func $DispatchNamespace.get_with_args_and_options (param $this externref) (param $name externref) (param $args externref) (param $options externref) (result externref)))
 
   ;; NonRetryableError

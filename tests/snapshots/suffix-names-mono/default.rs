@@ -218,3 +218,146 @@ extern "C" {
     #[wasm_bindgen(constructor, catch)]
     pub fn new(url: &str) -> Result<URL, JsValue>;
 }
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type GetOptions;
+    #[wasm_bindgen(method, getter)]
+    pub fn range(this: &GetOptions) -> Option<f64>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_range(this: &GetOptions, val: f64);
+}
+impl GetOptions {
+    pub fn new() -> GetOptions {
+        Self::builder().build()
+    }
+    pub fn builder() -> GetOptionsBuilder {
+        GetOptionsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for GetOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct GetOptionsBuilder {
+    inner: GetOptions,
+}
+impl GetOptionsBuilder {
+    pub fn range(self, val: f64) -> Self {
+        self.inner.set_range(val);
+        self
+    }
+    pub fn build(self) -> GetOptions {
+        self.inner
+    }
+}
+impl From<GetOptions> for GetOptionsBuilder {
+    fn from(inner: GetOptions) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Bucket;
+    #[wasm_bindgen(method)]
+    pub fn get(this: &Bucket, key: &str, options: &BucketOptions);
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub fn try_get(this: &Bucket, key: &str, options: &BucketOptions) -> Result<(), JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn put(this: &Bucket, key: &str);
+    #[wasm_bindgen(method, catch, js_name = "put")]
+    pub fn try_put(this: &Bucket, key: &str) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "put")]
+    pub fn put_with_options(this: &Bucket, key: &str, options: &BucketOptions2);
+    #[wasm_bindgen(method, catch, js_name = "put")]
+    pub fn try_put_with_options(
+        this: &Bucket,
+        key: &str,
+        options: &BucketOptions2,
+    ) -> Result<(), JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = GetOptions , extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type BucketOptions;
+    #[wasm_bindgen(method, getter, js_name = "onlyIf")]
+    pub fn only_if(this: &BucketOptions) -> String;
+    #[wasm_bindgen(method, setter, js_name = "onlyIf")]
+    pub fn set_only_if(this: &BucketOptions, val: &str);
+}
+impl BucketOptions {
+    pub fn new(only_if: &str) -> BucketOptions {
+        Self::builder(only_if).build()
+    }
+    pub fn builder(only_if: &str) -> BucketOptionsBuilder {
+        let inner: BucketOptions = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_only_if(only_if);
+        BucketOptionsBuilder { inner }
+    }
+}
+pub struct BucketOptionsBuilder {
+    inner: BucketOptions,
+}
+impl BucketOptionsBuilder {
+    pub fn range(self, val: f64) -> Self {
+        self.inner.set_range(val);
+        self
+    }
+    pub fn build(self) -> BucketOptions {
+        self.inner
+    }
+}
+impl From<BucketOptions> for BucketOptionsBuilder {
+    fn from(inner: BucketOptions) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type BucketOptions2;
+    #[wasm_bindgen(method, getter)]
+    pub fn md5(this: &BucketOptions2) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_md5(this: &BucketOptions2, val: &str);
+}
+impl BucketOptions2 {
+    pub fn new() -> BucketOptions2 {
+        Self::builder().build()
+    }
+    pub fn builder() -> BucketOptions2Builder {
+        BucketOptions2Builder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for BucketOptions2 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct BucketOptions2Builder {
+    inner: BucketOptions2,
+}
+impl BucketOptions2Builder {
+    pub fn md5(self, val: &str) -> Self {
+        self.inner.set_md5(val);
+        self
+    }
+    pub fn build(self) -> BucketOptions2 {
+        self.inner
+    }
+}
+impl From<BucketOptions2> for BucketOptions2Builder {
+    fn from(inner: BucketOptions2) -> Self {
+        Self { inner }
+    }
+}

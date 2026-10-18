@@ -49,4 +49,5 @@ pub struct ParseCtx<'arena, 'docs> {
     /// registered kind, which is what parse-time decisions that depend on
     /// what a name *is* (class, interface, alias) consult.
     pub type_arena: &'arena [crate::ir::TypeDeclaration],
+    pub options: crate::parse::ParseOptions,
 }

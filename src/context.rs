@@ -48,6 +48,8 @@ pub struct ParsedModule {
 #[derive(Clone, Debug)]
 pub struct GlobalContext {
     pub scopes: ScopeArena,
+    /// The options the input was parsed with.
+    pub parse_options: crate::parse::ParseOptions,
     pub diagnostics: DiagnosticCollector,
     pub external_map: ExternalMap,
     /// Pending imports that need to be resolved during import resolution.
@@ -192,6 +194,7 @@ impl GlobalContext {
     pub fn new() -> Self {
         Self {
             scopes: ScopeArena::new(),
+            parse_options: Default::default(),
             diagnostics: DiagnosticCollector::new(),
             external_map: ExternalMap::new(),
             pending_imports: Vec::new(),

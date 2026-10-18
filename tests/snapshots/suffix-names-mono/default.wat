@@ -67,6 +67,38 @@
   ;; constructor(url: string)
   (import "./bindings.wasm" "URL.new" (func $URL.new (param $url externref) (result externref)))
 
+  ;; GetOptions
+  ;; {} as GetOptions
+  (import "./bindings.wasm" "GetOptions.new" (func $GetOptions.new (result externref)))
+  ;; range?: number
+  (import "./bindings.wasm" "GetOptions.range" (func $GetOptions.range (param $this externref) (result externref)))
+  ;; set range(value: number)
+  (import "./bindings.wasm" "GetOptions.set_range" (func $GetOptions.set_range (param $this externref) (param $value f64)))
+
+  ;; Bucket
+  ;; get(key: string, options: BucketOptions): void
+  (import "./bindings.wasm" "Bucket.get" (func $Bucket.get (param $this externref) (param $key externref) (param $options externref)))
+  ;; put(key: string): void
+  (import "./bindings.wasm" "Bucket.put" (func $Bucket.put (param $this externref) (param $key externref)))
+  ;; put(key: string, options: BucketOptions2): void
+  (import "./bindings.wasm" "Bucket.put_with_options" (func $Bucket.put_with_options (param $this externref) (param $key externref) (param $options externref)))
+
+  ;; BucketOptions
+  ;; {} as BucketOptions
+  (import "./bindings.wasm" "BucketOptions.new" (func $BucketOptions.new (result externref)))
+  ;; onlyIf: string
+  (import "./bindings.wasm" "BucketOptions.only_if" (func $BucketOptions.only_if (param $this externref) (result externref)))
+  ;; set onlyIf(value: string)
+  (import "./bindings.wasm" "BucketOptions.set_only_if" (func $BucketOptions.set_only_if (param $this externref) (param $value externref)))
+
+  ;; BucketOptions2
+  ;; {} as BucketOptions2
+  (import "./bindings.wasm" "BucketOptions2.new" (func $BucketOptions2.new (result externref)))
+  ;; md5?: string
+  (import "./bindings.wasm" "BucketOptions2.md5" (func $BucketOptions2.md5 (param $this externref) (result externref)))
+  ;; set md5(value: string)
+  (import "./bindings.wasm" "BucketOptions2.set_md5" (func $BucketOptions2.set_md5 (param $this externref) (param $value externref)))
+
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
 

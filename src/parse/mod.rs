@@ -26,12 +26,31 @@ use crate::context::GlobalContext;
 use crate::ir::Module;
 use crate::parse::scope::ScopeId;
 
+/// Parse-time choices that follow the codegen mode.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct ParseOptions {
+    /// Name a method's inline parameter type `<Parent><Method><Param>`
+    /// (`R2BucketPutOptions`) rather than `<Parent><Param>`, which two
+    /// methods' `options` share and so number (`R2BucketOptions2`).
+    pub experimental_generic_mono: bool,
+}
+
 /// Parse one or more `.d.ts` files and produce a `Module` + `GlobalContext`.
 pub fn parse_dts_files(
     paths: &[impl AsRef<Path>],
     lib_name: Option<&str>,
 ) -> Result<(Module, GlobalContext)> {
+    parse_dts_files_with(paths, lib_name, ParseOptions::default())
+}
+
+/// [`parse_dts_files`] with [`ParseOptions`].
+pub fn parse_dts_files_with(
+    paths: &[impl AsRef<Path>],
+    lib_name: Option<&str>,
+    options: ParseOptions,
+) -> Result<(Module, GlobalContext)> {
     let mut gctx = GlobalContext::new();
+    gctx.parse_options = options;
     let mut module = Module::new(&mut gctx, lib_name);
     let global = module.global_scope;
 
@@ -280,6 +299,7 @@ fn parse_single_file(
         &mut scopes,
         &type_arena_snapshot,
         file_scope,
+        gctx.parse_options,
     );
     gctx.scopes = scopes;
     gctx.diagnostics = diag;

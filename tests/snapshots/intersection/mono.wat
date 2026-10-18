@@ -69,7 +69,7 @@
   ;; Store
   ;; get(key: string): Promise<string>
   (import "intersection" "Store.get" (func $intersection:Store.get (param $this externref) (param $key externref) (result externref)))
-  ;; get(key: string, options: StoreOptions): Promise<string | null>
+  ;; get(key: string, options: StoreGetOptions): Promise<string | null>
   (import "intersection" "Store.get_with_options" (func $intersection:Store.get_with_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
   ;; refine(value: Derived & Base): void
   (import "intersection" "Store.refine" (func $intersection:Store.refine (param $this externref) (param $value externref)))
@@ -77,7 +77,7 @@
   (import "intersection" "Store.same" (func $intersection:Store.same (param $this externref) (param $value externref)))
   ;; unrelated(value: Derived & Unrelated): void
   (import "intersection" "Store.unrelated" (func $intersection:Store.unrelated (param $this externref) (param $value externref)))
-  ;; shape(value: StoreValue): void
+  ;; shape(value: StoreShapeValue): void
   (import "intersection" "Store.shape" (func $intersection:Store.shape (param $this externref) (param $value externref)))
   ;; generic(value: T): void
   (import "intersection" "Store.generic" (func $intersection:Store.generic (param $this externref) (param $value externref)))
@@ -86,25 +86,25 @@
   ;; anything(value: any): void
   (import "intersection" "Store.anything" (func $intersection:Store.anything (param $this externref) (param $value externref)))
 
-  ;; StoreOptions
-  ;; {} as StoreOptions
-  (import "intersection" "StoreOptions.new" (func $intersection:StoreOptions.new (result externref)))
+  ;; StoreGetOptions
+  ;; {} as StoreGetOptions
+  (import "intersection" "StoreGetOptions.new" (func $intersection:StoreGetOptions.new (result externref)))
   ;; onlyIf: Conditional
-  (import "intersection" "StoreOptions.only_if" (func $intersection:StoreOptions.only_if (param $this externref) (result externref)))
+  (import "intersection" "StoreGetOptions.only_if" (func $intersection:StoreGetOptions.only_if (param $this externref) (result externref)))
   ;; set onlyIf(value: Conditional)
-  (import "intersection" "StoreOptions.set_only_if" (func $intersection:StoreOptions.set_only_if (param $this externref) (param $value externref)))
+  (import "intersection" "StoreGetOptions.set_only_if" (func $intersection:StoreGetOptions.set_only_if (param $this externref) (param $value externref)))
 
-  ;; StoreValue
-  ;; {} as StoreValue
-  (import "intersection" "StoreValue.new" (func $intersection:StoreValue.new (result externref)))
+  ;; StoreShapeValue
+  ;; {} as StoreShapeValue
+  (import "intersection" "StoreShapeValue.new" (func $intersection:StoreShapeValue.new (result externref)))
   ;; a: string
-  (import "intersection" "StoreValue.a" (func $intersection:StoreValue.a (param $this externref) (result externref)))
+  (import "intersection" "StoreShapeValue.a" (func $intersection:StoreShapeValue.a (param $this externref) (result externref)))
   ;; set a(value: string)
-  (import "intersection" "StoreValue.set_a" (func $intersection:StoreValue.set_a (param $this externref) (param $value externref)))
+  (import "intersection" "StoreShapeValue.set_a" (func $intersection:StoreShapeValue.set_a (param $this externref) (param $value externref)))
   ;; b: number
-  (import "intersection" "StoreValue.b" (func $intersection:StoreValue.b (param $this externref) (result f64)))
+  (import "intersection" "StoreShapeValue.b" (func $intersection:StoreShapeValue.b (param $this externref) (result f64)))
   ;; set b(value: number)
-  (import "intersection" "StoreValue.set_b" (func $intersection:StoreValue.set_b (param $this externref) (param $value f64)))
+  (import "intersection" "StoreShapeValue.set_b" (func $intersection:StoreShapeValue.set_b (param $this externref) (param $value f64)))
 
   ;; Refined
   ;; {} as Refined

@@ -191,19 +191,19 @@ extern "C" {
     pub async fn get_with_options(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
-        options: &StoreOptions,
+        options: &StoreGetOptions,
     ) -> Result<Option<String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_options_js_string(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
-        options: &StoreOptions,
+        options: &StoreGetOptions,
     ) -> Result<Option<JsString>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub fn get_with_options_promise(
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
-        options: &StoreOptions,
+        options: &StoreGetOptions,
     ) -> Result<Promise<Option<JsString>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "get")]
     pub async fn get_with_get_options(
@@ -230,7 +230,7 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub fn unrelated(this: &Store, value: &JsValue) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn shape(this: &Store, value: &StoreValue) -> Result<(), JsValue>;
+    pub fn shape(this: &Store, value: &StoreShapeValue) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch)]
     pub fn generic<T>(this: &Store, value: &T) -> Result<(), JsValue>
     where
@@ -245,36 +245,36 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = GetOptions , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type StoreOptions;
+    pub type StoreGetOptions;
     #[wasm_bindgen(method, getter, js_name = "onlyIf")]
-    pub fn only_if(this: &StoreOptions) -> Conditional;
+    pub fn only_if(this: &StoreGetOptions) -> Conditional;
     #[wasm_bindgen(method, setter, js_name = "onlyIf")]
-    pub fn set_only_if(this: &StoreOptions, val: &Conditional);
+    pub fn set_only_if(this: &StoreGetOptions, val: &Conditional);
 }
-impl StoreOptions {
-    pub fn new(only_if: &Conditional) -> StoreOptions {
+impl StoreGetOptions {
+    pub fn new(only_if: &Conditional) -> StoreGetOptions {
         Self::builder(only_if).build()
     }
-    pub fn builder(only_if: &Conditional) -> StoreOptionsBuilder {
-        let inner: StoreOptions = JsCast::unchecked_into(js_sys::Object::new());
+    pub fn builder(only_if: &Conditional) -> StoreGetOptionsBuilder {
+        let inner: StoreGetOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_only_if(only_if);
-        StoreOptionsBuilder { inner }
+        StoreGetOptionsBuilder { inner }
     }
 }
-pub struct StoreOptionsBuilder {
-    inner: StoreOptions,
+pub struct StoreGetOptionsBuilder {
+    inner: StoreGetOptions,
 }
-impl StoreOptionsBuilder {
+impl StoreGetOptionsBuilder {
     pub fn range(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_range(val);
         self
     }
-    pub fn build(self) -> StoreOptions {
+    pub fn build(self) -> StoreGetOptions {
         self.inner
     }
 }
-impl From<StoreOptions> for StoreOptionsBuilder {
-    fn from(inner: StoreOptions) -> Self {
+impl From<StoreGetOptions> for StoreGetOptionsBuilder {
+    fn from(inner: StoreGetOptions) -> Self {
         Self { inner }
     }
 }
@@ -282,21 +282,21 @@ impl From<StoreOptions> for StoreOptionsBuilder {
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type StoreValue;
+    pub type StoreShapeValue;
     #[wasm_bindgen(method, getter)]
-    pub fn a(this: &StoreValue) -> String;
+    pub fn a(this: &StoreShapeValue) -> String;
     #[wasm_bindgen(method, getter, js_name = "a")]
-    pub fn a_js_string(this: &StoreValue) -> JsString;
+    pub fn a_js_string(this: &StoreShapeValue) -> JsString;
     #[wasm_bindgen(method, setter)]
-    pub fn set_a(this: &StoreValue, val: impl ::wasm_bindgen::JsStringLike);
+    pub fn set_a(this: &StoreShapeValue, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
-    pub fn b(this: &StoreValue) -> f64;
+    pub fn b(this: &StoreShapeValue) -> f64;
     #[wasm_bindgen(method, setter)]
-    pub fn set_b(this: &StoreValue, val: f64);
+    pub fn set_b(this: &StoreShapeValue, val: f64);
 }
-impl StoreValue {
-    pub fn new(a: impl ::wasm_bindgen::JsStringLike, b: f64) -> StoreValue {
-        let inner: StoreValue = JsCast::unchecked_into(js_sys::Object::new());
+impl StoreShapeValue {
+    pub fn new(a: impl ::wasm_bindgen::JsStringLike, b: f64) -> StoreShapeValue {
+        let inner: StoreShapeValue = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_a(a);
         inner.set_b(b);
         inner

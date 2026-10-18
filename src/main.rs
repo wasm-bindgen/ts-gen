@@ -276,7 +276,13 @@ fn main() -> Result<()> {
     eprintln!("[ts-gen] Processing {} file(s)...", input_files.len());
 
     // Parse
-    let (module, mut gctx) = ts_gen::parse::parse_dts_files(&input_files, cli.lib_name.as_deref())?;
+    let (module, mut gctx) = ts_gen::parse::parse_dts_files_with(
+        &input_files,
+        cli.lib_name.as_deref(),
+        ts_gen::parse::ParseOptions {
+            experimental_generic_mono: cli.experimental_generic_mono,
+        },
+    )?;
 
     if cli.no_web_sys {
         gctx.external_map.clear_defaults();

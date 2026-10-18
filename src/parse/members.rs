@@ -368,7 +368,8 @@ pub(crate) fn try_synthesize_iterable_return(
 /// inline `TSTypeLiteral` parameter types into named `InterfaceDecl`s
 /// using the existing interface-building pipeline.
 ///
-/// The synthesized name is `<Parent><Member>` PascalCased, deduped
+/// The synthesized name is `<Parent><Member>` PascalCased (see
+/// [`crate::parse::ParseOptions`] for the per-mono form), deduped
 /// against `ctx.used_type_names` with a numeric suffix on collision.
 /// Hoisted interfaces are appended to `ctx.synth`.
 ///
@@ -396,11 +397,18 @@ pub(crate) fn convert_formal_params_with_synthesis(
             .map(to_snake_case)
             .unwrap_or_else(|| format!("arg{i}"));
 
+        let segment = match raw_param_name.as_deref() {
+            Some(p) if ctx.options.experimental_generic_mono && member_name != "Constructor" => {
+                format!("{}{}", to_pascal_case(member_name), to_pascal_case(p))
+            }
+            Some(p) => p.to_string(),
+            None => member_name.to_string(),
+        };
         let type_ref = match param.type_annotation.as_ref() {
             Some(ann) => match try_synthesize_inline_param(
                 &ann.type_annotation,
                 parent_name,
-                raw_param_name.as_deref().unwrap_or(member_name),
+                &segment,
                 scope,
                 ctx,
             ) {
