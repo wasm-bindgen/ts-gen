@@ -20,7 +20,7 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "onTick")]
     pub fn on_tick(
         this: &Timer,
-        callback: &Function<fn(Number, JsString) -> Boolean>,
+        callback: &Function<fn(f64, String) -> bool>,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "onAny")]
     pub fn on_any(this: &Timer, callback: &Function) -> Result<(), JsValue>;

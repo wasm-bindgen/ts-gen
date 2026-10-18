@@ -265,7 +265,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Socket;
     #[wasm_bindgen(method, getter)]
-    pub fn closed(this: &Socket) -> Promise<Undefined>;
+    pub fn closed(this: &Socket) -> Promise<()>;
 }
 impl Socket {
     #[allow(clippy::new_without_default)]

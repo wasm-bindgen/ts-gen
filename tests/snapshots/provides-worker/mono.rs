@@ -48,7 +48,7 @@ extern "C" {
 pub type ExportedHandlerFetchHandler = Function<fn(Request, Env, ExecutionContext) -> JsValue>;
 #[allow(dead_code)]
 pub type ExportedHandlerTailHandler =
-    Function<fn(Array<String>, Env, ExecutionContext) -> JsOption<Promise<Undefined>>>;
+    Function<fn(Array<String>, Env, ExecutionContext) -> Option<Promise<()>>>;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -68,11 +68,11 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn tail(
         this: &ExportedHandler,
-    ) -> Option<Function<fn(Array<String>, Env, ExecutionContext) -> JsOption<Promise<Undefined>>>>;
+    ) -> Option<Function<fn(Array<String>, Env, ExecutionContext) -> Option<Promise<()>>>>;
     #[wasm_bindgen(method, setter)]
     pub fn set_tail(
         this: &ExportedHandler,
-        val: &Function<fn(Array<String>, Env, ExecutionContext) -> JsOption<Promise<Undefined>>>,
+        val: &Function<fn(Array<String>, Env, ExecutionContext) -> Option<Promise<()>>>,
     );
     #[wasm_bindgen(method, catch)]
     pub async fn scheduled(
@@ -85,7 +85,7 @@ extern "C" {
         this: &ExportedHandler,
         cron: impl ::wasm_bindgen::JsStringLike,
         env: &Env,
-    ) -> Promise<Undefined>;
+    ) -> Promise<()>;
     #[doc = " Always provided: a plain method with an optional parameter."]
     #[wasm_bindgen(method, catch)]
     pub fn health(this: &ExportedHandler) -> Result<String, JsValue>;

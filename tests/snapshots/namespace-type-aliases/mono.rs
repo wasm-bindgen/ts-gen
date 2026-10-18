@@ -15,7 +15,7 @@ extern "C" {
 #[wasm_bindgen(module = "namespace-type-aliases", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "onEvent")]
-    pub fn on_event(listener: &Function<fn(JsString) -> Undefined>) -> Result<(), JsValue>;
+    pub fn on_event(listener: &Function<fn(String)>) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "namespace-type-aliases", experimental_generic_mono)]
 extern "C" {
@@ -38,10 +38,7 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Holder<T = JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn on<T: ::wasm_bindgen::JsGeneric>(
-        this: &Holder<T>,
-        listener: &Function<fn(T) -> Undefined>,
-    ) -> Result<(), JsValue>;
+    pub fn on<T>(this: &Holder<T>, listener: &Function<fn(T)>) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "namespace-type-aliases", experimental_generic_mono)]
 extern "C" {
@@ -113,7 +110,7 @@ pub mod events {
     #[allow(dead_code)]
     pub type Opts = Options;
     #[allow(dead_code)]
-    pub type Listener<E> = Function<fn(E) -> Undefined>;
+    pub type Listener<E> = Function<fn(E)>;
     #[allow(dead_code)]
     pub type Pair<A, B> = ArrayTuple<(A, B)>;
     #[allow(dead_code)]

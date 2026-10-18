@@ -142,7 +142,7 @@ extern "C" {
     #[wasm_bindgen(method, variadic, catch)]
     pub fn rest(this: &Probe, ms: &[impl ::wasm_bindgen::JsStringLike]) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "onMode")]
-    pub fn on_mode(this: &Probe, cb: &Function<fn(JsString) -> Number>) -> Result<(), JsValue>;
+    pub fn on_mode(this: &Probe, cb: &Function<fn(Mode) -> Level>) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = "nextMode")]
     pub async fn next_mode(this: &Probe) -> Result<Mode, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "nextMode")]

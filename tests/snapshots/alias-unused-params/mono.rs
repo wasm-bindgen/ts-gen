@@ -180,7 +180,7 @@ pub mod cf {
     }
 }
 #[allow(dead_code)]
-pub type Handler = Function<fn(cf::Env) -> Undefined>;
+pub type Handler = Function<fn(cf::Env)>;
 #[wasm_bindgen(private)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Color {
@@ -195,7 +195,7 @@ pub type Chosen<T = Color> = T;
 extern "C" {
     #[wasm_bindgen(catch)]
     pub fn misc(
-        handler: &Function<fn(cf::Env) -> Undefined>,
+        handler: &Function<fn(cf::Env)>,
         color: Color,
         qualified: Color,
         chosen: Color,

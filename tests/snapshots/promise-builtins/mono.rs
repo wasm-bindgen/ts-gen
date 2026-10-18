@@ -94,7 +94,7 @@ extern "C" {
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Undefined>;
+    ) -> Promise<()>;
     #[doc = " Declared `async`: plain."]
     # [wasm_bindgen (static_method_of = Store , catch)]
     pub async fn open(name: impl ::wasm_bindgen::JsStringLike) -> Result<Store, JsValue>;
@@ -112,7 +112,7 @@ extern "C" {
 extern "C" {
     #[doc = " A global function: plain `Promise<Undefined>`."]
     #[wasm_bindgen(js_name = "sleep")]
-    pub fn sleep_promise(ms: f64) -> Promise<Undefined>;
+    pub fn sleep_promise(ms: f64) -> Promise<()>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -160,7 +160,7 @@ extern "C" {
         this: &Cache,
         url: impl ::wasm_bindgen::JsStringLike,
         body: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Undefined>;
+    ) -> Promise<()>;
     #[doc = " A global class's static: plain."]
     # [wasm_bindgen (static_method_of = Cache , catch)]
     pub async fn open(name: impl ::wasm_bindgen::JsStringLike) -> Result<Cache, JsValue>;
@@ -181,7 +181,7 @@ pub mod scheduler {
     extern "C" {
         #[doc = " A function of a global namespace: plain."]
         #[wasm_bindgen(js_name = "wait", js_namespace = "scheduler")]
-        pub fn wait_promise(ms: f64) -> Promise<Undefined>;
+        pub fn wait_promise(ms: f64) -> Promise<()>;
     }
 }
 pub mod node {
@@ -254,7 +254,7 @@ pub mod cloudflare {
             pub async fn close(this: &Socket) -> Result<(), JsValue>;
             #[doc = " `cloudflare:` builtin method: plain."]
             #[wasm_bindgen(method, js_name = "close")]
-            pub fn close_promise(this: &Socket) -> Promise<Undefined>;
+            pub fn close_promise(this: &Socket) -> Promise<()>;
         }
         #[wasm_bindgen(module = "cloudflare:sockets", experimental_generic_mono)]
         extern "C" {

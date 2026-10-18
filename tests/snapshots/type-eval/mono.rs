@@ -342,11 +342,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_partial<T>(this: &Holder<T>, val: &PartialBox<T>);
 }
-impl<T> Holder<T>
-where
-    for<'__wbg> &'__wbg PartialBox<T>:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<T> Holder<T> {
     pub fn new(partial: &PartialBox<T>) -> Holder<T> {
         let inner: Holder<T> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_partial(partial);

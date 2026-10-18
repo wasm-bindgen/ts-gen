@@ -348,7 +348,7 @@ extern "C" {
     #[doc = " Wait for init to resolve before calling `parse`."]
     #[allow(non_upper_case_globals)]
     #[wasm_bindgen(thread_local_v2)]
-    pub static init: Promise<Undefined>;
+    pub static init: Promise<()>;
 }
 #[wasm_bindgen(module = "es-module-lexer", experimental_generic_mono)]
 extern "C" {

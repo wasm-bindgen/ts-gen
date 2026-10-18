@@ -81,9 +81,7 @@ pub fn maybe_rows_with_null() -> Result<Option<Vec<Array<String>>>, JsValue> {
 #[wasm_bindgen(module = "nested-arrays", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "forEachRow")]
-    pub fn for_each_row(
-        callback: &Function<fn(Array<Array<String>>) -> Undefined>,
-    ) -> Result<(), JsValue>;
+    pub fn for_each_row(callback: &Function<fn(Array<Array<String>>)>) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "nested-arrays", experimental_generic_mono)]
 extern "C" {

@@ -13,14 +13,14 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "blockConcurrencyWhile")]
     pub async fn block_concurrency_while(
         this: &State,
-        callback: &Function<fn() -> Promise<Undefined>>,
+        callback: &Function<fn() -> Promise<()>>,
     ) -> Result<(), JsValue>;
     #[doc = " `block_concurrency_while` + `block_concurrency_while_promise`."]
     #[wasm_bindgen(method, js_name = "blockConcurrencyWhile")]
     pub fn block_concurrency_while_promise(
         this: &State,
-        callback: &Function<fn() -> Promise<Undefined>>,
-    ) -> Promise<Undefined>;
+        callback: &Function<fn() -> Promise<()>>,
+    ) -> Promise<()>;
     #[doc = " Overloads: each expansion gets its own `_promise`."]
     #[wasm_bindgen(method, catch)]
     pub async fn fetch(
@@ -74,7 +74,7 @@ extern "C" {
         this: &State,
         key: impl ::wasm_bindgen::JsStringLike,
         value: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Undefined>;
+    ) -> Promise<()>;
     #[wasm_bindgen(method, catch, js_name = "put")]
     async fn __put_with_null(
         this: &State,
@@ -86,7 +86,7 @@ extern "C" {
         this: &State,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &::wasm_bindgen::JsValue,
-    ) -> Promise<Undefined>;
+    ) -> Promise<()>;
     #[doc = " ## Errors"]
     #[doc = ""]
     #[doc = " * `TypeError` — on an invalid key"]
@@ -116,7 +116,7 @@ extern "C" {
     pub fn id_js_string(this: &State) -> Result<JsString, JsValue>;
     #[doc = " A `Promise`-typed property is already sync; no companion."]
     #[wasm_bindgen(method, getter)]
-    pub fn done(this: &State) -> Promise<Undefined>;
+    pub fn done(this: &State) -> Promise<()>;
 }
 impl State {
     #[doc = " A `null` argument arm gets its own `_promise` form too."]
@@ -128,10 +128,7 @@ impl State {
             .await
     }
     #[doc = " A `null` argument arm gets its own `_promise` form too."]
-    pub fn put_with_null_promise(
-        &self,
-        key: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Undefined> {
+    pub fn put_with_null_promise(&self, key: impl ::wasm_bindgen::JsStringLike) -> Promise<()> {
         self.__put_with_null_promise(key, &::wasm_bindgen::JsValue::NULL)
     }
 }
@@ -193,5 +190,5 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "sleep")]
-    pub fn sleep_promise(ms: f64) -> Promise<Undefined>;
+    pub fn sleep_promise(ms: f64) -> Promise<()>;
 }

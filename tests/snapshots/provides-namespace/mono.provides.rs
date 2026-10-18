@@ -37,7 +37,7 @@ pub fn keys(o: Object) -> Vec<String> {
 }
 
 #[wasm_bindgen(js_name = "notify")]
-pub fn notify(cb: Function<fn(JsNullable<Error>, Number) -> Undefined>) {
+pub fn notify(cb: Function<fn(Nullable<Error>, f64)>) {
     super::app::notify(cb)
 }
 

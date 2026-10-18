@@ -33,7 +33,7 @@ pub fn keys(_o: Object) -> Vec<String> {
     todo!()
 }
 
-pub fn notify(_cb: Function<fn(JsNullable<Error>, Number) -> Undefined>) {}
+pub fn notify(_cb: Function<fn(Nullable<Error>, f64)>) {}
 
 pub fn ret_opt(_x: Option<String>) -> String {
     todo!()

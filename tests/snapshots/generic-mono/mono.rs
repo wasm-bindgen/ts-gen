@@ -313,11 +313,11 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "getStringCallback")]
     pub async fn get_string_callback(
         this: &Flags,
-    ) -> Result<Function<fn(JsString) -> JsString>, JsValue>;
+    ) -> Result<Function<fn(String) -> String>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "getStringCallback")]
     pub fn get_string_callback_promise(
         this: &Flags,
-    ) -> Result<Promise<Function<fn(JsString) -> JsString>>, JsValue>;
+    ) -> Result<Promise<Function<fn(String) -> String>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "compareStrings")]
     pub fn compare_strings(
         this: &Flags,

@@ -18,7 +18,7 @@ extern "C" {
     pub fn reply_promise(
         this: &ForwardableEmailMessage,
         message: &cloudflare::email::EmailMessage,
-    ) -> Promise<Undefined>;
+    ) -> Promise<()>;
 }
 pub mod cloudflare {
     #[allow(unused_imports)]

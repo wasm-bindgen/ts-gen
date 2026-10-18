@@ -555,7 +555,7 @@ extern "C" {
         this: &Cache,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &Map<impl ::wasm_bindgen::JsStringLike, Array<impl ::wasm_bindgen::JsStringLike>>,
-    ) -> Promise<Undefined>;
+    ) -> Promise<()>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

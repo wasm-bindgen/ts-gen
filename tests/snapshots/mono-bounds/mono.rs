@@ -10,16 +10,17 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Handler<Env = JsValue>;
     #[wasm_bindgen(method, getter)]
-    pub fn fetch<Env: ::wasm_bindgen::JsGeneric>(
-        this: &Handler<Env>,
-    ) -> Option<Function<fn(JsString, Env) -> Undefined>>
+    pub fn fetch<Env>(this: &Handler<Env>) -> Option<Function<fn(String, Env)>>
     where
-        Option<Function<fn(JsString, Env) -> Undefined>>: ::wasm_bindgen::convert::FromWasmAbi;
+        Option<Function<fn(String, Env)>>: ::wasm_bindgen::convert::FromWasmAbi;
     #[wasm_bindgen(method, setter)]
-    pub fn set_fetch<Env: ::wasm_bindgen::JsGeneric>(
-        this: &Handler<Env>,
-        val: &Function<fn(JsString, Env) -> Undefined>,
-    );
+    pub fn set_fetch<Env>(this: &Handler<Env>, val: &Function<fn(String, Env)>);
+    #[wasm_bindgen(method, getter)]
+    pub fn scheduled<Env>(this: &Handler<Env>) -> Option<Function<fn(Env) -> Option<Promise<()>>>>
+    where
+        Option<Function<fn(Env) -> Option<Promise<()>>>>: ::wasm_bindgen::convert::FromWasmAbi;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_scheduled<Env>(this: &Handler<Env>, val: &Function<fn(Env) -> Option<Promise<()>>>);
     #[wasm_bindgen(method, getter)]
     pub fn name<Env>(this: &Handler<Env>) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "name")]
@@ -27,11 +28,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_name<Env>(this: &Handler<Env>, val: impl ::wasm_bindgen::JsStringLike);
 }
-impl<Env: ::wasm_bindgen::JsGeneric> Handler<Env>
-where
-    for<'__wbg> &'__wbg Function<fn(JsString, Env) -> Undefined>:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<Env> Handler<Env> {
     pub fn new() -> Handler<Env> {
         Self::builder().build()
     }
@@ -49,13 +46,13 @@ impl<Env> Default for Handler<Env> {
 pub struct HandlerBuilder<Env> {
     inner: Handler<Env>,
 }
-impl<Env: ::wasm_bindgen::JsGeneric> HandlerBuilder<Env>
-where
-    for<'__wbg> &'__wbg Function<fn(JsString, Env) -> Undefined>:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
-    pub fn fetch(self, val: &Function<fn(JsString, Env) -> Undefined>) -> Self {
+impl<Env> HandlerBuilder<Env> {
+    pub fn fetch(self, val: &Function<fn(String, Env)>) -> Self {
         self.inner.set_fetch(val);
+        self
+    }
+    pub fn scheduled(self, val: &Function<fn(Env) -> Option<Promise<()>>>) -> Self {
+        self.inner.set_scheduled(val);
         self
     }
     pub fn name(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
@@ -124,14 +121,15 @@ extern "C" {
 }
 impl<T> Slot<T>
 where
-    Option<T>: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    for<'__wbg> Option<&'__wbg T>:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
     for<'__wbg> &'__wbg T:
         ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
-    pub fn new(value: Option<T>) -> Slot<T> {
+    pub fn new(value: Option<&T>) -> Slot<T> {
         Self::builder(value).build()
     }
-    pub fn builder(value: Option<T>) -> SlotBuilder<T> {
+    pub fn builder(value: Option<&T>) -> SlotBuilder<T> {
         let inner: Slot<T> = JsCast::unchecked_into(js_sys::Object::new());
         if let Some(val) = value {
             inner.set_value(val);
@@ -144,7 +142,8 @@ pub struct SlotBuilder<T> {
 }
 impl<T> SlotBuilder<T>
 where
-    Option<T>: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    for<'__wbg> Option<&'__wbg T>:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
     for<'__wbg> &'__wbg T:
         ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
@@ -163,6 +162,106 @@ impl<T> From<Slot<T>> for SlotBuilder<T> {
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Step<T = JsValue>;
+    #[wasm_bindgen(method, getter)]
+    pub fn done<T>(this: &Step<T>) -> Option<bool>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_done<T>(this: &Step<T>, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn value<T>(this: &Step<T>) -> Option<T>
+    where
+        Option<T>: ::wasm_bindgen::convert::FromWasmAbi;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_value<T>(this: &Step<T>, val: &T)
+    where
+        T: ::wasm_bindgen::convert::RefIntoWasmAbi;
+    #[wasm_bindgen(method, setter, js_name = "value")]
+    fn __set_value_with_null<T>(this: &Step<T>, val: &::wasm_bindgen::JsValue);
+}
+impl<T> Step<T> {
+    pub fn set_value_with_null(&self) {
+        self.__set_value_with_null(&::wasm_bindgen::JsValue::NULL)
+    }
+}
+impl<T> Step<T>
+where
+    for<'__wbg> &'__wbg T:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+{
+    pub fn new() -> Step<T> {
+        Self::builder().build()
+    }
+    pub fn builder() -> StepBuilder<T> {
+        StepBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl<T> Default for Step<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct StepBuilder<T> {
+    inner: Step<T>,
+}
+impl<T> StepBuilder<T>
+where
+    for<'__wbg> &'__wbg T:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+{
+    pub fn done(self, val: bool) -> Self {
+        self.inner.set_done(val);
+        self
+    }
+    pub fn value(self, val: &T) -> Self {
+        self.inner.set_value(val);
+        self
+    }
+    pub fn value_with_null(self) -> Self {
+        self.inner.set_value_with_null();
+        self
+    }
+    pub fn build(self) -> Step<T> {
+        self.inner
+    }
+}
+impl<T> From<Step<T>> for StepBuilder<T> {
+    fn from(inner: Step<T>) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn fill(r: &Rows<String>, s: &Slot<f64>) -> Result<(), JsValue>;
+    pub fn fill(r: &Rows<String>, s: &Slot<f64>, t: &Step<String>) -> Result<(), JsValue>;
+}
+#[wasm_bindgen(experimental_generic_mono)]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Store;
+    #[wasm_bindgen(method, catch, js_name = "blockConcurrencyWhile")]
+    pub async fn block_concurrency_while<T>(
+        this: &Store,
+        callback: &Function<fn() -> Promise<T>>,
+    ) -> Result<T, JsValue>
+    where
+        T: ::wasm_bindgen::convert::FromWasmAbi + 'static;
+    #[wasm_bindgen(method, js_name = "blockConcurrencyWhile")]
+    pub fn block_concurrency_while_promise<T>(
+        this: &Store,
+        callback: &Function<fn() -> Promise<T>>,
+    ) -> Promise<T>;
+    #[wasm_bindgen(method, catch, js_name = "forEach")]
+    pub fn for_each(
+        this: &Store,
+        callback: &Function<fn(String, String, Store)>,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch)]
+    pub async fn sync(this: &Store) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "sync")]
+    pub fn sync_promise(this: &Store) -> Promise<()>;
 }

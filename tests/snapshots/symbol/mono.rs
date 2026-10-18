@@ -39,7 +39,7 @@ extern "C" {
 #[wasm_bindgen(module = "symbol", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "forEach")]
-    pub fn for_each(callback: &Function<fn(Symbol) -> Undefined>) -> Result<(), JsValue>;
+    pub fn for_each(callback: &Function<fn(Symbol)>) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "symbol", experimental_generic_mono)]
 extern "C" {

@@ -5,17 +5,17 @@ use js_sys::*;
 #[allow(unused_imports)]
 use wasm_bindgen::prelude::*;
 #[allow(dead_code)]
-pub type Next<T> = Function<fn(Next<T>) -> Undefined>;
+pub type Next<T> = Function<fn(Next<T>)>;
 #[allow(dead_code)]
-pub type Ping = Function<fn(Pong) -> Undefined>;
+pub type Ping = Function<fn(Pong)>;
 #[allow(dead_code)]
-pub type Pong = Function<fn(Ping) -> Undefined>;
+pub type Pong = Function<fn(Ping)>;
 #[allow(dead_code)]
-pub type Grow<T> = Function<fn(Grow<Array<T>>) -> Undefined>;
+pub type Grow<T> = Function<fn(Grow<Array<T>>)>;
 #[allow(dead_code)]
 pub type Boxed<T> = Array<T>;
 #[allow(dead_code)]
-pub type Wrapped = Function<fn(Array<Wrapped>) -> Undefined>;
+pub type Wrapped = Function<fn(Array<Wrapped>)>;
 #[allow(dead_code)]
 pub type Step = Next<f64>;
 pub mod tree {
@@ -24,7 +24,7 @@ pub mod tree {
     #[allow(dead_code)]
     pub type Node = JsValue;
     #[allow(dead_code)]
-    pub type Leaf = Function<fn(Leaf) -> Undefined>;
+    pub type Leaf = Function<fn(Leaf)>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

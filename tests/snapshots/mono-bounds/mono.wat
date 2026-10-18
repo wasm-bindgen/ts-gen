@@ -27,6 +27,10 @@
   (import "./bindings.wasm" "Handler.fetch" (func $Handler.fetch (param $this externref) (result externref)))
   ;; set fetch(value: (request: string, env: Env) => void)
   (import "./bindings.wasm" "Handler.set_fetch" (func $Handler.set_fetch (param $this externref) (param $value externref)))
+  ;; scheduled?: (env: Env) => Promise<void> | undefined
+  (import "./bindings.wasm" "Handler.scheduled" (func $Handler.scheduled (param $this externref) (result externref)))
+  ;; set scheduled(value: (env: Env) => Promise<void> | undefined)
+  (import "./bindings.wasm" "Handler.set_scheduled" (func $Handler.set_scheduled (param $this externref) (param $value externref)))
   ;; name?: string
   (import "./bindings.wasm" "Handler.name" (func $Handler.name (param $this externref) (result externref)))
   ;; set name(value: string)
@@ -55,8 +59,30 @@
   ;; set fallback(value: T)
   (import "./bindings.wasm" "Slot.set_fallback" (func $Slot.set_fallback (param $this externref) (param $value externref)))
 
-  ;; fill(r: Rows<string>, s: Slot<number>): void
-  (import "./bindings.wasm" "fill" (func $fill (param $r externref) (param $s externref)))
+  ;; Step
+  ;; {} as Step
+  (import "./bindings.wasm" "Step.new" (func $Step.new (result externref)))
+  ;; done?: boolean
+  (import "./bindings.wasm" "Step.done" (func $Step.done (param $this externref) (result externref)))
+  ;; set done(value: boolean)
+  (import "./bindings.wasm" "Step.set_done" (func $Step.set_done (param $this externref) (param $value i32)))
+  ;; value?: T | null
+  (import "./bindings.wasm" "Step.value" (func $Step.value (param $this externref) (result externref)))
+  ;; set value(value: T)
+  (import "./bindings.wasm" "Step.set_value" (func $Step.set_value (param $this externref) (param $value externref)))
+  ;; set value(value: null)
+  (import "./bindings.wasm" "Step.set_value_with_null" (func $Step.set_value_with_null (param $this externref) (param $value externref)))
+
+  ;; fill(r: Rows<string>, s: Slot<number>, t: Step<string>): void
+  (import "./bindings.wasm" "fill" (func $fill (param $r externref) (param $s externref) (param $t externref)))
+
+  ;; Store
+  ;; blockConcurrencyWhile(callback: () => Promise<T>): Promise<T>
+  (import "./bindings.wasm" "Store.block_concurrency_while" (func $Store.block_concurrency_while (param $this externref) (param $callback externref) (result externref)))
+  ;; forEach(callback: (value: string, key: string, parent: Store) => void): void
+  (import "./bindings.wasm" "Store.for_each" (func $Store.for_each (param $this externref) (param $callback externref)))
+  ;; sync(): Promise<void>
+  (import "./bindings.wasm" "Store.sync" (func $Store.sync (param $this externref) (result externref)))
 
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))

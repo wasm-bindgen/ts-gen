@@ -216,14 +216,14 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn run<Props, T>(
         this: &Storage<Props>,
-        callback: &Function<fn() -> Promise>,
+        callback: &Function<fn() -> Promise<T>>,
     ) -> Result<T, JsValue>
     where
         T: ::wasm_bindgen::convert::FromWasmAbi + 'static;
     #[wasm_bindgen(method, js_name = "run")]
     pub fn run_promise<Props, T>(
         this: &Storage<Props>,
-        callback: &Function<fn() -> Promise>,
+        callback: &Function<fn() -> Promise<T>>,
     ) -> Promise<T>;
     #[wasm_bindgen(method, catch)]
     pub fn props<Props>(this: &Storage<Props>) -> Result<Props, JsValue>

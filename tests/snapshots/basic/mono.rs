@@ -380,11 +380,11 @@ pub mod cloudflare {
             #[wasm_bindgen(method, catch)]
             pub async fn close(this: &Socket) -> Result<(), JsValue>;
             #[wasm_bindgen(method, js_name = "close")]
-            pub fn close_promise(this: &Socket) -> Promise<Undefined>;
+            pub fn close_promise(this: &Socket) -> Promise<()>;
             #[wasm_bindgen(method, getter)]
-            pub fn closed(this: &Socket) -> Promise<Undefined>;
+            pub fn closed(this: &Socket) -> Promise<()>;
             #[wasm_bindgen(method, getter)]
-            pub fn opened(this: &Socket) -> Promise<Undefined>;
+            pub fn opened(this: &Socket) -> Promise<()>;
             #[wasm_bindgen(method, getter)]
             pub fn readable(this: &Socket) -> ReadableStream;
             #[wasm_bindgen(method, getter)]
@@ -465,7 +465,7 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn alarm(this: &DurableObject) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "alarm")]
-    pub fn alarm_promise(this: &DurableObject) -> Promise<Undefined>;
+    pub fn alarm_promise(this: &DurableObject) -> Promise<()>;
     #[wasm_bindgen(method, catch, js_name = "webSocketMessage")]
     pub async fn web_socket_message(
         this: &DurableObject,
@@ -477,7 +477,7 @@ extern "C" {
         this: &DurableObject,
         ws: &WebSocket,
         message: impl ::wasm_bindgen::JsStringLike,
-    ) -> Promise<Undefined>;
+    ) -> Promise<()>;
     #[wasm_bindgen(method, catch, js_name = "webSocketMessage")]
     pub async fn web_socket_message_with_array_buffer(
         this: &DurableObject,
@@ -489,7 +489,7 @@ extern "C" {
         this: &DurableObject,
         ws: &WebSocket,
         message: &ArrayBuffer,
-    ) -> Promise<Undefined>;
+    ) -> Promise<()>;
 }
 pub mod web_assembly {
     #[allow(unused_imports)]

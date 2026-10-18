@@ -82,10 +82,7 @@ extern "C" {
         val: impl ::wasm_bindgen::JsStringLike,
     );
 }
-impl<Metadata> ListResult<Metadata>
-where
-    ListKey<Metadata>: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,
-{
+impl<Metadata> ListResult<Metadata> {
     pub fn new(
         keys: &[ListKey<Metadata>],
         cursor: impl ::wasm_bindgen::JsStringLike,
@@ -138,7 +135,7 @@ extern "C" {
     pub fn add_event_listener<EventMap>(
         this: &Target<EventMap>,
         r#type: impl ::wasm_bindgen::JsStringLike,
-        handler: &Function<fn(JsValue) -> Undefined>,
+        handler: &Function<fn(JsValue)>,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]

@@ -81,7 +81,7 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn put(this: &Cache, url: impl ::wasm_bindgen::JsStringLike) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_promise(this: &Cache, url: impl ::wasm_bindgen::JsStringLike) -> Promise<Undefined>;
+    pub fn put_promise(this: &Cache, url: impl ::wasm_bindgen::JsStringLike) -> Promise<()>;
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub async fn put_with_ttl(
         this: &Cache,
@@ -93,11 +93,11 @@ extern "C" {
         this: &Cache,
         url: impl ::wasm_bindgen::JsStringLike,
         ttl: u32,
-    ) -> Promise<Undefined>;
+    ) -> Promise<()>;
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub async fn put_with_request(this: &Cache, request: &Response) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "put")]
-    pub fn put_with_request_promise(this: &Cache, request: &Response) -> Promise<Undefined>;
+    pub fn put_with_request_promise(this: &Cache, request: &Response) -> Promise<()>;
     #[wasm_bindgen(method, catch, js_name = "put")]
     pub async fn put_with_request_and_ttl(
         this: &Cache,
@@ -109,7 +109,7 @@ extern "C" {
         this: &Cache,
         request: &Response,
         ttl: u32,
-    ) -> Promise<Undefined>;
+    ) -> Promise<()>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -151,25 +151,22 @@ extern "C" {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setTimeout")]
-    pub fn set_timeout(callback: &Function<fn() -> Undefined>) -> Result<i32, JsValue>;
+    pub fn set_timeout(callback: &Function<fn()>) -> Result<i32, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setTimeout")]
-    pub fn set_timeout_with_ms(
-        callback: &Function<fn() -> Undefined>,
-        ms: f64,
-    ) -> Result<i32, JsValue>;
+    pub fn set_timeout_with_ms(callback: &Function<fn()>, ms: f64) -> Result<i32, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "setInterval")]
-    pub fn set_interval(callback: &Function<fn() -> Undefined>) -> i32;
+    pub fn set_interval(callback: &Function<fn()>) -> i32;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(js_name = "setInterval")]
-    pub fn set_interval_with_ms(callback: &Function<fn() -> Undefined>, ms: f64) -> i32;
+    pub fn set_interval_with_ms(callback: &Function<fn()>, ms: f64) -> i32;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

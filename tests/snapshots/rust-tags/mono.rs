@@ -111,13 +111,10 @@ impl From<ResponseInit> for ResponseInitBuilder {
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setTimeout")]
-    pub fn set_timeout(callback: &Function<fn() -> Undefined>) -> Result<i32, JsValue>;
+    pub fn set_timeout(callback: &Function<fn()>) -> Result<i32, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch, js_name = "setTimeout")]
-    pub fn set_timeout_with_ms(
-        callback: &Function<fn() -> Undefined>,
-        ms: u32,
-    ) -> Result<i32, JsValue>;
+    pub fn set_timeout_with_ms(callback: &Function<fn()>, ms: u32) -> Result<i32, JsValue>;
 }

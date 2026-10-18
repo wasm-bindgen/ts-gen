@@ -592,7 +592,7 @@ extern "C" {
         controller: &ScheduledController,
         env: &E,
         ctx: &ExecutionContext,
-    ) -> Promise<Undefined>
+    ) -> Promise<()>
     where
         E: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }

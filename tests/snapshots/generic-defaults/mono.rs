@@ -236,7 +236,7 @@ extern "C" {
         this: &Store,
         key: impl ::wasm_bindgen::JsStringLike,
         value: &T,
-    ) -> Result<Promise<Undefined>, JsValue>
+    ) -> Result<Promise<()>, JsValue>
     where
         T: ::wasm_bindgen::convert::RefIntoWasmAbi;
     #[wasm_bindgen(method, variadic, catch)]
@@ -272,14 +272,14 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn transaction<T>(
         this: &Store,
-        closure: &Function<fn(Store) -> Promise>,
+        closure: &Function<fn(Store) -> Promise<T>>,
     ) -> Result<T, JsValue>
     where
         T: ::wasm_bindgen::convert::FromWasmAbi + 'static;
     #[wasm_bindgen(method, catch, js_name = "transaction")]
     pub fn transaction_promise<T>(
         this: &Store,
-        closure: &Function<fn(Store) -> Promise>,
+        closure: &Function<fn(Store) -> Promise<T>>,
     ) -> Result<Promise<T>, JsValue>;
     #[wasm_bindgen(method, catch)]
     pub async fn collect(
@@ -292,16 +292,13 @@ extern "C" {
         make: &Function<fn() -> Promise>,
     ) -> Result<Promise<Map<String, JsValue>>, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn each<T: ::wasm_bindgen::JsGeneric>(
-        this: &Store,
-        r#fn: &Function<fn(T) -> Undefined>,
-    ) -> Result<Map<String, T>, JsValue>
+    pub async fn each<T>(this: &Store, r#fn: &Function<fn(T)>) -> Result<Map<String, T>, JsValue>
     where
         T: 'static;
     #[wasm_bindgen(method, catch, js_name = "each")]
-    pub fn each_promise<T: ::wasm_bindgen::JsGeneric>(
+    pub fn each_promise<T>(
         this: &Store,
-        r#fn: &Function<fn(T) -> Undefined>,
+        r#fn: &Function<fn(T)>,
     ) -> Result<Promise<Map<String, T>>, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "eachRest")]
     pub async fn each_rest(this: &Store, r#fn: &Function) -> Result<Map<String, JsValue>, JsValue>;

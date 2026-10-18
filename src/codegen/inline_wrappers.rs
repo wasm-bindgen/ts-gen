@@ -482,8 +482,11 @@ struct Wrapper {
     item: TokenStream,
 }
 
-/// Whether `ty` names one of `params`.
-fn mentions(ty: &Type, params: &[Ident]) -> bool {
+/// Whether `ty` names one of `params` outside the arguments of a generic
+/// type other than `Option`/`Vec`. A handle's ABI holds for every
+/// instantiation (`&Foo<T>`, `&Function<fn(T)>`, `Promise<T>`), so only a
+/// bare mention needs a bound.
+fn mentions_bare(ty: &Type, params: &[Ident]) -> bool {
     struct Find<'a> {
         params: &'a [Ident],
         found: bool,
@@ -497,6 +500,12 @@ fn mentions(ty: &Type, params: &[Ident]) -> bool {
                 self.found = true;
             }
             syn::visit_mut::visit_path_mut(self, path);
+        }
+        fn visit_path_segment_mut(&mut self, seg: &mut syn::PathSegment) {
+            let transparent = seg.ident == "Option" || seg.ident == "Vec";
+            if transparent || matches!(seg.arguments, PathArguments::None) {
+                syn::visit_mut::visit_path_segment_mut(self, seg);
+            }
         }
     }
     let mut find = Find {
@@ -531,9 +540,9 @@ fn slice_elem(ty: &Type) -> Option<&Type> {
     }
 }
 
-/// One predicate per typed argument naming a type parameter, as
-/// `experimental_generic_mono` bounds the import. Receivers are skipped. A borrow nested in the
-/// type (`Option<&T>`) is bound for every lifetime.
+/// One predicate per typed argument naming a type parameter bare, as
+/// `experimental_generic_mono` bounds the import. Receivers are skipped. A
+/// borrow nested in the type (`Option<&T>`) is bound for every lifetime.
 pub(crate) fn mono_arg_bounds<'a>(
     inputs: impl Iterator<Item = &'a FnArg>,
     params: &[Ident],
@@ -542,7 +551,7 @@ pub(crate) fn mono_arg_bounds<'a>(
     for arg in inputs {
         let FnArg::Typed(pat) = arg else { continue };
         let ty = &*pat.ty;
-        if !mentions(ty, params) {
+        if !mentions_bare(ty, params) {
             continue;
         }
         out.push(match (slice_elem(ty), ty) {

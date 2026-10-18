@@ -1002,7 +1002,7 @@ extern "C" {
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {
     #[wasm_bindgen(catch)]
-    pub fn callback(cb: &Function<fn(JsNullable<JsString>) -> Undefined>) -> Result<(), JsValue>;
+    pub fn callback(cb: &Function<fn(Nullable<String>)>) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "nullability", experimental_generic_mono)]
 extern "C" {

@@ -9,7 +9,6 @@ pub mod enums;
 pub mod error_enum;
 pub mod functions;
 pub(crate) mod inline_wrappers;
-mod mono_bounds;
 pub(crate) mod null_arms;
 pub mod provides;
 pub mod signatures;
@@ -204,9 +203,6 @@ pub fn generate_with_options(
         anyhow::anyhow!("generated tokens are not valid syn:\n{e}\n\nTokens:\n{tokens}")
     })?;
     inline_wrappers::apply(&mut file);
-    if options.experimental_generic_mono {
-        mono_bounds::apply(&mut file);
-    }
     split_unshared_views(&mut file.items);
     signatures::state_abi_bounds(&mut file.items);
     inline_wrappers::copy_abi_bounds(&mut file.items);
