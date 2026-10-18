@@ -2043,6 +2043,22 @@ pub async fn list(this: &Store) -> Result<Map<JsString, JsValue>, JsValue>;
 pub fn schedule(this: &Store, callback: &Function, args: &[JsValue]) -> f64;
 ```
 
+Under `--experimental-generic-mono` a method whose rule-3 erasure
+changes its lowered return also gets a `_typed` twin keeping the
+parameters, as a generic class's constructors do (`new_typed`). The
+plain form stays callable without a turbofish, and the twin names the
+type instead of an `unchecked_into`. `_typed` goes after the expansion
+suffix and before the companions (`run_typed::<Row>()`,
+`list_typed_promise::<M>()`,
+`get_with_metadata_json_with_options_typed::<V, M>`). A parameter the
+lowered return drops anyway (an alias that does not use it) has no
+twin, and rule 2 keeps its single form (`get_json::<T>`):
+
+```rust
+pub async fn run(this: &Store) -> Result<Row<Object>, JsValue>;
+pub async fn run_typed<T>(this: &Store) -> Result<Row<T>, JsValue>;
+```
+
 Passing `--experimental-generic-mono` selects wasm-bindgen's experimental
 per-monomorphization path. Every generated extern block receives
 `experimental_generic_mono`, type parameters omit the `JsGeneric` bound, and

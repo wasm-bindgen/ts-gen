@@ -18,15 +18,22 @@ use crate::parse::scope::{Binding, ScopeId};
 
 use super::typemap::CodegenContext;
 
-/// Rewrite the methods of a class-like declaration in place.
+/// Rewrite the methods of a class-like declaration in place. Per-mono,
+/// returns the methods that lost a parameter as declared: each also gets
+/// a `_typed` twin keeping its parameters (`list_typed::<M>()` beside
+/// `list()`), as a class's constructors do.
 pub(crate) fn erase_uninferrable_in_members(
     members: &mut [Member],
     cgctx: Option<&CodegenContext<'_>>,
-) {
+) -> Vec<Member> {
+    let mut typed = Vec::new();
     let Some(cgctx) = cgctx else {
-        return;
+        return typed;
     };
+    let mono = CodegenContext::generic_mono(Some(cgctx));
     for member in members {
+        let declared = mono.then(|| member.clone());
+        let before = type_param_count(member);
         match member {
             Member::Method(m) => erase_uninferrable(
                 &mut m.type_params,
@@ -44,6 +51,18 @@ pub(crate) fn erase_uninferrable_in_members(
             ),
             _ => {}
         }
+        if let Some(declared) = declared.filter(|_| type_param_count(member) != before) {
+            typed.push(declared);
+        }
+    }
+    typed
+}
+
+fn type_param_count(member: &Member) -> usize {
+    match member {
+        Member::Method(m) => m.type_params.len(),
+        Member::StaticMethod(m) => m.type_params.len(),
+        _ => 0,
     }
 }
 

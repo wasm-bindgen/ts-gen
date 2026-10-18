@@ -2,7 +2,8 @@
 
 // A reference passes no argument for an erased parameter, so a return
 // whose only string leaf is that argument (`Key` in `ListResult<M, Key>`)
-// has no `_js_string` variant: it would lower to `list`'s own type.
+// has no `_js_string` variant: it would lower to `list`'s own type. The
+// erased method gets a `_typed` twin keeping its parameter (`list_typed::<M>`).
 
 interface Entry<M, Key extends string = string> {
   name: Key;

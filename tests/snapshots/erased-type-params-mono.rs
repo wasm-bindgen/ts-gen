@@ -131,6 +131,10 @@ extern "C" {
     pub async fn list(this: &Store) -> Result<ListResult<JsValue>, JsValue>;
     #[wasm_bindgen(method, js_name = "list")]
     pub fn list_promise(this: &Store) -> Promise<ListResult<JsValue>>;
+    #[wasm_bindgen(method, catch, js_name = "list")]
+    pub async fn list_typed<M>(this: &Store) -> Result<ListResult<M>, JsValue>;
+    #[wasm_bindgen(method, js_name = "list")]
+    pub fn list_typed_promise<M>(this: &Store) -> Promise<ListResult<M>>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {

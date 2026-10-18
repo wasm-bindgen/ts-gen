@@ -28,9 +28,9 @@ use quote::quote;
 use std::collections::HashMap;
 
 use crate::codegen::signatures::{
-    build_signatures, generate_concrete_params_with_mono_bounds, generate_dictionary_params,
-    is_void_return, public_rust_name, render_generic_bounds, CallableSpec, ConcreteParam,
-    DictionaryParams, FunctionSignature, Overload, SignatureKind,
+    build_signatures, build_signatures_with_postfix, generate_concrete_params_with_mono_bounds,
+    generate_dictionary_params, is_void_return, public_rust_name, render_generic_bounds,
+    CallableSpec, ConcreteParam, DictionaryParams, FunctionSignature, Overload, SignatureKind,
 };
 use crate::codegen::typemap::{to_return_type, CodegenContext, TypePosition};
 use crate::ir::{
@@ -73,6 +73,9 @@ pub(crate) struct ClassConfig<'a> {
     /// The item type a declared `[Symbol.iterator]()` yields; see
     /// [`take_symbol_methods`].
     iterable: Option<TypeRef>,
+    /// Per-mono, the methods whose nested return-only type parameters
+    /// erased, as declared; see [`typed_twins`].
+    typed_twins: Vec<Member>,
 }
 
 /// Splits declared well-known-symbol methods out of `members` (the parser
@@ -368,7 +371,7 @@ impl<'a> ClassConfig<'a> {
 
         let mut members = decl.members.clone();
         let iterable = take_symbol_methods(&mut members);
-        super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
+        let typed_twins = super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
         ClassConfig {
             rust_name: decl.name.clone(),
             js_name: decl.js_name.clone(),
@@ -385,6 +388,7 @@ impl<'a> ClassConfig<'a> {
             cgctx,
             scope,
             iterable,
+            typed_twins,
         }
     }
 
@@ -405,7 +409,7 @@ impl<'a> ClassConfig<'a> {
         let inherited = inherited_members(&decl.extends, cgctx);
         let mut members = inherit_into(inherited.beyond_first, &decl.members);
         let iterable = take_symbol_methods(&mut members);
-        super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
+        let typed_twins = super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
 
         ClassConfig {
             rust_name: decl.name.clone(),
@@ -420,6 +424,7 @@ impl<'a> ClassConfig<'a> {
             cgctx,
             scope,
             iterable,
+            typed_twins,
         }
     }
 
@@ -443,6 +448,7 @@ impl<'a> ClassConfig<'a> {
             cgctx: self.cgctx,
             scope: self.scope,
             iterable: self.iterable.clone(),
+            typed_twins: self.typed_twins.clone(),
         }
     }
 
@@ -464,7 +470,7 @@ impl<'a> ClassConfig<'a> {
         };
         let mut members = decl.members.clone();
         let iterable = take_symbol_methods(&mut members);
-        super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
+        let typed_twins = super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
         ClassConfig {
             rust_name: decl.name.clone(),
             js_name: decl.js_name.clone(),
@@ -478,6 +484,7 @@ impl<'a> ClassConfig<'a> {
             cgctx,
             scope,
             iterable,
+            typed_twins,
         }
     }
 
@@ -1869,6 +1876,36 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 for sig in &sigs {
                     items.push(generate_expanded_method(config, sig));
                 }
+                let declared: Vec<Overload> = group
+                    .iter()
+                    .map(|m| {
+                        let m = config
+                            .typed_twins
+                            .iter()
+                            .find_map(|t| match t {
+                                Member::Method(t) if t.body_scope == m.body_scope => Some(t),
+                                _ => None,
+                            })
+                            .unwrap_or(m);
+                        Overload {
+                            params: &m.params,
+                            return_type: &m.return_type,
+                            body_scope: m.body_scope,
+                            throws: &m.throws,
+                            doc: &m.doc,
+                            string_mode: m.string_mode,
+                        }
+                    })
+                    .collect();
+                let spec = CallableSpec {
+                    js_name: &m.js_name,
+                    rust_name: Some(&base),
+                    kind: SignatureKind::Method,
+                    overloads: &declared,
+                };
+                for sig in typed_twins(config, &spec, &sigs, &mut names) {
+                    items.push(generate_expanded_method(config, &sig));
+                }
             }
             Member::StaticMethod(m) => {
                 if expanded_static_methods.contains(&m.js_name) {
@@ -1902,6 +1939,36 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                 );
                 for sig in &sigs {
                     items.push(generate_expanded_static_method(config, sig));
+                }
+                let declared: Vec<Overload> = group
+                    .iter()
+                    .map(|m| {
+                        let m = config
+                            .typed_twins
+                            .iter()
+                            .find_map(|t| match t {
+                                Member::StaticMethod(t) if t.body_scope == m.body_scope => Some(t),
+                                _ => None,
+                            })
+                            .unwrap_or(m);
+                        Overload {
+                            params: &m.params,
+                            return_type: &m.return_type,
+                            body_scope: m.body_scope,
+                            throws: &m.throws,
+                            doc: &m.doc,
+                            string_mode: m.string_mode,
+                        }
+                    })
+                    .collect();
+                let spec = CallableSpec {
+                    js_name: &m.js_name,
+                    rust_name: Some(&base),
+                    kind: SignatureKind::StaticMethod,
+                    overloads: &declared,
+                };
+                for sig in typed_twins(config, &spec, &sigs, &mut names) {
+                    items.push(generate_expanded_static_method(config, &sig));
                 }
             }
             Member::Getter(g) => {
@@ -1964,6 +2031,81 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
         #into_iterator
         #public_alias
     }
+}
+
+/// Per-mono `_typed` twins of a method group whose nested return-only
+/// type parameters erased (`list()` → `KVNamespaceListResult<JsValue>`):
+/// the group re-expanded as declared (`spec`), keeping each binding whose
+/// return differs from its erased one in `erased`, named after it with
+/// `_typed` before any companion suffix (`list_typed::<M>`,
+/// `list_typed_promise`).
+fn typed_twins(
+    config: &ClassConfig,
+    spec: &CallableSpec<'_>,
+    erased: &[FunctionSignature],
+    names: &mut LocalScope,
+) -> Vec<FunctionSignature> {
+    const POSTFIX: &str = "_typed";
+    let twinned = spec.overloads.iter().any(|o| {
+        config.typed_twins.iter().any(|t| match t {
+            Member::Method(t) => t.body_scope == o.body_scope,
+            Member::StaticMethod(t) => t.body_scope == o.body_scope,
+            _ => false,
+        })
+    });
+    if !twinned {
+        return Vec::new();
+    }
+    let mut scratch = names.clone();
+    let mut out = Vec::new();
+    for mut twin in build_signatures_with_postfix(spec, POSTFIX, &mut scratch, config.cgctx) {
+        let Some(at) = twin.rust_name.rfind(POSTFIX) else {
+            continue;
+        };
+        let erased_name = format!(
+            "{}{}",
+            &twin.rust_name[..at],
+            &twin.rust_name[at + POSTFIX.len()..]
+        );
+        // An erased parameter the lowering drops anyway (an alias that
+        // does not use it) leaves nothing to type.
+        let lowered = |sig: &FunctionSignature| {
+            to_return_type(
+                &sig.return_type,
+                sig.catch,
+                sig.is_async,
+                sig.js_string_return,
+                sig.error_type.as_ref(),
+                config.cgctx,
+                sig.body_scope,
+                &config.from_module(),
+                super::typemap::ReturnAnchor {
+                    base: &erased_name,
+                    kind: super::typemap::ReturnAnchorKind::Callable,
+                    parent: Some(&config.rust_name),
+                },
+            )
+            .to_string()
+        };
+        if !erased
+            .iter()
+            .any(|e| e.rust_name == erased_name && lowered(e) != lowered(&twin))
+        {
+            continue;
+        }
+        match &mut twin.literal {
+            // A literal binding's name is its first arm's.
+            Some(literal) => {
+                for (_, arm) in &mut literal.arms {
+                    *arm = names.declare(arm, Suffix::Snake);
+                }
+                twin.rust_name = literal.arms[0].1.clone();
+            }
+            None => twin.rust_name = names.declare(&twin.rust_name, Suffix::Snake),
+        }
+        out.push(twin);
+    }
+    out
 }
 
 /// Per-mono, a declared `[Symbol.iterator]()` binds as `iterator()` and
