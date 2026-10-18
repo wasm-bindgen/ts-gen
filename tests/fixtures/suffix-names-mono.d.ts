@@ -5,6 +5,9 @@
 // extends takes the parameter name (`head_with_options`), whichever comes
 // first.
 // A method's inline parameter type is named `<Parent><Method><Param>`.
+// A `maybe` prefix is dropped (`json_with_init`), and a parameter named
+// for its arms names each by its part (`measure_with_start_mark`). A
+// method returning `this` returns the receiver.
 
 interface RequestInit {
   method?: string;
@@ -25,6 +28,21 @@ declare class URL {
 
 interface GetOptions {
   range?: number;
+}
+interface MeasureOptions {
+  start?: string;
+}
+declare class Performance {
+  measure(name: string, measureOptionsOrStartMark?: MeasureOptions | string, maybeEndMark?: string): void;
+  session(constraintOrBookmark?: Bookmark | Constraint): void;
+}
+type Bookmark = string;
+type Constraint = "first-primary" | "first-unconstrained";
+declare class Response {
+  static json(any: any, maybeInit?: RequestInit | Response): Response;
+}
+declare class Span {
+  setAttribute(key: string, value: string): this;
 }
 declare class Bucket {
   get(key: string, options: GetOptions & { onlyIf: string }): void;

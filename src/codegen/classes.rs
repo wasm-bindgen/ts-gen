@@ -83,6 +83,47 @@ pub(crate) struct ClassConfig<'a> {
     typed_twins: Vec<Member>,
 }
 
+/// Per-mono, a method returning `this` returns the receiver's own type,
+/// so it chains (`span.set_attribute(..)?.set_attribute(..)`).
+fn resolve_this_returns(
+    members: &mut [Member],
+    name: &str,
+    type_params: &[crate::ir::TypeParam],
+    cgctx: Option<&CodegenContext<'_>>,
+) {
+    if !CodegenContext::generic_mono(cgctx) {
+        return;
+    }
+    fn resolve(ty: &mut TypeRef, this: &TypeRef) {
+        match ty {
+            TypeRef::Unresolved(s) if s == "this" => *ty = this.clone(),
+            TypeRef::Reference { generic_args, .. } => {
+                generic_args.iter_mut().for_each(|t| resolve(t, this))
+            }
+            TypeRef::Array(t) => resolve(t, this),
+            TypeRef::Union(_) => {
+                if let Some((mut core, n)) = ty.split_empties() {
+                    resolve(&mut core, this);
+                    *ty = core.with_empties(n);
+                }
+            }
+            _ => {}
+        }
+    }
+    let this = TypeRef::generic(
+        name,
+        type_params
+            .iter()
+            .map(|p| TypeRef::ident(p.name.clone()))
+            .collect(),
+    );
+    for member in members {
+        if let Member::Method(m) = member {
+            resolve(&mut m.return_type, &this);
+        }
+    }
+}
+
 /// Per-mono, drops an optional property typed `undefined` or `never`
 /// (D1's `error?: never`), which can only be absent: its getter would only
 /// read `None` and its setter take `&Undefined`.
@@ -421,6 +462,7 @@ impl<'a> ClassConfig<'a> {
         let mut members = decl.members.clone();
         let iterable = take_symbol_methods(&mut members);
         drop_absent_properties(&mut members, cgctx);
+        resolve_this_returns(&mut members, &decl.name, &decl.type_params, cgctx);
         let typed_twins = super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
         ClassConfig {
             rust_name: decl.name.clone(),
@@ -461,6 +503,7 @@ impl<'a> ClassConfig<'a> {
         let mut members = inherit_into(inherited.beyond_first, &decl.members);
         let iterable = take_symbol_methods(&mut members);
         drop_absent_properties(&mut members, cgctx);
+        resolve_this_returns(&mut members, &decl.name, &decl.type_params, cgctx);
         let typed_twins = super::type_params::erase_uninferrable_in_members(&mut members, cgctx);
 
         ClassConfig {

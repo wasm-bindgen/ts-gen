@@ -74,7 +74,7 @@ pub mod node_js {
             this: &EventEmitter,
             event: impl ::wasm_bindgen::JsStringLike,
             listener: &Function,
-        ) -> Result<JsValue, JsValue>;
+        ) -> Result<EventEmitter, JsValue>;
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]

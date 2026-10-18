@@ -379,7 +379,8 @@ impl LiteralSpec {
 pub struct FieldLiteral {
     /// Index among the parameters after `this`.
     pub position: usize,
-    pub field: String,
+    /// The property's setter on the full dictionary (`set_type`).
+    pub setter: String,
     pub value: String,
 }
 
@@ -978,7 +979,7 @@ fn field_literal(
     }
     Some(FieldLiteral {
         position: *position,
-        field,
+        setter: base_rust_name(&field, SignatureKind::Setter),
         value: value.clone(),
     })
 }
@@ -2105,6 +2106,55 @@ fn compute_rust_names(
             .filter(|t| *t != ty && (rules.is_dictionary)(t))
             .all(|t| (rules.extends)(t, ty))
     };
+    // Per-mono, a parameter named for its arms (`measureOptionsOrStartMark`
+    // over `PerformanceMeasureOptions | string`) names each arm by its part:
+    // named types by the part their name contains, a last unmatched arm by
+    // the last unmatched part.
+    let or_part = |abs_idx: usize, param: &ConcreteParam| -> Option<String> {
+        rules?;
+        let snake = mono_param_snake(&param.name);
+        let parts: Vec<&str> = snake.split("_or_").collect();
+        if parts.len() < 2 {
+            return None;
+        }
+        let mut arms: Vec<&TypeRef> = Vec::new();
+        for p in signatures.iter().filter_map(|s| s.get(abs_idx)) {
+            if p.name == param.name && !arms.contains(&&p.type_ref) {
+                arms.push(&p.type_ref);
+            }
+        }
+        if arms.len() != parts.len() {
+            return None;
+        }
+        let names_part = |ty: &TypeRef, part: &str| {
+            let t = type_snake_name(ty);
+            t == part || t.ends_with(&format!("_{part}"))
+        };
+        let mut assigned: Vec<Option<&str>> = arms
+            .iter()
+            .map(|ty| parts.iter().copied().find(|part| names_part(ty, part)))
+            .collect();
+        let unmatched_parts: Vec<&str> = parts
+            .iter()
+            .copied()
+            .filter(|part| !assigned.contains(&Some(*part)))
+            .collect();
+        let unmatched_arms: Vec<usize> =
+            (0..arms.len()).filter(|i| assigned[*i].is_none()).collect();
+        match (unmatched_parts.as_slice(), unmatched_arms.as_slice()) {
+            ([], []) => {}
+            ([part], [arm]) => assigned[*arm] = Some(part),
+            _ => return None,
+        }
+        let mut distinct = assigned.clone();
+        distinct.sort();
+        distinct.dedup();
+        if distinct.len() != parts.len() {
+            return None;
+        }
+        let index = arms.iter().position(|ty| **ty == param.type_ref)?;
+        assigned[index].map(str::to_string)
+    };
 
     // Greedy single-pass naming: the first signature with a given
     // candidate suffix keeps it; subsequent siblings whose
@@ -2212,17 +2262,22 @@ fn compute_rust_names(
                 param_snake,
             };
             let mono_part = match rules {
-                Some(mono)
-                    if part.from_type
-                        && (mono.is_dictionary)(&param.type_ref)
-                        && by_parameter(abs_idx, &param.type_ref) =>
-                {
-                    SuffixPart {
-                        text: part.param_snake.clone(),
-                        ..part.clone()
-                    }
-                }
-                _ => part.clone(),
+                Some(mono) => SuffixPart {
+                    text: if let Some(text) = or_part(abs_idx, param) {
+                        text
+                    } else if is_null(param) {
+                        part.text.clone()
+                    } else if !part.from_type
+                        || (mono.is_dictionary)(&param.type_ref)
+                            && by_parameter(abs_idx, &param.type_ref)
+                    {
+                        mono_param_snake(&param.name)
+                    } else {
+                        part.text.clone()
+                    },
+                    ..part.clone()
+                },
+                None => part.clone(),
             };
             let adds = match primary.get(abs_idx) {
                 // A position the primary lacks is named by its parameter,
@@ -2463,6 +2518,16 @@ fn compute_trim(signatures: &[Vec<ConcreteParam>]) -> (usize, usize) {
 /// `ArrayBufferView` is a synthetic union that lowers to `&Object` /
 /// `Uint8Array` depending on position; `typed_array` is short for
 /// "any concrete typed-array" which captures both arms.
+/// A parameter's snake name for a per-mono suffix: `maybe` only marks it
+/// optional, which the suffix already says (`json_with_init`).
+fn mono_param_snake(name: &str) -> String {
+    let snake = snake_ident(name);
+    match snake.strip_prefix("maybe_") {
+        Some(rest) if !rest.is_empty() => rest.to_string(),
+        _ => snake,
+    }
+}
+
 fn type_snake_name(ty: &TypeRef) -> String {
     match ty {
         TypeRef::String | TypeRef::StringLiteral(_) => "str".to_string(),

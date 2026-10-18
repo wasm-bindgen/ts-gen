@@ -1087,50 +1087,39 @@ impl Namespace {
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions<String>,
     ) -> Result<Option<String>, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("text"),
-        );
-        self.__get_text_with_options(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
-            .await
+        let options: GetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("text"));
+        self.__get_text_with_options(key, &options).await
     }
     pub async fn get_text_with_options_js_string(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions<String>,
     ) -> Result<Option<JsString>, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("text"),
-        );
-        self.__get_text_with_options_js_string(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
-            .await
+        let options: GetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("text"));
+        self.__get_text_with_options_js_string(key, &options).await
     }
     pub fn get_text_with_options_promise(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions<String>,
     ) -> Result<Promise<Option<JsString>>, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("text"),
-        );
-        self.__get_text_with_options_promise(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+        let options: GetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("text"));
+        self.__get_text_with_options_promise(key, &options)
     }
     pub async fn get_json_with_options<T>(
         &self,
@@ -1141,141 +1130,104 @@ impl Namespace {
         Option<T>: ::wasm_bindgen::convert::FromWasmAbi,
         T: 'static,
     {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("json"),
-        );
-        self.__get_json_with_options(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
-            .await
+        let options: GetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("json"));
+        self.__get_json_with_options(key, &options).await
     }
     pub fn get_json_with_options_promise<T>(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions<String>,
     ) -> Result<Promise<Option<T>>, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("json"),
-        );
-        self.__get_json_with_options_promise(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+        let options: GetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("json"));
+        self.__get_json_with_options_promise(key, &options)
     }
     pub async fn get_array_buffer_with_options(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions<String>,
     ) -> Result<Option<ArrayBuffer>, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("arrayBuffer"),
-        );
-        self.__get_array_buffer_with_options(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
-            .await
+        let options: GetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("arrayBuffer"));
+        self.__get_array_buffer_with_options(key, &options).await
     }
     pub fn get_array_buffer_with_options_promise(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &GetOptions<String>,
     ) -> Result<Promise<Option<ArrayBuffer>>, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("arrayBuffer"),
-        );
-        self.__get_array_buffer_with_options_promise(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
+        let options: GetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("arrayBuffer"));
+        self.__get_array_buffer_with_options_promise(key, &options)
     }
     pub async fn get_text_with_slice_and_options(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &GetOptions<String>,
     ) -> Result<Map<String, Nullable<String>>, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("text"),
-        );
-        self.__get_text_with_slice_and_options(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
-            .await
+        let options: GetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("text"));
+        self.__get_text_with_slice_and_options(key, &options).await
     }
     pub fn get_text_with_slice_and_options_promise(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &GetOptions<String>,
     ) -> Result<Promise<Map<String, Nullable<String>>>, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("text"),
-        );
-        self.__get_text_with_slice_and_options_promise(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
+        let options: GetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("text"));
+        self.__get_text_with_slice_and_options_promise(key, &options)
     }
     pub async fn get_json_with_slice_and_options(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &GetOptions<String>,
     ) -> Result<Map<String, JsValue>, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("json"),
-        );
-        self.__get_json_with_slice_and_options(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
-            .await
+        let options: GetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("json"));
+        self.__get_json_with_slice_and_options(key, &options).await
     }
     pub fn get_json_with_slice_and_options_promise(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &GetOptions<String>,
     ) -> Result<Promise<Map<String, JsValue>>, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("json"),
-        );
-        self.__get_json_with_slice_and_options_promise(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
+        let options: GetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("json"));
+        self.__get_json_with_slice_and_options_promise(key, &options)
     }
     pub async fn get_json_with_slice_and_options_typed<T>(
         &self,
@@ -1285,39 +1237,27 @@ impl Namespace {
     where
         T: 'static,
     {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("json"),
-        );
-        self.__get_json_with_slice_and_options_typed(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
-        .await
+        let options: GetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("json"));
+        self.__get_json_with_slice_and_options_typed(key, &options)
+            .await
     }
     pub fn get_json_with_slice_and_options_typed_promise<T>(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &GetOptions<String>,
     ) -> Result<Promise<Map<String, Nullable<T>>>, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("json"),
-        );
-        self.__get_json_with_slice_and_options_typed_promise(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
+        let options: GetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("json"));
+        self.__get_json_with_slice_and_options_typed_promise(key, &options)
     }
 }
 #[wasm_bindgen(module = "literal-overloads", experimental_generic_mono)]

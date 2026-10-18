@@ -75,6 +75,40 @@
   ;; set range(value: number)
   (import "./bindings.wasm" "GetOptions.set_range" (func $GetOptions.set_range (param $this externref) (param $value f64)))
 
+  ;; MeasureOptions
+  ;; {} as MeasureOptions
+  (import "./bindings.wasm" "MeasureOptions.new" (func $MeasureOptions.new (result externref)))
+  ;; start?: string
+  (import "./bindings.wasm" "MeasureOptions.start" (func $MeasureOptions.start (param $this externref) (result externref)))
+  ;; set start(value: string)
+  (import "./bindings.wasm" "MeasureOptions.set_start" (func $MeasureOptions.set_start (param $this externref) (param $value externref)))
+
+  ;; Performance
+  ;; measure(name: string): void
+  (import "./bindings.wasm" "Performance.measure" (func $Performance.measure (param $this externref) (param $name externref)))
+  ;; measure(name: string, measure_options_or_start_mark: MeasureOptions): void
+  (import "./bindings.wasm" "Performance.measure_with_measure_options" (func $Performance.measure_with_measure_options (param $this externref) (param $name externref) (param $measure_options_or_start_mark externref)))
+  ;; measure(name: string, measure_options_or_start_mark: string): void
+  (import "./bindings.wasm" "Performance.measure_with_str" (func $Performance.measure_with_str (param $this externref) (param $name externref) (param $measure_options_or_start_mark externref)))
+  ;; measure(name: string, measure_options_or_start_mark: MeasureOptions, maybe_end_mark: string): void
+  (import "./bindings.wasm" "Performance.measure_with_measure_options_and_maybe_end_mark" (func $Performance.measure_with_measure_options_and_maybe_end_mark (param $this externref) (param $name externref) (param $measure_options_or_start_mark externref) (param $maybe_end_mark externref)))
+  ;; measure(name: string, measure_options_or_start_mark: string, maybe_end_mark: string): void
+  (import "./bindings.wasm" "Performance.measure_with_str_and_maybe_end_mark" (func $Performance.measure_with_str_and_maybe_end_mark (param $this externref) (param $name externref) (param $measure_options_or_start_mark externref) (param $maybe_end_mark externref)))
+  ;; session(): void
+  (import "./bindings.wasm" "Performance.session" (func $Performance.session (param $this externref)))
+  ;; session(constraint_or_bookmark: Bookmark): void
+  (import "./bindings.wasm" "Performance.session_with_constraint_or_bookmark" (func $Performance.session_with_constraint_or_bookmark (param $this externref) (param $constraint_or_bookmark externref)))
+
+  ;; Response
+  ;; json(any: any): Response
+  (import "./bindings.wasm" "Response.json" (func $Response.json (param $any externref) (result externref)))
+  ;; json(any: any, maybe_init: RequestInit): Response
+  (import "./bindings.wasm" "Response.json_with_maybe_init" (func $Response.json_with_maybe_init (param $any externref) (param $maybe_init externref) (result externref)))
+
+  ;; Span
+  ;; setAttribute(key: string, value: string): this
+  (import "./bindings.wasm" "Span.set_attribute" (func $Span.set_attribute (param $this externref) (param $key externref) (param $value externref) (result externref)))
+
   ;; Bucket
   ;; get(key: string, options: BucketOptions): void
   (import "./bindings.wasm" "Bucket.get" (func $Bucket.get (param $this externref) (param $key externref) (param $options externref)))

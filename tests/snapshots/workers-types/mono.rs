@@ -8429,10 +8429,7 @@ extern "C" {
     # [wasm_bindgen (static_method_of = Response , catch)]
     pub fn json(any: &JsValue) -> Result<Response, JsValue>;
     # [wasm_bindgen (static_method_of = Response , catch , js_name = "json")]
-    pub fn json_with_maybe_init(
-        any: &JsValue,
-        maybe_init: &ResponseInit,
-    ) -> Result<Response, JsValue>;
+    pub fn json_with_init(any: &JsValue, maybe_init: &ResponseInit) -> Result<Response, JsValue>;
     # [wasm_bindgen (static_method_of = Response , catch , js_name = "json")]
     pub fn json_with_response(any: &JsValue, maybe_init: &Response) -> Result<Response, JsValue>;
     #[doc = " The **`clone()`** method of the Response interface creates a clone of a response object, identical in every way, but stored in a different variable."]
@@ -10231,50 +10228,39 @@ impl KVNamespace {
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Result<Option<String>, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("text"),
-        );
-        self.__get_text_with_options(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
-            .await
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("text"));
+        self.__get_text_with_options(key, &options).await
     }
     pub async fn get_text_with_options_js_string(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Result<Option<JsString>, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("text"),
-        );
-        self.__get_text_with_options_js_string(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
-            .await
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("text"));
+        self.__get_text_with_options_js_string(key, &options).await
     }
     pub fn get_text_with_options_promise(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Option<JsString>> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("text"),
-        );
-        self.__get_text_with_options_promise(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("text"));
+        self.__get_text_with_options_promise(key, &options)
     }
     pub async fn get_json_with_options<ExpectedValue>(
         &self,
@@ -10285,102 +10271,78 @@ impl KVNamespace {
         Option<ExpectedValue>: ::wasm_bindgen::convert::FromWasmAbi,
         ExpectedValue: 'static,
     {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("json"),
-        );
-        self.__get_json_with_options(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
-            .await
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("json"));
+        self.__get_json_with_options(key, &options).await
     }
     pub fn get_json_with_options_promise<ExpectedValue>(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Option<ExpectedValue>> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("json"),
-        );
-        self.__get_json_with_options_promise(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("json"));
+        self.__get_json_with_options_promise(key, &options)
     }
     pub async fn get_array_buffer_with_options(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Result<Option<ArrayBuffer>, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("arrayBuffer"),
-        );
-        self.__get_array_buffer_with_options(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
-            .await
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("arrayBuffer"));
+        self.__get_array_buffer_with_options(key, &options).await
     }
     pub fn get_array_buffer_with_options_promise(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Option<ArrayBuffer>> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("arrayBuffer"),
-        );
-        self.__get_array_buffer_with_options_promise(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("arrayBuffer"));
+        self.__get_array_buffer_with_options_promise(key, &options)
     }
     pub async fn get_stream_with_options(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Result<Option<ReadableStream>, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("stream"),
-        );
-        self.__get_stream_with_options(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
-            .await
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("stream"));
+        self.__get_stream_with_options(key, &options).await
     }
     pub fn get_stream_with_options_promise(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Option<ReadableStream>> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("stream"),
-        );
-        self.__get_stream_with_options_promise(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("stream"));
+        self.__get_stream_with_options_promise(key, &options)
     }
     pub async fn get_text_with_slice(
         &self,
@@ -10411,72 +10373,52 @@ impl KVNamespace {
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
     ) -> Result<Map<String, Nullable<String>>, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("text"),
-        );
-        self.__get_text_with_slice_and_options(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
-            .await
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("text"));
+        self.__get_text_with_slice_and_options(key, &options).await
     }
     pub fn get_text_with_slice_and_options_promise(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Map<String, Nullable<String>>> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("text"),
-        );
-        self.__get_text_with_slice_and_options_promise(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("text"));
+        self.__get_text_with_slice_and_options_promise(key, &options)
     }
     pub async fn get_json_with_slice_and_options(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
     ) -> Result<Map<String, JsValue>, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("json"),
-        );
-        self.__get_json_with_slice_and_options(key, ::wasm_bindgen::JsCast::unchecked_ref(&options))
-            .await
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("json"));
+        self.__get_json_with_slice_and_options(key, &options).await
     }
     pub fn get_json_with_slice_and_options_promise(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Map<String, JsValue>> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("json"),
-        );
-        self.__get_json_with_slice_and_options_promise(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("json"));
+        self.__get_json_with_slice_and_options_promise(key, &options)
     }
     pub async fn get_json_with_slice_typed<ExpectedValue>(
         &self,
@@ -10501,39 +10443,27 @@ impl KVNamespace {
     where
         ExpectedValue: 'static,
     {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("json"),
-        );
-        self.__get_json_with_slice_and_options_typed(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
-        .await
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("json"));
+        self.__get_json_with_slice_and_options_typed(key, &options)
+            .await
     }
     pub fn get_json_with_slice_and_options_typed_promise<ExpectedValue>(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Map<String, Nullable<ExpectedValue>>> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("json"),
-        );
-        self.__get_json_with_slice_and_options_typed_promise(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("json"));
+        self.__get_json_with_slice_and_options_typed_promise(key, &options)
     }
     pub async fn get_with_metadata_text(
         &self,
@@ -10595,176 +10525,122 @@ impl KVNamespace {
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Result<KVNamespaceGetWithMetadataResult<String>, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("text"),
-        );
-        self.__get_with_metadata_text_with_options(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
-        .await
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("text"));
+        self.__get_with_metadata_text_with_options(key, &options)
+            .await
     }
     pub async fn get_with_metadata_text_with_options_js_string(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Result<KVNamespaceGetWithMetadataResult<JsString>, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("text"),
-        );
-        self.__get_with_metadata_text_with_options_js_string(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
-        .await
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("text"));
+        self.__get_with_metadata_text_with_options_js_string(key, &options)
+            .await
     }
     pub fn get_with_metadata_text_with_options_promise(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<KVNamespaceGetWithMetadataResult<String>> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("text"),
-        );
-        self.__get_with_metadata_text_with_options_promise(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("text"));
+        self.__get_with_metadata_text_with_options_promise(key, &options)
     }
     pub async fn get_with_metadata_json_with_options(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Result<KVNamespaceGetWithMetadataResult, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("json"),
-        );
-        self.__get_with_metadata_json_with_options(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
-        .await
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("json"));
+        self.__get_with_metadata_json_with_options(key, &options)
+            .await
     }
     pub fn get_with_metadata_json_with_options_promise(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<KVNamespaceGetWithMetadataResult> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("json"),
-        );
-        self.__get_with_metadata_json_with_options_promise(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("json"));
+        self.__get_with_metadata_json_with_options_promise(key, &options)
     }
     pub async fn get_with_metadata_array_buffer_with_options(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Result<KVNamespaceGetWithMetadataResult<ArrayBuffer>, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("arrayBuffer"),
-        );
-        self.__get_with_metadata_array_buffer_with_options(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
-        .await
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("arrayBuffer"));
+        self.__get_with_metadata_array_buffer_with_options(key, &options)
+            .await
     }
     pub fn get_with_metadata_array_buffer_with_options_promise(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer>> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("arrayBuffer"),
-        );
-        self.__get_with_metadata_array_buffer_with_options_promise(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("arrayBuffer"));
+        self.__get_with_metadata_array_buffer_with_options_promise(key, &options)
     }
     pub async fn get_with_metadata_stream_with_options(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Result<KVNamespaceGetWithMetadataResult<ReadableStream>, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("stream"),
-        );
-        self.__get_with_metadata_stream_with_options(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
-        .await
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("stream"));
+        self.__get_with_metadata_stream_with_options(key, &options)
+            .await
     }
     pub fn get_with_metadata_stream_with_options_promise(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ReadableStream>> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("stream"),
-        );
-        self.__get_with_metadata_stream_with_options_promise(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("stream"));
+        self.__get_with_metadata_stream_with_options_promise(key, &options)
     }
     pub async fn get_with_metadata_text_with_slice(
         &self,
@@ -10795,78 +10671,54 @@ impl KVNamespace {
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
     ) -> Result<Map<String, KVNamespaceGetWithMetadataResult<String>>, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("text"),
-        );
-        self.__get_with_metadata_text_with_slice_and_options(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
-        .await
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("text"));
+        self.__get_with_metadata_text_with_slice_and_options(key, &options)
+            .await
     }
     pub fn get_with_metadata_text_with_slice_and_options_promise(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult<String>>> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("text"),
-        );
-        self.__get_with_metadata_text_with_slice_and_options_promise(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("text"));
+        self.__get_with_metadata_text_with_slice_and_options_promise(key, &options)
     }
     pub async fn get_with_metadata_json_with_slice_and_options(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
     ) -> Result<Map<String, KVNamespaceGetWithMetadataResult>, JsValue> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("json"),
-        );
-        self.__get_with_metadata_json_with_slice_and_options(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
-        .await
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("json"));
+        self.__get_with_metadata_json_with_slice_and_options(key, &options)
+            .await
     }
     pub fn get_with_metadata_json_with_slice_and_options_promise(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult>> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("json"),
-        );
-        self.__get_with_metadata_json_with_slice_and_options_promise(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("json"));
+        self.__get_with_metadata_json_with_slice_and_options_promise(key, &options)
     }
     pub async fn get_with_metadata_text_typed<Metadata>(
         &self,
@@ -10948,20 +10800,14 @@ impl KVNamespace {
     where
         Metadata: 'static,
     {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("text"),
-        );
-        self.__get_with_metadata_text_with_options_typed(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
-        .await
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("text"));
+        self.__get_with_metadata_text_with_options_typed(key, &options)
+            .await
     }
     pub async fn get_with_metadata_text_with_options_typed_js_string<Metadata>(
         &self,
@@ -10971,39 +10817,27 @@ impl KVNamespace {
     where
         Metadata: 'static,
     {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("text"),
-        );
-        self.__get_with_metadata_text_with_options_typed_js_string(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
-        .await
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("text"));
+        self.__get_with_metadata_text_with_options_typed_js_string(key, &options)
+            .await
     }
     pub fn get_with_metadata_text_with_options_typed_promise<Metadata>(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<KVNamespaceGetWithMetadataResult<String, Metadata>> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("text"),
-        );
-        self.__get_with_metadata_text_with_options_typed_promise(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("text"));
+        self.__get_with_metadata_text_with_options_typed_promise(key, &options)
     }
     pub async fn get_with_metadata_json_with_options_typed<ExpectedValue, Metadata>(
         &self,
@@ -11014,39 +10848,27 @@ impl KVNamespace {
         ExpectedValue: 'static,
         Metadata: 'static,
     {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("json"),
-        );
-        self.__get_with_metadata_json_with_options_typed(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
-        .await
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("json"));
+        self.__get_with_metadata_json_with_options_typed(key, &options)
+            .await
     }
     pub fn get_with_metadata_json_with_options_typed_promise<ExpectedValue, Metadata>(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("json"),
-        );
-        self.__get_with_metadata_json_with_options_typed_promise(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("json"));
+        self.__get_with_metadata_json_with_options_typed_promise(key, &options)
     }
     pub async fn get_with_metadata_array_buffer_with_options_typed<Metadata>(
         &self,
@@ -11056,39 +10878,27 @@ impl KVNamespace {
     where
         Metadata: 'static,
     {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("arrayBuffer"),
-        );
-        self.__get_with_metadata_array_buffer_with_options_typed(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
-        .await
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("arrayBuffer"));
+        self.__get_with_metadata_array_buffer_with_options_typed(key, &options)
+            .await
     }
     pub fn get_with_metadata_array_buffer_with_options_typed_promise<Metadata>(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ArrayBuffer, Metadata>> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("arrayBuffer"),
-        );
-        self.__get_with_metadata_array_buffer_with_options_typed_promise(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("arrayBuffer"));
+        self.__get_with_metadata_array_buffer_with_options_typed_promise(key, &options)
     }
     pub async fn get_with_metadata_stream_with_options_typed<Metadata>(
         &self,
@@ -11098,39 +10908,27 @@ impl KVNamespace {
     where
         Metadata: 'static,
     {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("stream"),
-        );
-        self.__get_with_metadata_stream_with_options_typed(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
-        .await
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("stream"));
+        self.__get_with_metadata_stream_with_options_typed(key, &options)
+            .await
     }
     pub fn get_with_metadata_stream_with_options_typed_promise<Metadata>(
         &self,
         key: impl ::wasm_bindgen::JsStringLike,
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<KVNamespaceGetWithMetadataResult<ReadableStream, Metadata>> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("stream"),
-        );
-        self.__get_with_metadata_stream_with_options_typed_promise(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("stream"));
+        self.__get_with_metadata_stream_with_options_typed_promise(key, &options)
     }
     pub async fn get_with_metadata_text_with_slice_typed<Metadata>(
         &self,
@@ -11173,39 +10971,27 @@ impl KVNamespace {
     where
         Metadata: 'static,
     {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("text"),
-        );
-        self.__get_with_metadata_text_with_slice_and_options_typed(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
-        .await
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("text"));
+        self.__get_with_metadata_text_with_slice_and_options_typed(key, &options)
+            .await
     }
     pub fn get_with_metadata_text_with_slice_and_options_typed_promise<Metadata>(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult<String, Metadata>>> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("text"),
-        );
-        self.__get_with_metadata_text_with_slice_and_options_typed_promise(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("text"));
+        self.__get_with_metadata_text_with_slice_and_options_typed_promise(key, &options)
     }
     pub async fn get_with_metadata_json_with_slice_and_options_typed<ExpectedValue, Metadata>(
         &self,
@@ -11216,39 +11002,27 @@ impl KVNamespace {
         ExpectedValue: 'static,
         Metadata: 'static,
     {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("json"),
-        );
-        self.__get_with_metadata_json_with_slice_and_options_typed(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
-        .await
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("json"));
+        self.__get_with_metadata_json_with_slice_and_options_typed(key, &options)
+            .await
     }
     pub fn get_with_metadata_json_with_slice_and_options_typed_promise<ExpectedValue, Metadata>(
         &self,
         key: &[impl ::wasm_bindgen::JsStringLike],
         options: &KVNamespaceGetOptions<String>,
     ) -> Promise<Map<String, KVNamespaceGetWithMetadataResult<ExpectedValue, Metadata>>> {
-        let options: ::js_sys::Object = ::js_sys::Object::assign(
-            &::js_sys::Object::new(),
-            ::wasm_bindgen::JsCast::unchecked_ref(options),
-        );
-        let _ = ::js_sys::Reflect::set_str(
-            &options,
-            &::js_sys::JsString::from("type"),
-            &::wasm_bindgen::JsValue::from_str("json"),
-        );
-        self.__get_with_metadata_json_with_slice_and_options_typed_promise(
-            key,
-            ::wasm_bindgen::JsCast::unchecked_ref(&options),
-        )
+        let options: KVNamespaceGetOptions<String> =
+            ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::assign(
+                &::js_sys::Object::new(),
+                ::wasm_bindgen::JsCast::unchecked_ref(options),
+            ));
+        options.set_type(&::core::convert::From::from("json"));
+        self.__get_with_metadata_json_with_slice_and_options_typed_promise(key, &options)
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -45275,7 +45049,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `constraintOrBookmark` - Either the session constraint or the explicit bookmark to anchor the created session."]
     #[wasm_bindgen(method, catch, js_name = "withSession")]
-    pub fn with_session_with_str(
+    pub fn with_session_with_bookmark(
         this: &D1Database,
         constraint_or_bookmark: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<D1DatabaseSession, JsValue>;
@@ -45285,7 +45059,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * `constraintOrBookmark` - Either the session constraint or the explicit bookmark to anchor the created session."]
     #[wasm_bindgen(method, catch, js_name = "withSession")]
-    pub fn with_session_with_d1_session_constraint(
+    pub fn with_session_with_constraint(
         this: &D1Database,
         constraint_or_bookmark: D1SessionConstraint,
     ) -> Result<D1DatabaseSession, JsValue>;
@@ -46103,7 +45877,10 @@ pub mod cloudflare {
             #[derive(Debug, Clone, PartialEq, Eq)]
             pub type NodeStyleServer;
             #[wasm_bindgen(method, variadic, catch)]
-            pub fn listen(this: &NodeStyleServer, args: &[JsValue]) -> Result<JsValue, JsValue>;
+            pub fn listen(
+                this: &NodeStyleServer,
+                args: &[JsValue],
+            ) -> Result<NodeStyleServer, JsValue>;
             #[wasm_bindgen(method, catch)]
             pub fn address(this: &NodeStyleServer)
                 -> Result<NodeStyleServerAddressReturn, JsValue>;
@@ -49399,7 +49176,7 @@ pub mod rpc {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type StubBase<T = JsValue>;
         #[wasm_bindgen(method, catch)]
-        pub fn dup<T>(this: &StubBase<T>) -> Result<JsValue, JsValue>;
+        pub fn dup<T>(this: &StubBase<T>) -> Result<StubBase<T>, JsValue>;
     }
     #[wasm_bindgen(experimental_generic_mono)]
     extern "C" {
@@ -49407,7 +49184,7 @@ pub mod rpc {
         #[derive(Debug, Clone, PartialEq, Eq)]
         pub type Stub<T = JsValue>;
         #[wasm_bindgen(method, catch)]
-        pub fn dup<T>(this: &Stub<T>) -> Result<JsValue, JsValue>;
+        pub fn dup<T>(this: &Stub<T>) -> Result<Stub<T>, JsValue>;
     }
     #[allow(dead_code)]
     pub type BaseType = Option<Nullable<JsValue>>;

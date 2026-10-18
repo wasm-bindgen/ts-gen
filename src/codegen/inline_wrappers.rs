@@ -67,8 +67,9 @@ fn literal_attr_without_determined(
     if let Some(field) = &sig.field_literal {
         let attr = format_ident!("{FIELD_LITERAL_ATTR}");
         let position = proc_macro2::Literal::usize_unsuffixed(field.position);
-        let (name, value) = (&field.field, &field.value);
-        return quote! { #[#attr(#position, #name, #value)] };
+        let setter = format_ident!("{}", field.setter);
+        let value = &field.value;
+        return quote! { #[#attr(#position, #setter, #value)] };
     }
     let Some(spec) = &sig.literal else {
         return quote! {};
@@ -104,11 +105,11 @@ fn take_literal_attr(item: &mut ForeignItemFn) -> Option<LiteralArms> {
     syn::parse2(list.tokens).ok()
 }
 
-/// `#[ts_gen_field_literal(position, "field", "value")]`; see
+/// `#[ts_gen_field_literal(position, set_field, "value")]`; see
 /// [`crate::codegen::signatures::FieldLiteral`].
 struct FieldLiteral {
     position: usize,
-    field: String,
+    setter: String,
     value: String,
 }
 
@@ -116,12 +117,12 @@ impl syn::parse::Parse for FieldLiteral {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
         let position: syn::LitInt = input.parse()?;
         input.parse::<syn::Token![,]>()?;
-        let field: syn::LitStr = input.parse()?;
+        let setter: Ident = input.parse()?;
         input.parse::<syn::Token![,]>()?;
         let value: syn::LitStr = input.parse()?;
         Ok(Self {
             position: position.base10_parse()?,
-            field: field.value(),
+            setter: setter.to_string(),
             value: value.value(),
         })
     }
@@ -910,6 +911,18 @@ fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
         None => vec![(Vec::new(), public_name.clone())],
     };
     let typed_inputs: Vec<FnArg> = public_sig.inputs.iter().skip(skip).cloned().collect();
+    // The copy of the caller's options is the extern's full dictionary,
+    // whose setter takes the literal.
+    let field_ty = field
+        .as_ref()
+        .and_then(|f| match item.sig.inputs.iter().nth(skip + f.position)? {
+            FnArg::Typed(pat) => match &*pat.ty {
+                Type::Reference(r) => Some((*r.elem).clone()),
+                _ => None,
+            },
+            FnArg::Receiver(_) => None,
+        })
+        .map(|ty| quote! { #ty });
     let receiver: Vec<FnArg> = public_sig.inputs.iter().take(skip).cloned().collect();
     arms.into_iter()
         .map(|(values, name)| {
@@ -927,7 +940,7 @@ fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
                         _ => quote! { #pname },
                     },
                     None if field.as_ref().is_some_and(|f| f.position == i) => {
-                        quote! { ::wasm_bindgen::JsCast::unchecked_ref(&#pname) }
+                        quote! { &#pname }
                     }
                     None if null_positions.contains(&i) => {
                         quote! { &::wasm_bindgen::JsValue::NULL }
@@ -943,17 +956,16 @@ fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
                 .and_then(|f| Some((f, param_names.get(f.position)?)))
             {
                 Some((f, pname)) => {
-                    let (name, value) = (&f.field, &f.value);
+                    let setter = format_ident!("{}", f.setter);
+                    let value = &f.value;
                     quote! {
-                        let #pname: ::js_sys::Object = ::js_sys::Object::assign(
-                            &::js_sys::Object::new(),
-                            ::wasm_bindgen::JsCast::unchecked_ref(#pname),
+                        let #pname: #field_ty = ::wasm_bindgen::JsCast::unchecked_into(
+                            ::js_sys::Object::assign(
+                                &::js_sys::Object::new(),
+                                ::wasm_bindgen::JsCast::unchecked_ref(#pname),
+                            ),
                         );
-                        let _ = ::js_sys::Reflect::set_str(
-                            &#pname,
-                            &::js_sys::JsString::from(#name),
-                            &::wasm_bindgen::JsValue::from_str(#value),
-                        );
+                        #pname.#setter(&::core::convert::From::from(#value));
                         #body
                     }
                 }

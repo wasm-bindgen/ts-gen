@@ -262,6 +262,166 @@ impl From<GetOptions> for GetOptionsBuilder {
 }
 #[wasm_bindgen]
 extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type MeasureOptions;
+    #[wasm_bindgen(method, getter)]
+    pub fn start(this: &MeasureOptions) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_start(this: &MeasureOptions, val: &str);
+}
+impl MeasureOptions {
+    pub fn new() -> MeasureOptions {
+        Self::builder().build()
+    }
+    pub fn builder() -> MeasureOptionsBuilder {
+        MeasureOptionsBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for MeasureOptions {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct MeasureOptionsBuilder {
+    inner: MeasureOptions,
+}
+impl MeasureOptionsBuilder {
+    pub fn start(self, val: &str) -> Self {
+        self.inner.set_start(val);
+        self
+    }
+    pub fn build(self) -> MeasureOptions {
+        self.inner
+    }
+}
+impl From<MeasureOptions> for MeasureOptionsBuilder {
+    fn from(inner: MeasureOptions) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Performance;
+    #[wasm_bindgen(method)]
+    pub fn measure(this: &Performance, name: &str);
+    #[wasm_bindgen(method, catch, js_name = "measure")]
+    pub fn try_measure(this: &Performance, name: &str) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "measure")]
+    pub fn measure_with_measure_options(
+        this: &Performance,
+        name: &str,
+        measure_options_or_start_mark: &MeasureOptions,
+    );
+    #[wasm_bindgen(method, catch, js_name = "measure")]
+    pub fn try_measure_with_measure_options(
+        this: &Performance,
+        name: &str,
+        measure_options_or_start_mark: &MeasureOptions,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "measure")]
+    pub fn measure_with_str(this: &Performance, name: &str, measure_options_or_start_mark: &str);
+    #[wasm_bindgen(method, catch, js_name = "measure")]
+    pub fn try_measure_with_str(
+        this: &Performance,
+        name: &str,
+        measure_options_or_start_mark: &str,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "measure")]
+    pub fn measure_with_measure_options_and_maybe_end_mark(
+        this: &Performance,
+        name: &str,
+        measure_options_or_start_mark: &MeasureOptions,
+        maybe_end_mark: &str,
+    );
+    #[wasm_bindgen(method, catch, js_name = "measure")]
+    pub fn try_measure_with_measure_options_and_maybe_end_mark(
+        this: &Performance,
+        name: &str,
+        measure_options_or_start_mark: &MeasureOptions,
+        maybe_end_mark: &str,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "measure")]
+    pub fn measure_with_str_and_maybe_end_mark(
+        this: &Performance,
+        name: &str,
+        measure_options_or_start_mark: &str,
+        maybe_end_mark: &str,
+    );
+    #[wasm_bindgen(method, catch, js_name = "measure")]
+    pub fn try_measure_with_str_and_maybe_end_mark(
+        this: &Performance,
+        name: &str,
+        measure_options_or_start_mark: &str,
+        maybe_end_mark: &str,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method)]
+    pub fn session(this: &Performance);
+    #[wasm_bindgen(method, catch, js_name = "session")]
+    pub fn try_session(this: &Performance) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "session")]
+    pub fn session_with_str(this: &Performance, constraint_or_bookmark: &str);
+    #[wasm_bindgen(method, catch, js_name = "session")]
+    pub fn try_session_with_str(
+        this: &Performance,
+        constraint_or_bookmark: &str,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, js_name = "session")]
+    pub fn session_with_constraint(this: &Performance, constraint_or_bookmark: Constraint);
+    #[wasm_bindgen(method, catch, js_name = "session")]
+    pub fn try_session_with_constraint(
+        this: &Performance,
+        constraint_or_bookmark: Constraint,
+    ) -> Result<(), JsValue>;
+}
+#[allow(dead_code)]
+pub type Bookmark = JsString;
+#[wasm_bindgen(private)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Constraint {
+    FirstPrimary = "first-primary",
+    FirstUnconstrained = "first-unconstrained",
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Response;
+    # [wasm_bindgen (static_method_of = Response)]
+    pub fn json(any: &JsValue) -> Response;
+    # [wasm_bindgen (static_method_of = Response , catch , js_name = "json")]
+    pub fn try_json(any: &JsValue) -> Result<Response, JsValue>;
+    # [wasm_bindgen (static_method_of = Response , js_name = "json")]
+    pub fn json_with_request_init(any: &JsValue, maybe_init: &RequestInit) -> Response;
+    # [wasm_bindgen (static_method_of = Response , catch , js_name = "json")]
+    pub fn try_json_with_request_init(
+        any: &JsValue,
+        maybe_init: &RequestInit,
+    ) -> Result<Response, JsValue>;
+    # [wasm_bindgen (static_method_of = Response , js_name = "json")]
+    pub fn json_with_response(any: &JsValue, maybe_init: &Response) -> Response;
+    # [wasm_bindgen (static_method_of = Response , catch , js_name = "json")]
+    pub fn try_json_with_response(
+        any: &JsValue,
+        maybe_init: &Response,
+    ) -> Result<Response, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Span;
+    #[wasm_bindgen(method, js_name = "setAttribute")]
+    pub fn set_attribute(this: &Span, key: &str, value: &str) -> JsValue;
+    #[wasm_bindgen(method, catch, js_name = "setAttribute")]
+    pub fn try_set_attribute(this: &Span, key: &str, value: &str) -> Result<JsValue, JsValue>;
+}
+#[wasm_bindgen]
+extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Bucket;

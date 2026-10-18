@@ -483,7 +483,7 @@ extern "C" {
         this: &EventEmitter,
         event: impl ::wasm_bindgen::JsStringLike,
         listener: &Function,
-    ) -> Result<JsValue, JsValue>;
+    ) -> Result<EventEmitter, JsValue>;
     #[wasm_bindgen(method, variadic, catch)]
     pub fn emit(
         this: &EventEmitter,
@@ -491,12 +491,12 @@ extern "C" {
         args: &[JsValue],
     ) -> Result<bool, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "removeAllListeners")]
-    pub fn remove_all_listeners(this: &EventEmitter) -> Result<JsValue, JsValue>;
+    pub fn remove_all_listeners(this: &EventEmitter) -> Result<EventEmitter, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "removeAllListeners")]
     pub fn remove_all_listeners_with_event(
         this: &EventEmitter,
         event: impl ::wasm_bindgen::JsStringLike,
-    ) -> Result<JsValue, JsValue>;
+    ) -> Result<EventEmitter, JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
