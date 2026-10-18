@@ -31,6 +31,10 @@
   (import "./bindings.wasm" "ResponseInit.cf" (func $ResponseInit.cf (param $this externref) (result externref)))
   ;; set cf(value: any)
   (import "./bindings.wasm" "ResponseInit.set_cf" (func $ResponseInit.set_cf (param $this externref) (param $value externref)))
+  ;; error?: never
+  (import "./bindings.wasm" "ResponseInit.error" (func $ResponseInit.error (param $this externref) (result externref)))
+  ;; set error(value: never)
+  (import "./bindings.wasm" "ResponseInit.set_error" (func $ResponseInit.set_error (param $this externref) (param $value externref)))
 
   ;; Reply
   ;; constructor()

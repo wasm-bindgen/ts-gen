@@ -17,6 +17,10 @@ extern "C" {
     pub fn cf(this: &ResponseInit) -> JsValue;
     #[wasm_bindgen(method, setter)]
     pub fn set_cf(this: &ResponseInit, val: &JsValue);
+    #[wasm_bindgen(method, getter)]
+    pub fn error(this: &ResponseInit) -> Undefined;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_error(this: &ResponseInit, val: &JsValue);
 }
 impl ResponseInit {
     pub fn new() -> ResponseInit {
@@ -43,6 +47,10 @@ impl ResponseInitBuilder {
     }
     pub fn cf(self, val: &JsValue) -> Self {
         self.inner.set_cf(val);
+        self
+    }
+    pub fn error(self, val: &JsValue) -> Self {
+        self.inner.set_error(val);
         self
     }
     pub fn build(self) -> ResponseInit {

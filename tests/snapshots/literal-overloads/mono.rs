@@ -1325,10 +1325,6 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type PartialGetOptionsUndefined;
-    #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &PartialGetOptionsUndefined) -> Undefined;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_type(this: &PartialGetOptionsUndefined, val: &Undefined);
     #[wasm_bindgen(method, getter, js_name = "cacheTtl")]
     pub fn cache_ttl(this: &PartialGetOptionsUndefined) -> Option<f64>;
     #[wasm_bindgen(method, setter, js_name = "cacheTtl")]
@@ -1353,10 +1349,6 @@ pub struct PartialGetOptionsUndefinedBuilder {
     inner: PartialGetOptionsUndefined,
 }
 impl PartialGetOptionsUndefinedBuilder {
-    pub fn type_(self, val: &Undefined) -> Self {
-        self.inner.set_type(val);
-        self
-    }
     pub fn cache_ttl(self, val: f64) -> Self {
         self.inner.set_cache_ttl(val);
         self

@@ -45148,39 +45148,14 @@ extern "C" {
     pub fn meta(this: &D1Response) -> JsValue;
     #[wasm_bindgen(method, setter)]
     pub fn set_meta(this: &D1Response, val: &JsValue);
-    #[wasm_bindgen(method, getter)]
-    pub fn error(this: &D1Response) -> Undefined;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_error(this: &D1Response, val: &JsValue);
 }
 impl D1Response {
     #[doc = " Construct with `success: true`."]
     pub fn new(meta: &JsValue) -> D1Response {
-        Self::builder(meta).build()
-    }
-    #[doc = " Start a builder with `success: true`."]
-    pub fn builder(meta: &JsValue) -> D1ResponseBuilder {
         let inner: D1Response = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_success(true);
         inner.set_meta(meta);
-        D1ResponseBuilder { inner }
-    }
-}
-pub struct D1ResponseBuilder {
-    inner: D1Response,
-}
-impl D1ResponseBuilder {
-    pub fn error(self, val: &JsValue) -> Self {
-        self.inner.set_error(val);
-        self
-    }
-    pub fn build(self) -> D1Response {
-        self.inner
-    }
-}
-impl From<D1Response> for D1ResponseBuilder {
-    fn from(inner: D1Response) -> Self {
-        Self { inner }
+        inner
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -45203,32 +45178,11 @@ where
 {
     #[doc = " Construct with `success: true`."]
     pub fn new(meta: &JsValue, results: &[T]) -> D1Result<T> {
-        Self::builder(meta, results).build()
-    }
-    #[doc = " Start a builder with `success: true`."]
-    pub fn builder(meta: &JsValue, results: &[T]) -> D1ResultBuilder<T> {
         let inner: D1Result<T> = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_success(true);
         inner.set_meta(meta);
         inner.set_results(results);
-        D1ResultBuilder { inner }
-    }
-}
-pub struct D1ResultBuilder<T> {
-    inner: D1Result<T>,
-}
-impl<T> D1ResultBuilder<T> {
-    pub fn error(self, val: &JsValue) -> Self {
-        self.inner.set_error(val);
-        self
-    }
-    pub fn build(self) -> D1Result<T> {
-        self.inner
-    }
-}
-impl<T> From<D1Result<T>> for D1ResultBuilder<T> {
-    fn from(inner: D1Result<T>) -> Self {
-        Self { inner }
+        inner
     }
 }
 #[wasm_bindgen(experimental_generic_mono)]
@@ -55645,10 +55599,6 @@ extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type PartialKvNamespaceGetOptionsUndefined;
-    #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type_(this: &PartialKvNamespaceGetOptionsUndefined) -> Undefined;
-    #[wasm_bindgen(method, setter)]
-    pub fn set_type(this: &PartialKvNamespaceGetOptionsUndefined, val: &Undefined);
     #[wasm_bindgen(method, getter, js_name = "cacheTtl")]
     pub fn cache_ttl(this: &PartialKvNamespaceGetOptionsUndefined) -> Option<f64>;
     #[wasm_bindgen(method, setter, js_name = "cacheTtl")]
@@ -55673,10 +55623,6 @@ pub struct PartialKvNamespaceGetOptionsUndefinedBuilder {
     inner: PartialKvNamespaceGetOptionsUndefined,
 }
 impl PartialKvNamespaceGetOptionsUndefinedBuilder {
-    pub fn type_(self, val: &Undefined) -> Self {
-        self.inner.set_type(val);
-        self
-    }
     pub fn cache_ttl(self, val: f64) -> Self {
         self.inner.set_cache_ttl(val);
         self

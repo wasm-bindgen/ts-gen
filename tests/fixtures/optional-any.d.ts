@@ -3,6 +3,9 @@
 interface ResponseInit {
   status?: number;
   cf?: any;
+  // Under per-monomorphization an optional property that can only be
+  // absent has no accessors.
+  error?: never;
 }
 declare class Reply {
   constructor(init?: ResponseInit);

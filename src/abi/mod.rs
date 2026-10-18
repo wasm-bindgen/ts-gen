@@ -799,9 +799,16 @@ fn build_members(
     let constructed = TypeRef::ident(local);
     // A declared well-known-symbol method (named `[Symbol.iterator]` by the
     // parser) has no import of its own here.
+    // Per-mono a property that can only be absent has no accessors either.
+    let absent = if lower.gctx.parse_options.experimental_generic_mono {
+        crate::codegen::classes::absent_properties(members.iter())
+    } else {
+        Vec::new()
+    };
     let members: Vec<&Member> = members
         .iter()
         .filter(|m| !matches!(m, Member::Method(m) if m.name.starts_with('[')))
+        .filter(|m| !crate::codegen::classes::absent_accessor(m, &absent))
         .collect();
     let mut method_overloads: HashMap<&str, Vec<Overload>> = HashMap::new();
     let mut static_overloads: HashMap<&str, Vec<Overload>> = HashMap::new();

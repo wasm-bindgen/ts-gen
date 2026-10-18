@@ -11276,10 +11276,6 @@
   (import "./bindings.wasm" "D1Response.meta" (func $D1Response.meta (param $this externref) (result externref)))
   ;; set meta(value: D1Meta & Record<string, unknown>)
   (import "./bindings.wasm" "D1Response.set_meta" (func $D1Response.set_meta (param $this externref) (param $value externref)))
-  ;; error?: never
-  (import "./bindings.wasm" "D1Response.error" (func $D1Response.error (param $this externref) (result externref)))
-  ;; set error(value: never)
-  (import "./bindings.wasm" "D1Response.set_error" (func $D1Response.set_error (param $this externref) (param $value externref)))
 
   ;; D1Result
   ;; {} as D1Result
@@ -13721,10 +13717,6 @@
   ;; PartialKvNamespaceGetOptionsUndefined
   ;; {} as PartialKvNamespaceGetOptionsUndefined
   (import "./bindings.wasm" "PartialKvNamespaceGetOptionsUndefined.new" (func $PartialKvNamespaceGetOptionsUndefined.new (result externref)))
-  ;; type?: undefined
-  (import "./bindings.wasm" "PartialKvNamespaceGetOptionsUndefined.type" (func $PartialKvNamespaceGetOptionsUndefined.type (param $this externref) (result externref)))
-  ;; set type(value: undefined)
-  (import "./bindings.wasm" "PartialKvNamespaceGetOptionsUndefined.set_type" (func $PartialKvNamespaceGetOptionsUndefined.set_type (param $this externref) (param $value externref)))
   ;; cacheTtl?: number
   (import "./bindings.wasm" "PartialKvNamespaceGetOptionsUndefined.cache_ttl" (func $PartialKvNamespaceGetOptionsUndefined.cache_ttl (param $this externref) (result externref)))
   ;; set cacheTtl(value: number)

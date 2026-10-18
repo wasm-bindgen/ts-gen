@@ -138,10 +138,6 @@
   ;; PartialGetOptionsUndefined
   ;; {} as PartialGetOptionsUndefined
   (import "literal-overloads" "PartialGetOptionsUndefined.new" (func $literal-overloads:PartialGetOptionsUndefined.new (result externref)))
-  ;; type?: undefined
-  (import "literal-overloads" "PartialGetOptionsUndefined.type" (func $literal-overloads:PartialGetOptionsUndefined.type (param $this externref) (result externref)))
-  ;; set type(value: undefined)
-  (import "literal-overloads" "PartialGetOptionsUndefined.set_type" (func $literal-overloads:PartialGetOptionsUndefined.set_type (param $this externref) (param $value externref)))
   ;; cacheTtl?: number
   (import "literal-overloads" "PartialGetOptionsUndefined.cache_ttl" (func $literal-overloads:PartialGetOptionsUndefined.cache_ttl (param $this externref) (result externref)))
   ;; set cacheTtl(value: number)

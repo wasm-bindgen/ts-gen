@@ -78,7 +78,10 @@ borrowed by reference; return-position container types are owned.
 `value?: never` property reads as `Option<T>` and is set with `&T` (see
 [Optional and nullable types](#optional-and-nullable-types)). A callable
 returning `never` binds only its catching form, typed `()` (see
-[`never` returns](#never-returns-keep-only-the-catching-form)).
+[`never` returns](#never-returns-keep-only-the-catching-form)). Under
+`--experimental-generic-mono` an optional property typed only `never` or
+`undefined` (D1's `error?: never`) has no getter, setter or builder method,
+since it can only be absent.
 
 TypeScript's built-in `PropertyKey` is recognised without a declaration
 and lowers exactly like `string | number | symbol`.
