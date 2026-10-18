@@ -1803,19 +1803,13 @@ pub(crate) fn render_param_type(
     if param.variadic && !mono.is_some_and(spreads_list) {
         return quote! { &[JsValue] };
     }
+    let type_ref = typemap::mono_argument_empty(&param.type_ref, cgctx);
     mono.and_then(|ctx| {
-        mono_argument_type(&param.type_ref).or_else(|| {
-            typemap::mono_string_like_argument(&param.type_ref, ctx, scope, from_module)
-        })
+        mono_argument_type(&type_ref)
+            .or_else(|| typemap::mono_string_like_argument(&type_ref, ctx, scope, from_module))
     })
     .unwrap_or_else(|| {
-        typemap::to_syn_type(
-            &param.type_ref,
-            TypePosition::ARGUMENT,
-            cgctx,
-            scope,
-            from_module,
-        )
+        typemap::to_syn_type(&type_ref, TypePosition::ARGUMENT, cgctx, scope, from_module)
     })
 }
 

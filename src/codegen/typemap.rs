@@ -1934,7 +1934,11 @@ fn generic_container(
 
 /// A bare reference to an in-scope type parameter. Without a context (unit
 /// tests) nothing is a type parameter.
-fn is_type_param(ty: &TypeRef, ctx: Option<&CodegenContext<'_>>, scope: ScopeId) -> bool {
+pub(crate) fn is_type_param(
+    ty: &TypeRef,
+    ctx: Option<&CodegenContext<'_>>,
+    scope: ScopeId,
+) -> bool {
     match (ty.as_ident(), ctx) {
         (Some(name), Some(c)) => matches!(
             c.gctx.scopes.resolve_binding(scope, name),
@@ -3059,6 +3063,25 @@ pub enum SliceMode {
     Copy,
 }
 
+/// Under per-monomorphization a `null`-admitting argument is an `Option`
+/// like an undefined-only one: `None` crosses as `undefined`, which a WebIDL
+/// nullable (`T?`) converts to `null`, and the `JsNullable` handle it would
+/// otherwise take keeps a string or number out of its native ABI.
+pub(crate) fn mono_argument_empty<'t>(
+    ty: &'t TypeRef,
+    ctx: Option<&CodegenContext<'_>>,
+) -> std::borrow::Cow<'t, TypeRef> {
+    match ty {
+        TypeRef::Nullable(inner, n) if n.null && CodegenContext::generic_mono(ctx) => {
+            std::borrow::Cow::Owned(TypeRef::Nullable(
+                inner.clone(),
+                crate::ir::Nullability::UNDEFINED,
+            ))
+        }
+        _ => std::borrow::Cow::Borrowed(ty),
+    }
+}
+
 /// The slice mode for this parameter, or `None` when the default is
 /// right: modes only act on numeric elements, every other slice already
 /// arrives as a fresh `Array`, and a variadic rest lowers to `&[JsValue]`
@@ -3075,7 +3098,8 @@ pub fn param_slice_mode(
     }
     // Only an undefined-only empty keeps the slice (`Option<&[T]>`); a
     // `null` arm takes the `JsNullable<Array<…>>` handle.
-    let ty = match &p.type_ref {
+    let arg = mono_argument_empty(&p.type_ref, ctx);
+    let ty = match arg.as_ref() {
         TypeRef::Nullable(inner, n) if !n.null => inner.as_ref(),
         other => other,
     };
@@ -3691,11 +3715,11 @@ mod tests {
                 )),
                 Some(SliceMode::Array)
             );
-            // `null` admitted: a `&JsNullable<Array<…>>` handle, not a slice.
+            // Under per-mono a `null` arm is an `Option` too.
             for n in [Nullability::NULL, Nullability::BOTH] {
                 assert_eq!(
                     mode(&cp("xs", TypeRef::Nullable(Box::new(numbers()), n))),
-                    None
+                    Some(SliceMode::Array)
                 );
             }
             assert_eq!(mode(&cp("xs", numbers())), Some(SliceMode::Array));

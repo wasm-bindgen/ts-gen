@@ -135,6 +135,16 @@ No coercion is assumed anywhere.
 * A discriminated-union branch whose property is required in one
   branch and `?: undefined` in another has a merged setter of the
   optional shape; the branch factory takes that setter's type.
+* Under `--experimental-generic-mono` a `null`-admitting argument lowers
+  like an undefined-only one (`Option<impl JsStringLike>`, `Option<f64>`,
+  `Option<&Signal>`, `Option<&[…]>`), since the `JsNullable` carrier would
+  take strings and numbers off their native ABI. `None` crosses as
+  `undefined`, which a WebIDL nullable (`T?`) converts to `null`; a
+  non-WebIDL callee that tests `=== null` needs the explicit form. A
+  dictionary builder's method for an optional nullable field takes the
+  value bare and passes `Some(…)` to the setter, since not calling it is
+  the field's empty: `.prefix("a")`, `.signal(&signal)`;
+  `set_prefix(None::<&str>)` still clears it.
 
 ## Array and slice types
 

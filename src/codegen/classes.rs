@@ -1542,6 +1542,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             };
             let method_ident = super::typemap::make_ident(&builder_method_name);
             let setter_ident = super::typemap::make_ident(&sig.rust_name);
+            let (builder_params, wrapped) = builder_value_params(config, &sig);
             // Mirrors `generate_setter`: an `ArrayBufferView` param is a
             // `<T: TypedArray>` generic on the extern setter, so the fluent
             // method that forwards to it must carry the same bound.
@@ -1551,7 +1552,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 params,
                 ..
             } = generate_dictionary_params(
-                &sig.params,
+                &builder_params,
                 config.cgctx,
                 sig.body_scope,
                 &config.from_module(),
@@ -1560,7 +1561,17 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             let param_idents: Vec<_> = sig
                 .params
                 .iter()
-                .map(|p| super::signatures::dictionary_param_ident(&p.name, config.cgctx))
+                .zip(&wrapped)
+                .map(|(p, &wrap)| {
+                    let ident = super::signatures::dictionary_param_ident(&p.name, config.cgctx);
+                    match wrap {
+                        Wrap::None => quote! { #ident },
+                        Wrap::Some => quote! { Some(#ident) },
+                        Wrap::SomeObject => {
+                            quote! { Some(::wasm_bindgen::JsCast::unchecked_ref(#ident)) }
+                        }
+                    }
+                })
                 .collect();
             builder_methods.push(quote! {
                 pub fn #method_ident #generics (self, #params) -> Self
@@ -1613,6 +1624,54 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             }
         }
     }
+}
+
+#[derive(Clone, Copy)]
+enum Wrap {
+    None,
+    Some,
+    SomeObject,
+}
+
+/// A builder method's parameters for an optional field's setter, and which
+/// of them the setter takes wrapped in `Some`. Under per-monomorphization
+/// the field's empty is not calling the method, so a nullable value is
+/// taken bare (`.prefix("a")`, `.signal(&signal)`) and passed on as
+/// `Some(…)`; `set_prefix(None)` still clears it. A type-parameter inner is
+/// left alone: the setter takes it by value (`Option<T>`), the builder by
+/// reference.
+fn builder_value_params(
+    config: &ClassConfig,
+    sig: &FunctionSignature,
+) -> (Vec<ConcreteParam>, Vec<Wrap>) {
+    let mono = CodegenContext::generic_mono(config.cgctx);
+    sig.params
+        .iter()
+        .map(|p| {
+            let ty = super::typemap::mono_argument_empty(&p.type_ref, config.cgctx);
+            match ty.as_ref() {
+                TypeRef::Nullable(inner, _)
+                    if mono
+                        && !p.variadic
+                        && !super::typemap::is_type_param(inner, config.cgctx, sig.body_scope) =>
+                {
+                    let bare = ConcreteParam {
+                        type_ref: (**inner).clone(),
+                        ..p.clone()
+                    };
+                    // A nullable view's setter takes the `Object` handle,
+                    // where the bare one is generic over `TypedArray`.
+                    let wrap = if matches!(**inner, TypeRef::ArrayBufferView) {
+                        Wrap::SomeObject
+                    } else {
+                        Wrap::Some
+                    };
+                    (bare, wrap)
+                }
+                _ => (p.clone(), Wrap::None),
+            }
+        })
+        .unzip()
 }
 
 /// Free a member base reserved by [`ClassConfig::reserved_names`], in both

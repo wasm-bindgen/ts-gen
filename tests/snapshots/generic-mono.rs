@@ -80,8 +80,8 @@ where
     for<'__wbg> &'__wbg T:
         ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
-    pub fn variant(self, val: Option<impl ::wasm_bindgen::JsStringLike>) -> Self {
-        self.inner.set_variant(val);
+    pub fn variant(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
+        self.inner.set_variant(Some(val));
         self
     }
     pub fn build(self) -> EvaluationDetails<T> {
