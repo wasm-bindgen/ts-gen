@@ -240,6 +240,12 @@ pub struct ExpandedSignature {
 pub struct LiteralArm {
     pub values: Vec<(usize, String)>,
     pub overload: usize,
+    /// The literals are type arguments of the parameters at the positions
+    /// (`options: GetOptions<"json">`) rather than the parameters
+    /// themselves. The value travels inside the argument, so nothing is
+    /// baked in: each arm is a binding of its own, keyed by name and
+    /// return.
+    pub in_type_arg: bool,
 }
 
 /// A literal-keyed cohort attached to an extern binding: the binding takes
@@ -462,6 +468,8 @@ pub fn expand_signatures(
             .collect()
     };
 
+    // Per-mono only: literal type arguments key overloads by name.
+    let type_arg_arms = CodegenContext::generic_mono(cgctx);
     let mut seen_concrete: Vec<&Vec<ConcreteParam>> = Vec::new();
     let mut seen_rendered: Vec<Vec<String>> = Vec::new();
     let mut deduped: Vec<Vec<ConcreteParam>> = Vec::new();
@@ -481,7 +489,10 @@ pub fn expand_signatures(
         if let Some(pos) = seen_rendered.iter().position(|r| *r == rendered) {
             // A duplicate that differs only in literal values is an arm of
             // the kept signature rather than a dropped one.
-            match (literal_arm(&deduped[pos], sig, *overload), &mut arms[pos]) {
+            match (
+                literal_arm(&deduped[pos], sig, *overload, type_arg_arms),
+                &mut arms[pos],
+            ) {
                 // A literal repeated across overloads (`"a" | "b"` and
                 // `"b" | "c"`, or a merged declaration's copy) is one arm,
                 // with the first overload's return, as TypeScript resolves
@@ -500,7 +511,11 @@ pub fn expand_signatures(
         seen_rendered.push(rendered);
         deduped.push(sig.clone());
         origins.push(*overload);
-        arms.push(literal_cohorts.then(|| literal_arm(sig, sig, *overload).into_iter().collect()));
+        arms.push(literal_cohorts.then(|| {
+            literal_arm(sig, sig, *overload, type_arg_arms)
+                .into_iter()
+                .collect()
+        }));
         if i < first_overload_sigs {
             first_overload_len += 1;
         }
@@ -553,11 +568,28 @@ pub fn expand_signatures(
     let mut keyed_suffixes = keyed_suffixes.into_iter();
     let suffixes: Vec<String> = stripped
         .iter()
-        .map(|s| match s {
-            None => plain_suffixes.next(),
-            Some(_) => keyed_suffixes.next(),
+        .zip(&deduped)
+        .zip(&arms)
+        .map(|((s, sig), arms)| {
+            let suffix = match s {
+                None => plain_suffixes.next(),
+                Some(_) => keyed_suffixes.next(),
+            }
+            .unwrap_or_default();
+            if s.is_none() || !arms[0].in_type_arg {
+                return suffix;
+            }
+            // A type-argument cohort keeps its parameters, so it names
+            // them: `get_json_with_options`, `get_json_with_slice_and_options`.
+            arms[0].values.iter().fold(suffix, |acc, &(i, _)| {
+                let name = to_snake_case(&sig[i].name);
+                if acc.is_empty() {
+                    format!("_with_{name}")
+                } else {
+                    format!("{acc}_and_{name}")
+                }
+            })
         })
-        .map(Option::unwrap_or_default)
         .collect();
     suffixes
         .into_iter()
@@ -626,30 +658,77 @@ fn suffixes_among<'a>(
 }
 
 /// `candidate` as a literal arm of `kept`: both carry string literals at
-/// the same positions and agree everywhere else. `None` when `kept` has
-/// no literal parameter or the shapes differ.
+/// the same positions, as parameters or as type arguments of a parameter
+/// (not both), and agree everywhere else. `None` when `kept` has no literal
+/// or the shapes differ.
 fn literal_arm(
     kept: &[ConcreteParam],
     candidate: &[ConcreteParam],
     index: usize,
+    keyed_type_args: bool,
 ) -> Option<LiteralArm> {
     if kept.len() != candidate.len() {
         return None;
     }
     let mut values = Vec::new();
+    let mut type_args = Vec::new();
     for (i, (k, c)) in kept.iter().zip(candidate).enumerate() {
+        if k.name != c.name || k.variadic != c.variadic {
+            return None;
+        }
         match (&k.type_ref, &c.type_ref) {
-            (TypeRef::StringLiteral(_), TypeRef::StringLiteral(lit)) if k.name == c.name => {
+            (TypeRef::StringLiteral(_), TypeRef::StringLiteral(lit)) => {
                 values.push((i, lit.clone()));
             }
-            _ if k.name == c.name && k.type_ref == c.type_ref && k.variadic == c.variadic => {}
+            (
+                TypeRef::Reference {
+                    segments: ks,
+                    generic_args: ka,
+                },
+                TypeRef::Reference {
+                    segments: cs,
+                    generic_args: ca,
+                },
+            ) if keyed_type_args && has_literal_arg(ka) => {
+                if ks != cs || ka.len() != ca.len() {
+                    return None;
+                }
+                let mut lits = Vec::new();
+                for (ka, ca) in ka.iter().zip(ca) {
+                    match (ka, ca) {
+                        (TypeRef::StringLiteral(_), TypeRef::StringLiteral(lit)) => {
+                            lits.push(lit.clone());
+                        }
+                        _ if ka == ca => {}
+                        _ => return None,
+                    }
+                }
+                if lits.is_empty() {
+                    return None;
+                }
+                type_args.push((i, lits.join("_")));
+            }
+            _ if k.type_ref == c.type_ref => {}
             _ => return None,
         }
     }
-    (!values.is_empty()).then_some(LiteralArm {
-        values,
-        overload: index,
-    })
+    match (values.is_empty(), type_args.is_empty()) {
+        (false, true) => Some(LiteralArm {
+            values,
+            overload: index,
+            in_type_arg: false,
+        }),
+        (true, false) => Some(LiteralArm {
+            values: type_args,
+            overload: index,
+            in_type_arg: true,
+        }),
+        _ => None,
+    }
+}
+
+fn has_literal_arg(args: &[TypeRef]) -> bool {
+    args.iter().any(|a| matches!(a, TypeRef::StringLiteral(_)))
 }
 
 /// Index of the expansion that owns the unsuffixed name; see the Phase 3
@@ -784,6 +863,24 @@ pub fn build_signatures(
     }
     let mut units: Vec<Unit> = Vec::new();
     for exp in expansions {
+        if exp.literal_arms.len() >= 2 && exp.literal_arms[0].in_type_arg {
+            for arm in &exp.literal_arms {
+                let tag = arm
+                    .values
+                    .iter()
+                    .map(|(_, v)| to_snake_case(v))
+                    .collect::<Vec<_>>()
+                    .join("_");
+                let candidate = public_rust_name(&format!("{base}_{tag}{}", exp.name_suffix));
+                units.push(Unit {
+                    params: exp.params.clone(),
+                    overload: arm.overload,
+                    primary_name: names.declare(&candidate, Suffix::Snake),
+                    literal: None,
+                });
+            }
+            continue;
+        }
         if exp.literal_arms.len() < 2 {
             let primary_candidate = public_rust_name(&join_suffix(&base, &exp.name_suffix));
             units.push(Unit {

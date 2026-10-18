@@ -3565,6 +3565,14 @@ impl CompressionStream {
 * Setters are exempt: `set_disposition("inline")` takes the value. A
   setter taking a named union alias is wrapped like any binding
   (`set_relative_to(&self, val: impl Into<ZonedDateTimeLike>)`).
+* Under per-monomorphization, overloads that differ only in a string
+  literal *type argument* of a parameter (`options?: GetOptions<"json">`,
+  `GetOptions<"text">`) form a cohort too. The literal travels inside
+  the argument, so nothing is baked in: each arm is a binding of its own
+  with its overload's return and type parameters, named
+  `<base>_<literal>` plus the remaining parameters' suffix and the keyed
+  parameter's name (`get_json_with_options<T>(key, &GetOptions<String>)
+  -> Option<T>`, `get_text_with_slice_and_options`).
 
 ## `@rust` JSDoc → Rust scalar
 

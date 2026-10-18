@@ -840,3 +840,150 @@ impl Opener {
         Self::__new_with_null("b", &::wasm_bindgen::JsValue::NULL)
     }
 }
+#[wasm_bindgen(module = "literal-overloads")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type GetOptions<Type: ::wasm_bindgen::JsGeneric = JsValue>;
+    #[wasm_bindgen(method, getter, js_name = "type")]
+    pub fn type_<Type: ::wasm_bindgen::JsGeneric>(this: &GetOptions<Type>) -> Type;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type<Type: ::wasm_bindgen::JsGeneric>(this: &GetOptions<Type>, val: &Type);
+    #[wasm_bindgen(method, getter, js_name = "cacheTtl")]
+    pub fn cache_ttl<Type: ::wasm_bindgen::JsGeneric>(this: &GetOptions<Type>) -> Option<f64>;
+    #[wasm_bindgen(method, setter, js_name = "cacheTtl")]
+    pub fn set_cache_ttl<Type: ::wasm_bindgen::JsGeneric>(this: &GetOptions<Type>, val: f64);
+}
+impl<Type: ::wasm_bindgen::JsGeneric> GetOptions<Type> {
+    pub fn new(r#type: &Type) -> GetOptions<Type> {
+        Self::builder(r#type).build()
+    }
+    pub fn builder(r#type: &Type) -> GetOptionsBuilder<Type> {
+        let inner: GetOptions<Type> = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_type(r#type);
+        GetOptionsBuilder { inner }
+    }
+}
+pub struct GetOptionsBuilder<Type: ::wasm_bindgen::JsGeneric> {
+    inner: GetOptions<Type>,
+}
+impl<Type: ::wasm_bindgen::JsGeneric> GetOptionsBuilder<Type> {
+    pub fn cache_ttl(self, val: f64) -> Self {
+        self.inner.set_cache_ttl(val);
+        self
+    }
+    pub fn build(self) -> GetOptions<Type> {
+        self.inner
+    }
+}
+impl<Type: ::wasm_bindgen::JsGeneric> From<GetOptions<Type>> for GetOptionsBuilder<Type> {
+    fn from(inner: GetOptions<Type>) -> Self {
+        Self { inner }
+    }
+}
+#[wasm_bindgen(module = "literal-overloads")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Namespace;
+    #[wasm_bindgen(method, catch)]
+    pub async fn get(this: &Namespace, key: &str) -> Result<Option<String>, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_promise(this: &Namespace, key: &str) -> Promise<JsNullable<JsString>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub async fn get_with_str_and_partial_get_options_undefined(
+        this: &Namespace,
+        key: &str,
+        options: &PartialGetOptionsUndefined,
+    ) -> Result<Option<String>, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_with_str_and_partial_get_options_undefined_promise(
+        this: &Namespace,
+        key: &str,
+        options: &PartialGetOptionsUndefined,
+    ) -> Promise<JsNullable<JsString>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub async fn get_with_str_and_get_options(
+        this: &Namespace,
+        key: &str,
+        options: &GetOptions<JsString>,
+    ) -> Result<Option<String>, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_with_str_and_get_options_promise(
+        this: &Namespace,
+        key: &str,
+        options: &GetOptions<JsString>,
+    ) -> Promise<JsNullable<JsString>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub async fn get_with_slice(
+        this: &Namespace,
+        key: &[String],
+    ) -> Result<Map<JsString, JsNullable<JsString>>, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_with_slice_promise(
+        this: &Namespace,
+        key: &[String],
+    ) -> Promise<Map<JsString, JsNullable<JsString>>>;
+    #[wasm_bindgen(method, catch, js_name = "get")]
+    pub async fn get_with_slice_and_options(
+        this: &Namespace,
+        key: &[String],
+        options: &GetOptions<JsString>,
+    ) -> Result<Map<JsString, JsNullable<JsString>>, JsValue>;
+    #[wasm_bindgen(method, js_name = "get")]
+    pub fn get_with_slice_and_options_promise(
+        this: &Namespace,
+        key: &[String],
+        options: &GetOptions<JsString>,
+    ) -> Promise<Map<JsString, JsNullable<JsString>>>;
+}
+#[wasm_bindgen(module = "literal-overloads")]
+extern "C" {
+    # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type PartialGetOptionsUndefined;
+    #[wasm_bindgen(method, getter, js_name = "type")]
+    pub fn type_(this: &PartialGetOptionsUndefined) -> Undefined;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_type(this: &PartialGetOptionsUndefined, val: &Undefined);
+    #[wasm_bindgen(method, getter, js_name = "cacheTtl")]
+    pub fn cache_ttl(this: &PartialGetOptionsUndefined) -> Option<f64>;
+    #[wasm_bindgen(method, setter, js_name = "cacheTtl")]
+    pub fn set_cache_ttl(this: &PartialGetOptionsUndefined, val: f64);
+}
+impl PartialGetOptionsUndefined {
+    pub fn new() -> PartialGetOptionsUndefined {
+        Self::builder().build()
+    }
+    pub fn builder() -> PartialGetOptionsUndefinedBuilder {
+        PartialGetOptionsUndefinedBuilder {
+            inner: JsCast::unchecked_into(js_sys::Object::new()),
+        }
+    }
+}
+impl Default for PartialGetOptionsUndefined {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+pub struct PartialGetOptionsUndefinedBuilder {
+    inner: PartialGetOptionsUndefined,
+}
+impl PartialGetOptionsUndefinedBuilder {
+    pub fn type_(self, val: &Undefined) -> Self {
+        self.inner.set_type(val);
+        self
+    }
+    pub fn cache_ttl(self, val: f64) -> Self {
+        self.inner.set_cache_ttl(val);
+        self
+    }
+    pub fn build(self) -> PartialGetOptionsUndefined {
+        self.inner
+    }
+}
+impl From<PartialGetOptionsUndefined> for PartialGetOptionsUndefinedBuilder {
+    fn from(inner: PartialGetOptionsUndefined) -> Self {
+        Self { inner }
+    }
+}

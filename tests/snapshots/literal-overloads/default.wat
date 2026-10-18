@@ -113,6 +113,40 @@
   ;; constructor(kind: "a", x: null)
   (import "literal-overloads" "Opener.new_with_null" (func $literal-overloads:Opener.new_with_null (param $kind externref) (param $x externref) (result externref)))
 
+  ;; GetOptions
+  ;; {} as GetOptions
+  (import "literal-overloads" "GetOptions.new" (func $literal-overloads:GetOptions.new (result externref)))
+  ;; type: Type
+  (import "literal-overloads" "GetOptions.type" (func $literal-overloads:GetOptions.type (param $this externref) (result externref)))
+  ;; set type(value: Type)
+  (import "literal-overloads" "GetOptions.set_type" (func $literal-overloads:GetOptions.set_type (param $this externref) (param $value externref)))
+  ;; cacheTtl?: number
+  (import "literal-overloads" "GetOptions.cache_ttl" (func $literal-overloads:GetOptions.cache_ttl (param $this externref) (result externref)))
+  ;; set cacheTtl(value: number)
+  (import "literal-overloads" "GetOptions.set_cache_ttl" (func $literal-overloads:GetOptions.set_cache_ttl (param $this externref) (param $value f64)))
+
+  ;; Namespace
+  ;; get(key: string): Promise<string | null>
+  (import "literal-overloads" "Namespace.get" (func $literal-overloads:Namespace.get (param $this externref) (param $key externref) (result externref)))
+  ;; get(key: string, options: PartialGetOptionsUndefined): Promise<string | null>
+  (import "literal-overloads" "Namespace.get_with_options" (func $literal-overloads:Namespace.get_with_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
+  ;; get(key: string[]): Promise<Map<string, string | null>>
+  (import "literal-overloads" "Namespace.get_with_slice" (func $literal-overloads:Namespace.get_with_slice (param $this externref) (param $key externref) (result externref)))
+  ;; get(key: string[], options: GetOptions<"text">): Promise<Map<string, string | null>>
+  (import "literal-overloads" "Namespace.get_with_slice_and_options" (func $literal-overloads:Namespace.get_with_slice_and_options (param $this externref) (param $key externref) (param $options externref) (result externref)))
+
+  ;; PartialGetOptionsUndefined
+  ;; {} as PartialGetOptionsUndefined
+  (import "literal-overloads" "PartialGetOptionsUndefined.new" (func $literal-overloads:PartialGetOptionsUndefined.new (result externref)))
+  ;; type?: undefined
+  (import "literal-overloads" "PartialGetOptionsUndefined.type" (func $literal-overloads:PartialGetOptionsUndefined.type (param $this externref) (result externref)))
+  ;; set type(value: undefined)
+  (import "literal-overloads" "PartialGetOptionsUndefined.set_type" (func $literal-overloads:PartialGetOptionsUndefined.set_type (param $this externref) (param $value externref)))
+  ;; cacheTtl?: number
+  (import "literal-overloads" "PartialGetOptionsUndefined.cache_ttl" (func $literal-overloads:PartialGetOptionsUndefined.cache_ttl (param $this externref) (result externref)))
+  ;; set cacheTtl(value: number)
+  (import "literal-overloads" "PartialGetOptionsUndefined.set_cache_ttl" (func $literal-overloads:PartialGetOptionsUndefined.set_cache_ttl (param $this externref) (param $value f64)))
+
   ;; `undefined`, for passing where TS says `T | undefined`.
   (import "./builtins.js" "undefined" (global $undefined externref))
 
