@@ -149,7 +149,9 @@ No coercion is assumed anywhere.
   `null` an arm of its own, which passes `null` itself and drops the
   parameter: `Response(body?: BodyInit | null, init?)` gives
   `new_with_str(body)`, `new_with_readable_stream(&stream)`, …,
-  `new_with_null()` and `new_with_null_and_init(&init)`; a setter's
+  `new_with_null_and_init(&init)`. An optional parameter's `null` arm
+  with nothing after it would read as omitting the argument, so there is
+  no `new_with_null()` beside `new()`. A setter's
   `null` arm clears the property (`set_body_with_null()`). A
   dictionary builder's method for an optional nullable field takes the
   value bare and passes `Some(…)` to the setter, since not calling it is
@@ -1697,8 +1699,11 @@ each kept only when the shorter name is still unique:
 * A dictionary arm is named after its parameter rather than its type:
   `listen_with_options` / `listen_with_bool` for `options?:
   ListenerOptions | boolean`, `put_with_options` for `KVNamespacePutOptions`.
-  A second dictionary arm at the same position collides and keeps
-  its type name (`new_with_source`, `new_with_underlying_source`).
+  Where the cohort passes several dictionary types at the position,
+  only the one the others extend takes the parameter name, whichever
+  comes first: R2's `put_with_options(&R2PutOptions)` beside
+  `put_with_r2_bucket_put_options`. Unrelated ones keep their type names
+  (`new_with_underlying_byte_source` / `new_with_underlying_source`).
 
 ### `_with_<type>` suffix vocabulary
 

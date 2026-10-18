@@ -503,7 +503,15 @@ pub fn expand_signatures(
         (Some(c), Some(scope)) => is_dictionary_type(ty, c, scope),
         _ => false,
     };
-    let rules: SuffixRules<'_> = type_arg_arms.then_some(&is_dictionary);
+    let extends = |child: &TypeRef, parent: &TypeRef| match (cgctx, scope) {
+        (Some(c), Some(scope)) => type_extends(child, parent, c, scope),
+        _ => false,
+    };
+    let mono = MonoSuffixes {
+        is_dictionary: &is_dictionary,
+        extends: &extends,
+    };
+    let rules: SuffixRules<'_> = type_arg_arms.then_some(&mono);
     let plain: Vec<Vec<ConcreteParam>> = deduped
         .iter()
         .zip(&keyed)
@@ -574,9 +582,36 @@ fn suffix_among(
     compute_suffixes(&all, rules).pop().unwrap_or_default()
 }
 
-/// Per-mono suffix rules, carrying whether a type is a dictionary (see
-/// [`compute_rust_names`]). `None` keeps the plain rules.
-type SuffixRules<'a> = Option<&'a dyn Fn(&TypeRef) -> bool>;
+/// Per-mono suffix rules (see [`compute_rust_names`]). `None` keeps the
+/// plain rules.
+type SuffixRules<'a> = Option<&'a MonoSuffixes<'a>>;
+
+struct MonoSuffixes<'a> {
+    is_dictionary: &'a dyn Fn(&TypeRef) -> bool,
+    /// Whether the first type declares the second among its ancestors.
+    extends: &'a dyn Fn(&TypeRef, &TypeRef) -> bool,
+}
+
+fn type_extends(
+    child: &TypeRef,
+    parent: &TypeRef,
+    cgctx: &CodegenContext<'_>,
+    scope: ScopeId,
+) -> bool {
+    fn head(ty: &TypeRef) -> Option<&str> {
+        match ty {
+            TypeRef::Nullable(inner, _) => head(inner),
+            TypeRef::Reference { segments, .. } if segments.len() == 1 => Some(&segments[0]),
+            _ => None,
+        }
+    }
+    let (Some(child), Some(parent)) = (head(child), head(parent)) else {
+        return false;
+    };
+    super::subtyping::ancestor_chain(child, cgctx, scope)
+        .iter()
+        .any(|a| a == parent)
+}
 
 /// A reference to a dictionary interface (an options bag).
 fn is_dictionary_type(ty: &TypeRef, cgctx: &CodegenContext<'_>, scope: ScopeId) -> bool {
@@ -1208,6 +1243,16 @@ fn expand_single_overload(
         }
     }
 
+    // An optional parameter's `null` arm with nothing after it reads as
+    // omitting the argument (`Response::new()`, not also `new_with_null()`).
+    if variadic_param.is_none() {
+        sigs.retain(|sig| {
+            !sig.last().is_some_and(|last| {
+                matches!(last.type_ref, TypeRef::Null) && non_variadic[sig.len() - 1].optional
+            })
+        });
+    }
+
     // Append variadic param to every signature.
     if let Some(vp) = variadic_param {
         for sig in &mut sigs {
@@ -1324,7 +1369,7 @@ fn flatten_type_with(
 
 /// Per-mono, a `null`-admitting union that fans out into overloads takes
 /// each alternative bare and gives `null` an arm of its own
-/// (`new_with_str(body)`, `new_with_null()`), rather than an `Option` on
+/// (`new_with_str(body)`, `new_with_null_and_init(init)`), rather than an `Option` on
 /// every arm. The `null` arm's parameter is dropped from its signature and
 /// passed as `null` (see [`typemap::to_syn_type`]'s `TypeRef::Null`).
 fn split_null_arm(alts: Vec<TypeRef>) -> Vec<TypeRef> {
@@ -1566,6 +1611,22 @@ fn compute_rust_names(
     //
     // Only the "middle" params that differ contribute to naming suffixes.
     let (trim_start, trim_end) = compute_trim(signatures);
+    // Per-mono, where the cohort passes several dictionary types at a
+    // position, only the one the others extend is named by its parameter,
+    // so the name does not depend on which comes first: R2's
+    // `put_with_options(&R2PutOptions)` beside
+    // `put_with_r2_bucket_put_options`.
+    let by_parameter = |abs_idx: usize, ty: &TypeRef| {
+        let Some(rules) = rules else {
+            return false;
+        };
+        signatures
+            .iter()
+            .filter_map(|s| s.get(abs_idx))
+            .map(|p| &p.type_ref)
+            .filter(|t| *t != ty && (rules.is_dictionary)(t))
+            .all(|t| (rules.extends)(t, ty))
+    };
 
     // Greedy single-pass naming: the first signature with a given
     // candidate suffix keeps it; subsequent siblings whose
@@ -1643,14 +1704,17 @@ fn compute_rust_names(
             } else {
                 (param_snake.clone(), false)
             };
-            if let Some(is_dictionary) = rules {
+            if let Some(mono) = rules {
                 let implied = from_type
                     && signatures[0]
                         .get(abs_idx)
                         .is_some_and(|p| p.name == param.name && p.type_ref == param.type_ref);
                 if !implied {
                     mono_parts.push(SuffixPart {
-                        text: if from_type && is_dictionary(&param.type_ref) {
+                        text: if from_type
+                            && (mono.is_dictionary)(&param.type_ref)
+                            && by_parameter(abs_idx, &param.type_ref)
+                        {
                             param_snake.clone()
                         } else {
                             text.clone()

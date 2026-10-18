@@ -193,8 +193,6 @@ extern "C" {
     #[wasm_bindgen(constructor, catch, js_name = "Reply")]
     pub fn new_with_signal(body: &Signal) -> Result<Reply, JsValue>;
     #[wasm_bindgen(constructor, catch, js_name = "Reply")]
-    fn new_with_null_js(body: &JsValue) -> Result<Reply, JsValue>;
-    #[wasm_bindgen(constructor, catch, js_name = "Reply")]
     pub fn new_with_str_and_init(
         body: impl ::wasm_bindgen::JsStringLike,
         init: &ResponseInit,
@@ -210,9 +208,6 @@ extern "C" {
     fn new_with_null_and_init_js(body: &JsValue, init: &ResponseInit) -> Result<Reply, JsValue>;
 }
 impl Reply {
-    pub fn new_with_null() -> Result<Reply, JsValue> {
-        Self::new_with_null_js(&::wasm_bindgen::JsValue::NULL)
-    }
     pub fn new_with_null_and_init(init: &ResponseInit) -> Result<Reply, JsValue> {
         Self::new_with_null_and_init_js(&::wasm_bindgen::JsValue::NULL, init)
     }

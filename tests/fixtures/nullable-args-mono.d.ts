@@ -3,7 +3,8 @@
 // Under per-monomorphization a `null`-admitting argument is an `Option`
 // like an undefined-only one, keeping strings and numbers on their native
 // ABI; `None` crosses as `undefined`. A union that fans out into overloads
-// takes each arm bare and gives `null` its own arm.
+// takes each arm bare and gives `null` its own arm, except an optional
+// parameter's trailing one, which omitting the argument already covers.
 
 declare class Signal {}
 declare class Body<T = unknown> {

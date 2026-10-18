@@ -3,6 +3,9 @@
 // Per-monomorphization overload suffixes: the arm the primary expansion
 // takes at a position is implied (`fetch_with_init`), and a dictionary arm
 // is named after its parameter (`_and_options`), unless that collides.
+// Where two dictionary types meet at a position, only the one the other
+// extends takes the parameter name (`head_with_options`), whichever comes
+// first.
 // A method's inline parameter type is named `<Parent><Method><Param>`.
 
 interface RequestInit {
@@ -28,4 +31,6 @@ interface GetOptions {
 declare class Bucket {
   get(key: string, options: GetOptions & { onlyIf: string }): void;
   put(key: string, options?: { md5?: string }): void;
+  head(key: string, options: GetOptions & { onlyIf: string }): void;
+  head(key: string, options?: GetOptions): void;
 }
