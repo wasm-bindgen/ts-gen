@@ -1989,6 +1989,14 @@ A base name that already reads `with` (`with`, `set_with`) continues the
 suffix with `_and_`: `with(fields, options?)` gives `with` and
 `with_and_options`, not `with_with_options`.
 
+Under `--experimental-generic-mono` a dictionary arm is also named
+after its parameter rather than its type, kept only when the shorter
+name is still unique: `listen_with_options` / `listen_with_bool` for
+`options?: ListenerOptions | boolean`, `put_with_options` for
+`KVNamespacePutOptions`. A second dictionary arm at the same position
+collides and keeps its type name (`new_with_source`,
+`new_with_underlying_source`).
+
 ### Named union aliases
 
 A named alias of a union is one Rust type, not one binding per arm. The

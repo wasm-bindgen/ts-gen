@@ -91,7 +91,7 @@ extern "C" {
     # [wasm_bindgen (static_method_of = Response , catch)]
     pub fn json(any: &JsValue) -> Result<Response, JsValue>;
     # [wasm_bindgen (static_method_of = Response , catch , js_name = "json")]
-    pub fn json_with_response_init(
+    pub fn json_with_maybe_init(
         any: &JsValue,
         maybe_init: &ResponseInit,
     ) -> Result<Response, JsValue>;

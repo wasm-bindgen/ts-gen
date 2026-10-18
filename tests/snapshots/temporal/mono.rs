@@ -2431,7 +2431,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn round_with_rounding_options(
+        pub fn round_with_round_to(
             this: &PlainTime,
             round_to: &RoundingOptions<TimeUnit>,
         ) -> Result<PlainTime, RangeError>;
@@ -2900,7 +2900,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn round_with_rounding_options(
+        pub fn round_with_round_to(
             this: &PlainDateTime,
             round_to: &RoundingOptions,
         ) -> Result<PlainDateTime, RangeError>;
@@ -3381,7 +3381,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn round_with_rounding_options(
+        pub fn round_with_round_to(
             this: &ZonedDateTime,
             round_to: &RoundingOptions,
         ) -> Result<ZonedDateTime, RangeError>;
@@ -3962,7 +3962,7 @@ pub mod temporal {
         #[doc = " * `RangeError` — if the duration has calendar units and `relativeTo` is not given"]
         #[doc = " * `TypeError` — if `relativeTo` is an object missing the fields it needs"]
         #[wasm_bindgen(method, catch, js_name = "total")]
-        pub fn total_with_duration_total_options(
+        pub fn total_with_total_of(
             this: &Duration,
             total_of: &DurationTotalOptions,
         ) -> Result<f64, Error>;
@@ -4208,7 +4208,7 @@ pub mod temporal {
         #[doc = ""]
         #[doc = " * `RangeError` — if the rounding options are invalid"]
         #[wasm_bindgen(method, catch, js_name = "round")]
-        pub fn round_with_rounding_options(
+        pub fn round_with_round_to(
             this: &Instant,
             round_to: &RoundingOptions<TimeUnit>,
         ) -> Result<Instant, RangeError>;

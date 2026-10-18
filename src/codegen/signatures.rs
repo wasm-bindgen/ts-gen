@@ -557,14 +557,20 @@ pub fn expand_signatures(
             )
         })
         .collect();
+    let scope = overloads.first().map(|o| o.body_scope);
+    let is_dictionary = |ty: &TypeRef| match (cgctx, scope) {
+        (Some(c), Some(scope)) => is_dictionary_type(ty, c, scope),
+        _ => false,
+    };
+    let rules: SuffixRules<'_> = type_arg_arms.then_some(&is_dictionary);
     let plain: Vec<Vec<ConcreteParam>> = deduped
         .iter()
         .zip(&stripped)
         .filter(|(_, s)| s.is_none())
         .map(|(sig, _)| sig.clone())
         .collect();
-    let mut plain_suffixes = compute_suffixes(&plain).into_iter();
-    let keyed_suffixes = suffixes_among(&plain, stripped.iter().flatten());
+    let mut plain_suffixes = compute_suffixes(&plain, rules).into_iter();
+    let keyed_suffixes = suffixes_among(&plain, stripped.iter().flatten(), rules);
     let mut keyed_suffixes = keyed_suffixes.into_iter();
     let suffixes: Vec<String> = stripped
         .iter()
@@ -606,7 +612,7 @@ pub fn expand_signatures(
                 && !params.is_empty()
                 && params.iter().all(|p| p.type_ref == TypeRef::Null)
             {
-                name_suffix = compute_suffixes(&[Vec::new(), params.clone()])
+                name_suffix = compute_suffixes(&[Vec::new(), params.clone()], rules)
                     .pop()
                     .unwrap_or_default();
             }
@@ -629,15 +635,16 @@ pub fn expand_signatures(
 fn suffixes_among<'a>(
     cohort: &[Vec<ConcreteParam>],
     extras: impl Iterator<Item = &'a Vec<ConcreteParam>> + Clone,
+    rules: SuffixRules<'_>,
 ) -> Vec<String> {
-    let cohort_suffixes = compute_suffixes(cohort);
+    let cohort_suffixes = compute_suffixes(cohort, rules);
     let mut all = cohort.to_vec();
     for extra in extras.clone() {
         if !all.iter().any(|s| concrete_params_eq(s, extra)) {
             all.push(extra.clone());
         }
     }
-    let all_suffixes = compute_suffixes(&all);
+    let all_suffixes = compute_suffixes(&all, rules);
     extras
         .map(|extra| {
             if let Some(pos) = cohort.iter().position(|s| concrete_params_eq(s, extra)) {
@@ -655,6 +662,33 @@ fn suffixes_among<'a>(
             }
         })
         .collect()
+}
+
+/// Per-mono suffix rules, carrying whether a type is a dictionary (see
+/// [`compute_rust_names`]). `None` keeps the plain rules.
+type SuffixRules<'a> = Option<&'a dyn Fn(&TypeRef) -> bool>;
+
+/// A reference to a dictionary interface (an options bag).
+fn is_dictionary_type(ty: &TypeRef, cgctx: &CodegenContext<'_>, scope: ScopeId) -> bool {
+    let core = ty.split_empties().map(|(core, _)| core);
+    let ty = core.as_ref().unwrap_or(ty);
+    let Some(name) = ty.as_ident().or_else(|| match ty {
+        TypeRef::Reference { segments, .. } if segments.len() == 1 => Some(segments[0].as_str()),
+        _ => None,
+    }) else {
+        return false;
+    };
+    cgctx
+        .gctx
+        .scopes
+        .resolve(scope, name)
+        .is_some_and(|id| match &cgctx.gctx.get_type(id).kind {
+            crate::ir::TypeKind::Interface(i) => {
+                i.classification == crate::ir::InterfaceClassification::Dictionary
+            }
+            crate::ir::TypeKind::DiscriminatedUnion(_) => true,
+            _ => false,
+        })
 }
 
 /// `candidate` as a literal arm of `kept`: both carry string literals at
@@ -1196,14 +1230,14 @@ fn push_js_string_twin(
 /// Public alias of [`compute_suffixes`] for callers in sibling modules
 /// that build their own concrete signature lists.
 pub fn compute_suffixes_pub(expansions: &[Vec<ConcreteParam>]) -> Vec<String> {
-    compute_suffixes(expansions)
+    compute_suffixes(expansions, None)
 }
 
-fn compute_suffixes(expansions: &[Vec<ConcreteParam>]) -> Vec<String> {
+fn compute_suffixes(expansions: &[Vec<ConcreteParam>], rules: SuffixRules<'_>) -> Vec<String> {
     // Use a placeholder base — `BASE` is just a prefix that won't appear in
     // any param name, so we can safely strip it back off.
     const BASE: &str = "BASE";
-    compute_rust_names(BASE, expansions)
+    compute_rust_names(BASE, expansions, rules)
         .into_iter()
         .map(|name| {
             // `compute_rust_names` returns either `BASE` (primary, no suffix)
@@ -1766,7 +1800,11 @@ fn flatten_collapse_to_lub(
 ///
 /// These are candidate names — the caller declares them in the block's `LocalScope` for
 /// final uniqueness within the extern block.
-fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec<String> {
+fn compute_rust_names(
+    base_name: &str,
+    signatures: &[Vec<ConcreteParam>],
+    rules: SuffixRules<'_>,
+) -> Vec<String> {
     if signatures.len() == 1 {
         return vec![base_name.to_string()];
     }
@@ -1803,7 +1841,12 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
     names.push(base_name.to_string());
     used.claim(base_name);
 
-    let plan = |sig_idx: usize, sig: &[ConcreteParam]| -> (Vec<SuffixPart>, Vec<SuffixPart>) {
+    type Plan = (
+        Vec<SuffixPart>,
+        Vec<SuffixPart>,
+        Option<(Vec<SuffixPart>, Vec<SuffixPart>)>,
+    );
+    let plan = |sig_idx: usize, sig: &[ConcreteParam]| -> Plan {
         // Compute per-position suffix parts, each tagged with whether
         // the suffix used the type-name (which is collision-prone) or
         // the param-name (uniquely identifying). On collision the
@@ -1818,6 +1861,11 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
         // shorter name is taken.
         let mut parts: Vec<SuffixPart> = Vec::new();
         let mut added: Vec<SuffixPart> = Vec::new();
+        // Per-mono, the same with a dictionary arm named after its
+        // parameter (`_with_options`, not `_with_kv_namespace_put_options`);
+        // used unless the result collides.
+        let mut mono: Option<(Vec<SuffixPart>, Vec<SuffixPart>)> =
+            rules.map(|_| (Vec::new(), Vec::new()));
         let primary = &signatures[0];
 
         let end = if sig.len() >= trim_end {
@@ -1876,31 +1924,53 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
                 from_type,
                 param_snake,
             };
-            match primary.get(abs_idx) {
+            let mono_part = match rules {
+                Some(is_dictionary) if part.from_type && is_dictionary(&param.type_ref) => {
+                    SuffixPart {
+                        text: part.param_snake.clone(),
+                        ..part.clone()
+                    }
+                }
+                _ => part.clone(),
+            };
+            let adds = match primary.get(abs_idx) {
                 // A position the primary lacks is named by its parameter,
                 // so `str` never names different parameters in sibling
                 // names: `new_with_str(url, base: &str)` would read as the
                 // `url: &str` form.
-                None if part.from_type => added.push(SuffixPart {
+                None if part.from_type => Some(SuffixPart {
                     text: part.param_snake.clone(),
                     from_type: false,
                     param_snake: part.param_snake.clone(),
                 }),
-                None => added.push(part.clone()),
+                None => Some(part.clone()),
                 Some(p)
                     if p.name != param.name
                         || p.type_ref != param.type_ref
                         || p.variadic != param.variadic =>
                 {
-                    added.push(part.clone())
+                    Some(part.clone())
                 }
-                Some(_) => {}
+                Some(_) => None,
+            };
+            if let Some((mono_added, mono_parts)) = &mut mono {
+                if let Some(add) = &adds {
+                    mono_added.push(if add.from_type {
+                        mono_part.clone()
+                    } else {
+                        add.clone()
+                    });
+                }
+                mono_parts.push(mono_part);
+            }
+            if let Some(add) = adds {
+                added.push(add);
             }
             parts.push(part);
         }
-        (added, parts)
+        (added, parts, mono)
     };
-    let plans: Vec<(Vec<SuffixPart>, Vec<SuffixPart>)> = signatures
+    let plans: Vec<Plan> = signatures
         .iter()
         .enumerate()
         .skip(1)
@@ -1911,7 +1981,7 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
     // `compare_with_str_and_plain_date` and `compare_with_plain_date_and_str`,
     // not one `compare_with_str` and a longer other.
     let mut added_names: std::collections::HashMap<String, usize> = Default::default();
-    for (added, _) in &plans {
+    for (added, _, _) in &plans {
         if !added.is_empty() {
             *added_names
                 .entry(compose_name(base_name, added, NamingStrategy::Greedy))
@@ -1919,7 +1989,7 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
         }
     }
 
-    for (added, parts) in plans {
+    for (added, parts, mono) in plans {
         // Assemble the candidate name. If it collides with a sibling
         // already in `used`, retry the type-name parts by prepending
         // the param name. The retry runs at most twice — once
@@ -1928,8 +1998,17 @@ fn compute_rust_names(base_name: &str, signatures: &[Vec<ConcreteParam>]) -> Vec
         // that returns to numeric dedup as the last-resort safety
         // net.
         let mut name = compose_name(base_name, &added, NamingStrategy::Greedy);
-        if added.is_empty() || added_names[&name] > 1 || used.contains(&name) {
+        let shortened = !(added.is_empty() || added_names[&name] > 1 || used.contains(&name));
+        if !shortened {
             name = compose_name(base_name, &parts, NamingStrategy::Greedy);
+        }
+        // Per-mono, the dictionary arms by parameter, kept while unique.
+        if let Some((mono_added, mono_parts)) = mono {
+            let by_param = if shortened { mono_added } else { mono_parts };
+            let mono = compose_name(base_name, &by_param, NamingStrategy::Greedy);
+            if !used.contains(&mono) {
+                name = mono;
+            }
         }
         if used.contains(&name) {
             // Strategy 1: every type-name part adopts its param-name
