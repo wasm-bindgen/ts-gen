@@ -1918,22 +1918,26 @@ need `?.await?`.
 ### Per-monomorphization: the `Promise<T>` itself
 
 Under `--experimental-generic-mono` a `Promise`-returning callable is one
-plain import returning `Promise<T>`, with `T` the awaited lowering below
-(`Promise<Vec<D1Result<T>>>`, `Promise<Option<String>>`, `Promise<()>`).
-js-sys implements `IntoFuture<Output = Result<T, JsValue>>` for it, so
-the one binding is both awaited (`kv.get(key).await?`) and handed to JS
-(`ctx.wait_until(&promise)`), and there is no `_promise` twin:
+plain import returning `Promise<T, E>`, with `T` the awaited lowering
+below (`Promise<Vec<D1Result<T>>>`, `Promise<Option<String>>`,
+`Promise<()>`) and `E` the error type a sync binding would have. js-sys
+implements `IntoFuture<Output = Result<T, E>>` for it (`E:
+From<JsValue>`, erased for the ABI), so the one binding is both awaited
+(`kv.get(key).await?`) and handed to JS (`ctx.wait_until(promise.upcast())`),
+and there is no `_promise` twin:
 
 ```rust
 #[wasm_bindgen(method, catch, js_name = "get")]
-pub fn get(this: &KVNamespace, key: impl JsStringLike) -> Promise<Option<String>>;
+pub fn get(this: &KVNamespace, key: impl JsStringLike) -> Promise<Option<String>, crate::Error>;
 ```
 
 * The JS call happens at the call, not at the first poll.
-* `.await` yields `Result<T, JsValue>`: `?` converts into `--error-type`
-  through its `From<JsValue>`, but a tail `x.await` returning
-  `Result<T, E>` is `Ok(x.await?)`, and `@throws` types do not reach the
-  awaited error.
+* `E` is `--error-type`, or the `@throws` type (the `--error-enum` when
+  set); `JsValue`, `Promise`'s default, is left unwritten, as is any `E`
+  of a `@throws {never}` member, which has no `catch`. A tail `x.await`
+  returns `Result<T, E>` as it is.
+* `Promise<T, E>` passes to a `&Promise` parameter through `upcast()`,
+  which changes `E` freely.
 * The import keeps `catch`, where wasm-bindgen returns a synchronous
   throw as the rejected promise (`Promise::reject_typed`), so it too
   arrives at `.await` as `Err`.

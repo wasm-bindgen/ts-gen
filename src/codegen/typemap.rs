@@ -2560,7 +2560,14 @@ pub fn to_return_type(
     };
 
     if is_async && CodegenContext::generic_mono(ctx) {
-        quote! { Promise<#inner> }
+        // `Promise<T, E>` awaits as `Result<T, E>`; `E` defaults to `JsValue`.
+        let err = catch
+            .then(|| error_type_tokens(error_ty, ctx, scope, from_module))
+            .filter(|err| err.to_string() != "JsValue");
+        match err {
+            Some(err) => quote! { Promise<#inner, #err> },
+            None => quote! { Promise<#inner> },
+        }
     } else if catch {
         let err = error_type_tokens(error_ty, ctx, scope, from_module);
         quote! { Result<#inner, #err> }
