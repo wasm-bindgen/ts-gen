@@ -43,11 +43,7 @@ extern "C" {
     where
         V: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
-impl<T> GenAbv<T>
-where
-    for<'__wbg> &'__wbg T:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<T> GenAbv<T> {
     pub fn new() -> GenAbv<T> {
         Self::builder().build()
     }
@@ -65,12 +61,12 @@ impl<T> Default for GenAbv<T> {
 pub struct GenAbvBuilder<T> {
     inner: GenAbv<T>,
 }
-impl<T> GenAbvBuilder<T>
-where
-    for<'__wbg> &'__wbg T:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
-    pub fn value(self, val: &T) -> Self {
+impl<T> GenAbvBuilder<T> {
+    pub fn value(self, val: &T) -> Self
+    where
+        for<'__wbg> &'__wbg T:
+            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    {
         self.inner.set_value(val);
         self
     }

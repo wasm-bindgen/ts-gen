@@ -108,11 +108,7 @@ extern "C" {
     where
         T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
-impl<T> Options<T>
-where
-    for<'__wbg> &'__wbg T:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<T> Options<T> {
     pub fn new() -> Options<T> {
         Self::builder().build()
     }
@@ -130,12 +126,12 @@ impl<T> Default for Options<T> {
 pub struct OptionsBuilder<T> {
     inner: Options<T>,
 }
-impl<T> OptionsBuilder<T>
-where
-    for<'__wbg> &'__wbg T:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
-    pub fn initial(self, val: &T) -> Self {
+impl<T> OptionsBuilder<T> {
+    pub fn initial(self, val: &T) -> Self
+    where
+        for<'__wbg> &'__wbg T:
+            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    {
         self.inner.set_initial(val);
         self
     }

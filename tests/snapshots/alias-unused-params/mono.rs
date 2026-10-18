@@ -87,7 +87,7 @@ pub type WithDefault<T, U = String> = Pair<T, U>;
 #[allow(dead_code)]
 pub type Chained<U> = Pair<U, U>;
 #[allow(dead_code)]
-pub type Fetcher<T = Undefined> = Pair<T, T>;
+pub type Fetcher<T = ()> = Pair<T, T>;
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
@@ -130,7 +130,7 @@ pub mod ns {
     #[allow(dead_code)]
     pub type WithInner<X, T = Inner> = super::Pair<X, T>;
     #[allow(dead_code)]
-    pub type Fetcher<T = Undefined> = super::Pair<T, T>;
+    pub type Fetcher<T = ()> = super::Pair<T, T>;
     #[allow(dead_code)]
     pub type ColorOf = super::Color;
 }
@@ -140,10 +140,10 @@ extern "C" {
     pub fn defaults(
         a: &Pair<f64, String>,
         b: &Pair<f64, f64>,
-        c: &Pair<Undefined, Undefined>,
+        c: &Pair<(), ()>,
         d: &Pair<String, String>,
         e: &Pair<String, ns::Inner>,
-        f: &Pair<Undefined, Undefined>,
+        f: &Pair<(), ()>,
     ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(experimental_generic_mono)]

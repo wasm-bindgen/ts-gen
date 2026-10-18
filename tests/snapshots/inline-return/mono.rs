@@ -34,11 +34,7 @@ extern "C" {
     where
         T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
-impl<T> CursorNextReturn<T>
-where
-    for<'__wbg> &'__wbg T:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<T> CursorNextReturn<T> {
     pub fn new() -> CursorNextReturn<T> {
         Self::builder().build()
     }
@@ -56,16 +52,16 @@ impl<T> Default for CursorNextReturn<T> {
 pub struct CursorNextReturnBuilder<T> {
     inner: CursorNextReturn<T>,
 }
-impl<T> CursorNextReturnBuilder<T>
-where
-    for<'__wbg> &'__wbg T:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<T> CursorNextReturnBuilder<T> {
     pub fn done(self, val: bool) -> Self {
         self.inner.set_done(val);
         self
     }
-    pub fn value(self, val: &T) -> Self {
+    pub fn value(self, val: &T) -> Self
+    where
+        for<'__wbg> &'__wbg T:
+            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    {
         self.inner.set_value(val);
         self
     }

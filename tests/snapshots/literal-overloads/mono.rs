@@ -935,11 +935,7 @@ where
 pub struct GetOptionsBuilder<Type> {
     inner: GetOptions<Type>,
 }
-impl<Type> GetOptionsBuilder<Type>
-where
-    for<'__wbg> &'__wbg Type:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<Type> GetOptionsBuilder<Type> {
     pub fn cache_ttl(self, val: f64) -> Self {
         self.inner.set_cache_ttl(val);
         self

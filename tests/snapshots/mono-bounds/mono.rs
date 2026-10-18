@@ -123,8 +123,6 @@ impl<T> Slot<T>
 where
     for<'__wbg> Option<&'__wbg T>:
         ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-    for<'__wbg> &'__wbg T:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn new(value: Option<&T>) -> Slot<T> {
         Self::builder(value).build()
@@ -140,14 +138,12 @@ where
 pub struct SlotBuilder<T> {
     inner: Slot<T>,
 }
-impl<T> SlotBuilder<T>
-where
-    for<'__wbg> Option<&'__wbg T>:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-    for<'__wbg> &'__wbg T:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
-    pub fn fallback(self, val: &T) -> Self {
+impl<T> SlotBuilder<T> {
+    pub fn fallback(self, val: &T) -> Self
+    where
+        for<'__wbg> &'__wbg T:
+            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    {
         self.inner.set_fallback(val);
         self
     }
@@ -185,11 +181,7 @@ impl<T> Step<T> {
         self.__set_value_with_null(&::wasm_bindgen::JsValue::NULL)
     }
 }
-impl<T> Step<T>
-where
-    for<'__wbg> &'__wbg T:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<T> Step<T> {
     pub fn new() -> Step<T> {
         Self::builder().build()
     }
@@ -207,16 +199,16 @@ impl<T> Default for Step<T> {
 pub struct StepBuilder<T> {
     inner: Step<T>,
 }
-impl<T> StepBuilder<T>
-where
-    for<'__wbg> &'__wbg T:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<T> StepBuilder<T> {
     pub fn done(self, val: bool) -> Self {
         self.inner.set_done(val);
         self
     }
-    pub fn value(self, val: &T) -> Self {
+    pub fn value(self, val: &T) -> Self
+    where
+        for<'__wbg> &'__wbg T:
+            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    {
         self.inner.set_value(val);
         self
     }

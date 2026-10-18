@@ -658,6 +658,10 @@ pub(crate) fn type_param_default_tokens(
     let Some(default) = default else {
         return quote! { JsValue };
     };
+    // Per-mono an `undefined` default is `()`, like `void`.
+    if CodegenContext::generic_mono(ctx) && matches!(default, TypeRef::Undefined | TypeRef::Void) {
+        return quote! { () };
+    }
     let tokens = to_syn_type(
         default,
         TypePosition::ARGUMENT.to_inner(),
@@ -3497,6 +3501,7 @@ fn to_mono_user_generic_arg_impl(
 ) -> TokenStream {
     let (peeled, peeled_scope) = peel_mono(ty, ctx, scope, visited);
     match peeled.as_ref() {
+        TypeRef::Undefined | TypeRef::Void => quote! { () },
         t if is_mono_native_leaf(t, ctx, peeled_scope) => to_syn_type(
             t,
             TypePosition::RETURN,

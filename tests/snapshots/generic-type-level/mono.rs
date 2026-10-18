@@ -91,13 +91,7 @@ extern "C" {
     where
         O: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
-impl<I, O> Transformer<I, O>
-where
-    for<'__wbg> &'__wbg I:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-    for<'__wbg> &'__wbg O:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<I, O> Transformer<I, O> {
     pub fn new() -> Transformer<I, O> {
         Self::builder().build()
     }
@@ -115,18 +109,20 @@ impl<I, O> Default for Transformer<I, O> {
 pub struct TransformerBuilder<I, O> {
     inner: Transformer<I, O>,
 }
-impl<I, O> TransformerBuilder<I, O>
-where
-    for<'__wbg> &'__wbg I:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-    for<'__wbg> &'__wbg O:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
-    pub fn readable_type(self, val: &I) -> Self {
+impl<I, O> TransformerBuilder<I, O> {
+    pub fn readable_type(self, val: &I) -> Self
+    where
+        for<'__wbg> &'__wbg I:
+            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    {
         self.inner.set_readable_type(val);
         self
     }
-    pub fn writable_type(self, val: &O) -> Self {
+    pub fn writable_type(self, val: &O) -> Self
+    where
+        for<'__wbg> &'__wbg O:
+            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    {
         self.inner.set_writable_type(val);
         self
     }

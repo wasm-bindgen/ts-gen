@@ -206,11 +206,7 @@ where
 pub struct RangeBuilder<R> {
     inner: Range<R>,
 }
-impl<R> RangeBuilder<R>
-where
-    for<'__wbg> &'__wbg R:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<R> RangeBuilder<R> {
     pub fn offset(self, val: f64) -> Self {
         self.inner.set_offset(val);
         self
@@ -268,12 +264,12 @@ where
 pub struct ReadResultBuilder<R> {
     inner: ReadResult<R>,
 }
-impl<R> ReadResultBuilder<R>
-where
-    for<'__wbg> &'__wbg R:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
-    pub fn value(self, val: &R) -> Self {
+impl<R> ReadResultBuilder<R> {
+    pub fn value(self, val: &R) -> Self
+    where
+        for<'__wbg> &'__wbg R:
+            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    {
         self.inner.set_value(val);
         self
     }

@@ -750,11 +750,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_label<T>(this: &PartialBox<T>, val: impl ::wasm_bindgen::JsStringLike);
 }
-impl<T> PartialBox<T>
-where
-    for<'__wbg> &'__wbg T:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<T> PartialBox<T> {
     pub fn new() -> PartialBox<T> {
         Self::builder().build()
     }
@@ -772,12 +768,12 @@ impl<T> Default for PartialBox<T> {
 pub struct PartialBoxBuilder<T> {
     inner: PartialBox<T>,
 }
-impl<T> PartialBoxBuilder<T>
-where
-    for<'__wbg> &'__wbg T:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
-    pub fn value(self, val: &T) -> Self {
+impl<T> PartialBoxBuilder<T> {
+    pub fn value(self, val: &T) -> Self
+    where
+        for<'__wbg> &'__wbg T:
+            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    {
         self.inner.set_value(val);
         self
     }

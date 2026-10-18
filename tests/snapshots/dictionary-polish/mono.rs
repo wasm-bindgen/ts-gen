@@ -205,11 +205,7 @@ pub mod polish {
         where
             T: ::wasm_bindgen::convert::RefIntoWasmAbi;
     }
-    impl<T> Holder<T>
-    where
-        for<'__wbg> &'__wbg T:
-            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-    {
+    impl<T> Holder<T> {
         pub fn new() -> Holder<T> {
             Self::builder().build()
         }
@@ -227,12 +223,12 @@ pub mod polish {
     pub struct HolderBuilder<T> {
         inner: Holder<T>,
     }
-    impl<T> HolderBuilder<T>
-    where
-        for<'__wbg> &'__wbg T:
-            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-    {
-        pub fn value(self, val: &T) -> Self {
+    impl<T> HolderBuilder<T> {
+        pub fn value(self, val: &T) -> Self
+        where
+            for<'__wbg> &'__wbg T:
+                ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+        {
             self.inner.set_value(val);
             self
         }

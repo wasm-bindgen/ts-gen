@@ -24,11 +24,7 @@ extern "C" {
     where
         Metadata: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
-impl<Metadata> ListKey<Metadata>
-where
-    for<'__wbg> &'__wbg Metadata:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<Metadata> ListKey<Metadata> {
     pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> ListKey<Metadata> {
         Self::builder(name).build()
     }
@@ -41,12 +37,12 @@ where
 pub struct ListKeyBuilder<Metadata> {
     inner: ListKey<Metadata>,
 }
-impl<Metadata> ListKeyBuilder<Metadata>
-where
-    for<'__wbg> &'__wbg Metadata:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
-    pub fn metadata(self, val: &Metadata) -> Self {
+impl<Metadata> ListKeyBuilder<Metadata> {
+    pub fn metadata(self, val: &Metadata) -> Self
+    where
+        for<'__wbg> &'__wbg Metadata:
+            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    {
         self.inner.set_metadata(val);
         self
     }

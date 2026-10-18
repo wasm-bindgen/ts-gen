@@ -622,8 +622,19 @@ impl<'a> ClassConfig<'a> {
     /// argument shape naming a type parameter (`&T`, `Option<T>`, `&[T]`),
     /// so the impl restates those bounds for the helpers' own signatures.
     fn helper_where_clause<'f>(&self, fns: impl Iterator<Item = &'f TokenStream>) -> TokenStream {
-        if !CodegenContext::generic_mono(self.cgctx) || self.type_params.is_empty() {
+        let preds = self.helper_where_preds(fns);
+        if preds.is_empty() {
             return quote! {};
+        }
+        quote! { where #(#preds),* }
+    }
+
+    fn helper_where_preds<'f>(
+        &self,
+        fns: impl Iterator<Item = &'f TokenStream>,
+    ) -> Vec<syn::WherePredicate> {
+        if !CodegenContext::generic_mono(self.cgctx) || self.type_params.is_empty() {
+            return Vec::new();
         }
         let idents: Vec<syn::Ident> = self
             .type_params
@@ -640,10 +651,7 @@ impl<'a> ClassConfig<'a> {
         );
         let mut seen = std::collections::HashSet::new();
         preds.retain(|p| seen.insert(quote::ToTokens::to_token_stream(p).to_string()));
-        if preds.is_empty() {
-            return quote! {};
-        }
-        quote! { where #(#preds),* }
+        preds
     }
 
     /// Tokens for the type's generic-argument list (`<T, …>`) used in
@@ -1702,9 +1710,27 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 .iter()
                 .map(|p| super::signatures::dictionary_param_ident(&p.name, config.cgctx))
                 .collect();
+            // A wrapped argument reaches the setter as `Some(…)`, so the
+            // setter's shape is what the method must bound. The bound is
+            // the method's own, so a builder whose parameter a field
+            // cannot cross with (`GetOptions<()>`'s `type`) keeps its
+            // other methods.
+            let method = quote! {
+                pub fn #method_ident #generics (self, #params) -> Self
+                {
+                    self.inner.#setter_ident(#(#param_idents),*);
+                    self
+                }
+            };
+            let preds = config.helper_where_preds(std::iter::once(&method));
+            let where_clause = match (helper_where_clause.is_empty(), preds.is_empty()) {
+                (_, true) => helper_where_clause,
+                (true, false) => quote! { where #(#preds),* },
+                (false, false) => quote! { #helper_where_clause, #(#preds),* },
+            };
             builder_methods.push(quote! {
                 pub fn #method_ident #generics (self, #params) -> Self
-                #helper_where_clause
+                #where_clause
                 {
                     self.inner.#setter_ident(#(#param_idents),*);
                     self
@@ -1717,12 +1743,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         .iter()
         .all(Vec::is_empty)
         .then_some(default_impl);
-    let helper_where = config.helper_where_clause(
-        new_variants
-            .iter()
-            .chain(&builder_variants)
-            .chain(&builder_methods),
-    );
+    let helper_where = config.helper_where_clause(new_variants.iter().chain(&builder_variants));
     if emit_builder || kept_builder {
         quote! {
             impl #type_decl #rust_type #helper_where {
@@ -1735,7 +1756,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
                 inner: #rust_type,
             }
 
-            impl #type_decl #builder_name #helper_where {
+            impl #type_decl #builder_name {
                 #(#builder_methods)*
 
                 pub fn build(self) -> #rust_type {

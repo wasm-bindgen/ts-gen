@@ -2128,7 +2128,7 @@ extern "C" {
 extern "C" {
     # [wasm_bindgen (extends = Fetcher , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type DurableObjectStub<T = Undefined>;
+    pub type DurableObjectStub<T = ()>;
     #[wasm_bindgen(method, getter)]
     pub fn id<T>(this: &DurableObjectStub<T>) -> DurableObjectId;
     #[wasm_bindgen(method, getter)]
@@ -2161,7 +2161,7 @@ impl core::fmt::Display for DurableObjectId {
 extern "C" {
     # [wasm_bindgen (extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type DurableObjectNamespace<T = Undefined>;
+    pub type DurableObjectNamespace<T = ()>;
     #[wasm_bindgen(method, catch, js_name = "newUniqueId")]
     pub fn new_unique_id<T>(this: &DurableObjectNamespace<T>) -> Result<DurableObjectId, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "newUniqueId")]
@@ -2347,7 +2347,7 @@ impl From<DurableObjectNamespaceGetDurableObjectOptions>
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type DurableObjectClass<_T = Undefined>;
+    pub type DurableObjectClass<_T = ()>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -8924,11 +8924,7 @@ impl<Cf> RequestInit<Cf> {
         self.__set_signal_with_null(&::wasm_bindgen::JsValue::NULL)
     }
 }
-impl<Cf> RequestInit<Cf>
-where
-    for<'__wbg> &'__wbg Cf:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<Cf> RequestInit<Cf> {
     pub fn new() -> RequestInit<Cf> {
         Self::builder().build()
     }
@@ -8946,11 +8942,7 @@ impl<Cf> Default for RequestInit<Cf> {
 pub struct RequestInitBuilder<Cf> {
     inner: RequestInit<Cf>,
 }
-impl<Cf> RequestInitBuilder<Cf>
-where
-    for<'__wbg> &'__wbg Cf:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<Cf> RequestInitBuilder<Cf> {
     pub fn method(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_method(val);
         self
@@ -9022,7 +9014,11 @@ where
         self.inner.set_fetcher_with_null();
         self
     }
-    pub fn cf(self, val: &Cf) -> Self {
+    pub fn cf(self, val: &Cf) -> Self
+    where
+        for<'__wbg> &'__wbg Cf:
+            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    {
         self.inner.set_cf(val);
         self
     }
@@ -9061,7 +9057,7 @@ pub type Service = JsValue;
 extern "C" {
     # [wasm_bindgen (extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type Fetcher<T = Undefined>;
+    pub type Fetcher<T = ()>;
     #[wasm_bindgen(method, catch)]
     pub async fn fetch<T, CfHostMetadata, Cf>(
         this: &Fetcher<T>,
@@ -9169,11 +9165,7 @@ extern "C" {
     where
         Metadata: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
-impl<Metadata> KVNamespaceListKey<Metadata>
-where
-    for<'__wbg> &'__wbg Metadata:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<Metadata> KVNamespaceListKey<Metadata> {
     pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> KVNamespaceListKey<Metadata> {
         Self::builder(name).build()
     }
@@ -9186,16 +9178,16 @@ where
 pub struct KVNamespaceListKeyBuilder<Metadata> {
     inner: KVNamespaceListKey<Metadata>,
 }
-impl<Metadata> KVNamespaceListKeyBuilder<Metadata>
-where
-    for<'__wbg> &'__wbg Metadata:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<Metadata> KVNamespaceListKeyBuilder<Metadata> {
     pub fn expiration(self, val: f64) -> Self {
         self.inner.set_expiration(val);
         self
     }
-    pub fn metadata(self, val: &Metadata) -> Self {
+    pub fn metadata(self, val: &Metadata) -> Self
+    where
+        for<'__wbg> &'__wbg Metadata:
+            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    {
         self.inner.set_metadata(val);
         self
     }
@@ -10605,11 +10597,7 @@ where
 pub struct KVNamespaceGetOptionsBuilder<Type> {
     inner: KVNamespaceGetOptions<Type>,
 }
-impl<Type> KVNamespaceGetOptionsBuilder<Type>
-where
-    for<'__wbg> &'__wbg Type:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<Type> KVNamespaceGetOptionsBuilder<Type> {
     pub fn cache_ttl(self, val: f64) -> Self {
         self.inner.set_cache_ttl(val);
         self
@@ -11041,11 +11029,7 @@ where
 pub struct MessageSendRequestBuilder<Body> {
     inner: MessageSendRequest<Body>,
 }
-impl<Body> MessageSendRequestBuilder<Body>
-where
-    for<'__wbg> &'__wbg Body:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<Body> MessageSendRequestBuilder<Body> {
     pub fn content_type(self, val: QueueContentType) -> Self {
         self.inner.set_content_type(val);
         self
@@ -13645,12 +13629,12 @@ where
 pub struct ReadableStreamReadResultBuilder<R> {
     inner: ReadableStreamReadResult<R>,
 }
-impl<R> ReadableStreamReadResultBuilder<R>
-where
-    for<'__wbg> &'__wbg R:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
-    pub fn value(self, val: &R) -> Self {
+impl<R> ReadableStreamReadResultBuilder<R> {
+    pub fn value(self, val: &R) -> Self
+    where
+        for<'__wbg> &'__wbg R:
+            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    {
         self.inner.set_value(val);
         self
     }
@@ -16545,11 +16529,7 @@ extern "C" {
     where
         T: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
-impl<T> SqlStorageCursorNextReturn<T>
-where
-    for<'__wbg> &'__wbg T:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<T> SqlStorageCursorNextReturn<T> {
     pub fn new() -> SqlStorageCursorNextReturn<T> {
         Self::builder().build()
     }
@@ -16567,16 +16547,16 @@ impl<T> Default for SqlStorageCursorNextReturn<T> {
 pub struct SqlStorageCursorNextReturnBuilder<T> {
     inner: SqlStorageCursorNextReturn<T>,
 }
-impl<T> SqlStorageCursorNextReturnBuilder<T>
-where
-    for<'__wbg> &'__wbg T:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<T> SqlStorageCursorNextReturnBuilder<T> {
     pub fn done(self, val: bool) -> Self {
         self.inner.set_done(val);
         self
     }
-    pub fn value(self, val: &T) -> Self {
+    pub fn value(self, val: &T) -> Self
+    where
+        for<'__wbg> &'__wbg T:
+            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    {
         self.inner.set_value(val);
         self
     }
@@ -17148,13 +17128,13 @@ pub type LoopbackForExport = JsValue;
 extern "C" {
     # [wasm_bindgen (extends = Fetcher , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type LoopbackServiceStub<T = Undefined>;
+    pub type LoopbackServiceStub<T = ()>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
     # [wasm_bindgen (extends = DurableObjectClass , extends = Object , is_type_of = JsValue :: is_object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type LoopbackDurableObjectClass<T = Undefined>;
+    pub type LoopbackDurableObjectClass<T = ()>;
 }
 #[wasm_bindgen(experimental_generic_mono)]
 extern "C" {
@@ -39786,11 +39766,7 @@ extern "C" {
         val: &IncomingRequestCfPropertiesTLSClientAuthPlaceholder,
     );
 }
-impl<HostMetadata> IncomingRequestCfProperties<HostMetadata>
-where
-    for<'__wbg> &'__wbg HostMetadata:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<HostMetadata> IncomingRequestCfProperties<HostMetadata> {
     #[doc = " Construct with `edgeRequestKeepAliveStatus: 0`."]
     #[doc = ""]
     #[doc = " ## Inlined fields"]
@@ -41571,11 +41547,7 @@ where
 pub struct IncomingRequestCfPropertiesBuilder<HostMetadata> {
     inner: IncomingRequestCfProperties<HostMetadata>,
 }
-impl<HostMetadata> IncomingRequestCfPropertiesBuilder<HostMetadata>
-where
-    for<'__wbg> &'__wbg HostMetadata:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<HostMetadata> IncomingRequestCfPropertiesBuilder<HostMetadata> {
     pub fn asn(self, val: f64) -> Self {
         self.inner.set_asn(val);
         self
@@ -41599,7 +41571,11 @@ where
         self.inner.set_tls_exported_authenticator(val);
         self
     }
-    pub fn host_metadata(self, val: &HostMetadata) -> Self {
+    pub fn host_metadata(self, val: &HostMetadata) -> Self
+    where
+        for<'__wbg> &'__wbg HostMetadata:
+            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    {
         self.inner.set_host_metadata(val);
         self
     }
@@ -42636,11 +42612,7 @@ extern "C" {
     ) where
         HostMetadata: ::wasm_bindgen::convert::RefIntoWasmAbi;
 }
-impl<HostMetadata> IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata>
-where
-    for<'__wbg> &'__wbg HostMetadata:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<HostMetadata> IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata> {
     pub fn new() -> IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata> {
         Self::builder().build()
     }
@@ -42661,12 +42633,12 @@ impl<HostMetadata> Default
 pub struct IncomingRequestCfPropertiesCloudflareForSaaSEnterpriseBuilder<HostMetadata> {
     inner: IncomingRequestCfPropertiesCloudflareForSaaSEnterprise<HostMetadata>,
 }
-impl<HostMetadata> IncomingRequestCfPropertiesCloudflareForSaaSEnterpriseBuilder<HostMetadata>
-where
-    for<'__wbg> &'__wbg HostMetadata:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
-    pub fn host_metadata(self, val: &HostMetadata) -> Self {
+impl<HostMetadata> IncomingRequestCfPropertiesCloudflareForSaaSEnterpriseBuilder<HostMetadata> {
+    pub fn host_metadata(self, val: &HostMetadata) -> Self
+    where
+        for<'__wbg> &'__wbg HostMetadata:
+            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    {
         self.inner.set_host_metadata(val);
         self
     }
@@ -44504,10 +44476,7 @@ where
 pub struct D1ResultBuilder<T> {
     inner: D1Result<T>,
 }
-impl<T> D1ResultBuilder<T>
-where
-    T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,
-{
+impl<T> D1ResultBuilder<T> {
     pub fn error(self, val: &JsValue) -> Self {
         self.inner.set_error(val);
         self
@@ -54638,11 +54607,7 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_retention<PARAMS>(this: &WorkflowInstanceCreateOptions<PARAMS>, val: &Object);
 }
-impl<PARAMS> WorkflowInstanceCreateOptions<PARAMS>
-where
-    for<'__wbg> &'__wbg PARAMS:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<PARAMS> WorkflowInstanceCreateOptions<PARAMS> {
     pub fn new() -> WorkflowInstanceCreateOptions<PARAMS> {
         Self::builder().build()
     }
@@ -54660,16 +54625,16 @@ impl<PARAMS> Default for WorkflowInstanceCreateOptions<PARAMS> {
 pub struct WorkflowInstanceCreateOptionsBuilder<PARAMS> {
     inner: WorkflowInstanceCreateOptions<PARAMS>,
 }
-impl<PARAMS> WorkflowInstanceCreateOptionsBuilder<PARAMS>
-where
-    for<'__wbg> &'__wbg PARAMS:
-        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
-{
+impl<PARAMS> WorkflowInstanceCreateOptionsBuilder<PARAMS> {
     pub fn id(self, val: impl ::wasm_bindgen::JsStringLike) -> Self {
         self.inner.set_id(val);
         self
     }
-    pub fn params(self, val: &PARAMS) -> Self {
+    pub fn params(self, val: &PARAMS) -> Self
+    where
+        for<'__wbg> &'__wbg PARAMS:
+            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    {
         self.inner.set_params(val);
         self
     }
