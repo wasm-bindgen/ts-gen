@@ -287,6 +287,7 @@ fn register_type(
                 members: vec![],
                 type_module_context: ctx.clone(),
                 body_scope: scope,
+                string_mode: None,
             })
         }
         ir::RegisteredKind::Interface => ir::TypeKind::Interface(ir::InterfaceDecl {
@@ -298,6 +299,7 @@ fn register_type(
             members: vec![],
             classification: ir::InterfaceClassification::Unclassified,
             body_scope: scope,
+            string_mode: None,
         }),
         ir::RegisteredKind::StringEnum => ir::TypeKind::StringEnum(ir::StringEnumDecl {
             name: name_str.clone(),
@@ -327,6 +329,7 @@ fn register_type(
             throws: ir::Throws::None,
             async_modifier: false,
             body_scope: scope,
+            string_mode: None,
         }),
         ir::RegisteredKind::Variable => ir::TypeKind::Variable(ir::VariableDecl {
             name: name_str.clone(),

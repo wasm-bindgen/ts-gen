@@ -73,6 +73,7 @@ pub fn convert_class_decl(
         members,
         type_module_context: module_ctx.clone(),
         body_scope,
+        string_mode: None,
     })
 }
 
@@ -161,6 +162,7 @@ pub fn interface_from_signatures(
         construct,
         classification,
         body_scope,
+        string_mode: None,
     }
 }
 
@@ -201,6 +203,10 @@ pub fn convert_function_decl(
         throws: info.throws(),
         async_modifier: func.r#async,
         body_scope,
+        string_mode: info
+            .string_mode
+            .as_deref()
+            .and_then(ir::StringModeHint::parse),
     })
 }
 

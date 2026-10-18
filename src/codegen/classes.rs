@@ -894,6 +894,7 @@ pub(crate) fn generate_dictionary_factory_with_passes(
             throws: &crate::ir::Throws::None,
             async_modifier: false,
             doc: &None,
+            string_mode: None,
         }];
         let setter_name = config.setter_name(MemberKind::Property, &g.js_name);
         build_signatures(
@@ -1763,6 +1764,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         throws: &c.throws,
                         async_modifier: false,
                         doc: &c.doc,
+                        string_mode: None,
                     })
                     .collect();
                 let sigs = build_signatures(
@@ -1796,6 +1798,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         throws: &m.throws,
                         async_modifier: m.async_modifier,
                         doc: &m.doc,
+                        string_mode: m.string_mode,
                     })
                     .collect();
                 let base = config.member_base(MemberKind::Method, &m.js_name);
@@ -1835,6 +1838,7 @@ pub(crate) fn generate_extern_block(config: &ClassConfig) -> TokenStream {
                         throws: &m.throws,
                         async_modifier: m.async_modifier,
                         doc: &m.doc,
+                        string_mode: m.string_mode,
                     })
                     .collect();
                 let base = config.member_base(MemberKind::StaticMethod, &m.js_name);
@@ -2394,13 +2398,16 @@ fn generate_getter(
         kind: super::typemap::ReturnAnchorKind::Getter,
         parent: Some(&config.rust_name),
     };
-    let getter_type = super::typemap::to_getter_return_type(
-        &lowered_ty,
-        config.cgctx,
-        getter.scope,
-        &config.from_module(),
-        anchor,
-    );
+    let getter_type = getter_string_ref_type(config, &lowered_ty, getter.scope, getter.string_mode)
+        .unwrap_or_else(|| {
+            super::typemap::to_getter_return_type(
+                &lowered_ty,
+                config.cgctx,
+                getter.scope,
+                &config.from_module(),
+                anchor,
+            )
+        });
 
     let mut wb_parts: Vec<TokenStream> = vec![quote! { method }, quote! { getter }];
     if super::typemap::needs_js_name(&rust_ident, &getter.js_name) {
@@ -2425,17 +2432,22 @@ fn generate_getter(
 
     let source_name = &getter.js_name;
     let catch = error_ty.is_some().then(|| quote! { , catch });
-    let js_string_variant =
-        getter_js_string_variant(config, &lowered_ty, getter.scope, &rust_name, names).map(
-            |(js_ident, js_type)| {
-                let js_type = wrap_getter_result(js_type, error_ty.as_ref());
-                quote! {
-                    #doc
-                    #[wasm_bindgen(method, getter, js_name = #source_name #catch)]
-                    pub fn #js_ident #fn_generics (this: &#this_type #this_generics) -> #js_type;
-                }
-            },
-        );
+    let js_string_variant = getter_js_string_variant(
+        config,
+        &lowered_ty,
+        getter.scope,
+        getter.string_mode,
+        &rust_name,
+        names,
+    )
+    .map(|(js_ident, js_type)| {
+        let js_type = wrap_getter_result(js_type, error_ty.as_ref());
+        quote! {
+            #doc
+            #[wasm_bindgen(method, getter, js_name = #source_name #catch)]
+            pub fn #js_ident #fn_generics (this: &#this_type #this_generics) -> #js_type;
+        }
+    });
 
     quote! {
         #doc
@@ -2465,6 +2477,28 @@ fn wrap_getter_result(ty: TokenStream, error_ty: Option<&TokenStream>) -> TokenS
     }
 }
 
+/// A `{@string ref}` getter's type: its `_js_string` form, under the base
+/// name.
+fn getter_string_ref_type(
+    config: &ClassConfig,
+    ty: &TypeRef,
+    scope: ScopeId,
+    mode: Option<crate::ir::StringModeHint>,
+) -> Option<TokenStream> {
+    if mode != Some(crate::ir::StringModeHint::Ref) {
+        return None;
+    }
+    let ctx = config
+        .cgctx
+        .filter(|ctx| super::signatures::has_js_string_return(ty, ctx, scope))?;
+    Some(super::typemap::to_mono_js_string_return_type(
+        ty,
+        ctx,
+        scope,
+        &config.from_module(),
+    ))
+}
+
 /// Ident and return type for a getter's additive `_js_string` variant, when
 /// per-monomorphization mode is on and the getter type has a string leaf.
 /// Instance and static getters differ only in attribute and receiver, which
@@ -2473,15 +2507,21 @@ fn getter_js_string_variant(
     config: &ClassConfig,
     ty: &TypeRef,
     scope: ScopeId,
+    mode: Option<crate::ir::StringModeHint>,
     rust_name: &str,
     names: &mut LocalScope,
 ) -> Option<(syn::Ident, TokenStream)> {
-    let ctx = config.cgctx.filter(|ctx| {
-        ctx.experimental_generic_mono
-            && (super::typemap::has_mono_js_string_return(ty, ctx, scope)
-                || super::typemap::is_mono_string_list_return(ty, ctx, scope))
-    })?;
-    let js_name = names.declare(&format!("{rust_name}_js_string"), Suffix::Snake);
+    use crate::ir::StringModeHint;
+    if matches!(mode, Some(StringModeHint::Copy | StringModeHint::Ref)) {
+        return None;
+    }
+    let ctx = config
+        .cgctx
+        .filter(|ctx| super::signatures::has_js_string_return(ty, ctx, scope))?;
+    let js_name = names.declare(
+        &super::signatures::js_string_twin_name(rust_name),
+        Suffix::Snake,
+    );
     let js_type =
         super::typemap::to_mono_js_string_return_type(ty, ctx, scope, &config.from_module());
     Some((super::typemap::make_ident(&js_name), js_type))
@@ -2507,6 +2547,7 @@ fn generate_setter(
         throws: &crate::ir::Throws::None,
         async_modifier: false,
         doc: &doc,
+        string_mode: None,
     }];
     let setter_name = config.setter_name(MemberKind::Property, &setter.js_name);
     let sigs = build_signatures(
@@ -2578,17 +2619,20 @@ fn generate_static_getter(
     let rust_ident = super::typemap::make_ident(&rust_name);
 
     let lowered_ty = read_type(&getter.type_ref, getter.optional);
-    let getter_type = super::typemap::to_getter_return_type(
-        &lowered_ty,
-        config.cgctx,
-        getter.scope,
-        &config.from_module(),
-        super::typemap::ReturnAnchor {
-            base: &getter.js_name,
-            kind: super::typemap::ReturnAnchorKind::Getter,
-            parent: Some(&config.rust_name),
-        },
-    );
+    let getter_type = getter_string_ref_type(config, &lowered_ty, getter.scope, getter.string_mode)
+        .unwrap_or_else(|| {
+            super::typemap::to_getter_return_type(
+                &lowered_ty,
+                config.cgctx,
+                getter.scope,
+                &config.from_module(),
+                super::typemap::ReturnAnchor {
+                    base: &getter.js_name,
+                    kind: super::typemap::ReturnAnchorKind::Getter,
+                    parent: Some(&config.rust_name),
+                },
+            )
+        });
 
     let mut wb_parts: Vec<TokenStream> = vec![quote! { static_method_of = #class_ident }];
     wb_parts.extend(config.js_class_parts());
@@ -2617,6 +2661,7 @@ fn generate_static_getter(
         config,
         &lowered_ty,
         getter.scope,
+        getter.string_mode,
         &rust_name,
         names,
     )
@@ -2656,6 +2701,7 @@ fn generate_static_setter(
         throws: &crate::ir::Throws::None,
         async_modifier: false,
         doc: &doc,
+        string_mode: None,
     }];
     let setter_name = config.setter_name(MemberKind::StaticProperty, &setter.js_name);
     let sigs = build_signatures(

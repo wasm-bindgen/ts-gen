@@ -83,6 +83,7 @@ fn emit_function(
         throws: &decl.throws,
         async_modifier: decl.async_modifier,
         doc,
+        string_mode: decl.string_mode,
     })
     .chain(decl.overloads.iter().map(|o| Overload {
         params: &o.params,
@@ -91,6 +92,7 @@ fn emit_function(
         throws: &o.throws,
         async_modifier: o.async_modifier,
         doc: &o.doc,
+        string_mode: o.string_mode,
     }))
     .collect();
     let sigs = build_signatures(
@@ -457,6 +459,7 @@ fn generate_constructs(
             throws: &construct.throws,
             async_modifier: false,
             doc,
+            string_mode: None,
         };
         match groups.iter_mut().find(|(first, _, _)| same(first)) {
             Some((_, _, overloads)) => overloads.push(overload),

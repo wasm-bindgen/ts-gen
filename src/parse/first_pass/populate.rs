@@ -458,11 +458,13 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         if self.is_duplicate(class.id.as_ref()) {
             return;
         }
-        let doc = self.lookup_doc(dcx.export_span_start, class.span.start);
+        let (doc, string_mode) = self.lookup_decl_doc(dcx.export_span_start, class.span.start);
         let module_context = dcx.module_context.clone();
         let scope = dcx.scope;
         let class_decl = convert_class_decl(class, &module_context, scope, &mut self.parse_ctx());
-        if let Some(d) = class_decl {
+        if let Some(mut d) = class_decl {
+            d.string_mode = string_mode;
+            crate::parse::members::apply_string_default(&mut d.members, string_mode);
             declarations.push(dcx.decl(ir::TypeKind::Class(d), doc));
             declarations.extend(self.drain_synth(&module_context, scope));
         }
@@ -477,10 +479,12 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         if self.is_duplicate(Some(&iface.id)) {
             return;
         }
-        let doc = self.lookup_doc(dcx.export_span_start, iface.span.start);
+        let (doc, string_mode) = self.lookup_decl_doc(dcx.export_span_start, iface.span.start);
         let module_context = dcx.module_context.clone();
         let scope = dcx.scope;
-        let iface_decl = convert_interface_decl(iface, scope, &mut self.parse_ctx());
+        let mut iface_decl = convert_interface_decl(iface, scope, &mut self.parse_ctx());
+        iface_decl.string_mode = string_mode;
+        crate::parse::members::apply_string_default(&mut iface_decl.members, string_mode);
         declarations.push(dcx.decl(ir::TypeKind::Interface(iface_decl), doc));
         declarations.extend(self.drain_synth(&module_context, scope));
     }
@@ -697,6 +701,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                 members,
                 type_module_context: dcx.module_context.clone(),
                 body_scope: dcx.scope,
+                string_mode: None,
             }),
             doc,
         )
@@ -779,6 +784,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                             // Var-as-function bindings have no surface type
                             // parameters; their body scope is the enclosing.
                             body_scope: dcx.scope,
+                            string_mode: None,
                         }),
                         doc.clone(),
                     ));
@@ -851,6 +857,7 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
                 throws: ir::Throws::None,
                 async_modifier: false,
                 body_scope,
+                string_mode: None,
             });
         }
         constructs
@@ -993,6 +1000,19 @@ impl<'a, 'docs> PopulateCtx<'a, 'docs> {
         export_span_start
             .and_then(|s| self.docs.for_span(s))
             .or_else(|| self.docs.for_span(inner_span_start))
+    }
+
+    /// A class or interface doc and its declaration-level `{@string mode}`;
+    /// a doc that only carried the tag is no doc.
+    fn lookup_decl_doc(
+        &mut self,
+        export_span_start: Option<u32>,
+        inner_span_start: u32,
+    ) -> (Option<String>, Option<ir::StringModeHint>) {
+        let (doc, info) = self.lookup_callable_doc(export_span_start, inner_span_start);
+        let site = "declaration";
+        let mode = crate::parse::members::string_hint(info.string_mode.as_deref(), site, self.diag);
+        (doc.filter(|d| !d.is_empty()), mode)
     }
 
     /// Same fallback behavior as [`lookup_doc`], but also returns the

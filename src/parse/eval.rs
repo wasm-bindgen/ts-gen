@@ -161,6 +161,7 @@ pub(crate) fn evaluate_types(gctx: &mut GlobalContext, module: &mut Module) {
                     members,
                     construct: Vec::new(),
                     body_scope,
+                    string_mode: None,
                 })
             }
         };
@@ -566,6 +567,7 @@ impl<'g> Eval<'g> {
                 members,
                 construct: Vec::new(),
                 body_scope: scope,
+                string_mode: None,
             }));
         }
         self.depth = 0;
@@ -1879,6 +1881,7 @@ fn props_to_members(props: &[Prop], scope: ScopeId) -> Vec<Member> {
             optional: p.optional,
             doc: p.doc.clone(),
             throws: Throws::None,
+            string_mode: None,
         }));
         if !p.readonly {
             members.push(Member::Setter(SetterMember {

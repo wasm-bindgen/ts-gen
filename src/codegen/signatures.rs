@@ -128,6 +128,16 @@ pub fn public_rust_name(name: &str) -> String {
     }
 }
 
+/// The `_js_string` twin of a public name, suffixed before keyword
+/// escaping: `type_` → `type_js_string`.
+pub fn js_string_twin_name(name: &str) -> String {
+    let stem = name
+        .strip_suffix('_')
+        .filter(|s| is_rust_keyword_or_path_name(s))
+        .unwrap_or(name);
+    format!("{stem}_js_string")
+}
+
 fn is_rust_keyword_or_path_name(name: &str) -> bool {
     matches!(
         name,
@@ -685,6 +695,8 @@ pub struct Overload<'a> {
     pub async_modifier: bool,
     /// Its doc comment, attached to each signature it expands to.
     pub doc: &'a Option<String>,
+    /// Which string-return forms it asks for; see [`crate::ir::StringModeHint`].
+    pub string_mode: Option<crate::ir::StringModeHint>,
 }
 
 /// Per-callable input describing a JS callable that needs to be emitted as
@@ -893,7 +905,7 @@ pub fn build_signatures(
             body_scope: scope,
             literal: primary_literal,
         };
-        push_with_js_string_return(&mut out, primary, names, cgctx, scope);
+        push_with_js_string_return(&mut out, primary, overload.string_mode, names, cgctx, scope);
 
         // An `async fn` import only calls JS when first polled, so a
         // caller that needs the call started now (handing the promise
@@ -954,7 +966,14 @@ pub fn build_signatures(
                 body_scope: scope,
                 literal: try_literal,
             };
-            push_with_js_string_return(&mut out, try_sig, names, cgctx, scope);
+            push_with_js_string_return(
+                &mut out,
+                try_sig,
+                overload.string_mode,
+                names,
+                cgctx,
+                scope,
+            );
         }
     }
 
@@ -1013,37 +1032,60 @@ fn takes_union_alias(param: &ConcreteParam, cgctx: &CodegenContext<'_>, scope: S
             .is_some_and(|alias| alias.kind.is_none())
 }
 
+/// Push `sig` and, under per-monomorphization when its return has a
+/// string leaf, the `_js_string` twin returning the handle. A `{@string
+/// copy}` member keeps only `sig`; `{@string ref}` keeps only the handle
+/// form, under `sig`'s name.
 fn push_with_js_string_return(
     out: &mut Vec<FunctionSignature>,
-    sig: FunctionSignature,
+    mut sig: FunctionSignature,
+    mode: Option<crate::ir::StringModeHint>,
     names: &mut LocalScope,
     cgctx: Option<&CodegenContext<'_>>,
     scope: ScopeId,
 ) {
-    let has_js_return = cgctx.is_some_and(|ctx| {
-        ctx.experimental_generic_mono
-            && (typemap::has_mono_js_string_return(&sig.return_type, ctx, scope)
-                || typemap::is_mono_string_list_return(&sig.return_type, ctx, scope))
-    });
-    out.push(sig.clone());
-    if has_js_return {
-        let mut js_sig = sig;
-        // A literal cohort's wrappers carry the arms' names, so each arm
-        // gets its own `_js_string` sibling; the binding is named for the
-        // first.
-        match &mut js_sig.literal {
-            Some(spec) => {
-                *spec = spec.derive(names, &|n| format!("{n}_js_string"));
-                js_sig.rust_name = spec.arms[0].1.clone();
-            }
-            None => {
-                js_sig.rust_name =
-                    names.declare(&format!("{}_js_string", js_sig.rust_name), Suffix::Snake);
-            }
+    use crate::ir::StringModeHint;
+    let has_js_return = cgctx.is_some_and(|ctx| has_js_string_return(&sig.return_type, ctx, scope));
+    match mode {
+        _ if !has_js_return => {}
+        Some(StringModeHint::Copy) => {}
+        Some(StringModeHint::Ref) => sig.js_string_return = true,
+        Some(StringModeHint::Both) | None => {
+            push_js_string_twin(out, sig, names);
+            return;
         }
-        js_sig.js_string_return = true;
-        out.push(js_sig);
     }
+    out.push(sig);
+}
+
+/// Whether a return under per-monomorphization has a string leaf a
+/// `_js_string` form can return as a handle.
+pub(crate) fn has_js_string_return(ty: &TypeRef, ctx: &CodegenContext<'_>, scope: ScopeId) -> bool {
+    ctx.experimental_generic_mono
+        && (typemap::has_mono_js_string_return(ty, ctx, scope)
+            || typemap::is_mono_string_list_return(ty, ctx, scope))
+}
+
+fn push_js_string_twin(
+    out: &mut Vec<FunctionSignature>,
+    sig: FunctionSignature,
+    names: &mut LocalScope,
+) {
+    out.push(sig.clone());
+    let mut js_sig = sig;
+    match js_sig.literal.take() {
+        Some(spec) => {
+            let spec = spec.derive(names, &js_string_twin_name);
+            js_sig.rust_name = spec.arms[0].1.clone();
+            js_sig.literal = Some(spec);
+        }
+        None => {
+            js_sig.rust_name =
+                names.declare(&js_string_twin_name(&js_sig.rust_name), Suffix::Snake);
+        }
+    }
+    js_sig.js_string_return = true;
+    out.push(js_sig);
 }
 
 /// Compute `_with_X` / `_with_X_and_Y` suffixes across a cohort of expanded
@@ -2793,6 +2835,7 @@ mod tests {
                     throws: &Throws::None,
                     async_modifier: false,
                     doc: &None,
+                    string_mode: None,
                 }],
             },
             used,
@@ -3062,6 +3105,7 @@ mod tests {
                     throws,
                     async_modifier: false,
                     doc,
+                    string_mode: None,
                 }],
             },
             used,
@@ -3112,6 +3156,7 @@ mod tests {
                     throws,
                     async_modifier,
                     doc: &None,
+                    string_mode: None,
                 }],
             },
             used,
@@ -3139,6 +3184,7 @@ mod tests {
                 throws: &Throws::None,
                 async_modifier: false,
                 doc,
+                string_mode: None,
             })
             .collect();
         build_signatures(
@@ -3429,6 +3475,7 @@ mod tests {
                         throws: &Throws::None,
                         async_modifier: false,
                         doc: &None,
+                        string_mode: None,
                     },
                     Overload {
                         params: &by_number,
@@ -3437,6 +3484,7 @@ mod tests {
                         throws: &Throws::None,
                         async_modifier: false,
                         doc: &None,
+                        string_mode: None,
                     },
                 ],
             },
@@ -4033,6 +4081,7 @@ mod tests {
             throws: &Throws::None,
             async_modifier: false,
             doc: &None,
+            string_mode: None,
         };
         let sigs = build_signatures(
             &CallableSpec {
@@ -4067,6 +4116,7 @@ mod tests {
             throws: &Throws::None,
             async_modifier: false,
             doc: &None,
+            string_mode: None,
         };
         let build = |overloads: &[Overload<'_>], used: &mut LocalScope| {
             build_signatures(
@@ -4421,6 +4471,7 @@ mod tests {
                 throws: &Throws::Never,
                 doc: &None,
                 async_modifier: false,
+                string_mode: None,
             })
             .collect();
         let sigs = build_signatures(

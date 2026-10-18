@@ -621,6 +621,7 @@ fn merge_function_overloads(
                         throws: f.throws.clone(),
                         async_modifier: f.async_modifier,
                         doc: decl.doc.clone(),
+                        string_mode: f.string_mode,
                     });
                     base.overloads.extend(f.overloads.iter().cloned());
                 }
@@ -877,6 +878,7 @@ fn insert_builtin(gctx: &mut GlobalContext, scope: ScopeId, name: &str) {
             members: vec![],
             classification: crate::ir::InterfaceClassification::ClassLike,
             body_scope: scope,
+            string_mode: None,
         }),
         module_context: crate::ir::ModuleContext::Global,
         doc: None,
@@ -989,6 +991,7 @@ fn bind_constructor_vars(gctx: &mut GlobalContext, module: &mut Module) {
                         members: i.members.clone(),
                         type_module_context: gctx.get_type(id).module_context.clone(),
                         body_scope: i.body_scope,
+                        string_mode: i.string_mode,
                     },
                     _ => unreachable!(),
                 };
@@ -1011,6 +1014,7 @@ fn bind_constructor_vars(gctx: &mut GlobalContext, module: &mut Module) {
                     members: vec![],
                     type_module_context: decl.module_context.clone(),
                     body_scope: decl.scope_id,
+                    string_mode: None,
                 };
                 (var, class)
             }
@@ -1169,6 +1173,7 @@ fn static_members(members: &[crate::ir::Member]) -> Vec<crate::ir::Member> {
                     optional: g.optional,
                     doc: g.doc.clone(),
                     throws: g.throws.clone(),
+                    string_mode: g.string_mode,
                 }))
             }
             Member::Setter(s) if s.js_name != "prototype" => {
@@ -1189,6 +1194,7 @@ fn static_members(members: &[crate::ir::Member]) -> Vec<crate::ir::Member> {
                 throws: m.throws.clone(),
                 async_modifier: m.async_modifier,
                 body_scope: m.body_scope,
+                string_mode: m.string_mode,
             })),
             _ => None,
         })
@@ -1543,6 +1549,7 @@ mod tests {
             throws: crate::ir::Throws::None,
             async_modifier: false,
             body_scope: ScopeId::DUMMY,
+            string_mode: None,
         })
     }
 
@@ -1554,6 +1561,7 @@ mod tests {
             optional: false,
             doc: None,
             throws: crate::ir::Throws::None,
+            string_mode: None,
         })
     }
 
@@ -1579,6 +1587,7 @@ mod tests {
             members,
             classification: InterfaceClassification::ClassLike,
             body_scope: ScopeId::DUMMY,
+            string_mode: None,
         }
     }
 
@@ -1593,6 +1602,7 @@ mod tests {
             members,
             type_module_context: ctx,
             body_scope: ScopeId::DUMMY,
+            string_mode: None,
         }
     }
 

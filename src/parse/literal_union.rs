@@ -180,6 +180,7 @@ pub(crate) fn merge_member_branches(branches: &[Vec<Member>], mode: MergeMode) -
             optional,
             doc,
             throws: crate::ir::Throws::None,
+            string_mode: None,
         }))
     };
 
@@ -358,6 +359,7 @@ mod tests {
             optional,
             doc: None,
             throws: crate::ir::Throws::None,
+            string_mode: None,
         })];
         if !readonly {
             out.push(Member::Setter(SetterMember {

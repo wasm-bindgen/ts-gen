@@ -127,7 +127,7 @@ extern "C" {
     ) -> Result<Option<String>, JsValue>;
     #[doc = " A global class's method: plain."]
     #[wasm_bindgen(method, catch, js_name = "match")]
-    pub async fn match__js_string(
+    pub async fn match_js_string(
         this: &Cache,
         url: impl ::wasm_bindgen::JsStringLike,
     ) -> Result<Option<JsString>, JsValue>;

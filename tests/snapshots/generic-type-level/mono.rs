@@ -12,7 +12,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &Event) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &Event) -> JsString;
+    pub fn type_js_string(this: &Event) -> JsString;
 }
 impl Event {
     #[allow(clippy::new_without_default)]

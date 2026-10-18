@@ -49,6 +49,11 @@ pub struct JsDocInfo {
     /// setter's value argument.
     pub slice_mode: Option<String>,
 
+    /// Mode name from a `{@string <mode>}` inline tag in the description
+    /// body or the `@returns` description; applies to the member's own
+    /// string return. Kept raw like [`Self::slice_mode`].
+    pub string_mode: Option<String>,
+
     /// `@rust <type>` — Rust scalar type for the member's own type (a
     /// property's type, a callable's return). See
     /// [`crate::ir::RustScalar`] for the accepted set.
@@ -211,7 +216,11 @@ fn convert_jsdoc_tags(lines: &[&str]) -> (String, JsDocInfo) {
             .strip_prefix("@returns ")
             .or_else(|| line.strip_prefix("@return "))
         {
-            returns = Some(rest.to_string());
+            let (rest, mode) = extract_inline_tag(rest, "string");
+            if let Some(mode) = mode {
+                info.string_mode.get_or_insert(mode);
+            }
+            returns = Some(rest);
         } else if let Some(rest) = line.strip_prefix("@rust ") {
             // `@rust u16` / `@rust status: u16`. Consumed, not rendered.
             let rest = rest.trim();
@@ -268,6 +277,15 @@ fn convert_jsdoc_tags(lines: &[&str]) -> (String, JsDocInfo) {
             let (line, mode) = extract_slice_tag(line);
             if let Some(mode) = mode {
                 info.slice_mode.get_or_insert(mode);
+            }
+            let (line, mode) = extract_inline_tag(&line, "string");
+            if let Some(mode) = mode {
+                info.string_mode.get_or_insert(mode);
+            }
+            // A doc that only carried binding tags renders as nothing.
+            if line.is_empty() && description.is_empty() {
+                i += 1;
+                continue;
             }
             description.push(line);
         }
@@ -443,15 +461,19 @@ fn is_primitive_type_name(s: &str) -> bool {
 /// with the tag (and any doubled spacing it leaves) removed, and the mode
 /// name. Only the first tag is recognised.
 fn extract_slice_tag(text: &str) -> (String, Option<String>) {
-    let Some(start) = text.find("{@slice ") else {
+    extract_inline_tag(text, "slice")
+}
+
+/// Strip a `{@<tag> <mode>}` inline tag from `text`, returning the mode.
+fn extract_inline_tag(text: &str, tag: &str) -> (String, Option<String>) {
+    let open = format!("{{@{tag} ");
+    let Some(start) = text.find(&open) else {
         return (text.to_string(), None);
     };
     let Some(len) = text[start..].find('}') else {
         return (text.to_string(), None);
     };
-    let mode = text[start + "{@slice ".len()..start + len]
-        .trim()
-        .to_string();
+    let mode = text[start + open.len()..start + len].trim().to_string();
     let cleaned = format!("{}{}", &text[..start], &text[start + len + 1..]).replace("  ", " ");
     (cleaned.trim_end().to_string(), Some(mode))
 }
@@ -591,6 +613,18 @@ mod tests {
         let (doc, info) = clean_jsdoc_with_info(raw);
         assert_eq!(info.slice_mode.as_deref(), Some("copy"));
         assert_eq!(doc, "Buffer contents.");
+    }
+
+    #[test]
+    fn string_tags_are_recorded_and_stripped() {
+        let raw = "\n * Reads a header.\n * @returns {string} The value {@string copy}\n ";
+        let (doc, info) = clean_jsdoc_with_info(raw);
+        assert_eq!(info.string_mode.as_deref(), Some("copy"));
+        assert!(doc.ends_with("Returns: {string} The value"), "{doc}");
+
+        let (doc, info) = clean_jsdoc_with_info(" {@string ref} ");
+        assert_eq!(info.string_mode.as_deref(), Some("ref"));
+        assert_eq!(doc, "");
     }
 
     #[test]

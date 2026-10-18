@@ -3522,7 +3522,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/type)"]
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &Event) -> JsString;
+    pub fn type_js_string(this: &Event) -> JsString;
     #[doc = " The **`eventPhase`** read-only property of the being evaluated."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Event/eventPhase)"]
@@ -4216,7 +4216,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/type)"]
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &Blob) -> JsString;
+    pub fn type_js_string(this: &Blob) -> JsString;
     #[doc = " The **`slice()`** method of the Blob interface creates and returns a new `Blob` object which contains data from a subset of the blob on which it's called."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/Blob/slice)"]
@@ -4291,7 +4291,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &BlobOptions) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &BlobOptions) -> Option<JsString>;
+    pub fn type_js_string(this: &BlobOptions) -> Option<JsString>;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &BlobOptions, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -4367,7 +4367,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &FileOptions) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &FileOptions) -> Option<JsString>;
+    pub fn type_js_string(this: &FileOptions) -> Option<JsString>;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &FileOptions, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter, js_name = "lastModified")]
@@ -5928,7 +5928,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/CryptoKey/type)"]
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &CryptoKey) -> JsString;
+    pub fn type_js_string(this: &CryptoKey) -> JsString;
     #[doc = " The read-only **`extractable`** property of the CryptoKey interface indicates whether or not the key may be extracted using `SubtleCrypto.exportKey()` or `SubtleCrypto.wrapKey()`."]
     #[doc = ""]
     #[doc = " [MDN Reference](https://developer.mozilla.org/docs/Web/API/CryptoKey/extractable)"]
@@ -5986,7 +5986,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "use")]
     pub fn use_(this: &JsonWebKey) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "use")]
-    pub fn use__js_string(this: &JsonWebKey) -> Option<JsString>;
+    pub fn use_js_string(this: &JsonWebKey) -> Option<JsString>;
     #[wasm_bindgen(method, setter)]
     pub fn set_use(this: &JsonWebKey, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
@@ -12490,7 +12490,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_<W>(this: &UnderlyingSink<W>) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string<W>(this: &UnderlyingSink<W>) -> Option<JsString>;
+    pub fn type_js_string<W>(this: &UnderlyingSink<W>) -> Option<JsString>;
     #[wasm_bindgen(method, setter)]
     pub fn set_type<W>(this: &UnderlyingSink<W>, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
@@ -12601,7 +12601,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &UnderlyingByteSource) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &UnderlyingByteSource) -> JsString;
+    pub fn type_js_string(this: &UnderlyingByteSource) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &UnderlyingByteSource, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter, js_name = "autoAllocateChunkSize")]
@@ -12691,7 +12691,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_<R>(this: &UnderlyingSource<R>) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string<R>(this: &UnderlyingSource<R>) -> Option<JsString>;
+    pub fn type_js_string<R>(this: &UnderlyingSource<R>) -> Option<JsString>;
     #[wasm_bindgen(method, setter)]
     pub fn set_type<R>(this: &UnderlyingSource<R>, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
@@ -18519,7 +18519,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &AiTextGenerationResponseFormat) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &AiTextGenerationResponseFormat) -> JsString;
+    pub fn type_js_string(this: &AiTextGenerationResponseFormat) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &AiTextGenerationResponseFormat, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
@@ -18771,7 +18771,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &AiTextGenerationToolOutput) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &AiTextGenerationToolOutput) -> JsString;
+    pub fn type_js_string(this: &AiTextGenerationToolOutput) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &AiTextGenerationToolOutput, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
@@ -19961,7 +19961,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &EasyInputMessage) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &EasyInputMessage) -> Option<JsString>;
+    pub fn type_js_string(this: &EasyInputMessage) -> Option<JsString>;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &EasyInputMessage, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -20102,7 +20102,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponsesFunctionTool) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponsesFunctionTool) -> JsString;
+    pub fn type_js_string(this: &ResponsesFunctionTool) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponsesFunctionTool, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
@@ -20515,7 +20515,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseContentReasoningText) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseContentReasoningText) -> JsString;
+    pub fn type_js_string(this: &ResponseContentReasoningText) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseContentReasoningText, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -20563,7 +20563,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseCreatedEvent) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseCreatedEvent) -> JsString;
+    pub fn type_js_string(this: &ResponseCreatedEvent) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseCreatedEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -20597,7 +20597,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseCustomToolCallOutput) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseCustomToolCallOutput) -> JsString;
+    pub fn type_js_string(this: &ResponseCustomToolCallOutput) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseCustomToolCallOutput, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
@@ -20723,7 +20723,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseErrorEvent) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseErrorEvent) -> JsString;
+    pub fn type_js_string(this: &ResponseErrorEvent) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseErrorEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -20809,7 +20809,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseFailedEvent) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseFailedEvent) -> JsString;
+    pub fn type_js_string(this: &ResponseFailedEvent) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseFailedEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -20831,7 +20831,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseFormatText) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseFormatText) -> JsString;
+    pub fn type_js_string(this: &ResponseFormatText) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseFormatText, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -20851,7 +20851,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseFormatJSONObject) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseFormatJSONObject) -> JsString;
+    pub fn type_js_string(this: &ResponseFormatJSONObject) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseFormatJSONObject, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -20933,7 +20933,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseFormatTextJSONSchemaConfig) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseFormatTextJSONSchemaConfig) -> JsString;
+    pub fn type_js_string(this: &ResponseFormatTextJSONSchemaConfig) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(
         this: &ResponseFormatTextJSONSchemaConfig,
@@ -21043,7 +21043,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseFunctionCallArgumentsDeltaEvent) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseFunctionCallArgumentsDeltaEvent) -> JsString;
+    pub fn type_js_string(this: &ResponseFunctionCallArgumentsDeltaEvent) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(
         this: &ResponseFunctionCallArgumentsDeltaEvent,
@@ -21111,7 +21111,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseFunctionCallArgumentsDoneEvent) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseFunctionCallArgumentsDoneEvent) -> JsString;
+    pub fn type_js_string(this: &ResponseFunctionCallArgumentsDoneEvent) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(
         this: &ResponseFunctionCallArgumentsDoneEvent,
@@ -21202,7 +21202,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseFunctionToolCall) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseFunctionToolCall) -> JsString;
+    pub fn type_js_string(this: &ResponseFunctionToolCall) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseFunctionToolCall, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
@@ -21350,7 +21350,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseFunctionToolCallOutputItem) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseFunctionToolCallOutputItem) -> JsString;
+    pub fn type_js_string(this: &ResponseFunctionToolCallOutputItem) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(
         this: &ResponseFunctionToolCallOutputItem,
@@ -21446,7 +21446,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseIncompleteEvent) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseIncompleteEvent) -> JsString;
+    pub fn type_js_string(this: &ResponseIncompleteEvent) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseIncompleteEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -21510,7 +21510,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseInputImage) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseInputImage) -> JsString;
+    pub fn type_js_string(this: &ResponseInputImage) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseInputImage, val: impl ::wasm_bindgen::JsStringLike);
     #[doc = " Base64 encoded image"]
@@ -21593,7 +21593,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseInputImageContent) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseInputImageContent) -> JsString;
+    pub fn type_js_string(this: &ResponseInputImageContent) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseInputImageContent, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
@@ -21778,7 +21778,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseInputItemFunctionCallOutput) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseInputItemFunctionCallOutput) -> JsString;
+    pub fn type_js_string(this: &ResponseInputItemFunctionCallOutput) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(
         this: &ResponseInputItemFunctionCallOutput,
@@ -21905,7 +21905,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseInputItemMessage) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseInputItemMessage) -> Option<JsString>;
+    pub fn type_js_string(this: &ResponseInputItemMessage) -> Option<JsString>;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseInputItemMessage, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -21993,7 +21993,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseInputMessageItem) -> Option<String>;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseInputMessageItem) -> Option<JsString>;
+    pub fn type_js_string(this: &ResponseInputMessageItem) -> Option<JsString>;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseInputMessageItem, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -22088,7 +22088,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseInputText) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseInputText) -> JsString;
+    pub fn type_js_string(this: &ResponseInputText) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseInputText, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -22115,7 +22115,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseInputTextContent) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseInputTextContent) -> JsString;
+    pub fn type_js_string(this: &ResponseInputTextContent) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseInputTextContent, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -22259,7 +22259,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseOutputItemAddedEvent) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseOutputItemAddedEvent) -> JsString;
+    pub fn type_js_string(this: &ResponseOutputItemAddedEvent) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseOutputItemAddedEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -22298,7 +22298,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseOutputItemDoneEvent) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseOutputItemDoneEvent) -> JsString;
+    pub fn type_js_string(this: &ResponseOutputItemDoneEvent) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseOutputItemDoneEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -22345,7 +22345,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseOutputMessage) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseOutputMessage) -> JsString;
+    pub fn type_js_string(this: &ResponseOutputMessage) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseOutputMessage, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -22442,7 +22442,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseOutputRefusal) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseOutputRefusal) -> JsString;
+    pub fn type_js_string(this: &ResponseOutputRefusal) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseOutputRefusal, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -22469,7 +22469,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseOutputText) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseOutputText) -> JsString;
+    pub fn type_js_string(this: &ResponseOutputText) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseOutputText, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
@@ -22525,7 +22525,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseReasoningItem) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseReasoningItem) -> JsString;
+    pub fn type_js_string(this: &ResponseReasoningItem) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseReasoningItem, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
@@ -22619,7 +22619,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseReasoningSummaryItem) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseReasoningSummaryItem) -> JsString;
+    pub fn type_js_string(this: &ResponseReasoningSummaryItem) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseReasoningSummaryItem, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -22646,7 +22646,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseReasoningContentItem) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseReasoningContentItem) -> JsString;
+    pub fn type_js_string(this: &ResponseReasoningContentItem) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseReasoningContentItem, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -22697,7 +22697,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseReasoningTextDeltaEvent) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseReasoningTextDeltaEvent) -> JsString;
+    pub fn type_js_string(this: &ResponseReasoningTextDeltaEvent) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseReasoningTextDeltaEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -22755,7 +22755,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseReasoningTextDoneEvent) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseReasoningTextDoneEvent) -> JsString;
+    pub fn type_js_string(this: &ResponseReasoningTextDoneEvent) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseReasoningTextDoneEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -22810,7 +22810,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseRefusalDeltaEvent) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseRefusalDeltaEvent) -> JsString;
+    pub fn type_js_string(this: &ResponseRefusalDeltaEvent) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseRefusalDeltaEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -22865,7 +22865,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseRefusalDoneEvent) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseRefusalDoneEvent) -> JsString;
+    pub fn type_js_string(this: &ResponseRefusalDoneEvent) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseRefusalDoneEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -22914,7 +22914,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseCompletedEvent) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseCompletedEvent) -> JsString;
+    pub fn type_js_string(this: &ResponseCompletedEvent) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseCompletedEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -23025,7 +23025,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseTextDeltaEvent) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseTextDeltaEvent) -> JsString;
+    pub fn type_js_string(this: &ResponseTextDeltaEvent) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseTextDeltaEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -23086,7 +23086,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ResponseTextDoneEvent) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ResponseTextDoneEvent) -> JsString;
+    pub fn type_js_string(this: &ResponseTextDoneEvent) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ResponseTextDoneEvent, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -23254,7 +23254,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &ToolChoiceFunction) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &ToolChoiceFunction) -> JsString;
+    pub fn type_js_string(this: &ToolChoiceFunction) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &ToolChoiceFunction, val: impl ::wasm_bindgen::JsStringLike);
 }
@@ -44298,7 +44298,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &EmailAttachment) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &EmailAttachment) -> JsString;
+    pub fn type_js_string(this: &EmailAttachment) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &EmailAttachment, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]
@@ -45454,7 +45454,7 @@ pub mod cloudflare {
             #[wasm_bindgen(method, getter, js_name = "type")]
             pub fn type_<T>(this: &WorkflowStepEvent<T>) -> String;
             #[wasm_bindgen(method, getter, js_name = "type")]
-            pub fn type__js_string<T>(this: &WorkflowStepEvent<T>) -> JsString;
+            pub fn type_js_string<T>(this: &WorkflowStepEvent<T>) -> JsString;
             #[wasm_bindgen(method, setter)]
             pub fn set_type<T>(this: &WorkflowStepEvent<T>, val: impl ::wasm_bindgen::JsStringLike);
         }
@@ -45565,7 +45565,7 @@ pub mod cloudflare {
             #[wasm_bindgen(method, getter, js_name = "type")]
             pub fn type_(this: &WorkflowStepOptions) -> String;
             #[wasm_bindgen(method, getter, js_name = "type")]
-            pub fn type__js_string(this: &WorkflowStepOptions) -> JsString;
+            pub fn type_js_string(this: &WorkflowStepOptions) -> JsString;
             #[wasm_bindgen(method, setter)]
             pub fn set_type(this: &WorkflowStepOptions, val: impl ::wasm_bindgen::JsStringLike);
             #[wasm_bindgen(method, getter)]
@@ -51617,7 +51617,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &FetchEventInfo) -> String;
         #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type__js_string(this: &FetchEventInfo) -> JsString;
+        pub fn type_js_string(this: &FetchEventInfo) -> JsString;
         #[wasm_bindgen(method, getter)]
         pub fn method(this: &FetchEventInfo) -> String;
         #[wasm_bindgen(method, getter, js_name = "method")]
@@ -51648,7 +51648,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &JsRpcEventInfo) -> String;
         #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type__js_string(this: &JsRpcEventInfo) -> JsString;
+        pub fn type_js_string(this: &JsRpcEventInfo) -> JsString;
     }
     impl JsRpcEventInfo {
         #[allow(clippy::new_without_default)]
@@ -51667,7 +51667,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &ScheduledEventInfo) -> String;
         #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type__js_string(this: &ScheduledEventInfo) -> JsString;
+        pub fn type_js_string(this: &ScheduledEventInfo) -> JsString;
         #[wasm_bindgen(method, getter, js_name = "scheduledTime")]
         pub fn scheduled_time(this: &ScheduledEventInfo) -> Date;
         #[wasm_bindgen(method, getter)]
@@ -51692,7 +51692,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &AlarmEventInfo) -> String;
         #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type__js_string(this: &AlarmEventInfo) -> JsString;
+        pub fn type_js_string(this: &AlarmEventInfo) -> JsString;
         #[wasm_bindgen(method, getter, js_name = "scheduledTime")]
         pub fn scheduled_time(this: &AlarmEventInfo) -> Date;
     }
@@ -51713,7 +51713,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &QueueEventInfo) -> String;
         #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type__js_string(this: &QueueEventInfo) -> JsString;
+        pub fn type_js_string(this: &QueueEventInfo) -> JsString;
         #[wasm_bindgen(method, getter, js_name = "queueName")]
         pub fn queue_name(this: &QueueEventInfo) -> String;
         #[wasm_bindgen(method, getter, js_name = "queueName")]
@@ -51738,7 +51738,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &EmailEventInfo) -> String;
         #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type__js_string(this: &EmailEventInfo) -> JsString;
+        pub fn type_js_string(this: &EmailEventInfo) -> JsString;
         #[wasm_bindgen(method, getter, js_name = "mailFrom")]
         pub fn mail_from(this: &EmailEventInfo) -> String;
         #[wasm_bindgen(method, getter, js_name = "mailFrom")]
@@ -51767,7 +51767,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &TraceEventInfo) -> String;
         #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type__js_string(this: &TraceEventInfo) -> JsString;
+        pub fn type_js_string(this: &TraceEventInfo) -> JsString;
         #[wasm_bindgen(method, getter)]
         pub fn traces(this: &TraceEventInfo) -> Vec<JsNullable<JsString>>;
     }
@@ -51788,7 +51788,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &HibernatableWebSocketEventInfoMessage) -> String;
         #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type__js_string(this: &HibernatableWebSocketEventInfoMessage) -> JsString;
+        pub fn type_js_string(this: &HibernatableWebSocketEventInfoMessage) -> JsString;
     }
     impl HibernatableWebSocketEventInfoMessage {
         #[allow(clippy::new_without_default)]
@@ -51807,7 +51807,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &HibernatableWebSocketEventInfoError) -> String;
         #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type__js_string(this: &HibernatableWebSocketEventInfoError) -> JsString;
+        pub fn type_js_string(this: &HibernatableWebSocketEventInfoError) -> JsString;
     }
     impl HibernatableWebSocketEventInfoError {
         #[allow(clippy::new_without_default)]
@@ -51826,7 +51826,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &HibernatableWebSocketEventInfoClose) -> String;
         #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type__js_string(this: &HibernatableWebSocketEventInfoClose) -> JsString;
+        pub fn type_js_string(this: &HibernatableWebSocketEventInfoClose) -> JsString;
         #[wasm_bindgen(method, getter)]
         pub fn code(this: &HibernatableWebSocketEventInfoClose) -> f64;
         #[wasm_bindgen(method, getter, js_name = "wasClean")]
@@ -51849,7 +51849,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &HibernatableWebSocketEventInfo) -> String;
         #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type__js_string(this: &HibernatableWebSocketEventInfo) -> JsString;
+        pub fn type_js_string(this: &HibernatableWebSocketEventInfo) -> JsString;
         #[wasm_bindgen(method, getter)]
         pub fn info(this: &HibernatableWebSocketEventInfo) -> JsValue;
     }
@@ -51870,7 +51870,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &CustomEventInfo) -> String;
         #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type__js_string(this: &CustomEventInfo) -> JsString;
+        pub fn type_js_string(this: &CustomEventInfo) -> JsString;
     }
     impl CustomEventInfo {
         #[allow(clippy::new_without_default)]
@@ -51889,7 +51889,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &FetchResponseInfo) -> String;
         #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type__js_string(this: &FetchResponseInfo) -> JsString;
+        pub fn type_js_string(this: &FetchResponseInfo) -> JsString;
         #[wasm_bindgen(method, getter, js_name = "statusCode")]
         pub fn status_code(this: &FetchResponseInfo) -> f64;
     }
@@ -51952,7 +51952,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &Onset) -> String;
         #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type__js_string(this: &Onset) -> JsString;
+        pub fn type_js_string(this: &Onset) -> JsString;
         #[wasm_bindgen(method, getter)]
         pub fn attributes(this: &Onset) -> Vec<Attribute>;
         #[wasm_bindgen(method, getter, js_name = "spanId")]
@@ -52001,7 +52001,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &Outcome) -> String;
         #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type__js_string(this: &Outcome) -> JsString;
+        pub fn type_js_string(this: &Outcome) -> JsString;
         #[wasm_bindgen(method, getter)]
         pub fn outcome(this: &Outcome) -> EventOutcome;
         #[wasm_bindgen(method, getter, js_name = "cpuTime")]
@@ -52026,7 +52026,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &SpanOpen) -> String;
         #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type__js_string(this: &SpanOpen) -> JsString;
+        pub fn type_js_string(this: &SpanOpen) -> JsString;
         #[wasm_bindgen(method, getter)]
         pub fn name(this: &SpanOpen) -> String;
         #[wasm_bindgen(method, getter, js_name = "name")]
@@ -52055,7 +52055,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &SpanClose) -> String;
         #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type__js_string(this: &SpanClose) -> JsString;
+        pub fn type_js_string(this: &SpanClose) -> JsString;
         #[wasm_bindgen(method, getter)]
         pub fn outcome(this: &SpanClose) -> EventOutcome;
     }
@@ -52076,7 +52076,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &DiagnosticChannelEvent) -> String;
         #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type__js_string(this: &DiagnosticChannelEvent) -> JsString;
+        pub fn type_js_string(this: &DiagnosticChannelEvent) -> JsString;
         #[wasm_bindgen(method, getter)]
         pub fn channel(this: &DiagnosticChannelEvent) -> String;
         #[wasm_bindgen(method, getter, js_name = "channel")]
@@ -52101,7 +52101,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &Exception) -> String;
         #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type__js_string(this: &Exception) -> JsString;
+        pub fn type_js_string(this: &Exception) -> JsString;
         #[wasm_bindgen(method, getter)]
         pub fn name(this: &Exception) -> String;
         #[wasm_bindgen(method, getter, js_name = "name")]
@@ -52132,7 +52132,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &Log) -> String;
         #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type__js_string(this: &Log) -> JsString;
+        pub fn type_js_string(this: &Log) -> JsString;
         #[wasm_bindgen(method, getter)]
         pub fn level(this: &Log) -> LevelKind;
         #[wasm_bindgen(method, getter)]
@@ -52176,7 +52176,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &StreamDiagnostic) -> String;
         #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type__js_string(this: &StreamDiagnostic) -> JsString;
+        pub fn type_js_string(this: &StreamDiagnostic) -> JsString;
         #[wasm_bindgen(method, getter)]
         pub fn diagnostic(this: &StreamDiagnostic) -> DroppedEventsDiagnostic;
     }
@@ -52197,7 +52197,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &Return) -> String;
         #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type__js_string(this: &Return) -> JsString;
+        pub fn type_js_string(this: &Return) -> JsString;
         #[wasm_bindgen(method, getter)]
         pub fn info(this: &Return) -> Option<FetchResponseInfo>;
     }
@@ -52239,7 +52239,7 @@ pub mod tail_stream {
         #[wasm_bindgen(method, getter, js_name = "type")]
         pub fn type_(this: &Attributes) -> String;
         #[wasm_bindgen(method, getter, js_name = "type")]
-        pub fn type__js_string(this: &Attributes) -> JsString;
+        pub fn type_js_string(this: &Attributes) -> JsString;
         #[wasm_bindgen(method, getter)]
         pub fn info(this: &Attributes) -> Vec<Attribute>;
     }
@@ -54220,7 +54220,7 @@ extern "C" {
     #[wasm_bindgen(method, getter, js_name = "type")]
     pub fn type_(this: &WorkflowInstanceSendEvent) -> String;
     #[wasm_bindgen(method, getter, js_name = "type")]
-    pub fn type__js_string(this: &WorkflowInstanceSendEvent) -> JsString;
+    pub fn type_js_string(this: &WorkflowInstanceSendEvent) -> JsString;
     #[wasm_bindgen(method, setter)]
     pub fn set_type(this: &WorkflowInstanceSendEvent, val: impl ::wasm_bindgen::JsStringLike);
     #[wasm_bindgen(method, getter)]

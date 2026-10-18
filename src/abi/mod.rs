@@ -587,6 +587,7 @@ fn build_declaration(
                 throws: &func.throws,
                 async_modifier: func.async_modifier,
                 doc: &decl.doc,
+                string_mode: None,
             })
             .chain(func.overloads.iter().map(|o| Overload {
                 params: &o.params,
@@ -595,6 +596,7 @@ fn build_declaration(
                 throws: &o.throws,
                 async_modifier: o.async_modifier,
                 doc: &o.doc,
+                string_mode: None,
             }))
             .collect();
             let mut used = LocalScope::default();
@@ -810,6 +812,7 @@ fn build_members(
                     throws: &m.throws,
                     async_modifier: m.async_modifier,
                     doc: &m.doc,
+                    string_mode: m.string_mode,
                 }),
             Member::StaticMethod(m) => static_overloads
                 .entry(m.js_name.as_str())
@@ -821,6 +824,7 @@ fn build_members(
                     throws: &m.throws,
                     async_modifier: m.async_modifier,
                     doc: &m.doc,
+                    string_mode: m.string_mode,
                 }),
             Member::Constructor(c) => ctor_overloads.push(Overload {
                 params: &c.params,
@@ -829,6 +833,7 @@ fn build_members(
                 throws: &c.throws,
                 async_modifier: false,
                 doc: &c.doc,
+                string_mode: None,
             }),
             _ => {}
         }
@@ -891,6 +896,7 @@ fn build_members(
                         throws: &Throws::None,
                         async_modifier: false,
                         doc: &None,
+                        string_mode: None,
                     }],
                     std::slice::from_ref(&this),
                     AbiOp::Set {
@@ -978,6 +984,7 @@ fn build_members(
                         throws: &Throws::None,
                         async_modifier: false,
                         doc: &None,
+                        string_mode: None,
                     }],
                     &[],
                     AbiOp::StaticSet {

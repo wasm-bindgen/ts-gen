@@ -2733,6 +2733,37 @@ The `_js_string` variant of an awaited value resolves the `JsString` form
 `_promise` form gets no variant: its string leaves are already inside the
 `Promise` handle (`Promise<Array<JsString>>`).
 
+The twin is named from the unescaped member name, so a keyword member
+`type` gives `type_` and `type_js_string`.
+
+A `{@string copy|ref|both}` JSDoc inline tag picks the forms one member gets,
+since most strings are small enough that the handle form is never used and
+a few are large enough that the copy should be avoided. It goes in the
+member's description or its `@returns` description and applies to the
+property type or return; a property's setter is unaffected:
+
+```ts
+interface Headers {
+  /** @returns The header value {@string copy} */
+  get(name: string): string | null;   // get -> Option<String>, no twin
+  /** {@string ref} */
+  getAll(name: string): string[];     // get_all -> Array<JsString>, no twin
+}
+/** {@string copy} */
+interface Meta {
+  readonly id: string;                // id -> String
+  /** {@string both} */
+  readonly body: string;              // body -> String, body_js_string -> JsString
+}
+```
+
+`copy` keeps only the `String` form, `ref` only the handle form under the
+base name, and `both` is the default. A tag in a class or interface doc is
+the default for every member of that declaration without its own tag. The
+tag only selects among the forms a member would get, so it has no effect
+where no twin exists (strings inside built-in containers) or without
+per-monomorphization.
+
 This can increase code size because wasm-bindgen generates a separate shim and
 descriptor for every instantiation. The option is experimental and tracks the
 upstream attribute of the same name.
@@ -3631,6 +3662,9 @@ ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
   reaches its setter too. Parameters match by name.
 * `@throws` replaces the input member's failure mode. Getters are
   infallible, so on a property it contributes only its doc.
+* `{@string mode}` replaces the input member's mode; one in a side
+  declaration's doc is the default for every input member of it that no
+  tag (input or side) sets.
 * A side member applies to every overload of the input method or
   function, and the `## Errors` section its `@throws` renders is
   appended to the input's doc once. The rest of the side doc is not
@@ -3643,7 +3677,7 @@ ts-gen --input node_modules/@cloudflare/workers-types/index.d.ts \
   not exist in the input fails the run, so a typo cannot silently miss
   a binding; so does an invalid `@rust` tag, or one whose scalar the
   input's type cannot carry. Side members without tags are ignored,
-  whatever their description.
+  whatever their description; a `{@string}` tag alone counts as one.
 * Only classes, interfaces and functions can be annotated: a
   `declare namespace`, `declare module`, variable, or alias that sets no
   type-parameter default (see below) in the side file fails the run

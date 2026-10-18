@@ -56,6 +56,7 @@ mod tests {
             optional,
             doc: None,
             throws: crate::ir::Throws::None,
+            string_mode: None,
         })
     }
 
@@ -67,6 +68,7 @@ mod tests {
             optional: false,
             doc: None,
             throws: crate::ir::Throws::None,
+            string_mode: None,
         })
     }
 
@@ -82,6 +84,7 @@ mod tests {
             throws: crate::ir::Throws::None,
             async_modifier: false,
             body_scope: crate::parse::scope::ScopeId::DUMMY,
+            string_mode: None,
         })
     }
 
