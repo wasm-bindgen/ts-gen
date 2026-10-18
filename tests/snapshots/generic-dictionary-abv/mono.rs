@@ -45,7 +45,8 @@ extern "C" {
 }
 impl<T> GenAbv<T>
 where
-    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg T:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn new() -> GenAbv<T> {
         Self::builder().build()
@@ -66,7 +67,8 @@ pub struct GenAbvBuilder<T> {
 }
 impl<T> GenAbvBuilder<T>
 where
-    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg T:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn value(self, val: &T) -> Self {
         self.inner.set_value(val);
@@ -120,7 +122,8 @@ extern "C" {
 }
 impl<T> ReqAbv<T>
 where
-    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg T:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn new<V: ::js_sys::TypedArray, W: ::js_sys::TypedArray>(
         value: &T,

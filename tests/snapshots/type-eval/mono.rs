@@ -259,10 +259,7 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "largestUnit")]
     pub fn set_largest_unit<U>(this: &Rounding<U>, val: LargestUnitKind);
 }
-impl<U> Rounding<U>
-where
-    for<'__wbg> &'__wbg U: ::wasm_bindgen::convert::IntoWasmAbi,
-{
+impl<U> Rounding<U> {
     pub fn new() -> Rounding<U> {
         Self::builder().build()
     }
@@ -280,10 +277,7 @@ impl<U> Default for Rounding<U> {
 pub struct RoundingBuilder<U> {
     inner: Rounding<U>,
 }
-impl<U> RoundingBuilder<U>
-where
-    for<'__wbg> &'__wbg U: ::wasm_bindgen::convert::IntoWasmAbi,
-{
+impl<U> RoundingBuilder<U> {
     pub fn smallest_unit(self, val: Plural) -> Self {
         self.inner.set_smallest_unit(val);
         self
@@ -328,7 +322,8 @@ extern "C" {
 }
 impl<T> Box_<T>
 where
-    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg T:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn new(value: &T, label: impl ::wasm_bindgen::JsStringLike) -> Box_<T> {
         let inner: Box_<T> = JsCast::unchecked_into(js_sys::Object::new());
@@ -349,7 +344,8 @@ extern "C" {
 }
 impl<T> Holder<T>
 where
-    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg PartialBox<T>:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn new(partial: &PartialBox<T>) -> Holder<T> {
         let inner: Holder<T> = JsCast::unchecked_into(js_sys::Object::new());
@@ -760,7 +756,8 @@ extern "C" {
 }
 impl<T> PartialBox<T>
 where
-    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg T:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn new() -> PartialBox<T> {
         Self::builder().build()
@@ -781,7 +778,8 @@ pub struct PartialBoxBuilder<T> {
 }
 impl<T> PartialBoxBuilder<T>
 where
-    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg T:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn value(self, val: &T) -> Self {
         self.inner.set_value(val);

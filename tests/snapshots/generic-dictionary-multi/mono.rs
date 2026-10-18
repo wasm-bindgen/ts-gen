@@ -28,8 +28,10 @@ extern "C" {
 }
 impl<T, E> ResultBox<T, E>
 where
-    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
-    for<'__wbg> &'__wbg E: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg T:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    for<'__wbg> &'__wbg E:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn new(value: &T, error: &E) -> ResultBox<T, E> {
         let inner: ResultBox<T, E> = JsCast::unchecked_into(js_sys::Object::new());

@@ -20,7 +20,8 @@ extern "C" {
 }
 impl<T> DefaultDetails<T>
 where
-    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg T:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn new(value: &T) -> DefaultDetails<T> {
         let inner: DefaultDetails<T> = JsCast::unchecked_into(js_sys::Object::new());

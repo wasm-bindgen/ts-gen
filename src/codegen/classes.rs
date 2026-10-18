@@ -541,20 +541,33 @@ impl<'a> ClassConfig<'a> {
         render_generic_bounds(&idents)
     }
 
-    /// The per-monomorphization helpers' `where` clause: they lend their
-    /// values to setters taking `&T`, so each parameter needs the bound
-    /// wasm-bindgen puts on such an import.
-    fn helper_where_clause(&self) -> TokenStream {
+    /// The per-monomorphization helpers' `where` clause. Each helper passes
+    /// its arguments to the setters, whose wasm-bindgen imports bound every
+    /// argument shape naming a type parameter (`&T`, `Option<T>`, `&[T]`),
+    /// so the impl restates those bounds for the helpers' own signatures.
+    fn helper_where_clause<'f>(&self, fns: impl Iterator<Item = &'f TokenStream>) -> TokenStream {
         if !CodegenContext::generic_mono(self.cgctx) || self.type_params.is_empty() {
             return quote! {};
         }
-        let idents = self
+        let idents: Vec<syn::Ident> = self
             .type_params
             .iter()
-            .map(|tp| super::typemap::make_ident(&tp.name));
-        quote! {
-            where #(for<'__wbg> &'__wbg #idents: ::wasm_bindgen::convert::IntoWasmAbi),*
+            .map(|tp| super::typemap::make_ident(&tp.name))
+            .collect();
+        let sigs: Vec<syn::Signature> = fns
+            .filter_map(|f| syn::parse2::<syn::ImplItemFn>(f.clone()).ok())
+            .map(|f| f.sig)
+            .collect();
+        let mut preds = super::inline_wrappers::mono_arg_bounds(
+            sigs.iter().flat_map(|s| s.inputs.iter()),
+            &idents,
+        );
+        let mut seen = std::collections::HashSet::new();
+        preds.retain(|p| seen.insert(quote::ToTokens::to_token_stream(p).to_string()));
+        if preds.is_empty() {
+            return quote! {};
         }
+        quote! { where #(#preds),* }
     }
 
     /// Tokens for the type's generic-argument list (`<T, …>`) used in
@@ -1628,7 +1641,12 @@ pub(crate) fn generate_dictionary_factory_with_passes(
         .iter()
         .all(Vec::is_empty)
         .then_some(default_impl);
-    let helper_where = config.helper_where_clause();
+    let helper_where = config.helper_where_clause(
+        new_variants
+            .iter()
+            .chain(&builder_variants)
+            .chain(&builder_methods),
+    );
     if emit_builder || kept_builder {
         quote! {
             impl #type_decl #rust_type #helper_where {

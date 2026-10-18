@@ -38,7 +38,10 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Holder<T = JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub fn on<T>(this: &Holder<T>, listener: &Function<fn(T) -> Undefined>) -> Result<(), JsValue>;
+    pub fn on<T: ::wasm_bindgen::JsGeneric>(
+        this: &Holder<T>,
+        listener: &Function<fn(T) -> Undefined>,
+    ) -> Result<(), JsValue>;
 }
 #[wasm_bindgen(module = "namespace-type-aliases", experimental_generic_mono)]
 extern "C" {

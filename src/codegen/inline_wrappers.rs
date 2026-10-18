@@ -482,6 +482,110 @@ struct Wrapper {
     item: TokenStream,
 }
 
+/// Whether `ty` names one of `params`.
+fn mentions(ty: &Type, params: &[Ident]) -> bool {
+    struct Find<'a> {
+        params: &'a [Ident],
+        found: bool,
+    }
+    impl VisitMut for Find<'_> {
+        fn visit_path_mut(&mut self, path: &mut syn::Path) {
+            if path.leading_colon.is_none()
+                && path.segments.len() == 1
+                && self.params.contains(&path.segments[0].ident)
+            {
+                self.found = true;
+            }
+            syn::visit_mut::visit_path_mut(self, path);
+        }
+    }
+    let mut find = Find {
+        params,
+        found: false,
+    };
+    find.visit_type_mut(&mut ty.clone());
+    find.found
+}
+
+/// `&[E]` or `Option<&[E]>` → `E`.
+fn slice_elem(ty: &Type) -> Option<&Type> {
+    let ty = match ty {
+        Type::Path(p) => {
+            let seg = p.path.segments.last()?;
+            let PathArguments::AngleBracketed(args) = &seg.arguments else {
+                return None;
+            };
+            match (seg.ident == "Option", args.args.first()) {
+                (true, Some(GenericArgument::Type(t))) => t,
+                _ => return None,
+            }
+        }
+        other => other,
+    };
+    match ty {
+        Type::Reference(r) if r.mutability.is_none() => match &*r.elem {
+            Type::Slice(slice) => Some(&slice.elem),
+            _ => None,
+        },
+        _ => None,
+    }
+}
+
+/// One predicate per typed argument naming a type parameter, as
+/// `experimental_generic_mono` bounds the import. Receivers are skipped. A borrow nested in the
+/// type (`Option<&T>`) is bound for every lifetime.
+pub(crate) fn mono_arg_bounds<'a>(
+    inputs: impl Iterator<Item = &'a FnArg>,
+    params: &[Ident],
+) -> Vec<syn::WherePredicate> {
+    let mut out: Vec<syn::WherePredicate> = Vec::new();
+    for arg in inputs {
+        let FnArg::Typed(pat) = arg else { continue };
+        let ty = &*pat.ty;
+        if !mentions(ty, params) {
+            continue;
+        }
+        out.push(match (slice_elem(ty), ty) {
+            (Some(elem), _) => {
+                syn::parse_quote!(#elem: ::wasm_bindgen::convert::VectorRefIntoWasmAbi)
+            }
+            (None, Type::Reference(r)) if r.mutability.is_none() => {
+                let elem = &r.elem;
+                syn::parse_quote!(for<'__wbg> &'__wbg #elem: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe)
+            }
+            _ => {
+                let mut ty = ty.clone();
+                if name_elided_lifetimes(&mut ty) {
+                    syn::parse_quote!(for<'__wbg> #ty: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe)
+                } else {
+                    syn::parse_quote!(#ty: ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe)
+                }
+            }
+        });
+    }
+    let mut seen = std::collections::HashSet::new();
+    out.retain(|p| seen.insert(p.to_token_stream().to_string()));
+    out
+}
+
+/// Gives every elided borrow in `ty` the lifetime `'__wbg`; whether any
+/// was found.
+fn name_elided_lifetimes(ty: &mut Type) -> bool {
+    struct Name(bool);
+    impl VisitMut for Name {
+        fn visit_type_reference_mut(&mut self, r: &mut syn::TypeReference) {
+            if r.lifetime.is_none() {
+                r.lifetime = Some(syn::Lifetime::new("'__wbg", Span::call_site()));
+                self.0 = true;
+            }
+            syn::visit_mut::visit_type_reference_mut(self, r);
+        }
+    }
+    let mut v = Name(false);
+    v.visit_type_mut(ty);
+    v.0
+}
+
 fn wrap(item: &mut ForeignItemFn) -> Vec<Wrapper> {
     let literal = take_literal_attr(item);
     let Some((attr_idx, binding)) = read_binding(item) else {

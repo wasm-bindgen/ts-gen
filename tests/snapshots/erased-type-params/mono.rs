@@ -26,7 +26,8 @@ extern "C" {
 }
 impl<Metadata> ListKey<Metadata>
 where
-    for<'__wbg> &'__wbg Metadata: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg Metadata:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn new(name: impl ::wasm_bindgen::JsStringLike) -> ListKey<Metadata> {
         Self::builder(name).build()
@@ -42,7 +43,8 @@ pub struct ListKeyBuilder<Metadata> {
 }
 impl<Metadata> ListKeyBuilder<Metadata>
 where
-    for<'__wbg> &'__wbg Metadata: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg Metadata:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn metadata(self, val: &Metadata) -> Self {
         self.inner.set_metadata(val);
@@ -82,7 +84,7 @@ extern "C" {
 }
 impl<Metadata> ListResult<Metadata>
 where
-    for<'__wbg> &'__wbg Metadata: ::wasm_bindgen::convert::IntoWasmAbi,
+    ListKey<Metadata>: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,
 {
     pub fn new(
         keys: &[ListKey<Metadata>],
@@ -199,7 +201,8 @@ extern "C" {
 }
 impl<V> Slot<V>
 where
-    for<'__wbg> &'__wbg V: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg V:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn new(value: &V) -> Slot<V> {
         let inner: Slot<V> = JsCast::unchecked_into(js_sys::Object::new());

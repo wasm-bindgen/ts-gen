@@ -91,8 +91,10 @@ extern "C" {
 }
 impl<I, O> Transformer<I, O>
 where
-    for<'__wbg> &'__wbg I: ::wasm_bindgen::convert::IntoWasmAbi,
-    for<'__wbg> &'__wbg O: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg I:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    for<'__wbg> &'__wbg O:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn new() -> Transformer<I, O> {
         Self::builder().build()
@@ -113,8 +115,10 @@ pub struct TransformerBuilder<I, O> {
 }
 impl<I, O> TransformerBuilder<I, O>
 where
-    for<'__wbg> &'__wbg I: ::wasm_bindgen::convert::IntoWasmAbi,
-    for<'__wbg> &'__wbg O: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg I:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
+    for<'__wbg> &'__wbg O:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn readable_type(self, val: &I) -> Self {
         self.inner.set_readable_type(val);

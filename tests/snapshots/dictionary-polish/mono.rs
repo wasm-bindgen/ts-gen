@@ -207,7 +207,8 @@ pub mod polish {
     }
     impl<T> Holder<T>
     where
-        for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+        for<'__wbg> &'__wbg T:
+            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
     {
         pub fn new() -> Holder<T> {
             Self::builder().build()
@@ -228,7 +229,8 @@ pub mod polish {
     }
     impl<T> HolderBuilder<T>
     where
-        for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+        for<'__wbg> &'__wbg T:
+            ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
     {
         pub fn value(self, val: &T) -> Self {
             self.inner.set_value(val);

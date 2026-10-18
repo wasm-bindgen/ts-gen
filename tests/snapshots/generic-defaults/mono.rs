@@ -104,7 +104,8 @@ extern "C" {
 }
 impl<T> Options<T>
 where
-    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg T:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn new() -> Options<T> {
         Self::builder().build()
@@ -125,7 +126,8 @@ pub struct OptionsBuilder<T> {
 }
 impl<T> OptionsBuilder<T>
 where
-    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg T:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn initial(self, val: &T) -> Self {
         self.inner.set_initial(val);
@@ -196,7 +198,7 @@ extern "C" {
 }
 impl<T> Row<T>
 where
-    for<'__wbg> &'__wbg T: ::wasm_bindgen::convert::IntoWasmAbi,
+    T: ::wasm_bindgen::convert::VectorRefIntoWasmAbi,
 {
     pub fn new(results: &[T]) -> Row<T> {
         let inner: Row<T> = JsCast::unchecked_into(js_sys::Object::new());
@@ -288,14 +290,14 @@ extern "C" {
         make: &Function<fn() -> Promise>,
     ) -> Result<Promise<Map<String, JsValue>>, JsValue>;
     #[wasm_bindgen(method, catch)]
-    pub async fn each<T>(
+    pub async fn each<T: ::wasm_bindgen::JsGeneric>(
         this: &Store,
         r#fn: &Function<fn(T) -> Undefined>,
     ) -> Result<Map<String, T>, JsValue>
     where
         T: 'static;
     #[wasm_bindgen(method, catch, js_name = "each")]
-    pub fn each_promise<T>(
+    pub fn each_promise<T: ::wasm_bindgen::JsGeneric>(
         this: &Store,
         r#fn: &Function<fn(T) -> Undefined>,
     ) -> Result<Promise<Map<String, T>>, JsValue>;

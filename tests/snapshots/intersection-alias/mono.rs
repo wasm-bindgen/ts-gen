@@ -191,7 +191,8 @@ extern "C" {
 }
 impl<R> Range<R>
 where
-    for<'__wbg> &'__wbg R: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg R:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn new(value: &R) -> Range<R> {
         Self::builder(value).build()
@@ -207,7 +208,8 @@ pub struct RangeBuilder<R> {
 }
 impl<R> RangeBuilder<R>
 where
-    for<'__wbg> &'__wbg R: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg R:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn offset(self, val: f64) -> Self {
         self.inner.set_offset(val);
@@ -242,7 +244,8 @@ extern "C" {
 }
 impl<R> ReadResult<R>
 where
-    for<'__wbg> &'__wbg R: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg R:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     #[doc = " Construct with `done: false`."]
     pub fn new_false(value: &R) -> ReadResult<R> {
@@ -267,7 +270,8 @@ pub struct ReadResultBuilder<R> {
 }
 impl<R> ReadResultBuilder<R>
 where
-    for<'__wbg> &'__wbg R: ::wasm_bindgen::convert::IntoWasmAbi,
+    for<'__wbg> &'__wbg R:
+        ::wasm_bindgen::convert::IntoWasmAbi + ::wasm_bindgen::describe::WasmDescribe,
 {
     pub fn value(self, val: &R) -> Self {
         self.inner.set_value(val);
