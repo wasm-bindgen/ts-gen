@@ -83,14 +83,18 @@ pub struct GlobalContext {
     /// an export map's local names refer to. The global scope holds every
     /// global, with the declarations of all files merged.
     declarations: std::collections::HashMap<ScopeId, indexmap::IndexMap<String, Vec<TypeId>>>,
-    /// The static side of a global constructor-shaped `var` (see
-    /// [`crate::parse::first_pass::StaticSides`]), by the var's id, for an
-    /// instance interface a later file declares.
+    /// The static side of a constructor-shaped `var` (see
+    /// [`crate::parse::first_pass::StaticSides`]), by the id of the var or
+    /// its class, for an instance interface another file declares.
     pub(crate) static_sides: std::collections::HashMap<TypeId, TypeDeclaration>,
     /// Each `var` typed by a named type, with the scope it is declared in,
     /// whose type `bind_constructor_vars` resolves once every file is
     /// inserted.
     pub(crate) ctor_vars: Vec<(TypeId, ScopeId)>,
+    /// The class of each constructor-shaped `var` nothing else describes
+    /// the instance of, whose construct signature's return type
+    /// `bind_constructor_vars` may find to be a global instance interface.
+    pub(crate) constructor_classes: Vec<TypeId>,
     types: Vec<TypeDeclaration>,
     modules: Vec<ParsedModule>,
     /// Map from module specifier to ModuleId for fast lookup.
@@ -196,6 +200,7 @@ impl GlobalContext {
             declarations: std::collections::HashMap::new(),
             static_sides: std::collections::HashMap::new(),
             ctor_vars: Vec::new(),
+            constructor_classes: Vec::new(),
             types: Vec::new(),
             modules: Vec::new(),
             module_index: std::collections::HashMap::new(),

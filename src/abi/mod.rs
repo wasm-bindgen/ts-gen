@@ -1210,7 +1210,7 @@ mod tests {
     }
 
     #[test]
-    fn dictionary_new_and_module_constructor_are_two_imports() {
+    fn split_class_collapses_into_module_constructor() {
         let abi = abi(r#"
             interface Email { readonly from: string; }
             declare module "cloudflare:email" {
@@ -1220,9 +1220,13 @@ mod tests {
         "#);
         let new = abi.import("cloudflare:email", "Email.new").unwrap();
         assert!(matches!(new.op, AbiOp::Construct { .. }), "{:?}", new.op);
-        let dict = abi.import(BINDINGS_SPECIFIER, "Email.new").unwrap();
-        assert_eq!(dict.op, AbiOp::NewObject);
-        assert_eq!(abi.function("Email.from").unwrap().module, None);
+        // The global interface collapses into the module's class: no
+        // dictionary builder, and the instance members share its module.
+        assert!(abi.import(BINDINGS_SPECIFIER, "Email.new").is_none());
+        assert_eq!(
+            abi.function("Email.from").unwrap().module.as_deref(),
+            Some("cloudflare:email")
+        );
     }
 
     #[test]

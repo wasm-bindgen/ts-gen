@@ -2607,7 +2607,7 @@ extern "C" {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
+    # [wasm_bindgen (extends = Fetcher , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type DurableObjectStub<T: ::wasm_bindgen::JsGeneric = Undefined>;
     #[wasm_bindgen(method, getter)]
@@ -9307,11 +9307,11 @@ extern "C" {
     #[wasm_bindgen(method, getter)]
     pub fn fetcher<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
         this: &Request<CfHostMetadata, Cf>,
-    ) -> JsValue;
+    ) -> Option<Fetcher>;
     #[wasm_bindgen(method, setter)]
     pub fn set_fetcher<CfHostMetadata: ::wasm_bindgen::JsGeneric, Cf: ::wasm_bindgen::JsGeneric>(
         this: &Request<CfHostMetadata, Cf>,
-        val: &JsValue,
+        val: &JsNullable<Fetcher>,
     );
     #[doc = " The read-only **`signal`** property of the Request interface returns the AbortSignal associated with the request."]
     #[doc = ""]
@@ -9441,9 +9441,12 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_redirect<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>, val: &str);
     #[wasm_bindgen(method, getter)]
-    pub fn fetcher<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>) -> JsValue;
+    pub fn fetcher<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>) -> Option<Fetcher>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_fetcher<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>, val: &JsValue);
+    pub fn set_fetcher<Cf: ::wasm_bindgen::JsGeneric>(
+        this: &RequestInit<Cf>,
+        val: &JsNullable<Fetcher>,
+    );
     #[wasm_bindgen(method, getter)]
     pub fn cf<Cf: ::wasm_bindgen::JsGeneric>(this: &RequestInit<Cf>) -> Option<Cf>;
     #[wasm_bindgen(method, setter)]
@@ -9539,7 +9542,7 @@ impl<Cf: ::wasm_bindgen::JsGeneric> RequestInitBuilder<Cf> {
         self.inner.set_redirect(val);
         self
     }
-    pub fn fetcher(self, val: &JsValue) -> Self {
+    pub fn fetcher(self, val: &JsNullable<Fetcher>) -> Self {
         self.inner.set_fetcher(val);
         self
     }
@@ -9569,8 +9572,161 @@ impl<Cf: ::wasm_bindgen::JsGeneric> RequestInitBuilder<Cf> {
 }
 #[allow(dead_code)]
 pub type Service = JsValue;
-#[allow(dead_code)]
-pub type Fetcher = JsValue;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type Fetcher<
+        T: ::wasm_bindgen::JsGeneric = Undefined,
+        Reserved: ::wasm_bindgen::JsGeneric = JsValue,
+    >;
+    #[wasm_bindgen(method, catch)]
+    pub async fn fetch<T: ::wasm_bindgen::JsGeneric, Reserved: ::wasm_bindgen::JsGeneric>(
+        this: &Fetcher<T, Reserved>,
+        input: &Request<JsValue, JsValue>,
+    ) -> Result<Response, JsValue>;
+    #[wasm_bindgen(method, js_name = "fetch")]
+    pub fn fetch_promise<T: ::wasm_bindgen::JsGeneric, Reserved: ::wasm_bindgen::JsGeneric>(
+        this: &Fetcher<T, Reserved>,
+        input: &Request<JsValue, JsValue>,
+    ) -> Promise<Response>;
+    #[wasm_bindgen(method, catch, js_name = "fetch")]
+    pub async fn fetch_with_str<T: ::wasm_bindgen::JsGeneric, Reserved: ::wasm_bindgen::JsGeneric>(
+        this: &Fetcher<T, Reserved>,
+        input: &str,
+    ) -> Result<Response, JsValue>;
+    #[wasm_bindgen(method, js_name = "fetch")]
+    pub fn fetch_with_str_promise<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        input: &str,
+    ) -> Promise<Response>;
+    #[wasm_bindgen(method, catch, js_name = "fetch")]
+    pub async fn fetch_with_url<T: ::wasm_bindgen::JsGeneric, Reserved: ::wasm_bindgen::JsGeneric>(
+        this: &Fetcher<T, Reserved>,
+        input: &URL,
+    ) -> Result<Response, JsValue>;
+    #[wasm_bindgen(method, js_name = "fetch")]
+    pub fn fetch_with_url_promise<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        input: &URL,
+    ) -> Promise<Response>;
+    #[wasm_bindgen(method, catch, js_name = "fetch")]
+    pub async fn fetch_with_request_and_init<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        input: &Request<JsValue, JsValue>,
+        init: &RequestInit,
+    ) -> Result<Response, JsValue>;
+    #[wasm_bindgen(method, js_name = "fetch")]
+    pub fn fetch_with_request_and_init_promise<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        input: &Request<JsValue, JsValue>,
+        init: &RequestInit,
+    ) -> Promise<Response>;
+    #[wasm_bindgen(method, catch, js_name = "fetch")]
+    pub async fn fetch_with_str_and_init<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        input: &str,
+        init: &RequestInit,
+    ) -> Result<Response, JsValue>;
+    #[wasm_bindgen(method, js_name = "fetch")]
+    pub fn fetch_with_str_and_init_promise<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        input: &str,
+        init: &RequestInit,
+    ) -> Promise<Response>;
+    #[wasm_bindgen(method, catch, js_name = "fetch")]
+    pub async fn fetch_with_url_and_init<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        input: &URL,
+        init: &RequestInit,
+    ) -> Result<Response, JsValue>;
+    #[wasm_bindgen(method, js_name = "fetch")]
+    pub fn fetch_with_url_and_init_promise<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        input: &URL,
+        init: &RequestInit,
+    ) -> Promise<Response>;
+    #[wasm_bindgen(method)]
+    pub fn connect<T: ::wasm_bindgen::JsGeneric, Reserved: ::wasm_bindgen::JsGeneric>(
+        this: &Fetcher<T, Reserved>,
+        address: &SocketAddress,
+    ) -> Socket;
+    #[wasm_bindgen(method, catch, js_name = "connect")]
+    pub fn try_connect<T: ::wasm_bindgen::JsGeneric, Reserved: ::wasm_bindgen::JsGeneric>(
+        this: &Fetcher<T, Reserved>,
+        address: &SocketAddress,
+    ) -> Result<Socket, JsValue>;
+    #[wasm_bindgen(method, js_name = "connect")]
+    pub fn connect_with_str<T: ::wasm_bindgen::JsGeneric, Reserved: ::wasm_bindgen::JsGeneric>(
+        this: &Fetcher<T, Reserved>,
+        address: &str,
+    ) -> Socket;
+    #[wasm_bindgen(method, catch, js_name = "connect")]
+    pub fn try_connect_with_str<T: ::wasm_bindgen::JsGeneric, Reserved: ::wasm_bindgen::JsGeneric>(
+        this: &Fetcher<T, Reserved>,
+        address: &str,
+    ) -> Result<Socket, JsValue>;
+    #[wasm_bindgen(method, js_name = "connect")]
+    pub fn connect_with_socket_address_and_options<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        address: &SocketAddress,
+        options: &SocketOptions,
+    ) -> Socket;
+    #[wasm_bindgen(method, catch, js_name = "connect")]
+    pub fn try_connect_with_socket_address_and_options<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        address: &SocketAddress,
+        options: &SocketOptions,
+    ) -> Result<Socket, JsValue>;
+    #[wasm_bindgen(method, js_name = "connect")]
+    pub fn connect_with_str_and_options<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        address: &str,
+        options: &SocketOptions,
+    ) -> Socket;
+    #[wasm_bindgen(method, catch, js_name = "connect")]
+    pub fn try_connect_with_str_and_options<
+        T: ::wasm_bindgen::JsGeneric,
+        Reserved: ::wasm_bindgen::JsGeneric,
+    >(
+        this: &Fetcher<T, Reserved>,
+        address: &str,
+        options: &SocketOptions,
+    ) -> Result<Socket, JsValue>;
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -11014,16 +11170,19 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "delete")]
     pub fn delete_with_slice_promise(this: &R2Bucket, keys: &[String]) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch)]
-    pub async fn list(this: &R2Bucket) -> Result<JsValue, JsValue>;
+    pub async fn list(this: &R2Bucket) -> Result<R2Objects, JsValue>;
     #[wasm_bindgen(method, js_name = "list")]
-    pub fn list_promise(this: &R2Bucket) -> Promise;
+    pub fn list_promise(this: &R2Bucket) -> Promise<R2Objects>;
     #[wasm_bindgen(method, catch, js_name = "list")]
     pub async fn list_with_options(
         this: &R2Bucket,
         options: &R2ListOptions,
-    ) -> Result<JsValue, JsValue>;
+    ) -> Result<R2Objects, JsValue>;
     #[wasm_bindgen(method, js_name = "list")]
-    pub fn list_with_options_promise(this: &R2Bucket, options: &R2ListOptions) -> Promise;
+    pub fn list_with_options_promise(
+        this: &R2Bucket,
+        options: &R2ListOptions,
+    ) -> Promise<R2Objects>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -11899,8 +12058,74 @@ impl R2HTTPMetadataBuilder {
         self.inner
     }
 }
-#[allow(dead_code)]
-pub type R2Objects = JsValue;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type R2Objects;
+    #[wasm_bindgen(method, getter)]
+    pub fn truncated(this: &R2Objects) -> bool;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_truncated(this: &R2Objects, val: bool);
+    #[wasm_bindgen(method, getter)]
+    pub fn cursor(this: &R2Objects) -> Option<String>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_cursor(this: &R2Objects, val: &str);
+    #[wasm_bindgen(method, getter)]
+    pub fn objects(this: &R2Objects) -> Vec<R2Object>;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_objects(this: &R2Objects, val: &[R2Object]);
+    #[wasm_bindgen(method, getter, js_name = "delimitedPrefixes")]
+    pub fn delimited_prefixes(this: &R2Objects) -> Vec<String>;
+    #[wasm_bindgen(method, setter, js_name = "delimitedPrefixes")]
+    pub fn set_delimited_prefixes(this: &R2Objects, val: &[String]);
+}
+impl R2Objects {
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `truncated: true`"]
+    pub fn new_true(objects: &[R2Object], delimited_prefixes: &[String]) -> R2Objects {
+        Self::builder_true(objects, delimited_prefixes).build()
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `truncated: false`"]
+    pub fn new_false(objects: &[R2Object], delimited_prefixes: &[String]) -> R2Objects {
+        Self::builder_false(objects, delimited_prefixes).build()
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `truncated: true`"]
+    pub fn builder_true(objects: &[R2Object], delimited_prefixes: &[String]) -> R2ObjectsBuilder {
+        let inner: R2Objects = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_truncated(true);
+        inner.set_objects(objects);
+        inner.set_delimited_prefixes(delimited_prefixes);
+        R2ObjectsBuilder { inner }
+    }
+    #[doc = " ## Inlined fields"]
+    #[doc = ""]
+    #[doc = " * `truncated: false`"]
+    pub fn builder_false(objects: &[R2Object], delimited_prefixes: &[String]) -> R2ObjectsBuilder {
+        let inner: R2Objects = JsCast::unchecked_into(js_sys::Object::new());
+        inner.set_truncated(false);
+        inner.set_objects(objects);
+        inner.set_delimited_prefixes(delimited_prefixes);
+        R2ObjectsBuilder { inner }
+    }
+}
+pub struct R2ObjectsBuilder {
+    inner: R2Objects,
+}
+impl R2ObjectsBuilder {
+    pub fn cursor(self, val: &str) -> Self {
+        self.inner.set_cursor(val);
+        self
+    }
+    pub fn build(self) -> R2Objects {
+        self.inner
+    }
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -12158,13 +12383,13 @@ impl UnderlyingByteSource {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"bytes\"`"]
-    pub fn new_bytes() -> UnderlyingByteSource {
-        Self::builder_bytes().build()
+    pub fn new() -> UnderlyingByteSource {
+        Self::builder().build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"bytes\"`"]
-    pub fn builder_bytes() -> UnderlyingByteSourceBuilder {
+    pub fn builder() -> UnderlyingByteSourceBuilder {
         let inner: UnderlyingByteSource = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("bytes");
         UnderlyingByteSourceBuilder { inner }
@@ -12895,7 +13120,7 @@ impl ReadableStreamGetReaderOptions {
     #[doc = " * `mode: \"byob\"` - Creates a ReadableStreamBYOBReader and locks the stream to the new reader."]
     #[doc = ""]
     #[doc = " This call behaves the same way as the no-argument variant, except that it only works on readable byte streams, i.e. streams which were constructed specifically with the ability to handle \"bring your own buffer\" reading. The returned BYOB reader provides the ability to directly read individual chunks from the stream via its read() method, into developer-supplied buffers, allowing more precise control over allocation."]
-    pub fn new_byob() -> ReadableStreamGetReaderOptions {
+    pub fn new() -> ReadableStreamGetReaderOptions {
         let inner: ReadableStreamGetReaderOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_mode("byob");
         inner
@@ -15217,9 +15442,19 @@ impl WebSocketAcceptOptionsBuilder {
 }
 #[wasm_bindgen]
 extern "C" {
-    #[allow(non_upper_case_globals)]
-    #[wasm_bindgen(thread_local_v2, js_name = "WebSocketPair")]
-    pub static web_socket_pair: Object;
+    # [wasm_bindgen (extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type WebSocketPair;
+    #[wasm_bindgen(constructor, catch)]
+    pub fn new() -> Result<WebSocketPair, JsValue>;
+    #[wasm_bindgen(method, getter, js_name = "0")]
+    pub fn _0(this: &WebSocketPair) -> WebSocket;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_0(this: &WebSocketPair, val: &WebSocket);
+    #[wasm_bindgen(method, getter, js_name = "1")]
+    pub fn _1(this: &WebSocketPair) -> WebSocket;
+    #[wasm_bindgen(method, setter)]
+    pub fn set_1(this: &WebSocketPair, val: &WebSocket);
 }
 #[wasm_bindgen]
 extern "C" {
@@ -15545,9 +15780,9 @@ extern "C" {
     #[wasm_bindgen(method, setter, js_name = "withCredentials")]
     pub fn set_with_credentials(this: &EventSourceEventSourceInit, val: bool);
     #[wasm_bindgen(method, getter)]
-    pub fn fetcher(this: &EventSourceEventSourceInit) -> JsValue;
+    pub fn fetcher(this: &EventSourceEventSourceInit) -> Option<Fetcher>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_fetcher(this: &EventSourceEventSourceInit, val: &JsValue);
+    pub fn set_fetcher(this: &EventSourceEventSourceInit, val: &Fetcher);
 }
 impl EventSourceEventSourceInit {
     pub fn new() -> EventSourceEventSourceInit {
@@ -15567,7 +15802,7 @@ impl EventSourceEventSourceInitBuilder {
         self.inner.set_with_credentials(val);
         self
     }
-    pub fn fetcher(self, val: &JsValue) -> Self {
+    pub fn fetcher(self, val: &Fetcher) -> Self {
         self.inner.set_fetcher(val);
         self
     }
@@ -15610,9 +15845,9 @@ extern "C" {
     #[wasm_bindgen(method, catch, js_name = "signal")]
     pub fn try_signal(this: &Container, signo: f64) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "getTcpPort")]
-    pub fn get_tcp_port(this: &Container, port: f64) -> JsValue;
+    pub fn get_tcp_port(this: &Container, port: f64) -> Fetcher;
     #[wasm_bindgen(method, catch, js_name = "getTcpPort")]
-    pub fn try_get_tcp_port(this: &Container, port: f64) -> Result<JsValue, JsValue>;
+    pub fn try_get_tcp_port(this: &Container, port: f64) -> Result<Fetcher, JsValue>;
     #[wasm_bindgen(method, catch, js_name = "setInactivityTimeout")]
     pub async fn set_inactivity_timeout(this: &Container, duration_ms: f64) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "setInactivityTimeout")]
@@ -15632,23 +15867,23 @@ extern "C" {
     pub async fn intercept_outbound_http(
         this: &Container,
         addr: &str,
-        binding: &JsValue,
+        binding: &Fetcher,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "interceptOutboundHttp")]
     pub fn intercept_outbound_http_promise(
         this: &Container,
         addr: &str,
-        binding: &JsValue,
+        binding: &Fetcher,
     ) -> Promise<Undefined>;
     #[wasm_bindgen(method, catch, js_name = "interceptAllOutboundHttp")]
     pub async fn intercept_all_outbound_http(
         this: &Container,
-        binding: &JsValue,
+        binding: &Fetcher,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, js_name = "interceptAllOutboundHttp")]
     pub fn intercept_all_outbound_http_promise(
         this: &Container,
-        binding: &JsValue,
+        binding: &Fetcher,
     ) -> Promise<Undefined>;
 }
 #[wasm_bindgen]
@@ -15847,10 +16082,18 @@ impl MessagePortPostMessageOptionsBuilder {
 }
 #[allow(dead_code)]
 pub type LoopbackForExport = JsValue;
-#[allow(dead_code)]
-pub type LoopbackServiceStub = JsValue;
-#[allow(dead_code)]
-pub type LoopbackDurableObjectClass = JsValue;
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = Fetcher , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type LoopbackServiceStub<T: ::wasm_bindgen::JsGeneric = Undefined>;
+}
+#[wasm_bindgen]
+extern "C" {
+    # [wasm_bindgen (extends = DurableObjectClass , extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type LoopbackDurableObjectClass<T: ::wasm_bindgen::JsGeneric = Undefined>;
+}
 #[wasm_bindgen]
 extern "C" {
     # [wasm_bindgen (extends = Object)]
@@ -15986,33 +16229,33 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WorkerStub;
     #[wasm_bindgen(method, js_name = "getEntrypoint")]
-    pub fn get_entrypoint<T: ::wasm_bindgen::JsGeneric>(this: &WorkerStub) -> JsValue;
+    pub fn get_entrypoint<T: ::wasm_bindgen::JsGeneric>(this: &WorkerStub) -> Fetcher<T>;
     #[wasm_bindgen(method, catch, js_name = "getEntrypoint")]
     pub fn try_get_entrypoint<T: ::wasm_bindgen::JsGeneric>(
         this: &WorkerStub,
-    ) -> Result<JsValue, JsValue>;
+    ) -> Result<Fetcher<T>, JsValue>;
     #[wasm_bindgen(method, js_name = "getEntrypoint")]
     pub fn get_entrypoint_with_name<T: ::wasm_bindgen::JsGeneric>(
         this: &WorkerStub,
         name: &str,
-    ) -> JsValue;
+    ) -> Fetcher<T>;
     #[wasm_bindgen(method, catch, js_name = "getEntrypoint")]
     pub fn try_get_entrypoint_with_name<T: ::wasm_bindgen::JsGeneric>(
         this: &WorkerStub,
         name: &str,
-    ) -> Result<JsValue, JsValue>;
+    ) -> Result<Fetcher<T>, JsValue>;
     #[wasm_bindgen(method, js_name = "getEntrypoint")]
     pub fn get_entrypoint_with_name_and_options<T: ::wasm_bindgen::JsGeneric>(
         this: &WorkerStub,
         name: &str,
         options: &WorkerStubEntrypointOptions,
-    ) -> JsValue;
+    ) -> Fetcher<T>;
     #[wasm_bindgen(method, catch, js_name = "getEntrypoint")]
     pub fn try_get_entrypoint_with_name_and_options<T: ::wasm_bindgen::JsGeneric>(
         this: &WorkerStub,
         name: &str,
         options: &WorkerStubEntrypointOptions,
-    ) -> Result<JsValue, JsValue>;
+    ) -> Result<Fetcher<T>, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {
@@ -16171,17 +16414,17 @@ extern "C" {
     #[wasm_bindgen(method, setter)]
     pub fn set_env(this: &WorkerLoaderWorkerCode, val: &JsValue);
     #[wasm_bindgen(method, getter, js_name = "globalOutbound")]
-    pub fn global_outbound(this: &WorkerLoaderWorkerCode) -> JsValue;
+    pub fn global_outbound(this: &WorkerLoaderWorkerCode) -> Option<Fetcher>;
     #[wasm_bindgen(method, setter, js_name = "globalOutbound")]
-    pub fn set_global_outbound(this: &WorkerLoaderWorkerCode, val: &JsValue);
+    pub fn set_global_outbound(this: &WorkerLoaderWorkerCode, val: &JsNullable<Fetcher>);
     #[wasm_bindgen(method, getter)]
-    pub fn tails(this: &WorkerLoaderWorkerCode) -> Option<Vec<JsValue>>;
+    pub fn tails(this: &WorkerLoaderWorkerCode) -> Option<Vec<Fetcher>>;
     #[wasm_bindgen(method, setter)]
-    pub fn set_tails(this: &WorkerLoaderWorkerCode, val: &[JsValue]);
+    pub fn set_tails(this: &WorkerLoaderWorkerCode, val: &[Fetcher]);
     #[wasm_bindgen(method, getter, js_name = "streamingTails")]
-    pub fn streaming_tails(this: &WorkerLoaderWorkerCode) -> Option<Vec<JsValue>>;
+    pub fn streaming_tails(this: &WorkerLoaderWorkerCode) -> Option<Vec<Fetcher>>;
     #[wasm_bindgen(method, setter, js_name = "streamingTails")]
-    pub fn set_streaming_tails(this: &WorkerLoaderWorkerCode, val: &[JsValue]);
+    pub fn set_streaming_tails(this: &WorkerLoaderWorkerCode, val: &[Fetcher]);
 }
 impl WorkerLoaderWorkerCode {
     pub fn new(
@@ -16219,15 +16462,15 @@ impl WorkerLoaderWorkerCodeBuilder {
         self.inner.set_env(val);
         self
     }
-    pub fn global_outbound(self, val: &JsValue) -> Self {
+    pub fn global_outbound(self, val: &JsNullable<Fetcher>) -> Self {
         self.inner.set_global_outbound(val);
         self
     }
-    pub fn tails(self, val: &[JsValue]) -> Self {
+    pub fn tails(self, val: &[Fetcher]) -> Self {
         self.inner.set_tails(val);
         self
     }
-    pub fn streaming_tails(self, val: &[JsValue]) -> Self {
+    pub fn streaming_tails(self, val: &[Fetcher]) -> Self {
         self.inner.set_streaming_tails(val);
         self
     }
@@ -17833,7 +18076,7 @@ impl AiTextGenerationToolOutput {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    pub fn new_function(id: &str, function: &Object) -> AiTextGenerationToolOutput {
+    pub fn new(id: &str, function: &Object) -> AiTextGenerationToolOutput {
         let inner: AiTextGenerationToolOutput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_type("function");
@@ -18817,17 +19060,17 @@ impl ResponsesFunctionTool {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    pub fn new_function(
+    pub fn new(
         name: &str,
         parameters: &JsNullable<Object>,
         strict: &JsNullable<Boolean>,
     ) -> ResponsesFunctionTool {
-        Self::builder_function(name, parameters, strict).build()
+        Self::builder(name, parameters, strict).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    pub fn builder_function(
+    pub fn builder(
         name: &str,
         parameters: &JsNullable<Object>,
         strict: &JsNullable<Boolean>,
@@ -18996,7 +19239,7 @@ impl ResponseContentReasoningText {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"reasoning_text\"`"]
-    pub fn new_reasoning_text(text: &str) -> ResponseContentReasoningText {
+    pub fn new(text: &str) -> ResponseContentReasoningText {
         let inner: ResponseContentReasoningText = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("reasoning_text");
@@ -19042,7 +19285,7 @@ impl ResponseCreatedEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.created\"`"]
-    pub fn new_responsecreated(response: &Response, sequence_number: f64) -> ResponseCreatedEvent {
+    pub fn new(response: &Response, sequence_number: f64) -> ResponseCreatedEvent {
         let inner: ResponseCreatedEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
         inner.set_sequence_number(sequence_number);
@@ -19078,28 +19321,19 @@ impl ResponseCustomToolCallOutput {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
-    pub fn new_custom_tool_call_output(
-        call_id: &str,
-        output: &str,
-    ) -> ResponseCustomToolCallOutput {
-        Self::builder_custom_tool_call_output(call_id, output).build()
+    pub fn new(call_id: &str, output: &str) -> ResponseCustomToolCallOutput {
+        Self::builder(call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
-    pub fn new_custom_tool_call_output_with_slice(
-        call_id: &str,
-        output: &[JsValue],
-    ) -> ResponseCustomToolCallOutput {
-        Self::builder_custom_tool_call_output_with_slice(call_id, output).build()
+    pub fn new_with_slice(call_id: &str, output: &[JsValue]) -> ResponseCustomToolCallOutput {
+        Self::builder_with_slice(call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
-    pub fn builder_custom_tool_call_output(
-        call_id: &str,
-        output: &str,
-    ) -> ResponseCustomToolCallOutputBuilder {
+    pub fn builder(call_id: &str, output: &str) -> ResponseCustomToolCallOutputBuilder {
         let inner: ResponseCustomToolCallOutput = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_call_id(call_id);
         inner.set_output(output);
@@ -19109,7 +19343,7 @@ impl ResponseCustomToolCallOutput {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"custom_tool_call_output\"`"]
-    pub fn builder_custom_tool_call_output_with_slice(
+    pub fn builder_with_slice(
         call_id: &str,
         output: &[JsValue],
     ) -> ResponseCustomToolCallOutputBuilder {
@@ -19184,7 +19418,7 @@ impl ResponseErrorEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"error\"`"]
-    pub fn new_error(
+    pub fn new(
         code: &JsNullable<JsString>,
         message: &str,
         param: &JsNullable<JsString>,
@@ -19221,7 +19455,7 @@ impl ResponseFailedEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.failed\"`"]
-    pub fn new_responsefailed(response: &Response, sequence_number: f64) -> ResponseFailedEvent {
+    pub fn new(response: &Response, sequence_number: f64) -> ResponseFailedEvent {
         let inner: ResponseFailedEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
         inner.set_sequence_number(sequence_number);
@@ -19243,7 +19477,7 @@ impl ResponseFormatText {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"text\"`"]
-    pub fn new_text() -> ResponseFormatText {
+    pub fn new() -> ResponseFormatText {
         let inner: ResponseFormatText = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("text");
         inner
@@ -19263,7 +19497,7 @@ impl ResponseFormatJSONObject {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"json_object\"`"]
-    pub fn new_json_object() -> ResponseFormatJSONObject {
+    pub fn new() -> ResponseFormatJSONObject {
         let inner: ResponseFormatJSONObject = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("json_object");
         inner
@@ -19301,16 +19535,13 @@ impl ResponseFormatTextJSONSchemaConfig {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"json_schema\"`"]
-    pub fn new_json_schema(name: &str, schema: &Object) -> ResponseFormatTextJSONSchemaConfig {
-        Self::builder_json_schema(name, schema).build()
+    pub fn new(name: &str, schema: &Object) -> ResponseFormatTextJSONSchemaConfig {
+        Self::builder(name, schema).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"json_schema\"`"]
-    pub fn builder_json_schema(
-        name: &str,
-        schema: &Object,
-    ) -> ResponseFormatTextJSONSchemaConfigBuilder {
+    pub fn builder(name: &str, schema: &Object) -> ResponseFormatTextJSONSchemaConfigBuilder {
         let inner: ResponseFormatTextJSONSchemaConfig =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
@@ -19365,7 +19596,7 @@ impl ResponseFunctionCallArgumentsDeltaEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.function_call_arguments.delta\"`"]
-    pub fn new_responsefunction_call_argumentsdelta(
+    pub fn new(
         delta: &str,
         item_id: &str,
         output_index: f64,
@@ -19415,7 +19646,7 @@ impl ResponseFunctionCallArgumentsDoneEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.function_call_arguments.done\"`"]
-    pub fn new_responsefunction_call_argumentsdone(
+    pub fn new(
         arguments: &str,
         item_id: &str,
         name: &str,
@@ -19471,21 +19702,13 @@ impl ResponseFunctionToolCall {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call\"`"]
-    pub fn new_function_call(
-        arguments: &str,
-        call_id: &str,
-        name: &str,
-    ) -> ResponseFunctionToolCall {
-        Self::builder_function_call(arguments, call_id, name).build()
+    pub fn new(arguments: &str, call_id: &str, name: &str) -> ResponseFunctionToolCall {
+        Self::builder(arguments, call_id, name).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call\"`"]
-    pub fn builder_function_call(
-        arguments: &str,
-        call_id: &str,
-        name: &str,
-    ) -> ResponseFunctionToolCallBuilder {
+    pub fn builder(arguments: &str, call_id: &str, name: &str) -> ResponseFunctionToolCallBuilder {
         let inner: ResponseFunctionToolCall = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_arguments(arguments);
         inner.set_call_id(call_id);
@@ -19559,27 +19782,23 @@ impl ResponseFunctionToolCallOutputItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn new_function_call_output(
-        id: &str,
-        call_id: &str,
-        output: &str,
-    ) -> ResponseFunctionToolCallOutputItem {
-        Self::builder_function_call_output(id, call_id, output).build()
+    pub fn new(id: &str, call_id: &str, output: &str) -> ResponseFunctionToolCallOutputItem {
+        Self::builder(id, call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn new_function_call_output_with_slice(
+    pub fn new_with_slice(
         id: &str,
         call_id: &str,
         output: &[JsValue],
     ) -> ResponseFunctionToolCallOutputItem {
-        Self::builder_function_call_output_with_slice(id, call_id, output).build()
+        Self::builder_with_slice(id, call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn builder_function_call_output(
+    pub fn builder(
         id: &str,
         call_id: &str,
         output: &str,
@@ -19595,7 +19814,7 @@ impl ResponseFunctionToolCallOutputItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn builder_function_call_output_with_slice(
+    pub fn builder_with_slice(
         id: &str,
         call_id: &str,
         output: &[JsValue],
@@ -19649,10 +19868,7 @@ impl ResponseIncompleteEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.incomplete\"`"]
-    pub fn new_responseincomplete(
-        response: &Response,
-        sequence_number: f64,
-    ) -> ResponseIncompleteEvent {
+    pub fn new(response: &Response, sequence_number: f64) -> ResponseIncompleteEvent {
         let inner: ResponseIncompleteEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
         inner.set_sequence_number(sequence_number);
@@ -19688,28 +19904,28 @@ impl ResponseInputImage {
     #[doc = ""]
     #[doc = " * `detail: \"low\"`"]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn new_low_input_image() -> ResponseInputImage {
-        Self::builder_low_input_image().build()
+    pub fn new_low() -> ResponseInputImage {
+        Self::builder_low().build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `detail: \"high\"`"]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn new_high_input_image() -> ResponseInputImage {
-        Self::builder_high_input_image().build()
+    pub fn new_high() -> ResponseInputImage {
+        Self::builder_high().build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `detail: \"auto\"`"]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn new_auto_input_image() -> ResponseInputImage {
-        Self::builder_auto_input_image().build()
+    pub fn new_auto() -> ResponseInputImage {
+        Self::builder_auto().build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `detail: \"low\"`"]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn builder_low_input_image() -> ResponseInputImageBuilder {
+    pub fn builder_low() -> ResponseInputImageBuilder {
         let inner: ResponseInputImage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_detail(DetailKind::Low);
         inner.set_type("input_image");
@@ -19719,7 +19935,7 @@ impl ResponseInputImage {
     #[doc = ""]
     #[doc = " * `detail: \"high\"`"]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn builder_high_input_image() -> ResponseInputImageBuilder {
+    pub fn builder_high() -> ResponseInputImageBuilder {
         let inner: ResponseInputImage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_detail(DetailKind::High);
         inner.set_type("input_image");
@@ -19729,7 +19945,7 @@ impl ResponseInputImage {
     #[doc = ""]
     #[doc = " * `detail: \"auto\"`"]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn builder_auto_input_image() -> ResponseInputImageBuilder {
+    pub fn builder_auto() -> ResponseInputImageBuilder {
         let inner: ResponseInputImage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_detail(DetailKind::Auto);
         inner.set_type("input_image");
@@ -19771,13 +19987,13 @@ impl ResponseInputImageContent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn new_input_image() -> ResponseInputImageContent {
-        Self::builder_input_image().build()
+    pub fn new() -> ResponseInputImageContent {
+        Self::builder().build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"input_image\"`"]
-    pub fn builder_input_image() -> ResponseInputImageContentBuilder {
+    pub fn builder() -> ResponseInputImageContentBuilder {
         let inner: ResponseInputImageContent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_type("input_image");
         ResponseInputImageContentBuilder { inner }
@@ -19835,28 +20051,22 @@ impl ResponseInputItemFunctionCallOutput {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn new_function_call_output(
-        call_id: &str,
-        output: &str,
-    ) -> ResponseInputItemFunctionCallOutput {
-        Self::builder_function_call_output(call_id, output).build()
+    pub fn new(call_id: &str, output: &str) -> ResponseInputItemFunctionCallOutput {
+        Self::builder(call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn new_function_call_output_with_slice(
+    pub fn new_with_slice(
         call_id: &str,
         output: &[JsValue],
     ) -> ResponseInputItemFunctionCallOutput {
-        Self::builder_function_call_output_with_slice(call_id, output).build()
+        Self::builder_with_slice(call_id, output).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn builder_function_call_output(
-        call_id: &str,
-        output: &str,
-    ) -> ResponseInputItemFunctionCallOutputBuilder {
+    pub fn builder(call_id: &str, output: &str) -> ResponseInputItemFunctionCallOutputBuilder {
         let inner: ResponseInputItemFunctionCallOutput =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_call_id(call_id);
@@ -19867,7 +20077,7 @@ impl ResponseInputItemFunctionCallOutput {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function_call_output\"`"]
-    pub fn builder_function_call_output_with_slice(
+    pub fn builder_with_slice(
         call_id: &str,
         output: &[JsValue],
     ) -> ResponseInputItemFunctionCallOutputBuilder {
@@ -20092,7 +20302,7 @@ impl ResponseInputText {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"input_text\"`"]
-    pub fn new_input_text(text: &str) -> ResponseInputText {
+    pub fn new(text: &str) -> ResponseInputText {
         let inner: ResponseInputText = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("input_text");
@@ -20117,7 +20327,7 @@ impl ResponseInputTextContent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"input_text\"`"]
-    pub fn new_input_text(text: &str) -> ResponseInputTextContent {
+    pub fn new(text: &str) -> ResponseInputTextContent {
         let inner: ResponseInputTextContent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("input_text");
@@ -20164,7 +20374,7 @@ impl ResponseOutputItemAddedEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.added\"`"]
-    pub fn new_responseoutput_itemadded(
+    pub fn new(
         item: &ResponseOutputMessage,
         output_index: f64,
         sequence_number: f64,
@@ -20179,7 +20389,7 @@ impl ResponseOutputItemAddedEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.added\"`"]
-    pub fn new_responseoutput_itemadded_with_response_function_tool_call(
+    pub fn new_with_response_function_tool_call(
         item: &ResponseFunctionToolCall,
         output_index: f64,
         sequence_number: f64,
@@ -20194,7 +20404,7 @@ impl ResponseOutputItemAddedEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.added\"`"]
-    pub fn new_responseoutput_itemadded_with_response_reasoning_item(
+    pub fn new_with_response_reasoning_item(
         item: &ResponseReasoningItem,
         output_index: f64,
         sequence_number: f64,
@@ -20243,7 +20453,7 @@ impl ResponseOutputItemDoneEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.done\"`"]
-    pub fn new_responseoutput_itemdone(
+    pub fn new(
         item: &ResponseOutputMessage,
         output_index: f64,
         sequence_number: f64,
@@ -20258,7 +20468,7 @@ impl ResponseOutputItemDoneEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.done\"`"]
-    pub fn new_responseoutput_itemdone_with_response_function_tool_call(
+    pub fn new_with_response_function_tool_call(
         item: &ResponseFunctionToolCall,
         output_index: f64,
         sequence_number: f64,
@@ -20273,7 +20483,7 @@ impl ResponseOutputItemDoneEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_item.done\"`"]
-    pub fn new_responseoutput_itemdone_with_response_reasoning_item(
+    pub fn new_with_response_reasoning_item(
         item: &ResponseReasoningItem,
         output_index: f64,
         sequence_number: f64,
@@ -20318,10 +20528,7 @@ impl ResponseOutputMessage {
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"in_progress\"`"]
     #[doc = " * `type: \"message\"`"]
-    pub fn new_assistant_in_progress_message(
-        id: &str,
-        content: &[JsValue],
-    ) -> ResponseOutputMessage {
+    pub fn new_in_progress(id: &str, content: &[JsValue]) -> ResponseOutputMessage {
         let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
@@ -20335,7 +20542,7 @@ impl ResponseOutputMessage {
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"completed\"`"]
     #[doc = " * `type: \"message\"`"]
-    pub fn new_assistant_completed_message(id: &str, content: &[JsValue]) -> ResponseOutputMessage {
+    pub fn new_completed(id: &str, content: &[JsValue]) -> ResponseOutputMessage {
         let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
@@ -20349,10 +20556,7 @@ impl ResponseOutputMessage {
     #[doc = " * `role: \"assistant\"`"]
     #[doc = " * `status: \"incomplete\"`"]
     #[doc = " * `type: \"message\"`"]
-    pub fn new_assistant_incomplete_message(
-        id: &str,
-        content: &[JsValue],
-    ) -> ResponseOutputMessage {
+    pub fn new_incomplete(id: &str, content: &[JsValue]) -> ResponseOutputMessage {
         let inner: ResponseOutputMessage = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_id(id);
         inner.set_content(content);
@@ -20380,7 +20584,7 @@ impl ResponseOutputRefusal {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"refusal\"`"]
-    pub fn new_refusal(refusal: &str) -> ResponseOutputRefusal {
+    pub fn new(refusal: &str) -> ResponseOutputRefusal {
         let inner: ResponseOutputRefusal = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_refusal(refusal);
         inner.set_type("refusal");
@@ -20409,13 +20613,13 @@ impl ResponseOutputText {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"output_text\"`"]
-    pub fn new_output_text(text: &str) -> ResponseOutputText {
-        Self::builder_output_text(text).build()
+    pub fn new(text: &str) -> ResponseOutputText {
+        Self::builder(text).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"output_text\"`"]
-    pub fn builder_output_text(text: &str) -> ResponseOutputTextBuilder {
+    pub fn builder(text: &str) -> ResponseOutputTextBuilder {
         let inner: ResponseOutputText = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("output_text");
@@ -20468,16 +20672,13 @@ impl ResponseReasoningItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"reasoning\"`"]
-    pub fn new_reasoning(
-        id: &str,
-        summary: &[ResponseReasoningSummaryItem],
-    ) -> ResponseReasoningItem {
-        Self::builder_reasoning(id, summary).build()
+    pub fn new(id: &str, summary: &[ResponseReasoningSummaryItem]) -> ResponseReasoningItem {
+        Self::builder(id, summary).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"reasoning\"`"]
-    pub fn builder_reasoning(
+    pub fn builder(
         id: &str,
         summary: &[ResponseReasoningSummaryItem],
     ) -> ResponseReasoningItemBuilder {
@@ -20526,7 +20727,7 @@ impl ResponseReasoningSummaryItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"summary_text\"`"]
-    pub fn new_summary_text(text: &str) -> ResponseReasoningSummaryItem {
+    pub fn new(text: &str) -> ResponseReasoningSummaryItem {
         let inner: ResponseReasoningSummaryItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("summary_text");
@@ -20551,7 +20752,7 @@ impl ResponseReasoningContentItem {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"reasoning_text\"`"]
-    pub fn new_reasoning_text(text: &str) -> ResponseReasoningContentItem {
+    pub fn new(text: &str) -> ResponseReasoningContentItem {
         let inner: ResponseReasoningContentItem = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_text(text);
         inner.set_type("reasoning_text");
@@ -20592,7 +20793,7 @@ impl ResponseReasoningTextDeltaEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.reasoning_text.delta\"`"]
-    pub fn new_responsereasoning_textdelta(
+    pub fn new(
         content_index: f64,
         delta: &str,
         item_id: &str,
@@ -20643,7 +20844,7 @@ impl ResponseReasoningTextDoneEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.reasoning_text.done\"`"]
-    pub fn new_responsereasoning_textdone(
+    pub fn new(
         content_index: f64,
         item_id: &str,
         output_index: f64,
@@ -20694,7 +20895,7 @@ impl ResponseRefusalDeltaEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.refusal.delta\"`"]
-    pub fn new_responserefusaldelta(
+    pub fn new(
         content_index: f64,
         delta: &str,
         item_id: &str,
@@ -20745,7 +20946,7 @@ impl ResponseRefusalDoneEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.refusal.done\"`"]
-    pub fn new_responserefusaldone(
+    pub fn new(
         content_index: f64,
         item_id: &str,
         output_index: f64,
@@ -20796,10 +20997,7 @@ impl ResponseCompletedEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.completed\"`"]
-    pub fn new_responsecompleted(
-        response: &Response,
-        sequence_number: f64,
-    ) -> ResponseCompletedEvent {
+    pub fn new(response: &Response, sequence_number: f64) -> ResponseCompletedEvent {
         let inner: ResponseCompletedEvent = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_response(response);
         inner.set_sequence_number(sequence_number);
@@ -20907,7 +21105,7 @@ impl ResponseTextDeltaEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_text.delta\"`"]
-    pub fn new_responseoutput_textdelta(
+    pub fn new(
         content_index: f64,
         delta: &str,
         item_id: &str,
@@ -20964,7 +21162,7 @@ impl ResponseTextDoneEvent {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"response.output_text.done\"`"]
-    pub fn new_responseoutput_textdone(
+    pub fn new(
         content_index: f64,
         item_id: &str,
         logprobs: &[Logprob],
@@ -21111,7 +21309,7 @@ impl ToolChoiceFunction {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `type: \"function\"`"]
-    pub fn new_function(name: &str) -> ToolChoiceFunction {
+    pub fn new(name: &str) -> ToolChoiceFunction {
         let inner: ToolChoiceFunction = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name(name);
         inner.set_type("function");
@@ -29719,15 +29917,15 @@ impl Ai_Cf_Deepgram_Flux_Input {
     #[doc = " * `encoding: \"linear16\"` - Encoding of the audio stream. Currently only supports raw signed little-endian 16-bit PCM."]
     #[doc = ""]
     #[doc = " * `sample_rate` - Sample rate of the audio stream in Hz."]
-    pub fn new_linear16(sample_rate: &str) -> Ai_Cf_Deepgram_Flux_Input {
-        Self::builder_linear16(sample_rate).build()
+    pub fn new(sample_rate: &str) -> Ai_Cf_Deepgram_Flux_Input {
+        Self::builder(sample_rate).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `encoding: \"linear16\"` - Encoding of the audio stream. Currently only supports raw signed little-endian 16-bit PCM."]
     #[doc = ""]
     #[doc = " * `sample_rate` - Sample rate of the audio stream in Hz."]
-    pub fn builder_linear16(sample_rate: &str) -> Ai_Cf_Deepgram_Flux_InputBuilder {
+    pub fn builder(sample_rate: &str) -> Ai_Cf_Deepgram_Flux_InputBuilder {
         let inner: Ai_Cf_Deepgram_Flux_Input = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_encoding("linear16");
         inner.set_sample_rate(sample_rate);
@@ -32367,7 +32565,7 @@ impl AutoRagAiSearchRequestStreaming {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `stream: true`"]
-    pub fn new_true() -> AutoRagAiSearchRequestStreaming {
+    pub fn new() -> AutoRagAiSearchRequestStreaming {
         let inner: AutoRagAiSearchRequestStreaming = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_stream(true);
         inner
@@ -32403,7 +32601,7 @@ impl AutoRagSearchResponse {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `object: \"vector_store.search_results.page\"`"]
-    pub fn new_vector_storesearch_resultspage(
+    pub fn new(
         search_query: &str,
         data: &[Object],
         has_more: bool,
@@ -34666,7 +34864,7 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
     #[doc = " * `cert_not_after` - The effective expiration date of the certificate"]
     #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
-    pub fn new_1_1(
+    pub fn new_1(
         cert_verified: CertVerificationStatus,
         cert_issuer_dn: &str,
         cert_subject_dn: &str,
@@ -34753,7 +34951,7 @@ impl IncomingRequestCfPropertiesTLSClientAuth {
     #[doc = " * `cert_not_after` - The effective expiration date of the certificate"]
     #[doc = ""]
     #[doc = " @example \"Dec 22 19:39:00 2018 GMT\""]
-    pub fn new_1_0(
+    pub fn new_0(
         cert_verified: CertVerificationStatus,
         cert_issuer_dn: &str,
         cert_subject_dn: &str,
@@ -34938,7 +35136,7 @@ impl IncomingRequestCfPropertiesTLSClientAuthPlaceholder {
     #[doc = " * `certFingerprintSHA256: \"\"`"]
     #[doc = " * `certNotBefore: \"\"`"]
     #[doc = " * `certNotAfter: \"\"`"]
-    pub fn new_0_none_0______________() -> IncomingRequestCfPropertiesTLSClientAuthPlaceholder {
+    pub fn new() -> IncomingRequestCfPropertiesTLSClientAuthPlaceholder {
         let inner: IncomingRequestCfPropertiesTLSClientAuthPlaceholder =
             JsCast::unchecked_into(js_sys::Object::new());
         inner.set_cert_presented("0");
@@ -35390,13 +35588,13 @@ impl D1Response {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `success: true`"]
-    pub fn new_true(meta: &JsValue) -> D1Response {
-        Self::builder_true(meta).build()
+    pub fn new(meta: &JsValue) -> D1Response {
+        Self::builder(meta).build()
     }
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `success: true`"]
-    pub fn builder_true(meta: &JsValue) -> D1ResponseBuilder {
+    pub fn builder(meta: &JsValue) -> D1ResponseBuilder {
         let inner: D1Response = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_success(true);
         inner.set_meta(meta);
@@ -35668,7 +35866,7 @@ impl D1PreparedStatementOptions {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `columnNames: true`"]
-    pub fn new_true() -> D1PreparedStatementOptions {
+    pub fn new() -> D1PreparedStatementOptions {
         let inner: D1PreparedStatementOptions = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_column_names(true);
         inner
@@ -35733,28 +35931,7 @@ impl EmailSendResult {
 }
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = Object)]
-    #[derive(Debug, Clone, PartialEq, Eq)]
-    pub type EmailMessage;
-    #[doc = " Envelope From attribute of the email message."]
-    #[wasm_bindgen(method, getter)]
-    pub fn from(this: &EmailMessage) -> String;
-    #[doc = " Envelope To attribute of the email message."]
-    #[wasm_bindgen(method, getter)]
-    pub fn to(this: &EmailMessage) -> String;
-}
-impl EmailMessage {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> EmailMessage {
-        #[allow(unused_unsafe)]
-        unsafe {
-            JsValue::from(js_sys::Object::new()).unchecked_into()
-        }
-    }
-}
-#[wasm_bindgen]
-extern "C" {
-    # [wasm_bindgen (extends = EmailMessage , extends = Object)]
+    # [wasm_bindgen (extends = cloudflare :: email :: EmailMessage , extends = Object)]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type ForwardableEmailMessage;
     #[doc = " Stream of the email message content."]
@@ -35834,7 +36011,7 @@ extern "C" {
     #[wasm_bindgen(method, catch)]
     pub async fn reply(
         this: &ForwardableEmailMessage,
-        message: &EmailMessage,
+        message: &cloudflare::email::EmailMessage,
     ) -> Result<EmailSendResult, JsValue>;
     #[doc = " Reply to the sender of this email message with a new EmailMessage object."]
     #[doc = ""]
@@ -35844,7 +36021,7 @@ extern "C" {
     #[wasm_bindgen(method, js_name = "reply")]
     pub fn reply_promise(
         this: &ForwardableEmailMessage,
-        message: &EmailMessage,
+        message: &cloudflare::email::EmailMessage,
     ) -> Promise<EmailSendResult>;
 }
 #[wasm_bindgen]
@@ -36041,10 +36218,15 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type SendEmail;
     #[wasm_bindgen(method, catch)]
-    pub async fn send(this: &SendEmail, message: &EmailMessage)
-        -> Result<EmailSendResult, JsValue>;
+    pub async fn send(
+        this: &SendEmail,
+        message: &cloudflare::email::EmailMessage,
+    ) -> Result<EmailSendResult, JsValue>;
     #[wasm_bindgen(method, js_name = "send")]
-    pub fn send_promise(this: &SendEmail, message: &EmailMessage) -> Promise<EmailSendResult>;
+    pub fn send_promise(
+        this: &SendEmail,
+        message: &cloudflare::email::EmailMessage,
+    ) -> Promise<EmailSendResult>;
     #[wasm_bindgen(method, catch, js_name = "send")]
     pub async fn send_with_builder(
         this: &SendEmail,
@@ -36253,6 +36435,12 @@ pub mod cloudflare {
             ) -> Result<EmailMessage, JsValue>;
             #[wasm_bindgen(constructor, catch, js_name = "EmailMessage")]
             pub fn new_with_str(from: &str, to: &str, raw: &str) -> Result<EmailMessage, JsValue>;
+            #[doc = " Envelope From attribute of the email message."]
+            #[wasm_bindgen(method, getter)]
+            pub fn from(this: &EmailMessage) -> String;
+            #[doc = " Envelope To attribute of the email message."]
+            #[wasm_bindgen(method, getter)]
+            pub fn to(this: &EmailMessage) -> String;
         }
     }
     pub mod node {
@@ -41709,7 +41897,7 @@ impl InternalError {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"InternalError\"`"]
-    pub fn new_internal_error() -> InternalError {
+    pub fn new() -> InternalError {
         let inner: InternalError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("InternalError");
         inner
@@ -41729,7 +41917,7 @@ impl BadRequestError {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"BadRequestError\"`"]
-    pub fn new_bad_request_error() -> BadRequestError {
+    pub fn new() -> BadRequestError {
         let inner: BadRequestError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("BadRequestError");
         inner
@@ -41749,7 +41937,7 @@ impl NotFoundError {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"NotFoundError\"`"]
-    pub fn new_not_found_error() -> NotFoundError {
+    pub fn new() -> NotFoundError {
         let inner: NotFoundError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("NotFoundError");
         inner
@@ -41769,7 +41957,7 @@ impl ForbiddenError {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"ForbiddenError\"`"]
-    pub fn new_forbidden_error() -> ForbiddenError {
+    pub fn new() -> ForbiddenError {
         let inner: ForbiddenError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("ForbiddenError");
         inner
@@ -41789,7 +41977,7 @@ impl RateLimitedError {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"RateLimitedError\"`"]
-    pub fn new_rate_limited_error() -> RateLimitedError {
+    pub fn new() -> RateLimitedError {
         let inner: RateLimitedError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("RateLimitedError");
         inner
@@ -41809,7 +41997,7 @@ impl QuotaReachedError {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"QuotaReachedError\"`"]
-    pub fn new_quota_reached_error() -> QuotaReachedError {
+    pub fn new() -> QuotaReachedError {
         let inner: QuotaReachedError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("QuotaReachedError");
         inner
@@ -41829,7 +42017,7 @@ impl MaxFileSizeError {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"MaxFileSizeError\"`"]
-    pub fn new_max_file_size_error() -> MaxFileSizeError {
+    pub fn new() -> MaxFileSizeError {
         let inner: MaxFileSizeError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("MaxFileSizeError");
         inner
@@ -41849,7 +42037,7 @@ impl InvalidURLError {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"InvalidURLError\"`"]
-    pub fn new_invalid_url_error() -> InvalidURLError {
+    pub fn new() -> InvalidURLError {
         let inner: InvalidURLError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("InvalidURLError");
         inner
@@ -41869,7 +42057,7 @@ impl AlreadyUploadedError {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"AlreadyUploadedError\"`"]
-    pub fn new_already_uploaded_error() -> AlreadyUploadedError {
+    pub fn new() -> AlreadyUploadedError {
         let inner: AlreadyUploadedError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("AlreadyUploadedError");
         inner
@@ -41889,7 +42077,7 @@ impl TooManyWatermarksError {
     #[doc = " ## Inlined fields"]
     #[doc = ""]
     #[doc = " * `name: \"TooManyWatermarksError\"`"]
-    pub fn new_too_many_watermarks_error() -> TooManyWatermarksError {
+    pub fn new() -> TooManyWatermarksError {
         let inner: TooManyWatermarksError = JsCast::unchecked_into(js_sys::Object::new());
         inner.set_name("TooManyWatermarksError");
         inner
@@ -44151,7 +44339,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * If the Worker script does not exist in this dispatch namespace, an error will be thrown."]
     #[wasm_bindgen(method)]
-    pub fn get(this: &DispatchNamespace, name: &str) -> JsValue;
+    pub fn get(this: &DispatchNamespace, name: &str) -> Fetcher;
     #[doc = " * `name` - Name of the Worker script."]
     #[doc = " * `args` - Arguments to Worker script."]
     #[doc = " * `options` - Options for Dynamic Dispatch invocation."]
@@ -44162,7 +44350,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " * If the Worker script does not exist in this dispatch namespace, an error will be thrown."]
     #[wasm_bindgen(method, catch, js_name = "get")]
-    pub fn try_get(this: &DispatchNamespace, name: &str) -> Result<JsValue, JsValue>;
+    pub fn try_get(this: &DispatchNamespace, name: &str) -> Result<Fetcher, JsValue>;
     #[doc = " * `name` - Name of the Worker script."]
     #[doc = " * `args` - Arguments to Worker script."]
     #[doc = " * `options` - Options for Dynamic Dispatch invocation."]
@@ -44177,7 +44365,7 @@ extern "C" {
         this: &DispatchNamespace,
         name: &str,
         args: &DispatchNamespaceArgs,
-    ) -> JsValue;
+    ) -> Fetcher;
     #[doc = " * `name` - Name of the Worker script."]
     #[doc = " * `args` - Arguments to Worker script."]
     #[doc = " * `options` - Options for Dynamic Dispatch invocation."]
@@ -44192,7 +44380,7 @@ extern "C" {
         this: &DispatchNamespace,
         name: &str,
         args: &DispatchNamespaceArgs,
-    ) -> Result<JsValue, JsValue>;
+    ) -> Result<Fetcher, JsValue>;
     #[doc = " * `name` - Name of the Worker script."]
     #[doc = " * `args` - Arguments to Worker script."]
     #[doc = " * `options` - Options for Dynamic Dispatch invocation."]
@@ -44208,7 +44396,7 @@ extern "C" {
         name: &str,
         args: &DispatchNamespaceArgs,
         options: &DynamicDispatchOptions,
-    ) -> JsValue;
+    ) -> Fetcher;
     #[doc = " * `name` - Name of the Worker script."]
     #[doc = " * `args` - Arguments to Worker script."]
     #[doc = " * `options` - Options for Dynamic Dispatch invocation."]
@@ -44224,7 +44412,7 @@ extern "C" {
         name: &str,
         args: &DispatchNamespaceArgs,
         options: &DynamicDispatchOptions,
-    ) -> Result<JsValue, JsValue>;
+    ) -> Result<Fetcher, JsValue>;
 }
 #[wasm_bindgen]
 extern "C" {

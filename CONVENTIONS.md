@@ -718,6 +718,15 @@ EmailAttachment::new_attachment(content: &str, filename: &str, type_: &str)
 EmailAttachment::new_attachment_with_array_buffer(content: &ArrayBuffer, filename: &str, type_: &str)
 ```
 
+A required field whose type is a *single* literal (`certPresented:
+"0"`) offers no choice: the literal is baked into every factory, but
+the field does not contribute to the name — only fields with several
+options do. A dictionary whose required fields are all single literals
+therefore gets a plain `new()`. The branches of a discriminated union
+each pin one literal, but across branches the field is the choice, so
+it still names each branch's factory (`new_inline` / `new_attachment`
+above).
+
 A number literal is baked in as a float literal matching the `f64`
 setter, and names its factory with `.` and a leading `-` spelled out
 (`scale: -1 | 0.5` → `new_neg_1()` setting `-1.0`, `new_0_5()` setting
@@ -967,6 +976,12 @@ writing, and a property typed differently across branches carries the
 intersection of those types, which is bounded at codegen (see
 [Intersections take their most specific member](#intersections-take-their-most-specific-member)).
 
+A parenthesised union of literals as a part — `R2Objects`' `& ({
+truncated: true; cursor: string } | { truncated: false })` — merges
+like a [union of inline literals](#union-of-inline-literals): `cursor`
+becomes optional. Members declared alongside win over the union's
+narrowing, so `truncated` keeps the explicit `boolean`.
+
 Every parent must be something an interface could `extends`. A type
 parameter (`T & { id: string }`) or an alias to a non-object type
 (`type Id = string`) leaves the intersection unhoisted, to be bounded
@@ -976,10 +991,15 @@ refuses too. A generic alias whose target mentions its own type
 parameters (`type Branded<T> = T & { … }`, `type Same<T> = T`,
 `type Of<T> = Provider<T>`) is refused, since its arguments are not
 substituted into the target. Imported and `--external` names have no local binding and
-are allowed through. A parent that erases at codegen (a conditional
-type, or a name that never resolves and is reported) is dropped from
-`extends` rather than replaced, so the first real parent stays the
-`Deref` target; the literal's own members survive either way. A generic first parent is
+are allowed through. A part that only narrows in TS (a conditional
+or indexed-access type, or a union other than of literals, see
+below; parenthesised or not) has no structural reading and is dropped
+with a warning, and `object` / `unknown` add
+nothing, so `(T extends X ? … : unknown) & { fetch(): … }` is still an
+interface with `fetch`. A parent that erases at codegen (a name that
+never resolves and is reported) is dropped from `extends` rather than
+replaced, so the first real parent stays the `Deref` target; the
+literal's own members survive either way. A generic first parent is
 spelled bare in `extends`, which wasm-bindgen reads as
 `Parent<JsValue>`; the type still derives `Eq` (see
 [Type-level generics](#type-level-generics-propagate-to-every-binding-site)).
@@ -1218,6 +1238,30 @@ and statics the same way. A global or namespace variable with no
 interface of its name is a value of the constructor interface's type,
 which stays an interface.
 
+A variable typed by an inline object literal is a class even without a
+same-named interface when the literal has constructor shape (a `new`
+signature or a `prototype` member). The construct signature's return
+type then describes the instance: an inline literal supplies the
+instance members, a named type becomes the parent:
+
+```ts
+declare const WebSocketPair: { new (): { 0: WebSocket; 1: WebSocket } };
+declare const TcpSocket: { new (address: string): Socket };
+```
+
+```rust
+pub type WebSocketPair;
+pub fn new() -> Result<WebSocketPair, JsValue>;
+#[wasm_bindgen(method, getter, js_name = "0")]
+pub fn _0(this: &WebSocketPair) -> WebSocket;
+
+#[wasm_bindgen(extends = Socket, extends = Object)]
+pub type TcpSocket;
+```
+
+A same-named interface in another file replaces that instance, as it
+does within one file.
+
 A construct signature on any other object type (`interface Factory {
 new (): Widget }`, or an inline `{ new (): T }` parameter type) is the
 type of a constructor *value*, not a constructor of that type. It is
@@ -1270,6 +1314,22 @@ nesting](#module-declarations-and-namespace-nesting) for the
 
 The `export { _EmailMessage as EmailMessage }` rename gives the class its
 public name; see [Type aliases and `export { X as Y }`](#type-aliases-and-export--x-as-y-).
+
+Upstream pairs this with a **global** `interface EmailMessage { … }`
+holding the instance shape (the constructor's return type names it).
+The two collapse into the one module-scoped class: the interface's
+members (and `extends`) move onto the class, the interface is dropped,
+and every reference to `EmailMessage` — `ForwardableEmailMessage
+extends EmailMessage`, `reply(message: EmailMessage)` — resolves to the
+class. A global reference is therefore a reference into
+`cloudflare:email` (`cloudflare::email::EmailMessage`), like any other
+[module-context declaration](#module-declarations-and-namespace-nesting).
+The interface is the one the construct signature's return type resolves
+to from the module, so another module's own `EmailMessage` is untouched.
+The collapse runs once every file's declarations have merged, so neither
+file nor declaration order matters. The interface of a class exported
+under its own name (`export let Email: { new (): Email }`) is not
+collapsed.
 
 ### Constructor variables named by a type alias
 

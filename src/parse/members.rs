@@ -359,6 +359,12 @@ pub(crate) enum InlineShape<'a, 'b> {
     Intersection {
         parents: Vec<&'a TSType<'b>>,
         literals: Vec<&'a TSTypeLiteral<'b>>,
+        /// `({ … } | { … })` parts, each joined into one set of members.
+        unions: Vec<Vec<&'a TSTypeLiteral<'b>>>,
+        /// Parts that only narrow in TS (a conditional or indexed-access
+        /// type, a union not of literals) and have no structural reading;
+        /// dropped with a warning.
+        dropped: Vec<&'static str>,
     },
 }
 
@@ -369,27 +375,38 @@ pub(crate) enum InlineShape<'a, 'b> {
 pub(crate) fn inline_shape<'a, 'b>(ts_type: &'a TSType<'b>) -> Option<InlineShape<'a, 'b>> {
     match ts_type {
         TSType::TSTypeLiteral(literal) => Some(InlineShape::Literal(literal)),
-        TSType::TSUnionType(union) if all_type_literals(&union.types) => Some(InlineShape::Union(
-            union
-                .types
-                .iter()
-                .filter_map(|t| match t {
-                    TSType::TSTypeLiteral(lit) => Some(&**lit),
-                    _ => None,
-                })
-                .collect(),
-        )),
+        TSType::TSUnionType(union) if all_type_literals(&union.types) => {
+            Some(InlineShape::Union(type_literals(&union.types)))
+        }
         TSType::TSIntersectionType(inter) => {
             let mut parents = Vec::new();
             let mut literals = Vec::new();
+            let mut unions = Vec::new();
+            let mut dropped = Vec::new();
             for t in &inter.types {
+                let t = t.without_parenthesized();
                 match t {
                     TSType::TSTypeLiteral(lit) => literals.push(&**lit),
                     TSType::TSTypeReference(_) => parents.push(t),
+                    TSType::TSUnionType(union) if all_type_literals(&union.types) => {
+                        unions.push(type_literals(&union.types))
+                    }
+                    TSType::TSObjectKeyword(_) | TSType::TSUnknownKeyword(_) => {}
+                    TSType::TSConditionalType(_) => dropped.push("conditional type"),
+                    TSType::TSUnionType(_) => dropped.push("union"),
+                    TSType::TSIndexedAccessType(_) => dropped.push("indexed access type"),
                     _ => return None,
                 }
             }
-            Some(InlineShape::Intersection { parents, literals })
+            if parents.is_empty() && literals.is_empty() && unions.is_empty() {
+                return None;
+            }
+            Some(InlineShape::Intersection {
+                parents,
+                literals,
+                unions,
+                dropped,
+            })
         }
         _ => None,
     }
@@ -416,10 +433,15 @@ pub(crate) fn synthesize_inline(
     ctx: &mut ParseCtx<'_, '_>,
 ) -> Option<SynthesizedInline> {
     let body_scope = create_body_scope(&type_params, parent_scope, ctx);
-    let (literals, mode, extends) = match shape {
-        InlineShape::Literal(lit) => (vec![*lit], MergeMode::Join, Vec::new()),
-        InlineShape::Union(lits) => (lits.clone(), MergeMode::Join, Vec::new()),
-        InlineShape::Intersection { parents, literals } => {
+    let (literals, mode, extends, unions) = match shape {
+        InlineShape::Literal(lit) => (vec![*lit], MergeMode::Join, Vec::new(), &[][..]),
+        InlineShape::Union(lits) => (lits.clone(), MergeMode::Join, Vec::new(), &[][..]),
+        InlineShape::Intersection {
+            parents,
+            literals,
+            unions,
+            dropped,
+        } => {
             let mut extends: Vec<TypeRef> = Vec::new();
             for parent in parents {
                 let converted = convert_ts_type_scoped(parent, body_scope, ctx);
@@ -443,7 +465,17 @@ pub(crate) fn synthesize_inline(
                     _ => return None,
                 }
             }
-            (literals.clone(), MergeMode::Meet, extends)
+            for kind in dropped {
+                ctx.diag.warn(format!(
+                    "Intersection `{name}`: dropping a {kind} part (no structural reading)"
+                ));
+            }
+            (
+                literals.clone(),
+                MergeMode::Meet,
+                extends,
+                unions.as_slice(),
+            )
         }
     };
     let branches: Vec<Vec<Member>> = literals
@@ -455,7 +487,26 @@ pub(crate) fn synthesize_inline(
                 .collect()
         })
         .collect();
-    let members = merge_member_branches(&branches, mode);
+    let mut members = merge_member_branches(&branches, mode);
+    if !unions.is_empty() {
+        // Members declared alongside win over a union part's narrowing
+        // (`truncated: boolean` over `true` / `false`).
+        let mut union_members = Vec::new();
+        for union in unions {
+            let union_branches: Vec<Vec<Member>> = union
+                .iter()
+                .map(|lit| {
+                    lit.members
+                        .iter()
+                        .flat_map(|sig| convert_ts_signature(sig, Some(&name), body_scope, ctx))
+                        .collect()
+                })
+                .collect();
+            union_members.extend(merge_member_branches(&union_branches, MergeMode::Join));
+        }
+        crate::parse::merge_members(&mut union_members, members);
+        members = union_members;
+    }
     let classification = crate::parse::classify::classify_interface(&members);
     Some(SynthesizedInline {
         iface: InterfaceDecl {
@@ -566,7 +617,8 @@ fn try_synthesize_inline_param(
     ctx: &mut ParseCtx<'_, '_>,
 ) -> Option<TypeRef> {
     let shape = inline_shape(ts_type)?;
-    if matches!(&shape, InlineShape::Intersection { literals, .. } if literals.is_empty()) {
+    if matches!(&shape, InlineShape::Intersection { literals, unions, .. } if literals.is_empty() && unions.is_empty())
+    {
         return None;
     }
     // Named before the body converts so hoists nested in it dedup against
@@ -584,6 +636,16 @@ fn try_synthesize_inline_param(
 /// signal for "this is an anonymous-interface union we can merge."
 fn all_type_literals(types: &[TSType<'_>]) -> bool {
     !types.is_empty() && types.iter().all(|t| matches!(t, TSType::TSTypeLiteral(_)))
+}
+
+fn type_literals<'a, 'b>(types: &'a [TSType<'b>]) -> Vec<&'a TSTypeLiteral<'b>> {
+    types
+        .iter()
+        .filter_map(|t| match t {
+            TSType::TSTypeLiteral(lit) => Some(&**lit),
+            _ => None,
+        })
+        .collect()
 }
 
 /// Convert a `TSSignature` (interface body member) to our IR

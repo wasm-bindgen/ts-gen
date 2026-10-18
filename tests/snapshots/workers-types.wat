@@ -2539,6 +2539,20 @@
   ;; set encodeResponseBody(value: "automatic")
   (import "./bindings.wasm" "RequestInit.set_encode_response_body" (func $RequestInit.set_encode_response_body (param $this externref) (param $value externref)))
 
+  ;; Fetcher
+  ;; fetch(input: RequestInfo): Promise<Response>
+  (import "./bindings.wasm" "Fetcher.fetch" (func $Fetcher.fetch (param $this externref) (param $input externref) (result externref)))
+  ;; fetch(input: RequestInfo, init: RequestInit): Promise<Response>
+  (import "./bindings.wasm" "Fetcher.fetch_with_init" (func $Fetcher.fetch_with_init (param $this externref) (param $input externref) (param $init externref) (result externref)))
+  ;; connect(address: SocketAddress): Socket
+  (import "./bindings.wasm" "Fetcher.connect" (func $Fetcher.connect (param $this externref) (param $address externref) (result externref)))
+  ;; connect(address: string): Socket
+  (import "./bindings.wasm" "Fetcher.connect_with_str" (func $Fetcher.connect_with_str (param $this externref) (param $address externref) (result externref)))
+  ;; connect(address: SocketAddress, options: SocketOptions): Socket
+  (import "./bindings.wasm" "Fetcher.connect_with_socket_address_and_options" (func $Fetcher.connect_with_socket_address_and_options (param $this externref) (param $address externref) (param $options externref) (result externref)))
+  ;; connect(address: string, options: SocketOptions): Socket
+  (import "./bindings.wasm" "Fetcher.connect_with_str_and_options" (func $Fetcher.connect_with_str_and_options (param $this externref) (param $address externref) (param $options externref) (result externref)))
+
   ;; KVNamespaceListKey
   ;; {} as KVNamespaceListKey
   (import "./bindings.wasm" "KVNamespaceListKey.new" (func $KVNamespaceListKey.new (result externref)))
@@ -3146,6 +3160,26 @@
   (import "./bindings.wasm" "R2HTTPMetadata.cache_expiry" (func $R2HTTPMetadata.cache_expiry (param $this externref) (result externref)))
   ;; set cacheExpiry(value: Date)
   (import "./bindings.wasm" "R2HTTPMetadata.set_cache_expiry" (func $R2HTTPMetadata.set_cache_expiry (param $this externref) (param $value externref)))
+
+  ;; R2Objects
+  ;; {} as R2Objects
+  (import "./bindings.wasm" "R2Objects.new" (func $R2Objects.new (result externref)))
+  ;; truncated: true | false
+  (import "./bindings.wasm" "R2Objects.truncated" (func $R2Objects.truncated (param $this externref) (result externref)))
+  ;; set truncated(value: true)
+  (import "./bindings.wasm" "R2Objects.set_truncated" (func $R2Objects.set_truncated (param $this externref) (param $value i32)))
+  ;; cursor?: string
+  (import "./bindings.wasm" "R2Objects.cursor" (func $R2Objects.cursor (param $this externref) (result externref)))
+  ;; set cursor(value: string)
+  (import "./bindings.wasm" "R2Objects.set_cursor" (func $R2Objects.set_cursor (param $this externref) (param $value externref)))
+  ;; objects: R2Object[]
+  (import "./bindings.wasm" "R2Objects.objects" (func $R2Objects.objects (param $this externref) (result externref)))
+  ;; set objects(value: R2Object[])
+  (import "./bindings.wasm" "R2Objects.set_objects" (func $R2Objects.set_objects (param $this externref) (param $value externref)))
+  ;; delimitedPrefixes: string[]
+  (import "./bindings.wasm" "R2Objects.delimited_prefixes" (func $R2Objects.delimited_prefixes (param $this externref) (result externref)))
+  ;; set delimitedPrefixes(value: string[])
+  (import "./bindings.wasm" "R2Objects.set_delimited_prefixes" (func $R2Objects.set_delimited_prefixes (param $this externref) (param $value externref)))
 
   ;; R2UploadPartOptions
   ;; {} as R2UploadPartOptions
@@ -4215,8 +4249,17 @@
   ;; set allowHalfOpen(value: boolean)
   (import "./bindings.wasm" "WebSocketAcceptOptions.set_allow_half_open" (func $WebSocketAcceptOptions.set_allow_half_open (param $this externref) (param $value i32)))
 
-  ;; const WebSocketPair: object
-  (import "./bindings.wasm" "WebSocketPair" (func $WebSocketPair (result externref)))
+  ;; WebSocketPair
+  ;; constructor()
+  (import "./bindings.wasm" "WebSocketPair.new" (func $WebSocketPair.new (result externref)))
+  ;; 0: WebSocket
+  (import "./bindings.wasm" "WebSocketPair.0" (func $WebSocketPair.0 (param $this externref) (result externref)))
+  ;; set 0(value: WebSocket)
+  (import "./bindings.wasm" "WebSocketPair.set_0" (func $WebSocketPair.set_0 (param $this externref) (param $value externref)))
+  ;; 1: WebSocket
+  (import "./bindings.wasm" "WebSocketPair.1" (func $WebSocketPair.1 (param $this externref) (result externref)))
+  ;; set 1(value: WebSocket)
+  (import "./bindings.wasm" "WebSocketPair.set_1" (func $WebSocketPair.set_1 (param $this externref) (param $value externref)))
 
   ;; SqlStorage
   ;; exec(query: string, ...bindings: any[]): SqlStorageCursor<T>
@@ -11126,14 +11169,6 @@
   ;; set messageId(value: string)
   (import "./bindings.wasm" "EmailSendResult.set_message_id" (func $EmailSendResult.set_message_id (param $this externref) (param $value externref)))
 
-  ;; EmailMessage
-  ;; {} as EmailMessage
-  (import "./bindings.wasm" "EmailMessage.new" (func $EmailMessage.new (result externref)))
-  ;; from: string
-  (import "./bindings.wasm" "EmailMessage.from" (func $EmailMessage.from (param $this externref) (result externref)))
-  ;; to: string
-  (import "./bindings.wasm" "EmailMessage.to" (func $EmailMessage.to (param $this externref) (result externref)))
-
   ;; ForwardableEmailMessage
   ;; raw: ReadableStream<Uint8Array>
   (import "./bindings.wasm" "ForwardableEmailMessage.raw" (func $ForwardableEmailMessage.raw (param $this externref) (result externref)))
@@ -11231,6 +11266,10 @@
   (import "cloudflare:email" "EmailMessage.new" (func $cloudflare:email:EmailMessage.new (param $from externref) (param $to externref) (param $raw externref) (result externref)))
   ;; constructor(from: string, to: string, raw: string)
   (import "cloudflare:email" "EmailMessage.new_with_str" (func $cloudflare:email:EmailMessage.new_with_str (param $from externref) (param $to externref) (param $raw externref) (result externref)))
+  ;; from: string
+  (import "cloudflare:email" "EmailMessage.from" (func $cloudflare:email:EmailMessage.from (param $this externref) (result externref)))
+  ;; to: string
+  (import "cloudflare:email" "EmailMessage.to" (func $cloudflare:email:EmailMessage.to (param $this externref) (result externref)))
 
   ;; HelloWorldBinding
   ;; get(): Promise<object>
